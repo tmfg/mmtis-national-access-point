@@ -659,7 +659,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:address-postal "Postal address"
   :address-postal-street "Street address or P.O. Box"
   :business-id-and-aux-names "Company name and auxiliary names"
-  :business-name "Business name"
+  :business-or-aux-name "Business name or auxiliary name"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
   :contact-details-other "Other contact details "
@@ -674,7 +674,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
   :help-desc-2 (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
   :help-merge-company-names "You have previously created one or more NAP service providers whose names do not correspond to the business names or auxiliary names registered for the business ID. \nPlease select the NAP service provider name which you want to replace using a name fetched from YTJ registry"
-  :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
+  :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing on the form below."
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   :help-ytj-integration-desc "The service provider information is received from the Business Information System (BIS) on the basis of the Business ID. If the information is incorrect or incomplete, you can make changes to it in the _BIS service_. Changes made in the BIS service (e.g. changing the street address or registering a new auxiliary trade name) will appear on this page after they are registered in the BIS register."

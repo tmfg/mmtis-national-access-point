@@ -172,7 +172,7 @@
       {:name :heading2
        :label (tr [:organization-page (if ytj-company-names-found?
                                         :business-id-and-aux-names
-                                        :business-name)])
+                                        :business-or-aux-name)])
        :type :text-label
        :h-style :h3
        :full-width? true}
@@ -372,33 +372,38 @@
   {:name->label (tr-key [:field-labels])
    :update! #(e! (to/->EditTransportOperatorState %))
    :footer-fn (fn [data]
-                [:div {:style style-form/action-control-section-margin}
+                [:div
                  [:div
-                  (when show-actions?
-                    [buttons/save {:id "btn-operator-save"
-                                   :on-click #(e! (to/->SaveTransportOperator))
-                                   :disabled (or (get-in state [:transport-operator :business-id-exists?])
+                  [:p
+                   (tr [:common-texts :nap-data-license])
+                   [ui-common/linkify (tr [:common-texts :nap-data-license-url]) (tr [:common-texts :nap-data-license-url-label]) {:target "_blank"}] "."]]
+                 [:div {:style style-form/action-control-section-margin}
+                  [:div
+                   (when show-actions?
+                     [buttons/save {:id "btn-operator-save"
+                                    :on-click #(e! (to/->SaveTransportOperator))
+                                    :disabled (or (get-in state [:transport-operator :business-id-exists?])
                                                   (form/disable-save? data))}
-                     (tr [:buttons :save])])
+                      (tr [:buttons :save])])
 
-                  [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
-                   (tr [:buttons :cancel])]]
+                   [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
+                    (tr [:buttons :cancel])]]
 
-                 (when (and show-actions? (empty? (:ytj-company-names state)))
-                   (when (not (get-in state [:transport-operator :new?]))
-                     [:div
-                      [:br]
-                      [ui/divider]
-                      [:br]
-                      [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
-                      [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
-                      [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
-                                     :disabled (if (and
-                                                     (empty? (:transport-service-vector state))
-                                                     (::t-operator/id data))
-                                                 false
-                                                 true)}
-                       (tr [:buttons :delete-operator])]]))])})
+                  (when (and show-actions? (empty? (:ytj-company-names state)))
+                    (when (not (get-in state [:transport-operator :new?]))
+                      [:div
+                       [:br]
+                       [ui/divider]
+                       [:br]
+                       [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
+                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
+                       [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
+                                      :disabled (if (and
+                                                      (empty? (:transport-service-vector state))
+                                                      (::t-operator/id data))
+                                                  false
+                                                  true)}
+                        (tr [:buttons :delete-operator])]]))]])})
 
 (defn operator [e! {operator :transport-operator :as state}]
   (let [creating? (nil? (get-in state [:params :id]))
@@ -421,11 +426,14 @@
                    :organization-form-title)])]]]
      [:div
       [info/info-toggle (tr [:common-texts :instructions] true)
-       [:div
-        [:div (tr [:organization-page :help-ytj-integration-desc])]
-        [:div (tr [:organization-page :help-desc-1])]
-        [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
-        [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]]]
+       (if ytj-supported?
+         [:div
+          [:div (tr [:organization-page :help-ytj-integration-desc])]
+          [:div (tr [:organization-page :help-desc-1])]
+          [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
+          [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]
+         [:div
+          [:div (tr [:organization-page :basic-info-tooltip])]])]]
 
      ;; When business-id has multiple companies create list of delete-operator dialogs. Otherwise add only one
      (if (empty? (:ytj-company-names state))
