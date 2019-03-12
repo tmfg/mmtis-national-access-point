@@ -336,8 +336,13 @@
     (testing "first change matches first-week-difference return value"
      (is (= (-> fwd-difference (get "Raimola") :different-week) (-> diff-pairs first :different-week))))
 
-    (testing "first change matches first-week-difference return value"
-      (is (= (-> fwd-difference (get "Esala") :different-week) (->> diff-pairs (filterv #(and (:different-week %) (= "Esala" (:route-key %)))) ))))
+    (testing "second route's first change date is ok"
+      (is (= (d 2019 2 25)
+             (first
+              (for [dp diff-pairs
+                    :let [d (-> dp :different-week :beginning-of-week)]
+                    :when (= "Esala" (:route-key dp))]
+                d)))))
 ))
 
 
