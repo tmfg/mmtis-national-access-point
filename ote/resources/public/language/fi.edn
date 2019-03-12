@@ -1331,7 +1331,15 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
   :other-company " muuta yritystä"
   :show-all-information "Näytä kaikki tiedot"
-  :back-link "Takaisin liikkumispalvelukatalogiin"}
+  :back-link "Takaisin liikkumispalvelukatalogiin"
+  :service-information "Palvelun tiedot"
+  :service-api&format "Palvelun rajapinnat ja formaatit"
+  :description "Kuvaus"
+  :type "Tyyppi"
+  :transport-type "Liikennemuoto"
+  :homepage "Verkko-osoite"
+  :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
+
 
  :login
  {:label "Kirjaudu palveluun"
