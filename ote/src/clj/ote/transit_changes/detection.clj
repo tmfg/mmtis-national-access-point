@@ -762,57 +762,59 @@
              (when changes
                (str " has changes")))))
 
-(defn store-transit-changes! [db today service-id package-ids {:keys [all-routes route-changes]}]
-  (let [type (db-route-detection-type db service-id)
-        route-change-infos (map (fn [[route-key detection-result]]
-                                  (transform-route-change all-routes route-key detection-result))
-                                route-changes)
-        change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
-        earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
-                                                   ;; Remove change-date from the route-changes-infos list if it is nil or it is in the past
-                                                   (or (nil? change-date)
-                                                       (date-in-the-past? (.toLocalDate change-date))))
-                                                 (sort-by :gtfs/change-date route-change-infos)))
-        ;; Set change date to future (1 week) if it is nil or it is too far in the future
-        new-change-date (if (or
-                              (nil? (:gtfs/change-date earliest-route-change))
-                              (.isAfter (.toLocalDate (:gtfs/change-date earliest-route-change)) (.plusDays (java.time.LocalDate/now) 30)))
-                          (sql-date (.plusDays (java.time.LocalDate/now) 7))
-                          (:gtfs/change-date earliest-route-change))]
-    #_(debug-print-change-stats all-routes route-changes type)
-    (tx/with-transaction db
-                         (specql/upsert! db :gtfs/transit-changes
-                                         #{:gtfs/transport-service-id :gtfs/date}
-                                         {:gtfs/transport-service-id service-id
+(defn- update-route-changes! [db analysis-date service-id route-change-infos]
+  {:pre [(some? analysis-date)
+         (pos-int? service-id)]}
+  ;; Previous detected route change rows deleted because design is, there can be one analysis run per day per service
+  ;; and count or details of route change rows per analysis round might differ.
+  (specql/delete! db :gtfs/detected-route-change
+                  {:gtfs/transit-change-date analysis-date
+                   :gtfs/transit-service-id service-id})
+  (doseq [r route-change-infos]
+    (specql/insert! db :gtfs/detected-route-change
+                    (merge {:gtfs/transit-change-date analysis-date
+                            :gtfs/transit-service-id service-id
+                            :gtfs/created-date (java.util.Date.)}
+                           r))))
 
-                                          :gtfs/date today
-                                          :gtfs/change-date new-change-date
-                                          :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
-                                          :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
+(defn update-transit-changes! [db analysis-date service-id package-ids {:keys [all-routes route-changes]}]
+  {:pre [(some? analysis-date)
+         (pos-int? service-id)
+         (pos-int? (count package-ids))]}
+  (tx/with-transaction
+    db
+    (let [route-change-infos (map (fn [[route-key detection-result]]
+                                    (transform-route-change all-routes route-key detection-result))
+                                  route-changes)
+          change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
+          earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
+                                                     ;; Remove change-date from the route-changes-infos list if it is nil or it is in the past
+                                                     (or (nil? change-date)
+                                                         (date-in-the-past? (.toLocalDate change-date))))
+                                                   (sort-by :gtfs/change-date route-change-infos)))
+          ;; Set change date to future (1 week) if it is nil or it is too far in the future
+          new-change-date (if (or
+                                (nil? (:gtfs/change-date earliest-route-change))
+                                (.isAfter (.toLocalDate (:gtfs/change-date earliest-route-change)) (.plusDays (java.time.LocalDate/now) 30)))
+                            (sql-date (.plusDays (java.time.LocalDate/now) 7))
+                            (:gtfs/change-date earliest-route-change))
+          transit-chg-res (specql/upsert! db :gtfs/transit-changes
+                                          #{:gtfs/transport-service-id :gtfs/date}
+                                          {:gtfs/transport-service-id service-id
+                                           :gtfs/date analysis-date
+                                           :gtfs/change-date new-change-date
+                                           :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
+                                           :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
 
-                                          :gtfs/removed-routes (:removed change-count-by-type 0)
-                                          :gtfs/added-routes (:added change-count-by-type 0)
-                                          :gtfs/changed-routes (:changed change-count-by-type 0)
-                                          :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
+                                           :gtfs/removed-routes (:removed change-count-by-type 0)
+                                           :gtfs/added-routes (:added change-count-by-type 0)
+                                           :gtfs/changed-routes (:changed change-count-by-type 0)
+                                           :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
 
-                                          :gtfs/package-ids package-ids
-                                          :gtfs/created (java.util.Date.)})
-                         (doseq [r route-change-infos]
-                           (let [update-count (specql/update! db :gtfs/detected-route-change
-                                                              (merge {:gtfs/transit-change-date (sql-date today)
-                                                                      :gtfs/transit-service-id service-id
-                                                                      :gtfs/created-date (java.util.Date.)}
-                                                                     r)
-                                                              {:gtfs/transit-change-date (sql-date today)
-                                                               :gtfs/transit-service-id service-id
-                                                               :gtfs/route-hash-id (:gtfs/route-hash-id r)})]
+                                           :gtfs/package-ids package-ids
+                                           :gtfs/created (java.util.Date.)})]
 
-                             (when (not= 1 update-count)
-                               (specql/insert! db :gtfs/detected-route-change
-                                               (merge {:gtfs/transit-change-date (sql-date today)
-                                                       :gtfs/transit-service-id service-id
-                                                       :gtfs/created-date (java.util.Date.)}
-                                                      r))))))))
+      (update-route-changes! db (sql-date analysis-date) service-id route-change-infos))))
 
 (defn override-static-holidays [date-route-hashes]
   (map (fn [{:keys [date] :as row}]
