@@ -247,10 +247,16 @@
     (testing "got two changes"
       (is (= 2 (count diff-pairs))))
     (testing "first change is detected"
-      (is (= (d 2019 2 18) (-> diff-pairs first :different-week :beginning-of-week))))
+      (is (= (d 2019 2 18) (-> diff-pairs
+                               first
+                               :different-week
+                               :beginning-of-week))))
 
     (testing "second change is detected"
-      (is (= old-diff-pairs (:different-week (first diff-pairs)))))))
+      (is (= (d 2019 3 4) (-> diff-pairs
+                              second
+                              :different-week
+                              :beginning-of-week))))))
 
 
 (def data-two-week-two-route-change                         ;This is the same format as the (combine-weeks) function
