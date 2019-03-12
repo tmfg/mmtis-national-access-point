@@ -31,74 +31,49 @@
                                :position      "relative"
                                :overflow      "hidden"})
 
-(def result-card-new {:box-shadow "1px 1px 10px 0 hsla(0, 0%, 86%, .5)"
-                      :background-color "#fff"
-                      :margin-top "1.5rem"
-                      :border (str "1px solid " colors/gray550)
-                      ::stylefy/sub-styles {:header {:align-items "center"
-                                                     :background-color "#fff"
-                                                     :border-bottom (str "1px solid " colors/gray550)
-                                                     :display "flex"
-                                                     :justify-content "space-between"
-                                                     :padding "1rem"
-                                                     ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                      {:flex-direction "column"
-                                                                       :align-items "flex-start"
-                                                                       :padding "0 0.7rem 0.7rem 0.7rem"}}}
-                                            :body {:padding "1rem"
-                                                   :display "flex"
-                                                   ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                    {:padding "1rem 0.7rem 0 0.7rem"
-                                                                     :flex-direction "column"}}}
-                                            :foot {:display "flex"
-                                                   :justify-content "space-between"
-                                                   :padding "0 1rem 1rem 1rem"
-                                                   ::stylefy/media {{:max-width (str width-sm "px")}
-                                                                    {:flex-direction "column"
-                                                                     :align-items "flex-start"}
-                                                                    {:max-width (str width-xxs "px")}
-                                                                    {:padding "0 0.7rem 0.7rem 0.7rem"}}}}})
-
-(def result-card {:margin-top "20px"
+(def result-card {:box-shadow "1px 1px 10px 0 hsla(0, 0%, 86%, .5)"
                   :background-color "#fff"
-                  :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
-
-(def result-card-title {:display "flex"
-                        :flex-flow "row nowrap"
-                        :justify-content "space-between"
-                        :padding-bottom "15px" ;; Only bottom is required, other "air" comes from the margins in the children
-                        :color "#fff"
-                        :background-color "#06c"
-                        ::stylefy/media {{:max-width (str width-xxs "px")} {:flex-flow "row wrap"}}
-                        ::stylefy/sub-styles {:title {:font-size "1.125em"
-                                                      :font-weight "700"
-                                                      :max-width "65%"
-                                                      :white-space "pre-line"
-                                                      :word-break "break-all"
-                                                      :hyphens "auto"
-                                                      :margin "20px 20px 0 0" ;; We define proper margins here in case of row wrapping
-                                                      ::stylefy/vendors ["webkit" "moz" "ms"]
-                                                      ::stylefy/auto-prefix #{:hyphens}
-                                                      ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                       {:max-width "100%"}}}
-                                              :actions {:display "flex"
-                                                        :position "relative"
-                                                        :top "-10px"
-                                                        :flex-flow "row nowrap"
-                                                        :margin-left "20px"
-                                                        :min-width "200px"
-                                                        :margin "20px 20px 0 20px" ;; We define proper margins here in case of row wrapping
-                                                        ::stylefy/media {{:max-width (str width-xxs "px")}
-                                                                         {:margin-left "auto"}}}}})
-
-(def result-card-header {:font-size "1em"
-                         :color "#323232"
-                         :font-weight "700"})
-
-(def result-card-body {:padding-top "20px"
-                       :padding-bottom "20px"
-                       :font-size "1em"
-                       :color     "#444444"})
+                  :margin-top "1.5rem"
+                  :border (str "1px solid " colors/gray550)
+                  :border-top (str "4px solid " colors/gray750)
+                  ::stylefy/sub-styles {:header {:align-items "center"
+                                                 :background-color "#fff"
+                                                 :border-bottom (str "1px solid " colors/gray550)
+                                                 :display "flex"
+                                                 :justify-content "space-between"
+                                                 :padding "1rem"
+                                                 ::stylefy/media {{:max-width (str width-md "px")}
+                                                                  {:padding "0.7rem"}
+                                                                  {:max-width (str width-xxs "px")}
+                                                                  {:flex-direction "column"
+                                                                   :align-items "flex-start"}}}
+                                        :sub-header {:margin 0
+                                                     ::stylefy/media {{:max-width (str width-md "px")}
+                                                                      {:margin "0 0 0.5rem 0"}}}
+                                        :body {:padding "1rem"
+                                               :display "flex"
+                                               ::stylefy/media {{:max-width (str width-md "px")}
+                                                                {:padding "1rem 0.7rem 0 0.7rem"
+                                                                 :flex-direction "column"}}}
+                                        :body-left {:flex 1
+                                                    ::stylefy/media {{:max-width (str width-md "px")}
+                                                                     {:padding-bottom "1rem"}}}
+                                        :body-right {:flex 1
+                                                     :padding-left "1.5rem"
+                                                     :padding-bottom "1rem"
+                                                     ::stylefy/media {{:max-width (str width-md "px")}
+                                                                      {:padding-left 0
+                                                                       :padding-bottom "0.7rem"}}}
+                                        :info-row {:border-bottom (str "1px solid " colors/gray350)
+                                                   :display "flex"
+                                                   :margin-bottom "0.5rem"
+                                                   :font-size "0.875rem"}
+                                        :info-title {:flex 1
+                                                     :word-break "break-all"}
+                                        :info-content {:flex 2}
+                                        :foot {:padding "0 1rem 1rem 1rem"
+                                               ::stylefy/media {{:max-width (str width-md "px")}
+                                                                {:padding "0 0.7rem 0.7rem 0.7rem"}}}}})
 
 (def simple-result-card-row {:padding-top "3px"})
 
