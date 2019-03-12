@@ -130,6 +130,9 @@ SELECT eid."transport-service-id" as id
 -- Find services by operation area names
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-       "places" pl
- WHERE ST_INTERSECTS(ST_SetSRID(oa.location, 4326), pl.location)
+       "places" pl,
+       "transport-service" ts
+ WHERE ts.published IS NOT NULL
+   AND ts.id = oa."transport-service-id"
+   AND ST_INTERSECTS(ST_SetSRID(oa.location, 4326), pl.location)
    AND pl.namefin IN (:operation-area);
