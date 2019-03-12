@@ -328,21 +328,17 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found-w-2-routes
-  (let [diff-pairs (-> no-traffic
+  (let [diff-pairs (-> data-two-week-two-route-change
                        (detection/changes-by-week->changes-by-route)
                        (detection/detect-changes-for-all-routes))
 
-        ;(detection/routes-changed-weeks (first (detection/changes-by-week->changes-by-route seppo)))
-        fwd-difference (detection/route-weeks-with-first-difference no-traffic)
-        ;; diff-pairs (detection/routes-changed-weeks data-two-week-two-route-change)
-        ;; fwd-difference (detection/first-week-difference data-two-week-two-route-change)
-        ]
-    ;;(testing "first change matches first-week-difference return value"
-    ;;  (is (= (-> fwd-difference vals) (-> diff-pairs first vals))))
-
+        fwd-difference (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
+    (testing "first change matches first-week-difference return value"
+     (is (= (-> fwd-difference (get "Raimola") :different-week) (-> diff-pairs first :different-week))))
 
     (testing "first change matches first-week-difference return value"
-      (is (= fwd-difference diff-pairs)))))
+      (is (= (-> fwd-difference (get "Esala") :different-week) (->> diff-pairs (filterv #(and (:different-week %) (= "Esala" (:route-key %)))) ))))
+))
 
 
 (deftest no-change-found
@@ -470,3 +466,4 @@
 
     (testing "second change date is correct"
       (is (= (d 2019 6 3) (-> diff-pairs second :different-week :beginning-of-week))))))
+
