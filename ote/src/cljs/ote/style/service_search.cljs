@@ -69,6 +69,7 @@
                                                    :margin-bottom "0.5rem"
                                                    :font-size "0.875rem"}
                                         :info-title {:flex 1
+                                                     :color colors/gray800
                                                      :word-break "break-all"}
                                         :info-content {:flex 2}
                                         :foot {:padding "0 1rem 1rem 1rem"
