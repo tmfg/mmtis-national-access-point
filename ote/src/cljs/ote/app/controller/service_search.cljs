@@ -45,7 +45,7 @@
                        :as filters}]
   (merge
    (when-not (empty? oa)
-     {:operation_area  (str/join "," (map :text oa))})
+     {:operation_area  (str/join "," (map :value oa))})
    (when-not (empty? (get operators :chip-results))
      {:operators (str/join "," (map :business-id (get operators :chip-results)))})
    (when text

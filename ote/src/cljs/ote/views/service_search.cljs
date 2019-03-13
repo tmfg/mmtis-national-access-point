@@ -26,7 +26,8 @@
             [ote.util.text :as text]
             [ote.ui.page :as page]
             [ote.app.utils :as utils]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.format :as format]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -273,6 +274,23 @@
 
 (def transport-types [:road :rail :sea :aviation])
 
+(defn- operation-area-searchbox [e! operation-area-filter-completions]
+  (let [suggestions (mapv (fn [s] {:text (format/postal-code-at-end s) :value s}) operation-area-filter-completions)]
+    {:name ::t-service/operation-area
+     :type :chip-input
+     :container-class "col-xs-12 col-sm-4 col-md-4"
+     :hint-text (tr [:service-search :operation-area-search-placeholder])
+     :filter (constantly true)
+     :hint-style {:top "20px"}
+     :full-width? true
+     :full-width-input? false
+     :suggestions-config {:text :text :value :value}
+     :suggestions suggestions
+     :max-results 10
+     :auto-select? true
+     :should-update-check form/always-update
+     :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}))
+
 (defn filters-form [e! {filters :filters
                         facets  :facets
                         operation-area-filter-completions :operation-area-filter-completions}]
@@ -358,20 +376,7 @@
             :layout :raw
             :card? false}
 
-           {:name ::t-service/operation-area
-            :type :chip-input
-            :container-class "col-xs-12 col-sm-4 col-md-4"
-            :hint-text (tr [:service-search :operation-area-search-placeholder])
-            :filter (constantly true)
-            :hint-style {:top "20px"}
-            :full-width? true
-            :full-width-input? false
-            :suggestions-config {:text :text :value :text}
-            :suggestions operation-area-filter-completions
-            :max-results 10
-            :auto-select? true
-            :should-update-check form/always-update
-            :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}
+           (operation-area-searchbox e! operation-area-filter-completions)
 
            {:id "sub-types"
             :name ::t-service/sub-type
