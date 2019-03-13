@@ -1293,7 +1293,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :limit-search-results "Limit search results"
-  :participating-operator "Participates in providing of this service"
+  :participating-operator "participates in providing of this service"
   :released-apis "Interfaces published in the service"
   :no-description "No description has been given to the service yet."
   :service-basic-info "Basic info of the service"

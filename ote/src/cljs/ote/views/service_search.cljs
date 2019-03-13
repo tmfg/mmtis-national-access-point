@@ -78,11 +78,11 @@
                   (when (= "kalkati.net" format)
                     "&type=kalkati"))
              [:span
-              [ic/action-open-in-new {:style {:position "absolute" :top "-6px" :left "8px" :color "#06c" :padding-right "3px"}}]
+              [ic/action-open-in-new {:style {:position "absolute" :top "-4px" :left "8px" :color "#06c" :padding-right "3px"}}]
               [:span (tr [:service-search :view-routes])]]
              {:target "_blank"})
            [:span
-            [ic/alert-warning {:style {:position "absolute" :top "-7px" :left "8px" :color "#f80" :padding-right "3px"}}]
+            [ic/alert-warning {:style {:position "absolute" :top "-4px" :left "8px" :color "#f80" :padding-right "3px"}}]
             (tr [:service-search :view-routes-failure])])]))))
 
 (defn parse-content-value [value-array]
