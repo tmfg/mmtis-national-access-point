@@ -243,17 +243,16 @@
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
-        date2-trips (get-in transit-visualization [:compare :date2-trips])]
+        date2-trips (get-in transit-visualization [:compare :date2-trips])
+        loading (or (:route-trips-for-date1-loading? transit-visualization) ;; both trips should be loaded
+                    (:route-trips-for-date2-loading? transit-visualization))]
     (cond
-      (and (not (:route-trips-for-date1-loading? transit-visualization)) ;; both trips should be loaded
-           (not (:route-trips-for-date2-loading? transit-visualization))
-           (not (empty? date1-trips))
-           (not (empty? date2-trips)))
+      (and (not loading)
+           (not-empty date1-trips)
+           (not-empty date2-trips))
       (compare-stop-differences transit-visualization date1-trips date2-trips)
 
-      (and (not (:route-trips-for-date1-loading? transit-visualization)) ;; both trips should be loaded
-           (not (:route-trips-for-date2-loading? transit-visualization)))
-
+      (not loading)
       ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
       (-> transit-visualization
           (compare-stop-differences date1-trips date2-trips)
