@@ -1308,10 +1308,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-filters "Hae palveluita syöttämällä hakuehdot yllä"
   :type-search "Liikkumispalvelun tyyppi"
   :limit-search-results "Rajaa katalogia"
-  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :participating-operator "osallistuu tämän palvelun tuottamiseen."
   :released-apis "Palvelussa julkaistut rajapinnat"
   :service-basic-info "Palvelun perustiedot"
-  :no-description "Palvelulle ei ole vielä annettu kuvausta."
+  :no-description "Palvelulle ei ole annettu vielä kuvausta."
   :result-count ["Hakuehdoille "
                  (:plural :count
                    "ei löytynyt palveluita"
