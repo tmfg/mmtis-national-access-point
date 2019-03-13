@@ -82,6 +82,7 @@
     (assoc this ::stop
            (http/publish!
             http
+            {:authenticated? false}
             (routes
              (GET "/place-completions/:term" [term]
                   (http/transit-response
