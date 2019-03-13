@@ -1315,7 +1315,14 @@ You can also draw the operating area or point to the map with drawing tools. You
   :other-involved-companies "Other companies providing the service"
   :other-company " other company"
   :show-all-information "Show all information"
-  :back-link "Back to service catalog"}
+  :back-link "Back to service catalog"
+  :service-information "Service information"
+  :service-api&format "Service interfaces and formats"
+  :description "Description"
+  :type "Type"
+  :transport-type "Transport type"
+  :homepage "Homepage"
+  :no-homepage "No website has been entered in the service."}
 
  :login
  {:label "Login credentials"
