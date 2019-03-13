@@ -136,3 +136,14 @@ SELECT oa."transport-service-id" as id
    AND ts.id = oa."transport-service-id"
    AND ST_INTERSECTS(ST_SetSRID(oa.location, 4326), pl.location)
    AND pl.namefin IN (:operation-area);
+
+-- name: service-match-quality-to-operation-area
+-- Finds service's match quality to a given operation area
+SELECT oa."transport-service-id" as id,
+       ST_Area(ST_Intersection(ST_SetSRID(oa.location, 4326), pl.location)) as intersection,
+       ST_Area(pl.location) as "search-area-size"
+  FROM "operation_area" oa,
+       "places" pl
+ WHERE oa."transport-service-id" = :id
+   AND pl.namefin IN (:operation-area);
+

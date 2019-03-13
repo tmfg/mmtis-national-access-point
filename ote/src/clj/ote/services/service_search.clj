@@ -130,6 +130,20 @@
                 ::t-service/gtfs-db-error))
     ei-link))
 
+(defn- service-search-match-quality [db result operation-area]
+  (let [{match-area :intersection
+         search-area :search-area-size}
+        (first 
+         (service-match-quality-to-operation-area db {:id (::t-service/id result) :operation-area operation-area}))]
+    (/ (min match-area search-area) (max match-area search-area))))
+
+(defn- service-search-match-qualities [db results operation-area]
+  (if operation-area
+    (mapv #(assoc % :operation-area-match-quality
+                  (service-search-match-quality db % operation-area))
+          results)
+    results))
+
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(services-operating-in db operation-area)
@@ -168,13 +182,14 @@
                                          (.contains operators (::t-service/business-id company))))
                                      c)))
                   results)
+        results (service-search-match-qualities db results operation-area)
         results-without-personal-info (mapv
                                         (fn [result]
                                           (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
                                         results)]
     (merge
      {:empty-filters? empty-filters?
-      :results results-without-personal-info
+      :results (reverse (sort-by :operation-area-match-quality results-without-personal-info))
       :filter-service-count (count ids)}
      (when empty-filters?
        {:total-service-count (total-service-count db)
