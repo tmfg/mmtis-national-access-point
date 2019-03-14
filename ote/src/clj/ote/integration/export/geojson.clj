@@ -37,7 +37,8 @@
 
 (def ^{:doc "Transport operator columns to set as properties in GeoJSON export"}
   transport-operator-properties-columns
-  #{::t-operator/name ::t-operator/business-id ::t-operator/homepage ::t-operator/visiting-address
+  #{::t-operator/name ::t-operator/business-id ::t-operator/homepage
+    ;::t-operator/visiting-address Commented out because addresses are not currently in use
     ::t-operator/phone ::t-operator/gsm ::t-operator/email})
 
 (def ^{:doc "Transport service columns to set as properties in GeoJSON export"}
