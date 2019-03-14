@@ -662,7 +662,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :business-or-aux-name "Business name or auxiliary name"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
-  :contact-details-other "Other contact details "
+  ;:contact-details-other "Other contact details "
+  :contact-details-service-developers "Contact details for developers of services"
+  :contact-details-authorities "Contact details for authorities"
   :fetch-from-ytj "Fetch data from YTJ"
   :fetch-from-ytj-success "Details successfully fetched from the BIS register."
   :field-phone-mobile "Mobile phone"
@@ -688,6 +690,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :help-about-ytj-link "https://www.ytj.fi/en/index/whatisbis.html"
   :help-ytj-contact-change-link-desc "Change details of your business in the Business Information System (BIS)"
   :help-ytj-contact-change-link "https://www.ytj.fi/en/index/notifications/notificationsofchanges.html"
+  :help-contact-details "Please enter contact details, using which a developer of traffic services or other similar partner may contact your company or organization."
+  :help-contact-details-privacy "The details provided will be publicly available in NAP -transport catalogue. Please note this, if the contact details contain personal information."
+  :help-contact-details-auth (:md "Following contact details will be provided only for the use of authorities. **NOTE: Following details will not be published.**")
   :merge-operator-to-ytj "will be renamed as"
   }
 

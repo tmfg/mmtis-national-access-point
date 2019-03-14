@@ -668,7 +668,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :business-or-aux-name "Toiminimi tai aputoiminimi"
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
-  :contact-details-other "Muut yhteystiedot"
+  ;:contact-details-other "Muut yhteystiedot"
+  :contact-details-service-developers "Yhteystiedot palveluiden kehittäjille"
+  :contact-details-authorities "Yhteystiedot viranomaiselle"
   :fetch-from-ytj "Hae tiedot YTJ:stä"
   :fetch-from-ytj-success "Tiedot haettu onnistuneesti YTJ:stä."
   :field-phone-mobile "Matkapuhelin"
@@ -694,6 +696,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :help-about-ytj-link "https://www.ytj.fi/index/tietoapalvelusta.html"
   :help-ytj-contact-change-link-desc "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"
   :help-ytj-contact-change-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html"
+  :help-contact-details "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä."
+  :help-contact-details-privacy "Huomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja."
+  :help-contact-details-auth (:md "Alla olevat tiedot ovat viranomaiskäyttöön. **HUOM: tietoja ei julkaista.**")
   :merge-operator-to-ytj "korvataan nimellä"
   }
 

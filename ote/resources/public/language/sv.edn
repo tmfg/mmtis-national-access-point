@@ -669,7 +669,9 @@
   :business-id-and-aux-names "Företagsnamn och parallellnamn"
   :business-or-aux-name "Företagsnamn eller extra företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
-  :contact-details-other "Andra kontaktuppgifter"
+  ;:contact-details-other "Andra kontaktuppgifter"
+  :contact-details-service-developers "Yhteystiedot palveluiden kehittäjille"
+  :contact-details-authorities "Yhteystiedot viranomaiselle"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
   :fetch-from-ytj-success "Uppgifterna har hämtats från YTJ."
@@ -696,6 +698,9 @@
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
+  :help-contact-details "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä."
+  :help-contact-details-privacy "Huomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja."
+  :help-contact-details-auth (:md "Alla olevat tiedot ovat viranomaiskäyttöön. **HUOM: tietoja ei julkaista.**")
   :merge-operator-to-ytj "ersätts med namnet"
   }
 
