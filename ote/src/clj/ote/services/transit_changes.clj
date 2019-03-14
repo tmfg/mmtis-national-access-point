@@ -1,22 +1,24 @@
 (ns ote.services.transit-changes
-  (:require [ote.components.service :refer [define-service-component]]
-            [ote.components.http :as http]
-            [compojure.core :refer [GET POST]]
+  (:require [compojure.core :refer [GET POST]]
             [jeesql.core :refer [defqueries]]
-            [ote.time :as time]
             [clojure.string :as str]
             [clojure.set :as set]
+            [specql.core :as specql]
+            [taoensso.timbre :as log]
+            [clj-time.core :as t]
+
             [ote.util.db :refer [PgArray->vec]]
             [ote.db.places :as places]
-            [specql.core :as specql]
-            [ote.authorization :as authorization]
-            [ote.tasks.gtfs :as gtfs-tasks]
-            [taoensso.timbre :as log]
-            [ote.transit-changes.detection :as detection]
             [ote.db.transport-service :as t-service]
+
+            [ote.components.service :refer [define-service-component]]
+            [ote.components.http :as http]
             [ote.time :as time]
+            [ote.authorization :as authorization]
+
+            [ote.tasks.gtfs :as gtfs-tasks]
             [ote.integration.import.gtfs :as import]
-            [clj-time.core :as t]))
+            [ote.transit-changes.detection :as detection]))
 
 (defqueries "ote/services/transit_changes.sql")
 (defqueries "ote/integration/import/import_gtfs.sql")
@@ -111,26 +113,35 @@
          (http/transit-response (detection/hash-recalculations db))))
 
   ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
-  (GET "/transit-changes/hash-calculation/:scope/:future" [scope future :as {user :user}]
+  (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
     (when (authorization/admin? user)
+      ;; Start slow process in other thread
+      (future
+        (cond
+          (= scope "month")
+          (detection/calculate-monthly-date-hashes-for-packages
+            db (:user user) (= "true" is-future))
+          (= scope "day")
+          (detection/calculate-date-hashes-for-all-packages
+            db (:user user) (= "true" is-future))
+          (= scope "contract")
+          (detection/calculate-date-hashes-for-contract-traffic
+            db (:user user) (= "true" is-future))))
+      ;; But give thumbs up
       (http/transit-response
         {:status 200
-         :body (cond
-                     (= scope "month")
-                     (detection/calculate-monthly-date-hashes-for-packages
-                       db (:user user) (= "true" future))
-                     (= scope "day")
-                     (detection/calculate-date-hashes-for-all-packages
-                       db (:user user) (= "true" future))
-                     (= scope "contract")
-                     (detection/calculate-date-hashes-for-contract-traffic
-                       db (:user user) (= "true" future)))})))
+         :body "OK"})))
 
   ;; Calculate date-hashes for given service-id and package-count
   (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
     (when (authorization/admin? user)
-      (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
-      "OK"))
+      (do
+        ;; Calculate date hashes in other thread
+        (future
+          (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
+          ;; Detect changes for service
+          (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)]))
+        "OK")))
 
   ;; Calculate route-hash-id for given service-id and package-count
   (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
