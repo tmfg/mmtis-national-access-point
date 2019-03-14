@@ -4,6 +4,7 @@
             [ote.communication :as comm]
             [ote.util.csv :as csv-util]
             [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
             [ote.ui.form :as form]
             [ote.app.routes :as routes]
             [ote.time :as time]
@@ -15,6 +16,24 @@
             [clojure.string :as str]
             [testdouble.cljs.csv :as csv]
             [ote.ui.validation :as validation]))
+
+(defn contact-details-missing? [service]
+  (let [key (t-service/service-key-by-type (::t-service/type service))
+        service-sub-data (get service key)]
+    (if (or
+          ;; contact details are not missing if address is given
+          (and
+            (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/street])))
+            (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/post_office])))
+            (and
+              (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))
+              (nil? (validation/validate-rule :postal-code nil (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))))
+          ;; or if contact-email is given
+          (not (empty? (::t-service/contact-email service-sub-data)))
+          ;; or if contact-phone is given
+          (not (empty? (::t-service/contact-phone service-sub-data))))
+      false
+      true)))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
