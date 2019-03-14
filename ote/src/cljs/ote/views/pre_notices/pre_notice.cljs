@@ -6,7 +6,7 @@
             [ote.app.controller.pre-notices :as pre-notice]
             [ote.ui.buttons :as buttons]
             [ote.ui.form-fields :as form-fields]
-    ;; db
+
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
@@ -18,7 +18,8 @@
             [ote.ui.leaflet :as leaflet]
             [ote.ui.mui-chip-input :as chip-input]
             [clojure.string :as str]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.style.base :as sbase]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -69,79 +70,86 @@
      (tr [:dialog :send-pre-notice :confirm])]))
 
 (defn select-operator [e! operator operators]
-  [:div {:style {:margin-bottom "20px"}}
-   [:div.row
+  [:div  {:style {:margin-bottom "20px"}}
+
+   [:div (stylefy/use-style (sbase/flex-container "column"))
     [form-fields/field
-     {:label       (tr [:field-labels :select-transport-operator])
-      :name        :select-transport-operator
-      :type        :selection
+     {:label (tr [:field-labels :select-transport-operator])
+      :name :select-transport-operator
+      :type :selection
       :show-option ::t-operator/name
-      :update!     #(e! (pre-notice/->SelectOperatorForNotice %))
-      :options     operators
+      :update! #(e! (pre-notice/->SelectOperatorForNotice %))
+      :options operators
       :auto-width? true}
-     operator]]
-   [:div.row
-    [:div.col-xs-12.col-sm-12.col-md-8
-     [:div.col-xs-8.col-sm-6.col-md-6
-      [form-fields/field
-       {:label     (tr [:field-labels ::t-operator/business-id])
-        :name      ::t-operator/business-id
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::t-operator/business-id operator)]
+     operator]
+    [form-fields/field
+     {:label (tr [:field-labels ::t-operator/business-id])
+      :name ::t-operator/business-id
+      :type :string
+      :update! nil
+      :disabled? true}
+     (::t-operator/business-id operator)]]
 
-      [form-fields/field
-       {:label     (tr [:field-labels ::db-common/street])
-        :name      ::db-common/street
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::db-common/street (::t-operator/visiting-address operator))]
+   [:div (stylefy/use-style (sbase/flex-container "column"))
+    [:div (stylefy/use-style sbase/item-list-container)
+     ;[form-fields/field
+     ; {:label     (tr [:field-labels ::db-common/street])
+     ;  :name      ::db-common/street
+     ;  :type      :string
+     ;  :update!   nil
+     ;  :disabled? true}
+     ; (::db-common/street (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
 
+     ;[form-fields/field
+     ; {:label     (tr [:field-labels ::db-common/postal_code])
+     ;  :name      ::db-common/postal_code
+     ;  :type      :string
+     ;  :update!   nil
+     ;  :disabled? true}
+     ; (::db-common/postal_code (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
+
+     ;[form-fields/field
+     ; {:label     (tr [:field-labels ::db-common/post_office])
+     ;  :name      ::db-common/post_office
+     ;  :type      :string
+     ;  :update!   nil
+     ;  :disabled? true}
+     ; (::db-common/post_office (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
+
+     [:div (stylefy/use-style sbase/item-list-row-margin)
       [form-fields/field
-       {:label     (tr [:field-labels ::db-common/postal_code])
-        :name      ::db-common/postal_code
-        :type      :string
-        :update!   nil
+       {:label (tr [:field-labels ::t-operator/phone])
+        :name ::t-operator/phone
+        :type :string
+        :update! nil
         :disabled? true}
-       (::db-common/postal_code (::t-operator/visiting-address operator))]
+       (::t-operator/phone operator)]]
+
+     [form-fields/field
+      {:label (tr [:field-labels ::t-operator/gsm])
+       :name ::t-operator/gsm
+       :type :string
+       :update! nil
+       :disabled? true}
+      (::t-operator/gsm operator)]]
+
+    [:div (stylefy/use-style sbase/item-list-container)
+     [:div (stylefy/use-style sbase/item-list-row-margin)
       [form-fields/field
-       {:label     (tr [:field-labels ::db-common/post_office])
-        :name      ::db-common/post_office
-        :type      :string
-        :update!   nil
+       {:label (tr [:field-labels ::t-operator/homepage])
+        :name ::t-operator/business-id
+        :type :string
+        :update! nil
         :disabled? true}
-       (::db-common/post_office (::t-operator/visiting-address operator))]]
-     [:div.col-xs-8.col-sm-6.col-md-6
-      [form-fields/field
-       {:label     (tr [:field-labels ::t-operator/homepage])
-        :name      ::t-operator/business-id
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::t-operator/homepage operator)]
-      [form-fields/field
-       {:label     (tr [:field-labels ::t-operator/phone])
-        :name      ::t-operator/phone
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::t-operator/phone operator)]
-      [form-fields/field
-       {:label     (tr [:field-labels ::t-operator/gsm])
-        :name      ::t-operator/gsm
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::t-operator/gsm operator)]
-      [form-fields/field
-       {:label     (tr [:field-labels ::t-operator/email])
-        :name      ::t-operator/email
-        :type      :string
-        :update!   nil
-        :disabled? true}
-       (::t-operator/email operator)]]]]])
+       (::t-operator/homepage operator)]]
+
+     [form-fields/field
+      {:label (tr [:field-labels ::t-operator/email])
+       :name ::t-operator/email
+       :type :string
+       :update! nil
+       :disabled? true}
+      (::t-operator/email operator)]]]])
 
 (defn transport-type [e! {pre-notice :pre-notice :as app}]
   (let [addition [form-fields/field
