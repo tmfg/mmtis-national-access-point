@@ -81,17 +81,17 @@
                {:layout :row}))
 
 
-      {:element-id "heading-business-id-title"
+      {:type :text-label
+       :element-id "heading-business-id-title"
        :name :heading-business-id-title
        :label (tr [:organization-page :business-id-heading])
-       :type :text-label
        :full-width? true
        :h-style :h3}
 
-      {:name ::t-operator/business-id
+      {:type :string
+       :name ::t-operator/business-id
        :label ""
        :element-id "input-business-id"
-       :type :string
        :validate [[:business-id]]
        :required? true
        :warning (tr [:common-texts :required-field])
@@ -104,9 +104,9 @@
 
       (when ytj-supported?
         ;; Disabled when business-id is taken or if business-id is not valid or if loading is ongoing
-        {:element-id "btn-submit-business-id"
+        {:type :external-button
+         :element-id "btn-submit-business-id"
          :name ::t-operator/btn-submit-business-id
-         :type :external-button
          :label (tr [:organization-page :fetch-from-ytj])
          :primary true
          :secondary true
@@ -118,17 +118,17 @@
                      (ytj-loading? state))})
 
       (when ytj-supported?
-        {:name :loading-spinner-ytj
-         :type :loading-spinner
+        {:type :loading-spinner
+         :name :loading-spinner-ytj
          :display? (ytj-loading? state)})
 
       (when (and ytj-supported? ytj-response?)
         (if ytj-success?
-          {:name :ytj-result-msg
-           :type :result-msg-success
+          {:type :result-msg-success
+           :name :ytj-result-msg
            :content (tr [:organization-page :fetch-from-ytj-success])}
-          {:name :ytj-result-msg
-           :type :result-msg-warning
+          {:type :result-msg-warning
+           :name :ytj-result-msg
            :content (if (= 404 status)
                       (str (tr [:common-texts :data-not-found])
                            " " (tr [:common-texts :optionally-fill-manually]))
@@ -138,9 +138,9 @@
 
       ; label composition for existing business-id
       (when (get-in state [:transport-operator :business-id-exists?])
-        {:element-id "label-business-id-is-not-unique"
+        {:type :result-msg-warning
+         :element-id "label-business-id-is-not-unique"
          :name :business-id-is-not-unique
-         :type :result-msg-warning
          :content (tr [:common-texts :business-id-is-not-unique])}))))
 
 (defn- operator-form-groups [e! {operator :transport-operator :as state} creating? ytj-supported?]
@@ -158,35 +158,35 @@
        :card? false}
 
       (when ytj-supported?
-        {:name :heading1-divider
-         :type :divider})
+        {:type :divider
+         :name :heading1-divider})
       ;; Because user not allowed to edit business id himself,
       ;; business-id field is input in business-id-selection when creating, a read-only label here when only modifying.
       (when-not creating?
-        {:element-id "heading-business-id"
+        {:type :text-label
+         :element-id "heading-business-id"
          :name :heading-business-id
          :label (str (tr [:organization-page :business-id-heading]) " " (::t-operator/business-id operator))
-         :type :text-label
          :h-style :h2})
 
-      {:name :heading2
+      {:type :text-label
+       :name :heading2
        :label (tr [:organization-page (if ytj-company-names-found?
                                         :business-id-and-aux-names
                                         :business-or-aux-name)])
-       :type :text-label
        :h-style :h3
        :full-width? true}
 
       (when ytj-response-ok?
-        {:name          :help-checkbox-group
-         :type          :info-toggle
+        {:type          :info-toggle
+         :name          :help-checkbox-group
          :label         (tr [:common-texts :instructions])
          :body          [:div (tr [:organization-page :help-operator-edit-selection])]
          :default-state true})
 
       (if ytj-response-ok?                                      ;; Input field if not YTJ results, checkbox-group otherwise
-        {:name                :transport-operators-to-save
-         :type                :checkbox-group-with-delete
+        {:type                :checkbox-group-with-delete
+         :name                :transport-operators-to-save
          :show-option         ::t-operator/name
          :option-enabled?     #(nil? (::t-operator/id %))
          :options             ytj-company-names
@@ -196,17 +196,19 @@
                       (do
                         (e! (to/->ToggleListTransportOperatorDeleteDialog data))
                         (delete-operator e! data (:transport-operators-with-services state))))}
-        {:element-id "input-operator-name"
+        {:type       :string
+         :element-id "input-operator-name"
          :name       ::t-operator/name
          :label      ""
-         :type       :string
+
          :required?  true
          :style      style-fields/form-field})
 
       (when (and ytj-response-ok? (not ytj-company-names-found?))
-        {:name :msg-no-aux-names-for-business-id
+        {:type :text-label
+         :name :msg-no-aux-names-for-business-id
          :label (tr [:organization-page :no-aux-names-for-business-id])
-         :type :text-label
+
          :max-length 128})
 
       {:name       :msg-business-id-contact-details
@@ -218,8 +220,8 @@
        :h-style    :h3}
 
       (when ytj-response-ok?
-        {:name          :help-operator-contact-details
-         :type          :info-toggle
+        {:type          :info-toggle
+         :name          :help-operator-contact-details
          :label         (tr [:common-texts :instructions])
          :body          [:div
                          (tr [:organization-page :help-operator-contact-entry])
@@ -228,23 +230,24 @@
                           (tr [:organization-page :help-ytj-contact-change-link-desc])]]
          :default-state true})
 
-      {:name ::ote.db.transport-operator/visiting-address
-       :type :text-label
+      {:type :text-label
+       :name ::ote.db.transport-operator/visiting-address
        :style style-fields/form-field
        :h-style :h4}
 
-      {:element-id "input-operator-addrVisitStreet"
+      {:type :string
+       :element-id "input-operator-addrVisitStreet"
        :name ::common/street
-       :type :string
+
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp ::common/street ::t-operator/visiting-address)
        :write (fn [data street]
                 (assoc-in data [::t-operator/visiting-address ::common/street] street))}
 
-      {:element-id "input-operator-addrVisitPostalCode"
+      {:type :string
+       :element-id "input-operator-addrVisitPostalCode"
        :name ::common/postal_code
-       :type :string
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :regex #"\d{0,5}"
@@ -252,34 +255,35 @@
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
 
-      {:element-id "input-operator-addrVisitCity"
+      {:type :string
+       :element-id "input-operator-addrVisitCity"
        :name :ote.db.common/post_office
-       :type :string
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
 
-      {:name :heading-address-postal
+      {:type :text-label
+       :name :heading-address-postal
        :label (tr [:organization-page :address-postal])
-       :type :text-label
        :h-style :h4}
 
-      {:element-id "input-operator-addrBillingStreet"
+      {:type        :string
+       :element-id "input-operator-addrBillingStreet"
        :name        ::common/billing-street
        :label       (tr [:organization-page :address-postal-street])
-       :type        :string
+
        :disabled?   disable-ytj-address-billing?
        :style       style-fields/form-field
        :read        (comp ::common/street ::t-operator/billing-address)
        :write       (fn [data street]
                       (assoc-in data [::t-operator/billing-address ::common/street] street))}
 
-      {:element-id "input-operator-addrBillingPostalCode"
+      {:type :string
+       :element-id "input-operator-addrBillingPostalCode"
        :name ::common/billing-postal_code
        :label (tr [:field-labels :ote.db.common/postal_code])
-       :type :string
        :disabled? disable-ytj-address-billing?
        :style style-fields/form-field
        :regex #"\d{0,5}"
@@ -287,45 +291,46 @@
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/billing-address ::common/postal_code] postal-code))}
 
-      {:element-id "input-operator-addrBillingCity"
+      {:type :string
+       :element-id "input-operator-addrBillingCity"
        :name ::common/billing-post_office
        :label (tr [:field-labels :ote.db.common/post_office])
-       :type :string
        :disabled? disable-ytj-address-billing?
        :style style-fields/form-field
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/billing-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/billing-address :ote.db.common/post_office] post-office))}
 
-      {:name :heading-contact-details-other
+      {:type :text-label
+       :name :heading-contact-details-other
        :label (tr [:organization-page :contact-details-other])
-       :type :text-label
        :h-style :h4}
 
-      {:element-id "input-operator-telephone"
+      {:type :string
+       :element-id "input-operator-telephone"
        :name ::t-operator/phone
        :label (tr [:organization-page :field-phone-telephone] )
-       :type :string
        :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
-      {:element-id "input-operator-mobilePhone"
+      {:type :string
+       :element-id "input-operator-mobilePhone"
        :name ::t-operator/gsm
        :label (tr [:organization-page :field-phone-mobile] )
-       :type :string :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
+       :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
-      {:element-id "input-operator-email"
+      {:type :string
+       :element-id "input-operator-email"
        :name ::t-operator/email
-       :type :string
        :disabled? (get-in state [:ytj-flags :use-ytj-email?] false)
        :style style-fields/form-field}
 
-      {:element-id "input-operator-web"
+      {:type :string
+       :element-id "input-operator-web"
        :name ::t-operator/homepage
-       :type :string
        :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
        :style style-fields/form-field})))
 
