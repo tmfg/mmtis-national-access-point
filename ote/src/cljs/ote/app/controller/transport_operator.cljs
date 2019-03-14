@@ -182,9 +182,9 @@
   (let [t-op (:transport-operator app)
         ytj-business-id-hit? (= 200 (:status response))
         ytj-address-billing (address-of-type 1 (:addresses response))
-        use-ytj-addr-billing? ytj-business-id-hit?
+        use-ytj-addr-billing? false ;;ytj-business-id-hit? Commented out because addresses are not currently in use
         ytj-address-visiting (address-of-type 2 (:addresses response))
-        use-ytj-addr-visiting? ytj-business-id-hit?
+        use-ytj-addr-visiting? false ;;ytj-business-id-hit? Commented out because addresses are not currently in use
         ytj-contact-phone (preferred-ytj-field ["Puhelin" "Telefon" "Telephone"] (:contactDetails response))
         use-ytj-phone? (seq ytj-contact-phone)
         ytj-contact-gsm (preferred-ytj-field ["Matkapuhelin" "Mobiltelefon" "Mobile phone"] (:contactDetails response))

@@ -80,17 +80,9 @@
              (when ytj-supported?                           ;; Sets input and button on same row
                {:layout :row}))
 
-
-      {:type :text-label
-       :element-id "heading-business-id-title"
-       :name :heading-business-id-title
-       :label (tr [:organization-page :business-id-heading])
-       :full-width? true
-       :h-style :h3}
-
       {:type :string
        :name ::t-operator/business-id
-       :label ""
+       :label (tr [:organization-page :business-id-heading])
        :element-id "input-business-id"
        :validate [[:business-id]]
        :required? true
@@ -160,22 +152,33 @@
       (when ytj-supported?
         {:type :divider
          :name :heading1-divider})
+
+      (when-not ytj-supported?
+        {:type :string
+         :element-id "input-operator-name"
+         :name ::t-operator/name
+         :label (tr [:organization-page :business-or-aux-name])
+         :required? true
+         :style style-fields/form-field})
+
       ;; Because user not allowed to edit business id himself,
       ;; business-id field is input in business-id-selection when creating, a read-only label here when only modifying.
       (when-not creating?
-        {:type :text-label
-         :element-id "heading-business-id"
-         :name :heading-business-id
-         :label (str (tr [:organization-page :business-id-heading]) " " (::t-operator/business-id operator))
-         :h-style :h2})
+        {:type :string
+         :name ::t-operator/business-id
+         :label (tr [:organization-page :business-id-heading])
+         :element-id "field-business-id-editmode"
+         :disabled? true
+         :style  style-fields/form-field})
 
-      {:type :text-label
-       :name :heading2
-       :label (tr [:organization-page (if ytj-company-names-found?
-                                        :business-id-and-aux-names
-                                        :business-or-aux-name)])
-       :h-style :h3
-       :full-width? true}
+      (when ytj-response-ok?
+        {:type :text-label
+         :name :heading2
+         :label (tr [:organization-page (if ytj-company-names-found?
+                                          :business-id-and-aux-names
+                                          :business-or-aux-name)])
+         :h-style :h3
+         :full-width? true})
 
       (when ytj-response-ok?
         {:type          :info-toggle
@@ -184,7 +187,7 @@
          :body          [:div (tr [:organization-page :help-operator-edit-selection])]
          :default-state true})
 
-      (if ytj-response-ok?                                      ;; Input field if not YTJ results, checkbox-group otherwise
+      (when ytj-response-ok? ;; Input field if no YTJ results, checkbox-group otherwise
         {:type                :checkbox-group-with-delete
          :name                :transport-operators-to-save
          :show-option         ::t-operator/name
@@ -195,14 +198,7 @@
          :on-delete (fn [data]
                       (do
                         (e! (to/->ToggleListTransportOperatorDeleteDialog data))
-                        (delete-operator e! data (:transport-operators-with-services state))))}
-        {:type       :string
-         :element-id "input-operator-name"
-         :name       ::t-operator/name
-         :label      ""
-
-         :required?  true
-         :style      style-fields/form-field})
+                        (delete-operator e! data (:transport-operators-with-services state))))})
 
       (when (and ytj-response-ok? (not ytj-company-names-found?))
         {:type :text-label
@@ -211,11 +207,11 @@
 
          :max-length 128})
 
-      {:name       :msg-business-id-contact-details
+      {:type       :text-label
+       :name       :msg-business-id-contact-details
        :label      (if ytj-company-names-found?
                      (tr [:organization-page :contact-details-plural])
                      (tr [:organization-page :contact-details]))
-       :type       :text-label
        :max-length 128
        :h-style    :h3}
 
@@ -231,80 +227,18 @@
          :default-state true})
 
       {:type :text-label
-       :name ::ote.db.transport-operator/visiting-address
-       :style style-fields/form-field
-       :h-style :h4}
-
-      {:type :string
-       :element-id "input-operator-addrVisitStreet"
-       :name ::common/street
-
-       :disabled? disable-ytj-address-visiting?
-       :style style-fields/form-field
-       :read (comp ::common/street ::t-operator/visiting-address)
-       :write (fn [data street]
-                (assoc-in data [::t-operator/visiting-address ::common/street] street))}
-
-      {:type :string
-       :element-id "input-operator-addrVisitPostalCode"
-       :name ::common/postal_code
-       :disabled? disable-ytj-address-visiting?
-       :style style-fields/form-field
-       :regex #"\d{0,5}"
-       :read (comp ::common/postal_code ::t-operator/visiting-address)
-       :write (fn [data postal-code]
-                (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
-
-      {:type :string
-       :element-id "input-operator-addrVisitCity"
-       :name :ote.db.common/post_office
-       :disabled? disable-ytj-address-visiting?
-       :style style-fields/form-field
-       :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
-       :write (fn [data post-office]
-                (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
-
-      {:type :text-label
-       :name :heading-address-postal
-       :label (tr [:organization-page :address-postal])
-       :h-style :h4}
-
-      {:type        :string
-       :element-id "input-operator-addrBillingStreet"
-       :name        ::common/billing-street
-       :label       (tr [:organization-page :address-postal-street])
-
-       :disabled?   disable-ytj-address-billing?
-       :style       style-fields/form-field
-       :read        (comp ::common/street ::t-operator/billing-address)
-       :write       (fn [data street]
-                      (assoc-in data [::t-operator/billing-address ::common/street] street))}
-
-      {:type :string
-       :element-id "input-operator-addrBillingPostalCode"
-       :name ::common/billing-postal_code
-       :label (tr [:field-labels :ote.db.common/postal_code])
-       :disabled? disable-ytj-address-billing?
-       :style style-fields/form-field
-       :regex #"\d{0,5}"
-       :read (comp ::common/postal_code ::t-operator/billing-address)
-       :write (fn [data postal-code]
-                (assoc-in data [::t-operator/billing-address ::common/postal_code] postal-code))}
-
-      {:type :string
-       :element-id "input-operator-addrBillingCity"
-       :name ::common/billing-post_office
-       :label (tr [:field-labels :ote.db.common/post_office])
-       :disabled? disable-ytj-address-billing?
-       :style style-fields/form-field
-       :read (comp :ote.db.common/post_office :ote.db.transport-operator/billing-address)
-       :write (fn [data post-office]
-                (assoc-in data [:ote.db.transport-operator/billing-address :ote.db.common/post_office] post-office))}
-
-      {:type :text-label
        :name :heading-contact-details-other
-       :label (tr [:organization-page :contact-details-other])
-       :h-style :h4}
+       :label (tr [:organization-page :contact-details-service-developers])
+       :h-style :h3}
+
+      {:type :info-toggle
+       :name :help-operator-contact-details-service-developers
+       :label (tr [:common-texts :instructions])
+       :body [:div
+              [:p (tr [:organization-page :help-contact-details])]
+              [:p (tr [:organization-page :help-contact-details-privacy])]
+              [:p (tr [:common-texts :nap-data-license]) "\"" (tr [:common-texts :nap-data-license-url-label]) "\"."]]
+       :default-state true}
 
       {:type :string
        :element-id "input-operator-telephone"
@@ -332,7 +266,35 @@
        :element-id "input-operator-web"
        :name ::t-operator/homepage
        :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
-       :style style-fields/form-field})))
+       :style style-fields/form-field}
+
+      {:type :text-label
+       :name :heading-contact-details-authorities
+       :label (tr [:organization-page :contact-details-authorities])
+       :h-style :h3}
+
+      {:type :info-toggle
+       :name :help-operator-contact-details-auth
+       :label (tr [:common-texts :instructions])
+       :body [:p (tr [:organization-page :help-contact-details-auth])]
+       :default-state true}
+
+      {:type :string
+       :element-id "input-operator-telephone-auth"
+       :name ::t-operator/phone-auth
+       :required? true
+       :label (tr [:organization-page :field-phone-telephone])
+       :style style-fields/form-field
+       :regex ui-validation/phone-number-regex}
+
+      {:type :string
+       :element-id "input-operator-email-auth"
+       :name ::t-operator/email-auth
+       :required? true
+       :label ::t-operator/email
+       :style style-fields/form-field
+       ;:validate [[:email]];;TODO implement email regex
+       })))
 
 (defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names]
   [:div {:style style-base/wizard-container}
@@ -377,38 +339,33 @@
   {:name->label (tr-key [:field-labels])
    :update! #(e! (to/->EditTransportOperatorState %))
    :footer-fn (fn [data]
-                [:div
+                [:div {:style style-form/action-control-section-margin}
                  [:div
-                  [:p
-                   (tr [:common-texts :nap-data-license])
-                   [ui-common/linkify (tr [:common-texts :nap-data-license-url]) (tr [:common-texts :nap-data-license-url-label]) {:target "_blank"}] "."]]
-                 [:div {:style style-form/action-control-section-margin}
-                  [:div
-                   (when show-actions?
-                     [buttons/save {:id "btn-operator-save"
-                                    :on-click #(e! (to/->SaveTransportOperator))
-                                    :disabled (or (get-in state [:transport-operator :business-id-exists?])
-                                                  (form/disable-save? data))}
-                      (tr [:buttons :save])])
+                  (when show-actions?
+                    [buttons/save {:id "btn-operator-save"
+                                   :on-click #(e! (to/->SaveTransportOperator))
+                                   :disabled (or (get-in state [:transport-operator :business-id-exists?])
+                                                 (form/disable-save? data))}
+                     (tr [:buttons :save])])
 
-                   [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
-                    (tr [:buttons :cancel])]]
+                  [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
+                   (tr [:buttons :cancel])]]
 
-                  (when (and show-actions? (empty? (:ytj-company-names state)))
-                    (when (not (get-in state [:transport-operator :new?]))
-                      [:div
-                       [:br]
-                       [ui/divider]
-                       [:br]
-                       [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
-                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
-                       [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
-                                      :disabled (if (and
-                                                      (empty? (:transport-service-vector state))
-                                                      (::t-operator/id data))
-                                                  false
-                                                  true)}
-                        (tr [:buttons :delete-operator])]]))]])})
+                 (when (and show-actions? (empty? (:ytj-company-names state)))
+                   (when (not (get-in state [:transport-operator :new?]))
+                     [:div
+                      [:br]
+                      [ui/divider]
+                      [:br]
+                      [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
+                      [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
+                      [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
+                                     :disabled (if (and
+                                                     (empty? (:transport-service-vector state))
+                                                     (::t-operator/id data))
+                                                 false
+                                                 true)}
+                       (tr [:buttons :delete-operator])]]))])})
 
 (defn operator [e! {operator :transport-operator :as state}]
   (let [creating? (nil? (get-in state [:params :id]))
