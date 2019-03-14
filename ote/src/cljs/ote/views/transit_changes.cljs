@@ -173,7 +173,10 @@
         change-list (if show-contract-traffic
                       (concat changes-contract-traffic change-list)
                       change-list)
-        change-list (sort-by :different-week-date > change-list)]
+        filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
+        filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
+        sorted-change-list (sort-by :different-week-date < filter-different-week-date)
+        change-list (concat sorted-change-list filter-missing-different-week-date)]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
