@@ -130,23 +130,29 @@ SELECT eid."transport-service-id" as id
 -- Find services by operation area names
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-       "places" pl,
+      (SELECT ST_Union(array_agg(pl.location)) as "location"
+         FROM places pl
+        WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts
  WHERE ts.published IS NOT NULL
+   AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_INTERSECTS(ST_SetSRID(oa.location, 4326), pl.location)
-   AND pl.namefin IN (:operation-area);
+   AND ST_Area(ST_Intersection(ST_SetSRID(oa.location, 4326), sa.location)) > 0;
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area
-SELECT oa."transport-service-id" as id,
-       ST_Area(ST_Intersection(ST_SetSRID(oa.location, 4326), sa.location)) as intersection,
-       ST_Area(sa.location) as "search-area-size"
-  FROM "operation_area" oa,
+SELECT "oa-agg"."transport-service-id" as id,
+       ST_Area(ST_Intersection(ST_SetSRID("oa-agg".location, 4326), sa.location)) as intersection,
+       ST_Area(ST_SymDifference(ST_SetSRID("oa-agg".location, 4326), sa.location)) as "difference"
+  FROM
+      (SELECT :id as "transport-service-id",
+              ST_Union(array_agg(ST_SetSRID(oa.location, 4326))) as "location"
+         FROM operation_area oa
+        WHERE oa."transport-service-id" = :id
+          AND oa."primary?" = true) as "oa-agg",
       (SELECT ST_Union(array_agg(pl.location)) as "location"
          FROM places pl
-        WHERE pl.namefin IN (:operation-area)) as "sa"
- WHERE oa."transport-service-id" = :id;
+        WHERE pl.namefin IN (:operation-area)) as "sa";
 
 
 

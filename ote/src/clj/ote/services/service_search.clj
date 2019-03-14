@@ -132,10 +132,10 @@
 
 (defn- service-search-match-quality [db result operation-area]
   (let [{match-area :intersection
-         search-area :search-area-size}
+         difference-area :difference}
         (first 
          (service-match-quality-to-operation-area db {:id (::t-service/id result) :operation-area operation-area}))]
-    (/ (min match-area search-area) (max match-area search-area))))
+    (/ difference-area match-area)))
 
 (defn- service-search-match-qualities [db results operation-area]
   (if operation-area
@@ -189,7 +189,7 @@
                                         results)]
     (merge
      {:empty-filters? empty-filters?
-      :results (reverse (sort-by :operation-area-match-quality results-without-personal-info))
+      :results (sort-by :operation-area-match-quality results-without-personal-info)
       :filter-service-count (count ids)}
      (when empty-filters?
        {:total-service-count (total-service-count db)
