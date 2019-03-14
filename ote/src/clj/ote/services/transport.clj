@@ -220,8 +220,8 @@
 (defn- select-op-keys-to-update [op]
   (select-keys op
                [::t-operator/name
-                ::t-operator/billing-address
-                ::t-operator/visiting-address
+                ;::t-operator/billing-address  Commented out because addresses are not currently in use
+                ;::t-operator/visiting-address Commented out because addresses are not currently in use
                 ::t-operator/phone
                 ::t-operator/gsm
                 ::t-operator/email
