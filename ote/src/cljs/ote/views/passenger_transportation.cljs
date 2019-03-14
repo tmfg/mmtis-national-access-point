@@ -191,7 +191,7 @@
   (let [form-groups
              [(ts-common/transport-type (::t-service/sub-type service))
               (ts-common/name-group (tr [:passenger-transportation-page :header-service-info]))
-              (ts-common/contact-info-group)
+              (ts-common/contact-info-group service)
               (ts-common/companies-group e!)
               (ts-common/brokerage-group e!)
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation)

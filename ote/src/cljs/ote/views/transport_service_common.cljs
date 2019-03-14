@@ -4,6 +4,7 @@
             [ote.db.transport-service :as t-service]
             [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
+            [ote.ui.validation :refer [phone-number-regex]]
             [ote.db.common :as common]
             [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
             [ote.ui.buttons :as buttons]
@@ -316,62 +317,43 @@
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 
-(defn contact-info-group []
-  (form/group
-    {:label (tr [:passenger-transportation-page :header-contact-details])
-     :columns 3
-     :layout :row}
+(defn contact-info-group [service]
+  (let [contact-details-missing? (ts/contact-details-missing? service)]
 
-    (form/info (tr [:form-help :description-why-contact-info]))
+    (form/group
+      {:label (tr [:passenger-transportation-page :header-contact-details])
+       :columns 3
+       :layout :row}
 
-    {:name ::common/street
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-4"
-     :full-width? true
-     :read (comp ::common/street ::t-service/contact-address)
-     :write (fn [data street]
-              (assoc-in data [::t-service/contact-address ::common/street] street))
-     :label (tr [:field-labels ::common/street])
-     :max-length 128}
+      (form/info [:span (tr [:form-help :description-why-contact-info])])
 
-    {:name ::common/postal_code
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-2"
-     :full-width? true
-     :regex #"\d{0,5}"
-     :read (comp ::common/postal_code ::t-service/contact-address)
-     :write (fn [data postal-code]
-              (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
-     :label (tr [:field-labels ::common/postal_code])
-     :validate [[:postal-code]]}
+      (when contact-details-missing?
+        {:name :contact-details-required
+         :type :text-label
+         :label (tr [:common-texts :one-is-required])
+         :container-class "col-xs-12"
+         :style style-base/required-element
+         :full-width? true})
 
-    {:name ::common/post_office
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-5"
-     :full-width? true
-     :read (comp ::common/post_office ::t-service/contact-address)
-     :write (fn [data post-office]
-              (assoc-in data [::t-service/contact-address ::common/post_office] post-office))
-     :label (tr [:field-labels ::common/post_office])
-     :max-length 64}
+      {:name ::t-service/contact-email
+       :type :string
+       :container-class "col-xs-12 col-sm-6 col-md-4"
+       :validate [[:correct-email]]
+       :full-width? true
+       :max-length 200}
 
-    {:name ::t-service/contact-email
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-4"
-     :full-width? true
-     :max-length 200}
+      {:name ::t-service/contact-phone
+       :type :string
+       :container-class "col-xs-12 col-sm-6 col-md-2"
+       :max-length 16
+       :regex phone-number-regex
+       :full-width? true}
 
-    {:name ::t-service/contact-phone
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-2"
-     :max-length 16
-     :full-width? true}
-
-    {:name ::t-service/homepage
-     :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-5"
-     :full-width? true
-     :max-length 200}))
+      {:name ::t-service/homepage
+       :type :string
+       :container-class "col-xs-12 col-sm-6 col-md-5"
+       :full-width? true
+       :max-length 200})))
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
@@ -380,7 +362,8 @@
         show-footer? (if (get-in app [:transport-service ::t-service/id])
                        (ts/is-service-owner? app)
                        true)
-        published? (not (nil? published))]
+        published? (not (nil? published))
+        contact-details-missing? (ts/contact-details-missing? (:transport-service app))]
     [:div
      ;; Show brokering dialog
      (when (get-in app [:transport-service :show-brokering-service-dialog?])
@@ -413,28 +396,26 @@
                     (tr [:dialog :brokering-service :link-text])]
                   {:target "_blank" :style {:text-decoration "none"}})]])
 
-     ;show-footer? - Take owner check away for now
-     (when true
-       [:div.row
-        (when (not (form/can-save? data))
-          [ui/card {:style {:margin-bottom "1rem"}}
-           [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
+     [:div.row
+      (when (or (not (form/can-save? data)) contact-details-missing?)
+        [ui/card {:style {:margin-bottom "1rem"}}
+         [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
 
-        (if published?
-          ;; True
-          [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                         :disabled (not (form/can-save? data))}
-           (tr [:buttons :save-updated])]
-          ;; False
-          [:span
-           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                          :disabled (not (form/can-save? data))}
-            (tr [:buttons :save-and-publish])]
-           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas false))
-                          :disabled name-missing?}
-            (tr [:buttons :save-as-draft])]])
-        [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
-         (tr [:buttons :discard])]])]))
+      (if published?
+        ;; True
+        [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                       :disabled (or (not (form/can-save? data)) contact-details-missing?)}
+         (tr [:buttons :save-updated])]
+        ;; False
+        [:span
+         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                        :disabled (or (not (form/can-save? data)) contact-details-missing?)}
+          (tr [:buttons :save-and-publish])]
+         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas false))
+                        :disabled name-missing?}
+          (tr [:buttons :save-as-draft])]])
+      [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+       (tr [:buttons :discard])]]]))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group
