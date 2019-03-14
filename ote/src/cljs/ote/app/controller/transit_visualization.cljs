@@ -19,7 +19,7 @@
   (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
 (def hash-colors
-  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
+  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4" "#FFAD9A" "#BDECB7" "#BAA2D1" "#F89DC0" "#97D5E8" "#E1C7B0" "#9CCDDC" "#c82565"]
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
