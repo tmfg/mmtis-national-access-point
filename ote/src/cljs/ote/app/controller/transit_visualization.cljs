@@ -81,6 +81,9 @@
                      detection-date))))
       changes)))
 
+(defn count-changes [key coll]
+  (count
+    (get coll key)))
 
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
@@ -89,7 +92,15 @@
         ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
         only-changes (filterv :change-date changes)
-        sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) only-changes)
+
+        ;; Group by only-changes by route-hash-id
+        grouped-changes (group-by #(:route-hash-id %) only-changes)
+        ;; Take first from every vector
+        route-changes (map #(first (second %)) grouped-changes)
+        route-changes (map (fn [x]
+                             (assoc x :count (count-changes (:route-hash-id x) grouped-changes)))
+                           route-changes)
+        sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) route-changes)
         all-sorted-changes (if show-no-change
                              (concat sorted-changes no-changes)
                              sorted-changes)]
@@ -169,7 +180,7 @@
               (assoc app
                 :service-changes-for-date-loading? false
                 :service-info (:service-info response)
-                :changes-all (:changes response)
+                :changes-all (sort-by :different-week-date <(:route-changes response))
                 :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
                 :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
                 :gtfs-package-info (:gtfs-package-info response)
@@ -378,7 +389,7 @@
 (define-event RouteDifferencesResponse [response]
   {}
   (-> app
-      (assoc :flash-message "Reitin tiedot ladattu.")
+      (assoc :flash-message "Reitin muutokset ladattu.")
       (assoc-in [:transit-visualization :route-differences-loading?] false)
       (assoc-in [:transit-visualization :compare :differences] response)))
 
