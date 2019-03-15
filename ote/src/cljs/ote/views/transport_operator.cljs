@@ -141,7 +141,11 @@
         disable-ytj-address-billing? (= (get-in state [:ytj-flags :use-ytj-addr-billing?]) true)
         disable-ytj-address-visiting? (= (get-in state [:ytj-flags :use-ytj-addr-visiting?]) true)
         ytj-company-names (:ytj-company-names state)
-        ytj-company-names-found? (pos-int? (count ytj-company-names))]
+        ytj-company-names-found? (pos-int? (count ytj-company-names))
+        required-public-contact-missing? (fn [operator] (and (empty? (::t-operator/phone operator))
+                                                             (empty? (::t-operator/gsm operator))
+                                                             (empty? (::t-operator/email operator))
+                                                             (empty? (::t-operator/homepage operator))))]
     (form/group
       {:label (tr [:common-texts :title-operator-basic-details])
        :columns 1
@@ -226,6 +230,8 @@
                           (tr [:organization-page :help-ytj-contact-change-link-desc])]]
          :default-state true})
 
+      ;; Contact details for service developers
+
       {:type :text-label
        :name :heading-contact-details-other
        :label (tr [:organization-page :contact-details-service-developers])
@@ -240,11 +246,22 @@
               [:p (tr [:common-texts :nap-data-license]) "\"" (tr [:common-texts :nap-data-license-url-label]) "\"."]]
        :default-state true}
 
+      (if (required-public-contact-missing? operator)
+        {:type :result-msg-warning
+         :element-id "label-public-contact-missing"
+         :name :public-contact-missing
+         :content (tr [:common-texts :required-one-of-many])}
+        {:type :text-label
+         :name :warning-public-contact-missing-placeholder
+         :label ""
+         :h-style :h4})
+
       {:type :string
        :element-id "input-operator-telephone"
        :name ::t-operator/phone
        :label (tr [:organization-page :field-phone-telephone] )
        :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
+       :required? (required-public-contact-missing? operator)
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -253,6 +270,7 @@
        :name ::t-operator/gsm
        :label (tr [:organization-page :field-phone-mobile] )
        :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
+       :required? (required-public-contact-missing? operator)
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -260,13 +278,17 @@
        :element-id "input-operator-email"
        :name ::t-operator/email
        :disabled? (get-in state [:ytj-flags :use-ytj-email?] false)
+       :required? (required-public-contact-missing? operator)
        :style style-fields/form-field}
 
       {:type :string
        :element-id "input-operator-web"
        :name ::t-operator/homepage
        :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
+       :required? (required-public-contact-missing? operator)
        :style style-fields/form-field}
+
+      ;; Contact details for authorities
 
       {:type :text-label
        :name :heading-contact-details-authorities
