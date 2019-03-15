@@ -982,6 +982,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-not-found "Tietoja ei löytynyt."
   :required-field "Tieto vaaditaan"
   :required-field-missing "Pakollisia tietoja syöttämättä"
+  :required-one-of-many "Yksi tiedoista vaaditaan."
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
