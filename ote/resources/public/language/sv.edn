@@ -669,7 +669,6 @@
   :business-id-and-aux-names "Företagsnamn och parallellnamn"
   :business-or-aux-name "Företagsnamn eller extra företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
-  ;:contact-details-other "Andra kontaktuppgifter"
   :contact-details-service-developers "Yhteystiedot palveluiden kehittäjille"
   :contact-details-authorities "Yhteystiedot viranomaiselle"
   :contact-details "Kontaktuppgifter"

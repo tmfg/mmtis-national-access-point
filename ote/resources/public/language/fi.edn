@@ -668,7 +668,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :business-or-aux-name "Toiminimi tai aputoiminimi"
   :contact-details-plural "Toiminimiin liittyvät yhteystiedot"
   :contact-details "Yhteystiedot"
-  ;:contact-details-other "Muut yhteystiedot"
   :contact-details-service-developers "Yhteystiedot palveluiden kehittäjille"
   :contact-details-authorities "Yhteystiedot viranomaiselle"
   :fetch-from-ytj "Hae tiedot YTJ:stä"

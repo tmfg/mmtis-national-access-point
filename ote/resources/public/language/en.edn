@@ -662,7 +662,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :business-or-aux-name "Business name or auxiliary name"
   :contact-details-plural "Contact information related to the Business ID"
   :contact-details "Contact details"
-  ;:contact-details-other "Other contact details "
   :contact-details-service-developers "Contact details for developers of services"
   :contact-details-authorities "Contact details for authorities"
   :fetch-from-ytj "Fetch data from YTJ"
