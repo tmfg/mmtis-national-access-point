@@ -18,10 +18,8 @@
 (define-event FetchServiceData [operator-id service-id]
               {}
               (do
-                (comm/get! (str "transport-service/" (url-util/encode-url-component operator-id))
-                           {:on-success (tuck/send-async! ->ServiceSuccess)})
-                (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
-                           {:on-success (tuck/send-async! ->OperatorSuccess)}))
+                (comm/get! (str "t-service/" (url-util/encode-url-component service-id))
+                           {:on-success (tuck/send-async! ->ServiceSuccess)}))
               app)
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]

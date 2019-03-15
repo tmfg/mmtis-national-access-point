@@ -37,6 +37,11 @@
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
+(def transport-operator-personal-columns
+  #{::t-service/contact-phone
+    ::t-service/contact-gsm
+    ::t-service/contact-email})
+
 (defn get-transport-operator
   [db where-parameter]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
@@ -82,7 +87,7 @@
     ;; For some reason type must be a keyword and query returns it as a string so make it keyword.
     (mapv #(update % ::t-service/type keyword) modified-services)))
 
-(defn get-transport-service
+(defn all-data-transport-service
   "Get single transport service by id"
   [db id]
   (let [ts (first (fetch db ::t-service/transport-service
@@ -471,6 +476,22 @@
       (log/info (str "Delete association failed with service: " service-id " and operator: " operator-id))
       {:status 404 :body "Association not found"})))
 
+(defn public-data-from-transport-service
+  "Get single transport service by id"
+  [db id]
+  (println "ran public transport service fn")
+  (let [ts (first (fetch db ::t-service/transport-service
+                         (disj
+                              transport-operator-personal-columns
+                              (conj (specql/columns ::t-service/transport-service)
+                                    ;; join external interfaces
+                                    [::t-service/external-interfaces
+                                     (specql/columns ::t-service/external-interface-description)]))
+                         {::t-service/id id}))]
+    (when ts
+      (assoc ts ::t-service/operation-area
+                (places/fetch-transport-service-operation-area db id)))))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
   [db config]
@@ -478,7 +499,7 @@
     (routes
 
       (GET "/transport-service/:id" [id]
-        (let [ts (get-transport-service db (Long/parseLong id))]
+        (let [ts (all-data-transport-service db (Long/parseLong id))]
           (if-not ts
             {:status 404}
             (http/no-cache-transit-response ts))))
@@ -548,7 +569,26 @@
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
+
+    (GET "/t-service/:id"
+      {{:keys [id]}
+       :params
+       user :user}
+
+      (let [id (Long/parseLong id)
+            operator-id (first (specql/fetch db ::t-service/transport-service
+                                       #{::t-service/transport-operator-id}
+                                             {::t-service/id id}))]
+        (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
+          (http/no-cache-transit-response (all-data-transport-service db id))
+          (http/no-cache-transit-response (public-data-from-transport-service db id)))))
+
+    (GET "/t-operator/:id" [id]
+      (let [ts "haloo"]
+        (if-not false
+          (http/no-cache-transit-response (public-data-from-transport-service db (Long/parseLong id)))
+          (http/no-cache-transit-response "testi"))))))
 
 (defrecord Transport [config]
   component/Lifecycle
