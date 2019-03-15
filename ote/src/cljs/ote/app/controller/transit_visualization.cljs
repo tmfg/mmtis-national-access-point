@@ -19,7 +19,7 @@
   (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
 (def hash-colors
-  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4"]
+  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4" "#FFAD9A" "#BDECB7" "#BAA2D1" "#F89DC0" "#97D5E8" "#E1C7B0" "#9CCDDC" "#c82565"]
   #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
    "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
    "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
@@ -231,31 +231,51 @@
      ;; Add all received routes to shown map
      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
+(defn compare-stop-differences [transit-visualization date1-trips date2-trips]
+  (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+          (let [first-common-stop
+                #(assoc %
+                   :first-common-stop first-common-stop
+                   :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
+                date1-trips (mapv first-common-stop date1-trips)
+                date2-trips (mapv first-common-stop date2-trips)
+                combined-trips (transit-changes/merge-by-closest-time
+                                 :first-common-stop-time
+                                 date1-trips date2-trips)]
+
+            (assoc-in transit-visualization [:compare :combined-trips]
+                      (mapv (fn [[l r]]
+                              [l r (transit-changes/trip-stop-differences l r)])
+                            combined-trips)))
+
+          ;; Can't find common stop
+          (assoc-in transit-visualization [:compare :combined-trips] nil)))
+
+
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
-        date2-trips (get-in transit-visualization [:compare :date2-trips])]
+        date2-trips (get-in transit-visualization [:compare :date2-trips])
+        loading (or (:route-trips-for-date1-loading? transit-visualization) ;; both trips should be loaded
+                    (:route-trips-for-date2-loading? transit-visualization))]
+    (cond
+      (and (not loading)
+           (not-empty date1-trips)
+           (not-empty date2-trips))
+      (compare-stop-differences transit-visualization date1-trips date2-trips)
 
-  (if (and date1-trips date2-trips)
-    (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
-      (let [first-common-stop
-            #(assoc %
-                    :first-common-stop first-common-stop
-                    :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
-            date1-trips (mapv first-common-stop date1-trips)
-            date2-trips (mapv first-common-stop date2-trips)
-            combined-trips (transit-changes/merge-by-closest-time
-                            :first-common-stop-time
-                            date1-trips date2-trips)]
-        (assoc-in transit-visualization [:compare :combined-trips]
-               (mapv (fn [[l r]]
-                       [l r (transit-changes/trip-stop-differences l r)])
-                     combined-trips)))
+      (not loading)
+      ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
+      (-> transit-visualization
+          (compare-stop-differences date1-trips date2-trips)
+          (assoc-in [:compare :differences]
+                    (if (and date1-trips (empty? date2-trips))
+                      ;ending - count trips from date1, because date2 is empty
+                      {:removed-trips (count date1-trips)}
+                      ;added - count trips from date2 because date1 is empty
+                      {:added-trips (count date2-trips)})))
 
-      ;; Can't find common stop
-      (assoc-in transit-visualization [:compare :combined-trips] nil))
-
-    ;; Both dates not fetched, don't try to calculate
-    (assoc-in transit-visualization [:compare :combined-trips] nil))))
+      :default
+      transit-visualization)))
 
 ;; Routes trip data
 (define-event RouteTripsForDateResponse [trips date]
@@ -274,7 +294,12 @@
 
                 :default
                 app))]
-    (select-first-trip app)))
+    ;; Wait until both trips are loaded
+    ;; No need to render trips and stops while they are not ready
+    (if (and (not (:route-trips-for-date1-loading? app))
+             (not (:route-trips-for-date2-loading? app)))
+      (select-first-trip app)
+      app)))
 
 (defn fetch-trip-data-for-dates [compare service-id route date1 date2]
   (doseq [date [date1 date2]

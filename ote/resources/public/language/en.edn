@@ -674,7 +674,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :help-desc-1 "The information given in this form will seen in the public pages of NAP-service."
   :help-desc-2 (:md "**Transport operators** are companies, communities and organizations, which provide transport services. Transport services are 1) passenger transport services (e.g. taxi and buss services), 2) stations, ports and terminals, 3) general commercial parking services, 4) vehicle rental services and commercial ridesharing services and 5) brokering and dispatch services.")
   :help-merge-company-names "You have previously created one or more NAP service providers whose names do not correspond to the business names or auxiliary names registered for the business ID. \nPlease select the NAP service provider name which you want to replace using a name fetched from YTJ registry"
-  :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing."
+  :basic-info-tooltip "Fill in to Basic information -section information about the company, community or organization you are representing on the form below."
   :contact-types-tooltip "Phone and email -section information is meant for utilisers of NAP-interfaces - not to the end users (customers) of your transport service."
   :ckan-description-tooltip "The purpose of the transport operator description is to give NAP utilisers an idea about what kind of transport operator they are dealing with. E.g. Example Ltd. is a company conducting scheduled transport and charter traffic in Southern Finland."
   :help-ytj-integration-desc "The service provider information is received from the Business Information System (BIS) on the basis of the Business ID. If the information is incorrect or incomplete, you can make changes to it in the _BIS service_. Changes made in the BIS service (e.g. changing the street address or registering a new auxiliary trade name) will appear on this page after they are registered in the BIS register."
@@ -1300,7 +1300,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-filters "Search for services by adding search criteria above"
   :type-search "Transport service mode"
   :limit-search-results "Limit search results"
-  :participating-operator "Participates in providing of this service"
+  :participating-operator "participates in providing of this service"
   :released-apis "Interfaces published in the service"
   :no-description "No description has been given to the service yet."
   :service-basic-info "Basic info of the service"
@@ -1322,7 +1322,14 @@ You can also draw the operating area or point to the map with drawing tools. You
   :other-involved-companies "Other companies providing the service"
   :other-company " other company"
   :show-all-information "Show all information"
-  :back-link "Back to service catalog"}
+  :back-link "Back to service catalog"
+  :service-information "Service information"
+  :service-api&format "Service interfaces and formats"
+  :description "Description"
+  :type "Type"
+  :transport-type "Transport type"
+  :homepage "Homepage"
+  :no-homepage "No website has been entered in the service."}
 
  :login
  {:label "Login credentials"

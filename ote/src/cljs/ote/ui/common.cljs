@@ -111,7 +111,7 @@
   [:div.help (stylefy/use-style style-base/help)
    [:div (stylefy/use-style style-form/help-text-element) help]])
 
-(defn- extended-help-link [help-link help-link-text]
+(defn extended-help-link [help-link help-link-text]
   [:div (stylefy/use-style style-base/help-link-container)
    [:div (stylefy/use-style style-base/link-icon-container)
     [ic/action-open-in-new {:style style-base/link-icon}]]

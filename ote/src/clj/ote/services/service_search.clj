@@ -115,6 +115,8 @@
     ::t-service/contact-phone
     ::t-service/description
     ::t-service/published
+    ::t-service/transport-type
+    ::t-service/homepage
     ;; Information JOINed from other tables
     ::t-service/external-interface-links
     ::t-service/operator-name
