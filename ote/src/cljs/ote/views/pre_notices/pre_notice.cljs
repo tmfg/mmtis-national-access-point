@@ -74,61 +74,37 @@
 
    [:div (stylefy/use-style (sbase/flex-container "column"))
     [form-fields/field
-     {:label (tr [:field-labels :select-transport-operator])
+     {:type :selection
+      :label (tr [:field-labels :select-transport-operator])
       :name :select-transport-operator
-      :type :selection
       :show-option ::t-operator/name
       :update! #(e! (pre-notice/->SelectOperatorForNotice %))
       :options operators
       :auto-width? true}
      operator]
     [form-fields/field
-     {:label (tr [:field-labels ::t-operator/business-id])
+     {:type :string
+      :label (tr [:field-labels ::t-operator/business-id])
       :name ::t-operator/business-id
-      :type :string
       :update! nil
       :disabled? true}
      (::t-operator/business-id operator)]]
 
    [:div (stylefy/use-style (sbase/flex-container "column"))
     [:div (stylefy/use-style sbase/item-list-container)
-     ;[form-fields/field
-     ; {:label     (tr [:field-labels ::db-common/street])
-     ;  :name      ::db-common/street
-     ;  :type      :string
-     ;  :update!   nil
-     ;  :disabled? true}
-     ; (::db-common/street (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
-
-     ;[form-fields/field
-     ; {:label     (tr [:field-labels ::db-common/postal_code])
-     ;  :name      ::db-common/postal_code
-     ;  :type      :string
-     ;  :update!   nil
-     ;  :disabled? true}
-     ; (::db-common/postal_code (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
-
-     ;[form-fields/field
-     ; {:label     (tr [:field-labels ::db-common/post_office])
-     ;  :name      ::db-common/post_office
-     ;  :type      :string
-     ;  :update!   nil
-     ;  :disabled? true}
-     ; (::db-common/post_office (::t-operator/visiting-address operator))] ;Commented out because addresses are not currently in use
-
      [:div (stylefy/use-style sbase/item-list-row-margin)
       [form-fields/field
-       {:label (tr [:field-labels ::t-operator/phone])
+       {:type :string
+        :label (tr [:field-labels ::t-operator/phone])
         :name ::t-operator/phone
-        :type :string
         :update! nil
         :disabled? true}
        (::t-operator/phone operator)]]
 
      [form-fields/field
-      {:label (tr [:field-labels ::t-operator/gsm])
+      {:type :string
+       :label (tr [:field-labels ::t-operator/gsm])
        :name ::t-operator/gsm
-       :type :string
        :update! nil
        :disabled? true}
       (::t-operator/gsm operator)]]
@@ -136,17 +112,17 @@
     [:div (stylefy/use-style sbase/item-list-container)
      [:div (stylefy/use-style sbase/item-list-row-margin)
       [form-fields/field
-       {:label (tr [:field-labels ::t-operator/homepage])
+       {:type :string
+        :label (tr [:field-labels ::t-operator/homepage])
         :name ::t-operator/business-id
-        :type :string
         :update! nil
         :disabled? true}
        (::t-operator/homepage operator)]]
 
      [form-fields/field
-      {:label (tr [:field-labels ::t-operator/email])
+      {:type :string
+       :label (tr [:field-labels ::t-operator/email])
        :name ::t-operator/email
-       :type :string
        :update! nil
        :disabled? true}
       (::t-operator/email operator)]]]])
