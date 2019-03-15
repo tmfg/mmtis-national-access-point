@@ -44,6 +44,7 @@
 (defn is-author?
   [db user transport-operator-id]
   (let [allowed-operators (user-transport-operators db user)]
+    (println "allowed operators: " allowed-operators)
     (contains? allowed-operators transport-operator-id)))
 
 (defn with-transit-authority-check

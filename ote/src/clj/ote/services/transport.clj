@@ -37,10 +37,16 @@
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
-(def transport-operator-personal-columns
+(def transport-service-personal-columns
   #{::t-service/contact-phone
     ::t-service/contact-gsm
     ::t-service/contact-email})
+
+(def transport-operator-personal-columns
+  #{::t-operator/gsm
+    ::t-operator/phone
+    ::t-operator/billing-address
+    ::t-operator/email})
 
 (defn get-transport-operator
   [db where-parameter]
@@ -476,21 +482,38 @@
       (log/info (str "Delete association failed with service: " service-id " and operator: " operator-id))
       {:status 404 :body "Association not found"})))
 
-(defn public-data-from-transport-service
+(defn public-data-transport-service
   "Get single transport service by id"
   [db id]
   (println "ran public transport service fn")
   (let [ts (first (fetch db ::t-service/transport-service
-                         (disj
-                              transport-operator-personal-columns
-                              (conj (specql/columns ::t-service/transport-service)
+                         (apply disj
+                                (conj (specql/columns ::t-service/transport-service)
                                     ;; join external interfaces
                                     [::t-service/external-interfaces
-                                     (specql/columns ::t-service/external-interface-description)]))
+                                     (specql/columns ::t-service/external-interface-description)])
+                                transport-service-personal-columns)
                          {::t-service/id id}))]
     (when ts
       (assoc ts ::t-service/operation-area
                 (places/fetch-transport-service-operation-area db id)))))
+
+
+(defn private-data-transport-operator
+  "Get single transport service by id"
+  [db id]
+  (first (fetch db ::t-operator/transport-operator
+                   (specql/columns ::t-operator/transport-operator)
+                   {::t-operator/id id})))
+
+(defn private-data-transport-operator
+  "Get single transport service by id"
+  [db id]
+  (first (fetch db ::t-operator/transport-operator
+                #{::t-operator/business-id
+                  ::t-operator/name
+                  ::t-operator/homepage}
+                {::t-operator/id id})))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -575,20 +598,22 @@
       {{:keys [id]}
        :params
        user :user}
-
       (let [id (Long/parseLong id)
-            operator-id (first (specql/fetch db ::t-service/transport-service
-                                       #{::t-service/transport-operator-id}
-                                             {::t-service/id id}))]
+            operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
+                                              #{::t-service/transport-operator-id}
+                                              {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
-          (http/no-cache-transit-response (all-data-transport-service db id))
-          (http/no-cache-transit-response (public-data-from-transport-service db id)))))
+          (http/transit-response (all-data-transport-service db id))
+          (http/transit-response (public-data-transport-service db id)))))
 
-    (GET "/t-operator/:id" [id]
-      (let [ts "haloo"]
-        (if-not false
-          (http/no-cache-transit-response (public-data-from-transport-service db (Long/parseLong id)))
-          (http/no-cache-transit-response "testi"))))))
+    (GET "/t-operator/:id"
+         {{:keys [id]}
+          :params
+          user :user}
+      (let [id (Long/parseLong id)]
+        (if (or (authorization/admin? user) (authorization/is-author? db user id))
+          (http/transit-response (private-data-transport-operator db id))
+          (http/transit-response (public-data-transport-operator db id)))))))
 
 (defrecord Transport [config]
   component/Lifecycle

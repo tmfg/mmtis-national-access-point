@@ -19,7 +19,9 @@
               {}
               (do
                 (comm/get! (str "t-service/" (url-util/encode-url-component service-id))
-                           {:on-success (tuck/send-async! ->ServiceSuccess)}))
+                           {:on-success (tuck/send-async! ->ServiceSuccess)})
+                (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
+                           {:on-success (tuck/send-async! ->OperatorSuccess)}))
               app)
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]
