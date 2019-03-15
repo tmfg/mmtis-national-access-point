@@ -91,7 +91,7 @@
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
         ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
-        only-changes (filterv :change-date changes)
+        only-changes (sort-by :different-week-date (filterv :change-date changes))
 
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by #(:route-hash-id %) only-changes)

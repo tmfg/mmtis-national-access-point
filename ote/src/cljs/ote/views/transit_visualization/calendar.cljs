@@ -13,7 +13,7 @@
             [ote.theme.colors :as colors]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
-            [ote.views.transit-visualization.section :as tv-section]
+            [ote.views.transit-visualization.change-utilities :as tv-section]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
             [ote.app.controller.transit-visualization :as tv]))
 
@@ -87,8 +87,9 @@
      [tv-section/section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
                :open? (get open-sections :route-service-calendar true)}
       "Kalenteri"
-      [:span
-       "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
+      [:div
+       [:p (tr [:transit-visualization-page :calendar-description-1])]
+       [:p (tr [:transit-visualization-page :calendar-description-2])]
        [:div (stylefy/use-style (merge (style-base/flex-container "row")
                                        {:margin-top "1rem"
                                         :margin-bottom "1rem"}))
@@ -97,14 +98,14 @@
                       :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
       [:div
       [:div.change-list
+       [tv-section/route-changes-legend]
        [table/table {:name->label str
                      :label-style style-base/table-col-style-wrap
                      :show-row-hover? true
                      :on-select #(when (first %)
                                    (do
-                                     (e! (tv/->SelectRouteForDisplay (first %)))
-                                     #_ (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
-                     :row-selected? #(= % selected-route)}
+                                     (e! (tv/->SelectRouteForDisplay (first %)))))
+                     :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
         [{:name "Aikaa muutokseen"
           :read :different-week-date
           :format (fn [different-week-date]

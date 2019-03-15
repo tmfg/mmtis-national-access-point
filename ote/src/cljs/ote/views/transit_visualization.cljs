@@ -25,7 +25,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
-            [ote.views.transit-visualization.section :as tv-section]
+            [ote.views.transit-visualization.change-utilities :as tv-section]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]))
 
 (set! *warn-on-infer* true)
@@ -289,19 +289,6 @@
                               :font-size "12px"
                               :font-weight "bold"}}]]])
 
-(defn route-changes-legend []
-  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend-container)
-   [:div
-    [:b "Taulukon ikonien selitteet"]]
-   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
-    (doall
-      (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
-                          [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
-                          [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                          [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
-        ^{:key (str "transit-visualization-route-changes-legend-" label)}
-        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
-
 (defn service-is-using-headsign
   "Routes are combained between gtfs packages using route-hash-id. When trips headsign is not used there is no
   reason to show it in route list or route name."
@@ -326,7 +313,6 @@
                           (tr [:transit-visualization-page :no-changes-in-routes])
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
-     [route-changes-legend]
      [table/table {:no-rows-message no-rows-message
                    :height table-height
                    :label-style style-base/table-col-style-wrap
@@ -338,7 +324,7 @@
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= % selected-route)}
 
-      [{:name "Reitti" :width "25%"
+      [{:name "Reitti" :width "30%"
         :read (juxt :route-short-name :route-long-name)
         :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
@@ -346,63 +332,17 @@
 
        ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
-         {:name "Reitti/määränpää" :width "20%"
+         {:name "Reitti/määränpää" :width "30%"
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
-       {:name "Aikaa 1. muutokseen"
-        :width "12%"
-        :read :different-week-date
-        :col-style style-base/table-col-style-wrap
-        :format (fn [different-week-date]
-                  (if-not different-week-date
-                    [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
-                    [:div
-                     [:div (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
-                                               :white-space "nowrap"})
-                      (str (time/days-until different-week-date) " pv ")]
-                     [:div (stylefy/use-style {:color "gray"
-                                               :overflow-wrap "break-word"})
-                      (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-
-       {:name "Muutos tunnistettu"
-        :width "13%"
-        :read :transit-change-date
-        :col-style style-base/table-col-style-wrap
-        :format #(time/format-timestamp->date-for-ui %)}
        {:name "Tunnistetut muutosajankohdat (kpl)"
+        :width "40%"
         :read identity
         :format (fn [row]
                   (if (= :no-change (:change-type row))
-                    "Ei muutoksia"
-                    (:count row)))}
-       #_ {:name "Muutokset" :width "30%"
-        :read identity
-        :col-style style-base/table-col-style-wrap
-        :format (fn [{change-type :change-type :as route}]
-                  (case change-type
-                    :no-traffic
-                    [icon-l/icon-labeled style/transit-changes-icon
-                     [ic/av-not-interested]
-                     "Tauko liikennöinnissä"]
-
-                    :added
-                    [icon-l/icon-labeled style/transit-changes-icon
-                     [ic/content-add-box {:color style/add-color}]
-                     "Uusi reitti"]
-
-                    :removed
-                    [icon-l/icon-labeled style/transit-changes-icon
-                     [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                     "Päättyvä reitti"]
-
-                    :no-change
-                    [icon-l/icon-labeled style/transit-changes-icon
-                     [ic/navigation-check]
-                     "Ei muutoksia"]
-
-                    :changed
-                    [tv-change-icons/change-icons route]))}]
+                    "Ei tulevia muutoksia"
+                    (:count row)))}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
@@ -695,7 +635,7 @@
         [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization)]
 
         ;; Route listing with number of changes
-        "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
+        (tr [:transit-visualization-page :route-description])
 
         [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
          [:div
