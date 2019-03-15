@@ -80,6 +80,14 @@
              (when ytj-supported?                           ;; Sets input and button on same row
                {:layout :row}))
 
+      (when-not ytj-supported?
+        {:type :string
+         :element-id "input-operator-name"
+         :name ::t-operator/name
+         :label (tr [:organization-page :business-or-aux-name])
+         :required? true
+         :style style-fields/form-field})
+
       {:type :string
        :name ::t-operator/business-id
        :label (tr [:organization-page :business-id-heading])
@@ -157,7 +165,7 @@
         {:type :divider
          :name :heading1-divider})
 
-      (when-not ytj-supported?
+      (when-not (or creating? ytj-supported?)
         {:type :string
          :element-id "input-operator-name"
          :name ::t-operator/name
@@ -211,14 +219,6 @@
 
          :max-length 128})
 
-      {:type       :text-label
-       :name       :msg-business-id-contact-details
-       :label      (if ytj-company-names-found?
-                     (tr [:organization-page :contact-details-plural])
-                     (tr [:organization-page :contact-details]))
-       :max-length 128
-       :h-style    :h3}
-
       (when ytj-response-ok?
         {:type          :info-toggle
          :name          :help-operator-contact-details
@@ -235,7 +235,7 @@
       {:type :text-label
        :name :heading-contact-details-other
        :label (tr [:organization-page :contact-details-service-developers])
-       :h-style :h3}
+       :h-style :h2}
 
       {:type :info-toggle
        :name :help-operator-contact-details-service-developers
@@ -293,7 +293,7 @@
       {:type :text-label
        :name :heading-contact-details-authorities
        :label (tr [:organization-page :contact-details-authorities])
-       :h-style :h3}
+       :h-style :h2}
 
       {:type :info-toggle
        :name :help-operator-contact-details-auth
@@ -379,7 +379,7 @@
                       [:br]
                       [ui/divider]
                       [:br]
-                      [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
+                      [:div [:h2 (tr [:dialog :delete-transport-operator :title-base-view])]]
                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
                       [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
                                      :disabled (if (and
@@ -392,14 +392,13 @@
 (defn operator [e! {operator :transport-operator :as state}]
   (let [creating? (nil? (get-in state [:params :id]))
         ytj-supported? (flags/enabled? :open-ytj-integration)
-        show-ytj-id-entry? (empty? (get-in state [:params :id]))
         show-details? (or (not ytj-supported?)
                           (and (:transport-operator-loaded? state)
                                (some? (:ytj-response state))))
         show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
         form-groups (cond-> []
-                            show-ytj-id-entry? (conj (business-id-selection e! state ytj-supported?))
+                            creating? (conj (business-id-selection e! state ytj-supported?))
                             show-details? (conj (operator-form-groups e! state creating? ytj-supported?)))]
     [:div
      [:div
@@ -408,6 +407,7 @@
                  (if (:new? operator)
                    :organization-new-title
                    :organization-form-title)])]]]
+     [:h2 (tr [:organization-page :basic-details])]
      [:div
       [info/info-toggle (tr [:common-texts :instructions] true)
        (if ytj-supported?
