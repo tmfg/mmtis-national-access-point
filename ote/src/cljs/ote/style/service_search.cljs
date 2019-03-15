@@ -70,7 +70,7 @@
                                                    :font-size "0.875rem"}
                                         :info-title {:flex 1
                                                      :color colors/gray800
-                                                     :word-break "break-all"}
+                                                     :word-break "break-word"}
                                         :info-content {:flex 2}
                                         :foot {:padding "0 1rem 1rem 1rem"
                                                ::stylefy/media {{:max-width (str width-md "px")}

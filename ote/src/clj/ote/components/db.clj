@@ -1,7 +1,6 @@
 (ns ote.components.db
   "Database connection pool component"
-  (:import (com.zaxxer.hikari HikariConfig HikariDataSource)
-           (org.postgresql.Driver))
+  (:import (com.zaxxer.hikari HikariConfig HikariDataSource))
   (:require [com.stuartsierra.component :as component]
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]))

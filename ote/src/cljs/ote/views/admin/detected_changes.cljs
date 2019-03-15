@@ -145,81 +145,75 @@
     "Laske sopimusliikenteelle päivätiivisteet"
     #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]]])
 
-(defn route-id [e! app-state]
+(defn route-id [e! app-state recalc?]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]
     [:div
-     [:div
-      [:h4 "Päivitä palvelulle reitin tunnistustyyppi"]
-      [form/form
-       {:update! #(e! (admin-transit-changes/->UpdateRouteHashCalculationValues %))
-        :footer-fn (fn [data]
-                     [:span
-                      [buttons/save {:primary true
-                                      :on-click #(e! (admin-transit-changes/->ForceRouteHashCalculationForService))}
-                       "Päivitä"]])}
-       [(form/group
-          {:label   "Route hash id:n hashien uudelleen laskenta"
-           :columns 3
-           :layout  :raw
-           :card?   false}
-          {:name      :service-id
-           :type      :string
-           :label     "Palvelun id"
-           :hint-text "Palvelun id"
-           :required? true}
-          {:name      :package-count
-           :type      :string
-           :label     "Pakettien määrä"
-           :hint-text "5"
-           :required? true}
-          {:name        :route-id-type
-           :type        :selection
-           :options     ["short-long" "short-long-headsign" "route-id" "long-headsign" "long"]
-           :show-option (fn [x] x)
-           :required?   true})]
-       (get-in app-state [:admin :transit-changes :route-hash-values])]]
+     (if recalc?
+       ;; Show recalc status
+       [hash-recalculation-warning e! app-state]
+       ;; else - Show form
+       [:div.form-container
+        [:div
+         [:h4 "Päivitä palvelulle reitin tunnistustyyppi"]
+         [form/form
+          {:update! #(e! (admin-transit-changes/->UpdateRouteHashCalculationValues %))
+           :footer-fn (fn [data]
+                        [:span
+                         [buttons/save {:primary true
+                                        :on-click #(e! (admin-transit-changes/->ForceRouteHashCalculationForService))}
+                          "Päivitä"]])}
+          [(form/group
+             {:label "Route hash id:n hashien uudelleen laskenta"
+              :columns 3
+              :layout :raw
+              :card? false}
+             {:name :service-id
+              :type :string
+              :label "Palvelun id"
+              :hint-text "Palvelun id"
+              :required? true}
+             {:name :package-count
+              :type :string
+              :label "Pakettien määrä"
+              :hint-text "5"
+              :required? true}
+             {:name :route-id-type
+              :type :selection
+              :options ["short-long" "short-long-headsign" "route-id" "long-headsign" "long"]
+              :show-option (fn [x] x)
+              :required? true})]
+          (get-in app-state [:admin :transit-changes :route-hash-values])]]
 
-     [:div
-      [:h4 "Päivitä palvelulle päivittäiset hash tunnisteet"]
-      [form/form
-       {:update! #(e! (admin-transit-changes/->UpdateHashCalculationValues %))
-        :footer-fn (fn [data]
-                     [:span
-                      [buttons/save {:primary true
-                                         :on-click #(do
-                                                      (.preventDefault %)
-                                                      (e! (admin-transit-changes/->ForceHashCalculationForService))
-                                                      (.setTimeout js/window
-                                                                   (fn [] (e! (admin-transit-changes/->LoadHashRecalculations)))
-                                                                   500))}
-                       "Laske"]])}
-       [(form/group
-          {:label   "Päivä hashien uudelleen laskenta"
-           :columns 3
-           :layout  :raw
-           :card?   false}
-          {:name      :service-id
-           :type      :string
-           :label     "Palvelun id"
-           :hint-text "Palvelun id"
-           :required? true}
-          {:name      :package-count
-           :type      :string
-           :label     "Pakettien määrä"
-           :hint-text "5"
-           :required? true})]
-       (get-in app-state [:admin :transit-changes :daily-hash-values])]]
-
-     [:div (stylefy/use-style (style-base/flex-container "column"))
-      [:br]
-      [buttons/save
-       {:id       "force-detect-transit-changes"
-        :on-click #(do
-                     (.preventDefault %)
-                     (e! (admin-transit-changes/->ForceDetectTransitChanges)))
-        :primary  true
-        :icon     (ic/content-filter-list)}
-       "Pakota kaikkien muutosten tunnistus"]]
+        [:div
+         [:h4 "Päivitä palvelulle päivittäiset hash tunnisteet"]
+         [form/form
+          {:update! #(e! (admin-transit-changes/->UpdateHashCalculationValues %))
+           :footer-fn (fn [data]
+                        [:span
+                         [buttons/save {:primary true
+                                        :on-click #(do
+                                                     (.preventDefault %)
+                                                     (e! (admin-transit-changes/->ForceHashCalculationForService))
+                                                     (.setTimeout js/window
+                                                                  (fn [] (e! (admin-transit-changes/->LoadHashRecalculations)))
+                                                                  500))}
+                          "Laske"]])}
+          [(form/group
+             {:label "Päivä hashien uudelleen laskenta"
+              :columns 3
+              :layout :raw
+              :card? false}
+             {:name :service-id
+              :type :string
+              :label "Palvelun id"
+              :hint-text "Palvelun id"
+              :required? true}
+             {:name :package-count
+              :type :string
+              :label "Pakettien määrä"
+              :hint-text "5"
+              :required? true})]
+          (get-in app-state [:admin :transit-changes :daily-hash-values])]]])
 
      [:div
       [:br]
@@ -302,7 +296,7 @@
       [:div.container {:style {:margin-top "20px"}}
        (case selected-tab
              "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
-                                      "admin-route-id" (if recalc? [hash-recalculation-warning e! app-state] [route-id e! app-state])
+                                      "admin-route-id" [route-id e! app-state recalc?]
                                       "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
                                       "admin-commercial-services" [contract-traffic e! app-state]
                                       ;;default
