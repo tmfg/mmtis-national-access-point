@@ -7,7 +7,6 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [clojure.spec.alpha :as spec]
-            ;; [spec-provider.provider :as provider]
             [specql.op :as op]
             [ote.db.user :as user]
             [ote.util.collections :refer [map-by count-matching]]
@@ -156,43 +155,29 @@
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
+  (cond
+    ;; If this is the first call and the current week is "anomalous".
+    ;; Then start at the next week.
+    (and (nil? state)
+         (not (week= curr next1))
+         (week= prev next1))
+    {} ;; Ignore this week
 
-  ;; todo: add detection dection reason to thje state map, instead of the debug prints
+    ;; No starting week specified yet, use current week
+    (nil? starting-week-hash)
+    (assoc state :starting-week-hash curr)
 
-  ;; (println "at curr:" curr)
-    (cond
-      ;; If this is the first call and the current week is "anomalous".
-      ;; Then start at the next week.
-      (and (nil? state)
-           (not (week= curr next1))
-           (week= prev next1))
-      ;; Ignore this week
-      (do
-        (println "debug: ignore week" curr)
-        {})
+    ;; If current week does not equal starting week...
+    (and (vnot (week= starting-week-hash curr) (str "curr = start (1) sw:" starting-week-hash " curr:" curr))
+         (vnot (week= starting-week-hash next1) "curr = next1 (2)")
+         ;; ...and traffic does not revert back to previous in two weeks
+         (vnot (week= starting-week-hash next2) "curr = next2 (3)"))
+    ;; this is a change
+    (assoc state :different-week-hash curr)
 
-      ;; No starting week specified yet, use current week
-      (nil? starting-week-hash)
-      (do
-        (println "debug: no starting-week -> set starting week")
-        (assoc state :starting-week-hash curr))
-
-      ;; If current week does not equal starting week...
-      (and (vnot (week= starting-week-hash curr) (str "curr = start (1) sw:" starting-week-hash " curr:" curr))
-           (vnot (week= starting-week-hash next1) "curr = next1 (2)")
-           ;; ...and traffic does not revert back to previous in two weeks
-           (vnot (week= starting-week-hash next2) "curr = next2 (3)"))
-      ;; this is a change
-        (do
-          (println "yes change")
-          (assoc state :different-week-hash curr))
-
-        ;; No change found, return state as is
-
-        :default
-        (do
-          #_(println "debug: no change")
-          state)))
+    ;; No change found, return state as is
+    :default
+    state))
 
 (defn week-hash-no-traffic-run
   "Return the continuous amount of days that have no traffic at the beginning or end of the weekhash."
@@ -285,7 +270,7 @@
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week curr)
                      (add-different-week curr))]
-      (if-let [dw (:different-week result)]
+      #_(if-let [dw (:different-week result)]
         (println "route-next-different-week found something:" dw )
         (println "no changes found from:" (:beginning-of-week (first  weeks))))
       result)))
@@ -332,7 +317,7 @@
   ::bow-eow-map)
 (spec/def
  ::week-hash-vec
-  (spec/coll-of (spec/or :keyword keyword? :string string?)))
+  (spec/coll-of (spec/or :keyword keyword? :string string? :nil nil?)))
 (spec/def
  ::different-week-hash
   ::week-hash-vec)
@@ -358,6 +343,23 @@
 (spec/fdef route-weeks-with-first-difference
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
+
+(spec/def ::route-key string?)
+
+(spec/def ::service-route-change-map
+  (spec/keys
+    :req-un
+    [::route-key
+     ::starting-week
+     ::starting-week-hash]
+    :opt-un
+    [::changes
+     ::different-week
+     ::different-week-hash]))
+
+(spec/def
+  ::detected-route-changes-for-services-coll
+  (spec/coll-of ::service-route-change-map :kind vector?))
 
 (defn route-weeks-with-first-difference
   "Detect the next different week in each route.
@@ -445,7 +447,6 @@
   (assert (some? date))
   (assert (some? rw))
   (assert (some? (:beginning-of-week rw)) rw)
-  (println "route-route-starting-week-not-before? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date "->" (not (local-date-before? (:beginning-of-week rw) date)))
   (not (local-date-before? (:beginning-of-week rw) date)))
 
 (defn filter-by-vals [pred map]
@@ -453,13 +454,8 @@
                  :when (pred v)]
              [k v])))
 
-
 (def new-data-example [{:starting-week :foo
                         :different-week :foo }])
-
-
-;; todo:
-;; split route-weeks into per-route data and call this once per route
 
 (defn route-differences
   "
@@ -483,13 +479,6 @@
   [route-weeks]
   (loop [route-weeks route-weeks
          results []]
-
-    ;(def route-weeks* route-weeks)
-
-    (println "route-weeks in route-difference : \n")
-    (clojure.pprint/pprint route-weeks)
-    (spec/explain ::route-weeks-vec route-weeks)
-    ;(assert (spec/valid? ::route-weeks-vec route-weeks) route-weeks)
     (let [diff-data (route-weeks-with-first-difference-new route-weeks)
           filtered-diff-data (first (filter (fn [value]
                                               (or (:no-traffic-start-date value) (:different-week value)))
@@ -499,26 +488,22 @@
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when (or diff-week-date no-traffic-end)
                            (.minusWeeks (or diff-week-date no-traffic-end) 1))]
-      ;(def no-traffic-end* no-traffic-end)
-      (println "filtered-diff-data: " (pr-str filtered-diff-data))
-      (println "diff-data: " (pr-str diff-data))
-      (println "no-traffic-end: " (pr-str no-traffic-end))
-      ;(def diff-data* diff-data)
-      ;(def diff-week-date* diff-week-date)
+      ;(println "filtered-diff-data: " (pr-str filtered-diff-data))
+      ;(println "diff-data: " (pr-str diff-data))
+      ;(println "no-traffic-end: " (pr-str no-traffic-end))
 
-      (println "diff-week-beginnings: " (pr-str diff-week-beginnings))
-      (println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
-                                        ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
+      ;(println "diff-week-beginnings: " (pr-str diff-week-beginnings))
+      ;(println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
+      ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
       (if (and (not-empty diff-data) prev-week-date)   ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
-         ;; Use the previous week date, because first-week-difference starts
-         ;; comparisons at the second given week
+          ;; Use the previous week date, because first-week-difference starts comparisons at the second given week
           (filter #(route-starting-week-not-before? % prev-week-date) route-weeks)
           (conj results filtered-diff-data))
         (if (empty? results)
           diff-data
-          results)))))                                      ;we need to add the default week data when no changes are found
+          results))))) ;; Default week data expected when no changes are found
 
 (defn combine-differences-with-routes
   [route-weeks differences]
@@ -590,35 +575,22 @@
   (let [route-day-changes
         (into {}
               (map (fn [[route {diff :different-week :as detection-result}]]
-                     (if diff
-                       ;; If a different week was found, do detailed trip analysis
-                       (do
-                         ;(println "Print differences for route " (pr-str route) (pr-str diff) "\n detection-result: " (pr-str detection-result))
-                         [route (assoc detection-result
-                                  :changes (compare-route-days db service-id route detection-result))])
-
-                       ;; Otherwise return as is
+                     (if diff ;; If a different week was found, do detailed trip analysis
+                       [route (assoc detection-result
+                                :changes (compare-route-days db service-id route detection-result))]
                        [route detection-result])))
               routes)]
     route-day-changes))
 
-
 (defn route-day-changes-new
-  "Takes in routes with possible different weeks and adds day change comparison."
+  "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
   [db service-id routes]
-  (println routes)
   (let [route-day-changes
-        (into {}
-              (map-indexed (fn [i {diff :different-week route-key :route-key :as detection-result}]
-                     (if diff
-                       ;; If a different week was found, do detailed trip analysis
-                       (do
-                         ;(println "Print differences for route " (pr-str route) (pr-str diff) "\n detection-result: " (pr-str detection-result))
-                         [(str route-key i) (assoc detection-result
-                                  :changes (compare-route-days db service-id route-key detection-result))])
-
-                       ;; Otherwise return as is
-                       [(str route-key i) detection-result])))
+        (mapv (fn [{diff :different-week route-key :route-key :as detection-result}]
+                (if diff ;; If a different week was found, do detailed trip analysis
+                  (assoc detection-result
+                    :changes (compare-route-days db service-id route-key detection-result))
+                  detection-result))
               routes)]
     route-day-changes))
 
@@ -659,18 +631,21 @@
      :gtfs/change-date nil}
     change))
 
+(spec/fdef transform-route-change
+           :args (spec/cat :all-routes vector? :route-change map? :route-changes-all ::detected-route-changes-for-services-coll))
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
-  [all-routes route-key-old
+  [all-routes
    {:keys [no-traffic-start-date no-traffic-end-date
            starting-week different-week route-key no-traffic-run
            changes] :as route-change} route-changes-all]
-
-  (let [route-map (map #(second %) all-routes)
-        route-changes-for-key (filter #(= route-key (:route-key (last %))) route-changes-all)
-        last-route-change? (= route-change (second (last route-changes-for-key)))
+  (spec/assert ::detected-route-changes-for-services-coll route-changes-all)
+  (let [route-map (map second all-routes)
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
         added? (min-date-in-the-future? route)
+        route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
+        last-route-change? (= route-change (last route-changes-for-key))
+        ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
         removed? (and last-route-change? (max-date-within-90-days? route))
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
@@ -686,7 +661,6 @@
         trip-stop-time-changes (reduce update-min-max-range
                                        {}
                                        (map :stop-time-changes trip-changes))]
-
     (merge
       {;; Route identification
        :gtfs/route-short-name (:route-short-name route)
@@ -785,8 +759,8 @@
          (pos-int? (count package-ids))]}
   (tx/with-transaction
     db
-    (let [route-change-infos (map (fn [[route-key detection-result]]
-                                    (transform-route-change all-routes route-key detection-result route-changes))
+    (let [route-change-infos (map (fn [detection-result]
+                                    (transform-route-change all-routes detection-result route-changes))
                                   route-changes)
           change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
           earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
@@ -812,7 +786,6 @@
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]
-
       (update-route-changes! db (sql-date analysis-date) service-id route-change-infos))))
 
 (defn override-static-holidays [date-route-hashes]
@@ -859,22 +832,23 @@
 
 
 (defn changes-by-week->changes-by-route
-  " Takes input-format and formats it to output-format
-  input-format:
-  {:beginning-of-week 1.1 :end-of-week 7.1 :routes { \"route1\" [\"h1\" \"h1\"}
-                                                    \"route2\" [\"h1\" \"h1\"]
-                                                    \"route3\" [\"h1\" \"h1\"]}}
-  {:beginning-of-week 8.1 :end-of-week 15.1 :routes { \"route1\" [\"h1\" \"h1\"}
-                                                    \"route2\" [\"h1\" \"h1\"]
-                                                    \"route3\" [\"h1\" \"h1\"]}}
-
-  Output-format:
-   [[{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
-    {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
-    {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]
-    [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
-     {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
-     {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
+  "Input: Takes collection of maps (weeks), each map contains all routes of the service for the week.
+    Input format:
+        {:beginning-of-week 1.1 :end-of-week 7.1 :routes { \"route1\" [\"h1\" \"h1\"}
+                                                          \"route2\" [\"h1\" \"h1\"]
+                                                          \"route3\" [\"h1\" \"h1\"]}}
+        {:beginning-of-week 8.1 :end-of-week 15.1 :routes { \"route1\" [\"h1\" \"h1\"}
+                                                          \"route2\" [\"h1\" \"h1\"]
+                                                          \"route3\" [\"h1\" \"h1\"]}}
+  Function splits the input maps so that routes are not grouped together, instead each route will be in its own collection.
+  Output: A vector of 'route-vectors'. Each route-vector contains maps, each representing a week for the specific route.
+    Output format:
+       [[{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
+        {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
+        {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]
+        [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
+         {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
+         {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
   [weeks]
   (vals (group-by (fn [d]
                     (keys (:routes d)))
@@ -889,40 +863,41 @@
                     []
                     weeks))))
 
-
 (defn detect-changes-for-all-routes
+  "Input: takes a vector or routes with their traffic weeks
+  Invokes a function in a loop for each route to detect any changes for each route.
+  Output: Vector of routes enriched by details if there are changes in traffic for a route on a week."
   [route-list-with-week-hashes]
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
+(spec/fdef detect-route-changes-for-service-new
+           :ret ::detected-route-changes-for-services-coll)
 (defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
-  "Returns map for each service"
-  (println "route-query-params: " (pr-str route-query-params))
+  "Input: Takes service-id,
+  fetches and analyzes packages for the service and produces a collection of structures, each of which describes
+  if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
+  Output: ::detected-route-changes-for-services-coll"
   (let [type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
         all-routes (map-by-route-key service-routes type)
         all-route-keys (set (keys all-routes))
-        ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db route-query-params)
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)]
+        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)] ;; Format: ({:date routes(=hashes)})
     (try
       {:all-routes all-routes
        :route-changes
-       (let [new-data (->> routes-by-date                       ;; Format of routes-by-date is: [{:date routes(=hashes)}]
-                       ;; Create week hashes so we can find out the differences between weeks
-                       (combine-weeks)
-                       ;; Search next week (for every route) that is different
-                       (changes-by-week->changes-by-route)  ;Contains list of vectors
-
-                       (detect-changes-for-all-routes)
-                       ;; Fetch detailed route comparison if a change was found
-                       (route-day-changes-new db service-id)    ;;remove this from here and the old function to run comparing tests
-                       )]
+       (let [new-data (->> routes-by-date
+                           ;; Create week hashes so we can find out the differences between weeks
+                           (combine-weeks)
+                           (changes-by-week->changes-by-route)
+                           (detect-changes-for-all-routes)
+                           ;; Fetch detailed day details
+                           (route-day-changes-new db service-id))]
+         (spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
-      ;route-changes keyu here is allways empty for some reason
-      ;in old code route-changes contains {route-key {detection-result} } <- multiple pairs
       (catch Exception e
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
