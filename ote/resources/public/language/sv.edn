@@ -666,6 +666,7 @@
  :organization-page
  {:address-postal "Postadress"
   :address-postal-street "Gatuadress eller postbox"
+  :basic-details "Perustiedot"
   :business-id-and-aux-names "Företagsnamn och parallellnamn"
   :business-or-aux-name "Företagsnamn eller extra företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
