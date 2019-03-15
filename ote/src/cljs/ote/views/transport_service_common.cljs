@@ -335,23 +335,23 @@
          :style style-base/required-element
          :full-width? true})
 
-      {:name ::t-service/contact-email
+      {:name ::t-service/homepage
        :type :string
        :container-class "col-xs-12 col-sm-6 col-md-4"
-       :validate [[:correct-email]]
        :full-width? true
        :max-length 200}
 
       {:name ::t-service/contact-phone
        :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-2"
+       :container-class "col-xs-12 col-sm-6 col-md-4"
        :max-length 16
        :regex phone-number-regex
        :full-width? true}
 
-      {:name ::t-service/homepage
+      {:name ::t-service/contact-email
        :type :string
-       :container-class "col-xs-12 col-sm-6 col-md-5"
+       :container-class "col-xs-12 col-sm-6 col-md-4"
+       :validate [[:correct-email]]
        :full-width? true
        :max-length 200})))
 

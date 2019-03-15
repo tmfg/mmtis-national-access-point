@@ -22,12 +22,7 @@
         service-sub-data (get service key)]
     (if (or
           ;; contact details are not missing if address is given
-          (and
-            (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/street])))
-            (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/post_office])))
-            (and
-              (not (empty? (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))
-              (nil? (validation/validate-rule :postal-code nil (get-in service-sub-data [::t-service/contact-address ::common/postal_code])))))
+          (not (empty? (::t-service/homepage service-sub-data)))
           ;; or if contact-email is given
           (not (empty? (::t-service/contact-email service-sub-data)))
           ;; or if contact-phone is given
