@@ -199,6 +199,31 @@
     (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))
     count))
 
+(defn- select-op-keys-to-create [op]
+  (select-keys op
+               [::t-operator/authority-email
+                ::t-operator/authority-phone
+                ::t-operator/business-id
+                ::t-operator/name
+                ::t-operator/phone
+                ::t-operator/gsm
+                ::t-operator/email
+                ::t-operator/homepage
+                ;; visiting-address and billing-address are not to be supported at the moment
+                ]))
+
+(defn- select-op-keys-to-update [op]
+  (select-keys op
+               [::t-operator/authority-email
+                ::t-operator/authority-phone
+                ::t-operator/name
+                ::t-operator/phone
+                ::t-operator/gsm
+                ::t-operator/email
+                ::t-operator/homepage
+                ;; visiting-address and billing-address are not to be supported at the moment
+                ]))
+
 (defn- create-transport-operator-nap
   "Takes `db`, `user` and operator `data`. Creates a new transport-operator and a group (organization) for it.
    Links the transport-operator to group via member table"
@@ -206,26 +231,13 @@
   {:pre [(some? data)]}
   (tx/with-transaction db
     (let [op (insert! db ::t-operator/transport-operator
-                      (dissoc data
-                              ::t-operator/id
-                              ::t-operator/ckan-description
-                              ::t-operator/ckan-group-id))
+                      (select-op-keys-to-create data))
           group (give-permissions! db op user)]
 
       (update! db ::t-operator/transport-operator
                {::t-operator/ckan-group-id (::t-operator/group-id group)}
                {::t-operator/id (::t-operator/id op)})
       op)))
-
-(defn- select-op-keys-to-update [op]
-  (select-keys op
-               [::t-operator/name
-                ;::t-operator/billing-address  Commented out because addresses are not currently in use
-                ;::t-operator/visiting-address Commented out because addresses are not currently in use
-                ::t-operator/phone
-                ::t-operator/gsm
-                ::t-operator/email
-                ::t-operator/homepage]))
 
 ;; Takes db and transport-operator. Resolves optional data for updating operator and returns a transport-operator map.
 (defn resolve-update-operator-data [db op]
