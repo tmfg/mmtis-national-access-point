@@ -1,10 +1,12 @@
-(ns ote.views.transit-visualization.section
-  "Container for different sections in transit visualization page."
+(ns ote.views.transit-visualization.change-utilities
+  "Helper ui components for transit visualization."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
-            [ote.app.controller.transit-visualization :as tv]))
+            [ote.app.controller.transit-visualization :as tv]
+            [ote.ui.icons :as ote-icons]
+            [ote.ui.icon_labeled :as icon-l]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -26,3 +28,16 @@
        help-content]
       [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
        body-content]])])
+
+(defn route-changes-legend []
+  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend-container)
+   [:div
+    [:b "Taulukon ikonien selitteet"]]
+   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
+    (doall
+      (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
+                          [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
+                          [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
+                          [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
+        ^{:key (str "transit-visualization-route-changes-legend-" label)}
+        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
