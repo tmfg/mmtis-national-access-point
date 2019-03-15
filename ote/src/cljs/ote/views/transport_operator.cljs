@@ -234,7 +234,7 @@
 
       {:type :text-label
        :name :heading-contact-details-other
-       :label (tr [:organization-page :contact-details-service-developers])
+       :label (tr [:organization-page :contact-details])
        :h-style :h2}
 
       {:type :info-toggle
@@ -242,7 +242,7 @@
        :label (tr [:common-texts :instructions])
        :body [:div
               [:p (tr [:organization-page :help-contact-details])]
-              [:p (tr [:organization-page :help-contact-details-privacy])]
+              [:p (tr [:organization-page :contact-details])]
               [:p (tr [:common-texts :nap-data-license]) "\"" (tr [:common-texts :nap-data-license-url-label]) "\"."]]
        :default-state true}
 
@@ -257,11 +257,20 @@
          :h-style :h4})
 
       {:type :string
+       :element-id "input-operator-web"
+       :name ::t-operator/homepage
+       :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
+       :required? (required-public-contact-missing? operator)
+       :show-errors? false
+       :style style-fields/form-field}
+
+      {:type :string
        :element-id "input-operator-telephone"
        :name ::t-operator/phone
        :label (tr [:organization-page :field-phone-telephone] )
        :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
        :required? (required-public-contact-missing? operator)
+       :show-errors? false
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -271,6 +280,7 @@
        :label (tr [:organization-page :field-phone-mobile] )
        :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
        :required? (required-public-contact-missing? operator)
+       :show-errors? false
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -279,13 +289,7 @@
        :name ::t-operator/email
        :disabled? (get-in state [:ytj-flags :use-ytj-email?] false)
        :required? (required-public-contact-missing? operator)
-       :style style-fields/form-field}
-
-      {:type :string
-       :element-id "input-operator-web"
-       :name ::t-operator/homepage
-       :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
-       :required? (required-public-contact-missing? operator)
+       :show-errors? false
        :style style-fields/form-field}
 
       ;; Contact details for authorities
@@ -313,7 +317,7 @@
        :element-id "input-operator-email-auth"
        :name ::t-operator/authority-email
        :required? true
-       :label ::t-operator/email
+       :label (tr [:field-labels :ote.db.transport-operator/email])
        :style style-fields/form-field
        ;:validate [[:email]];;TODO implement email regex
        })))
