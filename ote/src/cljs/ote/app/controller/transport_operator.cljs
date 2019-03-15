@@ -56,9 +56,9 @@
       (first result))))                                     ;; Return first because expected value is string not vector
 
 ;; Keys for saving fields common with all companies sharing the same Y-tunnus/business-id
-(defn- take-common-op-keys [coll] (select-keys coll [::t-operator/business-id
-                                                     ::t-operator/billing-address
-                                                     ::t-operator/visiting-address
+(defn- take-common-op-keys [coll] (select-keys coll [::t-operator/authority-email
+                                                     ::t-operator/authority-phone
+                                                     ::t-operator/business-id
                                                      ::t-operator/phone
                                                      ::t-operator/gsm
                                                      ::t-operator/email
@@ -68,7 +68,9 @@
 (defn- take-new-op-keys [coll] (select-keys coll [::t-operator/name]))
 
 ; Keys unique to an operator when editing existing company. Extra to `take-common-op-keys`
-(defn- take-update-op-keys [coll] (select-keys coll [::t-operator/id ::t-operator/ckan-description ::t-operator/ckan-group-id]))
+(defn- take-update-op-keys [coll] (select-keys coll [::t-operator/id
+                                                     ::t-operator/ckan-description
+                                                     ::t-operator/ckan-group-id]))
 
 ;; Take keys supported by backend transport-operator API
 (defn take-operator-api-keys [op] (merge (take-new-op-keys op) (take-update-op-keys op) (take-common-op-keys op)))

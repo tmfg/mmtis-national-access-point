@@ -281,7 +281,7 @@
 
       {:type :string
        :element-id "input-operator-telephone-auth"
-       :name ::t-operator/phone-auth
+       :name ::t-operator/authority-phone
        :required? true
        :label (tr [:organization-page :field-phone-telephone])
        :style style-fields/form-field
@@ -289,7 +289,7 @@
 
       {:type :string
        :element-id "input-operator-email-auth"
-       :name ::t-operator/email-auth
+       :name ::t-operator/authority-email
        :required? true
        :label ::t-operator/email
        :style style-fields/form-field
