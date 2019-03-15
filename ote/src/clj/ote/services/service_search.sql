@@ -137,7 +137,7 @@ SELECT oa."transport-service-id" as id
  WHERE ts.published IS NOT NULL
    AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_Area(ST_Intersection(ST_SetSRID(oa.location, 4326), sa.location)) > 0;
+   AND ST_Intersects(ST_SetSRID(oa.location, 4326), sa.location);
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area

@@ -37,6 +37,25 @@
      :id
      (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
+(defn- service-search-match-quality [db result operation-area]
+  "Returns match quality of a search result to the operation-area it was searched against. Greater return values are worse matches.
+   Negative return value is an invalid match"
+  (let [{match-area :intersection
+         difference-area :difference}
+        (first
+         (service-match-quality-to-operation-area db {:id (::t-service/id result) :operation-area operation-area}))]
+    (if (pos? match-area)
+      (/ difference-area match-area)
+      -1)))
+
+(defn- service-search-match-qualities [db results operation-area]
+  "Extends the results with quality of the match to the operation area. Results which are clearly not matches area filtered out"
+  (if operation-area
+    (let [qualities (mapv #(assoc % :operation-area-match-quality (service-search-match-quality db % operation-area)) results)
+          valid-results (filter (comp (complement neg?) :operation-area-match-quality) qualities)]
+      valid-results)
+    results))
+
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
     (let [text (str/trim text)]
@@ -129,20 +148,6 @@
         (dissoc ::t-service/gtfs-import-error
                 ::t-service/gtfs-db-error))
     ei-link))
-
-(defn- service-search-match-quality [db result operation-area]
-  (let [{match-area :intersection
-         difference-area :difference}
-        (first 
-         (service-match-quality-to-operation-area db {:id (::t-service/id result) :operation-area operation-area}))]
-    (/ difference-area match-area)))
-
-(defn- service-search-match-qualities [db results operation-area]
-  (if operation-area
-    (mapv #(assoc % :operation-area-match-quality
-                  (service-search-match-quality db % operation-area))
-          results)
-    results))
 
 (defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
