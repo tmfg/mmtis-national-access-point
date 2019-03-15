@@ -101,4 +101,19 @@
     (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
-      (is (zero? (count (:json result)))))))
+      (is (zero? (count (:json result))))))
+
+  (testing "Ranking search results with quality of match against operation-area"
+    (let [match-qualities '({:id 817
+                             :intersection 0.6384818473140419
+                             :difference 66.3123620550177}
+                            {:id 1448
+                             :intersection 0.0
+                             :difference 0.7630913680707156})
+          initial-results  [{::t-service/id 817} {::t-service/id 1448}]
+          results (sut/sort-by-match-quality initial-results match-qualities)]
+      (is (= #{817} (into #{} (map ::t-service/id results))))))
+
+  (testing "Match quality counting"
+    (is (= -1 (sut/match-quality 0 1))
+        (= 2 (sut/match-quality 2 1)))))

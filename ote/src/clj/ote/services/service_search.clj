@@ -30,29 +30,35 @@
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
 
-(defn- services-operating-in [db operation-area]
+(defn- services-operating-in
   "Returns ids of services which operate in the given areas"
+  [db operation-area]
   (when (seq operation-area)
     (ids
      :id
      (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
-(defn- service-search-match-quality [db result operation-area]
+(defn match-quality [intersection difference]
   "Returns match quality of a search result to the operation-area it was searched against. Greater return values are worse matches.
    Negative return value is an invalid match"
-  (let [{match-area :intersection
-         difference-area :difference}
-        (first
-         (service-match-quality-to-operation-area db {:id (::t-service/id result) :operation-area operation-area}))]
-    (if (pos? match-area)
-      (/ difference-area match-area)
-      -1)))
+  (if (pos? intersection) (/ difference intersection) -1))
 
-(defn- service-search-match-qualities [db results operation-area]
+(defn sort-by-match-quality
+  "Sorts results by the match quality. Removes results with invalid match qualities"
+  [results spatial-diffs]
+  (let [quality-by-id (zipmap (map :id spatial-diffs) (map #(match-quality (:intersection %) (:difference %)) spatial-diffs))]
+    (->> results
+         (map #(assoc % :match-quality (get quality-by-id (::t-service/id %))))
+         (filter (comp (complement neg?) :match-quality))
+         (sort-by :match-quality))))
+
+(defn- service-search-match-qualities
   "Extends the results with quality of the match to the operation area. Results which are clearly not matches area filtered out"
+  [db results operation-area]
   (if operation-area
-    (let [qualities (mapv #(assoc % :operation-area-match-quality (service-search-match-quality db % operation-area)) results)
-          valid-results (filter (comp (complement neg?) :operation-area-match-quality) qualities)]
+    (let [ids (map ::t-service/id results)
+          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
+          valid-results (sort-by-match-quality results qualities)]
       valid-results)
     results))
 
@@ -194,7 +200,7 @@
                                         results)]
     (merge
      {:empty-filters? empty-filters?
-      :results (sort-by :operation-area-match-quality results-without-personal-info)
+      :results results-without-personal-info
       :filter-service-count (count ids)}
      (when empty-filters?
        {:total-service-count (total-service-count db)

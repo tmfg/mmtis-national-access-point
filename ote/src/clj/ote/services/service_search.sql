@@ -145,15 +145,13 @@ SELECT "oa-agg"."transport-service-id" as id,
        ST_Area(ST_Intersection(ST_SetSRID("oa-agg".location, 4326), sa.location)) as intersection,
        ST_Area(ST_SymDifference(ST_SetSRID("oa-agg".location, 4326), sa.location)) as "difference"
   FROM
-      (SELECT :id as "transport-service-id",
+      (SELECT oa."transport-service-id" as "transport-service-id",
               ST_Union(array_agg(ST_SetSRID(oa.location, 4326))) as "location"
          FROM operation_area oa
-        WHERE oa."transport-service-id" = :id
-          AND oa."primary?" = true) as "oa-agg",
+        WHERE oa."transport-service-id" in (:id)
+          AND oa."primary?" = true
+     GROUP BY oa."transport-service-id") as "oa-agg",
       (SELECT ST_Union(array_agg(pl.location)) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa";
-
-
-
 
