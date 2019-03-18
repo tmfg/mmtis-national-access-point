@@ -2,10 +2,8 @@
   "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
 
             [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
             [ote.ui.info :as info]
@@ -13,23 +11,17 @@
             [ote.ui.warning_msg :as msg-warn]
             [ote.ui.success_msg :as msg-succ]
             [ote.ui.circular_progress :as prog]
-            [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
             [ote.style.form-fields :as style-fields]
-            [ote.ui.common :as ui-common]
-            [ote.ui.form-fields :as form-fields]
 
             [ote.app.controller.flags :as flags]
             [ote.app.controller.transport-operator :as to]
-            [ote.app.controller.front-page :as fp]
 
             [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.style.base :as style-base]
             [ote.ui.common :as uicommon]
-            [ote.style.dialog :as style-dialog])
-  )
+            [ote.style.dialog :as style-dialog]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -267,7 +259,7 @@
       {:type :string
        :element-id "input-operator-telephone"
        :name ::t-operator/phone
-       :label (tr [:organization-page :field-phone-telephone] )
+       :label (tr [:organization-page :field-phone-telephone])
        :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
        :required? (required-public-contact-missing? operator)
        :show-errors? false
@@ -399,7 +391,8 @@
         show-details? (or (not ytj-supported?)
                           (and (:transport-operator-loaded? state)
                                (some? (:ytj-response state))))
-        show-merge-companies? (and (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
+        show-merge-companies? (and ytj-supported?
+                                   (pos-int? (count (get-in state [:transport-operator :ytj-orphan-nap-operators])))
                                    (pos-int? (count (:ytj-company-names state))))
         form-groups (cond-> []
                             creating? (conj (business-id-selection e! state ytj-supported?))
