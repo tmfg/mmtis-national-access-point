@@ -159,7 +159,7 @@
 
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
-     :cljs ( year (dec month) date)))
+     :cljs (goog.date.Date. year (dec month) date)))
 
 (defn year [dt]
   (::year (date-fields dt)))
