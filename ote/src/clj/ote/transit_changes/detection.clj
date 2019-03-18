@@ -158,7 +158,7 @@
   (cond
     ;; If this is the first call and the current week is "anomalous".
     ;; Then start at the next week.
-    (and (nil? state)
+    (and (nil? starting-week-hash)
          (not (week= curr next1))
          (week= prev next1))
     {} ;; Ignore this week
