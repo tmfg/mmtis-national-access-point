@@ -58,7 +58,7 @@
    :ote.db.transport-service/contact-address "Osoitetiedot"
    :ote.db.transport-service/contact-phone "Puhelin"
    :ote.db.transport-service/contact-email "Sähköposti"
-   :ote.db.transport-service/homepage "Verkkosivujen osoite"
+   :ote.db.transport-service/homepage "Verkkosivun osoite"
 
    :ote.db.transport-service/operation-area "Toiminta-alue"
    :ote.db.transport-service/location "Sijainti"
@@ -976,7 +976,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-operator-basic-details "Perustiedot"
   :data-not-found "Tietoja ei löytynyt."
   :required-field "Tieto vaaditaan"
-  :one-is-required "Yksi tieto vaaditaan"
+  :one-is-required "Anna vähintään yksi tieto."
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"

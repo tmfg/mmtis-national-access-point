@@ -970,7 +970,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :title-operator-basic-details "Basinfo"
   :data-not-found "Inga uppgifter hittades."
   :required-field "Obligatorisk uppgift"
-  :one-is-required "Yksi tieto vaaditaan"
+  :one-is-required "Anna vähintään yksi tieto."
   :invalid-email "Tarkista sähköposti"
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"

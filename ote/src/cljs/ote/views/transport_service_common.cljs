@@ -405,7 +405,7 @@
         ;; True
         [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
                        :disabled (or (not (form/can-save? data)) contact-details-missing?)}
-         (tr [:buttons :save-updated])]
+         (tr [:buttons :save])]
         ;; False
         [:span
          [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
