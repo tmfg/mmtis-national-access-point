@@ -341,7 +341,7 @@
         fwd-difference-new (detection/route-weeks-with-first-difference-new data-two-week-two-route-change)]
     (testing "first change matches first-week-difference return value"
       (is (= (-> fwd-difference-old (get "Raimola") :different-week) (-> diff-pairs first :different-week)))
-      (is (= (-> fwd-difference-new first :different-week) (-> diff-pairs first :different-week))))
+      (is (= (-> fwd-difference-new second :different-week) (-> diff-pairs first :different-week))))
 
     (testing "second route's first change date is ok"
       (is (= (d 2019 2 25)
