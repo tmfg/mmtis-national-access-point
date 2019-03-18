@@ -252,8 +252,6 @@
        :element-id "input-operator-web"
        :name ::t-operator/homepage
        :disabled? (get-in state [:ytj-flags :use-ytj-homepage?] false)
-       :required? (required-public-contact-missing? operator)
-       :show-errors? false
        :style style-fields/form-field}
 
       {:type :string
@@ -261,8 +259,6 @@
        :name ::t-operator/phone
        :label (tr [:organization-page :field-phone-telephone])
        :disabled? (get-in state [:ytj-flags :use-ytj-phone?] false)
-       :required? (required-public-contact-missing? operator)
-       :show-errors? false
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -271,8 +267,6 @@
        :name ::t-operator/gsm
        :label (tr [:organization-page :field-phone-mobile] )
        :disabled? (get-in state [:ytj-flags :use-ytj-gsm?] false)
-       :required? (required-public-contact-missing? operator)
-       :show-errors? false
        :style style-fields/form-field
        :regex ui-validation/phone-number-regex}
 
@@ -280,9 +274,8 @@
        :element-id "input-operator-email"
        :name ::t-operator/email
        :disabled? (get-in state [:ytj-flags :use-ytj-email?] false)
-       :required? (required-public-contact-missing? operator)
-       :show-errors? false
-       :style style-fields/form-field}
+       :style style-fields/form-field
+       :validate [[:correct-email]]}
 
       ;; Contact details for authorities
 
@@ -311,8 +304,7 @@
        :required? true
        :label (tr [:field-labels :ote.db.transport-operator/email])
        :style style-fields/form-field
-       ;:validate [[:email]];;TODO implement email regex
-       })))
+       :validate [[:correct-email]]})))
 
 (defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names]
   [:div {:style style-base/wizard-container}
@@ -353,7 +345,13 @@
                   :style style-form/action-control-section-margin}
     (tr [:buttons :next])]])
 
-(defn- operator-form-options [e! state show-actions?]
+(defn- required-public-contact-missing? [operator]
+  (and (empty? (::t-operator/phone operator))
+       (empty? (::t-operator/gsm operator))
+       (empty? (::t-operator/email operator))
+       (empty? (::t-operator/homepage operator))))
+
+(defn- operator-form-options [e! {operator :transport-operator :as state} show-actions?]
   {:name->label (tr-key [:field-labels])
    :update! #(e! (to/->EditTransportOperatorState %))
    :footer-fn (fn [data]
@@ -362,7 +360,8 @@
                   (when show-actions?
                     [buttons/save {:id "btn-operator-save"
                                    :on-click #(e! (to/->SaveTransportOperator))
-                                   :disabled (or (get-in state [:transport-operator :business-id-exists?])
+                                   :disabled (or (required-public-contact-missing? operator)
+                                                 (get-in state [:transport-operator :business-id-exists?])
                                                  (form/disable-save? data))}
                      (tr [:buttons :save])])
 
@@ -370,7 +369,7 @@
                    (tr [:buttons :cancel])]]
 
                  (when (and show-actions? (empty? (:ytj-company-names state)))
-                   (when (not (get-in state [:transport-operator :new?]))
+                   (when-not (get-in state [:transport-operator :new?])
                      [:div
                       [:br]
                       [ui/divider]
@@ -378,9 +377,8 @@
                       [:div [:h2 (tr [:dialog :delete-transport-operator :title-base-view])]]
                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
                       [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
-                                     :disabled (if (and
-                                                     (empty? (:transport-service-vector state))
-                                                     (::t-operator/id data))
+                                     :disabled (if (and (empty? (:transport-service-vector state))
+                                                        (::t-operator/id data))
                                                  false
                                                  true)}
                        (tr [:buttons :delete-operator])]]))])})
