@@ -59,7 +59,7 @@
   (is (= {:no-traffic-start-date (d 2018 11 13)
           :no-traffic-end-date (d 2018 11 30)}
          (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run-weekdays)
-             (get route-name)
+             first
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
 (def no-traffic-run-full-detection-window
