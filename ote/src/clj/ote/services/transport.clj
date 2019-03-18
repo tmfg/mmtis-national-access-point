@@ -485,7 +485,6 @@
 (defn public-data-transport-service
   "Get single transport service by id"
   [db id]
-  (println "ran public transport service fn")
   (let [ts (first (fetch db ::t-service/transport-service
                          (apply disj
                                 (conj (specql/columns ::t-service/transport-service)
@@ -506,7 +505,7 @@
                    (specql/columns ::t-operator/transport-operator)
                    {::t-operator/id id})))
 
-(defn private-data-transport-operator
+(defn public-data-transport-operator
   "Get single transport service by id"
   [db id]
   (first (fetch db ::t-operator/transport-operator
