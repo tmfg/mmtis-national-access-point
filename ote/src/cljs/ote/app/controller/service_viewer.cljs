@@ -1,4 +1,4 @@
-(ns ote.app.controller.service-view
+(ns ote.app.controller.service-viewer
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.localization :as localization :refer [tr]]

@@ -1331,7 +1331,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
   :other-company " muuta yritystä"
   :show-all-information "Näytä kaikki tiedot"
-  :back-link "Takaisin liikkumispalvelukatalogiin"
+  :back-link "Siirry liikkumispalvelukatalogiin"
   :service-information "Palvelun tiedot"
   :service-api&format "Palvelun rajapinnat ja formaatit"
   :description "Kuvaus"
