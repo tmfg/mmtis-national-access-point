@@ -153,10 +153,6 @@
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
-(defn date-fields->date-midnight [{::keys [year date month]}]
-  #_(t/date-midnight year month date)
-  (t/date-time year month date))
-
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
      :cljs (goog.date.Date. year (dec month) date)))
