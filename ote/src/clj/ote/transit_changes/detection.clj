@@ -370,7 +370,7 @@
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
-  (println "first-week-difference called, #weeks:" (count route-weeks))
+  #_(println "first-week-difference called, #weeks:" (count route-weeks))
   ;(if (= 7  (count route-weeks))
   ;   (def *r7 route-weeks))
   ;; (println "spec for route-weeks:")
@@ -434,7 +434,7 @@
   (clj-time.core/after? (time/native->date-time d1) (time/native->date-time d2)))
 
 (defn route-starting-week-past-date? [rw date]
-  (println "route-starting-week-past-date? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
+  #_(println "route-starting-week-past-date? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
   (assert (some? date))
   (assert (some? rw))
   (assert (some? (:beginning-of-week rw)) rw)
@@ -578,7 +578,7 @@
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
   [db service-id routes]
-  (println routes)
+  #_(println routes)
   (let [route-day-changes
         (into {}
               (map (fn [[route {diff :different-week :as detection-result}]]
@@ -739,7 +739,7 @@
           :let [key (:route-hash-id r)
                 {:keys [changes no-traffic-start-date no-traffic-end-date]
                  :as   route} (route-changes key)]]
-    (println key " has traffic " (:min-date r) " - " (:max-date r)
+    #_(println key " has traffic " (:min-date r) " - " (:max-date r)
              (when no-traffic-end-date
                (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
              (when changes
@@ -837,7 +837,7 @@
 
 (defn changed-day-from-changed-week
   [db service-id route-list-with-changed-weeks]
-  (println "route-list-with-changed-weeks: " route-list-with-changed-weeks)
+  #_(println "route-list-with-changed-weeks: " route-list-with-changed-weeks)
   (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
 
 
@@ -974,7 +974,7 @@
                            :gtfs/route-short-name (:gtfs/route-short-name r)
                            :gtfs/route-long-name (:gtfs/route-long-name r)
                            :gtfs/trip-headsign (:gtfs/trip-headsign r)}))
-        (println "service id " service-id "date " (:gtfs/date t))))))
+        #_(println "service id " service-id "date " (:gtfs/date t))))))
 
 ;;Use only in local environment and for debugging purposes!
 (defn update-route-hashes [db]
@@ -989,7 +989,7 @@
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (dotimes [i (count packages)]
       (let [package-id (nth packages i)]
-          (println "Generating" (inc i) "/" package-count " - " package-id)
+          #_(println "Generating" (inc i) "/" package-count " - " package-id)
           (if future
             (generate-date-hashes-for-future db {:package-id (:package-id package-id)})
             (generate-date-hashes db {:package-id (:package-id package-id)}))
