@@ -17,7 +17,7 @@
   :ote.db.transport-operator/phone "Puhelinnumero 1"
   :ote.db.transport-operator/gsm "Puhelinnumero 2"
   :ote.db.transport-operator/email "Sähköpostiosoite"
-  :ote.db.transport-operator/homepage "WWW-osoite"
+  :ote.db.transport-operator/homepage "Verkkosivun osoite"
   :ote.db.transport-operator/visiting-address "Käyntiosoite"
   :ote.db.transport-operator/billing-address "Laskutusosoite"
 
@@ -58,7 +58,7 @@
    :ote.db.transport-service/contact-address "Osoitetiedot"
    :ote.db.transport-service/contact-phone "Puhelin"
    :ote.db.transport-service/contact-email "Sähköposti"
-   :ote.db.transport-service/homepage "Verkkosivujen osoite"
+   :ote.db.transport-service/homepage "Verkkosivun osoite"
 
    :ote.db.transport-service/operation-area "Toiminta-alue"
    :ote.db.transport-service/location "Sijainti"

@@ -17,7 +17,7 @@
   :ote.db.transport-operator/phone "Telefon 1"
   :ote.db.transport-operator/gsm "Telefon 2"
   :ote.db.transport-operator/email "E-post"
-  :ote.db.transport-operator/homepage "WWW-adress"
+  :ote.db.transport-operator/homepage "Webadress"
   :ote.db.transport-operator/visiting-address "Besöksadress"
   :ote.db.transport-operator/billing-address "Faktureringsadress"
 
@@ -975,7 +975,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :data-not-found "Inga uppgifter hittades."
   :required-field "Obligatorisk uppgift"
   :required-field-missing "Obligatorisk uppgift"
-  :required-one-of-many "Yksi tiedoista vaaditaan."
+  :required-one-of-many "Fyll minst ett fält."
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"

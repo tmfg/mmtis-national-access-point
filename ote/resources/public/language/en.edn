@@ -16,7 +16,7 @@
   :ote.db.transport-operator/phone "Phone 1"
   :ote.db.transport-operator/gsm "Phone 2"
   :ote.db.transport-operator/email "Email address"
-  :ote.db.transport-operator/homepage "WWW-address"
+  :ote.db.transport-operator/homepage "Web page address"
   :ote.db.transport-operator/visiting-address "Postal address"
   :ote.db.transport-operator/billing-address "Billing address"
 
@@ -971,7 +971,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :data-not-found "Information is not found."
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
-  :required-one-of-many "Details for at least one of the fields must be set."
+  :required-one-of-many "Please fill at least one field."
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
