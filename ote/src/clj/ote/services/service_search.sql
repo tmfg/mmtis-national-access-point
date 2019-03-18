@@ -135,9 +135,10 @@ SELECT oa."transport-service-id" as id
         WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts
  WHERE ts.published IS NOT NULL
+   AND oa.id not in (4046, 5013)
    AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_Intersects(ST_SetSRID(oa.location, 4326), sa.location);
+   AND ST_Intersects(oa.location, sa.location);
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area
