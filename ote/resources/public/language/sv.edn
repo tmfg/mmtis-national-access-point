@@ -1297,7 +1297,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
   :limit-search-results "Begränsar katalogen"
-  :participating-operator "Osallistuu tämän palvelun tuottamiseen"
+  :participating-operator "deltar i produktionen av denna tjänst."
   :released-apis "Gränssnitt publicerade i tjänsten."
   :no-description "Ingen beskrivning har givits till tjänsten än."
   :service-basic-info "Basic info of the service"
@@ -1319,7 +1319,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :other-involved-companies "De företag som producerar tjänsten"
   :other-company " annat företag"
   :show-all-information "Visa alla data"
-  :back-link "Tillbaka till tjänstekatalog"}
+  :back-link "Tillbaka till tjänstekatalog"
+  :service-information "Tjänstens basinfo"
+  :service-api&format "Tjänstens gränssnitt och format"
+  :description "Beskrivning"
+  :type "Typ"
+  :transport-type "Trafikslag"
+  :homepage "www-sidor"
+  :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}
 
  :login
  {:label "Inloggning"

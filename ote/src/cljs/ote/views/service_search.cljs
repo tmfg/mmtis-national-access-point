@@ -70,8 +70,7 @@
   (when format
     (let [format (str/lower-case format)]
       (when (or (= "gtfs" format) (= "kalkati.net" format))
-        [:span
-         [:br]
+        [:span {:style {:position "relative" :padding-left "30px"}}
          (if-not has-errors?
            (common-ui/linkify
              (str "#/routes/view-gtfs?url=" (.encodeURIComponent js/window
@@ -79,11 +78,11 @@
                   (when (= "kalkati.net" format)
                     "&type=kalkati"))
              [:span
-              [ic/action-open-in-new {:style {:position "relative" :top "6px" :color "#06c" :padding-right "3px"}}]
-              (tr [:service-search :view-routes])]
+              [ic/action-open-in-new {:style {:position "absolute" :top "-4px" :left "8px" :color "#06c" :padding-right "3px"}}]
+              [:span (tr [:service-search :view-routes])]]
              {:target "_blank"})
            [:span
-            [ic/alert-warning {:style {:position "relative" :top "6px" :color "#f80" :padding-right "3px"}}]
+            [ic/alert-warning {:style {:position "absolute" :top "-4px" :left "8px" :color "#f80" :padding-right "3px"}}]
             (tr [:service-search :view-routes-failure])])]))))
 
 (defn parse-content-value [value-array]
@@ -92,11 +91,19 @@
         return-value (text/maybe-shorten-text-to 45 value-str)]
     return-value))
 
+(defn information-row
+  [title information]
+  [:div (stylefy/use-sub-style style/result-card :info-row)
+   [:strong (stylefy/use-sub-style style/result-card :info-title)
+    title]
+   [:span (stylefy/use-sub-style style/result-card :info-content)
+    information]])
+
 (defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
   (let [bullet-span [:span {:style {:color colors/gray650}} " • "]]
+
     [:div {:key id}
-     [:div
-      [:span (tr [:service-search :service-basic-info]) bullet-span "GeoJSON"]]
+     [information-row (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
      (when-not (empty? external-interface-links)
        (doall
          (map-indexed
@@ -105,10 +112,8 @@
                                   (::t-service/url external-interface)
                                   (parse-content-value data-content))]
                [:div {:key (str i "-" id)}
-                [:span data-content bullet-span (str/join format)]
-                [gtfs-viewer-link row]]))
+                [information-row data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
            external-interface-links)))]))
-
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
@@ -147,64 +152,75 @@
                                   (stylefy/use-style style/simple-result-card-row))
                   (str (::t-service/name c) " (" (::t-service/business-id c) ")")])))))])))
 
-
-(defn- result-card [e! admin?
-                        {::t-service/keys [id name sub-type description
-                                           operator-name business-id transport-operator-id service-companies companies]
-                         :as service}]
+(defn- result-card
+  [e! admin?
+   {::t-service/keys [id name sub-type description transport-type homepage
+                      operator-name business-id transport-operator-id service-companies companies]
+    :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links service]
         service-desc (t-service/localized-text-for "FI" description)
+        formatted-desc (cond
+                         (> (count service-desc) 90)
+                         [:span (str (str/join (take 80 service-desc)) "... ")
+                          [common-ui/linkify (str "/#/service/" transport-operator-id "/" id)
+                           (tr [:service-search :show-all-information])]]
+                         (not-empty service-desc)
+                         [:span service-desc]
+                         :else
+                         [:span {:style {:color colors/gray650}}
+                          (tr [:service-search :no-description])])
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
                             (and service-companies (empty? companies)) service-companies
                             :else companies)
-        spacer-margin {:margin "0.5rem 0 1.5rem 0"}]
-    [:div (stylefy/use-style style/result-card-new)
-     [:div (stylefy/use-sub-style style/result-card-new :header)
-      [:h3.result-title {:style {:margin "1rem 0"}}
-       name]
+        transport-types (map #(tr [:enums ::t-service/transport-type %]) transport-type)]
+    [:div (stylefy/use-style style/result-card)
+     [:div (stylefy/use-sub-style style/result-card :header)
+      [:div
+       [:h3.result-title {:style {:margin "0 0 0.5rem 0"}}
+        operator-name " "
+        [:span {:style {:font-weight "normal"}}
+         "(" business-id ")"]]
+       [:h4 (stylefy/use-sub-style style/result-card :sub-header)
+        name]]
+
       [:div {:style {:display "flex"
                      :justify-content "flex-end"
                      :align-items "center"}}
        (when admin?
          [:div {:style {:margin-right "1rem"}}
           [delete-service-action e! id name (get service :show-delete-modal?)]])
-       [:a (merge (stylefy/use-style button-styles/primary-button)
+       [:a (merge (stylefy/use-style (merge button-styles/primary-button
+                                       {:padding "1rem"}))
                   {:href (str "/#/service/" transport-operator-id "/" id)})
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
-     [:div (stylefy/use-sub-style style/result-card-new :body)
-      [:div {:style {:flex 2
-                     :padding-right "1rem"}}
-       [:h4 {:style {:margin 0}}
-        (sub-type-tr sub-type)]
-       (if (not-empty service-desc)
-         [:p {:style spacer-margin} service-desc]
-         [:p {:style (merge {:color colors/gray650}
-                            spacer-margin)} (tr [:service-search :no-description])])]
-      [:div {:style {:flex "1"}}
-       [:h4 {:style {:margin 0}}
-        (tr [:service-search :operator-search])]
-       [:div {:style spacer-margin}
-        [:strong operator-name]
-        [:p {:style {:margin "0"}}
-         (str (tr [:field-labels :ote.db.transport-operator/business-id]) ": " business-id)]]
-       (when (not-empty service-companies)
-         [:div
-          (doall
-            (for [company service-companies]
-              [:div
-               [:strong
-                (::t-service/name company)
-                " (" (::t-service/business-id company) ") "]
-               [:span (tr [:service-search :participating-operator])]]))])]]
-     [:div (stylefy/use-sub-style style/result-card-new :foot)
-      [:div {:style {:flex "2"}}
-       [:h4 {:style {:margin "0"}}
-        (tr [:service-search :released-apis])]
-       [:div.result-interfaces {:style spacer-margin}
-        e-links]]]]))
+     [:div (stylefy/use-sub-style style/result-card :body)
+      [:div (stylefy/use-sub-style style/result-card :body-left)
+       [:h4 {:style {:margin "0 0 0.5rem 0"}}
+        (tr [:service-search :service-information])]
+       [information-row (tr [:service-search :description]) formatted-desc]
+       [information-row (tr [:service-search :type]) (sub-type-tr sub-type)]
+       [information-row (tr [:service-search :transport-type]) (str/join ", " transport-types)]
+       [information-row (tr [:service-search :homepage]) (if homepage
+                                                          [common-ui/linkify homepage homepage {:target "_blank"}]
+                                                          [:span {:style {:color colors/gray650}}
+                                                           (tr [:service-search :no-homepage])])]]
+      [:div (stylefy/use-sub-style style/result-card :body-right)
+       [:h4 {:style {:margin "0 0 0.5rem 0"}}
+        (tr [:service-search :service-api&format])]
+       [:div.result-interfaces
+        e-links]]]
+     (when (not-empty service-companies)
+       [:div (stylefy/use-sub-style style/result-card :foot)
+        (doall
+          (for [company service-companies]
+            [:div
+             [:strong
+              (::t-service/name company)
+              " (" (::t-service/business-id company) ") "]
+             [:span (tr [:service-search :participating-operator])]]))])]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count total-company-count

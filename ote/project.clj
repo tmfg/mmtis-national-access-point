@@ -1,6 +1,6 @@
 (defproject ote "0.1-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.908"]
+  :dependencies [[org.clojure/clojure "1.10.0"]
+                 [org.clojure/clojurescript "1.10.520"]
                  ;; CSV parser for backend
                  [org.clojure/data.csv "0.1.4"]
                  ;; CSV parser for frontend
@@ -46,8 +46,8 @@
                  [org.clojure/core.cache "0.7.1"]
 
                  ;; Transit tietomuoto
-                 [com.cognitect/transit-clj "0.8.300"]
-                 [com.cognitect/transit-cljs "0.8.239"]
+                 [com.cognitect/transit-clj "0.8.313"]
+                 [com.cognitect/transit-cljs "0.8.256"]
 
                  ;; Lightweight scheduler
                  [jarohen/chime "0.2.2"]

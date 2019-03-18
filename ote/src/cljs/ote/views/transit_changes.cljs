@@ -84,31 +84,33 @@
 (defn transit-change-filters [e! {:keys [selected-finnish-regions finnish-regions show-errors show-contract-traffic]}]
   [:div {:style {:padding-top "10px"}}
    [:h3 "Rajaa taulukkoa"]
-   [:div.col-md-4
-   [form-fields/field {:label "Maakunta"
-                       :type :chip-input
-                       :list-style {:max-height "400px" :overflow "auto"}
-                       :suggestions (mapv (fn [{name ::places/nimi :as r}]
-                                            {:text name :value r}) finnish-regions)
-                       :suggestions-config {:text :text :value :value}
-                       :max-results (count finnish-regions)
-                       :auto-select? true
-                       :open-on-focus? true
-                       :allow-duplicates? false
-                       :show-option #(str (::places/numero %) " " (::places/nimi %))
-                       :show-option-short ::places/numero
-                       :update! #(e! (tc/->SetRegionFilter %))}
-    selected-finnish-regions]]
-   [:div.col-md-4 {:style {:margin-top "10px"}}
-    [form-fields/field {:label "Näytä palvelut, joiden rajapinta on virheellinen tai rajapinta puuttuu"
-                        :type :checkbox
-                        :update! #(e! (tc/->ToggleShowAllChanges))}
-     show-errors]]
-   [:div.col-md-4 {:style {:margin-top "10px"}}
-    [form-fields/field {:label "Näytä sopimusliikenne"
-                        :type :checkbox
-                        :update! #(e! (tc/->ToggleShowContractTraffic))}
-     show-contract-traffic]]])
+   [:div.row
+    [:div.col-md-12
+     [form-fields/field {:label "Maakunta"
+                         :type :chip-input
+                         :full-width? true
+                         :list-style {:max-height "400px" :overflow "auto"}
+                         :suggestions (mapv (fn [{name ::places/nimi :as r}]
+                                              {:text name :value r}) finnish-regions)
+                         :suggestions-config {:text :text :value :value}
+                         :max-results (count finnish-regions)
+                         :auto-select? true
+                         :open-on-focus? true
+                         :allow-duplicates? false
+                         :show-option #(str (::places/numero %) " " (::places/nimi %))
+                         :show-option-short ::places/numero
+                         :update! #(e! (tc/->SetRegionFilter %))}
+      selected-finnish-regions]]
+    [:div.col-md-12 {:style {:margin-top "10px"}}
+     [form-fields/field {:label "Näytä myös palvelut, joiden rajapinta on virheellinen tai rajapinta puuttuu"
+                         :type :checkbox
+                         :update! #(e! (tc/->ToggleShowAllChanges))}
+      show-errors]]
+    [:div.col-md-12 {:style {:margin-top "10px"}}
+     [form-fields/field {:label "Näytä myös sopimusliikenne"
+                         :type :checkbox
+                         :update! #(e! (tc/->ToggleShowContractTraffic))}
+      show-contract-traffic]]]])
 
 (defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
@@ -171,7 +173,10 @@
         change-list (if show-contract-traffic
                       (concat changes-contract-traffic change-list)
                       change-list)
-        change-list (sort-by :different-week-date > change-list)]
+        filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
+        filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
+        sorted-change-list (sort-by :different-week-date < filter-different-week-date)
+        change-list (concat sorted-change-list filter-missing-different-week-date)]
   [:div.transit-changes {:style {:padding-top "10px"}}
    [transit-changes-legend]
    [table/table {:no-rows-message (if loading?
