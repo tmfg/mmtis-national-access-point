@@ -340,7 +340,7 @@
   ::single-route-change
   (spec/coll-of (spec/tuple ::route-key ::route-change-map) :kind map?))
 
-(spec/fdef route-weeks-with-first-difference
+(spec/fdef route-weeks-with-first-difference-old
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
 
@@ -361,7 +361,7 @@
   ::detected-route-changes-for-services-coll
   (spec/coll-of ::service-route-change-map :kind vector?))
 
-(defn route-weeks-with-first-difference
+(defn route-weeks-with-first-difference-old
   "Detect the next different week in each route.
 
   NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
@@ -930,7 +930,7 @@
                            ;; Create week hashes so we can find out the differences between weeks
                            (combine-weeks)
                            ;; Search next week (for every route) that is different
-                           (route-weeks-with-first-difference)
+                           (route-weeks-with-first-difference-old)
                            ;; Fetch detailed route comparison if a change was found
                            (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
                            )]
