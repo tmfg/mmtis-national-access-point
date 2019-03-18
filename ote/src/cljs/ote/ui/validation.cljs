@@ -16,6 +16,8 @@
 ;; max length 16 chars (optional plus followed by digits)
 (def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
 
+(def email-regex #"(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$")
+
 (defn empty-value? [val]
   (or (nil? val)
       (str/blank? val)
@@ -132,6 +134,11 @@
     (and (not (empty-value? data)) (not (re-matches #"^\d{5}$" data)))
     (or message (tr [:common-texts :invalid-postal-code]))
   ))
+
+(defmethod validate-rule :correct-email [_ _ data _ _]
+  (when (and (not (empty-value? data)) (not (re-matches email-regex data)))
+    (tr [:common-texts :invalid-email])))
+
 
 ;; Validate that checkbox is checked
 (defmethod validate-rule :checked? [_ _ data _ _ ]

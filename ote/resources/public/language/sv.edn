@@ -306,7 +306,7 @@
   :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
 
   :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
-  :description-why-contact-info "Av kontaktinformationen i tjänsten är det endast webbadressen som publiceras i den offentliga NAP-tjänstekatalogen"
+  :description-why-contact-info (:md "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä.\n\nHuomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja.\n\nTiedot julkaistaan kaikille avoimessa NAP-liikkumispalvelukatalogissa avoimena datana. Julkaistujen tietojen lisenssi on Creative Commons Nimeä 4.0 Kansainvälinen.")
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
@@ -976,6 +976,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :required-field "Obligatorisk uppgift"
   :required-field-missing "Obligatorisk uppgift"
   :required-one-of-many "Fyll minst ett fält."
+  :invalid-email "Tarkista sähköposti"
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"

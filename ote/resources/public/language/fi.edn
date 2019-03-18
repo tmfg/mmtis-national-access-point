@@ -298,7 +298,7 @@
 Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avulla. Voit nimetä itse piirtämäsi alueen vapaasti esim. \"Etelä-Suomen toiminta-alue\"."
 
   :available-from-and-to "Kirjaa päivämääräväli, jolloin palvelu on voimassa.\n\u2022 Jos palvelu on jo saatavilla kirjaushetkellä, jätä \"Saatavilla alkaen\" -päivämäärä tyhjäksi (\"Heti\").\n\u2022 Jos palvelu on toistaiseksi voimassa, jätä \"Saatavilla asti\" -päivämäärä tyhjäksi (\"Toistaiseksi\")."
-  :description-why-contact-info "Palvelun yhteystiedoista julkaistaan julkisessa NAP-palvelukatalogissa ainoastaan verkkosivujen osoite."
+  :description-why-contact-info (:md "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä.\n\nHuomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja.\n\nTiedot julkaistaan kaikille avoimessa NAP-liikkumispalvelukatalogissa avoimena datana. Julkaistujen tietojen lisenssi on Creative Commons Nimeä 4.0 Kansainvälinen.")
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
@@ -985,6 +985,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
+  :invalid-email "Tarkista sähköposti"
   :save-failure "Tallennus ei onnistunut."
   :save-success "Tallennus onnistui."
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
