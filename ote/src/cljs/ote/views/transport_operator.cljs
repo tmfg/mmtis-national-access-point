@@ -234,7 +234,7 @@
        :label (tr [:common-texts :instructions])
        :body [:div
               [:p (tr [:organization-page :help-contact-details])]
-              [:p (tr [:organization-page :contact-details])]
+              [:p (tr [:organization-page :help-contact-details-privacy])]
               [:p (tr [:common-texts :nap-data-license]) "\"" (tr [:common-texts :nap-data-license-url-label]) "\"."]]
        :default-state true}
 
