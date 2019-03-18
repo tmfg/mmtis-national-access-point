@@ -3,6 +3,9 @@
       :password "$OTE_DB_PASSWORD"}
  :http {:port 3000
         :strip-prefix "/ote"
+        :ssl-upgrade {:port 3080
+                      :ip "localhost"
+                      :url "http://localhost:3000/"}
         :auth-tkt {:shared-secret "$OTE_AUTH_SHARED_SECRET"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}}
