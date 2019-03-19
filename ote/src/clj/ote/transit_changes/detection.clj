@@ -762,8 +762,8 @@
 
 (defn update-transit-changes! [db analysis-date service-id package-ids {:keys [all-routes route-changes]}]
   {:pre [(some? analysis-date)
-         (pos-int? service-id)
-         (pos-int? (count package-ids))]}
+         (or (zero? service-id)
+             (pos? service-id))]}
   (tx/with-transaction
     db
     (let [route-change-infos (map (fn [detection-result]
