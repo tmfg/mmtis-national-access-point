@@ -411,6 +411,12 @@
   [native-date]
   (date-fields->date-time (date-fields native-date)))
 
+(defn native->date
+  ""
+  [native-date]
+  (date-fields->date (date-fields native-date))
+  #_(date-fields->date-midnight (date-fields native-date)))
+
 (defn date-fields->native
   "Convert date fields ma pto native Date object"
   [{::keys [year month date hours minutes seconds]}]
