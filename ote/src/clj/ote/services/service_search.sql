@@ -143,11 +143,11 @@ SELECT oa."transport-service-id" as id
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area
 SELECT "oa-agg"."transport-service-id" as id,
-       ST_Area(ST_Intersection(ST_SetSRID("oa-agg".location, 4326), sa.location)) as intersection,
-       ST_Area(ST_SymDifference(ST_SetSRID("oa-agg".location, 4326), sa.location)) as "difference"
+       ST_Area(ST_Intersection("oa-agg".location, sa.location)) as intersection,
+       ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
   FROM
       (SELECT oa."transport-service-id" as "transport-service-id",
-              ST_Union(array_agg(ST_SetSRID(oa.location, 4326))) as "location"
+              ST_Union(array_agg(oa.location)) as "location"
          FROM operation_area oa
         WHERE oa."transport-service-id" in (:id)
           AND oa."primary?" = true

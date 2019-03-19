@@ -38,9 +38,10 @@
      :id
      (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
-(defn match-quality [intersection difference]
+(defn match-quality
   "Returns match quality of a search result to the operation-area it was searched against. Greater return values are worse matches.
-   Negative return value is an invalid match"
+Negative return value is an invalid match"
+  [intersection difference]
   (if (pos? intersection) (/ difference intersection) -1))
 
 (defn sort-by-match-quality
