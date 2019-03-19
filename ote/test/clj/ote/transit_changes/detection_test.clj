@@ -32,12 +32,11 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
-
-(deftest test-no-traffic-run-is-detected
+(deftest no-traffic-run-is-detected
   (is (= {:no-traffic-start-date (d 2018 10 17)
           :no-traffic-end-date (d 2018 11 3)}
-         (-> (detection/route-weeks-with-first-difference data-test-no-traffic-run)
-             (get route-name)
+         (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run)
+             first
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
 (def data-no-traffic-run-twice
@@ -97,8 +96,8 @@
   ;; is still detected.
   (is (= {:no-traffic-start-date (d 2018 11 13)
           :no-traffic-end-date (d 2018 11 30)}
-         (-> (detection/route-weeks-with-first-difference test-no-traffic-run-weekdays)
-             (get route-name)
+         (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run-weekdays)
+             first
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
 (def no-traffic-run-full-detection-window
@@ -125,8 +124,8 @@
 (deftest test-no-traffic-run-full-detection-window
   ;; Test that traffic that has normal "no-traffic" days (like no traffic on weekends)
   ;; is still detected.
-  (let [result (-> (detection/route-weeks-with-first-difference no-traffic-run-full-detection-window)
-                   (get route-name))]
+  (let [result (-> (detection/route-weeks-with-first-difference-new no-traffic-run-full-detection-window)
+                   first)]
     (is (= {:no-traffic-start-date (d 2018 11 13)}
            (select-keys result [:no-traffic-start-date :no-traffic-end-date])))))
 
@@ -142,7 +141,7 @@
 
 (deftest two-week-difference-is-skipped
   (is (nil?
-       (get-in (detection/route-weeks-with-first-difference test-traffic-2-different-weeks)
+       (get-in (detection/route-weeks-with-first-difference-new test-traffic-2-different-weeks)
                [route-name :different-week]))))
 
 (def normal-to-1-different-to-1-normal-and-rest-are-changed
@@ -159,18 +158,19 @@
          {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]})); New schedule
 
 (deftest one-week-difference-is-skipped
-  (let [result (detection/route-weeks-with-first-difference normal-to-1-different-to-1-normal-and-rest-are-changed)]
+  (let [result (detection/route-weeks-with-first-difference-new normal-to-1-different-to-1-normal-and-rest-are-changed)]
     (is (= {:beginning-of-week (d 2019 3 11)
             :end-of-week (d 2019 3 17)}
-           (get-in result [route-name :different-week])))))
+           (:different-week (first result))
+           ))))
 
 
 (def test-traffic-normal-difference
   (weeks (d 2018 10 8)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting point
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7" ]} ; wednesday different
-         {route-name ["h1" "h2" "h3" "!!" "h5" "h6" "h7" ]} ; thursday different
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-15, starting point
+         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7" ]} ; 2018-10-22, wednesday different
+         {route-name ["h1" "h2" "h3" "!!" "h5" "h6" "h7" ]} ; 2018-10-29, thursday different
          {route-name ["h1" "h2" "h3" "h4" "!!" "h6" "h7"]} ; friday different
          {route-name ["h1" "h2" "h3" "!!" "!!" "h6" "h7"]})) ;; thu and fri different
 
@@ -180,24 +180,28 @@
                           :end-of-week (d 2018 10 21)}
           :different-week-hash  ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
           :different-week {:beginning-of-week (d 2018 10 22)
-                           :end-of-week (d 2018 10 28)}}
-         (get (detection/route-weeks-with-first-difference test-traffic-normal-difference) route-name))))
+                           :end-of-week (d 2018 10 28)}
+          :route-key "Raimola"}
+         (first (detection/route-weeks-with-first-difference-new test-traffic-normal-difference)))))
 
 
 (def test-traffic-starting-point-anomalous
   (weeks (d 2018 10 8)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]} ; starting week is an exception
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; next week same as previous
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
+         {route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]} ; 2018-10-15, starting week is an exception
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-22, next week same as previous
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-29
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
-(deftest anomalous-starting-point-is-ignore
+(deftest anomalous-starting-point-is-ignored
   (let [{:keys [starting-week different-week] :as res}
-        (get (detection/route-weeks-with-first-difference test-traffic-starting-point-anomalous) route-name)]
-    (is (= (d 2018 10 22) (:beginning-of-week starting-week)))
-    (is (nil? different-week))))
+        (-> test-traffic-starting-point-anomalous
+            detection/route-weeks-with-first-difference-new
+            first)]
+    (is (= (d 2018 10 22) (:beginning-of-week starting-week))); gets -15, should be -22
+    (is (= "Raimola" (:route-key res)))
+    (is (nil? different-week)))) ;; gets -22, should be nil
 
 (def test-traffic-static-holidays
   (weeks (d 2018 12 3)
@@ -212,7 +216,7 @@
 
 (deftest static-holidays-are-skipped
   (let [{:keys [starting-week different-week] :as res}
-        (get (detection/route-weeks-with-first-difference test-traffic-static-holidays) route-name)]
+        (first (detection/route-weeks-with-first-difference-new test-traffic-static-holidays))]
 
     (testing "detection skipped christmas week"
       (is (= (d 2018 12 31) (:beginning-of-week different-week))))
@@ -268,31 +272,30 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
+  (spec-test/instrument `detection/route-weeks-with-first-difference-old)
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
     (is (= (d 2019 2 18) (-> test-more-than-one-change
-                             detection/route-weeks-with-first-difference
-                             (get route-name)
+                             detection/route-weeks-with-first-difference-new
+                             first
                              :different-week
                              :beginning-of-week))))
   
-  (let [diff-pairs (-> test-more-than-one-change
+  (let [diff-maps (-> test-more-than-one-change
                        detection/changes-by-week->changes-by-route
                        detection/detect-changes-for-all-routes)
-        ;; diff-pairs (detection/routes-changed-weeks test-more-than-one-change)
-        old-diff-pairs (detection/route-weeks-with-first-difference test-more-than-one-change)]
+        old-diff-maps (detection/route-weeks-with-first-difference-old test-more-than-one-change)]
     (testing "got two changes"
-      (is (= 2 (count diff-pairs))))
+      (is (= 2 (count diff-maps))))
     (testing "first change is detected"
-      (is (= (d 2019 2 18) (-> diff-pairs
+      (is (= (d 2019 2 18) (-> diff-maps
                                first
                                :different-week
                                :beginning-of-week))))
 
     (testing "second change is detected"
-      (is (= (d 2019 3 4) (-> diff-pairs
+      (is (= (d 2019 3 4) (-> diff-maps
                               second
                               :different-week
                               :beginning-of-week))))))
@@ -367,31 +370,32 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found-w-2-routes
-  (let [diff-pairs (-> data-two-week-two-route-change
+  (let [diff-maps (-> data-two-week-two-route-change
                        (detection/changes-by-week->changes-by-route)
                        (detection/detect-changes-for-all-routes))
 
-        fwd-difference (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
+        fwd-difference-old (detection/route-weeks-with-first-difference-old data-two-week-two-route-change)
+        fwd-difference-new (detection/route-weeks-with-first-difference-new data-two-week-two-route-change)]
     (testing "first change matches first-week-difference return value"
-     (is (= (-> fwd-difference (get "Raimola") :different-week) (-> diff-pairs first :different-week))))
+      (is (= (-> fwd-difference-old (get "Raimola") :different-week) (-> diff-maps first :different-week)))
+      (is (= (-> fwd-difference-new second :different-week) (-> diff-maps first :different-week))))
 
     (testing "second route's first change date is ok"
       (is (= (d 2019 2 25)
              (first
-              (for [dp diff-pairs
+              (for [dp diff-maps
                     :let [d (-> dp :different-week :beginning-of-week)]
                     :when (= "Esala" (:route-key dp))]
-                d)))))
-))
+                d)))))))
 
 
 (deftest no-change-found
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
+  (spec-test/instrument `detection/route-weeks-with-first-difference-new)
 
-  (let [diff-pairs (-> data-two-week-change
+  (let [diff-maps (-> data-two-week-change
                        detection/changes-by-week->changes-by-route
                        detection/detect-changes-for-all-routes)
-        pairs-with-changes (filterv :different-week diff-pairs)]
+        pairs-with-changes (filterv :different-week diff-maps)]
     (testing "got no changes"
       (is (= 0 (count pairs-with-changes))))))
 
@@ -487,27 +491,27 @@
       (is (= old-diff new-diff)))))
 
 (deftest more-than-one-change-found-case-2
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
+  (spec-test/instrument `detection/route-weeks-with-first-difference-new)
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
     (is (= (d 2019 5 27) (-> data-realworld-two-change-case
-                             detection/route-weeks-with-first-difference
-                             (get route-name)
+                             detection/route-weeks-with-first-difference-new
+                             first
                              :different-week
                              :beginning-of-week))))
 
-  (let [diff-pairs (-> data-realworld-two-change-case
+  (let [diff-maps (-> data-realworld-two-change-case
                        detection/changes-by-week->changes-by-route
                        detection/detect-changes-for-all-routes)
-        old-diff-pair (-> data-realworld-two-change-case
-                          detection/route-weeks-with-first-difference)]
+        old-diff-map (-> data-realworld-two-change-case
+                          detection/route-weeks-with-first-difference-old)]
     (testing "got two changes"
-      (is (= 2 (count diff-pairs))))
+      (is (= 2 (count diff-maps))))
     
     (testing "first change is detected"
-      (is (= (d 2019 5 27) (-> diff-pairs first :different-week :beginning-of-week))))
+      (is (= (d 2019 5 27) (-> diff-maps first :different-week :beginning-of-week))))
 
     (testing "second change date is correct"
-      (is (= (d 2019 6 3) (-> diff-pairs second :different-week :beginning-of-week))))))
+      (is (= (d 2019 6 3) (-> diff-maps second :different-week :beginning-of-week))))))
 
