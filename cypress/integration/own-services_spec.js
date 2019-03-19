@@ -70,9 +70,7 @@ describe('Add a new service', function () {
 
             // Fill mandatory fields
             cy.get('input[id*="name--Palvelunnimi"]').type(this.serviceName);
-            cy.get('input[name="street"]').typeRaw(genNaughtyString(20));
-            cy.get('input[name="postal_code"]').type(service.contact.postal_code);
-            cy.get('input[name="post_office"]').typeRaw(genNaughtyString(20));
+            cy.get('input[name="homepage"]').typeRaw(genNaughtyString(20));
             cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
 
             cy.wrap(service.areas).each(area => {
