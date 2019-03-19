@@ -775,12 +775,8 @@
                                                      (or (nil? change-date)
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
-          ;; Set change date to future (1 week) if it is nil or it is too far in the future
-          new-change-date (if (or
-                                (nil? (:gtfs/change-date earliest-route-change))
-                                (.isAfter (.toLocalDate (:gtfs/change-date earliest-route-change)) (.plusDays (java.time.LocalDate/now) 30)))
-                            (sql-date (.plusDays (java.time.LocalDate/now) 7))
-                            (:gtfs/change-date earliest-route-change))
+          ;; Set change date to future (every 4 weeks at monday) - This is the day when changes are detected for next time
+          new-change-date (sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id

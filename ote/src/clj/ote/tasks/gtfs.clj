@@ -77,8 +77,8 @@
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
 
-         ;; Continue 15 weeks from the current week
-         end-date (time/days-from start-date (dec (* 7 16)))
+         ;; Continue 30 weeks from the current week -> 31 week
+         end-date (time/days-from start-date (dec (* 7 31)))
 
          ;; Convert to LocalDate instances
          [start-date end-date today] (map (comp time/date-fields->date time/date-fields)

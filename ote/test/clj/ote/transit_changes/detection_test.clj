@@ -22,7 +22,7 @@
         route-maps)))
 
 
-(def test-no-traffic-run
+(def data-test-no-traffic-run
   (weeks (d 2018 10 8)
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" nil nil nil nil nil]} ; 4 day run
@@ -35,9 +35,47 @@
 (deftest no-traffic-run-is-detected
   (is (= {:no-traffic-start-date (d 2018 10 17)
           :no-traffic-end-date (d 2018 11 3)}
-         (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run)
+         (-> (detection/route-weeks-with-first-difference-new data-test-no-traffic-run)
              first
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
+
+(def data-no-traffic-run-twice
+  (weeks (d 2018 10 8)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         ))
+
+
+(deftest test-no-traffic-run-twice-is-detected
+  (let [test-result (-> data-no-traffic-run-twice
+                        detection/changes-by-week->changes-by-route
+                        detection/detect-changes-for-all-routes)]
+    ;; Test first occurence
+    (is (= {:no-traffic-start-date (d 2018 10 15)
+          :no-traffic-end-date (d 2018 11 5)
+          :route-key "Raimola"
+          :no-traffic-change 21}
+           (-> (first test-result)
+               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change]))))
+
+    ;; Test second occurence
+    (is (= {:no-traffic-start-date (d 2018 11 26)
+            :no-traffic-end-date (d 2018 12 17)
+            :route-key "Raimola"
+            :no-traffic-change 21}
+           (-> (second test-result)
+               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change]))))))
 
 (def test-no-traffic-run-weekdays
   (weeks (d 2018 10 8)
