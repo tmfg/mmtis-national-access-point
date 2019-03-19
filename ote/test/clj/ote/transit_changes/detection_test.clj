@@ -35,7 +35,7 @@
 (deftest no-traffic-run-is-detected
   (is (= {:no-traffic-start-date (d 2018 10 17)
           :no-traffic-end-date (d 2018 11 3)}
-         (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run)
+         (-> (detection/route-weeks-with-first-difference-new data-test-no-traffic-run)
              first
              (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
 
