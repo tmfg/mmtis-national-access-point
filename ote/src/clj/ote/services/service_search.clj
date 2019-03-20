@@ -58,7 +58,7 @@ Negative return value is an invalid match"
   [db results operation-area]
   (if operation-area
     (let [ids (map ::t-service/id results)
-          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
+          qualities (service-match-quality-to-operation-area-old db {:id ids :operation-area operation-area} )
           valid-results (sort-by-match-quality results qualities)]
       valid-results)
     results))

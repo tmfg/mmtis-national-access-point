@@ -130,7 +130,7 @@ SELECT eid."transport-service-id" as id
 -- Find services by operation area names
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-      (SELECT ST_Union(array_agg(pl.location)) as "location"
+      (SELECT ST_Union(ST_Accum(pl.location)) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts
@@ -147,6 +147,22 @@ SELECT "oa-agg"."transport-service-id" as id,
        ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
   FROM
       (SELECT oa."transport-service-id" as "transport-service-id",
+              ST_Envelope(ST_Union(array_agg(ST_Envelope(oa.location)))) as "location"
+         FROM operation_area oa
+        WHERE oa."transport-service-id" in (:id)
+          AND oa."primary?" = true
+     GROUP BY oa."transport-service-id") as "oa-agg",
+      (SELECT ST_Envelope(ST_Union(array_agg(ST_Envelope(pl.location)))) as "location"
+         FROM places pl
+        WHERE pl.namefin IN (:operation-area)) as "sa";
+
+-- name: service-match-quality-to-operation-area-old
+-- Finds service's match quality to a given operation area
+SELECT "oa-agg"."transport-service-id" as id,
+       ST_Area(ST_Intersection("oa-agg".location, sa.location)) as intersection,
+       ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
+  FROM
+      (SELECT oa."transport-service-id" as "transport-service-id",
               ST_Union(array_agg(oa.location)) as "location"
          FROM operation_area oa
         WHERE oa."transport-service-id" in (:id)
@@ -155,4 +171,19 @@ SELECT "oa-agg"."transport-service-id" as id,
       (SELECT ST_Union(array_agg(pl.location)) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa";
+
+
+
+-- name: services-by-operation-areas
+-- Find services and
+WITH search_area as (SELECT ST_Union(pl.location) as location
+                       FROM places pl
+                      WHERE pl.namefin IN (:operation-area)),
+        services as (SELECT oa."transport-service-id" as id
+                    FROM "operation_area" oa
+                    JOIN "transport-service" ts ON (ts.id = oa."transport-service-id" AND ts.published IS NOT NULL)
+                    WHERE oa.id not in (4046, 5013)
+                      AND oa."primary?" = true
+                      AND ST_Intersects(oa.location, search_area.location)
+   SELECT count(*) from services;
 
