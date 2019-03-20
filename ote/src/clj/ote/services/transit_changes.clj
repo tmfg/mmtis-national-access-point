@@ -112,6 +112,10 @@
        (when (authorization/admin? user)
          (http/transit-response (detection/hash-recalculations db))))
 
+  (GET "/transit-changes/reset-hash-calculation-status" {user :user :as request}
+    (when (authorization/admin? user)
+      (http/transit-response (detection/reset-last-hash-recalculations db))))
+
   ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
   (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
     (when (authorization/admin? user)
@@ -158,6 +162,12 @@
   (POST "/transit-changes/force-detect" req
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db (time/now) true)
+          "OK"))
+
+  ;; Force detection change for all services
+  (GET "/transit-changes/detect-changes-for-given-service/:service-id" [service-id :as {user :user}]
+        (when (authorization/admin? user)
+          (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
           "OK"))
 
   ;; Force detection change for all services for given date

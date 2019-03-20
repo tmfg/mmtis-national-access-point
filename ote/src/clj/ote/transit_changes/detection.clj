@@ -41,6 +41,18 @@
     (when (pos-int? (count calculations))
        {:calculations calculations})))
 
+(defn reset-last-hash-recalculations
+  "Reset currently running hash-recalculations. Should only be used if caluclation is stuck."
+  [db]
+  (let [last-calculation (first (specql/fetch db :gtfs/hash-recalculation
+                                              (specql/columns :gtfs/hash-recalculation)
+                                              {:gtfs/completed              op/null?}
+                                              {:specql.core/order-by        :gtfs/recalculation-id
+                                               :specql.core/order-direction :desc
+                                               :specql.core/limit           1}))]
+    (when last-calculation
+      (specql/delete! db :gtfs/hash-recalculation {:gtfs/recalculation-id (:gtfs/recalculation-id last-calculation)}))))
+
  (defn- start-hash-recalculation [db packets-total user]
   (let [id (specql/insert! db :gtfs/hash-recalculation
                   {:gtfs/started (java.sql.Timestamp. (System/currentTimeMillis))
@@ -607,7 +619,7 @@
 
 (defn- max-date-within-90-days? [{max-date :max-date}]
   (and max-date
-       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90))
+       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 180))
        (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
 
 (defn- min-date-in-the-future? [{min-date :min-date}]
