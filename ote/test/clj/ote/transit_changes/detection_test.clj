@@ -569,13 +569,10 @@
         ;; gtfs-zipfile-new-path (rewrite-gtfs-dates gtfs-zipfile-orig-date)
         _ (ote.integration.import.gtfs/save-gtfs-to-db db (slurp-bytes gtfs-zipfile-orig-path) 1 1 service-id my-intercept-fn)
         route-query-params {:service-id 1 :start-date (time/days-from (time/now) -60) :end-date (time/days-from (time/now) 30)}
-        new-diff (detection/detect-route-changes-for-service-new db route-query-params)
-        old-diff (detection/detect-route-changes-for-service-old db route-query-params)]
-    ;; new-diff structure:
-    ;; :route-changes [ ( [ routeid {dada} ]) etc
+        new-diff (detection/detect-route-changes-for-service-new db route-query-params)]
     (println (:start-date route-query-params))
-    (testing "differences between new and old"
-      (is (= old-diff new-diff)))))
+    (testing "got someting"
+      (is (not= nil (first new-diff))))))
 
 (deftest more-than-one-change-found-case-2
   (spec-test/instrument `detection/route-weeks-with-first-difference-new)

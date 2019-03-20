@@ -140,7 +140,8 @@
           (recur (inc i) ps))))))
 
 
-(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id]
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn]
+  ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
@@ -153,7 +154,10 @@
              (io/copy input output))
            (when-let [db-table-name (db-table-name name)]
              (let [file-type (gtfs-spec/name->keyword name)
-                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))]
+                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))
+                   file-data (if intercept-fn
+                               (intercept-fn file-type file-data)
+                               file-data)]
                (log/debug file-type " file: " name " PARSED.")
                (when (= file-type :gtfs/calendar-txt)
                  (def debug-calendar file-data))

@@ -275,7 +275,7 @@
         (println "no changes found from:" (:beginning-of-week (first  weeks))))
       result)))
 
-(defn- route-next-different-week
+(defn- route-next-different-week-old
   [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr]
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
@@ -386,7 +386,7 @@
                        ;; value under route key in r-d-s map will be updated by
                        ;; (route-next-different-week *value* route weeks curr)
                        (update route-detection-state route
-                               route-next-different-week route weeks curr))
+                               route-next-different-week-old route weeks curr))
                      route-detection-state route-names))
                  {}    ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
@@ -878,6 +878,17 @@
 
 (spec/fdef detect-route-changes-for-service-new
            :ret ::detected-route-changes-for-services-coll)
+
+(defn joda->inst-vals [m]
+  (into {}
+        (map
+         (fn [[k v]]
+           [k
+            (if (instance? org.joda.time.DateTime v)
+              (clj-time.coerce/to-timestamp v)
+              v)]))
+        m))
+
 (defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
@@ -888,7 +899,7 @@
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
         all-routes (map-by-route-key service-routes type)
         all-route-keys (set (keys all-routes))
-        route-hashes (service-route-hashes-for-date-range db route-query-params)
+        route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)] ;; Format: ({:date routes(=hashes)})
@@ -915,7 +926,7 @@
         all-routes (map-by-route-key service-routes type)
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
-        route-hashes (service-route-hashes-for-date-range db route-query-params)
+        route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)]
