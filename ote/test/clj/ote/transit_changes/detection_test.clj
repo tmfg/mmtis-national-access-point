@@ -184,7 +184,6 @@
           :route-key "Raimola"}
          (first (detection/route-weeks-with-first-difference-new test-traffic-normal-difference)))))
 
-
 (def test-traffic-starting-point-anomalous
   (weeks (d 2018 10 8)
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
@@ -399,7 +398,6 @@
     (testing "got no changes"
       (is (= 0 (count pairs-with-changes))))))
 
-
 ; Dev tip: Put *symname in ns , evaluate, load, run (=define) and inspect in REPL
 ; Fetched from routes like below
 ; <snippet>
@@ -514,4 +512,38 @@
 
     (testing "second change date is correct"
       (is (= (d 2019 6 3) (-> diff-maps second :different-week :beginning-of-week))))))
+
+;; Day hash data for changes for a default week with ONE kind of day hashes
+(def data-wk-hash-one-kind              ["A" "A" "A" "A" "A" "A" "A" ])
+(def data-wk-hash-one-kind-change-one   ["A" "A" "3" "3" "3" "3" "3"])
+(def data-wk-hash-one-kind-change-three ["A" "A" "3" "3" "3" "3" "7"])
+;; Day hash data for changes for a default week with TWO kind of day hashes
+(def data-wk-hash-traffic-two-kind            ["A" "A" "A" "A" "A" "B" "B" ])
+(def data-wk-hash-traffic-two-kind-change-one ["A" "A" "A" "A" "A" "5" "5" ])
+(def data-wk-hash-traffic-two-kind-change-two ["1" "1" "1" "1" "1" "5" "5" ])
+;; Day hash data for changes for a default week with FIVE kind of day hashes
+(def data-wk-hash-traffic-five-kind             ["A" "B" "B" "B" "F" "G" "H"])
+(def data-wk-hash-traffic-five-kind-change-four ["A" "2" "5" "5" "5" "6" "7"])
+
+(deftest test-changed-days-of-week
+  (testing "One kind of traffic, changes: 0"
+    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind))))
+
+  (testing "One kind of traffic, changes: 1"
+    (is (= [2] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-one))))
+
+  (testing "One kind of traffic, changes: 3"
+    (is (= [2 6] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-three))))
+
+  (testing "Two kinds of traffic, changes: 1 (weekend)"
+    (is (= [5] (transit-changes/changed-days-of-week data-wk-hash-traffic-two-kind data-wk-hash-traffic-two-kind-change-one))))
+
+  (testing "Two kinds of traffic, changes: 2 (weekend+week)"
+    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-traffic-two-kind data-wk-hash-traffic-two-kind-change-two))))
+
+  (testing "Five kinds of traffic, changes: 0"
+    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind))))
+
+  (testing "Five kinds of traffic, changes: 5"
+    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind-change-four)))))
 
