@@ -161,6 +161,25 @@
                         service))
                     services))))
 
+(define-event SetSingleDetectionServiceId [service-id]
+  {}
+  (assoc-in app [:admin :transit-changes :single-detection-service-id] service-id))
+
+(define-event DetectChangesForGivenService []
+  {}
+  (let [service-id (get-in app [:admin :transit-changes :single-detection-service-id])]
+    ;; When service-id is not given, do not try to start detection
+    (when service-id
+      (comm/get! (str "transit-changes/detect-changes-for-given-service/" service-id)
+                 {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+    app))
+
+(define-event ResetHashRecalculations []
+  {}
+  (comm/get! (str "transit-changes/reset-hash-calculation-status")
+             {:on-success (tuck/send-async! ->LoadHashRecalculations)})
+  app)
+
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
 
