@@ -13,8 +13,6 @@ DROP VIEW places RESTRICT;
 --- Update SRIDs to location columns to make Spatial joins more efficient
 --- Data is already in this projection
 SELECT UpdateGeometrySRID('operation_area','location',4326);
-SELECT UpdateGeometrySRID('finnish_municipalities','location',4326);
-SELECT UpdateGeometrySRID('finnish_postal_codes','location',4326);
 SELECT UpdateGeometrySRID('finnish_regions','location',4326);
 SELECT UpdateGeometrySRID('country','location',4326);
 SELECT UpdateGeometrySRID('continent','location',4326);
@@ -30,14 +28,14 @@ CREATE OR REPLACE VIEW places AS
         'finnish-municipality' as type,
         namefin,
         nameswe,
-        ST_FlipCoordinates(location) as location
+        ST_FlipCoordinates(ST_SetSRID(location, 4326)) as location
    FROM finnish_municipalities
 UNION ALL
  SELECT CONCAT('finnish-postal-',posti_alue) as id,
         'finnish-postal' as type,
         CONCAT(posti_alue,' ',nimi) AS namefin,
         CONCAT(posti_alue,' ',namn) AS nameswe,
-        location
+        ST_SetSRID(location, 4326)
    FROM finnish_postal_codes
 UNION ALL
  SELECT CONCAT('finnish-region-',numero) as id,
@@ -60,3 +58,11 @@ UNION ALL
         nameswe,
         location
    FROM continent;
+
+CREATE TABLE "spatial-search-tree" (
+  inside TEXT,
+  outside TEXT,
+  weight REAL);
+
+CREATE INDEX "spatial-search-inside-idx" on "spatial-search-tree" (inside);
+CREATE INDEX "spatial-search-outside-idx" on "spatial-search-tree" (outside);
