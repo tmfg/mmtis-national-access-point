@@ -514,9 +514,9 @@
       (is (= (d 2019 6 3) (-> diff-maps second :different-week :beginning-of-week))))))
 
 ;; Day hash data for changes for a default week with ONE kind of day hashes
-(def data-wk-hash-one-kind              ["A" "A" "A" "A" "A" "A" "A" ])
-(def data-wk-hash-one-kind-change-one   ["A" "A" "3" "3" "3" "3" "3"])
-(def data-wk-hash-one-kind-change-three ["A" "A" "3" "3" "3" "3" "7"])
+(def data-wk-hash-one-kind            ["A" "A" "A" "A" "A" "A" "A" ])
+(def data-wk-hash-one-kind-change-one  ["A" "A" "3" "3" "3" "3" "3"])
+(def data-wk-hash-one-kind-change-two ["A" "A" "3" "3" "3" "3" "7"])
 ;; Day hash data for changes for a default week with TWO kind of day hashes
 (def data-wk-hash-traffic-two-kind            ["A" "A" "A" "A" "A" "B" "B" ])
 (def data-wk-hash-traffic-two-kind-change-one ["A" "A" "A" "A" "A" "5" "5" ])
@@ -533,7 +533,7 @@
     (is (= [2] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-one))))
 
   (testing "One kind of traffic, changes: 3"
-    (is (= [2 6] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-three))))
+    (is (= [2 6] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-two))))
 
   (testing "Two kinds of traffic, changes: 1 (weekend)"
     (is (= [5] (transit-changes/changed-days-of-week data-wk-hash-traffic-two-kind data-wk-hash-traffic-two-kind-change-one))))
