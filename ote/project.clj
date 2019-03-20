@@ -103,7 +103,8 @@
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
                  ;; override old guava version from deps
-                 [com.google.guava/guava "21.0"]]
+                 [com.google.guava/guava "21.0"]
+                 #_[spec-provider "0.4.14"]]
 
   :profiles {:uberjar {:aot :all
 
