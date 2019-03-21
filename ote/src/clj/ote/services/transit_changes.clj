@@ -1,5 +1,5 @@
 (ns ote.services.transit-changes
-  (:require [compojure.core :refer [GET POST]]
+  (:require [compojure.core :refer [GET POST DELETE]]
             [jeesql.core :refer [defqueries]]
             [clojure.string :as str]
             [clojure.set :as set]
@@ -112,7 +112,7 @@
        (when (authorization/admin? user)
          (http/transit-response (detection/hash-recalculations db))))
 
-  (GET "/transit-changes/reset-hash-calculation-status" {user :user :as request}
+  (DELETE "/transit-changes/hash-calculation" {user :user :as request}
     (when (authorization/admin? user)
       (http/transit-response (detection/reset-last-hash-recalculations db))))
 
@@ -158,26 +158,18 @@
     (when (authorization/admin? (:user req))
       (http/transit-response (services-with-route-hash-id db))))
 
-  ;; Force detection change for all services
-  (POST "/transit-changes/force-detect" req
+  ;; Force change detection for all services
+  (POST "/transit-changes/force-detect/" req
         (when (authorization/admin? (:user req))
           (gtfs-tasks/detect-new-changes-task db (time/now) true)
           "OK"))
 
-  ;; Force detection change for all services
-  (GET "/transit-changes/detect-changes-for-given-service/:service-id" [service-id :as {user :user}]
+  ;; Force change detection for single service
+  (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
+                                                     user :user}
         (when (authorization/admin? user)
           (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
           "OK"))
-
-  ;; Force detection change for all services for given date
-  (POST "/transit-changes/force-detect-date/:date"
-        {{:keys [date]} :params
-         user           :user
-         :as            req}
-    (when (authorization/admin? user)
-      (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true)
-      "OK"))
 
   ;; Delete row from gtfs_package to make this work. Don't know why, but it must be done.
   ;; Also change external-interface-description.gtfs-imported to past to make import work because we only import new packages.
