@@ -108,11 +108,11 @@
                              :intersection 0.6384818473140419
                              :difference 66.3123620550177}
                             {:id 1448
-                             :intersection 0.0
+                             :intersection 0.1
                              :difference 0.7630913680707156})
           initial-results  [{::t-service/id 817} {::t-service/id 1448}]
           results (sut/sort-by-match-quality initial-results match-qualities)]
-      (is (= #{817} (into #{} (map ::t-service/id results))))))
+      (is (= [1448 817] (map ::t-service/id results)))))
 
   (testing "Match quality counting"
     (is (= -1 (sut/match-quality 0 1))

@@ -126,4 +126,32 @@ SELECT eid."transport-service-id" as id
                WHERE ts.id = eid."transport-service-id"
                  AND ts.published IS NOT NULL)
 
+-- name: service-ids-by-operation-areas
+-- Find services by operation area names
+SELECT oa."transport-service-id" as id
+  FROM "operation_area" oa,
+      (SELECT ST_MakeValid(ST_Simplify(ST_Union(ST_Accum(pl.location)), 1, true)) as "location"
+         FROM places pl
+        WHERE pl.namefin IN (:operation-area)) as "sa",
+       "transport-service" ts
+ WHERE ts.published IS NOT NULL
+   AND oa."primary?" = true
+   AND ts.id = oa."transport-service-id"
+   AND ST_Intersects(sa.location, oa."simplified-location");
+--   AND NOT ST_Touches(sa.location, oa."simplified-location");
 
+-- name: service-match-quality-to-operation-area
+-- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one
+SELECT "oa-agg"."transport-service-id" as id,
+       ST_Area(ST_Intersection("oa-agg".location, sa.location)) as intersection,
+       ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
+  FROM
+      (SELECT oa."transport-service-id" as "transport-service-id",
+              ST_Envelope(ST_Union(array_agg(ST_Envelope(oa.location)))) as "location"
+         FROM operation_area oa
+        WHERE oa."transport-service-id" in (:id)
+          AND oa."primary?" = true
+     GROUP BY oa."transport-service-id") as "oa-agg",
+      (SELECT ST_Envelope(ST_Union(array_agg(ST_Envelope(pl.location)))) as "location"
+         FROM places pl
+        WHERE pl.namefin IN (:operation-area)) as "sa";

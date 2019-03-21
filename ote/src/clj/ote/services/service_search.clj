@@ -45,12 +45,11 @@ Negative return value is an invalid match"
   (if (pos? intersection) (/ difference intersection) -1))
 
 (defn sort-by-match-quality
-  "Sorts results by the match quality. Removes results with invalid match qualities"
+  "Sorts results by the match quality."
   [results spatial-diffs]
   (let [quality-by-id (zipmap (map :id spatial-diffs) (map #(match-quality (:intersection %) (:difference %)) spatial-diffs))]
     (->> results
          (map #(assoc % :match-quality (get quality-by-id (::t-service/id %))))
-         (filter (comp (complement neg?) :match-quality))
          (sort-by :match-quality))))
 
 (defn- service-search-match-qualities
@@ -58,7 +57,7 @@ Negative return value is an invalid match"
   [db results operation-area]
   (if operation-area
     (let [ids (map ::t-service/id results)
-          qualities (service-match-quality-to-operation-area-old db {:id ids :operation-area operation-area} )
+          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
           valid-results (sort-by-match-quality results qualities)]
       valid-results)
     results))
@@ -156,7 +155,7 @@ Negative return value is an invalid match"
                 ::t-service/gtfs-db-error))
     ei-link))
 
-(defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
+(defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
