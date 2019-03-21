@@ -281,7 +281,7 @@
      :container-class "col-xs-12 col-sm-4 col-md-4"
      :hint-text (tr [:service-search :operation-area-search-placeholder])
      :filter (constantly true)
-     :hint-style {:top "20px"}
+     :hint-style {:top "1.25rem"}
      :full-width? true
      :full-width-input? false
      :suggestions-config {:text :text :value :value}
