@@ -120,11 +120,8 @@
                     (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
                       (do
-
                         (let [^CSSStyleDeclaration icon-style (aget icon "style")]
-                          (.log js/console " row 120 type icon " (type icon) " layer " (type layer) (type (aget icon "style")))
                           (set! (.-visibility icon-style)
-
                                 (if (and
                                       (:stops show)
                                       (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
@@ -307,6 +304,23 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
+(defn- route-change-summary
+  "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
+  need to merge-with them together."
+  [single-change all-changes]
+  (let [selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
+                               :trip-stop-sequence-changes-upper :route-hash-id
+                               :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips}
+        all-changes (map #(select-keys % selected-change-keys) all-changes)
+        single-change (select-keys single-change selected-change-keys)
+        all-route-changes (filter
+                            (fn [c]
+                              (let [x (select-keys c selected-change-keys)]
+                                (if (= (:route-hash-id x) (:route-hash-id single-change)) true false)))
+                            all-changes)
+        merged-changes (apply merge-with + all-route-changes)]
+    merged-changes))
+
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
@@ -343,7 +357,7 @@
 
        ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
-         {:name "Reitti/määränpää" :width "25%"
+         {:name "Reitti/määränpää" :width "23%"
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
@@ -365,7 +379,7 @@
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-       {:name "Muutokset" :width "30%"
+       {:name "Muutosten yhteenveto" :width "32%"
         :read identity
         :format (fn [{change-type :change-type :as route-changes}]
                   (case change-type
@@ -381,8 +395,8 @@
 
                     :removed
                     [tv-change-icons/labeled-icon
-                     [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                     "Päättyvä reitti"]
+                     [ic/content-remove-circle-outline {:color style/remove-color}]
+                     "Mahdollisesti päättyvä reitti"]
 
                     :no-change
                     [tv-change-icons/labeled-icon
@@ -390,7 +404,7 @@
                      "Ei muutoksia"]
 
                     :changed
-                    [tv-change-icons/change-icons route-changes]))}]
+                    [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
