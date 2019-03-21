@@ -58,7 +58,7 @@
 
                  ;; Frontend UI libraries
                  [reagent "0.8.0-alpha2"]
-                 [webjure/tuck "20180327"]
+                 [webjure/tuck "20181204"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljsjs/chartjs "2.7.3-0"]
@@ -68,7 +68,7 @@
                  [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
                  [cljsjs/leaflet "1.2.0-0"]
                  [funcool/bide "1.6.0"] ; URL router
-                 [stylefy "1.11.0-beta1"]
+                 [stylefy "1.12.0"]
                  [cljsjs/leaflet-draw "0.4.12-0"]
                  [cljsjs/nprogress "0.2.0-1"]
                  ;; Note: Sadly, no good clj/cljs library was found. There were good libs only for server-side rendering.
