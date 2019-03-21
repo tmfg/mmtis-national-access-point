@@ -312,62 +312,6 @@
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
-(def seppo
-  (weeks (d 2019 2 4)
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 18.2. first change in route1
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
-
-(def data-with-pause
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 11.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 18.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 25.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 1.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 15.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})) ;; 22.4.
-
-
-(def no-traffic
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
-(def differences
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 25.2.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 4.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 11.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 25.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 1.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;; 15.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;22.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;29.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;;6.5.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 13.5.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
 (deftest more-than-one-change-found-w-2-routes
   (let [diff-maps (-> data-two-week-two-route-change
                        (detection/changes-by-week->changes-by-route)
