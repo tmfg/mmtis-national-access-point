@@ -6,13 +6,14 @@ SELECT ST_AsGeoJSON(location)
 
 
 -- name: link-transport-service-place!
+-- Copies operation area from places table.
+-- Fills "simplified-location" column with information for spatial search
 INSERT INTO operation_area
-       ("transport-service-id", "description", "location", "primary?")
+       ("transport-service-id", "description", "location", "simplified-location", "primary?")
 VALUES (:transport-service-id,
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
-        (SELECT "location"
-           FROM places
-          WHERE id = :place-id),
+        (select "location" from places where id = :place-id),
+        (SELECT ST_MakeValid(ST_Simplify("location",0.01,true)) from places where id = :place-id),
         :primary?);
 
 -- name: fetch-operation-area-geojson
@@ -21,12 +22,14 @@ SELECT id, "transport-service-id", ST_AsGeoJSON(location)
  WHERE "transport-service-id" = :transport-service-id
 
 -- name: insert-geojson-for-transport-service!
--- Insert an operation area with GeoJSON data.
-INSERT INTO operation_area ("transport-service-id", "location", "description", "primary?")
+-- Insert an operation area with GeoJSON data. Sets SRID to 4326, the only projection supported by geojson since 2016.
+-- Fills "simplified-location" column with information for spatial search
+INSERT INTO operation_area ("transport-service-id", "location", "description", "primary?", "simplified-location")
 VALUES (:transport-service-id,
-        ST_GeomFromGeoJSON(:geojson),
+        ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326),
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
-        :primary?);
+        :primary?,
+        ST_SetSRID(ST_MakeValid(ST_Simplify(ST_GeomFromGeoJSON(:geojson), 1, true)), 4326));
 
 -- name: fetch-operation-area-search
 -- sort operation area places search in following alphabetical order
