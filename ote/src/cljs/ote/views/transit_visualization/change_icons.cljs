@@ -20,6 +20,7 @@
       (str lower)
       (str lower "\u2014" upper))))
 
+;; Ui elements
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
@@ -37,17 +38,6 @@
      [:span
       changes
       (when with-labels? " aikataulumuutosta")]]))
-
-
-;; Ui
-(defn labeled-icon
-  ([icon label]
-   [labeled-icon {} icon label])
-  ([wrapper-attrs icon label]
-   [:div wrapper-attrs
-    icon
-    [:div (stylefy/use-style style/change-icon-value)
-     label]]))
 
 (defn change-icons
   ([diff]

@@ -2,7 +2,6 @@
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
@@ -313,7 +312,7 @@
         all-route-changes (filter
                             (fn [c]
                               (let [x (select-keys c selected-change-keys)]
-                                (if (= (:route-hash-id x) (:route-hash-id single-change)) true false)))
+                                (= (:route-hash-id x) (:route-hash-id single-change))))
                             all-changes)
         merged-changes (apply merge-with + all-route-changes)]
     merged-changes))
@@ -381,22 +380,22 @@
         :format (fn [{change-type :change-type :as route-changes}]
                   (case change-type
                     :no-traffic
-                    [tv-change-icons/labeled-icon
+                    [icon-l/icon-labeled
                      [ic/av-not-interested]
                      "Tauko liikennöinnissä"]
 
                     :added
-                    [tv-change-icons/labeled-icon
+                    [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
                      "Uusi reitti"]
 
                     :removed
-                    [tv-change-icons/labeled-icon
+                    [icon-l/icon-labeled
                      [ic/content-remove-circle-outline {:color style/remove-color}]
                      "Mahdollisesti päättyvä reitti"]
 
                     :no-change
-                    [tv-change-icons/labeled-icon
+                    [icon-l/icon-labeled
                      [ic/navigation-check]
                      "Ei muutoksia"]
 
