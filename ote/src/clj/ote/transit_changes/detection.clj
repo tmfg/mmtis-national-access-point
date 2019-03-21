@@ -575,6 +575,18 @@
           date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
       (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
 
+(defn compare-route-days-all-changes-for-week [db service-id route-hash-id
+                          {:keys [starting-week starting-week-hash
+                                  different-week different-week-hash] :as r}]
+  (let [changed-days (transit-changes/changed-days-of-week starting-week-hash different-week-hash)]
+    (for [ix changed-days
+          :let [starting-week-date (.plusDays (:beginning-of-week starting-week) ix)
+                different-week-date (.plusDays (:beginning-of-week different-week) ix)
+                date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
+                date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
+          :when (number? ix)]
+      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
   [db service-id routes]
@@ -589,6 +601,20 @@
               routes)]
     route-day-changes))
 
+(defn- expand-day-changes
+  "Input: coll of maps each describing a week with traffic changes.
+  Takes :changes coll from each map, removes it, and creates a new map to contain each of the elements in :changes coll.
+  Output: returns a coll of maps, each describing one single changed day on a week.
+  There may be multiple maps per one week if there are multiple changed days on the week."
+  [detection-results]
+  (reduce (fn [result detection]
+            (if-let [changes (:changes detection)]
+              (concat result (for [chg changes]
+                               (assoc detection :changes chg)))
+              (conj result detection)))
+          []
+          detection-results))
+
 (defn route-day-changes-new
   "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
   [db service-id routes]
@@ -596,10 +622,11 @@
         (mapv (fn [{diff :different-week route-key :route-key :as detection-result}]
                 (if diff ;; If a different week was found, do detailed trip analysis
                   (assoc detection-result
-                    :changes (compare-route-days db service-id route-key detection-result))
+                    :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
                   detection-result))
-              routes)]
-    route-day-changes))
+              routes)
+        res (into [] (expand-day-changes route-day-changes))]
+    res))
 
 (defn- date-in-the-past? [^LocalDate date]
   (and date
