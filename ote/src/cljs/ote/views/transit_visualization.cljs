@@ -25,7 +25,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
-            [ote.views.transit-visualization.change-utilities :as tv-section]
+            [ote.views.transit-visualization.change-utilities :as tv-utilities]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]))
 
 (set! *warn-on-infer* true)
@@ -73,11 +73,15 @@
 
 (defn- initialize-route-features
   "Bind popup content and set marker icon for stop marker features."
-  [offset [w h]]
-  (fn [feature ^js/L.Layer layer]
+  [^Number offset [w h]]
+  (fn [^Object feature ^js/L.Layer layer]
     (let [stop-name (aget feature "properties" "stopname")
           trip-name (aget feature "properties" "trip-name")
-          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))]
+          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))
+          ^Function my-layer (aget layer "setOffset")]
+      ;(.log js/console "type (aget layer \"setOffset\") " (type (aget layer "setOffset")))
+      ;(.log js/console "type  feature" (type feature))
+
       (if stop-name
       ;; This features is a stop marker
       (do
@@ -91,7 +95,7 @@
         ;; Add popup
         (.bindPopup layer popup-html))
       ;; This feature has no name, it is the route line, apply pixel offset
-      (.call (aget layer "setOffset") layer offset)))))
+      (.call my-layer layer offset)))))
 
 (defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
@@ -111,16 +115,22 @@
                         layers))
                     % show))
 
+
     (.eachLayer m (fn [layer]
-                    (if-let [icon (aget layer "_icon")]
+                    (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
-                      (set! (.-visibility (aget icon "style"))
-                              (if (and
-                                    (:stops show)
-                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
-                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                                ""
-                                "hidden")))
+                      (do
+
+                        (let [^CSSStyleDeclaration icon-style (aget icon "style")]
+                          (.log js/console " row 120 type icon " (type icon) " layer " (type layer) (type (aget icon "style")))
+                          (set! (.-visibility icon-style)
+
+                                (if (and
+                                      (:stops show)
+                                      (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                      (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                  ""
+                                  "hidden")))))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -297,7 +307,7 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
-(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
+(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
         table-height (str
@@ -313,6 +323,7 @@
                           (tr [:transit-visualization-page :no-changes-in-routes])
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
+     [tv-utilities/route-changes-legend]
      [table/table {:no-rows-message no-rows-message
                    :height table-height
                    :label-style style-base/table-col-style-wrap
@@ -324,7 +335,7 @@
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= % selected-route)}
 
-      [{:name "Reitti" :width "30%"
+      [{:name "Reitti" :width "20%"
         :read (juxt :route-short-name :route-long-name)
         :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
@@ -332,17 +343,54 @@
 
        ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
-         {:name "Reitti/määränpää" :width "30%"
+         {:name "Reitti/määränpää" :width "25%"
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
-       {:name "Tunnistetut muutosajankohdat (kpl)"
-        :width "40%"
+       {:name "Muutoksia (kpl)"
+        :width "10%"
         :read identity
         :format (fn [row]
                   (if (= :no-change (:change-type row))
-                    "Ei tulevia muutoksia"
-                    (:count row)))}]
+                    "0"
+                    (:count row)))}
+       {:name "Aikaa 1. muutokseen"
+        :width "15%"
+        :read :different-week-date
+        :format (fn [different-week-date]
+                  (if-not different-week-date
+                    [tv-change-icons/labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                    [:span
+                     (str (time/days-until different-week-date) " pv")
+                     [:span (stylefy/use-style {:margin-left "5px"
+                                                :color "gray"})
+                      (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+       {:name "Muutokset" :width "30%"
+        :read identity
+        :format (fn [{change-type :change-type :as route-changes}]
+                  (case change-type
+                    :no-traffic
+                    [tv-change-icons/labeled-icon
+                     [ic/av-not-interested]
+                     "Tauko liikennöinnissä"]
+
+                    :added
+                    [tv-change-icons/labeled-icon
+                     [ic/content-add-box {:color style/add-color}]
+                     "Uusi reitti"]
+
+                    :removed
+                    [tv-change-icons/labeled-icon
+                     [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
+                     "Päättyvä reitti"]
+
+                    :no-change
+                    [tv-change-icons/labeled-icon
+                     [ic/navigation-check]
+                     "Ei muutoksia"]
+
+                    :changed
+                    [tv-change-icons/change-icons route-changes]))}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
@@ -368,7 +416,7 @@
 
 (defn route-trips [e! open-sections {:keys [trips date1 date2 date1-trips date2-trips combined-trips
                                             selected-trip-pair]}]
-  [tv-section/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
+  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
    "Vuorot"
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
@@ -437,7 +485,7 @@
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
                                                    combined-stop-sequence selected-trip-pair] :as compare}]
-  [tv-section/section {:open? (get open-sections :trip-stop-sequence true)
+  [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
             :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
@@ -559,7 +607,7 @@
                                          :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
-  [tv-section/section {:toggle! #(e! (tv/->ToggleSection :route-map))
+  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
             :open? (get open-sections :route-map true)}
    "Kartta"
    [:div
@@ -600,8 +648,10 @@
          {:icon (if open?
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
-          :on-click #(do (.preventDefault %)
-                         (e! (tv/->ToggleSection :gtfs-package-info)))
+          :on-click (fn [^SyntheticMouseEvent event]
+                      (do
+                        (.preventDefault event)
+                        (e! (tv/->ToggleSection :gtfs-package-info))))
           :style style/infobox-more-link}]
         (when open?
           [:div
@@ -648,7 +698,7 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type changes-all]]]
 
       (when selected-route
         [:div.transit-visualization-route.container

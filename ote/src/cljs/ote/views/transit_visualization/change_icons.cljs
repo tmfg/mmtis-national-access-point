@@ -39,6 +39,15 @@
 
 
 ;; Ui
+(defn labeled-icon
+  ([icon label]
+   [labeled-icon {} icon label])
+  ([wrapper-attrs icon label]
+   [:div wrapper-attrs
+    icon
+    [:div (stylefy/use-style style/change-icon-value)
+     label]]))
+
 (defn change-icons
   ([diff]
    [change-icons diff false])
