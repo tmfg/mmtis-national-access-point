@@ -21,28 +21,28 @@
   [e! app-state]
   (let [calculation (first (get-in app-state [:admin :transit-changes :hash-recalculations :calculations]))]
     [:div
-     "Taustalaskenta on menossa. Muutostunnistuksen työkalut ovat poissa käytöstä."
+     [:strong "Taustalaskenta on menossa. Muutostunnistuksen työkalut ovat poissa käytöstä."]
      [:br]
      [:div
       [:div "Laskenta aloitettu " (str (:gtfs/started calculation))]
       [:div "Paketteja yhteensä " (:gtfs/packets-total calculation)]
       [:div "Paketeja laskettu " (:gtfs/packets-ready calculation)]]
-
-     [:a (merge (stylefy/use-style button-styles/primary-button)
-                {:id "update-hash-recalculation-status"
-                 :href "#"
-                 :on-click #(do
-                              (.preventDefault %)
-                              (e! (admin-transit-changes/->LoadHashRecalculations)))
-                 :icon (ic/content-filter-list)})
+     [:br]
+     [buttons/save
+      {:id "update-hash-recalculation-status"
+       :href "#"
+       :on-click #(do
+                    (.preventDefault %)
+                    (e! (admin-transit-changes/->LoadHashRecalculations)))
+       :icon (ic/content-filter-list)}
       [:span "Tarkista laskennan eteneminen"]]
-     [:a (merge (stylefy/use-style button-styles/negative-button)
-                {:id "reset-hash-recalculation-status"
-                 :href "#"
-                 :on-click #(do
-                              (.preventDefault %)
-                              (e! (admin-transit-changes/->ResetHashRecalculations)))
-                 :icon (ic/content-filter-list)})
+     [buttons/delete
+      {:id "reset-hash-recalculation-status"
+       :href "#"
+       :on-click #(do
+                    (.preventDefault %)
+                    (e! (admin-transit-changes/->ResetHashRecalculations)))
+       :icon (ic/content-filter-list)}
       [:span "Nollaa status, jos se on jäänyt jumiin"]]]))
 
 (defn contract-traffic [e! app-state]
@@ -124,11 +124,10 @@
       Löydät palvelun id:n omat palvelutiedot sivun kautta tai muutostunnistuksen visualisointisivun url:stä."]
       [:div {:style {:flex 2}}
        [ui/text-field
-        {:id                  "jaakko-mies"
-         :name                "jes"
+        {:id                  "detection-service-id"
+         :name                "detection-service-name"
          :floating-label-text "Palvelun id"
          :value               (get-in app-state [:admin :transit-changes :single-detection-service-id])
-         ;:type    :string
          :on-change           #(do
                                  (.preventDefault %)
                                  (e! (admin-transit-changes/->SetSingleDetectionServiceId %2)))}]
