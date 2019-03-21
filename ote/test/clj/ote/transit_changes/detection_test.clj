@@ -53,9 +53,7 @@
          {route-name [nil nil nil nil nil nil nil]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         ))
-
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest test-no-traffic-run-twice-is-detected
   (let [test-result (-> data-no-traffic-run-twice
@@ -468,6 +466,8 @@
 ;; Day hash data for changes for a default week with FIVE kind of day hashes
 (def data-wk-hash-traffic-five-kind             ["A" "B" "B" "B" "F" "G" "H"])
 (def data-wk-hash-traffic-five-kind-change-four ["A" "2" "5" "5" "5" "6" "7"])
+(def data-wk-hash-traffic-seven-kind             ["A" "C" "D" "E" "F" "G" "H"])
+(def data-wk-hash-traffic-five-kind-change-seven ["1" "2" "3" "4" "5" "6" "7"])
 
 (deftest test-changed-days-of-week
   (testing "One kind of traffic, changes: 0"
@@ -489,5 +489,8 @@
     (is (= [] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind))))
 
   (testing "Five kinds of traffic, changes: 5"
-    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind-change-four)))))
+    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind-change-four))))
+
+  (testing "Seven kinds of traffic, changes: 7"
+    (is (= [0 1 2 3 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-traffic-seven-kind data-wk-hash-traffic-five-kind-change-seven)))))
 
