@@ -3,27 +3,32 @@
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
-            [ote.ui.tabs :as tabs]
-            [ote.ui.form-fields :as form-fields]
-            [ote.app.controller.admin :as admin-controller]
+            [clojure.string :as str]
+            [cljs-react-material-ui.icons :as ic]
+            [reagent.core :as r]
+            [stylefy.core :as stylefy]
+
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
-            [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]
             [ote.localization :refer [tr tr-key]]
-            [ote.ui.common :refer [linkify]]
             [ote.time :as time]
-            [cljs-react-material-ui.icons :as ic]
-            [reagent.core :as r]
+
+            [ote.app.controller.admin :as admin-controller]
+            [ote.app.controller.front-page :as fp]
+            [ote.theme.colors :as colors]
+            [ote.style.base :as style-base]
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.common :as ui-common]
+            [ote.ui.page :as page]
+            [ote.ui.tabs :as tabs]
+            [ote.ui.form-fields :as form-fields]
             [ote.views.admin.interfaces :as interfaces]
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
-            [ote.ui.page :as page]
-            [ote.views.admin.sea-routes :as sea-routes]
-            [ote.style.dialog :as style-dialog]))
+            [ote.views.admin.sea-routes :as sea-routes]))
 
 (def id-filter-type [:operators :services :ALL])
 
@@ -242,8 +247,17 @@
               {:label "Merireitit" :value "sea-routes"}]
         selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
     [:div
-     [:div {:style {:position "absolute" :top "80px" :right "20px"}}
-      [linkify "/#/admin/detected-changes/detect-changes" [:span [ic/action-settings] "Asetukset"]]]
+     [:div {:style {:position "absolute" :top "90px" :right "20px"}}
+      [:a (merge {:href "/#/admin/detected-changes/detect-changes"
+                  :style {:margin-right "2rem"}
+                  :id "admin-transit-changes-settings-btn"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (fp/->ChangePage :admin-detected-changes nil)))}
+                 (stylefy/use-style style-base/blue-link-with-icon))
+       [ic/action-settings]
+       [:span {:style {:padding-left "0.5rem"}}
+        "Muutostunnistuksen asetukset"]]]
      [page/page-controls "" "Ylläpitopaneeli"
       [:div {:style {:padding-bottom "20px"}}
        [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))

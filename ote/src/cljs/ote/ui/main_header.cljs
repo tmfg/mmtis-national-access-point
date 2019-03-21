@@ -387,7 +387,7 @@
                                  {:margin-top "0px"}))}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
-(defn- top-nav [e! app is-scrolled?]
+(defn top-nav [e! app is-scrolled?]
   [:div
    [header-scroll-sensor is-scrolled? -250]
    [esc-press-listener e! app]
