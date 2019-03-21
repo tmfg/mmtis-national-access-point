@@ -137,8 +137,8 @@ SELECT oa."transport-service-id" as id
  WHERE ts.published IS NOT NULL
    AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_Intersects(sa.location, oa."simplified-location");
---   AND NOT ST_Touches(sa.location, oa."simplified-location");
+   AND ST_Intersects(sa.location, oa."simplified-location")
+   AND NOT ST_Touches(sa.location, oa."simplified-location");
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one
