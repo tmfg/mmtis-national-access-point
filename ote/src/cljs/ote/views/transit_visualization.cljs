@@ -79,9 +79,6 @@
           trip-name (aget feature "properties" "trip-name")
           popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))
           ^Function my-layer (aget layer "setOffset")]
-      ;(.log js/console "type (aget layer \"setOffset\") " (type (aget layer "setOffset")))
-      ;(.log js/console "type  feature" (type feature))
-
       (if stop-name
       ;; This features is a stop marker
       (do
