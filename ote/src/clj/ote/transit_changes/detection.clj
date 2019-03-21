@@ -644,7 +644,7 @@
   (and date
        (.isBefore date (java.time.LocalDate/now))))
 
-(defn- max-date-within-90-days? [{max-date :max-date}]
+(defn- max-date-within-evaluation-window? [{max-date :max-date}]
   (and max-date
        (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 180))
        (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
@@ -692,7 +692,7 @@
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
         last-route-change? (= route-change (last route-changes-for-key))
         ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
-        removed? (and last-route-change? (max-date-within-90-days? route))
+        removed? (and last-route-change? (max-date-within-evaluation-window? route))
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (and (> no-traffic-run no-traffic-detection-threshold)
