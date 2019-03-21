@@ -22,6 +22,12 @@ CREATE VIEW operation_area_geojson AS
  SELECT oa.*, ST_AsGeoJSON(oa.location) AS "location-geojson"
    FROM operation_area oa;
 
+-- Create simplified version of operation-area.location. 0.01 is the tolerance for the algorithm.
+ALTER TABLE "operation_area" ADD COLUMN "simplified-location" GEOMETRY;
+UPDATE "operation_area" SET "simplified-location" = ST_MakeValid(ST_Simplify(location, 0.01, true));
+SELECT UpdateGeometrySRID('operation_area', 'simplified-location', 4326);
+CREATE INDEX "operation-area-simplified-gix" ON "operation_area" USING GIST("simplified-location");
+
 --- Recreate view
 CREATE OR REPLACE VIEW places AS
  SELECT CONCAT('finnish-municipality-', natcode) AS id,
@@ -58,11 +64,3 @@ UNION ALL
         nameswe,
         location
    FROM continent;
-
-CREATE TABLE "spatial-search-tree" (
-  inside TEXT,
-  outside TEXT,
-  weight REAL);
-
-CREATE INDEX "spatial-search-inside-idx" on "spatial-search-tree" (inside);
-CREATE INDEX "spatial-search-outside-idx" on "spatial-search-tree" (outside);
