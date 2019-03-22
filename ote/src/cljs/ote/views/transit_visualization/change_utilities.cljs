@@ -35,9 +35,10 @@
     [:b "Taulukon ikonien selitteet"]]
    [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
-      (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
-                          [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
-                          [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                          [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
+      (for [[icon color label] [[ic/content-remove-circle-outline {:color style/remove-color} "Mahdollisesti päättyvä reitti"]
+                          [ote-icons/outline-add-box {} "Uusia vuoroja"]
+                          [ote-icons/outline-indeterminate-checkbox {} "Poistuvia vuoroja"]
+                          [ic/action-timeline {} "Pysäkkimuutoksia per vuoro"]
+                          [ic/action-query-builder {} "Aikataulumuutoksia per vuoro"]]]
         ^{:key (str "transit-visualization-route-changes-legend-" label)}
-        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
+        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))]])

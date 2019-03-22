@@ -7,7 +7,8 @@
             [ote.app.controller.transit-visualization :as tv]
             [ote.style.base :as style-base]
             [ote.ui.icon_labeled :as icon-l]
-            [ote.ui.icons :as ote-icons]))
+            [ote.ui.icons :as ote-icons]
+            [clojure.string :as str]))
 
 ;; Utility methods
 
@@ -19,6 +20,7 @@
       (str lower)
       (str lower "\u2014" upper))))
 
+;; Ui elements
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
@@ -37,25 +39,24 @@
       changes
       (when with-labels? " aikataulumuutosta")]]))
 
-
-;; Ui
 (defn change-icons
   ([diff]
    [change-icons diff false])
-  ([{:keys [added-trips removed-trips
+  ([{:keys [change-type added-trips removed-trips
             trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
             trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
     with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    [:div {:style {:width "20%"}}
+    [:div {:style {:width "15%"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
                                            style/add-color)}]
       [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
-    [:div {:style {:width "20%"}}
-     [icon-l/icon-labeled style/transit-changes-legend-icon
+
+    [:div {:style {:width "15%"}}
+     [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                           style/no-change-color
                                                           style/remove-color)}]
@@ -67,4 +68,10 @@
 
 
     [:div {:style {:width "30%"}}
-     [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
+     [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]
+
+    ;; Add route ending icon if route ending change is detected
+    (when (str/includes? (str change-type) "removed")
+      [:div {:style {:width "10%"}}
+       [icon-l/icon-labeled
+        [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))
