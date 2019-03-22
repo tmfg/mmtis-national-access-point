@@ -130,7 +130,7 @@ SELECT eid."transport-service-id" as id
 -- Find services by operation area names
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-      (SELECT ST_MakeValid(ST_Simplify(ST_Union(ST_Accum(pl.location)), 1, true)) as "location"
+      (SELECT ST_MakeValid(ST_Simplify(ST_Union(ST_Accum(pl.location)), 0.01, true)) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts

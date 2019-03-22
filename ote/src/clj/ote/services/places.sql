@@ -29,7 +29,7 @@ VALUES (:transport-service-id,
         ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326),
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
         :primary?,
-        ST_SetSRID(ST_MakeValid(ST_Simplify(ST_GeomFromGeoJSON(:geojson), 1, true)), 4326));
+        ST_SetSRID(ST_MakeValid(ST_Simplify(ST_GeomFromGeoJSON(:geojson), 0.01, true)), 4326));
 
 -- name: fetch-operation-area-search
 -- sort operation area places search in following alphabetical order
