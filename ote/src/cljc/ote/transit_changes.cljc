@@ -250,10 +250,18 @@
              week-hash-1
              week-hash-2)))
 
-(defn- day-changes-from-previous? [d1 d2 d1p d2p]
+(defn- day-is-change?
+  "Input: d1: baseline day hash, d2: hash of the day to analyze, d1p: day previous to baseline day, d2p: day previous to day being analyzed
+  Output: True if d1 is considered a day when it's traffic has changed compared to baseline, false if not."
+  [d1 d2 d1p d2p]
   (when (not= d1 d2)
-    ;; Not a change if change happened on previous day and it just continues on this day. E.g. AAAAAAA => AABBBBB
-    (or (not= d1p d1) (not= d2p d2))))
+    (let [res (if (and (not (keyword? d1))
+                       (not (keyword? d2))
+                       ;; Not a change if change happened on previous day and it just continues on this day. E.g. AAAAAAA => AABBBBB
+                       (= d1p d1) (= d2p d2))
+                false
+                true)]
+      res)))
 
 (defn changed-days-of-week
   "Input:
@@ -266,16 +274,12 @@
          ix 0
          d1 (nth week-hash-1 ix)                            ;; Day on "current week" which is the evaluation baseline
          d2 (nth week-hash-2 ix)                            ;; Day on future week, which is being evaluated
-         d1p nil                                            ;; Day previous to d1, if available
-         d2p nil]                                           ;; Day previous to d2, if available
+         d1p "."                                            ;; Day previous to d1, if available. Initial value for "not set" is here "." because logic uses nil and keyword.
+         d2p "."]                                           ;; Day previous to d2, if available. Initial value for "not set" is here "." because logic uses nil and keyword.
     (if (< ix (count week-hash-2))
       (recur
         ;; Logic for detecting if day d2 is a new change or not.
-        (if (and (some? d1)
-                 (some? d2)
-                 (not (keyword? d1))
-                 (not (keyword? d2))
-                 (day-changes-from-previous? d1 d2 d1p d2p))
+        (if (day-is-change? d1 d2 d1p d2p)
           (conj result ix)                                  ;; Day is a change, so append its index to result coll
           result)                                           ;; No change, no changes added to result coll
         (inc ix)
