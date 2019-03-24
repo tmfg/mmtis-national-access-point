@@ -678,7 +678,7 @@
     change))
 
 (spec/fdef transform-route-change
-           :args (spec/cat :all-routes vector? :route-change map? :route-changes-all ::detected-route-changes-for-services-coll))
+           :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -695,8 +695,8 @@
         removed? (and last-route-change? (max-date-within-evaluation-window? route))
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
-                             (and (> no-traffic-run no-traffic-detection-threshold)
-                                  (.isAfter no-traffic-start-date (.toLocalDate (:max-date route))))))
+                             (and (pos? no-traffic-run)
+                                  (.isBefore no-traffic-start-date (.toLocalDate (:max-date route))))))
         max-date-in-past? (.isBefore (.toLocalDate (:max-date route)) (java.time.LocalDate/now))
         {:keys [starting-week-date different-week-date
                 added-trips removed-trips trip-changes]} changes
