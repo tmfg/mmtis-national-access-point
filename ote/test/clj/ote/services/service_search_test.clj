@@ -156,6 +156,39 @@
         (is (= 1 (count (services-in "Suomi"))))
         (is (= 1 (count (services-in "Eurooppa")))))))
 
+  (testing "Spatial search returns services which operate in areas intersecting with search areas 3rd sample set"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-municipality-249",
+                                                                     :namefin "Keuruu",
+                                                                     :type "finnish-municipality",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "Keuruu"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "Petäjävesi"))))
+        (is (zero? (count (services-in "Virrat"))))
+        (is (zero? (count (services-in "Mänttä-Vilppula"))))
+        (is (zero? (count (services-in "Multia"))))
+        (is (zero? (count (services-in "Jämsä"))))
+        (is (zero? (count (services-in "Ähtäri"))))
+        (is (zero? (count (services-in "Pirkanmaa"))))
+        (is (zero? (count (services-in "Etelä-Pohjanmaa"))))
+        ;; Doesn't match with exterior areas
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with overlapping areas
+        (is (= 1 (count (services-in "Keski-Suomi"))))
+        (is (= 1 (count (services-in "41970 Huttula"))))
+        (is (= 1 (count (services-in "42520 Asunta"))))
+
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
   (testing "Operator search does not return deleted companies"
     (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
