@@ -76,9 +76,23 @@
 
 (define-event ForceDetectTransitChanges []
   {}
-  (comm/post! "/transit-changes/force-detect" nil
+  (comm/post! "/transit-changes/force-detect/" nil
               {:on-success #(.log js/console %)})
   app)
+
+(define-event SetSingleDetectionServiceId [service-id]
+  {}
+  (assoc-in app [:admin :transit-changes :single-detection-service-id] service-id))
+
+(define-event DetectChangesForGivenService []
+  {}
+  (let [service-id (get-in app [:admin :transit-changes :single-detection-service-id])]
+    ;; When service-id is not given, do not try to start detection
+    (when service-id
+      (comm/post! (str "transit-changes/force-detect/" service-id) nil
+                 {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+    app))
+
 
 (define-event ForceInterfaceImport []
   {}
@@ -160,6 +174,12 @@
                         (assoc service :commercial? (not commercial?))
                         service))
                     services))))
+
+(define-event ResetHashRecalculations []
+  {}
+  (comm/delete! (str "transit-changes/hash-calculation") {}
+             {:on-success (tuck/send-async! ->LoadHashRecalculations)})
+  app)
 
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))

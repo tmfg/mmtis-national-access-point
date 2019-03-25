@@ -41,6 +41,18 @@
     (when (pos-int? (count calculations))
        {:calculations calculations})))
 
+(defn reset-last-hash-recalculations
+  "Reset currently running hash-recalculations. Should only be used if caluclation is stuck."
+  [db]
+  (let [last-calculation (first (specql/fetch db :gtfs/hash-recalculation
+                                              (specql/columns :gtfs/hash-recalculation)
+                                              {:gtfs/completed              op/null?}
+                                              {:specql.core/order-by        :gtfs/recalculation-id
+                                               :specql.core/order-direction :desc
+                                               :specql.core/limit           1}))]
+    (when last-calculation
+      (specql/delete! db :gtfs/hash-recalculation {:gtfs/recalculation-id (:gtfs/recalculation-id last-calculation)}))))
+
  (defn- start-hash-recalculation [db packets-total user]
   (let [id (specql/insert! db :gtfs/hash-recalculation
                   {:gtfs/started (java.sql.Timestamp. (System/currentTimeMillis))
@@ -575,6 +587,18 @@
           date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
       (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
 
+(defn compare-route-days-all-changes-for-week [db service-id route-hash-id
+                          {:keys [starting-week starting-week-hash
+                                  different-week different-week-hash] :as r}]
+  (let [changed-days (transit-changes/changed-days-of-week starting-week-hash different-week-hash)]
+    (for [ix changed-days
+          :let [starting-week-date (.plusDays (:beginning-of-week starting-week) ix)
+                different-week-date (.plusDays (:beginning-of-week different-week) ix)
+                date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
+                date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
+          :when (number? ix)]
+      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
   [db service-id routes]
@@ -589,6 +613,20 @@
               routes)]
     route-day-changes))
 
+(defn- expand-day-changes
+  "Input: coll of maps each describing a week with traffic changes.
+  Takes :changes coll from each map, removes it, and creates a new map to contain each of the elements in :changes coll.
+  Output: returns a coll of maps, each describing one single changed day on a week.
+  There may be multiple maps per one week if there are multiple changed days on the week."
+  [detection-results]
+  (reduce (fn [result detection]
+            (if-let [changes (:changes detection)]
+              (concat result (for [chg changes]
+                               (assoc detection :changes chg)))
+              (conj result detection)))
+          []
+          detection-results))
+
 (defn route-day-changes-new
   "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
   [db service-id routes]
@@ -596,18 +634,19 @@
         (mapv (fn [{diff :different-week route-key :route-key :as detection-result}]
                 (if diff ;; If a different week was found, do detailed trip analysis
                   (assoc detection-result
-                    :changes (compare-route-days db service-id route-key detection-result))
+                    :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
                   detection-result))
-              routes)]
-    route-day-changes))
+              routes)
+        res (into [] (expand-day-changes route-day-changes))]
+    res))
 
 (defn- date-in-the-past? [^LocalDate date]
   (and date
        (.isBefore date (java.time.LocalDate/now))))
 
-(defn- max-date-within-90-days? [{max-date :max-date}]
+(defn- max-date-within-evaluation-window? [{max-date :max-date}]
   (and max-date
-       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 90))
+       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 180))
        (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
 
 (defn- min-date-in-the-future? [{min-date :min-date}]
@@ -653,7 +692,7 @@
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
         last-route-change? (= route-change (last route-changes-for-key))
         ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
-        removed? (and last-route-change? (max-date-within-90-days? route))
+        removed? (and last-route-change? (max-date-within-evaluation-window? route))
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (and (> no-traffic-run no-traffic-detection-threshold)

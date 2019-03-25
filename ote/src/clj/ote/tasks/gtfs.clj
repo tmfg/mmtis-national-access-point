@@ -63,7 +63,6 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-
 ;; To speed up detection, call this with vector of service-ids:
 ;; e.g.: (detect-new-changes-task db (time/now) true [1289])
 (defn detect-new-changes-task
