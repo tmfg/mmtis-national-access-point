@@ -300,21 +300,39 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
+(def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
+                            :trip-stop-sequence-changes-upper :route-hash-id
+                            :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips})
+
+(defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
+  ;; Filter nil values
+  (keep
+    (fn [c]
+      (let [x (select-keys c selected-change-keys)
+            x (if (= :removed (:change-type x))
+                ;; Remove trip and stop changes from route summary if route has change-type :removed
+                (dissoc x :trip-stop-sequence-changes-lower
+                        :trip-stop-time-changes-lower
+                        :trip-stop-sequence-changes-upper
+                        :trip-stop-time-changes-upper
+                        :removed-trips)
+                x)]
+        ;; Return nil because keep won't work with false values.
+        (if (= (:route-hash-id x) (:route-hash-id single-change))
+          x
+          nil)
+        ))
+    all-changes))
+
 (defn- route-change-summary
   "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
   need to merge-with them together."
   [single-change all-changes]
-  (let [selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
-                               :trip-stop-sequence-changes-upper :route-hash-id
-                               :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips}
-        all-changes (map #(select-keys % selected-change-keys) all-changes)
+  (let [all-changes (map #(select-keys % selected-change-keys) all-changes)
         single-change (select-keys single-change selected-change-keys)
-        all-route-changes (filter
-                            (fn [c]
-                              (let [x (select-keys c selected-change-keys)]
-                                (= (:route-hash-id x) (:route-hash-id single-change))))
-                            all-changes)
+        all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
         merged-changes (apply merge-with + all-route-changes)]
+    ;(.log js/console "all-route-changes " (pr-str all-route-changes))
     merged-changes))
 
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
