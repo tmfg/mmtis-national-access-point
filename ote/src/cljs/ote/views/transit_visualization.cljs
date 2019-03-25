@@ -332,7 +332,6 @@
         single-change (select-keys single-change selected-change-keys)
         all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
         merged-changes (apply merge-with + all-route-changes)]
-    ;(.log js/console "all-route-changes " (pr-str all-route-changes))
     merged-changes))
 
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
