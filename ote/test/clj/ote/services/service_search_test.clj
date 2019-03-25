@@ -125,6 +125,36 @@
         (is (= 1 (count (services-in "Suomi"))))
         (is (= 1 (count (services-in "Eurooppa")))))))
 
+  (testing "Spatial search returns services which operate in areas intersecting with search areas 2nd sample set"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-postal-90900",
+                                                                     :namefin "90900 Kiiminki Keskus",
+                                                                     :type "finnish-postal",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "90900 Kiiminki Keskus"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "90630 Korvensuora"))))
+        (is (zero? (count (services-in "90660 Sanginsuu"))))
+        (is (zero? (count (services-in "91200 Yli-Ii Keskus"))))
+        (is (zero? (count (services-in "91210 Jakkukylä"))))
+        (is (zero? (count (services-in "91260 Pahkakoski-Räinä"))))
+        (is (zero? (count (services-in "90910 Kontio"))))
+        (is (zero? (count (services-in "90940 Jääli"))))
+        (is (zero? (count (services-in "91300 Ylikiiminki Keskus"))))
+        (is (zero? (count (services-in "91310 Arkala"))))
+        ;; Doesn't match with areas close by
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Oulu"))))
+        (is (= 1 (count (services-in "Pohjois-Pohjanmaa"))))
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
 
   (testing "Operator search does not return deleted companies"
     (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")

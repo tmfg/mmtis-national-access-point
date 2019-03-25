@@ -127,18 +127,18 @@ SELECT eid."transport-service-id" as id
                  AND ts.published IS NOT NULL)
 
 -- name: service-ids-by-operation-areas
--- Find services by operation area names
+-- Find services by operation area names. Simplifies and shrinks geometries to make querying more efficient. Shrinking is necessary to correct in the cases
+-- where simplifying neighbouring operation areas creates new overlaps between the areas.
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-      (SELECT ST_MakeValid(ST_Simplify(ST_Union(ST_Accum(pl.location)), 0.01, true)) as "location"
+      (SELECT ST_MakeValid(ST_Buffer(ST_Simplify(ST_Union(ST_Accum(pl.location)), 0.01, true), -0.01)) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts
  WHERE ts.published IS NOT NULL
    AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_Intersects(sa.location, oa."simplified-location")
-   AND NOT ST_Touches(sa.location, oa."simplified-location");
+   AND ST_Intersects(sa.location, oa."simplified-location");
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one

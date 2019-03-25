@@ -22,9 +22,10 @@ CREATE VIEW operation_area_geojson AS
  SELECT oa.*, ST_AsGeoJSON(oa.location) AS "location-geojson"
    FROM operation_area oa;
 
--- Create simplified version of operation-area.location. 0.01 is the tolerance for the algorithm.
+-- Create simplified version of operation-area.location. 0.01 is the tolerance for the algorithm. Shrink the operation area to make sure
+-- new overlaps have not been created.
 ALTER TABLE "operation_area" ADD COLUMN "simplified-location" GEOMETRY;
-UPDATE "operation_area" SET "simplified-location" = ST_MakeValid(ST_Simplify(location, 0.01, true));
+UPDATE "operation_area" SET "simplified-location" = ST_MakeValid(ST_Buffer(ST_Simplify(location, 0.01, true), -0.01));
 SELECT UpdateGeometrySRID('operation_area', 'simplified-location', 4326);
 CREATE INDEX "operation-area-simplified-gix" ON "operation_area" USING GIST("simplified-location");
 
