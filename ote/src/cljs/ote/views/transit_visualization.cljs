@@ -305,24 +305,20 @@
                             :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips})
 
 (defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
-  ;; Filter nil values
-  (keep
-    (fn [c]
-      (let [x (select-keys c selected-change-keys)
-            x (if (= :removed (:change-type x))
-                ;; Remove trip and stop changes from route summary if route has change-type :removed
-                (dissoc x :trip-stop-sequence-changes-lower
-                        :trip-stop-time-changes-lower
-                        :trip-stop-sequence-changes-upper
-                        :trip-stop-time-changes-upper
-                        :removed-trips)
-                x)]
-        ;; Return nil because keep won't work with false values.
-        (if (= (:route-hash-id x) (:route-hash-id single-change))
-          x
-          nil)
-        ))
-    all-changes))
+	;; Filter nil values
+	(keep
+		(fn [c]
+			;; Return nil if route-hash-id doesn't match because keep won't work with false values.
+			(when (= (:route-hash-id c) (:route-hash-id single-change))
+				(if (= :removed (:change-type c))
+					;; Remove trip and stop changes from route summary if route has change-type :removed
+					(dissoc c :trip-stop-sequence-changes-lower
+									:trip-stop-time-changes-lower
+									:trip-stop-sequence-changes-upper
+									:trip-stop-time-changes-upper
+									:removed-trips)
+					c)))
+		all-changes))
 
 (defn- route-change-summary
   "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
