@@ -171,10 +171,24 @@ SELECT p.id, p.created,
  WHERE p."transport-service-id" = :service-id AND p."deleted?" = FALSE
  ORDER BY p.created DESC;
 
--- name: detected-changed-to-service-by-date
+-- name: detected-service-change-by-date
 SELECT c.date, c."added-routes", c."removed-routes", c."changed-routes", c."no-traffic-routes", c."current-week-date",
        c."different-week-date", c."change-date", c.created, c."transport-service-id"
 FROM "gtfs-transit-changes" c
 WHERE c."transport-service-id" = :service-id
   AND c.date = :date::DATE;
+
+-- name: detected-route-changes-by-date
+SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
+       c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
+       c."trip-stop-time-changes-lower", c."trip-stop-sequence-changes-upper", c."current-week-date",
+       c."different-week-date", c."change-date", c."created-date"
+  FROM "detected-route-change" c,
+       "detected-change-history" h
+ WHERE c."transit-change-date" = :date
+   AND c."transit-service-id" = :service-id
+   AND h."transport-service-id" = :service-id
+   AND h."change-str" = c."change-str"
+   AND h."different-week-date" >= :date;
+
 
