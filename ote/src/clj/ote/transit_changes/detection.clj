@@ -11,7 +11,8 @@
             [ote.db.user :as user]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
-            [ote.db.tx :as tx])
+            [ote.db.tx :as tx]
+            [ote.transit-changes.change-history :as change-history])
   (:import (java.time LocalDate DayOfWeek)))
 
 (def ^:const no-traffic-detection-threshold
@@ -662,10 +663,6 @@
   (.plusDays date (- (.getValue week-day)
                      (.getValue (.getDayOfWeek date)))))
 
-(defn- sql-date [local-date]
-  (when local-date
-    (java.sql.Date/valueOf local-date)))
-
 (defn discard-past-changes
   "Discard past changes by returning a :no-change"
   [{type :gtfs/change-type change-date :gtfs/change-date :as change}]
@@ -679,6 +676,60 @@
 
 (spec/fdef transform-route-change
            :args (spec/cat :all-routes vector? :route-change map? :route-changes-all ::detected-route-changes-for-services-coll))
+
+(defn- route-change-type [max-date-in-past? added? removed? changed? no-traffic? starting-week-date different-week-date
+                          no-traffic-start-date no-traffic-end-date route]
+  ;; Change type and type specific dates
+  (discard-past-changes
+    (cond
+
+      max-date-in-past?                                  ; Done because some of the changes listed in transit changes pages are actually in the past
+      {:gtfs/change-type         :no-change}
+
+      added?
+      {:gtfs/change-type         :added
+
+       ;; For an added route, the change-date is the date when traffic starts
+       :gtfs/different-week-date (:min-date route)
+       :gtfs/change-date         (:min-date route)
+       :gtfs/current-week-date   (time/sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
+
+      removed?
+      {:gtfs/change-type         :removed
+       ;; For a removed route, the change-date is the day after traffic stops
+       ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
+       :gtfs/change-date (if (.isBefore (.toLocalDate (time/sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
+                           nil
+                           (time/sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
+
+       :gtfs/different-week-date (time/sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+       :gtfs/current-week-date   (:max-date route)}
+
+      changed?
+      {:gtfs/change-type         :changed
+       :gtfs/current-week-date   (time/sql-date starting-week-date)
+       :gtfs/different-week-date (time/sql-date different-week-date)
+       :gtfs/change-date         (time/sql-date different-week-date)}
+
+      no-traffic?
+      {:gtfs/change-type :no-traffic
+
+       ;; If the change is a no-traffic period, the different day is the first day that has no traffic
+       :gtfs/current-week-date (time/sql-date
+                                 (.plusDays no-traffic-start-date -1))
+       ;; If no-traffic starts in future set different-week-day the day when no-traffic segment starts
+       ;; if no-traffic segment is in the past (or currenlty on progress) set different-week-date when the traffic starts again
+       :gtfs/different-week-date (if (.isBefore (.toLocalDate (time/sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                                   (time/sql-date no-traffic-end-date)
+                                   (time/sql-date no-traffic-start-date))
+       ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set change date where the traffic starts again.
+       :gtfs/change-date (if (.isBefore (.toLocalDate (time/sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                           (time/sql-date no-traffic-end-date) ;; Day when traffic starts again
+                           (time/sql-date no-traffic-start-date))}
+
+      :default
+      {:gtfs/change-type :no-change})))
+
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -688,6 +739,7 @@
   (spec/assert ::detected-route-changes-for-services-coll route-changes-all)
   (let [route-map (map second all-routes)
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
+
         added? (min-date-in-the-future? route)
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
         last-route-change? (= route-change (last route-changes-for-key))
@@ -706,7 +758,19 @@
                                       (map :stop-seq-changes trip-changes))
         trip-stop-time-changes (reduce update-min-max-range
                                        {}
-                                       (map :stop-time-changes trip-changes))]
+                                       (map :stop-time-changes trip-changes))
+        change (route-change-type max-date-in-past? added? removed? changed? no-traffic? starting-week-date different-week-date
+                                       no-traffic-start-date no-traffic-end-date route)
+        change-str (change-history/create-change-str-from-change-data (merge route
+                                                                        {:gtfs/route-hash-id (:route-hash-id route)
+                                                                         :gtfs/change-type (:gtfs/change-type change)
+                                                                         :gtfs/different-week-date (:gtfs/different-week-date change)
+                                                                         :gtfs/added-trips added-trips
+                                                                         :gtfs/removed-trips removed-trips
+                                                                         :gtfs/trip-stop-sequence-changes-lower (:lower trip-stop-seq-changes)
+                                                                         :gtfs/trip-stop-sequence-changes-upper (:upper trip-stop-seq-changes)
+                                                                         :gtfs/trip-stop-time-changes-lower (:lower trip-stop-time-changes)
+                                                                         :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)}) )]
     (merge
       {;; Route identification
        :gtfs/route-short-name (:route-short-name route)
@@ -720,58 +784,10 @@
        :gtfs/trip-stop-sequence-changes-lower (:lower trip-stop-seq-changes)
        :gtfs/trip-stop-sequence-changes-upper (:upper trip-stop-seq-changes)
        :gtfs/trip-stop-time-changes-lower (:lower trip-stop-time-changes)
-       :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)}
+       :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)
 
-     ;; Change type and type specific dates
-     (discard-past-changes
-       (cond
-
-         max-date-in-past?                                  ; Done because some of the changes listed in transit changes pages are actually in the past
-         {:gtfs/change-type         :no-change}
-
-         added?
-         {:gtfs/change-type         :added
-
-         ;; For an added route, the change-date is the date when traffic starts
-         :gtfs/different-week-date (:min-date route)
-         :gtfs/change-date         (:min-date route)
-         :gtfs/current-week-date   (sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
-
-         removed?
-         {:gtfs/change-type         :removed
-          ;; For a removed route, the change-date is the day after traffic stops
-          ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
-                             nil
-                             (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
-
-         :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
-         :gtfs/current-week-date   (:max-date route)}
-
-         changed?
-         {:gtfs/change-type         :changed
-         :gtfs/current-week-date   (sql-date starting-week-date)
-         :gtfs/different-week-date (sql-date different-week-date)
-         :gtfs/change-date         (sql-date different-week-date)}
-
-         no-traffic?
-         {:gtfs/change-type :no-traffic
-
-          ;; If the change is a no-traffic period, the different day is the first day that has no traffic
-          :gtfs/current-week-date (sql-date
-                                    (.plusDays no-traffic-start-date -1))
-          ;; If no-traffic starts in future set different-week-day the day when no-traffic segment starts
-          ;; if no-traffic segment is in the past (or currenlty on progress) set different-week-date when the traffic starts again
-          :gtfs/different-week-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
-                                      (sql-date no-traffic-end-date)
-                                      (sql-date no-traffic-start-date))
-          ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set change date where the traffic starts again.
-          :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
-                              (sql-date no-traffic-end-date) ;; Day when traffic starts again
-                              (sql-date no-traffic-start-date))}
-
-         :default
-         {:gtfs/change-type :no-change})))))
+       :gtfs/change-str (:gtfs/change-str change-str)}
+      change)))
 
 (defn- debug-print-change-stats [all-routes route-changes type]
   (doseq [r all-routes
@@ -815,7 +831,7 @@
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
           ;; Set change date to future (every 4 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
@@ -831,7 +847,8 @@
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]
-      (update-route-changes! db (sql-date analysis-date) service-id route-change-infos))))
+      (update-route-changes! db (time/sql-date analysis-date) service-id route-change-infos)
+      (change-history/update-change-history db (time/sql-date analysis-date) service-id package-ids route-change-infos))))
 
 (defn override-static-holidays [date-route-hashes]
   (map (fn [{:keys [date] :as row}]
