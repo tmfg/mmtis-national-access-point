@@ -66,7 +66,7 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 17
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 24
          {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}))
 
 (deftest test-change-on-2nd-to-last-wk
   (let [result (-> data-change-on-2nd-to-last-wk
