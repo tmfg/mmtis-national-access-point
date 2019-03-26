@@ -409,7 +409,7 @@
 
 (defn route-weeks-with-first-difference-new
   "Detect the next different week in each route.
-  NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
+  NOTE! starting from the second week in the given route-weeks, the first given week is considered the \"prev\" week.
   Takes a list of weeks that have week hashes for each route.
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
@@ -476,13 +476,13 @@
 
   Input: [{:beginning-of-week #object[java.time.LocalDate 0x3f51d3c0 \"2019-02-11\"],
           :end-of-week #object[java.time.LocalDate 0x30b5f64f \"2019-02-17\"],
-          :routes {\"Raimola\" [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}}
+          :routes {\"routename\" [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}}
           {...}]
 
   Output: [{:different-week
             {:beginning-of-week [\"2019-02-25\"]
             :end-of-week #object[java.time.LocalDate 0x5a900751 \"2019-03-03\"]}
-           :route-key \"raimola\"
+           :route-key \"routename\"
            :different-week-hash [\"h1\" \"!!\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]\n
            :starting-week {:beginning-of-week #object[java.time.LocalDate   \"2019-02-11\"]
                             :end-of-week #object[java.time.LocalDate \"2019-02-17\"]}
@@ -549,7 +549,6 @@
                            :gtfs/stop-sequence stop-sequence
                            :gtfs/departure-time (time/pginterval->interval departure-time)})
                         trip-stops)})))
-
 
 (defn compare-selected-trips [date1-trips date2-trips starting-week-date different-week-date]
   (let [combined-trips (transit-changes/combine-trips date1-trips date2-trips)
