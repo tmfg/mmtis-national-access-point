@@ -319,7 +319,7 @@
         (println "no changes found from:" (:beginning-of-week (first  weeks))))
       result)))
 
-(defn- route-next-different-week
+(defn- route-next-different-week-old
   [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr]
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
@@ -430,7 +430,7 @@
                        ;; value under route key in r-d-s map will be updated by
                        ;; (route-next-different-week *value* route weeks curr)
                        (update route-detection-state route
-                               route-next-different-week route weeks curr))
+                               route-next-different-week-old route weeks curr))
                      route-detection-state route-names))
                  {}    ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
