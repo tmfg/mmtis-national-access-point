@@ -379,27 +379,27 @@
         :read identity
         :format (fn [{change-type :change-type :as route-changes}]
                   (case change-type
-                    :no-traffic
+                    "no-traffic"
                     [icon-l/icon-labeled
                      [ic/av-not-interested]
                      "Tauko liikennöinnissä"]
 
-                    :added
+                    "added"
                     [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
                      "Uusi reitti"]
 
-                    :removed
+                    "removed"
                     [icon-l/icon-labeled
                      [ic/content-remove-circle-outline {:color style/remove-color}]
                      "Mahdollisesti päättyvä reitti"]
 
-                    :no-change
+                    "no-change"
                     [icon-l/icon-labeled
                      [ic/navigation-check]
                      "Ei muutoksia"]
 
-                    :changed
+                    "changed"
                     [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
 
       route-changes] e!
