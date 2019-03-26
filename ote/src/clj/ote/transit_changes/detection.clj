@@ -242,7 +242,7 @@
       :default
       (dissoc state :no-traffic-start-date :no-traffic-run))))
 
-(defn add-no-traffic-run-dates [{:keys [no-traffic-run no-traffic-change
+(defn add-no-traffic-run-dates-old [{:keys [no-traffic-run no-traffic-change
                                         no-traffic-start-date] :as state} week]
 
   (cond
@@ -262,8 +262,40 @@
     :default
     state))
 
+(defn add-no-traffic-run-dates-new
+  "
+  state: map where analysis results per route and week are concatenated iteratively
+  week: the week being analysed during this call,
+  last-analysis-wk: week map of the last week where analysis will be carried out"
+  [{:keys [no-traffic-run no-traffic-change
+                                        no-traffic-start-date] :as state} week last-analysis-wk]
+
+  (cond
+
+    ;; Dissoc'd no-traffic keys because if normal week has traffic on weekdays and nil on last day,
+    ;; analysis reports a started no-traffic run even if it actually ends on next day. This happens because analysis
+    ;; doesn't run on the last weeks of the x week window.
+    ;; Refer to test test-no-changes-weekend-nil
+    (and no-traffic-run (nil? no-traffic-start-date) (= week last-analysis-wk))
+    (dissoc state :no-traffic-start-date :no-traffic-run)
+
+    ;; A new no traffic run has started, set date from current week
+    (and no-traffic-run (nil? no-traffic-start-date))
+    (assoc state :no-traffic-start-date (.plusDays (:beginning-of-week week) (- 7 no-traffic-run)))
+
+    ;; No traffic change was detected, add end date
+    no-traffic-change
+    (assoc state :no-traffic-end-date (.plusDays no-traffic-start-date no-traffic-change))
+
+    ;; Run ended without reaching threshold, remove start date
+    (nil? no-traffic-run)
+    (dissoc state :no-traffic-start)
+
+    :default
+    state))
+
 (defn- route-next-different-week-new
-  [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr]
+  [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr last-analysis-wk]
   ;; (println "route-next-different-week called with curr= " curr)
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
@@ -276,7 +308,7 @@
                      (assoc :route-key route)
                      ;; Detect no-traffic run
                      (detect-no-traffic-run route-week-hashes)
-                     (add-no-traffic-run-dates curr)
+                     (add-no-traffic-run-dates-new curr last-analysis-wk)
 
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route)
@@ -299,7 +331,7 @@
           result (-> state
                      ;; Detect no-traffic run
                      (detect-no-traffic-run route-week-hashes)
-                     (add-no-traffic-run-dates curr)
+                     (add-no-traffic-run-dates-old curr)
 
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route)
@@ -429,7 +461,7 @@
                        ;; value under route key in r-d-s map will be updated by
                        ;; (route-next-different-week *value* route weeks curr)
                        (update route-detection-state route
-                               route-next-different-week-new route weeks curr))
+                               route-next-different-week-new route weeks curr (first (take-last 3 route-weeks))))
                      route-detection-state
                      route-names))
                  {}    ; initial route detection state is empty
