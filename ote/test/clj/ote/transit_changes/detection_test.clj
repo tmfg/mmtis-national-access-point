@@ -8,6 +8,13 @@
 (defn d [year month day]
   (java.time.LocalDate/of year month day))
 
+(def select-keys-detect-changes-for-all-routes [:different-week
+                                                :no-traffic-start-date
+                                                :no-traffic-end-date
+                                                :no-traffic-run
+                                                :no-traffic-change
+                                                :route-key
+                                                :starting-week])
 (def route-name "Raimola")
 (def route-name-2 "Esala")
 
@@ -21,6 +28,82 @@
            :routes routes})
         route-maps)))
 
+;;;;;; TESTS for analysing specific weekx for changes in hash/traffic
+
+(def data-no-changes
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 03
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 10
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 24
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
+
+(deftest test-no-changes
+  (let [result (-> data-no-changes
+                   detection/changes-by-week->changes-by-route
+                   detection/detect-changes-for-all-routes)]
+    (is (= {:route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+           (-> result
+               first
+               (select-keys
+                 [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
+                  :different-week :route-key :starting-week]))))
+    (is (= 1 (count result)))))
+
+
+(def data-change-on-2nd-to-last-wk
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 03
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 10
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 24
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}))
+
+(deftest test-change-on-2nd-to-last-wk
+  (let [result (-> data-change-on-2nd-to-last-wk
+                   detection/changes-by-week->changes-by-route
+                   detection/detect-changes-for-all-routes)]
+    (is (= {:route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+           (-> result
+               first
+               (select-keys ;; NOTE: Changes on 2nd to last and last week not detected currently by the analysis!
+                   [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
+                    :different-week :route-key :starting-week]))))
+    (is (= 1 (count result)))))
+
+(def data-no-changes-weekend-nil
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 05 27
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 06 03
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 06 10
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}))
+
+(deftest test-no-changes-weekend-nil
+  (let [result (-> data-no-changes-weekend-nil
+                   detection/changes-by-week->changes-by-route
+                   detection/detect-changes-for-all-routes)]
+    (testing "Weekend traffic nil, ensure :no-traffic is not reported"
+      (is (= {:route-key route-name
+              :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+             (-> result
+                 first
+                 (select-keys select-keys-detect-changes-for-all-routes))))
+      (is (= 1 (count result))))))
 
 (def data-test-no-traffic-run
   (weeks (d 2018 10 8)
@@ -33,11 +116,18 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest no-traffic-run-is-detected
-  (is (= {:no-traffic-start-date (d 2018 10 17)
-          :no-traffic-end-date (d 2018 11 3)}
-         (-> (detection/route-weeks-with-first-difference-new data-test-no-traffic-run)
+  (testing "no-traffic starts and ends middle of week, ensure not no-traffic reported"
+    (is (= {:route-key route-name
+            :starting-week {:beginning-of-week (d 2018 10 15) :end-of-week (d 2018 10 21)}
+            :no-traffic-change 17
+            :no-traffic-start-date (d 2018 10 17)
+            :no-traffic-end-date (d 2018 11 3)}
+           (-> #_(detection/route-weeks-with-first-difference-new data-test-no-traffic-run)
+             data-test-no-traffic-run
+             detection/changes-by-week->changes-by-route
+             detection/detect-changes-for-all-routes
              first
-             (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
+             (select-keys select-keys-detect-changes-for-all-routes))))))
 
 (def data-no-traffic-run-twice
   (weeks (d 2018 10 8)
@@ -54,28 +144,27 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         ))
-
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest test-no-traffic-run-twice-is-detected
   (let [test-result (-> data-no-traffic-run-twice
                         detection/changes-by-week->changes-by-route
                         detection/detect-changes-for-all-routes)]
-    ;; Test first occurence
-    (is (= {:no-traffic-start-date (d 2018 10 15)
-          :no-traffic-end-date (d 2018 11 5)
-          :route-key "Raimola"
-          :no-traffic-change 21}
-           (-> (first test-result)
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change]))))
-
-    ;; Test second occurence
-    (is (= {:no-traffic-start-date (d 2018 11 26)
-            :no-traffic-end-date (d 2018 12 17)
-            :route-key "Raimola"
-            :no-traffic-change 21}
-           (-> (second test-result)
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change]))))))
+    (testing "no-traffic run twice, ensure first run is reported"
+      (is (= {:no-traffic-start-date (d 2018 10 15)
+              :no-traffic-end-date (d 2018 11 5)
+              :route-key "Raimola"
+              :no-traffic-change 21}
+             (-> (first test-result)
+                 (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change])))))
+    (testing "no-traffic run twice, ensure second run is reported"
+      (is (= {:no-traffic-start-date (d 2018 11 26)
+              :no-traffic-end-date (d 2018 12 17)
+              :route-key "Raimola"
+              :no-traffic-change 21}
+             (-> (second test-result)
+                 (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change])))))))
 
 (def test-no-traffic-run-weekdays
   (weeks (d 2018 10 8)
@@ -84,31 +173,33 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 22.10.
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 29.10.
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 5.11.
-         {route-name ["h1" nil nil nil nil nil nil]} ; 6 day run
-         {route-name [nil nil nil nil nil nil nil]} ; 7 days
-         {route-name [nil nil nil nil "h5" nil nil]} ; 4 days => sum 17
+         {route-name ["h1" nil nil nil nil nil nil]}     ;; Starts 13.11, 6 day run
+         {route-name [nil nil nil nil nil nil nil]}      ;;        7 days
+         {route-name [nil nil nil nil "h5" nil nil]}     ;; Ends 30.11, 4 days => sum 17
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}))
 
 (deftest no-traffic-run-weekdays-is-detected
-  ;; Test that traffic that has normal "no-traffic" days (like no traffic on weekends)
-  ;; is still detected.
-  (is (= {:no-traffic-start-date (d 2018 11 13)
-          :no-traffic-end-date (d 2018 11 30)}
-         (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run-weekdays)
-             first
-             (select-keys [:no-traffic-start-date :no-traffic-end-date])))))
+  (testing "Ensure no-traffic run is reported and normal no-traffic weekends are not. "
+    (is (= {:route-key route-name
+            :starting-week {:beginning-of-week (d 2018 10 15) :end-of-week (d 2018 10 21)}
+            :no-traffic-change 17
+            :no-traffic-start-date (d 2018 11 13)
+            :no-traffic-end-date (d 2018 11 30)}
+           (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run-weekdays)
+               first
+               (select-keys select-keys-detect-changes-for-all-routes))))))
 
 (def no-traffic-run-full-detection-window
   (weeks (d 2018 10 8)
-         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 8.10.
-         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 15.10.
-         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 22.10.
-         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 29.10.
-         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 5.11.
-         {route-name ["h1" nil nil nil nil nil nil]} ; 6 day run
-         {route-name [nil nil nil nil nil nil nil]} ; 7 days
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}    ;; 8.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}    ;; 15.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}    ;; 22.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}    ;; 29.10.
+         {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}    ;; 5.11.
+         {route-name ["h1" nil nil nil nil nil nil]}        ;; 12.11, Starting 13.11. 6 day run
+         {route-name [nil nil nil nil nil nil nil]}
          {route-name [nil nil nil nil nil nil nil]}
          {route-name [nil nil nil nil nil nil nil]}
          {route-name [nil nil nil nil nil nil nil]}
@@ -122,12 +213,18 @@
          {route-name [nil nil nil nil nil nil nil]}))
 
 (deftest test-no-traffic-run-full-detection-window
-  ;; Test that traffic that has normal "no-traffic" days (like no traffic on weekends)
-  ;; is still detected.
-  (let [result (-> (detection/route-weeks-with-first-difference-new no-traffic-run-full-detection-window)
-                   first)]
-    (is (= {:no-traffic-start-date (d 2018 11 13)}
-           (select-keys result [:no-traffic-start-date :no-traffic-end-date])))))
+  (testing "Ensure traffic with normal no-traffic days detects a no-traffic change correctly"
+    (let [result (-> no-traffic-run-full-detection-window
+                     detection/changes-by-week->changes-by-route
+                     detection/detect-changes-for-all-routes)]
+      (is (= {:route-key route-name
+              :starting-week {:beginning-of-week (d 2018 10 15) :end-of-week (d 2018 10 21)}
+              :no-traffic-run 76
+              :no-traffic-start-date (d 2018 11 13)}
+             (-> (first result)
+                 (select-keys select-keys-detect-changes-for-all-routes))))
+
+      (is (= 1 (count result))))))
 
 (def test-traffic-2-different-weeks
   (weeks (d 2018 10 8)
@@ -163,7 +260,6 @@
             :end-of-week (d 2019 3 17)}
            (:different-week (first result))
            ))))
-
 
 (def test-traffic-normal-difference
   (weeks (d 2018 10 8)
@@ -223,7 +319,6 @@
     (testing "first different day is wednesday because tuesday is new year"
       (is (= 2 (transit-changes/first-different-day (:starting-week-hash res) (:different-week-hash res)))))))
 
-
 (def test-more-than-one-change  
   ; Produce change records about individual days -> first change week contains 2 days with differences
   ; In this test case we need to produce 3 rows in the database
@@ -236,7 +331,6 @@
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
          {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}))
-
 
 (def test-more-than-one-change-2-routes
   ; Produce change records about individual days -> first change week contains 2 days with differences
@@ -299,8 +393,7 @@
                               :different-week
                               :beginning-of-week))))))
 
-
-(def data-two-week-two-route-change                         ;This is the same format as the (combine-weeks) function
+(def data-two-week-two-route-change                         ;; This is the same format as the (combine-weeks) function
   (weeks (d 2019 2 4)
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
@@ -311,62 +404,6 @@
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
          {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
-(def seppo
-  (weeks (d 2019 2 4)
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 18.2. first change in route1
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "##" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name   ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
-
-(def data-with-pause
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 11.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 18.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 25.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 1.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 15.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})) ;; 22.4.
-
-
-(def no-traffic
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
-
-(def differences
-  (weeks (d 2019 2 4)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.2.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 25.2.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 4.3.
-         {route-name [nil nil nil nil nil nil nil]}         ;; 11.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 18.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 25.3.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 1.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 8.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;; 15.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;22.4.
-         {route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]}  ;;29.4.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;;6.5.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 13.5.
-         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))
 
 (deftest more-than-one-change-found-w-2-routes
   (let [diff-maps (-> data-two-week-two-route-change
@@ -513,17 +550,87 @@
     (testing "second change date is correct"
       (is (= (d 2019 6 3) (-> diff-maps second :different-week :beginning-of-week))))))
 
+(def data-change-to-summer-schedule-nil-weeks-with-midsummer
+  (weeks (d 2019 5 13)
+         {route-name ["1A" "1A" "1A" "1A" "1A" "6A" "7A"]} ;; 2019 05 13
+         {route-name ["1A" "1A" "1A" "1A" "1A" "6A" "7A"]} ;; 2019 05 20
+         {route-name ["1A" "1A" "1A" "7A" "5B" "6A" "7B"]} ;; 2019 05 27
+         {route-name [nil nil nil nil nil "B6" nil]}       ;; 2019 06 03
+         {route-name [nil nil nil nil nil "B6" nil]}       ;; 2019 06 10
+         {route-name [nil nil nil nil "C5" nil nil]}       ;; 2019 06 17
+         {route-name [nil nil nil nil nil "B6" nil]}       ;; 2019 06 24
+         {route-name [nil nil nil nil nil "B6" nil]}
+         {route-name [nil nil nil nil nil "B6" nil]}
+         {route-name [nil nil nil nil nil "B6" nil]}
+         {route-name [nil nil nil nil "C5" "B6" nil]}
+         {route-name [nil nil nil nil nil "B6" nil]}
+         {route-name [nil nil nil nil nil "B6" nil]}))
+
+(def data-traffic-winter-to-summer-and-end-traffic
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+         {route-name [nil nil nil nil nil "h6" nil]}        ;; 2019 06 03
+         {route-name [nil nil nil nil nil "h6" nil]}        ;; 2019 06 10
+         {route-name [nil nil nil nil nil "h6" nil]}        ;; 2019 06 17
+         {route-name [nil nil nil nil nil nil nil]}         ;; 2019 06 24
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}
+         {route-name [nil nil nil nil nil nil nil]}))
+
+(deftest test-traffic-winter-to-summer-and-end-traffic
+  (let [result (-> data-traffic-winter-to-summer-and-end-traffic
+                   detection/changes-by-week->changes-by-route
+                   detection/detect-changes-for-all-routes)]
+    (is (= {:no-traffic-start-date (d 2019 6 23)
+            :route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+           (select-keys (nth result 0)
+                        [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
+                         :different-week :route-key :starting-week])))
+    (is (= 1 (count result)))))
+
+(deftest test-change-to-summer-schedule-nil-weeks-with-midsummer
+  (let [result (-> data-change-to-summer-schedule-nil-weeks-with-midsummer
+                   detection/changes-by-week->changes-by-route
+                   detection/detect-changes-for-all-routes)]
+    (is (= {:different-week {:beginning-of-week (d 2019 5 27) :end-of-week (d 2019 6 2)}
+            :route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+           (-> (nth result 0)
+               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
+                             :different-week :route-key :starting-week]))))
+
+    (is (= {:different-week {:beginning-of-week (d 2019 6 3) :end-of-week (d 2019 6 9)}
+            :route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 27) :end-of-week (d 2019 6 2)}
+            :no-traffic-start-date (d 2019 6 9)}
+           (-> (nth result 1)
+               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
+                             :different-week :route-key :starting-week]))))
+    (is (= 2 (count result)))))
+
+;;;;;; TESTS for analysing specific days for changes in hash/traffic
+
 ;; Day hash data for changes for a default week with ONE kind of day hashes
-(def data-wk-hash-one-kind            ["A" "A" "A" "A" "A" "A" "A" ])
+(def data-wk-hash-one-kind            ["A" "A" "A" "A" "A" "A" "A"])
 (def data-wk-hash-one-kind-change-one  ["A" "A" "3" "3" "3" "3" "3"])
 (def data-wk-hash-one-kind-change-two ["A" "A" "3" "3" "3" "3" "7"])
 ;; Day hash data for changes for a default week with TWO kind of day hashes
-(def data-wk-hash-traffic-two-kind            ["A" "A" "A" "A" "A" "B" "B" ])
-(def data-wk-hash-traffic-two-kind-change-one ["A" "A" "A" "A" "A" "5" "5" ])
-(def data-wk-hash-traffic-two-kind-change-two ["1" "1" "1" "1" "1" "5" "5" ])
+(def data-wk-hash-two-kind            ["A" "A" "A" "A" "A" "B" "B" ])
+(def data-wk-hash-two-kind-change-one ["A" "A" "A" "A" "A" "5" "5" ])
+(def data-wk-hash-two-kind-change-two ["1" "1" "1" "1" "1" "5" "5" ])
+(def data-wk-hash-traffic-weekdays-nil-weekend-traffic [nil nil nil nil nil "C5" "C6"])
+(def data-wk-hash-traffic-nil         [nil nil nil nil nil nil nil])
+
+(def data-wk-hash-two-kind-on-weekend            ["A" "A" "A" "A" "A" "D" "E" ])
+(def data-wk-hash-traffic-weekdays-nil-weekend-nil [nil nil nil nil nil "D2" "E2"])
 ;; Day hash data for changes for a default week with FIVE kind of day hashes
-(def data-wk-hash-traffic-five-kind             ["A" "B" "B" "B" "F" "G" "H"])
-(def data-wk-hash-traffic-five-kind-change-four ["A" "2" "5" "5" "5" "6" "7"])
+(def data-wk-hash-five-kind           ["A" "B" "B" "B" "F" "G" "H"])
+(def data-wk-hash-five-kind-change-four  ["A" "2" "5" "5" "5" "6" "7"])
+(def data-wk-hash-seven-kind             ["A" "C" "D" "E" "F" "G" "H"])
+(def data-wk-hash-five-kind-change-seven ["1" "2" "3" "4" "5" "6" "7"])
 
 (deftest test-changed-days-of-week
   (testing "One kind of traffic, changes: 0"
@@ -536,14 +643,25 @@
     (is (= [2 6] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-two))))
 
   (testing "Two kinds of traffic, changes: 1 (weekend)"
-    (is (= [5] (transit-changes/changed-days-of-week data-wk-hash-traffic-two-kind data-wk-hash-traffic-two-kind-change-one))))
+    (is (= [5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-two-kind-change-one))))
 
   (testing "Two kinds of traffic, changes: 2 (weekend+week)"
-    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-traffic-two-kind data-wk-hash-traffic-two-kind-change-two))))
+    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-two-kind-change-two))))
+
+  (testing "Two kinds of traffic, changes to nil on weekdays, different on weekend"
+    (is (= [0 5 6] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-traffic-weekdays-nil-weekend-traffic))))
+
+  (testing "Two kinds of traffic, changes to nil"
+    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-traffic-nil))))
 
   (testing "Five kinds of traffic, changes: 0"
-    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind))))
+    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-five-kind data-wk-hash-five-kind))))
 
   (testing "Five kinds of traffic, changes: 5"
-    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-traffic-five-kind data-wk-hash-traffic-five-kind-change-four)))))
+    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-five-kind data-wk-hash-five-kind-change-four))))
 
+  (testing "Seven kinds of traffic, changes: 7"
+    (is (= [0 1 2 3 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-seven-kind data-wk-hash-five-kind-change-seven))))
+
+  (testing "Two kinds of traffic, changes to nil on weekdays, different on weekend2"
+    (is (= [0 5 6] (transit-changes/changed-days-of-week data-wk-hash-two-kind-on-weekend data-wk-hash-traffic-weekdays-nil-weekend-nil)))))
