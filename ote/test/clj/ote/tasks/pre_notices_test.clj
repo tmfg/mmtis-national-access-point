@@ -35,6 +35,19 @@
 (defn- email-content []
   (get-in @outbox [0 :body 0 :content]))
 
+(defn- clean-up-db [db]
+  ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
+  (specql/delete! db :gtfs/detection-route
+                  {:gtfs/package-id 1})                 ;; Clean detection-route to prevent foreign key problems
+  (specql/delete! db :gtfs/package
+                  {:gtfs/id 1})
+  (specql/delete! db :gtfs/transit-changes
+                  {:gtfs/date (tc/to-sql-date (time/now))})
+  (specql/delete! db :gtfs/detected-change-history
+                  {:gtfs/transport-service-id 2})
+  (specql/delete! db :gtfs/detected-route-change
+                  {:gtfs/transit-service-id 2}))
+
 (deftest no-notices-to-send
   (testing "Default empty database, there are no notices to send"
     (send!)
@@ -65,63 +78,65 @@
     (is (= 1 (count @outbox)))))
 
 (deftest email-includes-detected-changes
+  (let [route-hash-id "route-hash-id"
+        current-date (tc/to-sql-date (time/now))
+        different-week-date (tc/to-sql-date (time/days-from (time/now) 70))
+        change-key "abcd"]
 
-  (testing "nothing is sent before detected change"
-    (send!)
-    (is (empty? @outbox)))
+    (testing "nothing is sent before detected change"
+      (send!)
+      (is (empty? @outbox)))
 
-  (testing "inserted change is found and sent"
-    ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
-    (specql/delete! (:db *ote*) :gtfs/detection-route
-                    {:gtfs/package-id 1}) ;; Clean detection-route to prevent foreign key problems
-    (specql/delete! (:db *ote*) :gtfs/package
-                    {:gtfs/id 1})
-    (specql/delete! (:db *ote*) :gtfs/transit-changes
-                    {:gtfs/date (tc/to-sql-date (time/now))})
-    (specql/delete! (:db *ote*) :gtfs/detected-change-history
-                    {:gtfs/transport-service-id 2})
-    (specql/delete! (:db *ote*) :gtfs/detected-route-change
-                    {:gtfs/transit-service-id 2})
+    (testing "inserted change is found and sent"
 
-    ;; Create package-id (email content is dependent on this id)
-    (specql/insert! (:db *ote*) :gtfs/package
-                    {:gtfs/id 1
-                     :gtfs/transport-operator-id 1
-                     :gtfs/transport-service-id  2
-                     :gtfs/created               (tc/to-sql-date (time/now))})
+      (clean-up-db (:db *ote*))
+      ;; Create package-id (email content is dependent on this id)
+      (specql/insert! (:db *ote*) :gtfs/package
+                      {:gtfs/id 1
+                       :gtfs/transport-operator-id 1
+                       :gtfs/transport-service-id 2
+                       :gtfs/created current-date})
 
-    (specql/insert! (:db *ote*) :gtfs/transit-changes
-                    {:gtfs/transport-service-id 2
-                     :gtfs/date                 (tc/to-sql-date (time/now))
-                     :gtfs/current-week-date    (tc/to-sql-date (time/now))
-                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
-                     :gtfs/change-date          (tc/to-sql-date (time/days-from (time/now) 67))
-                     :gtfs/package-ids          [1]
-                     :gtfs/removed-routes       1
-                     :gtfs/added-routes         2
-                     :gtfs/changed-routes       3})
+      (specql/insert! (:db *ote*) :gtfs/transit-changes
+                      {:gtfs/transport-service-id 2
+                       :gtfs/date current-date
+                       :gtfs/current-week-date current-date
+                       :gtfs/different-week-date different-week-date
+                       :gtfs/change-date (tc/to-sql-date (time/days-from (time/now) 67))
+                       :gtfs/package-ids [1]
+                       :gtfs/removed-routes 1
+                       :gtfs/added-routes 2
+                       :gtfs/changed-routes 3})
 
-    ;; Add one change to route-change table
-    (specql/insert! (:db *ote*) :gtfs/detected-route-change
-                    {:gtfs/transit-service-id 2
-                     :gtfs/transit-change-date (tc/to-sql-date (time/now))
+      ;; Add one change to route-change table
+      (specql/insert! (:db *ote*) :gtfs/detected-route-change
+                      {:gtfs/transit-service-id 2
+                       :gtfs/transit-change-date current-date
+                       :gtfs/different-week-date different-week-date
+                       :gtfs/current-week-date current-date
+                       :gtfs/created-date (tc/to-sql-date (time/now))
+                       :gtfs/route-hash-id route-hash-id
+                       :gtfs/route-long-name "long"
+                       :gtfs/route-short-name "short"
+                       :gtfs/change-key change-key
+                       :gtfs/added-trips 1
+                       :gtfs/removed-trips 1})
 
-                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
-                     :gtfs/current-week-date    (tc/to-sql-date (time/now))
-                     :gtfs/created-date    (tc/to-sql-date (time/now))
-                     :gtfs/route-hash-id "abcd"
-                     :gtfs/route-long-name "long"
-                     :gtfs/route-short-name "short"
-                     :gtfs/change-str "abc"})
+      ;; Add one change to history table
+      (specql/insert! (:db *ote*) :gtfs/detected-change-history
+                      {:gtfs/transport-service-id 2
+                       :gtfs/different-week-date different-week-date
+                       :gtfs/package-ids [1]
+                       :gtfs/route-hash-id route-hash-id
+                       :gtfs/change-key change-key
+                       :gtfs/change-detected current-date
+                       :gtfs/change-type :added})
 
-    ;; Add one change to history table
-    (specql/insert! (:db *ote*) :gtfs/detected-change-history
-                    {:gtfs/transport-service-id 2
-                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
-                     :gtfs/package-ids          [1]
-                     :gtfs/route-hash-id "abcd"
-                     :gtfs/change-str "abc"})
+      ;(println "SQL response " (sut/fetch-unsent-changes-by-regions (:db *ote*) {:regions nil}))
 
-    (send!)
-    (is (= 1 (count @outbox)))
-    (is (str/includes? (email-content) "tunnistetut"))))
+      (send!)
+      ;(println "email-content" (pr-str (email-content)))
+      (is (= 1 (count @outbox)))
+      (is (str/includes? (email-content) "tunnistetut"))
+      (is (str/includes? (email-content) "1 uutta reittiä"))
+      (clean-up-db (:db *ote*)))))
