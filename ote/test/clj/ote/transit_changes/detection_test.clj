@@ -28,7 +28,7 @@
            :routes routes})
         route-maps)))
 
-;;;;;; TESTS for analysing specific weekx for changes in hash/traffic
+;;;;;; TESTS for analysing specific weeks for changes in hash/traffic
 
 (def data-no-changes
   (weeks (d 2019 5 13)
@@ -50,9 +50,7 @@
             :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
            (-> result
                first
-               (select-keys
-                 [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                  :different-week :route-key :starting-week]))))
+               (select-keys select-keys-detect-changes-for-all-routes))))
     (is (= 1 (count result)))))
 
 
@@ -76,9 +74,8 @@
             :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
            (-> result
                first
-               (select-keys ;; NOTE: Changes on 2nd to last and last week not detected currently by the analysis!
-                   [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                    :different-week :route-key :starting-week]))))
+               ;; NOTE: Changes on 2nd to last and last week not detected currently by the analysis!
+               (select-keys select-keys-detect-changes-for-all-routes))))
     (is (= 1 (count result)))))
 
 (def data-no-changes-weekend-nil
@@ -122,12 +119,11 @@
             :no-traffic-change 17
             :no-traffic-start-date (d 2018 10 17)
             :no-traffic-end-date (d 2018 11 3)}
-           (-> #_(detection/route-weeks-with-first-difference-new data-test-no-traffic-run)
-             data-test-no-traffic-run
-             detection/changes-by-week->changes-by-route
-             detection/detect-changes-for-all-routes
-             first
-             (select-keys select-keys-detect-changes-for-all-routes))))))
+           (-> data-test-no-traffic-run
+               detection/changes-by-week->changes-by-route
+               detection/detect-changes-for-all-routes
+               first
+               (select-keys select-keys-detect-changes-for-all-routes))))))
 
 (def data-no-traffic-run-twice
   (weeks (d 2018 10 8)
@@ -155,18 +151,22 @@
       (is (= {:no-traffic-start-date (d 2018 10 15)
               :no-traffic-end-date (d 2018 11 5)
               :route-key "Raimola"
-              :no-traffic-change 21}
+              :no-traffic-change 21
+              :starting-week {:beginning-of-week (d 2018 10 15)
+                              :end-of-week (d 2018 10 21)}}
              (-> (first test-result)
-                 (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change])))))
+                 (select-keys select-keys-detect-changes-for-all-routes)))))
     (testing "no-traffic run twice, ensure second run is reported"
       (is (= {:no-traffic-start-date (d 2018 11 26)
               :no-traffic-end-date (d 2018 12 17)
               :route-key "Raimola"
-              :no-traffic-change 21}
+              :no-traffic-change 21
+              :starting-week {:beginning-of-week (d 2018 11 5)
+                              :end-of-week (d 2018 11 11)}}
              (-> (second test-result)
-                 (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change])))))))
+                 (select-keys select-keys-detect-changes-for-all-routes)))))))
 
-(def test-no-traffic-run-weekdays
+(def data-no-traffic-run-weekdays
   (weeks (d 2018 10 8)
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 8.10.
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 15.10.
@@ -180,14 +180,15 @@
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}
          {route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}))
 
-(deftest no-traffic-run-weekdays-is-detected
+(deftest test-no-traffic-run-weekdays
   (testing "Ensure no-traffic run is reported and normal no-traffic weekends are not. "
     (is (= {:route-key route-name
             :starting-week {:beginning-of-week (d 2018 10 15) :end-of-week (d 2018 10 21)}
             :no-traffic-change 17
             :no-traffic-start-date (d 2018 11 13)
             :no-traffic-end-date (d 2018 11 30)}
-           (-> (detection/route-weeks-with-first-difference-new test-no-traffic-run-weekdays)
+           (-> data-no-traffic-run-weekdays
+               (detection/route-weeks-with-first-difference-new)
                first
                (select-keys select-keys-detect-changes-for-all-routes))))))
 
@@ -599,16 +600,15 @@
             :route-key route-name
             :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
            (-> (nth result 0)
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                             :different-week :route-key :starting-week]))))
+               (select-keys select-keys-detect-changes-for-all-routes))))
 
     (is (= {:different-week {:beginning-of-week (d 2019 6 3) :end-of-week (d 2019 6 9)}
             :route-key route-name
             :starting-week {:beginning-of-week (d 2019 5 27) :end-of-week (d 2019 6 2)}
-            :no-traffic-start-date (d 2019 6 9)}
+            :no-traffic-start-date (d 2019 6 9)
+            :no-traffic-run 1}
            (-> (nth result 1)
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                             :different-week :route-key :starting-week]))))
+               (select-keys select-keys-detect-changes-for-all-routes))))
     (is (= 2 (count result)))))
 
 ;;;;;; TESTS for analysing specific days for changes in hash/traffic
