@@ -136,9 +136,9 @@
                        "Uusi reitti"]
 
                       :removed
-                      [icon-l/icon-labeled style/transit-changes-icon
-                       [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                       "Päättyvä reitti"]
+                      [icon-l/icon-labeled
+                       [ic/content-remove-circle-outline {:color style/remove-color}]
+                       "Mahdollisesti päättyvä reitti"]
 
                       :no-change
                       [icon-l/icon-labeled style/transit-changes-icon

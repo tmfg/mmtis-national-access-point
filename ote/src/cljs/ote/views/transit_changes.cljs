@@ -42,12 +42,12 @@
     [:b "Taulukon ikonien selitteet"]]
    [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
-      (for [[icon label] [[ic/content-add-circle-outline " Uusia reittejä"]
-                          [ic/content-remove-circle-outline " Päättyviä reittejä"]
-                          [ui-icons/outline-ballot " Reittimuutoksia"]
-                          [ic/av-not-interested " Reittejä, joissa tauko liikenteessä"]]]
+      (for [[icon color label] [[ic/content-add-circle-outline {:color style/add-color} " Uusia reittejä"]
+                          [ic/content-remove-circle-outline {:color style/remove-color} " Päättyviä reittejä"]
+                          [ui-icons/outline-ballot {:color style/remove-color} " Reittimuutoksia"]
+                          [ic/av-not-interested {:color style/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
         ^{:key (str "transit-changes-legend-" label)}
-        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
+        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
                    :interfaces-has-errors? :no-interfaces? :no-interfaces-imported?})
