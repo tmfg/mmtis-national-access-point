@@ -761,7 +761,7 @@
                                        (map :stop-time-changes trip-changes))
         change (route-change-type max-date-in-past? added? removed? changed? no-traffic? starting-week-date different-week-date
                                        no-traffic-start-date no-traffic-end-date route)
-        change-str (change-history/create-change-str-from-change-data (merge route
+        change-key (change-history/create-change-key-from-change-data (merge route
                                                                         {:gtfs/route-hash-id (:route-hash-id route)
                                                                          :gtfs/change-type (:gtfs/change-type change)
                                                                          :gtfs/different-week-date (:gtfs/different-week-date change)
@@ -786,7 +786,7 @@
        :gtfs/trip-stop-time-changes-lower (:lower trip-stop-time-changes)
        :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)
 
-       :gtfs/change-str (:gtfs/change-str change-str)}
+       :gtfs/change-key (:gtfs/change-key change-key)}
       change)))
 
 (defn- debug-print-change-stats [all-routes route-changes type]

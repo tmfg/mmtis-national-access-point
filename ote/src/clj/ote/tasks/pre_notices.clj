@@ -61,7 +61,6 @@
 
 (defn detected-change-row [unsent-changes]
   (let [grouped-changes (group-by :transport-service-id unsent-changes)]
-    (println "detected-change-row - grouped-changes" (pr-str grouped-changes))
     (for [grouped-change grouped-changes]
       (let [change-list (second grouped-change)
             transport-service-id (:transport-service-id (first change-list))

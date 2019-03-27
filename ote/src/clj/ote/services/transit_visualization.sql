@@ -188,7 +188,7 @@ SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-h
  WHERE c."transit-change-date" = :date
    AND c."transit-service-id" = :service-id
    AND h."transport-service-id" = :service-id
-   AND h."change-str" = c."change-str"
+   AND h."change-key" = c."change-key"
    AND h."different-week-date" >= :date;
 
 

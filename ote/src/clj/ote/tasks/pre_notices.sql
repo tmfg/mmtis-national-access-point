@@ -36,7 +36,7 @@ SELECT (SELECT array_agg(fr.nimi)
        JOIN "transport-service" ts ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND ts."commercial-traffic?" = TRUE
        JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
  WHERE p.id = ANY(h."package-ids")
-   AND h."change-str" = r."change-str"
+   AND h."change-key" = r."change-key"
    AND h."email-sent" IS NULL
    AND (p."finnish-regions" IS NULL OR
          :regions::CHAR(2)[] IS NULL OR
