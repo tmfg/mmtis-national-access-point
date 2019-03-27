@@ -151,13 +151,14 @@
                     (count notices) " new pre-notices and "
                     (count detected-changes) " new detected changes "
                     " from 24 hours for regions " (:finnish-regions user))
-          (html (notification-template notices detected-changes)))
-        (log/info "No new pre-notices or detected changes found."))
 
-      ;; Mark changes in detected-change-history as sent
-      (specql/update! db :gtfs/detected-change-history
-                      {:gtfs/email-sent (java.util.Date.)}
-                      {:gtfs/id (op/in (into #{} (map :history-id detected-changes)))}))
+          ;; Mark changes in detected-change-history as sent
+          (specql/update! db :gtfs/detected-change-history
+                          {:gtfs/email-sent (java.util.Date.)}
+                          {:gtfs/id (op/in (into #{} (map :history-id detected-changes)))})
+
+          (html (notification-template notices detected-changes)))
+        (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e ))))

@@ -76,6 +76,13 @@
                     {:gtfs/package-id 1}) ;; Clean detection-route to prevent foreign key problems
     (specql/delete! (:db *ote*) :gtfs/package
                     {:gtfs/id 1})
+    (specql/delete! (:db *ote*) :gtfs/transit-changes
+                    {:gtfs/date (tc/to-sql-date (time/now))})
+    (specql/delete! (:db *ote*) :gtfs/detected-change-history
+                    {:gtfs/transport-service-id 2})
+    (specql/delete! (:db *ote*) :gtfs/detected-route-change
+                    {:gtfs/transit-service-id 2})
+
     ;; Create package-id (email content is dependent on this id)
     (specql/insert! (:db *ote*) :gtfs/package
                     {:gtfs/id 1
@@ -93,6 +100,27 @@
                      :gtfs/removed-routes       1
                      :gtfs/added-routes         2
                      :gtfs/changed-routes       3})
+
+    ;; Add one change to route-change table
+    (specql/insert! (:db *ote*) :gtfs/detected-route-change
+                    {:gtfs/transit-service-id 2
+                     :gtfs/transit-change-date (tc/to-sql-date (time/now))
+
+                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
+                     :gtfs/current-week-date    (tc/to-sql-date (time/now))
+                     :gtfs/created-date    (tc/to-sql-date (time/now))
+                     :gtfs/route-hash-id "abcd"
+                     :gtfs/route-long-name "long"
+                     :gtfs/route-short-name "short"
+                     :gtfs/change-str "abc"})
+
+    ;; Add one change to history table
+    (specql/insert! (:db *ote*) :gtfs/detected-change-history
+                    {:gtfs/transport-service-id 2
+                     :gtfs/different-week-date  (tc/to-sql-date (time/days-from (time/now) 70))
+                     :gtfs/package-ids          [1]
+                     :gtfs/route-hash-id "abcd"
+                     :gtfs/change-str "abc"})
 
     (send!)
     (is (= 1 (count @outbox)))
