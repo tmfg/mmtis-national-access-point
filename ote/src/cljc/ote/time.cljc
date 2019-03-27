@@ -394,16 +394,6 @@
    (cons start
          (when (t/before? start end)
            (date-range (t/plus start (t/days 1)) end)))))
-
-
-(defn java-localdate->inst [ld]
-  (date-fields->native
-   (merge {::hours 0 ::minutes 0 ::seconds 0}
-          (date-fields ld))))
-
-(defn java-localdate->joda-date-time [ld]
-  (native->date-time (java-localdate->inst ld)))
-
 (def week-days [:monday :tuesday :wednesday :thursday :friday :saturday :sunday])
 (def week-day-order {:monday 0 :tuesday 1 :wednesday 2 :thursday 3 :friday 4 :saturday 5 :sunday 6})
 
@@ -453,6 +443,13 @@
     (t/in-days (t/interval date1 date2))
     (- (t/in-days (t/interval date2 date1)))))
 
+(defn java-localdate->inst [ld]
+  (date-fields->native
+   (merge {::hours 0 ::minutes 0 ::seconds 0}
+          (date-fields ld))))
+
+(defn java-localdate->joda-date-time [ld]
+  (native->date-time (java-localdate->inst ld)))
 
 (defn date-string->date-time [date-string]
   (let [df (date-fields-only (parse-date-iso-8601 date-string))

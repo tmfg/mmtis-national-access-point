@@ -555,9 +555,16 @@
                                    :date (java.time.LocalDate/parse "2013-01-06"),
                                    :exception-type 1}] #inst "2013-01-01") )))
 
+(defn first-scheduled-service-id [db]
+  (let [q "select min(id) as id from \"transport-service\" where \"sub-type\" = 'schedule'"
+        res (clojure.java.jdbc/query db q)]
+    (:id (first res))))
+
+
+;; tbd - check some actual changes read from this package (detected-route-change table)
 (deftest test-with-gtfs-package-of-a-service
   (let [db (:db ote.test/*ote*)
-        service-id 1
+        service-id (first-scheduled-service-id db)
         gtfs-zipfile-orig-path "/home/ernoku/Downloads/2019-02-24_310_1290_gtfs.zip"
         gtfs-zipfile-orig-date #inst "2019-02-24T00:00:00"
         my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
@@ -566,17 +573,46 @@
                             (rewrite-calendar file-data gtfs-zipfile-orig-date)
                             file-data)
                           file-data)
-        ;; gtfs-zipfile-new-path (rewrite-gtfs-dates gtfs-zipfile-orig-date)
-        _ (ote.integration.import.gtfs/save-gtfs-to-db db (slurp-bytes gtfs-zipfile-orig-path) 1 1 service-id my-intercept-fn)
-        route-query-params {:service-id 1 :start-date (time/days-from (time/now) -60) :end-date (time/days-from (time/now) 30)}
+        package-id 1
+        interface-id 1
+        _ (ote.integration.import.gtfs/save-gtfs-to-db db (slurp-bytes gtfs-zipfile-orig-path) package-id interface-id service-id my-intercept-fn)
+        route-query-params {:service-id service-id :start-date (time/days-from (time/now) -265) :end-date (time/days-from (time/now) 1)}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)]
+    (def *nd new-diff)
+    (println (:start-date route-query-params))
+    (testing "got something"
+      (is (not= nil (first new-diff))))))
+
+;; tbd - check some actual changes read from this package (detected-route-change table)
+;; and cross ref with the bug
+
+;; for case Lohja - Nummela - Vihti we should find
+;; detected-route-change rows containing 
+(deftest test-with-kalkati-package
+  (let [;; db (:db ote.test/*ote*)
+        db (:db ote.main/ote)
+        service-id (first-scheduled-service-id db)
+        kalkati-zip-path "../issue163446864_kalkati_anonco.zip"
+        gtfs-zip-bytes (ote.gtfs.kalkati-to-gtfs/convert-bytes (slurp-bytes kalkati-zip-path))
+        orig-date #inst "2019-03-24T00:00:00"
+        my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
+                          ;; (println "hello from intercept fn, type" file-type)
+                          (if (= file-type :gtfs/calendar-dates-txt)
+                            (rewrite-calendar file-data orig-date)
+                            file-data)
+                          file-data)
+        package-id 2
+        interface-id 1
+        _ (ote.integration.import.gtfs/save-gtfs-to-db db gtfs-zip-bytes package-id interface-id service-id my-intercept-fn)
+        route-query-params {:service-id service-id :start-date (time/days-from (time/now) -120) :end-date (time/days-from (time/now) 1)}
+        new-diff (detection/detect-route-changes-for-service-new db route-query-params)]
+    (def *nd new-diff)
     (println (:start-date route-query-params))
     (testing "got someting"
       (is (not= nil (first new-diff))))))
 
 (deftest more-than-one-change-found-case-2
   (spec-test/instrument `detection/route-weeks-with-first-difference-new)
-
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
     (is (= (d 2019 5 27) (-> data-realworld-two-change-case
