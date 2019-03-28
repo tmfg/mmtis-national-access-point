@@ -9,7 +9,8 @@
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
             [clojure.string :as str]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.theme.colors :as colors]))
 
 ;; Utility methods
 
@@ -25,8 +26,7 @@
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
-     [ic/action-timeline {:style {:color (when (= "0" changes)
-                                           style/no-change-color)}}]
+     [ic/action-timeline {:style {:color colors/gray700}}]
      [:span
       changes
       (when with-labels? " pysäkkimuutosta")]]))
@@ -34,8 +34,7 @@
 (defn stop-time-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
-     [ic/action-query-builder {:color (when (= "0" changes)
-                                        style/no-change-color)}]
+     [ic/action-query-builder {:color colors/gray700}]
      [:span
       changes
       (when with-labels? " aikataulumuutosta")]]))
@@ -64,11 +63,11 @@
       [:span (or removed-trips (:gtfs/removed-trips diff))
        (when with-labels? " poistettua vuoroa")]]]
 
-    [:div {:style {:width "30%"}}
+    [:div {:style {:width "25%"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
 
-    [:div {:style {:width "30%"}}
+    [:div {:style {:width "25%"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]
 
     ;; Add route ending icon if route ending change is detected
