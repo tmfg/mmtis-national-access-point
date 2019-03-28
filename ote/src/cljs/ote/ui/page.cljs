@@ -17,7 +17,7 @@
   the rest of the page."
   [top-link title content]
   [:div.page-controls (stylefy/use-style style/page-controls)
-   [:div.container
+   [:div.container (when (not (empty? top-link)) {:style {:padding-top "1rem"}})
     top-link
     [:h1 title]
     [:div.page-controls-content (stylefy/use-style style/content)
