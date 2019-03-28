@@ -18,11 +18,16 @@
   [route]
   (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
+;; Order is relevant - change order to create different kind of color scheme in calendar
 (def hash-colors
-  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4" "#FFAD9A" "#BDECB7" "#BAA2D1" "#F89DC0" "#97D5E8" "#E1C7B0" "#9CCDDC" "#c56c8f" "#b9cf84" "#a4515b" "#23dbe1"]
-  #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
-   "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
-   "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+  ["#c7f7c5" "#7ffed3" "#baf63c" "#99fb98" "#02ff80"
+   "#a1decf" "#abe337" "#85e1d6" "#4be08c" "#e0ffff"
+   "#e6f2fe" "#c4eff6" "#01ffff" "#bad4d3" "#32dada"
+   "#82cfdf" "#feebdc" "#ddc6e0" "#b1cbe4" "#fff9cd"
+   "#f0f127" "#c8f127" "#ffd801" "#f4d76f" "#f7ca17"
+   "#d3cfaa" "#fde3a8" "#efa99f" "#dda1dd" "#afa8d2"
+   "#edf1f2" "#e6cb22" "#f4a361" "#ff8b00" "#01c8a9"
+   "#efa99f" "#ffac9a" "#e1c7b0" "#c66c8f" "#baa3d1"])
 
 (defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
   (seq changes-route-no-change))
