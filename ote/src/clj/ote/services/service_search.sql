@@ -131,14 +131,15 @@ SELECT eid."transport-service-id" as id
 -- where simplifying neighbouring operation areas creates new overlaps between the areas.
 SELECT oa."transport-service-id" as id
   FROM "operation_area" oa,
-      (SELECT ST_MakeValid(ST_Buffer(ST_Simplify(ST_Union(ST_Accum(pl.location)), 0.01, true), -0.01)) as "location"
+      (SELECT ST_MakeValid(ST_Union(ST_Accum(pl.location))) as "location"
          FROM places pl
         WHERE pl.namefin IN (:operation-area)) as "sa",
        "transport-service" ts
  WHERE ts.published IS NOT NULL
    AND oa."primary?" = true
    AND ts.id = oa."transport-service-id"
-   AND ST_Intersects(sa.location, oa."simplified-location");
+   AND ST_Intersects(sa.location, oa."simplified-location")
+   AND NOT ST_Touches(sa.location, oa."simplified-location");
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one

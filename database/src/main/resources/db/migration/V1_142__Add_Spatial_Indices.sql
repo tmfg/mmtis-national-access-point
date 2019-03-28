@@ -23,7 +23,7 @@ CREATE VIEW operation_area_geojson AS
    FROM operation_area oa;
 
 CREATE OR REPLACE FUNCTION ote_simplify(geometry) RETURNS geometry
-  AS 'SELECT ST_SetSRID(ST_MakeValid(ST_Buffer(ST_Simplify($1, 0.01, true), -0.01)), 4326);'
+  AS 'SELECT ST_SetSRID(ST_MakeValid($1), 4326);'
   LANGUAGE SQL
   IMMUTABLE
   RETURNS NULL ON NULL INPUT;
@@ -34,6 +34,7 @@ ALTER TABLE "operation_area" ADD COLUMN "simplified-location" GEOMETRY;
 UPDATE "operation_area" SET "simplified-location" = ote_simplify(location);
 SELECT UpdateGeometrySRID('operation_area', 'simplified-location', 4326);
 CREATE INDEX "operation-area-simplified-gix" ON "operation_area" USING GIST("simplified-location");
+
 
 --- Recreate view
 CREATE OR REPLACE VIEW places AS
@@ -71,3 +72,29 @@ UNION ALL
         nameswe,
         location
    FROM continent;
+
+-- Table intended to store unique place information
+CREATE TABLE "spatial-search-areas" ();
+
+-- Operation areas not in known spatial nomenclature
+CREATE TABLE "custom-operation-areas" (
+ "id" INTEGER PRIMARY KEY,
+ "transport-service-id" integer,
+ "description" localized_text[],
+ "location" geometry(Geometry, 4326),
+ "primary?" boolean
+);
+
+CREATE INDEX "custom-operation-areas-indx" on "custom-operation-areas" (id);
+
+-- Create a table for spatial search
+CREATE TABLE "spatial-intersections" (
+ "place-id" VARCHAR(64),
+ "operation-area-id" INTEGER
+);
+
+CREATE INDEX "spatial-intersections-indx" on "spatial-intersections" ("place-id");
+
+-- Migrate existing operation areas to the table
+INSERT INTO "spatial-intersections" ("place-id", "operation-area-id")
+SELECT pl.id, oa.id FROM places pl JOIN operation_area oa ON ST_Intersects(ST_MakeValid(pl.location), ST_MakeValid(oa.location)) AND NOT ST_Touches(ST_MakeValid(pl.location), ST_MakeValid(oa.location)); 
