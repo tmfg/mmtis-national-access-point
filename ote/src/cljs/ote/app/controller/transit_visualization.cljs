@@ -20,14 +20,16 @@
 
 ;; Order is relevant - change order to create different kind of color scheme in calendar
 (def hash-colors
-  ["#c7f7c5" "#7ffed3" "#baf63c" "#99fb98" "#02ff80"
-   "#a1decf" "#abe337" "#85e1d6" "#4be08c" "#e0ffff"
-   "#e6f2fe" "#c4eff6" "#01ffff" "#bad4d3" "#32dada"
-   "#82cfdf" "#feebdc" "#ddc6e0" "#b1cbe4" "#fff9cd"
-   "#f0f127" "#c8f127" "#ffd801" "#f4d76f" "#f7ca17"
-   "#d3cfaa" "#fde3a8" "#efa99f" "#dda1dd" "#afa8d2"
-   "#edf1f2" "#e6cb22" "#f4a361" "#ff8b00" "#01c8a9"
-   "#efa99f" "#ffac9a" "#e1c7b0" "#c66c8f" "#baa3d1"])
+  [;; 70% opacity
+   "#b3d1f0" "#b3e6eb" "#b3ebdb" "#b3e6b3" "#e0f0b3" "#f5f0b3" "#ffdbb3" "#f5b3b3" "#ffb3cc" "#f5b3e6" "#e0b3f5" "#c2c2f5"
+   ;; 80% opacity
+   "#cce0f5" "#cceef1" "#ccf1e7" "#cceecc" "#ebf5cc" "#f8f5cc" "#ffe7cc" "#f8cccc" "#ffccdd" "#f8ccee" "#ebccf8" "#d6d6f8"
+   ;; 90% opacity
+   "#e6f0fa" "#e6f7f8" "#e6f8f3" "#e6f7e6" "#f5fae6" "#fcfae6" "#fff3e6" "#fce6e6" "#ffe6ee" "#fce6f7" "#f5e6fc" "#ebebfc"
+   ;; 50% opacity
+   "#80b3e6" "#80d5dd" "#80ddc4" "#80d580" "#cce680" "#eee680" "#ffc480" "#ee8080" "#ff80aa" "#ee80d5" "#cc80ee" "#9999ee"
+   ;; 60% opacity
+   "#99c2eb" "#99dde4" "#99e4cf" "#99dd99" "#d6eb99" "#f1eb99" "#ffcf99" "#f19999" "#ff99bb" "#f199dd" "#d699f1" "#adadf1"])
 
 (defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
   (seq changes-route-no-change))
