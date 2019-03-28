@@ -125,27 +125,27 @@
           :col-style style-base/table-col-style-wrap
           :format (fn [{change-type :change-type :as route}]
                     (case change-type
-                      "no-traffic"
+                      :no-traffic
                       [icon-l/icon-labeled style/transit-changes-icon
                        [ic/av-not-interested]
                        "Tauko liikennöinnissä"]
 
-                      "added"
+                      :added
                       [icon-l/icon-labeled style/transit-changes-icon
                        [ic/content-add-box {:color style/add-color}]
                        "Uusi reitti"]
 
-                      "removed"
+                      :removed
                       [icon-l/icon-labeled
                        [ic/content-remove-circle-outline {:color style/remove-color}]
                        "Mahdollisesti päättyvä reitti"]
 
-                      "no-change"
+                      :no-change
                       [icon-l/icon-labeled style/transit-changes-icon
                        [ic/navigation-check]
                        "Ei muutoksia"]
 
-                      "changed"
+                      :changed
                       [tv-change-icons/change-icons route]))}]
         changes]]
 

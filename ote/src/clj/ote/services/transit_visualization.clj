@@ -115,9 +115,10 @@
        :changes (first (detected-service-change-by-date db
                                                         {:service-id service-id
                                                          :date (time/iso-8601-date->sql-date date)}))
-       :route-changes (detected-route-changes-by-date db
-                                                      {:date (time/iso-8601-date->sql-date date)
-                                                       :service-id service-id})
+       :route-changes (map #(assoc % :change-type (keyword (:change-type %)))
+                           (detected-route-changes-by-date db
+                                                           {:date (time/iso-8601-date->sql-date date)
+                                                            :service-id service-id}))
        :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
                                                 #{:gtfs/route-hash-id-type}
                                                 {:gtfs/transport-service-id service-id}))
