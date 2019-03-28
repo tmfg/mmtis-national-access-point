@@ -8,7 +8,8 @@
             [ote.style.base :as style-base]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.time :as time]))
 
 ;; Utility methods
 
@@ -44,7 +45,7 @@
    [change-icons diff false])
   ([{:keys [change-type added-trips removed-trips
             trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
-            trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
+            trip-stop-time-changes-lower trip-stop-time-changes-upper different-week-date] :as diff}
     with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
     [:div {:style {:width "15%"}}
@@ -72,6 +73,6 @@
 
     ;; Add route ending icon if route ending change is detected
     (when (str/includes? (str change-type) "removed")
-      [:div {:style {:width "10%"} :title "Mahdollisesti päättyvä reitti"}
+      [:div {:style {:width "10%"} :title "Reitti on mahdollisesti päättymässä. Ota liikennöitsijään yhteyttä saadaksesi tarkempaa informaatiota."}
        [icon-l/icon-labeled
         [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))

@@ -302,7 +302,8 @@
 
 (def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
                             :trip-stop-sequence-changes-upper :route-hash-id
-                            :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips})
+                            :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips
+                            :different-week-date})
 
 (defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
 	;; Filter nil values
@@ -390,7 +391,7 @@
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
        {:name "Muutosten yhteenveto" :width "32%"
         :read identity
-        :format (fn [{change-type :change-type :as route-changes}]
+        :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
                     [icon-l/icon-labeled
@@ -405,7 +406,11 @@
                     :removed
                     [icon-l/icon-labeled
                      [ic/content-remove-circle-outline {:color style/remove-color}]
-                     "Mahdollisesti päättyvä reitti"]
+                     [:span {:title (str "Reitti päättyy mahdollisesti "
+                                         (time/format-timestamp->date-for-ui different-week-date)
+                                         ". "
+                                         "Ota liikennöitsijään yhteyttä saadaksesi tarkempaa informaatiota.")}
+                      "Mahdollisesti päättyvä reitti"]]
 
                     :no-change
                     [icon-l/icon-labeled
