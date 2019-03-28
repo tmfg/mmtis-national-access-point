@@ -72,6 +72,6 @@
 
     ;; Add route ending icon if route ending change is detected
     (when (str/includes? (str change-type) "removed")
-      [:div {:style {:width "10%"} :title "Reitti on mahdollisesti päättymässä. Ota liikennöitsijään yhteyttä saadaksesi tarkempaa informaatiota."}
+      [:div {:style {:width "10%"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
        [icon-l/icon-labeled
         [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))

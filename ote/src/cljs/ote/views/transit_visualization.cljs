@@ -409,7 +409,7 @@
                      [:span {:title (str "Reitti päättyy mahdollisesti "
                                          (time/format-timestamp->date-for-ui different-week-date)
                                          ". "
-                                         "Ota liikennöitsijään yhteyttä saadaksesi tarkempaa informaatiota.")}
+                                         "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
                       "Mahdollisesti päättyvä reitti"]]
 
                     :no-change
