@@ -37,8 +37,7 @@
                              :end-of-week (test-utilities/to-local-date 2019 6 23)}}
            (-> result
                first
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                             :different-week :route-key :starting-week]))))
+               (select-keys test-utilities/select-keys-detect-changes-for-all-routes))))
     (is (= 1 (count result)))))
 
 (deftest test-change-at-week-33
@@ -50,6 +49,5 @@
                             :end-of-week (test-utilities/to-local-date 2019 1 20)}} ;; HOX! No different week, no change
            (-> result
                first
-               (select-keys [:no-traffic-start-date :no-traffic-end-date :route-key :no-traffic-change
-                             :different-week :route-key :starting-week]))))
+               (select-keys test-utilities/select-keys-detect-changes-for-all-routes))))
     (is (= 1 (count result)))))
