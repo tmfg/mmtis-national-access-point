@@ -294,4 +294,18 @@ span.search-card-title {
     border-width: medium medium 3px !important;
 }
 
+.language-select button {
+    fill: #0066cc !important;
+    width: 36px !important;
+    height: 36px !important;
+    top: -12px !important;
+}
 
+.language-select div div:nth-child(2) {
+    color: #0066cc !important;
+    padding-right: 34px !important;
+    line-height: inherit !important;
+    height: auto !important;
+    top: 0 !important;
+    width: 55px !important;
+}
