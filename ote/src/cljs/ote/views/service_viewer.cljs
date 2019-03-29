@@ -245,25 +245,31 @@
   [title data shown-language change-lang-fn]
   [:div
    [:h4 title]
-   (doall
-     (for [interface data
-           :let [title (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))])
-                 url (::t-service/url (::t-service/external-interface interface))
-                 license (::t-service/license interface)
-                 format (first (::t-service/format interface))
-                 descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
-       ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
-       [info-sections-2-cols (string/upper-case title)
-        [:div
-         [information-row-with-padding-right (tr [:service-search :homepage]) (when url [common-ui/linkify
-                                                                                         url
-                                                                                         url
-                                                                                         {:target "_blank"}])]
-         [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/license]) license]]
-        [:div
-         [information-row-with-padding-right (tr [:viewer "format"]) format]
-         [information-row-with-selection (tr [:field-labels :transport-service-common ::t-service/external-service-description]) descriptions shown-language change-lang-fn]]
-        {:sub-title true}]))
+   (if data
+     (doall
+       (for [interface data
+             :let [title (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))])
+                   url (::t-service/url (::t-service/external-interface interface))
+                   license (::t-service/license interface)
+                   format (first (::t-service/format interface))
+                   descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
+         ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
+         [info-sections-2-cols (string/upper-case title)
+          [:div
+           [information-row-with-padding-right (tr [:service-search :homepage]) (when url [common-ui/linkify
+                                                                                           url
+                                                                                           url
+                                                                                           {:target "_blank"}])]
+           [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/license]) license]]
+          [:div
+           [information-row-with-padding-right (tr [:viewer "format"]) format]
+           [information-row-with-selection (tr [:field-labels :transport-service-common ::t-service/external-service-description]) descriptions shown-language change-lang-fn]]
+          {:sub-title true}]))
+     [:h5 (stylefy/use-style (merge
+                               style-base/info-content
+                               {:color colors/gray650
+                                :font-style "italic"}))
+      (tr [:service-viewer :not-disclosed])])
    [spacer]])
 
 
@@ -336,10 +342,10 @@
           [:div
            [information-row-with-padding-right
             (tr [:service-viewer :guaranteed-accessibility])
-            (when (:guaranteed list) (string/join ", " (:guaranteed list)))]
+            (when (not-empty (:guaranteed list)) (string/join ", " (:guaranteed list)))]
            [information-row-with-padding-right
             (tr [:service-viewer :limited-accessibility])
-            (when (:limited list) (string/join ", " (:limited list)))]]
+            (when (not-empty (:limited list)) (string/join ", " (:limited list)))]]
           {:sub-title true}]))
      [info-sections-1-col (tr [:service-viewer :other-accessibility-info])
       [:div
