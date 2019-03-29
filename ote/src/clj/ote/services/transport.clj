@@ -520,18 +520,6 @@
   (let [nap-config (:nap config)]
     (routes
 
-      (GET "/transport-service/:id" [id]
-        (let [ts (all-data-transport-service db (Long/parseLong id))]
-          (if-not ts
-            {:status 404}
-            (http/no-cache-transit-response ts))))
-
-      (GET "/t-operator/:id" [id :as {user :user}]
-        (let [to (authenticated-get-operator-with-id db user (Long/parseLong id))]
-          (if-not to
-            {:status 404}
-            (http/no-cache-transit-response to))))
-
       (GET "/transport-operator/ensure-unique-business-id/:business-id" [business-id :as {user :user}]
         (http/transit-response
           (business-id-exists db business-id)))
@@ -593,7 +581,7 @@
       (http/transit-response
         (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
 
-    (GET "/t-service/:id"
+    (GET "/transport-service/:id"
       {{:keys [id]}
        :params
        user :user}
