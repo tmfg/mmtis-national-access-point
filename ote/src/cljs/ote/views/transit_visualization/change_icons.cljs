@@ -47,7 +47,7 @@
             trip-stop-time-changes-lower trip-stop-time-changes-upper different-week-date] :as diff}
     with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    [:div {:style {:width "15%"}}
+    [:div {:style {:width "20%"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
@@ -55,7 +55,7 @@
       [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
 
-    [:div {:style {:width "15%"}}
+    [:div {:style {:width "20%"}}
      [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                           style/no-change-color

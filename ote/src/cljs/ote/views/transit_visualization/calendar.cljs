@@ -53,7 +53,8 @@
   [:div (stylefy/use-style (merge (style-base/flex-container "row")
                                   {:justify-content "space-between"
                                    :width "20%"}))
-   [:div [:div {:style (merge {:display "inline-block"
+   [:div
+    [:div {:style (merge {:display "inline-block"
                                :position "relative"
                                :top "5px"
                                :margin-right "0.5em"
@@ -61,7 +62,8 @@
                                :height "20px"}
                               (style/date1-highlight-style))}]
     (time/format-date date1)]
-   [:div [:div {:style (merge {:display "inline-block"
+   [:div
+    [:div {:style (merge {:display "inline-block"
                                :position "relative"
                                :top "5px"
                                :margin-right "0.5em"
@@ -71,7 +73,7 @@
     (time/format-date date2)]])
 
 (defn comparison-date-changes [{diff :differences :as compare}]
-  [:span
+  [:div
    [comparison-dates compare]
 
    (when (seq diff)
@@ -108,6 +110,7 @@
                      :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
         [{:name "Aikaa muutokseen"
           :read :different-week-date
+          :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
                     [:div
                      [:span (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
@@ -118,6 +121,7 @@
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]])}
          {:name "Muutos tunnistettu"
           :read :transit-change-date
+          :col-style style-base/table-col-style-wrap
           :format (fn [transit-change-date]
                     (time/format-timestamp->date-for-ui transit-change-date))}
          {:name "Muutokset" :width "30%"

@@ -374,6 +374,7 @@
        {:name "Muutoksia (kpl)"
         :width "10%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [row]
                   (if (= :no-change (:change-type row))
                     "0"
@@ -381,6 +382,7 @@
        {:name "Aikaa 1. muutokseen"
         :width "15%"
         :read :different-week-date
+        :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
                     [tv-change-icons/labeled-icon [ic/navigation-check] "Ei muutoksia"]
@@ -391,6 +393,7 @@
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
        {:name "Muutosten yhteenveto" :width "32%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
@@ -458,6 +461,7 @@
       [:div.trips-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
+                     :label-style style-base/table-col-style-wrap
                      :on-select #(e! (tv/->SelectTripPair (first %)))}
 
         [;; name of the first stop of the first trip (FIXME: should be first common?)
@@ -465,30 +469,30 @@
                   "Reittitunnus"
                   "")
           :read #(:headsign (first %))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
           :read #(-> % first :stoptimes first :gtfs/departure-time)
           :format (partial format-stop-time (style/date1-highlight-style) )
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          ;; name of the last stop of the first trip
          {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
           :read #(-> % first :stoptimes last :gtfs/departure-time)
           :format (partial format-stop-time (style/date1-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
 
          {:name (if (-> trips first second :stoptimes first :gtfs/stop-name)
                     "Reittitunnus"
                     "")
           :read #(:headsign (second %))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (-> trips first second :stoptimes first :gtfs/stop-name)
           :read (comp :gtfs/departure-time first :stoptimes second)
           :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (-> trips first second :stoptimes last :gtfs/stop-name)
           :read (comp :gtfs/departure-time last :stoptimes second)
           :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
 
          {:name "Muutokset" :read identity
           :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
@@ -508,7 +512,7 @@
                         [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
                        [:div (stylefy/use-style {:width "50%"})
                         [tv-change-icons/stop-time-changes-icon stop-time-changes]]]))
-          :col-style {:padding-left "10px" :padding-right "5px"}}]
+          :col-style style-base/table-col-style-wrap}]
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
@@ -518,12 +522,24 @@
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
    (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
-     [:div.trip-stop-sequence
-      [table/table {:name->label str}
-       [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
-        {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
-        {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
-        {:name "Muutokset" :read identity
+     [:div.trip-stop-sequence {:style {:margin-top "1em"}}
+      [table/table {:name->label str
+                    :label-style style-base/table-col-style-wrap}
+       [{:name "Pysäkki"
+         :read :gtfs/stop-name
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-name)}
+        {:name "Lähtöaika"
+         :read :gtfs/departure-time-date1
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-time (style/date1-highlight-style))}
+        {:name "Lähtöaika"
+         :read :gtfs/departure-time-date2
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-time (style/date2-highlight-style))}
+        {:name "Muutokset"
+         :read identity
+         :col-style style-base/table-col-style-wrap
          :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
                    (cond
                      (and departure-time-date1 (nil? departure-time-date2))

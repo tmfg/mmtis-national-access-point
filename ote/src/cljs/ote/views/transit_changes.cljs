@@ -61,21 +61,21 @@
 
 (defn change-icons [{:keys [added-routes removed-routes changed-routes no-traffic-routes]}]
   [:div.transit-change-icons (stylefy/use-style style/transit-changes-icon-row-container)
-   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
+   [:div {:style {:width "25%"}}
     [ic/content-add-circle-outline {:color (if (= 0 added-routes)
                                              style/no-change-color
                                              style/add-color)}]
     (cap-number added-routes)]
-   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
+   [:div {:style {:width "25%"}}
     [ic/content-remove-circle-outline {:color (if (= 0 removed-routes)
                                                 style/no-change-color
                                                 style/remove-color)}]
     (cap-number removed-routes)]
 
-   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
+   [:div {:style {:width "25%"}}
     [ui-icons/outline-ballot] (cap-number changed-routes)]
 
-   [:div (use-style (merge style/transit-changes-legend-icon {:width "25%"}))
+   [:div {:style {:width "25%"}}
     [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
                                                 style/no-change-color
                                                 style/remove-color)}]

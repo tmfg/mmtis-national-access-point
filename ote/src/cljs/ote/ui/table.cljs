@@ -30,6 +30,7 @@
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
                  :body-style {:padding "3px"}
+                 :header-style {:border (str "solid 3px " colors/gray400)}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
                  ;;        For now, leaving this commented out.
@@ -60,7 +61,7 @@
                                       (merge
                                         (when width
                                           {:width width})
-                                        {:white-space "pre-wrap"
+                                        {:white-space "pre-line"
                                          :overflow "visible"
                                          :color (color :grey900)
                                          :font-size "1em"
@@ -97,7 +98,7 @@
                      (let [value ((or format identity) (if read (read row) (get row name)))]
                        ^{:key (str i "-" random-table-id "-row-col-" name)}
                        [ui/table-row-column {:style (merge
-                                                      {:white-space "pre-wrap"
+                                                      {:white-space "pre-line"
                                                        :overflow "visible"}
                                                       (when width {:width width})
                                                       (when col-style col-style))}
