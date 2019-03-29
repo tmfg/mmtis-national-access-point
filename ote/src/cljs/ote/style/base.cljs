@@ -34,14 +34,19 @@
 
 (def blue-link-with-icon {:color colors/primary
                           :text-decoration "none"
-                          :margin-bottom "1px"
                           :border "none"
                           :background "none"
                           :cursor "pointer"
                           :padding "0"
                           :display "inline-flex"
                           ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/primary)
-                                                  :margin-bottom "-1px"}}})
+                                                  :margin-bottom "-1px"
+                                                  :color colors/primary-dark}}})
+
+(def base-link {:color colors/primary
+                :text-decoration "none"
+                ::stylefy/mode {:hover {:text-decoration "underline"
+                                        :color colors/primary-dark}}})
 
 (def base-button
   {:padding-left "1.1em"
@@ -230,3 +235,14 @@
   {:padding-left "0.5rem"
    :padding-right "0"
    :overflow-wrap "break-word"})
+
+(def info-row {:border-bottom (str "1px solid " colors/gray350)
+               :display "flex"
+               :margin-bottom "0.5rem"
+               :font-size "0.875rem"})
+(def info-title {:flex 3
+                 :color colors/gray800
+                 :overflow-wrap "break-word"
+                 :padding-right "0.5rem"})
+
+(def info-content {:flex 5})
