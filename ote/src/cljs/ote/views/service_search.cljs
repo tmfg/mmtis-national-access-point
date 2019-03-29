@@ -91,29 +91,19 @@
         return-value (text/maybe-shorten-text-to 45 value-str)]
     return-value))
 
-(defn information-row
-  [title information]
-  [:div (stylefy/use-sub-style style/result-card :info-row)
-   [:strong (stylefy/use-sub-style style/result-card :info-title)
-    title]
-   [:span (stylefy/use-sub-style style/result-card :info-content)
-    information]])
-
-(defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
-  (let [bullet-span [:span {:style {:color colors/gray650}} " • "]]
-
-    [:div {:key id}
-     [information-row (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
-     (when-not (empty? external-interface-links)
-       (doall
-         (map-indexed
-           (fn [i {::t-service/keys [external-interface format data-content] :as row}]
-             (let [data-content (if (nil? data-content)
-                                  (::t-service/url external-interface)
-                                  (parse-content-value data-content))]
-               [:div {:key (str i "-" id)}
-                [information-row data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
-           external-interface-links)))]))
+(defn- external-interface-links [{::t-service/keys [id external-interface-links]}]
+  [:div {:key id}
+   [common-ui/information-row (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
+   (when-not (empty? external-interface-links)
+     (doall
+       (map-indexed
+         (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+           (let [data-content (if (nil? data-content)
+                                (::t-service/url external-interface)
+                                (parse-content-value data-content))]
+             [:div {:key (str i "-" id)}
+              [common-ui/information-row data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
+         external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
@@ -168,7 +158,8 @@
                          (not-empty service-desc)
                          [:span service-desc]
                          :else
-                         [:span {:style {:color colors/gray650}}
+                         [:span {:style {:color colors/gray650
+                                         :font-style "italic"}}
                           (tr [:service-search :no-description])])
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
@@ -200,12 +191,13 @@
       [:div (stylefy/use-sub-style style/result-card :body-left)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
         (tr [:service-search :service-information])]
-       [information-row (tr [:service-search :description]) formatted-desc]
-       [information-row (tr [:service-search :type]) (sub-type-tr sub-type)]
-       [information-row (tr [:service-search :transport-type]) (str/join ", " transport-types)]
-       [information-row (tr [:service-search :homepage]) (if homepage
+       [common-ui/information-row (tr [:service-search :description]) formatted-desc]
+       [common-ui/information-row (tr [:service-search :type]) (sub-type-tr sub-type)]
+       [common-ui/information-row (tr [:service-search :transport-type]) (str/join ", " transport-types)]
+       [common-ui/information-row (tr [:service-search :homepage]) (if homepage
                                                           [common-ui/linkify homepage homepage {:target "_blank"}]
-                                                          [:span {:style {:color colors/gray650}}
+                                                          [:span {:style {:color colors/gray650
+                                                                          :font-style "italic"}}
                                                            (tr [:service-search :no-homepage])])]]
       [:div (stylefy/use-sub-style style/result-card :body-right)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
