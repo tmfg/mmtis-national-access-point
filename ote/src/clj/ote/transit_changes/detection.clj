@@ -693,7 +693,7 @@
   (.plusDays date (- (.getValue week-day)
                      (.getValue (.getDayOfWeek date)))))
 
-(defn- sql-date [local-date]
+(defn sql-date [local-date]
   (when local-date
     (java.sql.Date/valueOf local-date)))
 
@@ -723,7 +723,8 @@
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
         last-route-change? (= route-change (last route-changes-for-key))
         ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
-        removed? (and last-route-change? (max-date-within-evaluation-window? route))
+        ;removed? (and last-route-change? (max-date-within-evaluation-window? route))
+        removed-date (:route-end-date route-change)
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (and (pos? no-traffic-run)
@@ -768,16 +769,27 @@
          :gtfs/change-date         (:min-date route)
          :gtfs/current-week-date   (sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
 
-         removed?
-         {:gtfs/change-type         :removed
+         removed-date
+         {:gtfs/change-type :removed
           ;; For a removed route, the change-date is the day after traffic stops
           ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
-                             nil
-                             (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
+          :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate removed-date))) (java.time.LocalDate/now))
+                              nil
+                              (sql-date (.toLocalDate removed-date)))
 
-         :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
-         :gtfs/current-week-date   (:max-date route)}
+          :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+          :gtfs/current-week-date (:max-date route)}
+
+         ;removed?
+         ;{:gtfs/change-type         :removed
+         ; ;; For a removed route, the change-date is the day after traffic stops
+         ; ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
+         ;:gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
+         ;                    nil
+         ;                    (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
+         ;
+         ;:gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+         ;:gtfs/current-week-date   (:max-date route)}
 
          changed?
          {:gtfs/change-type         :changed
@@ -906,7 +918,6 @@
   #_(println "route-list-with-changed-weeks: " route-list-with-changed-weeks)
   (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
 
-
 (defn changes-by-week->changes-by-route
   "Input: Takes collection of maps (weeks), each map contains all routes of the service for the week.
     Input format:
@@ -946,6 +957,98 @@
   [route-list-with-week-hashes]
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
+(defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
+  ;(println "*** route-ends? traffic-threshold-d date max-date" traffic-threshold-d date max-date)
+  (and max-date
+       (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
+       (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
+
+(spec/fdef add-ending-route-change
+           :args (spec/cat :traffic-threshold-d pos? :all-route-changes coll? :all-routes coll?)
+           :ret ::detected-route-changes-for-services-coll)
+(defn add-ending-route-change
+  "Takes a collection of route changes and adds a \"route ending\" change if max-date is before
+  a traffic threshold days value
+  See spec definition for argument validity.
+  Input:
+        all-routes format:
+                    ([\"-Vihtjärvi - Loppi-\"
+                    {:route-short-name \"\",
+                    :route-long-name \"Vihtjärvi - Loppi\",
+                    :trip-headsign \"\",
+                    :min-date #inst \"2019-03-13T22:00:00.000-00:00\",
+                    :max-date #inst \"2019-08-29T21:00:00.000-00:00\",
+                    :route-hash-id \"-Vihtjärvi - Loppi-\"}]
+                    [...])
+        all-route-changes format:
+                    [{:route-key \"-Vihtjärvi - Loppi-\",
+                     :no-traffic-run 78,
+                     :starting-week-hash  [\"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x795102e43a28a709b622b373880dafc7fb842850f13c3af2403f6bb3b2b32ee3\"   nil],
+                     :starting-week  {:beginning-of-week   #object[java.time.LocalDate 0x2af682f8 \"2019-03-25\"], :end-of-week #object[java.time.LocalDate 0x68572428 \"2019-03-31\"]},
+                     :no-traffic-start-date  #object[java.time.LocalDate 0x59e94954 \"2019-06-02\"]
+                     {...}]
+         traffic-window-d: Threshold in number of days, routes with :max-date below this will be marked ending
+   Output:
+        [{:route-key \"-Vihtjärvi - Loppi-\",
+        :no-traffic-run 78,
+        :starting-week-hash  [\"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x795102e43a28a709b622b373880dafc7fb842850f13c3af2403f6bb3b2b32ee3\"   nil],
+        :starting-week  {:beginning-of-week   #object[java.time.LocalDate 0x2af682f8 \"2019-03-25\"],
+        :end-of-week #object[java.time.LocalDate 0x68572428 \"2019-03-31\"]},
+        :no-traffic-start-date  #object[java.time.LocalDate 0x59e94954 \"2019-06-02\"]
+        REMOVE THIS: :max-date #inst \"2019-08-29T21:00:00.000-00:00\"
+        }
+        {...}]
+  "
+  [date traffic-threshold-d all-routes all-changes]
+  ;(println "***************** ")
+  ;(clojure.pprint/pprint all-changes)
+  (let [route-max-date (fn [route-hash-id all-routes]
+                         (:max-date (some
+                                      #(when (= route-hash-id (:route-hash-id (second %))) (second %))
+                                      all-routes)))
+        create-end-change (fn [last-chg traffic-threshold-d max-date ^LocalDate date]
+                            ;(println "last-chg traffic-threshold-d max-date date= "  last-chg traffic-threshold-d max-date date)
+                            (when (route-ends? date max-date traffic-threshold-d)
+                              (merge {:route-end-date (or (and (nil? (:no-traffic-end-date last-chg))
+                                                               ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
+                                                               ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
+                                                               (:no-traffic-start-date last-chg))
+                                                          ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
+                                                          (.plusDays (.toLocalDate max-date) 1))}
+                                     (select-keys last-chg [:route-key :starting-week :starting-week-hash]))))
+        remove-ongoing-or-break (fn [route-chg-group]
+                                  ;(println "***  route-chg-group=")
+                                  ;(clojure.pprint/pprint (last route-chg-group))
+
+                                  (if (and (= 1 (count route-chg-group))
+                                           (empty? (select-keys (last route-chg-group) [:different-week  ;; If map is a traffic change map, don't discard
+                                                                                        ;; If map is an ending no-traffic map, don't discard
+                                                                                        :no-traffic-end-date])))
+                                    [] ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
+                                    route-chg-group))
+        res (first (map
+                     (fn [[route-key route-chg-group]]
+                       (let [last-change (last route-chg-group)
+                             max-date (route-max-date (:route-key last-change) all-routes) ;;TODO: mitä jos maxdate on nil?
+                             end-change (create-end-change last-change traffic-threshold-d max-date date)]
+
+                         (when end-change (println "route ends: \n" end-change)) ;; TODO: remove me
+
+                         (if end-change
+                           (conj (remove-ongoing-or-break route-chg-group) end-change)
+                           route-chg-group)))
+                     (group-by :route-key all-changes)))
+        res2 (or res [])]
+    ;(println "*** add-ending-route-change all-changes=")
+    ;(clojure.pprint/pprint all-changes)
+    ;(println "*** add-ending-route-change res2=")
+    ;(clojure.pprint/pprint res2)
+    (spec/assert ::detected-route-changes-for-services-coll all-changes)
+    (spec/assert ::detected-route-changes-for-services-coll res2)
+    res2))
+
+(def route-end-detection-threshold 90)
+
 (spec/fdef detect-route-changes-for-service-new
            :ret ::detected-route-changes-for-services-coll)
 (defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
@@ -970,6 +1073,7 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
+                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
                            ;; Fetch detailed day details
                            (route-day-changes-new db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)

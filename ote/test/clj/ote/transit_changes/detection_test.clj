@@ -14,9 +14,11 @@
                                                 :no-traffic-run
                                                 :no-traffic-change
                                                 :route-key
+                                                :route-end-date
                                                 :starting-week])
 (def route-name "Raimola")
 (def route-name-2 "Esala")
+(def route-name-3 "Kyykkävaaranmäki")
 
 (defn weeks
   "Give first day of week (monday) as a starting-from."
@@ -610,6 +612,119 @@
            (-> (nth result 1)
                (select-keys select-keys-detect-changes-for-all-routes))))
     (is (= 2 (count result)))))
+
+;;;;;; TESTS for analysing route end reporting
+
+(def data-all-routes [[route-name-2
+                       {:route-short-name route-name-2,
+                        :route-long-name route-name-2,
+                        :trip-headsign "",
+                        :min-date nil,
+                        :max-date nil,
+                        :route-hash-id route-name-2}]
+                      [route-name
+                       {:route-short-name "",
+                        :route-long-name route-name,
+                        :trip-headsign "",
+                        :min-date (detection/sql-date (d 2019 1 1)),
+                        :max-date (detection/sql-date (d 2019 7 14)),
+                        :route-hash-id route-name}]
+                      [route-name-3
+                       {:route-short-name "",
+                        :route-long-name route-name-3,
+                        :trip-headsign "",
+                        :min-date nil,
+                        :max-date nil,
+                        :route-hash-id route-name-3}]])
+
+(def change-window detection/route-end-detection-threshold)
+
+(def data-ending-route-change
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 03
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 10
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 24
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}));; 2019 07 08
+
+(deftest test-ending-route-change
+  (let [result (->> data-ending-route-change ;; Notice thread-last
+                   (detection/changes-by-week->changes-by-route)
+                   (detection/detect-changes-for-all-routes)
+                   (detection/add-ending-route-change (d 2019 5 20) change-window data-all-routes))]
+    (is (= {:route-end-date (d 2019 7 15)
+            :route-key route-name
+            :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+           (-> result
+               first
+               (select-keys select-keys-detect-changes-for-all-routes))))
+    (is (= 1 (count result)))))
+
+(def data-change-and-ending-route
+  (weeks (d 2019 5 13)
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 03
+         {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 06 10
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]}  ;; 2019 06 17
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]}  ;; 2019 06 24
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]}  ;; 2019 07 01
+         {route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]}));; 2019 07 08
+
+(deftest test-change-and-ending-route
+  (let [result (->> data-change-and-ending-route ;; Notice thread-last
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    (detection/add-ending-route-change (d 2019 5 20) change-window data-all-routes))]
+    (testing "Ensure a traffic change and route end within detection window are reported."
+      (is (= {:different-week {:beginning-of-week (d 2019 6 17)
+                               :end-of-week (d 2019 6 23)}
+              :route-key route-name
+              :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+             (-> result
+                 first
+                 (select-keys select-keys-detect-changes-for-all-routes)
+                 )))
+
+      (is (= {:route-end-date (d 2019 7 15)
+              :route-key route-name
+              :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+             (-> result
+                 second
+                 (select-keys select-keys-detect-changes-for-all-routes)
+                 )))
+      (is (= 2 (count result))))))
+
+(def data-change-nil-and-ending-route
+ (weeks (d 2019 5 13)
+        {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 13
+        {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 20
+        {route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}  ;; 2019 05 27
+        {route-name ["h1" "h2" nil nil nil nil nil]}  ;; 2019 06 03
+        {route-name [nil nil nil nil nil nil nil]}  ;; 2019 06 10
+        {route-name [nil nil nil nil nil nil nil]}  ;; 2019 06 17
+        {route-name [nil nil nil nil nil nil nil]}  ;; 2019 06 24
+        {route-name [nil nil nil nil nil nil nil]}  ;; 2019 07 01
+        {route-name [nil nil nil nil nil nil nil]}));; 2019 07 08
+
+(deftest test-change-nil-and-ending-route
+  (let [result (->> data-change-nil-and-ending-route ;; Notice thread-last
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    (detection/add-ending-route-change (d 2019 5 20) change-window data-all-routes))]
+    (testing "Ensure route end is reported when no-traffic starts, even if route max-date is later. If that is possible..."
+      (is (= {:route-end-date (d 2019 6 5)
+              :route-key route-name
+              :starting-week {:beginning-of-week (d 2019 5 20) :end-of-week (d 2019 5 26)}}
+             (-> result
+                 first
+                 (select-keys select-keys-detect-changes-for-all-routes))))
+      (is (= 1 (count result))))))
 
 ;;;;;; TESTS for analysing specific days for changes in hash/traffic
 
