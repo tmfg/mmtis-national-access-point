@@ -49,9 +49,7 @@
                    :default
                    url)]
          [:a (merge
-               (stylefy/use-style (merge {:color colors/primary
-                                          :text-decoration "none"
-                                          ::stylefy/mode {:hover {:text-decoration "underline"}}}
+               (stylefy/use-style (merge style-base/base-link
                                          (when style
                                            style)))
               {:href url}
@@ -298,3 +296,21 @@
 
 (defn loading-spinner []
   [:div.loading [:img {:src "/base/images/loading-spinner.gif"}]])
+
+
+(defn information-row
+  ([title information]
+    [information-row title information {}])
+  ([title information style]
+   [:div (stylefy/use-style (merge style-base/info-row
+                                   style))
+    [:strong (stylefy/use-style style-base/info-title)
+     title]
+    (if information
+      [:span (stylefy/use-style style-base/info-content)
+       information]
+      [:span (stylefy/use-style (merge
+                                  style-base/info-content
+                                  {:color colors/gray650
+                                   :font-style "italic"}))
+       (tr [:service-viewer :not-disclosed])])]))
