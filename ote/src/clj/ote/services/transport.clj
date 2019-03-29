@@ -102,9 +102,10 @@
                                [::t-service/external-interfaces
                                 (specql/columns ::t-service/external-interface-description)])
                          {::t-service/id id}))]
-    (when ts
-      (assoc ts ::t-service/operation-area
-             (places/fetch-transport-service-operation-area db id)))))
+    (if ts
+      (http/transit-response (assoc ts ::t-service/operation-area
+                                       (places/fetch-transport-service-operation-area db id)))
+      {:status 404})))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
@@ -493,26 +494,33 @@
                                      (specql/columns ::t-service/external-interface-description)])
                                 transport-service-personal-columns)
                          {::t-service/id id}))]
-    (when ts
-      (assoc ts ::t-service/operation-area
-                (places/fetch-transport-service-operation-area db id)))))
+    (if ts
+      (http/transit-response (assoc ts ::t-service/operation-area
+                                       (places/fetch-transport-service-operation-area db id)))
+      {:status 404})))
 
 
 (defn private-data-transport-operator
   "Get single transport service by id"
   [db id]
-  (first (fetch db ::t-operator/transport-operator
-                   (specql/columns ::t-operator/transport-operator)
-                   {::t-operator/id id})))
+  (let [to (first (fetch db ::t-operator/transport-operator
+                         (specql/columns ::t-operator/transport-operator)
+                         {::t-operator/id id}))]
+    (if to
+      (http/transit-response to)
+      {:status 404})))
 
 (defn public-data-transport-operator
   "Get single transport service by id"
   [db id]
-  (first (fetch db ::t-operator/transport-operator
-                #{::t-operator/business-id
-                  ::t-operator/name
-                  ::t-operator/homepage}
-                {::t-operator/id id})))
+  (let [to (first (fetch db ::t-operator/transport-operator
+                         #{::t-operator/business-id
+                           ::t-operator/name
+                           ::t-operator/homepage}
+                         {::t-operator/id id}))]
+    (if to
+      (http/transit-response to)
+      {:status 404})))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -590,8 +598,8 @@
                                               #{::t-service/transport-operator-id}
                                               {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
-          (http/transit-response (all-data-transport-service db id))
-          (http/transit-response (public-data-transport-service db id)))))
+          (all-data-transport-service db id)
+          (public-data-transport-service db id))))
 
     (GET "/t-operator/:id"
          {{:keys [id]}
@@ -599,8 +607,8 @@
           user :user}
       (let [id (Long/parseLong id)]
         (if (or (authorization/admin? user) (authorization/is-author? db user id))
-          (http/transit-response (private-data-transport-operator db id))
-          (http/transit-response (public-data-transport-operator db id)))))))
+          (private-data-transport-operator db id)
+          (public-data-transport-operator db id))))))
 
 (defrecord Transport [config]
   component/Lifecycle
