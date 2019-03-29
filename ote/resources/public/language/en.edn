@@ -924,7 +924,14 @@ You can also draw the operating area or point to the map with drawing tools. You
  :transit-visualization-page
  {:loading-routes "Loading service routes."
   :no-changes-in-routes "No routes with changes."
-  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"
+  :route-description "Taulukkoon on listattu palvelun reitit, joissa on havaittu muutoksia.
+  Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin muutokset näytetään taulukon alapuolella."
+  :calendar-description-1 "Muutoksen vertailupäivät on korostettu lilalla ja sinisellä ympyrällä. Päivät ovat valitun muutoksen tapahtumapäivä (sininen)
+  sekä vastaava viikonpäivä aiemmalta viikolta (lila). Kalenterissa samalla värillä väritetyt päivät kuvaavat samanlaista liikennettä. Taustaväreillä ei ole muita merkityksiä."
+  :calendar-description-2 "Valitse haluamasi muutos tarkasteluun napsauttamalla muutosriviä alla olevasta taulukosta. Voit myös valita kalenterista itse
+  päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla valitut päivät kalenterista."
+  }
 
  :common-texts
  {:check-your-input "Please check that the information you have given is correct."

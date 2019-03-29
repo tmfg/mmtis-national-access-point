@@ -212,7 +212,7 @@
    :align-items "center"})
 
 (def icon-labeled-icon
-  {:margin-right "0.25rem"})
+  {:margin-right "0.125rem"})
 
 (def msg-container (merge (flex-container "row")
                           (align-items "center")))
