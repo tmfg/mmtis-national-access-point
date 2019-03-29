@@ -89,8 +89,7 @@
                                                           {:outline (str "solid 3px " colors/primary-dark)
                                                            ::stylefy/mode {:hover {:background-color (if (even? i) table-row-color table-row-color-alt)}}})
                                                         (when row-style row-style)))
-                              {:selectable (boolean on-select)
-                               :display-border false})
+                              {:selectable (boolean on-select)})
 
                (doall
                  (map-indexed

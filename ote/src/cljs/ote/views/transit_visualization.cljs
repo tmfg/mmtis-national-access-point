@@ -458,7 +458,7 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
-      [:div.trips-table {:style {:margin-top "1em"}}
+      [:div.trips-table {:style {:margin-top "1em"} :key (str "trips-table-" (count trips))}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
                      :label-style style-base/table-col-style-wrap
@@ -674,18 +674,25 @@
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
    [selected-route-map e! date->hash hash->color compare]]])
 
-(defn gtfs-package-info [e! open-sections packages]
+(defn gtfs-package-info [e! open-sections packages service-id]
   (let [[latest-package & previous-packages] packages
+        previous-packages [latest-package]
         open? (get open-sections :gtfs-package-info false)
-        pkg (fn [{:keys [created min-date max-date interface-url]}]
-              [:div.gtfs-package
-               interface-url
-               " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
-               "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
+        pkg (fn [{:keys [created min-date max-date interface-url]} show-link?]
+              (when created
+                [:div.gtfs-package
+                 interface-url
+                 " Ladattu NAPiin "
+                 (if show-link?
+                   (common/linkify
+                     (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created))
+                     (time/format-timestamp-for-ui created))
+                   (time/format-timestamp-for-ui created)) ". "
+                 "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."]))]
     [:div (stylefy/use-style style/infobox)
      [:div (stylefy/use-style style/infobox-text)
       [:b "Viimeisin aineisto"]
-      [pkg latest-package]]
+      [pkg latest-package false]]
      (when (seq previous-packages)
        [:div
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
@@ -702,7 +709,7 @@
            (doall
             (for [{id :id :as p} previous-packages]
               ^{:key (str "gtfs-package-info-" id)}
-              [pkg p]))])])]))
+              [pkg p true]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
@@ -726,7 +733,7 @@
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
 
-        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization)]
+        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization) (:transport-service-id service-info)]
 
         ;; Route listing with number of changes
         (tr [:transit-visualization-page :route-description])
