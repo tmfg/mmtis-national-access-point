@@ -19,9 +19,7 @@
                         :color "gray"}}
        opts])))
 
-(defn table [{:keys [height name->label key-fn
-                     label-style
-                     row-style show-row-hover? selected-route
+(defn table [{:keys [height name->label key-fn label-style row-style
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"

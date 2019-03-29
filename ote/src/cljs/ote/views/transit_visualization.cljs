@@ -357,7 +357,7 @@
                                  (do
                                    (e! (tv/->SelectRouteForDisplay (first %)))
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
-                   :row-selected? #(= % selected-route)}
+                   :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
       [{:name "Reitti" :width "20%"
         :read (juxt :route-short-name :route-long-name)
