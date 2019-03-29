@@ -925,7 +925,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :transit-visualization-page
  {:loading-routes "Laddar rutterna för tjänsten."
   :no-changes-in-routes "Ei reittejä, joissa muutoksia."
-  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"
+  :checkbox-show-no-change "Näytä myös reitit, joihin ei ole tulossa muutoksia"
   :route-description "Taulukkoon on listattu palvelun reitit, joissa on havaittu muutoksia.
   Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin muutokset näytetään taulukon alapuolella."
   :calendar-description-1 "Muutoksen vertailupäivät on korostettu lilalla ja sinisellä ympyrällä. Päivät ovat valitun muutoksen tapahtumapäivä (sininen)
@@ -1027,7 +1027,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :save-user-success "Profil sparad"
   :business-id-is-not-unique "FO-numret finns redan i NAP. Ta kontakt med NAP Help Desk, joukkoliikenne@traficom.fi eller tfn 0295 34 6705 (vardagar kl 9-15)."
   :start-time "Från kl"
-  :ending-time "Till kl"}
+  :ending-time "Till kl"
+  :day-of-week-1-short "Må"
+  :day-of-week-2-short "Ti"
+  :day-of-week-3-short "On"
+  :day-of-week-4-short "To"
+  :day-of-week-5-short "Fr"
+  :day-of-week-6-short "Lö"
+  :day-of-week-7-short "Sö"}
 
 
  :dialog

@@ -4,6 +4,7 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.time :as time]
+            [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.localization :refer [tr]]
             [ote.ui.icons :as ote-icons]
@@ -18,6 +19,9 @@
             [ote.app.controller.transit-visualization :as tv]))
 
 ;; Utility methods
+(defn day-of-week-number->text [dof]
+  (tr [:common-texts (keyword (str "day-of-week-" dof "-short"))]))
+
 (defn select-day [e! day loading?]
   (when-not loading?
     (e! (tv/->SelectDatesForComparison day))))
@@ -113,18 +117,21 @@
           :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
                     [:div
-                     [:span (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
-                                               :white-space "nowrap"})
+                     [:span (stylefy/use-style {;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
+                                                :white-space "nowrap"})
                       (str (time/days-until different-week-date) " pv ")]
                      [:span (stylefy/use-style {:color "gray"
-                                               :overflow-wrap "break-word"})
-                      (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]])}
+                                                :overflow-wrap "break-word"})
+                      (str "("
+                           (day-of-week-number->text (t/day-of-week (time/js-date-to-goog-date different-week-date)))
+                           " "
+                           (time/format-timestamp->date-for-ui different-week-date) ")")]])}
          {:name "Muutos tunnistettu"
           :read :transit-change-date
           :col-style style-base/table-col-style-wrap
           :format (fn [transit-change-date]
                     (time/format-timestamp->date-for-ui transit-change-date))}
-         {:name "Muutokset" :width "30%"
+         {:name "Vertailupäivien väliset muutokset" :width "30%"
           :read identity
           :col-style style-base/table-col-style-wrap
           :format (fn [{change-type :change-type :as route}]
