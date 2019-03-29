@@ -300,20 +300,34 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
+(def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
+                            :trip-stop-sequence-changes-upper :route-hash-id
+                            :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips
+                            :different-week-date})
+
+(defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
+	;; Filter nil values
+	(keep
+		(fn [c]
+			;; Return nil if route-hash-id doesn't match because keep won't work with false values.
+			(when (= (:route-hash-id c) (:route-hash-id single-change))
+				(if (= :removed (:change-type c))
+					;; Remove trip and stop changes from route summary if route has change-type :removed
+					(dissoc c :trip-stop-sequence-changes-lower
+									:trip-stop-time-changes-lower
+									:trip-stop-sequence-changes-upper
+									:trip-stop-time-changes-upper
+									:removed-trips)
+					c)))
+		all-changes))
+
 (defn- route-change-summary
   "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
   need to merge-with them together."
   [single-change all-changes]
-  (let [selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
-                               :trip-stop-sequence-changes-upper :route-hash-id
-                               :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips}
-        all-changes (map #(select-keys % selected-change-keys) all-changes)
+  (let [all-changes (map #(select-keys % selected-change-keys) all-changes)
         single-change (select-keys single-change selected-change-keys)
-        all-route-changes (filter
-                            (fn [c]
-                              (let [x (select-keys c selected-change-keys)]
-                                (= (:route-hash-id x) (:route-hash-id single-change))))
-                            all-changes)
+        all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
         merged-changes (apply merge-with + all-route-changes)]
     merged-changes))
 
@@ -377,7 +391,7 @@
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
        {:name "Muutosten yhteenveto" :width "32%"
         :read identity
-        :format (fn [{change-type :change-type :as route-changes}]
+        :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
                     [icon-l/icon-labeled
@@ -392,7 +406,11 @@
                     :removed
                     [icon-l/icon-labeled
                      [ic/content-remove-circle-outline {:color style/remove-color}]
-                     "Mahdollisesti päättyvä reitti"]
+                     [:span {:title (str "Reitti päättyy mahdollisesti "
+                                         (time/format-timestamp->date-for-ui different-week-date)
+                                         ". "
+                                         "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
+                      "Mahdollisesti päättyvä reitti"]]
 
                     :no-change
                     [icon-l/icon-labeled

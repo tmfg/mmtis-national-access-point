@@ -25,7 +25,7 @@
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
-        table-row-color-alt colors/gray300
+        table-row-color-alt colors/gray200
         table-row-hover-color colors/gray400]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
