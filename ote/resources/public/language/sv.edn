@@ -40,9 +40,11 @@
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Färmedlens tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-vehicle-accessibility "Färmedlens tillgänglighet (via bokning)"
+   :ote.db.transport-service/vehicle-accessibility "Färmedlens tillgänglighet"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/info-service-accessibility "Infotjänsternas tillgänglighet"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "garanteras alltid"
    :ote.db.transport-service/guaranteed-accessibility-description "Beskriving av garanterad tillgänglighet"
@@ -51,6 +53,7 @@
 
    :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
    :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/transportable-aid "Hjälpmedel som kan transporteras"
 
    :ote.db.transport-service/accessibility-info-url "Beskrivning av tillgänglighetstjänsterna (WWW)"
 
@@ -1345,6 +1348,38 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
+
+
+ :service-viewer
+ {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :operator-info "Palveluntuottajan tiedot"
+  :not-disclosed "Ei ilmoitettu"
+  :brokerage {true "Kyllä"
+              false "Ei"}
+  :yes "Kyllä"
+  :no "Ei"
+  :service-area "Toiminta-alue"
+  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
+  :luggage-warnings "Matkatavaroita koskevat varoitukset"
+  :advance-reservation "Ennakkovaraus"
+  :reservation-service "Varauspalvelu"
+  :real-time-info "Reaaliaikapalvelu"
+  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
+  :accessibility-website "Esteettömyystietojen nettisivu"
+  :guaranteed-accessibility "Taattu saatavuus"
+  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
+  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
+  :limited-accessibility "Rajoitettu saatavuus"
+  :price-information "Hintatiedot"
+  :service-hours "Palveluajat"
+  :primary-areas "Pääasialliset toiminta-alueet"
+  :other-accessibility-info "Muut esteettömyystiedot"
+  :secondary-areas "Toissijaiset toiminta-alueet"
+  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
+  :price/unit "Hinta/yksikkö"
+  :pricing-basis "Hinnoitteluperuste"
+  :day-of-week "Viikonpäivä"
+  :exception "poikkeus"}
 
  :register
  {:label "Skapa ett nytt konto"

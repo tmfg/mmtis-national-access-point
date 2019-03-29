@@ -40,9 +40,11 @@
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/vehicle-accessibility "Liikennevälineiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/info-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "Aina saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
@@ -51,6 +53,7 @@
 
    :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
    :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+   :ote.db.transport-service/transportable-aid "Kuljetettavat apuvälineet"
 
    :ote.db.transport-service/accessibility-info-url "Esteettömyyspalveluiden kuvaus (WWW)"
 
@@ -1358,6 +1361,38 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :check-email-for-link "Salasanan vaihtopyyntösi on vastaanotettu. Olemme nyt lähettäneet salasanan vaihtamiseen tarvittavan linkin sähköpostiisi."
   :logged-out "Olet kirjautunut ulos."}
+
+
+ :service-viewer
+ {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :operator-info "Palveluntuottajan tiedot"
+  :not-disclosed "Ei ilmoitettu"
+  :brokerage {true "Kyllä"
+              false "Ei"}
+  :yes "Kyllä"
+  :no "Ei"
+  :service-area "Toiminta-alue"
+  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
+  :luggage-warnings "Matkatavaroita koskevat varoitukset"
+  :advance-reservation "Ennakkovaraus"
+  :reservation-service "Varauspalvelu"
+  :real-time-info "Reaaliaikapalvelu"
+  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
+  :accessibility-website "Esteettömyystietojen nettisivu"
+  :guaranteed-accessibility "Taattu saatavuus"
+  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
+  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
+  :limited-accessibility "Rajoitettu saatavuus"
+  :price-information "Hintatiedot"
+  :service-hours "Palveluajat"
+  :primary-areas "Pääasialliset toiminta-alueet"
+  :other-accessibility-info "Muut esteettömyystiedot"
+  :secondary-areas "Toissijaiset toiminta-alueet"
+  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
+  :price/unit "Hinta/yksikkö"
+  :pricing-basis "Hinnoitteluperuste"
+  :day-of-week "Viikonpäivä"
+  :exception "poikkeus"}
 
  :register
  {:label "Rekisteröi uusi käyttäjätili"
