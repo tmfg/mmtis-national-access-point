@@ -142,21 +142,20 @@
 
 (defn- operator-info
   [title operator]
-  (let [address (::t-operator/visiting-address operator)]
-    [:section
-     [info-sections-2-cols title
-      [:div
-       [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/company-name]) (::t-operator/name operator)]
-       [information-row-with-padding-right (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
-       [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
-       [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
-       ]
-      [:div
-       [information-row-with-padding-right (tr [:field-labels ::t-operator/business-id]) (::t-operator/business-id operator)]
-       [information-row-with-padding-right (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
-       [information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
-       [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/homepage]) (::t-operator/homepage operator)]]]
-     [spacer]]))
+  [:section
+   [info-sections-2-cols title
+    [:div
+     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/company-name]) (::t-operator/name operator)]
+     [information-row-with-padding-right (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
+     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
+     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
+     ]
+    [:div
+     [information-row-with-padding-right (tr [:field-labels ::t-operator/business-id]) (::t-operator/business-id operator)]
+     [information-row-with-padding-right (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
+     [information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
+     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/homepage]) (::t-operator/homepage operator)]]]
+   [spacer]])
 
 (defn- service-info
   [title service shown-language change-lang-fn]
