@@ -146,14 +146,14 @@
    [info-sections-2-cols title
     [:div
      [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/company-name]) (::t-operator/name operator)]
-     [information-row-with-padding-right (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
-     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
-     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
+     ;[information-row-with-padding-right (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
+     ;[information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
+     ;[information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
      ]
     [:div
      [information-row-with-padding-right (tr [:field-labels ::t-operator/business-id]) (::t-operator/business-id operator)]
-     [information-row-with-padding-right (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
-     [information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
+     ;[information-row-with-padding-right (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
+     ;[information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
      [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/homepage]) (::t-operator/homepage operator)]]]
    [spacer]])
 
@@ -188,16 +188,16 @@
         (when (not-empty transport-type-texts) (string/join ", " transport-type-texts))]
        [information-row-with-selection (tr [:viewer "description"]) descriptions shown-language change-lang-fn]
        [information-row-with-padding-right (tr [:viewer "brokerage?"]) brokerage?-text]
-       [information-row-with-padding-right
-        (tr [:field-labels :transport-service-common ::t-service/contact-email])
-        nil]                ;(::t-service/contact-email service)
+       #_[information-row-with-padding-right
+          (tr [:field-labels :transport-service-common ::t-service/contact-email])
+          nil]                                              ;(::t-service/contact-email service)
        ]
       [:div
        [information-row-with-padding-right (tr [:field-labels :transport-service ::t-service/type]) sub-type-text]
        [information-row-with-padding-right (tr [:viewer "published"]) published-time]
        [information-row-with-padding-right (tr [:viewer "available-from"]) available-from]
        [information-row-with-padding-right (tr [:viewer "available-to"]) available-to]
-       [information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) nil] ;(::t-service/contact-phone service)
+       #_[information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) nil] ;(::t-service/contact-phone service)
        [information-row-with-padding-right
         (tr [:field-labels :transport-service-common ::t-service/homepage])
         (::t-service/homepage service)]]]
@@ -232,10 +232,13 @@
     [:section
      [info-sections-2-cols title
       [:div
-       [information-row-with-padding-right (tr [:service-viewer :primary-areas]) (string/join ", " primary-area-names)]]
+       [information-row-with-padding-right (tr [:service-viewer :primary-areas])
+        (when (not-empty primary-area-names)
+          (string/join ", " primary-area-names))]]
       [:div
-       [information-row-with-padding-right (tr [:service-viewer :secondary-areas]) (when (not-empty secondary-area-names)
-                                                                                     (string/join ", " secondary-area-names))]]]
+       [information-row-with-padding-right (tr [:service-viewer :secondary-areas])
+        (when (not-empty secondary-area-names)
+          (string/join ", " secondary-area-names))]]]
      [leaflet-map e! areas]
      [spacer]]))
 
