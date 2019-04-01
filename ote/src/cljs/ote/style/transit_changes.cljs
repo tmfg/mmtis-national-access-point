@@ -6,7 +6,7 @@
 
 (def add-color "rgb(0,170,0)")
 (def remove-color "rgb(221,0,0)")
-(def no-change-color "rgb(235,235,235)")
+(def no-change-color colors/gray700)
 
 (def transit-changes-legend-container
   {:align-items "flex-start"
