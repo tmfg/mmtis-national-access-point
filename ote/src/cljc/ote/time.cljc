@@ -165,7 +165,7 @@
 
 ;; Change js-date (.js/date) to google datetime
 #?(:cljs
-   (defn js-date-to-goog-date [d]
+   (defn js-date->goog-date [d]
      (let [fields (date-fields d)]
        (goog.date.Date. (:ote.time/year fields) (dec (:ote.time/month fields)) (:ote.time/date fields)))))
 

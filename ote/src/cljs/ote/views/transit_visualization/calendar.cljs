@@ -123,7 +123,7 @@
                      [:span (stylefy/use-style {:color "gray"
                                                 :overflow-wrap "break-word"})
                       (str "("
-                           (day-of-week-number->text (t/day-of-week (time/js-date-to-goog-date different-week-date)))
+                           (day-of-week-number->text (t/day-of-week (time/js-date->goog-date different-week-date)))
                            " "
                            (time/format-timestamp->date-for-ui different-week-date) ")")]])}
          {:name "Muutos tunnistettu"
