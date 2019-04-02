@@ -179,6 +179,7 @@ WHERE c."transport-service-id" = :service-id
   AND c.date = :date::DATE;
 
 -- name: detected-route-changes-by-date
+-- Fetch changes for service joinin detected-route-change table and detected-change-history table.
 SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
        c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
        c."trip-stop-time-changes-lower", c."trip-stop-sequence-changes-upper", c."current-week-date",
