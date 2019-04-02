@@ -2,7 +2,8 @@
   "Base styles for OTE application. Everything that affects the overall look and feel of the app."
   (:require
     [stylefy.core :as stylefy :refer [use-style use-sub-style]]
-    [ote.theme.colors :as colors]))
+    [ote.theme.colors :as colors]
+    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xs]]))
 
 (def body {:margin 0
            :padding 0})
@@ -245,4 +246,34 @@
                  :overflow-wrap "break-word"
                  :padding-right "0.5rem"})
 
-(def info-content {:flex 5})
+(def info-content {:flex 5
+                   :display "flex"
+                   :justify-content "space-between"})
+
+(def info-title-25 {:flex-basis "25%"
+                    :color colors/gray800
+                    :overflow-wrap "break-word"
+                    :padding-right "0.5rem"
+                    ::stylefy/media {{:max-width (str width-xs "px")}
+                                     {:flex-basis "50%"}}})
+
+(def info-content-50 {:flex-basis "50%"
+                      :display "flex"
+                      :justify-content "space-between"})
+
+(def info-title-50 {:flex-basis "50%"
+                    :color colors/gray800
+                    :overflow-wrap "break-word"
+                    :padding-right "0.5rem"})
+
+(def info-content-75 {:flex-basis "75%"
+                      :display "flex"
+                      :justify-content "space-between"
+                      ::stylefy/media {{:max-width (str width-xs "px")}
+                                       {:flex-basis "50%"}}})
+
+
+
+(def capital-bold
+  {:text-transform "uppercase"
+   :font-weight "bold"})
