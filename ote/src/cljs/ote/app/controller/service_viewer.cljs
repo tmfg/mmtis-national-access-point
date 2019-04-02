@@ -12,16 +12,6 @@
             [ote.app.routes :as routes]
             [ote.app.controller.place-search :as place-search]))
 
-(defn format-descriptions
-  [data]
-  (reduce
-    (fn [new-collection item]
-      (let [lang (keyword (string/lower-case (::t-service/lang item)))
-            val (::t-service/text item)]
-        (assoc new-collection lang val)))
-    {}
-    data))
-
 (define-event ServiceSuccess [result]
               {}
               (let [areas (::t-service/operation-area result)
@@ -84,15 +74,27 @@
 
 (define-event OperatorSuccess [result]
               {}
-              (assoc-in app [:service-view :transport-operator] result))
+              (-> app
+                  (assoc-in [:service-view :transport-operator] result)
+                  (update-in [:service-view :transport-operator] dissoc :error)))
+
+(define-event OperatorFailure [result]
+              {}
+              (assoc-in app [:service-view :transport-operator] {:error 404}))
+
+(define-event ServiceFailure [result]
+              {}
+              (assoc-in app [:service-view :transport-service] {:error 404}))
 
 (define-event FetchServiceData [operator-id service-id]
               {}
               (do
                 (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
-                           {:on-success (tuck/send-async! ->ServiceSuccess)})
+                           {:on-success (tuck/send-async! ->ServiceSuccess)
+                            :on-failure (tuck/send-async! ->ServiceFailure)})
                 (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
-                           {:on-success (tuck/send-async! ->OperatorSuccess)}))
+                           {:on-success (tuck/send-async! ->OperatorSuccess)
+                            :on-failure (tuck/send-async! ->OperatorFailure)}))
               app)
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]
