@@ -363,10 +363,16 @@
           [:div
            [common-ui/information-row-with-option
             (tr [:service-viewer :guaranteed-accessibility])
-            (when (not-empty (:guaranteed list)) (string/join ", " (:guaranteed list))) true]
+            (when (not-empty (:guaranteed list))
+              (string/capitalize
+                (string/join ", " (:guaranteed list))))
+            true]
            [common-ui/information-row-with-option
             (tr [:service-viewer :limited-accessibility])
-            (when (not-empty (:limited list)) (string/join ", " (:limited list))) true]]
+            (when (not-empty (:limited list))
+              (string/capitalize
+                (string/join ", " (:limited list))))
+            true]]
           {:sub-title true}]))
      [info-sections-1-col (tr [:service-viewer :other-accessibility-info])
       [:div

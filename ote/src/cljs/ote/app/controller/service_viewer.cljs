@@ -31,12 +31,12 @@
                             {}
                             areas)
                     accessibility-data (let [pt (::t-service/passenger-transportation result)
-                                             guaranteed-vehicle-acc (set (::t-service/guaranteed-vehicle-accessibility pt))
-                                             limited-vehicle-acc (set (::t-service/limited-vehicle-accessibility pt))
-                                             guaranteed-info-acc (set (::t-service/guaranteed-info-service-accessibility pt))
-                                             limited-info-acc (set (::t-service/limited-info-service-accessibility pt))
-                                             guaranteed-transportable-aid (set (::t-service/guaranteed-transportable-aid pt))
-                                             limited-transportable-aid (set (::t-service/limited-transportable-aid pt))
+                                             guaranteed-vehicle-acc (::t-service/guaranteed-vehicle-accessibility pt)
+                                             limited-vehicle-acc (::t-service/limited-vehicle-accessibility pt)
+                                             guaranteed-info-acc (::t-service/guaranteed-info-service-accessibility pt)
+                                             limited-info-acc (::t-service/limited-info-service-accessibility pt)
+                                             guaranteed-transportable-aid (::t-service/guaranteed-transportable-aid pt)
+                                             limited-transportable-aid (::t-service/limited-transportable-aid pt)
                                              guaraunteed-desc (::t-service/guaranteed-accessibility-description pt)
                                              limited-desc (::t-service/limited-accessibility-description pt)
                                              url (::t-service/accessibility-info-url pt)]
