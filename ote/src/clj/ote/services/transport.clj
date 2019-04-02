@@ -42,12 +42,6 @@
     ::t-service/contact-gsm
     ::t-service/contact-email})
 
-(def transport-operator-personal-columns
-  #{::t-operator/gsm
-    ::t-operator/phone
-    ::t-operator/billing-address
-    ::t-operator/email})
-
 (defn get-transport-operator
   [db where-parameter]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
@@ -495,8 +489,9 @@
                                 transport-service-personal-columns)
                          {::t-service/id id}))]
     (if ts
-      (http/transit-response (assoc ts ::t-service/operation-area
-                                       (places/fetch-transport-service-operation-area db id)))
+      (http/transit-response
+        (assoc ts ::t-service/operation-area
+                  (places/fetch-transport-service-operation-area db id)))
       {:status 404})))
 
 
