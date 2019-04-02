@@ -659,18 +659,31 @@
    [selected-route-map e! date->hash hash->color compare]]])
 
 (defn gtfs-package-info [e! open-sections packages]
-  (let [[latest-package & previous-packages] packages
+  (let [grouped-packages (group-by :interface-url packages)
+        group-keys (keys grouped-packages)
+        latests-packages (mapv
+                           (fn [k]
+                             (first (get grouped-packages k)))
+                           group-keys)
+        previous-packages (apply concat
+                                 (mapv (fn [k]
+                                         (when-not (empty? (rest (get grouped-packages k)))
+                                           (rest (get grouped-packages k))))
+                                       group-keys))
         open? (get open-sections :gtfs-package-info false)
         pkg (fn [{:keys [created min-date max-date interface-url]}]
               [:div.gtfs-package
                interface-url
                " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
-               "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
+               "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."])]
     [:div (stylefy/use-style style/infobox)
      [:div (stylefy/use-style style/infobox-text)
       [:b "Viimeisin aineisto"]
-      [pkg latest-package]]
-     (when (seq previous-packages)
+      (doall
+        (for [p latests-packages]
+          ^{:key (str "latest-package-id-" (:id p))}
+          [pkg p]))]
+     (when (and (seq previous-packages) (not (empty? previous-packages)))
        [:div
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
          {:icon (if open?
@@ -684,9 +697,9 @@
         (when open?
           [:div
            (doall
-            (for [{id :id :as p} previous-packages]
-              ^{:key (str "gtfs-package-info-" id)}
-              [pkg p]))])])]))
+             (for [{id :id :as p} previous-packages]
+               ^{:key (str "gtfs-package-info-" id)}
+               [pkg p]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
