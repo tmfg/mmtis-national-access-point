@@ -319,7 +319,7 @@
 
 (defn information-row-with-option
   ([title information wide]
-   [information-row-with-option title information wide {}])
+   [information-row-with-option title information wide nil])
   ([title information wide {:keys [id] :as options}]
    [:div (merge (when id
                   {:id id})

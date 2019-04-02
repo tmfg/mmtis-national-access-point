@@ -3,6 +3,6 @@ describe('Should render service-viewer page', function () {
         cy.visit('/#/service/1/1');
 
         cy.get('h1').contains("Ajopalvelu Testinen Oy");
-        cy.get('#service-name').contains("Paljon kuvausta ja tarinaa");
+        cy.get('#service-name').contains("Taksi");
     });
 });
