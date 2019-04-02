@@ -951,6 +951,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :finap-status "NAP status"
   :header-nap-official-name "Tjänstekatalog"
   :instructions "Instruktioner"
+  :name "Namn"
+  :description "Beskrivning"
+  :brokerage "Förmedlingstjänst"
+  :published "Publicerat"
+  :available-from "Startdatum"
+  :available-to "Slutdatum"
+  :format "Format"
   :navigation-own-service-list "Egna tjänsteuppgifter"
   :navigation-front-page "Framsida"
   :navigation-organizations "Tjänsteproducenter"
@@ -1360,11 +1367,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :service-viewer
  {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
   :operator-info "Palveluntuottajan tiedot"
+  :transport-service-info "Mobilitetstjänstens uppgifter"
   :not-disclosed "Ei ilmoitettu"
-  :brokerage {true "Kyllä"
-              false "Ei"}
-  :yes "Kyllä"
-  :no "Ei"
+  :brokerage {true "Ja"
+              false "Nej"}
+  :yes "Ja"
+  :no "Nej"
   :service-area "Toiminta-alue"
   :published-interfaces "Ulkoiset koneluettavat rajapinnat"
   :luggage-warnings "Matkatavaroita koskevat varoitukset"
@@ -1385,8 +1393,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
   :price/unit "Hinta/yksikkö"
   :pricing-basis "Hinnoitteluperuste"
-  :day-of-week "Viikonpäivä"
-  :exception "poikkeus"}
+  :day-of-week "Dagar"
+  :exception "Betjäningstider"}
 
  :register
  {:label "Skapa ett nytt konto"
