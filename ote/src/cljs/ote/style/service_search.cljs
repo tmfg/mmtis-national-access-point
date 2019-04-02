@@ -64,14 +64,7 @@
                                                      ::stylefy/media {{:max-width (str width-md "px")}
                                                                       {:padding-left 0
                                                                        :padding-bottom "0.7rem"}}}
-                                        :info-row {:border-bottom (str "1px solid " colors/gray350)
-                                                   :display "flex"
-                                                   :margin-bottom "0.5rem"
-                                                   :font-size "0.875rem"}
-                                        :info-title {:flex 1
-                                                     :color colors/gray800
-                                                     :word-break "break-word"}
-                                        :info-content {:flex 2}
+
                                         :foot {:padding "0 1rem 1rem 1rem"
                                                ::stylefy/media {{:max-width (str width-md "px")}
                                                                 {:padding "0 0.7rem 0.7rem 0.7rem"}}}}})

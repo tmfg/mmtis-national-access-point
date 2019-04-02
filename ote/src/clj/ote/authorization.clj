@@ -41,6 +41,11 @@
       :else
       (body-fn))))
 
+(defn is-author?
+  [db user transport-operator-id]
+  (let [allowed-operators (user-transport-operators db user)]
+    (contains? allowed-operators transport-operator-id)))
+
 (defn with-transit-authority-check
   [db user body-fn]
   (if-not (users/is-transit-authority-user? db {:user-id (user-id user)})
