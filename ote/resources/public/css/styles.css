@@ -301,11 +301,19 @@ span.search-card-title {
     top: -12px !important;
 }
 
+.language-select div {
+    height: auto !important;
+}
+
+.language-select hr {
+    display: none !important;
+}
+
 .language-select div div:nth-child(2) {
     color: #0066cc !important;
     padding-right: 34px !important;
     line-height: inherit !important;
     height: auto !important;
     top: 0 !important;
-    width: 55px !important;
+    width: 40px !important;
 }
