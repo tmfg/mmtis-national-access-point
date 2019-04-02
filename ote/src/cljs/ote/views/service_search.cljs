@@ -93,7 +93,7 @@
 
 (defn- external-interface-links [{::t-service/keys [id external-interface-links]}]
   [:div {:key id}
-   [common-ui/information-row (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
+   [common-ui/information-row-default (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
    (when-not (empty? external-interface-links)
      (doall
        (map-indexed
@@ -102,7 +102,7 @@
                                 (::t-service/url external-interface)
                                 (parse-content-value data-content))]
              [:div {:key (str i "-" id)}
-              [common-ui/information-row data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
+              [common-ui/information-row-default data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
          external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
@@ -191,14 +191,16 @@
       [:div (stylefy/use-sub-style style/result-card :body-left)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
         (tr [:service-search :service-information])]
-       [common-ui/information-row (tr [:service-search :description]) formatted-desc]
-       [common-ui/information-row (tr [:service-search :type]) (sub-type-tr sub-type)]
-       [common-ui/information-row (tr [:service-search :transport-type]) (str/join ", " transport-types)]
-       [common-ui/information-row (tr [:service-search :homepage]) (if homepage
-                                                          [common-ui/linkify homepage homepage {:target "_blank"}]
-                                                          [:span {:style {:color colors/gray650
-                                                                          :font-style "italic"}}
-                                                           (tr [:service-search :no-homepage])])]]
+       [common-ui/information-row-default (tr [:service-search :description]) formatted-desc]
+       [common-ui/information-row-default (tr [:service-search :type]) (sub-type-tr sub-type)]
+       [common-ui/information-row-default (tr [:service-search :transport-type]) (str/join ", " transport-types)]
+       [common-ui/information-row-default
+        (tr [:service-search :homepage])
+        (if homepage
+          [common-ui/linkify homepage homepage {:target "_blank"}]
+          [:span {:style {:color colors/gray650
+                          :font-style "italic"}}
+           (tr [:service-search :no-homepage])])]]
       [:div (stylefy/use-sub-style style/result-card :body-right)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
         (tr [:service-search :service-api&format])]

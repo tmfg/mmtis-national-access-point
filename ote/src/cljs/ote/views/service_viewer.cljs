@@ -17,47 +17,48 @@
             [ote.ui.link-icon :refer [link-with-icon]]
             [ote.style.service-viewer :as service-viewer]
             [ote.app.controller.place-search :as place-search]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.style.base :as base]))
+
+(defonce shown-language
+  (r/atom (string/upper-case (name @selected-language))))
+
+(defn change-lang-fn
+  [new-val]
+  (reset! shown-language new-val))
+
 
 (defn information-row-with-selection
-  [title information selection change-fn]
-  (let [text ((keyword (string/lower-case @selection)) information)]
+  [title information wide]
+  (let [text ((keyword (string/lower-case @shown-language)) information)]
     [:div (stylefy/use-style (dissoc style-base/info-row :padding-right))
-     [:strong (stylefy/use-style style-base/info-title)
+     [:strong (stylefy/use-style (if wide
+                                   style-base/info-title-25
+                                   style-base/info-title-50))
       title]
-     (if text
-       [:span (stylefy/use-style style-base/info-content)
-        text]
-       [:span (stylefy/use-style (merge
-                                   style-base/info-content
-                                   {:color colors/gray650
-                                    :font-style "italic"}))
-        (tr [:service-viewer :not-disclosed])])
-     [:div
-      [form-fields/field
-       {:name :select-transport-operator
-        :type :selection
-        :auto-width true
-        :style {:display "inline"
-                :width "55px"
-                :max-height "20px"}
-        :show-option identity
-        :update! change-fn
-        :options (map string/upper-case supported-languages)
-        :auto-width? true
-        :class-name "language-select"}
-       @selection]]]))
-
-
-(defn information-row-with-padding-right
-  [title information]
-  [common-ui/information-row title information {:padding-right "55px"}])
-
-(defn select-text-for-language
-  "Select a keyword from given map based on selected language
-  Takes map {:fi \"Finnish text\" :sv \"swedish text\" :en \"English text\"}"
-  [desc]
-  ((keyword @selected-language) desc))
+     [:div (stylefy/use-style (if wide
+                                style-base/info-content-75
+                                style-base/info-content-50))
+      (if text
+        [:span text]
+        [:span (stylefy/use-style {:color colors/gray650
+                                   :font-style "italic"})
+         (tr [:service-viewer :not-disclosed])])
+      [:div {:style {:padding-left "0.5rem"}}
+       [:div
+        [form-fields/field
+         {:name :select-transport-operator
+          :type :selection
+          :auto-width true
+          :style {:display "inline"
+                  :width "55px"
+                  :max-height "20px"}
+          :show-option identity
+          :update! change-lang-fn
+          :options (map string/upper-case supported-languages)
+          :auto-width? true
+          :class-name "language-select"}
+         @shown-language]]]]]))
 
 (defn format-descriptions
   [data]
@@ -81,8 +82,7 @@
   ([title sv settings]
    [:div
     (if (:sub-title settings)
-      [:p {:style {:text-transform "uppercase"
-                   :font-weight "bold"}} title]
+      [:p (stylefy/use-style base/capital-bold) title]
       [:h4 title])
     [:div.info-block (stylefy/use-style service-viewer/info-container)
      [:div (stylefy/use-sub-style service-viewer/info-container :left-block)
@@ -95,8 +95,7 @@
   ([title lv rv settings]
    [:div
     (if (:sub-title settings)
-      [:p {:style {:text-transform "uppercase"
-                   :font-weight "bold"}} title]
+      [:p (stylefy/use-style base/capital-bold) title]
       [:h4 title])
     [:div.info-block (stylefy/use-style service-viewer/info-container)
      [:div (stylefy/use-sub-style service-viewer/info-container :left-block)
@@ -110,8 +109,7 @@
   ([title lv mv rv settings]
    [:div
     (if (:sub-title settings)
-      [:p {:style {:text-transform "uppercase"
-                   :font-weight "bold"}} title]
+      [:p (stylefy/use-style base/capital-bold) title]
       [:h4 title])
     [:div.info-block (stylefy/use-style service-viewer/info-container)
      [:div (stylefy/use-sub-style service-viewer/info-container :left-block)
@@ -120,8 +118,6 @@
       mv]
      [:div (stylefy/use-sub-style service-viewer/info-container :right-block)
       rv]]]))
-
-
 
 (def open-in-new-icon
   (ic/action-open-in-new {:style {:width 20
@@ -138,27 +134,35 @@
                                                               :color style-base/link-color}]
                                      (tr [:service-search :back-link])]]
    [:h1 service-name]
-   [link-with-icon open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
+   [link-with-icon {} open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
 
 (defn- operator-info
   [title operator]
-  [:section
-   [info-sections-2-cols title
-    [:div
-     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/company-name]) (::t-operator/name operator)]
-     ;[information-row-with-padding-right (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
-     ;[information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
-     ;[information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
-     ]
-    [:div
-     [information-row-with-padding-right (tr [:field-labels ::t-operator/business-id]) (::t-operator/business-id operator)]
-     ;[information-row-with-padding-right (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
-     ;[information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
-     [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/homepage]) (::t-operator/homepage operator)]]]
-   [spacer]])
+  (let [url (::t-operator/homepage operator)]
+    [:section
+     [info-sections-2-cols title
+      [:div
+       [common-ui/information-row-with-option
+        (tr [:field-labels :transport-service-common ::t-service/company-name])
+        (::t-operator/name operator) false]
+       ;[common-ui/information-row-default (tr [:field-labels ::t-operator/visiting-address]) nil] ;(::common/street address)
+       ;[common-ui/information-row-default (tr [:field-labels :transport-service-common ::t-service/contact-phone]) nil] ;(::t-operator/phone operator)
+       ;[common-ui/information-row-default (tr [:field-labels :transport-service-common ::t-service/contact-email]) nil] ;(::t-operator/email operator)
+       ]
+      [:div
+       [common-ui/information-row-with-option
+        (tr [:field-labels ::t-operator/business-id])
+        (::t-operator/business-id operator) false]
+       ;[common-ui/information-row-default (tr [:organization-page :address-postal]) nil] ;(when address (str (::common/postal_code address) ", " (::common/post_office address)))
+       ;[common-ui/information-row-default (tr [:organization-page :field-phone-mobile]) (::t-operator/phone operator)]
+       [common-ui/information-row-with-option
+        (tr [:field-labels :transport-service-common ::t-service/homepage])
+        (when url
+          [common-ui/linkify url url {:target "_blank"}]) false]]]
+     [spacer]]))
 
 (defn- service-info
-  [title service shown-language change-lang-fn]
+  [title service]
   (let [brokerage?-text (tr [:service-viewer :brokerage (::t-service/brokerage? service)])
         sub-type-text (tr [:enums ::t-service/sub-type (::t-service/sub-type service)])
         transport-type-texts (map
@@ -178,29 +182,31 @@
                          (tr [:field-labels :transport-service ::t-service/available-from-nil]))
         available-to (if (::t-service/available-to service)
                        (time/format-timestamp->date-for-ui (::t-service/available-to service))
-                       (tr [:field-labels :transport-service ::t-service/available-to-nil]))]
+                       (tr [:field-labels :transport-service ::t-service/available-to-nil]))
+        url (::t-service/homepage service)]
     [:section
      [info-sections-2-cols title
       [:div
-       [information-row-with-padding-right (tr [:viewer "name"]) (::t-service/name service)]
-       [information-row-with-padding-right
+       [common-ui/information-row-with-option (tr [:common-texts :name]) (::t-service/name service) false]
+       [common-ui/information-row-with-option
         (tr [:service-search :transport-type])
-        (when (not-empty transport-type-texts) (string/join ", " transport-type-texts))]
-       [information-row-with-selection (tr [:viewer "description"]) descriptions shown-language change-lang-fn]
-       [information-row-with-padding-right (tr [:viewer "brokerage?"]) brokerage?-text]
-       #_[information-row-with-padding-right
+        (when (not-empty transport-type-texts) (string/join ", " transport-type-texts)) false]
+       [information-row-with-selection (tr [:common-texts :description]) descriptions false]
+       [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false]
+       #_[common-ui/information-row-with-option
           (tr [:field-labels :transport-service-common ::t-service/contact-email])
-          nil]                                              ;(::t-service/contact-email service)
+          nil false]                                              ;(::t-service/contact-email service)
        ]
       [:div
-       [information-row-with-padding-right (tr [:field-labels :transport-service ::t-service/type]) sub-type-text]
-       [information-row-with-padding-right (tr [:viewer "published"]) published-time]
-       [information-row-with-padding-right (tr [:viewer "available-from"]) available-from]
-       [information-row-with-padding-right (tr [:viewer "available-to"]) available-to]
-       #_[information-row-with-padding-right (tr [:organization-page :field-phone-mobile]) nil] ;(::t-service/contact-phone service)
-       [information-row-with-padding-right
+       [common-ui/information-row-with-option (tr [:field-labels :transport-service ::t-service/type]) sub-type-text false]
+       [common-ui/information-row-with-option (tr [:common-texts :published]) published-time false]
+       [common-ui/information-row-with-option (tr [:common-texts :available-from]) available-from false]
+       [common-ui/information-row-with-option (tr [:common-texts :available-to]) available-to false]
+       #_[common-ui/information-row-with-option (tr [:organization-page :field-phone-mobile]) nil false] ;(::t-service/contact-phone service)
+       [common-ui/information-row-with-option
         (tr [:field-labels :transport-service-common ::t-service/homepage])
-        (::t-service/homepage service)]]]
+        (when url
+          [common-ui/linkify url url {:target "_blank"}]) false]]]
      [spacer]]))
 
 
@@ -232,19 +238,23 @@
     [:section
      [info-sections-2-cols title
       [:div
-       [information-row-with-padding-right (tr [:service-viewer :primary-areas])
+       [common-ui/information-row-with-option
+        (tr [:service-viewer :primary-areas])
         (when (not-empty primary-area-names)
-          (string/join ", " primary-area-names))]]
+          (string/join ", " primary-area-names))
+        false]]
       [:div
-       [information-row-with-padding-right (tr [:service-viewer :secondary-areas])
+       [common-ui/information-row-with-option
+        (tr [:service-viewer :secondary-areas])
         (when (not-empty secondary-area-names)
-          (string/join ", " secondary-area-names))]]]
+          (string/join ", " secondary-area-names))
+        false]]]
      [leaflet-map e! areas]
      [spacer]]))
 
 
 (defn- published-interfaces
-  [title data shown-language change-lang-fn]
+  [title data]
   [:div
    [:h4 title]
    (if data
@@ -258,14 +268,20 @@
          ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
          [info-sections-2-cols (string/upper-case title)
           [:div
-           [information-row-with-padding-right (tr [:service-search :homepage]) (when url [common-ui/linkify
+           [common-ui/information-row-with-option (tr [:service-search :homepage]) (when url [common-ui/linkify
                                                                                            url
                                                                                            url
-                                                                                           {:target "_blank"}])]
-           [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/license]) license]]
+                                                                                           {:target "_blank"}]) false]
+           [common-ui/information-row-with-option
+            (tr [:field-labels :transport-service-common ::t-service/license])
+            license
+            false]]
           [:div
-           [information-row-with-padding-right (tr [:viewer "format"]) format]
-           [information-row-with-selection (tr [:field-labels :transport-service-common ::t-service/external-service-description]) descriptions shown-language change-lang-fn]]
+           [common-ui/information-row-with-option (tr [:common-texts :format]) format false]
+           [information-row-with-selection
+            (tr [:field-labels :transport-service-common ::t-service/external-service-description])
+            descriptions
+            false]]
           {:sub-title true}]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
@@ -276,26 +292,26 @@
 
 
 (defn- luggage-warnings
-  [title data cur-select change-lang-fn]
+  [title data]
   (let [warning-texts (format-descriptions data)]
     [:section
      [info-sections-1-col title
       [:div
-       [information-row-with-selection (tr [:viewer "description"]) warning-texts cur-select change-lang-fn]]]
+       [information-row-with-selection (tr [:common-texts :description]) warning-texts true]]]
      [spacer]]))
 
 (defn- real-time-info
-  [title data shown-language change-lang-fn]
+  [title data]
   (let [url (::t-service/url data)
         descriptions (format-descriptions (::t-service/description data))]
     [:section
      [info-sections-2-cols title
       [:div
-       [information-row-with-padding-right
+       [common-ui/information-row-with-option
         (tr [:field-labels :transport-service-common ::t-service/homepage])
-        (when url [common-ui/linkify url url {:target "_blank"}])]]
+        (when url [common-ui/linkify url url {:target "_blank"}]) false]]
       [:div
-       [information-row-with-selection (tr [:viewer "description"]) descriptions shown-language change-lang-fn]]]
+       [information-row-with-selection (tr [:common-texts :description]) descriptions false]]]
      [spacer]]))
 
 (defn- pre-booking
@@ -303,7 +319,10 @@
   [:section
    [info-sections-1-col title
     [:div
-     [information-row-with-padding-right (tr [:service-viewer :reservation-possibilities-responsibilities]) (tr [:enums ::t-service/advance-reservation data])]]]
+     [common-ui/information-row-with-option
+      (tr [:service-viewer :reservation-possibilities-responsibilities])
+      (tr [:enums ::t-service/advance-reservation data])
+      true]]]
    [spacer]])
 
 (defn- booking-service
@@ -313,10 +332,10 @@
     [:section
      [info-sections-2-cols title
       [:div
-       [information-row-with-padding-right (tr [:field-labels :transport-service-common ::t-service/homepage])
-        (when url [common-ui/linkify url url {:target "_blank"}])]]
+       [common-ui/information-row-with-option (tr [:field-labels :transport-service-common ::t-service/homepage])
+        (when url [common-ui/linkify url url {:target "_blank"}]) false]]
       [:div
-       [information-row-with-selection (tr [:viewer "description"]) descriptions shown-language change-lang-fn]]]
+       [information-row-with-selection (tr [:common-texts :description]) descriptions false]]]
      [spacer]]))
 
 (defn- accessibility-and-other-services
@@ -342,18 +361,18 @@
          ^{:key k}
          [info-sections-1-col title
           [:div
-           [information-row-with-padding-right
+           [common-ui/information-row-with-option
             (tr [:service-viewer :guaranteed-accessibility])
-            (when (not-empty (:guaranteed list)) (string/join ", " (:guaranteed list)))]
-           [information-row-with-padding-right
+            (when (not-empty (:guaranteed list)) (string/join ", " (:guaranteed list))) true]
+           [common-ui/information-row-with-option
             (tr [:service-viewer :limited-accessibility])
-            (when (not-empty (:limited list)) (string/join ", " (:limited list)))]]
+            (when (not-empty (:limited list)) (string/join ", " (:limited list))) true]]
           {:sub-title true}]))
      [info-sections-1-col (tr [:service-viewer :other-accessibility-info])
       [:div
-       [information-row-with-padding-right (tr [:service-viewer :accessibility-website]) (when url [common-ui/linkify url url {:target "_blank"}])]
-       [information-row-with-selection (tr [:service-viewer :guaranteed-accessibility-description]) guaranteed-descriptions shown-language change-lang-fn]
-       [information-row-with-selection (tr [:service-viewer :limited-accessibility-description]) limited-descriptions shown-language change-lang-fn]]]
+       [common-ui/information-row-with-option (tr [:service-viewer :accessibility-website]) (when url [common-ui/linkify url url {:target "_blank"}]) true]
+       [information-row-with-selection (tr [:service-viewer :guaranteed-accessibility-description]) guaranteed-descriptions true]
+       [information-row-with-selection (tr [:service-viewer :limited-accessibility-description]) limited-descriptions true]]]
      [spacer]]))
 
 (defn- price-information
@@ -372,19 +391,27 @@
            ^{:key (str (::t-service/name class) (::t-service/price-per-unit class))}
            [:div (stylefy/use-style service-viewer/info-row)
             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
-             [information-row-with-padding-right (tr [:field-labels :parking ::t-service/price-class-name]) (::t-service/name class)]]
+             [common-ui/information-row-with-option
+              (tr [:field-labels :parking ::t-service/price-class-name])
+              (::t-service/name class) true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-             [information-row-with-padding-right (tr [:service-viewer :price/unit]) (::t-service/price-per-unit class)]]
+             [common-ui/information-row-with-option
+              (tr [:service-viewer :price/unit])
+              (::t-service/price-per-unit class) true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-             [information-row-with-padding-right (tr [:service-viewer :pricing-basis]) (::t-service/unit class)]]]))]
-      [information-row-with-padding-right (tr [:parking-page :header-payment-methods])
-       (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))]
-      [information-row-with-selection (tr [:viewer "description"]) description shown-language change-lang-fn]
-      [information-row-with-selection (tr [:field-labels :passenger-transportation ::t-service/pricing-description]) pricing-description shown-language change-lang-fn]
-      [information-row-with-padding-right
+             [common-ui/information-row-with-option
+              (tr [:service-viewer :pricing-basis])
+              (::t-service/unit class) true]]]))]
+      [common-ui/information-row-with-option (tr [:parking-page :header-payment-methods])
+       (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods))) true]
+      [information-row-with-selection (tr [:common-texts :description]) description true]
+      [information-row-with-selection
+       (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
+       pricing-description true]
+      [common-ui/information-row-with-option
        (tr [:field-labels :passenger-transportation ::t-service/pricing-url])
        (when pricing-url
-         [common-ui/linkify pricing-url pricing-url {:target "_blank"}])]])
+         [common-ui/linkify pricing-url pricing-url {:target "_blank"}]) true]])
    [spacer]])
 
 (defn- service-hours
@@ -406,19 +433,19 @@
           ^{:key (str (::t-service/week-days time))}
           [:div (stylefy/use-style service-viewer/info-row)
            [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
-            [information-row-with-padding-right
+            [common-ui/information-row-with-option
              (tr [:service-viewer :day-of-week])
              (string/join ", " (map
                                  #(string/lower-case (tr [:enums ::t-service/day :short %]))
-                                 (::t-service/week-days time)))]]
+                                 (::t-service/week-days time))) true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-            [information-row-with-padding-right
+            [common-ui/information-row-with-option
              (tr [:common-texts :start-time])
-             (str (get-in time [::t-service/from :hours]) ":" start-minutes)]]
+             (str (get-in time [::t-service/from :hours]) ":" start-minutes) true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-            [information-row-with-padding-right
+            [common-ui/information-row-with-option
              (tr [:common-texts :ending-time])
-             (str (get-in time [::t-service/to :hours]) ":" end-minutes)]]]))
+             (str (get-in time [::t-service/to :hours]) ":" end-minutes) true]]]))
       [:div {:style {:margin-bottom "0.5rem"}}
        (doall
          (for [exception exceptions
@@ -428,14 +455,14 @@
            ^{:key (str start-date end-date)}
            [:div (stylefy/use-style service-viewer/info-row)
             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
-             [information-row-with-selection (tr [:service-viewer :exception]) (format-descriptions description) shown-language change-lang-fn]]
+             [information-row-with-selection (tr [:service-viewer :exception]) (format-descriptions description) true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-             [information-row-with-padding-right (tr [:common-texts :start-time]) start-date]]
+             [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date] true]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-             [information-row-with-padding-right (tr [:common-texts :ending-time]) end-date]]]))]
+             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]
       [information-row-with-selection
        (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
-       (format-descriptions info) shown-language change-lang-fn]])
+       (format-descriptions info) true]])
    [spacer]])
 
 (defn service-view
@@ -447,20 +474,20 @@
         booking-data (get-in ts [::t-service/passenger-transportation ::t-service/booking-service])
         accessibility-data (:accessibility ts)
         pricing-data (:pricing-info ts)
-        shown-language (r/atom (string/upper-case (name @selected-language)))
-        change-lang-fn (fn [new-val]
-                         (reset! shown-language new-val))
         service-hours-data (:service-hours-info ts)]
-    [:div
-     [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-     [operator-info (tr [:service-viewer :operator-info]) to]
-     [service-info (tr [:viewer "transport-service"]) ts shown-language change-lang-fn]
-     [service-area e! (tr [:service-viewer :service-area]) ts]
-     [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces shown-language change-lang-fn]
-     [luggage-warnings (tr [:service-viewer :luggage-warnings]) warnings shown-language change-lang-fn]
-     [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data shown-language change-lang-fn]
-     [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-     [booking-service (tr [:service-viewer :reservation-service]) booking-data shown-language change-lang-fn]
-     [accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data shown-language change-lang-fn]
-     [price-information (tr [:service-viewer :price-information]) pricing-data shown-language change-lang-fn]
-     [service-hours (tr [:service-viewer :service-hours]) service-hours-data shown-language change-lang-fn]]))
+    (if (or (= (:error to) 404)
+            (= (:error ts) 404))
+      [:h2 (tr [:common-texts :data-not-found])]
+      [:div
+       [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
+       [operator-info (tr [:service-viewer :operator-info]) to]
+       [service-info (tr [:service-viewer :transport-service-info]) ts]
+       [service-area e! (tr [:service-viewer :service-area]) ts]
+       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
+       [luggage-warnings (tr [:service-viewer :luggage-warnings]) warnings]
+       [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+       [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+       [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+       [accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
+       [price-information (tr [:service-viewer :price-information]) pricing-data]
+       [service-hours (tr [:service-viewer :service-hours]) service-hours-data]])))
