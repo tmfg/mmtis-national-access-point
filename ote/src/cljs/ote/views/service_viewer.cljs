@@ -187,7 +187,7 @@
     [:section
      [info-sections-2-cols title
       [:div
-       [common-ui/information-row-with-option (tr [:common-texts :name]) (::t-service/name service) false]
+       [common-ui/information-row-with-option (tr [:common-texts :name]) (::t-service/name service) false {:id "service-name"}]
        [common-ui/information-row-with-option
         (tr [:service-search :transport-type])
         (when (not-empty transport-type-texts) (string/join ", " transport-type-texts)) false]

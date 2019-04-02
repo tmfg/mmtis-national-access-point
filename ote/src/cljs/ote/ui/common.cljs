@@ -299,38 +299,46 @@
 
 
 (defn information-row-default
-  [title information]
-  [:div (stylefy/use-style style-base/info-row)
-   [:strong (stylefy/use-style style-base/info-title)
-    title]
-   (if information
-     [:span (stylefy/use-style style-base/info-content)
-      information]
-     [:span (stylefy/use-style (merge
-                                 style-base/info-content
-                                 {:color colors/gray650
-                                  :font-style "italic"}))
-      (tr [:service-viewer :not-disclosed])])])
+  ([title information]
+   [information-row-default title information {}])
+  ([title information {:keys [id] :as options}]
+   [:div (merge (when id
+                  {:id id})
+                (stylefy/use-style style-base/info-row))
+    [:strong (stylefy/use-style style-base/info-title)
+     title]
+    (if information
+      [:span (stylefy/use-style style-base/info-content)
+       information]
+      [:span (stylefy/use-style (merge
+                                  style-base/info-content
+                                  {:color colors/gray650
+                                   :font-style "italic"}))
+       (tr [:service-viewer :not-disclosed])])]))
 
 
 (defn information-row-with-option
-  [title information wide]
-  [:div (stylefy/use-style style-base/info-row)
-   [:strong (stylefy/use-style
-              (if wide
-                style-base/info-title-25
-                style-base/info-title-50))
-    title]
-   (if information
-     [:span (stylefy/use-style
-              (if wide
-                style-base/info-content-75
-                style-base/info-content-50))
-      information]
-     [:span (stylefy/use-style (merge
-                                 (if wide
-                                   style-base/info-content-75
-                                   style-base/info-content-50)
-                                 {:color colors/gray650
-                                  :font-style "italic"}))
-      (tr [:service-viewer :not-disclosed])])])
+  ([title information wide]
+   [information-row-with-option title information wide {}])
+  ([title information wide {:keys [id] :as options}]
+   [:div (merge (when id
+                  {:id id})
+                (stylefy/use-style style-base/info-row))
+    [:strong (stylefy/use-style
+               (if wide
+                 style-base/info-title-25
+                 style-base/info-title-50))
+     title]
+    (if information
+      [:span (stylefy/use-style
+               (if wide
+                 style-base/info-content-75
+                 style-base/info-content-50))
+       information]
+      [:span (stylefy/use-style (merge
+                                  (if wide
+                                    style-base/info-content-75
+                                    style-base/info-content-50)
+                                  {:color colors/gray650
+                                   :font-style "italic"}))
+       (tr [:service-viewer :not-disclosed])])]))
