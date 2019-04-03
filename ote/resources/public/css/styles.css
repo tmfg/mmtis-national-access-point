@@ -30,7 +30,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 h1 {
-    font-weight: 400;
+    font-weight: 300;
     font-size: 3rem;
     line-height: 1.25;
     color: rgb(50,50,50);
@@ -294,4 +294,26 @@ span.search-card-title {
     border-width: medium medium 3px !important;
 }
 
+.language-select button {
+    fill: #0066cc !important;
+    width: 36px !important;
+    height: 36px !important;
+    top: -12px !important;
+}
 
+.language-select div {
+    height: auto !important;
+}
+
+.language-select hr {
+    display: none !important;
+}
+
+.language-select div div:nth-child(2) {
+    color: #0066cc !important;
+    padding-right: 34px !important;
+    line-height: inherit !important;
+    height: auto !important;
+    top: 0 !important;
+    width: 40px !important;
+}

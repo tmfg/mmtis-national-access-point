@@ -40,9 +40,11 @@
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Liikennevälineiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-vehicle-accessibility "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/vehicle-accessibility "Liikennevälineiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infopalveluiden esteettömyys (taattu saatavuus)"
    :ote.db.transport-service/limited-info-service-accessibility "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
+   :ote.db.transport-service/info-service-accessibility "Infopalveluiden esteettömyys"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "Aina saatavilla olevat esteettömyysvälineet"
    :ote.db.transport-service/guaranteed-accessibility-description "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
@@ -51,6 +53,7 @@
 
    :ote.db.transport-service/guaranteed-transportable-aid "Kuljetettavat apuvälineet (taattu saatavuus)"
    :ote.db.transport-service/limited-transportable-aid "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
+   :ote.db.transport-service/transportable-aid "Kuljetettavat apuvälineet"
 
    :ote.db.transport-service/accessibility-info-url "Esteettömyyspalveluiden kuvaus (WWW)"
 
@@ -954,6 +957,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :finap-status "NAP tila"
   :header-nap-official-name "Palvelukatalogi"
   :instructions "Ohjeet"
+  :name "Nimi"
+  :description "Kuvaus"
+  :brokerage "Välityspalvelu"
+  :published "Julkaistu"
+  :available-from "Saatavilla alkaen"
+  :available-to "Saatavilla asti"
+  :format "Formaatti"
   :navigation-own-service-list "Omat palvelutiedot"
   :navigation-front-page "Etusivu"
   :navigation-organizations "Palveluntuottajat"
@@ -1079,230 +1089,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :result-count-all ["Yhteensä " :total-count " palveluntuottajaa"]
   }
 
-
- ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
- ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
- ;; and we must show those as is.
- :viewer {"transport-operator" "Palveluntuottaja"
-          "transport-service" "Liikkumispalvelun tiedot"
-          "contact-address" "Osoite"
-          "contact-email" "Sähköpostiosoite"
-          "homepage" "Kotisivu"
-          "post_office" "Postitoimipaikka"
-          "postal_code" "Postinumero"
-          "street" "Katuosoite"
-          "contact-phone" "Puhelinnumero"
-          "id" "Tunnistenumero"
-          "name" "Nimi"
-          "business-id" "Y-tunnus"
-          "published?" "Julkaistu?"
-          "published" "Julkaistu"
-          "transport-operator-id" "Palveluntuottajan tunnistenumero"
-          "type" "Palvelun tyyppi"
-          "email" "Sähköpostiosoite"
-          "phone" "Puhelinnumero"
-
-          "passenger-transportation" "Palvelukohtaiset tiedot"
-          "parking" "Palvelukohtaiset tiedot"
-          "rentals" "Palvelukohtaiset tiedot"
-          "accessibility-description" "Kuvaus saavutettavuudesta"
-          "accessibility-tool" "Saavutettavuusvälineet"
-          "additional-services" "Lisäpalvelut"
-          "payment-methods" "Maksuvälineet"
-          "price-classes" "Hintaluokat"
-          "currency" "Rahayksikkö"
-          "price-per-unit" "yksikköhinta"
-          "unit" "yksikkö"
-
-          "lang" "Kieli"
-          "text" "Teksti"
-
-          "description" "Kuvaus"
-          "real-time-information" "Reaaliaikaiset palvelutiedot"
-          "booking-service" "Varauspalvelu"
-          "luggage-restrictions" "Matkatavaroita koskevat rajoitukset"
-
-          "url" "WWW-osoite"
-          "csv-url" "Palvelun tuottamiseen osallistuvat yritykset"
-          "service-hours-info" "Lisätiedot"
-          "indoor-map" "Sisätilakartan osoitetiedot"
-          "pick-up-locations" "Toimipisteet"
-          "pick-up-locations-url" "Toimipisteiden tietojen web-osoite"
-          "rental-additional-services" "Muut palvelut"
-          "vehicle-price-url" "Ajoneuvot ja hintatiedot (WWW-osoite)"
-          "usage-area" "Sallitut maat"
-          "vehicle-classes" "Vuokrattavat ajoneuvot"
-
-          "additional-service-links" "Muut palvelut"
-          "charging-points" "Kuvaus latauspisteistä"
-          "parking-capacities" "Parkkipaikkojen määrä"
-
-          "available-from" "Saatavilla alkaen"
-          "available-to" "Saatavilla asti"
-
-          "maximum-stay" "Maksimi pysäköintiaika"
-          "seconds" "Sekuntia"
-          "minutes" "Minuuttia"
-          "hours" "Tuntia"
-          "days" "Päivää"
-          "months" "Kuukautta"
-          "years" "Vuotta"
-          "transport-type" "Palvelun liikennemuoto"
-          "advance-reservation" "Ennakkovaraus"
-          "visiting-address" "Käyntiosoite"
-
-          :values {"passenger-transportation" "Henkilöiden kuljetuspalvelu"
-                   true "Kyllä"
-                   false "Ei"
-
-                   "taxi" "Taksiliikenne (tieliikenne)"
-                   "request" "Tilausliikenne ja muu kutsuun perustuva liikenne"
-                   "schedule" "Säännöllinen aikataulun mukainen liikenne"
-                   "terminal" "Asemat, satamat ja muut terminaalit"
-                   "rentals" "Liikennevälineiden vuokrauspalvelut ja kaupalliset yhteiskäyttöpalvelut"
-                   "parking" "Yleiset kaupalliset pysäköintipalvelut"
-
-                   ;; accessibility tools
-                   "wheelchair" "Pyörätuoli"
-                   "walkingstick" "Kävelykeppi"
-                   "audio-navigator" "Ääniopastus"
-                   "visual-navigator" "Visuaaliset opasteet"
-                   "passenger-cart" "Henkilökuljetuskärryt"
-                   "pushchair" "Lastenrattaat"
-                   "umbrella" "Sateenvarjo"
-                   "buggy" "Lastenvaunut"
-                   "other" "Muu"
-                   "boarding-assistance" "Kyytiin nousun avustus"
-                   "low-floor" "Matalalattia"
-                   "accessible-vehicle" "Esteetön kulkuneuvo"
-                   "escalator" "Liukuportaat"
-                   "lift" "Hissi"
-                   "narrow-entrance" "Kapea sisäänkäynti"
-                   "barrier" "Puomi"
-                   "travelator" "Liikkuva kävelytie"
-                   "ramp" "Ramppi"
-                   "stairs" "Portaat"
-                   "step-free-access" "Portaaton pääsy"
-                   "suitable-for-wheelchairs" "Sopii pyörätuolille"
-                   "assistance-dog-space" "Tila avustuskoiralle"
-                   "crutches" "Kainalosauvat"
-                   "walker" "Rollaattori"
-                   "walking-stick" "Kävelykeppi"
-                   "tactile-guiding-strips" "Kosketukseen perustuvat ohjausliuskat"
-                   "tactile-platform-edges" "Kosketukseen perustuva varoitus laiturin reunassa"
-                   "wheelchair-access-toilet" "Inva WC"
-                   "visual-displays" "Visuaaliset näytöt"
-                   "large-print-timetables" "Suuret kirjasimet aikatauluissa"
-                   "displays-for-visually-impaired" "Näytöt näkövammaisille (taktiili)"
-                   "audio-information" "Kuulutukset"
-                   "audio-for-hearing-impaired" "Äänivahvistimet huonokuuloisille"
-                   "disability-adapted-vehicle" "Käsihallintalaitteilla varustettuja autoja"
-
-                   ;; additional services
-                   "animal-transport" "Eläinkuljetus"
-                   "child-seat" "Lastenistuin"
-
-                   ;; parking types
-                   "unknown" "Tuntematon"
-                   "car-park" "Autopaikat"
-                   "park-and-ride-park" "Liityntäpysäköinti"
-                   "motorcycle-park" "Moottoripyörät"
-                   "cycle-park" "Polkupyörät"
-                   "rental-car-park" "Vuokra-autot"
-                   "coach-park" "Linja-autot"
-                   "disabled-park" "Invapaikat"
-
-                   ;; payment methods
-                   "debit-card" "Pankkikortti"
-                   "credit-card" "Luottokortti"
-                   "cash" "Käteinen"
-                   "contactless-payment" "Lähimaksu"
-                   "mobilepay" "Mobiilimaksu"
-                   "invoice" "Lasku"
-
-                   ;; week days
-                   "MON" "Ma"
-                   "TUE" "Ti"
-                   "WED" "Ke"
-                   "THU" "To"
-                   "FRI" "Pe"
-                   "SAT" "La"
-                   "SUN" "Su"
-
-                   ;; Data content
-                   "route-and-schedule" "Reitti- ja aikataulutiedot"
-                   "luggage-restrictions" "Matkatavararajoitukset"
-                   "realtime-interface" "Reaaliaikarajapinta"
-                   "booking-interface" "Varausrajapinta"
-                   "accessibility-services" "Esteettömyyspalvelut"
-                   "other-services" "Muut palvelut"
-                   "pricing" "Hintatiedot"
-                   "service-hours" "Palveluajat"
-                   "disruptions" "Häiriötilanteet"
-                   "payment-interface" "Lippu- ja myyntirajapinta"
-                   "map-and-location" "Kartta- ja paikkatietoaineistot"
-
-                   ;; rentals
-                   "pick-up" "Nouto"
-                   "return" "Palautus"
-                   "pick-up-return" "Nouto ja palautus"
-
-                   "advance-reservation" "Ennakkovaraus"
-                   "no" "ei"
-                   "road" "Tieliikenne"
-                   "rail" "Rautatieliikenne"
-                   "sea" "Merenkulku"
-                   "aviation" "Ilmailu"
-
-                   "mandatory" "Pakollinen"
-                   "possible" "Mahdollinen"
-                   }
-
-
-          ;; External interfaces
-          "external-interfaces" "Ulkoiset rajapinnat"
-          "data-content" "Tietosisältö"
-          "license" "Lisenssi/käyttöehdot"
-          "format" "Formaatti"
-          "external-interface" "Ulkoinen rajapinta"
-
-          ;; accessibility
-          "accessibility" "Esteettömyys"
-          "information-service-accessibility" "Infopalveluiden esteettömyys"
-          "brokerage?" "Välityspalvelu?"
-          "companies" "Palvelun tuottamiseen osallistuvat yritykset"
-          "accessibility-info-url" "Esteettömyyspalveluiden kuvaus (WWW)"
-          "guaranteed-accessibility-description" "Kerro tarvittaessa lisätietoja aina saatavilla olevista esteettömyyspalveluista"
-          "guaranteed-info-service-accessibility" "Infopalveluiden esteettömyys (taattu saatavuus)"
-          "guaranteed-transportable-aid" "Kuljetettavat apuvälineet (taattu saatavuus)"
-          "guaranteed-vehicle-accessibility" "Liikennevälineiden esteettömyysominaisuudet (aina saatavilla)."
-          "limited-accessibility-description" "Kerro tarvittaessa lisätietoja rajoitetusti saatavilla olevista esteettömyyspalveluista"
-          "limited-info-service-accessibility" "Infopalveluiden esteettömyys (rajoitettu saatavuus)"
-          "limited-transportable-aid" "Kuljetettavat apuvälineet (rajoitettu saatavuus)"
-          "limited-vehicle-accessibility" "Liikennevälineiden esteettömyys (rajoitettu saatavuus)"
-
-          "payment-method-description" "Maksutapojen lisätiedot"
-          "pricing" "Hinnoittelu"
-          "service-exceptions" "Toiminta-aikojen poikkeukset"
-          "service-hours" "Toiminta-ajat"
-          "week-days" "Viikonpäivät"
-          "from" "Alkaen"
-          "to" "Päättyen"
-          "from-date" "Alkaen (pvm)"
-          "to-date" "Päättyen (pvm)"
-          "sub-type" "Alityyppi"
-          "terminal" " "
-
-          ;; Assistance
-          "assistance" "Avustuspalvelut"
-          "assistance-place-description" "Sijainti"
-          "assistance-by-reservation-only" "Varattava etukäteen"
-          "notification-requirements" "Varausta koskevat vaatimukset"
-          "hours-before" "Palvelu varattava (tuntia) ennen"
-          "telephone" "Puhelin"}
-
-
-
  :service-search
  {:label "Liikkumispalvelukatalogi"
   :filters-label "Hakuehdot"
@@ -1338,7 +1124,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :other-involved-companies "Muut palvelun tuottamiseen osallistuvat yritykset"
   :other-company " muuta yritystä"
   :show-all-information "Näytä kaikki tiedot"
-  :back-link "Takaisin liikkumispalvelukatalogiin"
+  :back-link "Siirry liikkumispalvelukatalogiin"
   :service-information "Palvelun tiedot"
   :service-api&format "Palvelun rajapinnat ja formaatit"
   :description "Kuvaus"
@@ -1365,6 +1151,39 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :check-email-for-link "Salasanan vaihtopyyntösi on vastaanotettu. Olemme nyt lähettäneet salasanan vaihtamiseen tarvittavan linkin sähköpostiisi."
   :logged-out "Olet kirjautunut ulos."}
+
+
+ :service-viewer
+ {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :operator-info "Palveluntuottajan tiedot"
+  :transport-service-info "Liikkumispalvelun tiedot"
+  :not-disclosed "Ei ilmoitettu"
+  :brokerage {true "Kyllä"
+              false "Ei"}
+  :yes "Kyllä"
+  :no "Ei"
+  :service-area "Toiminta-alue"
+  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
+  :luggage-warnings "Matkatavaroita koskevat varoitukset"
+  :advance-reservation "Ennakkovaraus"
+  :reservation-service "Varauspalvelu"
+  :real-time-info "Reaaliaikapalvelu"
+  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
+  :accessibility-website "Esteettömyystietojen nettisivu"
+  :guaranteed-accessibility "Taattu saatavuus"
+  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
+  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
+  :limited-accessibility "Rajoitettu saatavuus"
+  :price-information "Hintatiedot"
+  :service-hours "Palveluajat"
+  :primary-areas "Pääasialliset toiminta-alueet"
+  :other-accessibility-info "Muut esteettömyystiedot"
+  :secondary-areas "Toissijaiset toiminta-alueet"
+  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
+  :price/unit "Hinta/yksikkö"
+  :pricing-basis "Hinnoitteluperuste"
+  :day-of-week "Viikonpäivä"
+  :exception "Poikkeus"}
 
  :register
  {:label "Rekisteröi uusi käyttäjätili"

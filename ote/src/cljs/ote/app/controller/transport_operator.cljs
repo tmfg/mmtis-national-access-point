@@ -521,5 +521,4 @@
 (defmethod routes/on-navigate-event :transport-operator [{id :params}]
   (if (some? (:id id))
     (->EditTransportOperator (:id id))
-    (->VerifyCreateState)
-    ))
+    (->VerifyCreateState)))
