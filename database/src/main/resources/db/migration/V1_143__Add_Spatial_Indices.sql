@@ -64,8 +64,8 @@ CREATE TABLE "spatial-relations-places" (
  "search-area" VARCHAR(64),
  "place-id" VARCHAR(64),
  "operation-area-search-term" VARCHAR(64),
- "search-area-size" double,
- "matching-area-size" double,
+ "search-area-size" float,
+ "matching-area-size" float,
  "mirrored" boolean default false
 );
 
@@ -135,7 +135,7 @@ SELECT
 -- Prefill search table for custom areas
 CREATE TABLE "spatial-relations-custom-areas" (
  "search-area" VARCHAR(64),
- "operation-area-id" integer
+ "operation-area-id" integer REFERENCES "operation_area" (id) ON DELETE CASCADE,
  "search-area-size" float,
  "matching-area-size" float
 );
