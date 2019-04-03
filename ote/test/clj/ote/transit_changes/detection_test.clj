@@ -671,8 +671,7 @@
               :starting-week {:beginning-of-week (test-utilities/to-local-date 2019 5 20) :end-of-week (test-utilities/to-local-date 2019 5 26)}}
              (-> result
                  second
-                 (select-keys test-utilities/select-keys-detect-changes-for-all-routes)
-                 )))
+                 (select-keys test-utilities/select-keys-detect-changes-for-all-routes))))
       (is (= 2 (count result))))))
 
 (def data-change-nil-and-ending-route
