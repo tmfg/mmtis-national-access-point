@@ -773,9 +773,9 @@
          {:gtfs/change-type :removed
           ;; For a removed route, the change-date is the day after traffic stops
           ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-          :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate removed-date))) (java.time.LocalDate/now))
+          :gtfs/change-date (if (.isBefore removed-date (java.time.LocalDate/now))
                               nil
-                              (sql-date (.toLocalDate removed-date)))
+                              (sql-date removed-date))
 
           :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
           :gtfs/current-week-date (:max-date route)}
@@ -1000,8 +1000,6 @@
         {...}]
   "
   [date traffic-threshold-d all-routes all-changes]
-  ;(println "***************** ")
-  ;(clojure.pprint/pprint all-changes)
   (let [route-max-date (fn [route-hash-id all-routes]
                          (:max-date (some
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))
@@ -1026,26 +1024,18 @@
                                                                                         :no-traffic-end-date])))
                                     [] ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
                                     route-chg-group))
-        res (first (map
-                     (fn [[route-key route-chg-group]]
-                       (let [last-change (last route-chg-group)
-                             max-date (route-max-date (:route-key last-change) all-routes) ;;TODO: mitä jos maxdate on nil?
-                             end-change (create-end-change last-change traffic-threshold-d max-date date)]
-
-                         (when end-change (println "route ends: \n" end-change)) ;; TODO: remove me
-
-                         (if end-change
-                           (conj (remove-ongoing-or-break route-chg-group) end-change)
-                           route-chg-group)))
-                     (group-by :route-key all-changes)))
-        res2 (or res [])]
-    ;(println "*** add-ending-route-change all-changes=")
-    ;(clojure.pprint/pprint all-changes)
-    ;(println "*** add-ending-route-change res2=")
-    ;(clojure.pprint/pprint res2)
-    (spec/assert ::detected-route-changes-for-services-coll all-changes)
-    (spec/assert ::detected-route-changes-for-services-coll res2)
-    res2))
+        chg (doall (vec (mapcat
+                          (fn [[route-key route-chg-group]]
+                            (let [last-change (last route-chg-group)
+                                  max-date (route-max-date (:route-key last-change) all-routes) ;;TODO: mitä jos maxdate on nil?
+                                  end-change (create-end-change last-change traffic-threshold-d max-date date)]
+                              (if end-change
+                                (conj (remove-ongoing-or-break route-chg-group) end-change)
+                                route-chg-group)))
+                          (group-by :route-key all-changes))))
+        res (or chg [])]
+    (spec/assert ::detected-route-changes-for-services-coll res)
+    res))
 
 (def route-end-detection-threshold 90)
 
