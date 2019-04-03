@@ -127,19 +127,31 @@ SELECT eid."transport-service-id" as id
                  AND ts.published IS NOT NULL)
 
 -- name: service-ids-by-operation-areas
--- Find services by operation area names. Simplifies and shrinks geometries to make querying more efficient. Shrinking is necessary to correct in the cases
--- where simplifying neighbouring operation areas creates new overlaps between the areas.
+-- Find services by operation area names using two search tables. Notice the UNION of two selects.
 SELECT oa."transport-service-id" as id
-  FROM "operation_area" oa,
-      (SELECT ST_MakeValid(ST_Union(ST_Accum(pl.location))) as "location"
-         FROM places pl
-        WHERE pl.namefin IN (:operation-area)) as "sa",
+  FROM "places" pl1,
+       "operation-area-facet" oa,
+       "spatial-relations-places" sr,
        "transport-service" ts
- WHERE ts.published IS NOT NULL
-   AND oa."primary?" = true
-   AND ts.id = oa."transport-service-id"
-   AND ST_Intersects(sa.location, oa."simplified-location")
-   AND NOT ST_Touches(sa.location, oa."simplified-location");
+ WHERE pl1.namefin in (:operation-area)
+   AND pl1.id = sr."search-area"
+   AND sr."operation-area-search-term" = oa."operation-area"
+   AND oa."transport-service-id" = ts.id
+   AND ts.published IS NOT NULL
+
+   UNION
+
+SELECT oa."transport-service-id" as id
+  FROM "places" pl,
+       "spatial-relations-custom-areas" sr,
+       "operation_area" oa,
+       "transport-service" ts
+ WHERE pl.namefin in (:operation-area)
+   AND pl.id = sr."search-area"
+   AND sr."operation-area-id" = oa.id
+   AND oa."transport-service-id" = ts.id
+   AND ts.published IS NOT NULL;
+
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one

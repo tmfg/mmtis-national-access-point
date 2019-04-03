@@ -7,13 +7,11 @@ SELECT ST_AsGeoJSON(location)
 
 -- name: link-transport-service-place!
 -- Copies operation area from places table.
--- Fills "simplified-location" column with information for spatial search
 INSERT INTO operation_area
-       ("transport-service-id", "description", "location", "simplified-location", "primary?")
+       ("transport-service-id", "description", "location", "primary?")
 VALUES (:transport-service-id,
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
         (select "location" from places where id = :place-id),
-        (SELECT ote_simplify(location) from places where id = :place-id),
         :primary?);
 
 -- name: fetch-operation-area-geojson
@@ -21,15 +19,32 @@ SELECT id, "transport-service-id", ST_AsGeoJSON(location)
   FROM "operation_area"
  WHERE "transport-service-id" = :transport-service-id
 
--- name: insert-geojson-for-transport-service!
+-- name: insert-geojson-for-transport-service<!
+-- return-keys: ["id"]
 -- Insert an operation area with GeoJSON data. Sets SRID to 4326, the only projection supported by geojson since 2016.
--- Fills "simplified-location" column with information for spatial search
-INSERT INTO operation_area ("transport-service-id", "location", "description", "primary?", "simplified-location")
+INSERT INTO operation_area ("transport-service-id", "location", "description", "primary?")
 VALUES (:transport-service-id,
         ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326),
         ARRAY[ROW('FI',:name)::localized_text]::localized_text[],
-        :primary?,
-        ote_simplify(ST_GeomFromGeoJSON(:geojson)));
+        :primary?);
+
+-- name: insert-spatial-search-custom-area!
+-- Inserts the custom area to a search table which is used in spatial search.
+INSERT INTO "spatial-relations-custom-areas" ("search-area", "operation-area-id", "search-area-size", "matching-area-size")
+SELECT
+    pl.id,
+    oa.id,
+    ST_Area(pl.location),
+    CASE
+     WHEN ST_GeometryType(oa.location) in ('ST_Point', 'ST_Linestring')
+          THEN ST_Area(pl.location)
+          ELSE ST_Area(ST_Intersection(ST_MakeValid(oa.location), ST_MakeValid(pl.location)))
+    END
+FROM operation_area oa,
+     places pl
+WHERE oa.id = :operation-area-id
+  AND oa.location && pl.location
+  AND ST_Relate(ST_MakeValid(oa.location), pl.location, 'T********');
 
 -- name: fetch-operation-area-search
 -- sort operation area places search in following alphabetical order

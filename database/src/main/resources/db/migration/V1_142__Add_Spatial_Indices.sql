@@ -22,20 +22,6 @@ CREATE VIEW operation_area_geojson AS
  SELECT oa.*, ST_AsGeoJSON(oa.location) AS "location-geojson"
    FROM operation_area oa;
 
-CREATE OR REPLACE FUNCTION ote_simplify(geometry) RETURNS geometry
-  AS 'SELECT ST_SetSRID(ST_MakeValid($1), 4326);'
-  LANGUAGE SQL
-  IMMUTABLE
-  RETURNS NULL ON NULL INPUT;
-
--- Create simplified version of operation-area.location. 0.01 is the tolerance for the algorithm. Shrink the operation area to make sure
--- new overlaps have not been created.
-ALTER TABLE "operation_area" ADD COLUMN "simplified-location" GEOMETRY;
-UPDATE "operation_area" SET "simplified-location" = ote_simplify(location);
-SELECT UpdateGeometrySRID('operation_area', 'simplified-location', 4326);
-CREATE INDEX "operation-area-simplified-gix" ON "operation_area" USING GIST("simplified-location");
-
-
 --- Recreate view
 CREATE OR REPLACE VIEW places AS
  SELECT CONCAT('finnish-municipality-', natcode) AS id,
@@ -73,28 +59,103 @@ UNION ALL
         location
    FROM continent;
 
--- Table intended to store unique place information
-CREATE TABLE "spatial-search-areas" ();
-
--- Operation areas not in known spatial nomenclature
-CREATE TABLE "custom-operation-areas" (
- "id" INTEGER PRIMARY KEY,
- "transport-service-id" integer,
- "description" localized_text[],
- "location" geometry(Geometry, 4326),
- "primary?" boolean
-);
-
-CREATE INDEX "custom-operation-areas-indx" on "custom-operation-areas" (id);
-
 -- Create a table for spatial search
-CREATE TABLE "spatial-intersections" (
+CREATE TABLE "spatial-relations-places" (
+ "search-area" VARCHAR(64),
  "place-id" VARCHAR(64),
- "operation-area-id" INTEGER
+ "operation-area-search-term" VARCHAR(64),
+ "search-area-size" double,
+ "matching-area-size" double,
+ "mirrored" boolean default false
 );
 
-CREATE INDEX "spatial-intersections-indx" on "spatial-intersections" ("place-id");
+CREATE INDEX "spatial-relations-search-indx" on "spatial-relations-places" ("search-area");
 
--- Migrate existing operation areas to the table
-INSERT INTO "spatial-intersections" ("place-id", "operation-area-id")
-SELECT pl.id, oa.id FROM places pl JOIN operation_area oa ON ST_Intersects(ST_MakeValid(pl.location), ST_MakeValid(oa.location)) AND NOT ST_Touches(ST_MakeValid(pl.location), ST_MakeValid(oa.location)); 
+
+-- Migrate existing operation areas to the table.
+-- don't check matching types, because we don't want to link postal codes to postal codes, counties to counties etc
+INSERT INTO "spatial-relations-places" ("search-area", "place-id", "operation-area-search-term", "search-area-size", "matching-area-size")
+SELECT
+    pl1.id,
+    pl2.id,
+    lower(pl2.namefin),
+    ST_Area(pl1.location),
+    ST_Area(ST_Intersection(pl1.location, pl2.location))
+FROM places pl1,
+     places pl2
+WHERE (ST_Intersects(pl1.location, pl2.location)
+ -- Match postal code areas to municipalities and regions
+ AND (pl1.type = 'finnish-postal'
+     AND pl2.type in ('finnish-municipality', 'finnish-region')
+ -- Match municipalities to regions
+ OR (pl1.type = 'finnish-municipality'
+     AND pl2.type = 'finnish-region'))
+ -- Match countries to continents
+ OR (pl1.type = 'country' AND pl2.type = 'continent'))
+ -- We know finnish areas are inside Finland
+ OR (pl1.type in ('finnish-postal', 'finnish-municipality', 'finnish-region')
+     AND pl2.namefin = 'Suomi')
+ -- And that they are inside Europe
+ OR (pl1.type in ('finnish-postal', 'finnish-municipality', 'finnish-region')
+     AND pl2.namefin = 'Eurooppa');
+
+-- Clean matches that are deemed not valid. If matching area is significantly smaller than the search area, consider the match invalid
+-- However, we know matches to Europe and Finland must be correct nevermind their calculated match quality. For instance, the geometry for Europe does not cover all of the
+-- islands in southwestern archipelago. Yet we know the islands _are_ in Europe.
+DELETE FROM "spatial-relations-places"
+       WHERE ("matching-area-size" / "search-area-size") < 0.1
+       AND "place-id" NOT IN ('continent-EU', 'country-FI');
+
+-- Mirror data in spatial-relations-places so searches can be done from bigger areas to smaller areas
+INSERT INTO "spatial-relations-places" ("search-area", "place-id", "operation-area-search-term", "search-area-size", "matching-area-size", "mirrored")
+SELECT
+    pl2.id,
+    pl1.id,
+    lower(pl1.namefin),
+    ST_Area(pl2.location),
+    ST_Area(ST_Intersection(pl1.location, pl2.location)),
+    true
+  FROM "spatial-relations-places" sr,
+       "places" pl1,
+       "places" pl2
+ WHERE sr."search-area" = pl1.id
+   AND sr."place-id" = pl2.id
+   AND sr.mirrored = false;
+
+-- Match all search terms to themselves so we don't need to join backwards
+INSERT INTO "spatial-relations-places" ("search-area", "place-id", "operation-area-search-term", "search-area-size", "matching-area-size")
+SELECT
+    pl1.id,
+    pl1.id,
+    lower(pl1.namefin),
+    ST_Area(pl1.location),
+    ST_Area(pl1.location)
+  FROM "places" pl1;
+
+-- Prefill search table for custom areas
+CREATE TABLE "spatial-relations-custom-areas" (
+ "search-area" VARCHAR(64),
+ "operation-area-id" integer
+ "search-area-size" float,
+ "matching-area-size" float
+);
+
+CREATE INDEX "places-to-custom-operation-area-indx" on "spatial-relations-custom-areas" ("search-area");
+
+INSERT INTO "spatial-relations-custom-areas" ("search-area", "operation-area-id", "search-area-size", "matching-area-size")
+SELECT
+    pl.id,
+    oa.id,
+    ST_Area(pl.location),
+    -- Consider geometry types without surface area to fill the whole search area so they won't be discarded as invalid matches. Otherwise measure the area of the intersection.
+    -- Perhaps it should be the area of the smallest search area instead? Or some fixed size?
+    CASE
+     WHEN ST_GeometryType(oa.location) in ('ST_Point', 'ST_Linestring')
+          THEN ST_Area(pl.location)
+          ELSE ST_Area(ST_Intersection(ST_MakeValid(oa.location), ST_MakeValid(pl.location)))
+    END
+FROM operation_area oa
+ JOIN places pl ON pl.location && oa.location -- help ST_Relate by using spatial index in oa.location
+               AND ST_Relate(ST_MakeValid(oa.location), ST_MakeValid(pl.location), 'T********')
+-- No identifier in operation_area to tell us which are custom areas
+WHERE oa.id NOT IN (SELECT oa.id FROM operation_area oa JOIN places pl ON ST_Equals(oa.location, pl.location));
