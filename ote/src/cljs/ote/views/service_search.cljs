@@ -184,7 +184,8 @@
           [delete-service-action e! id name (get service :show-delete-modal?)]])
        [:a (merge (stylefy/use-style (merge button-styles/primary-button
                                        {:padding "1rem"}))
-                  {:href (str "/#/service/" transport-operator-id "/" id)})
+                  {:id "all-info-link"
+                   :href (str "/#/service/" transport-operator-id "/" id)})
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
      [:div (stylefy/use-sub-style style/result-card :body)
