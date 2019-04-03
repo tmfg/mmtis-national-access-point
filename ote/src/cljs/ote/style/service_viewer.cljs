@@ -46,3 +46,7 @@
                                ::stylefy/media {{:max-width (str width-xs "px")}
                                                 {:margin-right 0}}}
                          :right {:flex 1}}})
+
+(def service-header
+  {::stylefy/media {{:max-width (str width-sm "px")}
+                    {:margin-top "2rem"}}})
