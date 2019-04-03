@@ -593,11 +593,13 @@
                   combined-trips)
         ;; When dealing with new routes there aren't traffic at date1-trips because traffic is starting
         ;; So calculate only new trips, no other changes or stops
-        added-trip-count (when (and (nil? combined-trips) (pos-int? (count date2-trips)))
-                      (count date2-trips))
+        added-trip-count (if (and (nil? combined-trips) (pos-int? (count date2-trips)))
+                      (count date2-trips)
+                      0)
         ;; When traffic is ending there isn't traffic at date2-trips vector. So calculate only ending trips.
-        removed-trip-count (when (and (nil? combined-trips) (pos-int? (count date1-trips)))
-                           (count date1-trips))]
+        removed-trip-count (if (and (nil? combined-trips) (pos-int? (count date1-trips)))
+                           (count date1-trips)
+                           0)]
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
      :added-trips (if combined-trips (count added) added-trip-count)
@@ -719,9 +721,9 @@
   (spec/assert ::detected-route-changes-for-services-coll route-changes-all)
   (let [route-map (map second all-routes)
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
-        added? (min-date-in-the-future? route)
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
-        last-route-change? (= route-change (last route-changes-for-key))
+        first-route-change? (= route-change (first route-changes-for-key))
+        added? (and first-route-change? (min-date-in-the-future? route)) ;; Overwrite only first change type to "added" for a new route. Otherwise also changes after route start would be marked as "added".
         ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
         ;removed? (and last-route-change? (max-date-within-evaluation-window? route))
         removed-date (:route-end-date route-change)
@@ -1059,14 +1061,15 @@
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
-                           ;; Create week hashes so we can find out the differences between weeks
-                           (combine-weeks)
-                           (changes-by-week->changes-by-route)
-                           (detect-changes-for-all-routes)
-                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           ; Create week hashes so we can find out the differences between weeks
+                           ;(combine-weeks)
+                           ;(changes-by-week->changes-by-route)
+                           ;(detect-changes-for-all-routes)
+                           ;(add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
                            ;; Fetch detailed day details
-                           (route-day-changes-new db service-id))]
-         (spec/assert ::detected-route-changes-for-services-coll new-data)
+                           ;(route-day-changes-new db service-id)
+                           )]
+         ;(spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
       (catch Exception e
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
