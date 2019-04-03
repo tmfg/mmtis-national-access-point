@@ -666,11 +666,6 @@
   (and date
        (.isBefore date (java.time.LocalDate/now))))
 
-(defn- max-date-within-evaluation-window? [{max-date :max-date}]
-  (and max-date
-       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 180))
-       (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
-
 (defn- min-date-in-the-future? [{min-date :min-date}]
   (and min-date
        (.isAfter (.toLocalDate min-date) (java.time.LocalDate/now))))
