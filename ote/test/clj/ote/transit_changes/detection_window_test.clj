@@ -2,14 +2,7 @@
   "Detection window is time range for detecting changes from routes. With these tests we ensure that it works properly."
   (:require [ote.transit-changes.detection :as detection]
             [clojure.test :as t :refer [deftest testing is]]
-            [clojure.spec.test.alpha :as spec-test]
-            [ote.transit-changes :as transit-changes]
-            [ote.transit-changes.detection-test-utilities :as tu]
-            [ote.time :as time]))
-
-(defn generate-basic-data-week [number-of-weeks]
-  (let [basic-week {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}]
-    (vec (repeat number-of-weeks basic-week))))
+            [ote.transit-changes.detection-test-utilities :as tu]))
 
 (def data-change-at-week-25
   (tu/weeks (tu/to-local-date 2019 1 7)
