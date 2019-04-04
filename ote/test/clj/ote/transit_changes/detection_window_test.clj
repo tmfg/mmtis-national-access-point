@@ -13,7 +13,7 @@
 
 (def data-change-at-week-25
   (tu/weeks (tu/to-local-date 2019 1 7)
-            (concat (generate-basic-data-week 23)
+            (concat (tu/generate-traffic-week 23)
                     [{tu/route-name ["!!" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 17 - vk25 !! change
                      {tu/route-name ["!!" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 24 - vk26
                      {tu/route-name ["!!" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 07 01 - vk27
@@ -21,7 +21,7 @@
 
 (def data-change-at-week-33
   (tu/weeks (tu/to-local-date 2019 1 7)
-            (concat (generate-basic-data-week 32)
+            (concat (tu/generate-traffic-week 32)
                     [{tu/route-name [nil "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 07 08 - vk33 !! change
                      {tu/route-name [nil "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 07 08 - vk34
                      {tu/route-name [nil "h2" "h3" "h4" "h5" "h6" "h7"]}])))
