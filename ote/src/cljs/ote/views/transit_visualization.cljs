@@ -455,6 +455,7 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
+      ^{:key (str "trip-table" (rand-int 9999999))}
       [:div.trips-table {:style {:margin-top "1em"}}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
@@ -635,28 +636,45 @@
                                          :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
-  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
-            :open? (get open-sections :route-map true)}
-   "Kartta"
-   [:div
-    [:span
-     "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."]
-    [:div (stylefy/use-style style/map-checkbox-container)
+  (let [date-differences (:differences compare)]
+    [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
+                           :open? (get open-sections :route-map true)}
+     "Kartta"
+     [:div
+      [:span
+       "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."]
+      [:div (stylefy/use-style style/map-checkbox-container)
 
-     [:div {:style {:flex 1}}
-      [ui/checkbox {:label "Näytä pysäkit"
-                    :checked (boolean (:show-stops? compare))
-                    :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
-     [:div {:style {:flex 4}}
-      (when (pos-int? (count (:show-route-lines compare)))
-        ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
-        (doall
-          (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
-            ^{:key (str "selected-route-map-section-" routename)}
-            [ui/checkbox {:label (first (str/split routename #"\|\|"))
-                          :checked show?
-                          :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
-   [selected-route-map e! date->hash hash->color compare]]])
+       [:div {:style {:flex 1}}
+        [ui/checkbox {:label "Näytä pysäkit"
+                      :checked (boolean (:show-stops? compare))
+                      :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
+       [:div {:style {:flex 4}}
+        (when (pos-int? (count (:show-route-lines compare)))
+          ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
+          (doall
+            (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
+              ^{:key (str "selected-route-map-section-" routename)}
+              [ui/checkbox {:label (first (str/split routename #"\|\|"))
+                            :checked show?
+                            :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]]
+
+     [:div
+      (when (seq date-differences)
+        [:div {:style {:padding-top "0.5rem"}}
+         [:div {:style {:display "inline-block"}}
+          [:div {:style {:display "inline-block"
+                         :padding-right "2em"}}
+           [:div (stylefy/use-style style/map-different-date1)]
+           (time/format-date (:date1 compare))]
+          [:div {:style {:display "inline-block"}}
+           [:div (stylefy/use-style style/map-different-date2)]
+           (time/format-date (:date2 compare))]]
+
+         [tv-change-icons/change-icons date-differences true]])
+
+      [:div
+       [selected-route-map e! date->hash hash->color compare]]]]))
 
 (defn gtfs-package-info [e! open-sections packages]
   (let [grouped-packages (group-by :interface-url packages)
