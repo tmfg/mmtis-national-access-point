@@ -17,16 +17,23 @@
             [ote.time :as time]
             [clj-time.core :as t]
             [ote.tasks.gtfs :as gtfs-tasks])
-  (:import (java.nio.file Files)))
+  (:import (java.nio.file Files)
+           (java.net URLConnection)))
 
 (def allowed-mime-types #{"application/pdf" "image/jpeg" "image/png"})
 
 (defn- generate-file-key [id filename]
   (str id "_" filename))
 
-(defn validate-file [{:keys [tempfile]}]
+(defn validate-file [{:keys [tempfile filename]}]
   (let [path (.toPath tempfile)
-        content-mime (Files/probeContentType path)]
+        content-mime (Files/probeContentType path)
+        ;; In Mac os x mime types are not handled very well in java 1.8. So we use this as a backup.
+        mime-from-name (URLConnection/guessContentTypeFromName filename)
+        content-mime (if (nil? content-mime)
+                       mime-from-name
+                       content-mime)]
+
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
 
