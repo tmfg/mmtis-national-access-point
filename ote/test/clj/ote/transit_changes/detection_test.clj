@@ -663,8 +663,7 @@
               :starting-week {:beginning-of-week (test-utilities/to-local-date 2019 5 20) :end-of-week (test-utilities/to-local-date 2019 5 26)}}
              (-> result
                  first
-                 (select-keys test-utilities/select-keys-detect-changes-for-all-routes)
-                 )))
+                 (select-keys test-utilities/select-keys-detect-changes-for-all-routes))))
 
       (is (= {:route-end-date (test-utilities/to-local-date 2019 7 15)
               :route-key test-utilities/route-name
