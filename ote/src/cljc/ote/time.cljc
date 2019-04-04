@@ -144,6 +144,12 @@
         ::minutes (.getMinuteOfHour this)
         ::seconds (.getSecondOfMinute this)})
 
+     org.joda.time.LocalDate
+     (date-fields [this]
+       {::date (.getDayOfMonth this)
+        ::month (.getMonthOfYear this)
+        ::year (.getYear this)})
+
      java.sql.Date
      (date-fields [this]
        (date-fields (.toLocalDate this)))))
@@ -411,6 +417,11 @@
   [native-date]
   (date-fields->date-time (date-fields native-date)))
 
+(defn native->date
+  "Converts different formats into DateFields and converts result into localdate or goog.date"
+  [native-date]
+  (date-fields->date (date-fields native-date)))
+
 (defn date-fields->native
   "Convert date fields ma pto native Date object"
   [{::keys [year month date hours minutes seconds]}]
@@ -427,6 +438,7 @@
   (if (t/before? date1 date2)
     (t/in-days (t/interval date1 date2))
     (- (t/in-days (t/interval date2 date1)))))
+
 
 (defn date-string->date-time [date-string]
   (let [df (date-fields-only (parse-date-iso-8601 date-string))

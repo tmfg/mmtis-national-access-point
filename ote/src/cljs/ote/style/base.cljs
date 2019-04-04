@@ -2,7 +2,8 @@
   "Base styles for OTE application. Everything that affects the overall look and feel of the app."
   (:require
     [stylefy.core :as stylefy :refer [use-style use-sub-style]]
-    [ote.theme.colors :as colors]))
+    [ote.theme.colors :as colors]
+    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xs]]))
 
 (def body {:margin 0
            :padding 0})
@@ -34,14 +35,19 @@
 
 (def blue-link-with-icon {:color colors/primary
                           :text-decoration "none"
-                          :margin-bottom "1px"
                           :border "none"
                           :background "none"
                           :cursor "pointer"
                           :padding "0"
                           :display "inline-flex"
                           ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/primary)
-                                                  :margin-bottom "-1px"}}})
+                                                  :margin-bottom "-1px"
+                                                  :color colors/primary-dark}}})
+
+(def base-link {:color colors/primary
+                :text-decoration "none"
+                ::stylefy/mode {:hover {:text-decoration "underline"
+                                        :color colors/primary-dark}}})
 
 (def base-button
   {:padding-left "1.1em"
@@ -207,7 +213,7 @@
    :align-items "center"})
 
 (def icon-labeled-icon
-  {:margin-right "0.25rem"})
+  {:margin-right "0.125rem"})
 
 (def msg-container (merge (flex-container "row")
                           (align-items "center")))
@@ -230,3 +236,44 @@
   {:padding-left "0.5rem"
    :padding-right "0"
    :overflow-wrap "break-word"})
+
+(def info-row {:border-bottom (str "1px solid " colors/gray350)
+               :display "flex"
+               :margin-bottom "0.5rem"
+               :font-size "0.875rem"})
+(def info-title {:flex 3
+                 :color colors/gray800
+                 :overflow-wrap "break-word"
+                 :padding-right "0.5rem"})
+
+(def info-content {:flex 5
+                   :display "flex"
+                   :justify-content "space-between"})
+
+(def info-title-25 {:flex-basis "25%"
+                    :color colors/gray800
+                    :overflow-wrap "break-word"
+                    :padding-right "0.5rem"
+                    ::stylefy/media {{:max-width (str width-xs "px")}
+                                     {:flex-basis "50%"}}})
+
+(def info-content-50 {:flex-basis "50%"
+                      :display "flex"
+                      :justify-content "space-between"})
+
+(def info-title-50 {:flex-basis "50%"
+                    :color colors/gray800
+                    :overflow-wrap "break-word"
+                    :padding-right "0.5rem"})
+
+(def info-content-75 {:flex-basis "75%"
+                      :display "flex"
+                      :justify-content "space-between"
+                      ::stylefy/media {{:max-width (str width-xs "px")}
+                                       {:flex-basis "50%"}}})
+
+
+
+(def capital-bold
+  {:text-transform "uppercase"
+   :font-weight "bold"})

@@ -34,7 +34,8 @@
     ["/edit-service/:id" :edit-service]
     ["/services" :services]
     ["/services/:operator" :services]
-    ["/service/:transport-operator-id/:transport-service-id" :service]
+    ["/service-old/:transport-operator-id/:transport-service-id" :service]
+    ["/service/:transport-operator-id/:transport-service-id" :service-view]
 
     ["/email-settings" :email-settings]
 
@@ -90,7 +91,7 @@
        (nil? (get-in app [:user :username]))
        (contains? auth-required (:page app))))
 
-(defn- send-startup-events [event]
+(defn send-startup-events [event]
   (let [e! (fn e! [event]
              (binding [tuck/*current-send-function* e!]
                (swap! state/app (flip tuck/process-event) event)))]
@@ -104,7 +105,7 @@
 
 (declare navigate!)
 
-(defn- on-navigate [go-to-url-event route-name params query]
+(defn on-navigate [go-to-url-event route-name params query]
   (swap! state/app
          (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
            (if (and before-unload-message (not navigation-prompt-open?))

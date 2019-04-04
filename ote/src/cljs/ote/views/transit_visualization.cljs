@@ -2,7 +2,6 @@
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
@@ -23,7 +22,10 @@
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
             [ote.ui.common :as common]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.views.transit-visualization.calendar :as tv-calendar]
+            [ote.views.transit-visualization.change-utilities :as tv-utilities]
+            [ote.views.transit-visualization.change-icons :as tv-change-icons]))
 
 (set! *warn-on-infer* true)
 
@@ -54,40 +56,9 @@
                                 inset 0 0 0 3px transparent,
                                 inset 0 0 0 100px rgba(0,0,0,.25)"}))))))
 
-(defn day-style [hash->color date->hash date1 date2 day]
-  (let [prev-week-date (time/format-date-iso-8601 (time/days-from day -7))
-        next-week-date (time/format-date-iso-8601 (time/days-from day 7))
-        prev-week-hash (date->hash prev-week-date)
-        next-week-hash (date->hash next-week-date)
-
-        d (time/format-date-iso-8601 day)
-        hash (date->hash d)
-        hash-color (hash->color hash)]
-    (merge
-     {:font-size "0.75rem"
-      :background-color hash-color
-      :color "rgb (0, 255, 255)"
-      :transition "box-shadow 0.25s"
-      :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-     (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
-       {:box-shadow "inset 0 0 0 1px black,
-                     inset 0 0 0 2px transparent"})
-     (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))
-           (style/date1-highlight-style hash-color)
-
-           (= (and (some? date2) (time/format-date-iso-8601 date2)) d)
-           (style/date2-highlight-style hash-color)
-
-           (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
-           (style/date-highlight-style hash-color colors/gray800)))))
-
 (defn hover-day [e! date->hash day]
   (e! (tv/->HighlightHash (date->hash (time/format-date day)) day))
   (e! (tv/->DaysToFirstDiff (time/format-date day) date->hash)))
-
-(defn select-day [e! day loading?]
-  (when-not loading?
-    (e! (tv/->SelectDatesForComparison day))))
 
 (defn day-of-week-short [dt]
   (tr [:enums ::t-service/day :short (case (time/day-of-week dt)
@@ -101,11 +72,12 @@
 
 (defn- initialize-route-features
   "Bind popup content and set marker icon for stop marker features."
-  [offset [w h]]
-  (fn [feature ^js/L.Layer layer]
+  [^Number offset [w h]]
+  (fn [^Object feature ^js/L.Layer layer]
     (let [stop-name (aget feature "properties" "stopname")
           trip-name (aget feature "properties" "trip-name")
-          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))]
+          popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))
+          ^Function my-layer (aget layer "setOffset")]
       (if stop-name
       ;; This features is a stop marker
       (do
@@ -119,7 +91,7 @@
         ;; Add popup
         (.bindPopup layer popup-html))
       ;; This feature has no name, it is the route line, apply pixel offset
-      (.call (aget layer "setOffset") layer offset)))))
+      (.call my-layer layer offset)))))
 
 (defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
@@ -139,16 +111,19 @@
                         layers))
                     % show))
 
+
     (.eachLayer m (fn [layer]
-                    (if-let [icon (aget layer "_icon")]
+                    (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
-                      (set! (.-visibility (aget icon "style"))
-                              (if (and
-                                    (:stops show)
-                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
-                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                                ""
-                                "hidden")))
+                      (do
+                        (let [^CSSStyleDeclaration icon-style (aget icon "style")]
+                          (set! (.-visibility icon-style)
+                                (if (and
+                                      (:stops show)
+                                      (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                      (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                  ""
+                                  "hidden")))))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -159,8 +134,6 @@
     (doseq [[_ layers] @removed-route-layers]
       (doseq [layer layers]
         (.removeLayer m layer)))))
-
-
 
 (defn stop-listing [stops]
   [:table
@@ -244,7 +217,6 @@
        ;; Show trip list
        [date-trips e! compare]])))
 
-
 (defn days-to-diff-info [e! {:keys [days-to-diff]} highlight]
   (let [hovered-date (:day highlight)
         days (:days days-to-diff)
@@ -320,96 +292,6 @@
                               :font-size "12px"
                               :font-weight "bold"}}]]])
 
-(defn route-changes-legend []
-  [:div.transit-changes-legend (stylefy/use-style style/transit-changes-legend-container)
-   [:div
-    [:b "Taulukon ikonien selitteet"]]
-   [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
-    (doall
-      (for [[icon label] [[ote-icons/outline-add-box " Uusia vuoroja"]
-                          [ote-icons/outline-indeterminate-checkbox " Poistuvia vuoroja"]
-                          [ic/action-timeline " Pysäkkimuutoksia per vuoro"]
-                          [ic/action-query-builder " Aikataulumuutoksia per vuoro"]]]
-        ^{:key (str "transit-visualization-route-changes-legend-" label)}
-        [icon-l/icon-labeled style/transit-changes-icon [icon] label]))]])
-
-(defn format-range [lower upper]
-  (if (and (nil? lower) (nil? upper))
-    "0"
-    (if (or (= lower upper)
-            (nil? upper))
-      (str lower)
-      (str lower "\u2014" upper))))
-
-(defn stop-seq-changes-icon [lower upper with-labels?]
-  (let [changes (format-range lower upper)]
-    [icon-l/icon-labeled
-     [ic/action-timeline {:style {:color (when (= "0" changes)
-                                           style/no-change-color)}}]
-     [:span
-      changes
-      (when with-labels? " pysäkkimuutosta")]]))
-
-(defn stop-time-changes-icon [lower upper with-labels?]
-  (let [changes (format-range lower upper)]
-    [icon-l/icon-labeled
-     [ic/action-query-builder {:color (when (= "0" changes)
-                                        style/no-change-color)}]
-     [:span
-      changes
-      (when with-labels? " aikataulumuutosta")]]))
-
-(defn change-icons
-  ([diff]
-   [change-icons diff false])
-  ([{:keys [added-trips removed-trips
-            trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper
-            trip-stop-time-changes-lower trip-stop-time-changes-upper] :as diff}
-    with-labels?]
-   [:div (stylefy/use-style (style-base/flex-container "row"))
-    [:div {:style {:width "20%"}}
-     [icon-l/icon-labeled
-      [ote-icons/outline-add-box {:color (if (= 0 added-trips)
-                                           style/no-change-color
-                                           style/add-color)}]
-      [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
-       (when with-labels? " lisättyä vuoroa")]]]
-    [:div {:style {:width "20%"}}
-     [icon-l/icon-labeled style/transit-changes-legend-icon
-      [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
-                                                  style/no-change-color
-                                                  style/remove-color)}]
-      [:span (or removed-trips (:gtfs/removed-trips diff))
-       (when with-labels? " poistettua vuoroa")]]]
-
-    [:div {:style {:width "30%"}}
-     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
-
-
-    [:div {:style {:width "30%"}}
-     [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]]))
-
-(defn section [{:keys [open? toggle!]} title help-content body-content]
-  [:div.transit-visualization-section (stylefy/use-style (if open?
-                                                           style/section
-                                                           style/section-closed))
-   [:div.transit-visualization-section-title (merge
-                                              (stylefy/use-style style/section-title)
-                                              {:on-click toggle!})
-    [(if open?
-       ic/navigation-expand-less
-       ic/navigation-expand-more) {:color "white"
-                                   :style {:position "relative"
-                                           :top "6px"
-                                           :margin-right "0.5rem"}}]
-    title]
-   (when open?
-     [:span
-      [:div.transit-visualization-section-header (stylefy/use-style style/section-header)
-       help-content]
-      [:div.transit-visualization-section-body (stylefy/use-style style/section-body)
-       body-content]])])
-
 (defn service-is-using-headsign
   "Routes are combained between gtfs packages using route-hash-id. When trips headsign is not used there is no
   reason to show it in route list or route name."
@@ -418,7 +300,38 @@
       (= (:gtfs/route-hash-id-type route-hash-id-type) "short-long-headsign")
       (= (:gtfs/route-hash-id-type route-hash-id-type) "long-headsign")))
 
-(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
+(def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
+                            :trip-stop-sequence-changes-upper :route-hash-id
+                            :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips
+                            :different-week-date})
+
+(defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
+	;; Filter nil values
+	(keep
+		(fn [c]
+			;; Return nil if route-hash-id doesn't match because keep won't work with false values.
+			(when (= (:route-hash-id c) (:route-hash-id single-change))
+				(if (= :removed (:change-type c))
+					;; Remove trip and stop changes from route summary if route has change-type :removed
+					(dissoc c :trip-stop-sequence-changes-lower
+									:trip-stop-time-changes-lower
+									:trip-stop-sequence-changes-upper
+									:trip-stop-time-changes-upper
+									:removed-trips)
+					c)))
+		all-changes))
+
+(defn- route-change-summary
+  "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
+  need to merge-with them together."
+  [single-change all-changes]
+  (let [all-changes (map #(select-keys % selected-change-keys) all-changes)
+        single-change (select-keys single-change selected-change-keys)
+        all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
+        merged-changes (apply merge-with + all-route-changes)]
+    merged-changes))
+
+(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
         table-height (str
@@ -434,7 +347,7 @@
                           (tr [:transit-visualization-page :no-changes-in-routes])
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
-     [route-changes-legend]
+     [tv-utilities/route-changes-legend]
      [table/table {:no-rows-message no-rows-message
                    :height table-height
                    :label-style style-base/table-col-style-wrap
@@ -446,7 +359,7 @@
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= % selected-route)}
 
-      [{:name "Reitti" :width "25%"
+      [{:name "Reitti" :width "20%"
         :read (juxt :route-short-name :route-long-name)
         :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
@@ -454,125 +367,61 @@
 
        ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
-         {:name "Reitti/määränpää" :width "20%"
+         {:name "Reitti/määränpää" :width "23%"
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
+       {:name "Muutoksia (kpl)"
+        :width "10%"
+        :read identity
+        :format (fn [row]
+                  (if (= :no-change (:change-type row))
+                    "0"
+                    (:count row)))}
        {:name "Aikaa 1. muutokseen"
-        :width "12%"
+        :width "15%"
         :read :different-week-date
-        :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
-                    [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
-                    [:div
-                     [:div (stylefy/use-style { ;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
-                                               :white-space "nowrap"})
-                      (str (time/days-until different-week-date) " pv ")]
-                     [:div (stylefy/use-style {:color "gray"
-                                               :overflow-wrap "break-word"})
-                      (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-
-       {:name "Muutos tunnistettu"
-        :width "13%"
-        :read :transit-change-date
-        :col-style style-base/table-col-style-wrap
-        :format #(time/format-timestamp->date-for-ui %)}
-
-       {:name "Muutokset" :width "30%"
+                    [tv-change-icons/labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                    [:span
+                     (str (time/days-until different-week-date) " pv")
+                     [:span (stylefy/use-style {:margin-left "5px"
+                                                :color "gray"})
+                      (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+       {:name "Muutosten yhteenveto" :width "32%"
         :read identity
-        :col-style style-base/table-col-style-wrap
-        :format (fn [{change-type :change-type :as route}]
+        :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
-                    [icon-l/icon-labeled style/transit-changes-icon
+                    [icon-l/icon-labeled
                      [ic/av-not-interested]
                      "Tauko liikennöinnissä"]
 
                     :added
-                    [icon-l/icon-labeled style/transit-changes-icon
+                    [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
                      "Uusi reitti"]
 
                     :removed
-                    [icon-l/icon-labeled style/transit-changes-icon
-                     [ote-icons/outline-indeterminate-checkbox {:color style/remove-color}]
-                     "Päättyvä reitti"]
+                    [icon-l/icon-labeled
+                     [ic/content-remove-circle-outline {:color style/remove-color}]
+                     [:span {:title (str "Reitti päättyy mahdollisesti "
+                                         (time/format-timestamp->date-for-ui different-week-date)
+                                         ". "
+                                         "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
+                      "Mahdollisesti päättyvä reitti"]]
 
                     :no-change
-                    [icon-l/icon-labeled style/transit-changes-icon
+                    [icon-l/icon-labeled
                      [ic/navigation-check]
                      "Ei muutoksia"]
 
                     :changed
-                    [change-icons route]))}]
+                    [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
-
-(defn comparison-dates [{:keys [date1 date2]}]
-  [:div (stylefy/use-style (merge (style-base/flex-container "row")
-                                  {:justify-content "space-between"
-                                   :width "20%"}))
-   [:div [:div {:style (merge {:display "inline-block"
-                               :position "relative"
-                               :top "5px"
-                               :margin-right "0.5em"
-                               :width "20px"
-                               :height "20px"}
-                              (style/date1-highlight-style))}]
-    (time/format-date date1)]
-   [:div [:div {:style (merge {:display "inline-block"
-                               :position "relative"
-                               :top "5px"
-                               :margin-right "0.5em"
-                               :width "20px"
-                               :height "20px"}
-                              (style/date2-highlight-style))}]
-    (time/format-date date2)]])
-
-(defn comparison-date-changes [{diff :differences :as compare}]
-  [:span
-   [comparison-dates compare]
-
-   (when (seq diff)
-     [change-icons diff true])])
-
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections] :as transit-visualization}]
-  (let [current-year (time/year (time/now))]
-    [:div.route-service-calendar
-     [section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
-               :open? (get open-sections :route-service-calendar true)}
-      "Kalenteri"
-      [:span
-       "Valitut päivät on korostettu sinisellä ja lilalla taustavärillä. Oletuksiksi valitut päivämäärät ovat reitin ensimmäinen tunnistettu muutospäivä sekä vastaava viikonpäivä kuluvalta viikolta. Ne kalenteripäivät, joiden pysäkkiketjut ja aikataulut ovat keskenään samanlaiset, on väritetty samalla taustavärillä kokonaisuuden hahmottamiseksi. Taustaväreillä ei ole muita merkityksiä. Kaikki NAP-palvelun havaitsemat päivät, jolloin liikennöinnissä tapahtuu muutoksia suhteessa edellisen viikon vastaavaan viikonpäivään, on merkitty mustilla kehyksillä. Voit myös valita kalenterista itse päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla haluttuja päiviä kalenterista."
-       [:div (stylefy/use-style (merge (style-base/flex-container "row")
-                                       {:margin-top "1rem"
-                                        :margin-bottom "1rem"}))
-        [ui/checkbox {:label "Näytä myös edellinen vuosi"
-                      :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
-      [:div.route-service-calendar-content
-
-
-
-       [service-calendar/service-calendar {:selected-date? (constantly false)
-                                           :on-select #(select-day e! % (:route-differences-loading? transit-visualization))
-                                           :day-style (r/partial day-style hash->color date->hash
-                                                                 (:date1 compare) (:date2 compare))
-                                           :years (vec (concat (when show-previous-year?
-                                                                 [(dec current-year)])
-                                                               [current-year]
-                                                               [(inc current-year)]))
-                                           :hover-style #(let [d (time/format-date-iso-8601 %)
-                                                               hash (date->hash d)
-                                                               hash-color (hash->color hash)]
-                                                           (style/date-highlight-style hash-color
-                                                                                       style/date-highlight-color-hover))}]
-       (when (and (:date1 compare) (:date2 compare))
-         [:div
-          [:h3 "Valittujen päivämäärien väliset muutokset"]
-          [comparison-date-changes compare]])]]]))
 
 (defn format-stop-name [stop-name]
   (let [splitted-stop-name (if (str/includes? stop-name "->")
@@ -595,7 +444,7 @@
 
 (defn route-trips [e! open-sections {:keys [trips date1 date2 date1-trips date2-trips combined-trips
                                             selected-trip-pair]}]
-  [section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
+  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
    "Vuorot"
    "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
    [:div.route-trips
@@ -656,15 +505,15 @@
                       :default
                       [:div (stylefy/use-style style/transit-changes-icon-row-container)
                        [:div (stylefy/use-style {:width "50%"})
-                        [stop-seq-changes-icon stop-seq-changes]]
+                        [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
                        [:div (stylefy/use-style {:width "50%"})
-                        [stop-time-changes-icon stop-time-changes]]]))
+                        [tv-change-icons/stop-time-changes-icon stop-time-changes]]]))
           :col-style {:padding-left "10px" :padding-right "5px"}}]
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
                                                    combined-stop-sequence selected-trip-pair] :as compare}]
-  [section {:open? (get open-sections :trip-stop-sequence true)
+  [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
             :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
@@ -786,7 +635,7 @@
                                          :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
-  [section {:toggle! #(e! (tv/->ToggleSection :route-map))
+  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
             :open? (get open-sections :route-map true)}
    "Kartta"
    [:div
@@ -827,8 +676,10 @@
          {:icon (if open?
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
-          :on-click #(do (.preventDefault %)
-                         (e! (tv/->ToggleSection :gtfs-package-info)))
+          :on-click (fn [^SyntheticMouseEvent event]
+                      (do
+                        (.preventDefault event)
+                        (e! (tv/->ToggleSection :gtfs-package-info))))
           :style style/infobox-more-link}]
         (when open?
           [:div
@@ -837,7 +688,9 @@
               ^{:key (str "gtfs-package-info-" id)}
               [pkg p]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-route-filtered selected-route compare open-sections route-hash-id-type all-route-changes-display? all-route-changes-checkbox]
+(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
+                                        changes-route-filtered selected-route compare open-sections route-hash-id-type
+                                        all-route-changes-display? all-route-changes-checkbox]
                                  :as transit-visualization}]
   (let [routes (if all-route-changes-display?
                  changes-route-no-change
@@ -860,7 +713,7 @@
         [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization)]
 
         ;; Route listing with number of changes
-        "Taulukossa on listattu valitussa palvelussa havaittuja muutoksia. Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin reitti- ja aikataulutiedot näytetään taulukon alapuolella kalenterissa, kartalla, vuorolistalla ja pysäkkiaikataululistalla."
+        (tr [:transit-visualization-page :route-description])
 
         [:div.row {:style {:margin-top "1rem" :display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
          [:div
@@ -873,13 +726,13 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type changes-all]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: " route-name]
 
-         [route-calendar e! transit-visualization]
+         [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
          (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
            [:span
             [selected-route-map-section e! open-sections date->hash hash->color compare]

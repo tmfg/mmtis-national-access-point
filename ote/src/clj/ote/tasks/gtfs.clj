@@ -63,7 +63,6 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-
 ;; To speed up detection, call this with vector of service-ids:
 ;; e.g.: (detect-new-changes-task db (time/now) true [1289])
 (defn detect-new-changes-task
@@ -77,8 +76,8 @@
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
 
-         ;; Continue 15 weeks from the current week
-         end-date (time/days-from start-date (dec (* 7 16)))
+         ;; Continue 30 weeks from the current week -> 31 week
+         end-date (time/days-from start-date (dec (* 7 31)))
 
          ;; Convert to LocalDate instances
          [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
@@ -98,10 +97,10 @@
             (let [query-params {:service-id service-id
                                 :start-date start-date
                                 :end-date end-date}]
-              (detection/store-transit-changes!
+              (detection/update-transit-changes!
                db today service-id
                (detection/service-package-ids-for-date-range db query-params)
-               (detection/detect-route-changes-for-service db query-params)))
+               (detection/detect-route-changes-for-service-new db query-params)))
             (catch Exception e
               (log/warn e "Change detection failed for service " service-id))))))))))
 

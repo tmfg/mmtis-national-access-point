@@ -57,18 +57,17 @@
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
 
                  ;; Frontend UI libraries
-                 [reagent "0.8.0-alpha2"]
-                 [webjure/tuck "20180327"]
+                 [reagent "0.8.0-alpha2" :exclusions [cljs/react cljsjs/react-dom]]
+                 [webjure/tuck "20181204"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljsjs/chartjs "2.7.3-0"]
                  [cljs-react-material-ui "0.2.48"]
                  [cljsjs/material-ui-chip-input "0.17.2-0"]
-                 [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
                  [cljsjs/leaflet "1.2.0-0"]
                  [funcool/bide "1.6.0"] ; URL router
-                 [stylefy "1.11.0-beta1"]
+                 [stylefy "1.12.0"]
                  [cljsjs/leaflet-draw "0.4.12-0"]
                  [cljsjs/nprogress "0.2.0-1"]
                  ;; Note: Sadly, no good clj/cljs library was found. There were good libs only for server-side rendering.
@@ -103,7 +102,8 @@
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
                  ;; override old guava version from deps
-                 [com.google.guava/guava "21.0"]]
+                 [com.google.guava/guava "21.0"]
+                 #_[spec-provider "0.4.14"]]
 
   :profiles {:uberjar {:aot :all
 

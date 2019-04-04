@@ -40,9 +40,11 @@
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Färmedlens tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-vehicle-accessibility "Färmedlens tillgänglighet (via bokning)"
+   :ote.db.transport-service/vehicle-accessibility "Färmedlens tillgänglighet"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/info-service-accessibility "Infotjänsternas tillgänglighet"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "garanteras alltid"
    :ote.db.transport-service/guaranteed-accessibility-description "Beskriving av garanterad tillgänglighet"
@@ -51,6 +53,7 @@
 
    :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
    :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/transportable-aid "Hjälpmedel som kan transporteras"
 
    :ote.db.transport-service/accessibility-info-url "Beskrivning av tillgänglighetstjänsterna (WWW)"
 
@@ -929,7 +932,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :transit-visualization-page
  {:loading-routes "Laddar rutterna för tjänsten."
   :no-changes-in-routes "Ei reittejä, joissa muutoksia."
-  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"}
+  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"
+  :route-description "Taulukkoon on listattu palvelun reitit, joissa on havaittu muutoksia.
+  Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin muutokset näytetään taulukon alapuolella."
+  :calendar-description-1 "Muutoksen vertailupäivät on korostettu lilalla ja sinisellä ympyrällä. Päivät ovat valitun muutoksen tapahtumapäivä (sininen)
+  sekä vastaava viikonpäivä aiemmalta viikolta (lila). Kalenterissa samalla värillä väritetyt päivät kuvaavat samanlaista liikennettä. Taustaväreillä ei ole muita merkityksiä."
+  :calendar-description-2 "Valitse haluamasi muutos tarkasteluun napsauttamalla muutosriviä alla olevasta taulukosta. Voit myös valita kalenterista itse
+  päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla valitut päivät kalenterista."
+  }
 
  :common-texts
  {:check-your-input "Kolla att uppgifterna du skrev in är korrekta."
@@ -945,6 +955,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :finap-status "NAP status"
   :header-nap-official-name "Tjänstekatalog"
   :instructions "Instruktioner"
+  :name "Namn"
+  :description "Beskrivning"
+  :brokerage "Förmedlingstjänst"
+  :published "Publicerat"
+  :available-from "Startdatum"
+  :available-to "Slutdatum"
+  :format "Format"
   :navigation-own-service-list "Egna tjänsteuppgifter"
   :navigation-front-page "Framsida"
   :navigation-organizations "Tjänsteproducenter"
@@ -1070,227 +1087,6 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :result-count ["Hittades " :total-count " tjänsteproducenter"]
   :result-count-all ["Totalt " :total-count " tjänsteproducenter"]}
 
- ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
- ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
- ;; and we must show those as is.
- :viewer {"transport-operator" "Tjänsteproducent"
-          "transport-service" "Mobilitetstjänstens uppgifter"
-          "contact-address" "Adress"
-          "contact-email" "E-post"
-          "homepage" "www-sidor"
-          "post_office" "Postanstalt"
-          "postal_code" "Postnummer"
-          "street" "Gatuadress"
-          "contact-phone" "Telefonnr"
-          "id" "id"
-          "name" "Namn"
-          "business-id" "FO-nummer"
-          "published?" "Publicerat?"
-          "published" "Publicerat"
-          "transport-operator-id" "Tjänsteproducentens id"
-          "type" "Tjänstetyp"
-          "email" "E-post"
-          "phone" "Telefonnr"
-
-          "passenger-transportation" "Tjänstespecifika uppgifter"
-          "parking" "Tjänstespecifika uppgifter"
-          "rentals" "Tjänstespecifika uppgifter"
-          "accessibility-description" "Beskrivning av tillgänglighet"
-          "accessibility-tool" "Redskap"
-          "additional-services" "Tilläggstjänster"
-          "payment-methods" "Betalsätt"
-          "price-classes" "Priskategori"
-          "currency" "Valuta"
-          "price-per-unit" "Enhetspris"
-          "unit" "enhet"
-
-          "lang" "Språk"
-          "text" "Text"
-
-          "description" "Beskrivning"
-          "real-time-information" "Realtidsinfo"
-          "booking-service" "Bokningstjänst"
-          "luggage-restrictions" "Begränsningar gällande resgods"
-
-          "url" "WWW-adress"
-          "csv-url" "Företag som medverkar i tjänsteproduktionen"
-          "service-hours-info" "Tilläggsinfo"
-          "indoor-map" "Inomhuskarta www-sidor"
-          "pick-up-locations" "Verksamhetsställen"
-          "pick-up-locations-url" "Web-adress för verksamhetsställen"
-          "rental-additional-services" "Övriga tjänster"
-          "usage-area" "Tillåtna länder"
-          "vehicle-price-url" "Web-adress med uppgifter om fordon och priser"
-          "vehicle-classes" "Fordon som uthyres"
-
-          "additional-service-links" "Andra tjänster"
-          "charging-points" "Beskriving av laddningspunkterna"
-          "parking-capacities" "Antalet parkeringsplatser"
-
-          "available-from" "Startdatum"
-          "available-to" "Slutdatum"
-
-          "maximum-stay" "Max parkeringstid"
-          "seconds" "Sekunder"
-          "minutes" "Minuter"
-          "hours" "Timmar"
-          "days" "Dagar"
-          "months" "Månader"
-          "years" "År"
-          "transport-type" "Trafikslag"
-          "advance-reservation" "Förhandsbokning"
-          "visiting-address" "Besöksadress"
-
-          :values {"passenger-transportation" "Persontransport"
-                   true "Ja"
-                   false "Nej"
-
-                   "taxi" "Taxitjänst (i vägtrafik)"
-                   "request" "Abbonerad trafik eller annan anropsstyrd trafik"
-                   "schedule" "Regelbunden ruttbaserad trafik"
-                   "terminal" "Stationer, hamnar och övriga terminaler"
-                   "rentals" "Fordonsuthyrning och komersiella samanvändningstjänster"
-                   "parking" "Allmänna kommersiella parkeringstjänster"
-
-                   ;; accessibility tools
-                   "wheelchair" "Rullstol"
-                   "walkingstick" "Gåkäpp"
-                   "audio-navigator" "Audioguide"
-                   "visual-navigator" "Visuella skyltar"
-                   "passenger-cart" "Persontransportvagn"
-                   "pushchair" "pushchair"
-                   "umbrella" "paraply"
-                   "buggy" "Barnvagn"
-                   "other" "Muu"
-                   "boarding-assistance" "Assistans vid ombordstigning"
-                   "low-floor" "Låggolv"
-                   "accessible-vehicle" "Hinderfritt fordon"
-                   "step-free-access" "Ingång utan trappa"
-                   "suitable-for-wheelchairs" "Lämplig för rullstol"
-                   "assistance-dog-space" "Plats för assistanshund"
-                   "crutches" "Kryckor"
-                   "walker" "Rollator"
-                   "walking-stick" "Gåkäpp"
-                   "escalator" "Rulltrappor"
-                   "lift" "Hiss"
-                   "narrow-entrance" "Smal ingång"
-                   "barrier" "Bom"
-                   "travelator" "Rullband"
-                   "ramp" "Ramp"
-                   "stairs" "Trappor"
-                   "tactile-guiding-strips" "Beröringstyrda följlinjer"
-                   "tactile-platform-edges" "Varning vid perrongkanten"
-                   "wheelchair-access-toilet" "Inva WC"
-                   "visual-displays" "Monitorer"
-                   "large-print-timetables" "Tidtabellskyltar med stor text"
-                   "displays-for-visually-impaired" "Taktila skyltar (taktiili)"
-                   "audio-information" "Utrop"
-                   "audio-for-hearing-impaired" "Ljudförstärkning för hörselskadade"
-                   "disability-adapted-vehicle" "Fordon lämpat för rörelsehindrade"
-
-                   ;; additional services
-                   "animal-transport" "Djurtransport tillåten"
-                   "child-seat" "Barnstol"
-
-                   ;; parking types
-                   "unknown" "Okänd"
-                   "car-park" "Bilplatser"
-                   "park-and-ride-park" "Infartsparkering"
-                   "motorcycle-park" "Motorcyklar"
-                   "cycle-park" "Cyklar"
-                   "rental-car-park" "Hyrbilar"
-                   "coach-park" "Bussar"
-                   "disabled-park" "Invaplatser"
-
-                   ;; payment methods
-                   "debit-card" "Bankkort"
-                   "credit-card" "Kreditkort"
-                   "cash" "Kontant"
-                   "contactless-payment" "Kontaktlös kortbetalning"
-                   "mobilepay" "Mobile pay"
-                   "invoice" "Faktura"
-
-                   ;; week days
-                   "MON" "Må"
-                   "TUE" "Ti"
-                   "WED" "On"
-                   "THU" "To"
-                   "FRI" "Fr"
-                   "SAT" "Lö"
-                   "SUN" "Sö"
-
-                   ;; Data content
-                   "route-and-schedule" "Rutt- och tidtabellsinformation"
-                   "luggage-restrictions" "Resgodsbegränsningar"
-                   "realtime-interface" "Realtidsgränssnitt"
-                   "booking-interface" "Bokningsgränssnitt"
-                   "accessibility-services" "Tillgänglighetstjänster"
-                   "other-services" "Övriga tjänster"
-                   "pricing" "Prisinformation"
-                   "service-hours" "Betjäningstider"
-                   "disruptions" "Störningsinformation"
-                   "payment-interface" "Biljett- och försäljningsgränssnit"
-                   "map-and-location" "Kart- och platsdata"
-
-                   ;; rentals
-                   "pick-up" "Avhämtning"
-                   "return" "Returnering"
-                   "pick-up-return" "Avhämtning och returnering"
-
-                   "advance-reservation" "förhandsbokning"
-                   "no" "Inte"
-                   "road" "Vägtrafik"
-                   "rail" "Tågtrafik"
-                   "sea" "Sjötrafik"
-                   "aviation" "Luftfart"
-
-                   "mandatory" "Obligatorisk"
-                   "possible" "Möjlig"}
-
-          ;; External interfaces
-          "external-interfaces" "Externa maskinläsbara gränssnitt"
-          "license" "Licens"
-          "data-content" "Informationsinnehåll"
-          "format" "Format"
-          "external-interface" "Yttre gränssnitt"
-
-          ;; accessibility
-          "accessibility" "Tillgänglihet"
-          "information-service-accessibility" "Information (tillgänglighet)"
-          "brokerage?" "Förmedlingstjänst?"
-          "companies" "Företag som medverkar i tjänsteproduktionen"
-          "accessibility-info-url" "Tillgänglighetsbeskriving (www-adress)"
-          "guaranteed-accessibility-description" "Garanterad tillgänglighet"
-          "guaranteed-info-service-accessibility" "Tillgänglig info (garanterad)"
-          "guaranteed-transportable-aid" "Hjälpmedel som får transporteras (garanterad)"
-          "guaranteed-vehicle-accessibility" "Fordonens tillgänglihet (garanterad)."
-          "limited-accessibility-description" "Beskrivning av tillgänglighetstjänster som inte alltid garanteras, kontakta tjänsteproducenten"
-          "limited-info-service-accessibility" "Infotjänsternas tillgänglighet (begränsad tillgänglighet)"
-          "limited-transportable-aid" "Hjälpmedel som får transporteras (begränsad tillgänglighet)"
-          "limited-vehicle-accessibility" "Fordonens tillgänglihet (begränsad tillgänglighet)"
-
-          "payment-method-description" "Tilläggsinfo om betalsätt"
-          "pricing" "Prissättning"
-          "service-exceptions" "Undantag i verksamhetstider"
-          "service-hours" "Verksamhetstider"
-          "week-days" "Veckodagar"
-          "from" "Från"
-          "to" "Till"
-          "from-date" "Från (datum)"
-          "to-date" "Till (datum)"
-          "sub-type" "Undertyp"
-          "terminal" " "
-
-          ;; Assistance
-          "assistance" "Assistanstjänster"
-          "assistance-place-description" "Plats (Assistanspunkt?)"
-          "assistance-by-reservation-only" "Bokas i förväg"
-          "notification-requirements" "Krav gällande bokningen"
-          "hours-before" "Tjänsten ska bokas (timmar) i förväg"
-          "telephone" "Telefon"}
-
-
-
  :service-search
  {:label "Mobilitetstjänstekatalog"
   :filters-label "Sökvillkor"
@@ -1351,6 +1147,39 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
+
+
+ :service-viewer
+ {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :operator-info "Palveluntuottajan tiedot"
+  :transport-service-info "Mobilitetstjänstens uppgifter"
+  :not-disclosed "Ei ilmoitettu"
+  :brokerage {true "Ja"
+              false "Nej"}
+  :yes "Ja"
+  :no "Nej"
+  :service-area "Toiminta-alue"
+  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
+  :luggage-warnings "Matkatavaroita koskevat varoitukset"
+  :advance-reservation "Ennakkovaraus"
+  :reservation-service "Varauspalvelu"
+  :real-time-info "Reaaliaikapalvelu"
+  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
+  :accessibility-website "Esteettömyystietojen nettisivu"
+  :guaranteed-accessibility "Taattu saatavuus"
+  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
+  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
+  :limited-accessibility "Rajoitettu saatavuus"
+  :price-information "Hintatiedot"
+  :service-hours "Palveluajat"
+  :primary-areas "Pääasialliset toiminta-alueet"
+  :other-accessibility-info "Muut esteettömyystiedot"
+  :secondary-areas "Toissijaiset toiminta-alueet"
+  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
+  :price/unit "Hinta/yksikkö"
+  :pricing-basis "Hinnoitteluperuste"
+  :day-of-week "Dagar"
+  :exception "Betjäningstider"}
 
  :register
  {:label "Skapa ett nytt konto"

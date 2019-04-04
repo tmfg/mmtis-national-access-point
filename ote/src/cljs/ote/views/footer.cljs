@@ -12,7 +12,7 @@
                            ["sv" "svenska"]
                            ["en" "english"]])
 
-(defn- footer [e!]
+(defn footer [e!]
   [:div
    [:footer.site-footer
     [:div.container {:style {:margin-bottom "60px"}}
