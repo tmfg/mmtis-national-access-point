@@ -507,5 +507,8 @@
                   java.util.Date/from)]
     date1)))
 
-
+#?(:clj
+(defn sql-date [local-date]
+  (when local-date
+    (java.sql.Date/valueOf local-date))))
 

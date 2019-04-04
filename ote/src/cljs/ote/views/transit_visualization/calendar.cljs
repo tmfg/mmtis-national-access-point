@@ -127,16 +127,16 @@
                            " "
                            (time/format-timestamp->date-for-ui different-week-date) ")")]])}
          {:name "Muutos tunnistettu"
-          :read :transit-change-date
+          :read :change-detected
           :col-style style-base/table-col-style-wrap
-          :format (fn [transit-change-date]
-                    (time/format-timestamp->date-for-ui transit-change-date))}
+          :format (fn [change-detected]
+                    (time/format-timestamp->date-for-ui change-detected))}
          {:name "Vertailupäivien väliset muutokset" :width "30%"
           :read identity
           :col-style style-base/table-col-style-wrap
           :format (fn [{change-type :change-type :as route}]
                     (case change-type
-                          :no-traffic
+                      :no-traffic
                       [icon-l/icon-labeled style/transit-changes-icon
                        [ic/av-not-interested]
                        "Tauko liikennöinnissä"]
