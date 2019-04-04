@@ -31,7 +31,7 @@ fi
 if [ -f spatial_relations_places.csv ]; then
     echo "Insert Prefilled Spatial Search data"
     $P napote -c "TRUNCATE \"spatial-relations-places\";" || true
-    $P napote -c "\COPY \"spatial-relations-places\" FROM /static-data/spatial_relations_places.csv CSV HEADER;" || true
+    $P napote -c "\COPY \"spatial-relations-places\" FROM spatial_relations_places.csv CSV HEADER;" || true
 fi
 
 
