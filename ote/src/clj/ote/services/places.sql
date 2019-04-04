@@ -30,6 +30,7 @@ VALUES (:transport-service-id,
 
 -- name: insert-spatial-search-custom-area!
 -- Inserts the custom area to a search table which is used in spatial search.
+-- For geometries without surface area, use a carefully selected constant value
 INSERT INTO "spatial-relations-custom-areas" ("search-area", "operation-area-id", "search-area-size", "matching-area-size")
 SELECT
     pl.id,
@@ -37,7 +38,7 @@ SELECT
     ST_Area(pl.location),
     CASE
      WHEN ST_GeometryType(oa.location) in ('ST_Point', 'ST_Linestring')
-          THEN ST_Area(pl.location)
+          THEN 3e-4
           ELSE ST_Area(ST_Intersection(ST_MakeValid(oa.location), ST_MakeValid(pl.location)))
     END
 FROM operation_area oa,

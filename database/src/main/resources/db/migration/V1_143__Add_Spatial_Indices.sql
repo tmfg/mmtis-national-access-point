@@ -147,11 +147,10 @@ SELECT
     pl.id,
     oa.id,
     ST_Area(pl.location),
-    -- Consider geometry types without surface area to fill the whole search area so they won't be discarded as invalid matches. Otherwise measure the area of the intersection.
-    -- Perhaps it should be the area of the smallest search area instead? Or some fixed size?
+    -- For geometries without surface area, give a fixed size so they aren't discarded as invalid matches. Otherwise measure the area of the intersection.
     CASE
      WHEN ST_GeometryType(oa.location) in ('ST_Point', 'ST_Linestring')
-          THEN ST_Area(pl.location)
+          THEN 3e-4
           ELSE ST_Area(ST_Intersection(ST_MakeValid(oa.location), ST_MakeValid(pl.location)))
     END
 FROM operation_area oa
@@ -159,3 +158,43 @@ FROM operation_area oa
                AND ST_Relate(ST_MakeValid(oa.location), ST_MakeValid(pl.location), 'T********')
 -- No identifier in operation_area to tell us which are custom areas
 WHERE oa.id NOT IN (SELECT oa.id FROM operation_area oa JOIN places pl ON ST_Equals(oa.location, pl.location));
+
+-- Add primary information also to operation-area-facet table, to make easier to leave secondary operation areas out of the results
+ALTER TABLE "operation-area-facet" ADD COLUMN "primary?" boolean DEFAULT false;
+
+-- Copy information from "operation_area"."primary?" using places table to know which area is which
+UPDATE "operation-area-facet" oaf
+   SET "primary?" = true
+ WHERE EXISTS (SELECT 1
+                 FROM "places" pl,
+                      "operation_area" oa
+                WHERE oaf."operation-area" = lower(pl.namefin)
+                   AND ST_Equals(pl.location, oa.location)
+                   AND oa."transport-service-id" = oaf."transport-service-id"
+                   AND oa."primary?" = true);
+
+
+-- Update trigger function that updates facet when service changes - we need to fill primary? column as well
+CREATE OR REPLACE FUNCTION transport_service_operation_area_array () RETURNS TRIGGER AS $$
+BEGIN
+
+  -- Delete all previous entries for this service
+  DELETE
+  FROM "operation-area-facet"
+  WHERE "transport-service-id" = NEW.id;
+
+  IF NEW.published IS NOT NULL THEN
+    -- Insert new values (for published only)
+    INSERT
+    INTO "operation-area-facet"
+    ("transport-service-id", "operation-area", "primary?")
+    SELECT NEW.id, LOWER(oad.text), oa."primary?"
+    FROM operation_area oa
+           JOIN LATERAL unnest(oa.description) AS oad ON TRUE
+    WHERE oa."transport-service-id" = NEW.id
+      AND oad.text IN (SELECT p.namefin FROM "places" p);
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
