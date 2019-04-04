@@ -1,4 +1,4 @@
-(ns ote.transit-changes.detection-test
+(ns ote.transit-changes.detection-test-weeks
   (:require [ote.transit-changes.detection :as detection]
             [clojure.test :as t :refer [deftest testing is]]
             [clojure.spec.test.alpha :as spec-test]
@@ -6,19 +6,10 @@
             [ote.transit-changes.detection-test-utilities :as tu]
             [ote.time :as time]))
 
-;;;;;; TESTS for analysing specific weeks for changes in hash/traffic
+;;;;;; TESTS for analysing changes in traffic between different weeks
 
 (def data-no-changes
-  (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 03
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 10
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 24
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
+  (tu/weeks (tu/to-local-date 2019 5 13) (tu/generate-traffic-week 9 ))) ;; Last week starts 2019 07 08
 
 (deftest test-no-changes
   (let [result (-> data-no-changes
@@ -33,15 +24,9 @@
 
 (def data-change-on-2nd-to-last-wk
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 03
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 10
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 24
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]})))
+            (concat (tu/generate-traffic-week 5) ;; Last week starts 2019 06 17
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}])))
 
 (deftest test-change-on-2nd-to-last-wk
   (let [result (-> data-change-on-2nd-to-last-wk
@@ -57,15 +42,7 @@
 
 (def data-no-changes-weekend-nil
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 06 03
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 06 10
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]})))
+            (tu/generate-traffic-week 9 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name))) ;; Last week starts 2019 06 24
 
 (deftest test-no-changes-weekend-nil
   (let [result (-> data-no-changes-weekend-nil
@@ -104,21 +81,17 @@
 
 (def data-no-traffic-run-twice
   (tu/weeks (tu/to-local-date 2018 10 8)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
+            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}]
+                    (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]))))
 
 (deftest test-no-traffic-run-twice-is-detected
   (let [test-result (-> data-no-traffic-run-twice
@@ -170,24 +143,9 @@
 
 (def no-traffic-run-full-detection-window
   (tu/weeks (tu/to-local-date 2018 10 8)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 8.10.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 15.10.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 22.10.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 29.10.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]} ;; 5.11.
-                  {tu/route-name ["h1" nil nil nil nil nil nil]} ;; 12.11, Starting 13.11. 6 day run
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]})))
+            (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name)
+                    [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
+                    (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name))))
 
 (deftest test-no-traffic-run-full-detection-window
   (testing "Ensure traffic with normal no-traffic days detects a no-traffic change correctly"
@@ -259,12 +217,9 @@
 
 (def test-traffic-starting-point-anomalous
   (tu/weeks (tu/to-local-date 2018 10 8)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
-                  {tu/route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]} ; 2018-10-15, starting week is an exception
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-22, next week same as previous
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-29
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
+            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
+                     {tu/route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]}] ; 2018-10-15, starting week is an exception
+                    (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name))))
 
 (deftest anomalous-starting-point-is-ignored
   (let [{:keys [starting-week different-week] :as res}
@@ -332,14 +287,11 @@
 
 (def data-two-week-change
   (tu/weeks (tu/to-local-date 2019 2 4)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-                  {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
+            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
+                     {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
+                     {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}]
+                    (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name))))
 
 (deftest more-than-one-change-found
   (spec-test/instrument `detection/route-weeks-with-first-difference-old)
@@ -463,7 +415,7 @@
    {:beginning-of-week (java.time.LocalDate/parse "2019-05-20"),
     :end-of-week (java.time.LocalDate/parse "2019-05-26"),
     :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"), ;; first change 
+   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"), ;; first change
     :end-of-week (java.time.LocalDate/parse "2019-06-02"),
     :routes {tu/route-name ["heka" "hkolmas" nil nil nil nil nil]}}
    {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
@@ -545,16 +497,13 @@
 
 (def data-traffic-winter-to-summer-and-end-traffic
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 03
-                  {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 10
-                  {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 17
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 24
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]}
-                  {tu/route-name [nil nil nil nil nil nil nil]})))
+            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 03
+                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 10
+                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 17
+                     (tu/generate-traffic-week 4 [nil nil nil nil nil nil nil] tu/route-name)])))
 
 (deftest test-traffic-winter-to-summer-and-end-traffic
   (let [result (-> data-traffic-winter-to-summer-and-end-traffic
@@ -615,15 +564,7 @@
 
 (def data-ending-route-change
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 03
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 10
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 24
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})));; 2019 07 08
+            (tu/generate-traffic-week 9)));; 2019 07 08
 
 (deftest test-ending-route-change
   (let [result (->> data-ending-route-change ;; Notice thread-last
@@ -640,15 +581,9 @@
 
 (def data-change-and-ending-route
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 03
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 06 10
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]} ;; 2019 06 17
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]} ;; 2019 06 24
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]} ;; 2019 07 01
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]})));; 2019 07 08
+            (concat (tu/generate-traffic-week 5  ["h1" "h2" "h3" "h4" "h5" "h6" "h7"])
+                    ;; In below series: First wk 2019 06 17, last wk 2019 07 08
+                    (tu/generate-traffic-week 4  ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]))))
 
 (deftest test-change-and-ending-route
   (let [result (->> data-change-and-ending-route ;; Notice thread-last
@@ -674,15 +609,11 @@
 
 (def data-change-nil-and-ending-route
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
-                  {tu/route-name ["h1" "h2" nil nil nil nil nil]} ;; 2019 06 03
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 10
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 17
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 24
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 07 01
-                  {tu/route-name [nil nil nil nil nil nil nil]})));; 2019 07 08
+            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 27
+                     {tu/route-name ["h1" "h2" nil nil nil nil nil]}] ;; 2019 06 03
+                    (tu/generate-traffic-week 5 [nil nil nil nil nil nil nil]))))
 
 (deftest test-change-nil-and-ending-route
   (let [result (->> data-change-nil-and-ending-route ;; Notice thread-last
@@ -697,85 +628,3 @@
                  first
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= 1 (count result))))))
-
-;;;;;; TESTS for analysing specific days for changes in hash/traffic
-
-;; Day hash data for changes for a default week with ONE kind of day hashes
-(def data-wk-hash-one-kind            ["A" "A" "A" "A" "A" "A" "A"])
-(def data-wk-hash-one-kind-change-one  ["A" "A" "3" "3" "3" "3" "3"])
-(def data-wk-hash-one-kind-change-two ["A" "A" "3" "3" "3" "3" "7"])
-;; Day hash data for changes for a default week with TWO kind of day hashes
-(def data-wk-hash-two-kind            ["A" "A" "A" "A" "A" "B" "B" ])
-(def data-wk-hash-two-kind-one-nil    ["A" "A" "A" nil "A" "B" "B" ])
-(def data-wk-hash-two-kind-change-one ["A" "A" "A" "A" "A" "5" "5" ])
-(def data-wk-hash-two-kind-change-two ["1" "1" "1" "1" "1" "5" "5" ])
-(def data-wk-hash-two-kind-holiday    [:holiday1 "A" "A" "A" "A" "B" "B" ])
-(def data-wk-hash-traffic-weekdays-nil-weekend-traffic [nil nil nil nil nil "C5" "C6"])
-(def data-wk-hash-traffic-nil         [nil nil nil nil nil nil nil])
-
-(def data-wk-hash-two-kind-on-weekend            ["A" "A" "A" "A" "A" "D" "E" ])
-(def data-wk-hash-traffic-weekdays-nil-weekend-nil [nil nil nil nil nil "D2" "E2"])
-;; Day hash data for changes for a default week with FIVE kind of day hashes
-(def data-wk-hash-five-kind           ["A" "B" "B" "B" "F" "G" "H"])
-(def data-wk-hash-five-kind-change-four  ["A" "2" "5" "5" "5" "6" "7"])
-(def data-wk-hash-seven-kind             ["A" "C" "D" "E" "F" "G" "H"])
-(def data-wk-hash-five-kind-change-seven ["1" "2" "3" "4" "5" "6" "7"])
-
-(def data-wk-hash-two-kind-nil                     ["A" "A" "A" "A" nil "B" "B" ])
-(def data-wk-hash-two-kind-nil-and-holiday         ["A" "A" "A" "A" :some-holiday nil "B" ])
-(def data-wk-hash-two-kind-nil-and-holiday-changed ["A" "A" "A" "A" "4" "5" "6" ])
-(def data-wk-hash-two-kind-nil-changed-and-holiday ["B" "B" :some-holiday "B" "B" "B" "B" ])
-
-
-(deftest test-changed-days-of-week
-  (testing "One kind of traffic, changes: 0"
-    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind))))
-
-  (testing "One kind of traffic, changes: 1"
-    (is (= [2] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-one))))
-
-  (testing "One kind of traffic, changes: 3"
-    (is (= [2 6] (transit-changes/changed-days-of-week data-wk-hash-one-kind data-wk-hash-one-kind-change-two))))
-
-  (testing "Two kinds of traffic, changes: 1 (weekend)"
-    (is (= [5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-two-kind-change-one))))
-
-  (testing "Two kinds of traffic, changes: 2 (weekend+week)"
-    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-two-kind-change-two))))
-
-  (testing "Two kinds of traffic, changes to nil on weekdays, different on weekend"
-    (is (= [0 5 6] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-traffic-weekdays-nil-weekend-traffic))))
-
-  (testing "Two kinds of traffic, changes to all nil"
-    (is (= [0 5] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-traffic-nil))))
-
-  (testing "Two kinds of traffic, changes to one nil"
-    (is (= [3] (transit-changes/changed-days-of-week data-wk-hash-two-kind data-wk-hash-two-kind-one-nil))))
-
-  (testing "Five kinds of traffic, changes: 0"
-    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-five-kind data-wk-hash-five-kind))))
-
-  (testing "Five kinds of traffic, changes: 5"
-    (is (= [1 2 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-five-kind data-wk-hash-five-kind-change-four))))
-
-  (testing "Seven kinds of traffic, changes: 7"
-    (is (= [0 1 2 3 4 5 6] (transit-changes/changed-days-of-week data-wk-hash-seven-kind data-wk-hash-five-kind-change-seven))))
-
-  (testing "Two kinds of traffic, changes to nil on weekdays, different on weekend2"
-    (is (= [0 5 6] (transit-changes/changed-days-of-week data-wk-hash-two-kind-on-weekend data-wk-hash-traffic-weekdays-nil-weekend-nil)))))
-
-(deftest test-changed-days-holidays
-  (testing "Two kinds of traffic with nil, changes to one kind with holiday"
-    (is (= [0 4] (transit-changes/changed-days-of-week data-wk-hash-two-kind-nil data-wk-hash-two-kind-nil-changed-and-holiday))))
-
-  (testing "Two kinds of traffic with holiday on baseline, ensure no change is detected"
-    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-two-kind-holiday data-wk-hash-two-kind-holiday))))
-
-  (testing "Two kinds of traffic with holiday on new week, ensure no change is detected"
-    (is (= [] (transit-changes/changed-days-of-week data-wk-hash-two-kind-holiday data-wk-hash-two-kind-holiday))))
-
-  (testing "Two kinds of traffic with holiday on baseline, ensure change is detected"
-    (is (= [1 5] (transit-changes/changed-days-of-week data-wk-hash-two-kind-holiday data-wk-hash-two-kind-change-two))))
-
-  (testing "Two kinds of traffic with holiday and nil on baseline, ensure change is detected"
-    (is (= [5 6] (transit-changes/changed-days-of-week data-wk-hash-two-kind-nil-and-holiday data-wk-hash-two-kind-nil-and-holiday-changed)))))
