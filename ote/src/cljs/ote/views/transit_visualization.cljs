@@ -357,7 +357,7 @@
                                  (do
                                    (e! (tv/->SelectRouteForDisplay (first %)))
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
-                   :row-selected? #(= % selected-route)}
+                   :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
       [{:name "Reitti" :width "20%"
         :read (juxt :route-short-name :route-long-name)
@@ -374,6 +374,7 @@
        {:name "Muutoksia (kpl)"
         :width "10%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [row]
                   (if (= :no-change (:change-type row))
                     "0"
@@ -381,6 +382,7 @@
        {:name "Aikaa 1. muutokseen"
         :width "15%"
         :read :different-week-date
+        :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
                     [tv-change-icons/labeled-icon [ic/navigation-check] "Ei muutoksia"]
@@ -391,6 +393,7 @@
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
        {:name "Muutosten yhteenveto" :width "32%"
         :read identity
+        :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
@@ -455,9 +458,10 @@
                                     (comp :gtfs/stop-name first :stoptimes second)
                                     (comp :gtfs/stop-name last :stoptimes second))
                               combined-trips)]
-      [:div.trips-table {:style {:margin-top "1em"}}
+      [:div.trips-table {:style {:margin-top "1em"} :key (str "trips-table-" (count trips))}
        [table/table {:name->label str
                      :row-selected? #(= % selected-trip-pair)
+                     :label-style style-base/table-col-style-wrap
                      :on-select #(e! (tv/->SelectTripPair (first %)))}
 
         [;; name of the first stop of the first trip (FIXME: should be first common?)
@@ -465,30 +469,30 @@
                   "Reittitunnus"
                   "")
           :read #(:headsign (first %))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
           :read #(-> % first :stoptimes first :gtfs/departure-time)
           :format (partial format-stop-time (style/date1-highlight-style) )
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          ;; name of the last stop of the first trip
          {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
           :read #(-> % first :stoptimes last :gtfs/departure-time)
           :format (partial format-stop-time (style/date1-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
 
          {:name (if (-> trips first second :stoptimes first :gtfs/stop-name)
                     "Reittitunnus"
                     "")
           :read #(:headsign (second %))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (-> trips first second :stoptimes first :gtfs/stop-name)
           :read (comp :gtfs/departure-time first :stoptimes second)
           :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
          {:name (-> trips first second :stoptimes last :gtfs/stop-name)
           :read (comp :gtfs/departure-time last :stoptimes second)
           :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style {:padding-left "10px" :padding-right "5px"}}
+          :col-style style-base/table-col-style-wrap}
 
          {:name "Muutokset" :read identity
           :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
@@ -508,7 +512,7 @@
                         [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
                        [:div (stylefy/use-style {:width "50%"})
                         [tv-change-icons/stop-time-changes-icon stop-time-changes]]]))
-          :col-style {:padding-left "10px" :padding-right "5px"}}]
+          :col-style style-base/table-col-style-wrap}]
         trips]])]])
 
 (defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
@@ -518,12 +522,24 @@
    "Pysäkit"
    "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
    (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
-     [:div.trip-stop-sequence
-      [table/table {:name->label str}
-       [{:name "Pysäkki" :read :gtfs/stop-name :format (partial format-stop-name)}
-        {:name "Lähtöaika" :read :gtfs/departure-time-date1 :format (partial format-stop-time (style/date1-highlight-style))}
-        {:name "Lähtöaika" :read :gtfs/departure-time-date2 :format (partial format-stop-time (style/date2-highlight-style))}
-        {:name "Muutokset" :read identity
+     [:div.trip-stop-sequence {:style {:margin-top "1em"}}
+      [table/table {:name->label str
+                    :label-style style-base/table-col-style-wrap}
+       [{:name "Pysäkki"
+         :read :gtfs/stop-name
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-name)}
+        {:name "Lähtöaika"
+         :read :gtfs/departure-time-date1
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-time (style/date1-highlight-style))}
+        {:name "Lähtöaika"
+         :read :gtfs/departure-time-date2
+         :col-style style-base/table-col-style-wrap
+         :format (partial format-stop-time (style/date2-highlight-style))}
+        {:name "Muutokset"
+         :read identity
+         :col-style style-base/table-col-style-wrap
          :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
                    (cond
                      (and departure-time-date1 (nil? departure-time-date2))
@@ -658,18 +674,25 @@
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]
    [selected-route-map e! date->hash hash->color compare]]])
 
-(defn gtfs-package-info [e! open-sections packages]
+(defn gtfs-package-info [e! open-sections packages service-id]
   (let [[latest-package & previous-packages] packages
+        previous-packages [latest-package]
         open? (get open-sections :gtfs-package-info false)
-        pkg (fn [{:keys [created min-date max-date interface-url]}]
-              [:div.gtfs-package
-               interface-url
-               " Ladattu NAPiin " (time/format-timestamp-for-ui created) ". "
-               "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."])]
+        pkg (fn [{:keys [created min-date max-date interface-url]} show-link?]
+              (when created
+                [:div.gtfs-package
+                 interface-url
+                 " Ladattu NAPiin "
+                 (if show-link?
+                   (common/linkify
+                     (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created))
+                     (time/format-timestamp-for-ui created))
+                   (time/format-timestamp-for-ui created)) ". "
+                 "Kattaa liikennöinnin aikavälillä " min-date " - " max-date "."]))]
     [:div (stylefy/use-style style/infobox)
      [:div (stylefy/use-style style/infobox-text)
       [:b "Viimeisin aineisto"]
-      [pkg latest-package]]
+      [pkg latest-package false]]
      (when (seq previous-packages)
        [:div
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
@@ -686,7 +709,7 @@
            (doall
             (for [{id :id :as p} previous-packages]
               ^{:key (str "gtfs-package-info-" id)}
-              [pkg p]))])])]))
+              [pkg p true]))])])]))
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
@@ -710,7 +733,7 @@
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
 
-        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization)]
+        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization) (:transport-service-id service-info)]
 
         ;; Route listing with number of changes
         (tr [:transit-visualization-page :route-description])

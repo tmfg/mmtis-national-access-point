@@ -184,12 +184,7 @@ SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-h
        c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
        c."trip-stop-time-changes-lower", c."trip-stop-sequence-changes-upper", c."current-week-date",
        c."different-week-date", c."change-date", c."created-date"
-  FROM "detected-route-change" c,
-       "detected-change-history" h
+  FROM "detected-route-change" c
+       LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key" AND h."different-week-date" >= :date
  WHERE c."transit-change-date" = :date
-   AND c."transit-service-id" = :service-id
-   AND h."transport-service-id" = c."transit-service-id"
-   AND h."change-key" = c."change-key"
-   AND h."different-week-date" >= :date;
-
-
+   AND c."transit-service-id" = :service-id;
