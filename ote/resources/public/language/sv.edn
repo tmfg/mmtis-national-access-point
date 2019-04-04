@@ -669,11 +669,11 @@
  :organization-page
  {:address-postal "Postadress"
   :address-postal-street "Gatuadress eller postbox"
-  :basic-details "Perustiedot"
+  :basic-details "Basuppgifter"
   :business-id-and-aux-names "Företagsnamn och parallellnamn"
   :business-or-aux-name "Företagsnamn eller extra företagsnamn"
   :contact-details-plural "Kontaktuppgifter för företagsnamn"
-  :contact-details-authorities "Yhteystiedot viranomaiselle"
+  :contact-details-authorities "Kontaktuppgifter för myndigheten"
   :contact-details "Kontaktuppgifter"
   :fetch-from-ytj "Hämta data från YTJ"
   :fetch-from-ytj-success "Uppgifterna har hämtats från YTJ."
@@ -700,9 +700,9 @@
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
   :help-ytj-contact-change-link "https://www.ytj.fi/sv/index/ilmoittaminen/muutosilmoitus.html"
-  :help-contact-details "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä."
-  :help-contact-details-privacy "Huomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja."
-  :help-contact-details-auth (:md "Alla olevat tiedot ovat viranomaiskäyttöön. **HUOM: tietoja ei julkaista.**")
+  :help-contact-details "Meddela kontaktuppgifterna som de som utvecklar transporttjänsterna eller andra samarbetsparter kan använda för att kontakta ditt företag eller din organisation."
+  :help-contact-details-privacy "Vänligen notera att de kontaktuppgifter som du uppger finns fritt tillgängliga i NAP-tjänsten. Detta är bra att känna till ifall kontaktuppgifterna innehåller dina personliga kontaktuppgifter, t.ex. ditt personliga telefonnummer."
+  :help-contact-details-auth (:md "Alla kontaktuppgifter är endast avsedda för myndighetsbruk. **OBS! Dessa kontaktuppgifter publiceras inte på NAP-tjänstens offentliga sidor.**")
   :merge-operator-to-ytj "ersätts med namnet"
   }
 
@@ -992,8 +992,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :data-not-found "Inga uppgifter hittades."
   :required-field "Obligatorisk uppgift"
   :required-field-missing "Obligatorisk uppgift"
-  :required-one-of-many "Fyll minst ett fält."
-  :invalid-email "E-postadressen är inte giltig."
+  :required-one-of-many "Fyll i minst ett av fälten nedan."
+  :invalid-email "Den angivna e-postadressen är felaktig. Vänligen kontrollera adressen."
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"

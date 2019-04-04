@@ -698,9 +698,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :help-about-ytj-link "https://www.ytj.fi/index/tietoapalvelusta.html"
   :help-ytj-contact-change-link-desc "Tietojen muutosilmoitus Yritys- ja yhteisötietojärjestelmässä (YTJ)"
   :help-ytj-contact-change-link "https://www.ytj.fi/index/ilmoittaminen/muutosilmoitus.html"
-  :help-contact-details "Ilmoita yhteystiedot, joilla liikennepalveluiden kehittäjä tai muu kumppani saa yritykseesi tai organisaatioosi yhteyttä."
-  :help-contact-details-privacy "Huomioithan, että ilmoittamasi yhteystiedot ovat NAP-liikkumispalvelukatalogista vapaasti kaikkien saatavilla. Tämä on hyvä tietää, mikäli ilmoittamasi yhteystiedot ovat myös henkilökohtaisia yhteystietoja."
-  :help-contact-details-auth (:md "Alla olevat tiedot ovat viranomaiskäyttöön. **HUOM: tietoja ei julkaista.**")
+  :help-contact-details "Ilmoita yhteystiedot, joiden avulla liikennepalveluiden kehittäjät tai muut kumppanit voivat ottaa yritykseesi tai organisaatioosi yhteyttä."
+  :help-contact-details-privacy "Huomioithan, että ilmoittamasi yhteystiedot ovat NAP-palvelussa vapaasti kaikkien saatavilla. Tämä on hyvä tiedostaa, mikäli ilmoittamasi yhteystiedot sisältävät henkilökohtaisia yhteystietojasi, esim. henkilökohtaisen puhelinnumerosi."
+  :help-contact-details-auth (:md "Alla olevat yhteystiedot on tarkoitettu vain viranomaiskäyttöön. **HUOM! Näitä yhteystietoja ei julkaista NAP-palvelun julkisilla sivuilla.**")
   :merge-operator-to-ytj "korvataan nimellä"
   }
 
@@ -998,11 +998,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :data-not-found "Tietoja ei löytynyt."
   :required-field "Tieto vaaditaan"
   :required-field-missing "Pakollisia tietoja syöttämättä"
-  :required-one-of-many "Anna vähintään yksi tieto."
+  :required-one-of-many "Täytä vähintään yksi alla olevista kentistä."
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
-  :invalid-email "Tarkista, että sähköpostiosoite on oikein."
+  :invalid-email "Antamasi sähköpostiosoite on virheellinen. Tarkista osoite."
   :save-failure "Tallennus ei onnistunut."
   :save-success "Tallennus onnistui."
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
