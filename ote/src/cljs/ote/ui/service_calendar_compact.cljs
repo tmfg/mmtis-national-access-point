@@ -103,7 +103,7 @@
 (defn- month-name [month]
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
     (subs
-     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})
+     (.toLocaleString (doto (js/Date. (.getFullYear (js/Date.)) (- month 1) 1)) lang #js {:month "short"})
      0 3)))
 
 (defn service-calendar-month [{:keys [selected-date? on-select on-hover hover-style

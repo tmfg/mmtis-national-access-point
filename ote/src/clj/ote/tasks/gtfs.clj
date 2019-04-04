@@ -102,7 +102,8 @@
                (detection/service-package-ids-for-date-range db query-params)
                (detection/detect-route-changes-for-service-new db query-params)))
             (catch Exception e
-              (log/warn e "Change detection failed for service " service-id))))))))))
+              (log/warn e "Change detection failed for service " service-id)))
+          (log/info "Detection completed for service: " service-id))))))))
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
