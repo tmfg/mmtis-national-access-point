@@ -28,6 +28,13 @@ if [ -f finnish_postal_codes.csv ]; then
     $P napote -c "\COPY finnish_postal_codes FROM finnish_postal_codes.csv CSV HEADER;" || true
 fi
 
+if [ -f spatial_relations_places.csv ]; then
+    echo "Insert Prefilled Spatial Search data"
+    $P napote -c "TRUNCATE \"spatial-relations-places\";" || true
+    $P napote -c "\COPY \"spatial-relations-places\" FROM /static-data/spatial_relations_places.csv CSV HEADER;" || true
+fi
+
+
 echo "Clean up and free connections"
 $P -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'napote' AND pid <> pg_backend_pid();"
 

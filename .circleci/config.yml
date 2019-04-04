@@ -43,6 +43,7 @@ jobs:
       - run: aws s3 cp s3://ote-assets/places/finnish_municipalities.csv database/finnish_municipalities.csv
       - run: aws s3 cp s3://ote-assets/places/maakunnat.csv database/maakunnat.csv
       - run: aws s3 cp s3://ote-assets/places/finnish_postal_codes.csv database/finnish_postal_codes.csv
+      - run: aws s3 cp s3://ote-assets/places/spatial_relations_places.csv database/spatial_relations_places.csv
       - run: cd database && sh circleci_setup.sh
 
       # run tests!
