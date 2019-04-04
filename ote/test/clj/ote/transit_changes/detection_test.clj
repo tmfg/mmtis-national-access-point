@@ -601,8 +601,8 @@
                        {:route-short-name "",
                         :route-long-name test-utilities/route-name,
                         :trip-headsign "",
-                        :min-date (detection/sql-date (test-utilities/to-local-date 2019 1 1)),
-                        :max-date (detection/sql-date (test-utilities/to-local-date 2019 7 14)),
+                        :min-date (time/sql-date (test-utilities/to-local-date 2019 1 1)),
+                        :max-date (time/sql-date (test-utilities/to-local-date 2019 7 14)),
                         :route-hash-id test-utilities/route-name}]
                       [test-utilities/route-name-3
                        {:route-short-name "",
