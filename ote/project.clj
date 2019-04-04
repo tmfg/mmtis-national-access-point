@@ -57,14 +57,13 @@
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
 
                  ;; Frontend UI libraries
-                 [reagent "0.8.0-alpha2"]
+                 [reagent "0.8.0-alpha2" :exclusions [cljs/react cljsjs/react-dom]]
                  [webjure/tuck "20181204"]
                  [cljsjs/react "15.6.1-2"]
                  [cljsjs/react-dom "15.6.1-2"]
                  [cljsjs/chartjs "2.7.3-0"]
                  [cljs-react-material-ui "0.2.48"]
                  [cljsjs/material-ui-chip-input "0.17.2-0"]
-                 [figwheel "0.5.13"]
                  [cljsjs/react-leaflet "1.6.5-0" :exclusions [cljsjs/leaflet]]
                  [cljsjs/leaflet "1.2.0-0"]
                  [funcool/bide "1.6.0"] ; URL router

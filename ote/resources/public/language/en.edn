@@ -39,9 +39,11 @@
 
    :ote.db.transport-service/guaranteed-vehicle-accessibility "Vehicle accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-vehicle-accessibility "Vehicle accessibility (limited availability)"
+   :ote.db.transport-service/vehicle-accessibility "Vehicle accessibility"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Info service accessibility (guaranteed availability)"
    :ote.db.transport-service/limited-info-service-accessibility "Info service accessibility (limited availability)"
+   :ote.db.transport-service/info-service-accessibility "Info service accessibility"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "Always available accessibility tools"
    :ote.db.transport-service/guaranteed-accessibility-description "Describe more information about always available accessibility tools when needed"
@@ -50,6 +52,7 @@
 
    :ote.db.transport-service/guaranteed-transportable-aid "Transportable aid (guaranteed availability)"
    :ote.db.transport-service/limited-transportable-aid "Transportable aid (limited availability)"
+   :ote.db.transport-service/transportable-aid "Transportable aid"
 
    :ote.db.transport-service/accessibility-info-url "Accessibility description (WWW)"
 
@@ -944,6 +947,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :finap-status "NAP-status"
   :header-nap-official-name "Transport service catalog"
   :instructions "Instructions"
+  :name "Name"
+  :description "Description"
+  :brokerage "Brokering service"
+  :published "Published"
+  :available-from "Available from"
+  :available-to "Available to"
+  :format "Format"
   :navigation-own-service-list "Own transport services"
   :navigation-front-page "Front page"
   :navigation-organizations "Transport operator"
@@ -1067,227 +1077,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :result-count ["Found " :total-count " transport operators"]
   :result-count-all ["Total " :total-count " transport operators"]}
 
- ;; Translations for GeoJSON keys (unnamespaced), in the CKAN viewer plugin.
- ;; This is unfortunate duplication, but GeoJSON may have arbitrary keys (not just the ones we defined)
- ;; and we must show those as is.
- :viewer {"transport-operator" "Transport operator"
-          "transport-service" "Transport service information"
-          "contact-address" "Contact address"
-          "contact-email" "Email"
-          "homepage" "Web page"
-          "post_office" "Post office"
-          "postal_code" "Postal code"
-          "street" "Street address"
-          "contact-phone" "Phonenumber"
-          "id" "Business ID"
-          "name" "Name"
-          "business-id" "Business ID"
-          "published?" "Published?"
-          "published" "Published"
-          "transport-operator-id" "Transport operator ID"
-          "type" "Service mode"
-          "email" "Email"
-          "phone" "Phone"
-
-          "passenger-transportation" "Service relaited information"
-          "parking" "Service relaited information"
-          "rentals" "Service relaited information"
-          "accessibility-description" "Accessibility description"
-          "accessibility-tool" "Accessibility tools"
-          "additional-services" "Additional services"
-          "payment-methods" "Accepted payment methods"
-          "price-classes" "Price classes"
-          "currency" "Currency"
-          "price-per-unit" "Price per unit"
-          "unit" "Unit"
-
-          "lang" "Language"
-          "text" "Text"
-
-          "description" "Description"
-          "real-time-information" "Real time service information"
-          "booking-service" "Booking service"
-          "luggage-restrictions" "Luggage restrictions"
-
-          "url" "WWW-address"
-          "csv-url" "Companies providing the service"
-          "service-hours-info" "Additional information"
-          "indoor-map" "Indoor map WWW-address"
-          "pick-up-locations" "Pick-up and returning points"
-          "pick-up-locations-url" "Rental point information web address"
-          "rental-additional-services" "Additional services"
-          "usage-area" "Usage area restrictions (country limitations)"
-          "vehicle-price-url" "Vehicle and price info WWW address"
-          "vehicle-classes" "Rental vehicles"
-
-          "additional-service-links" "Additional services"
-          "charging-points" "Charging points description"
-          "parking-capacities" "Parking capacity"
-
-          "available-from" "Available from"
-          "available-to" "Available to"
-
-          "maximum-stay" "Maximum parking time"
-          "seconds" "Seconds"
-          "minutes" "Minutes"
-          "hours" "Hours"
-          "days" "Days"
-          "months" "Months"
-          "years" "Years"
-
-          "transport-type" "Transport type"
-          "advance-reservation" "Advance reservation"
-          "visiting-address" "Postal address"
-
-          :values {"passenger-transportation" "Passenger transportation"
-                   true "Yes"
-                   false "No"
-
-                   "taxi" "Taxi service (road traffic)"
-                   "request" "Charter traffic and other request based traffic"
-                   "schedule" "Regular scheduled traffic (passenger transportation)"
-                   "terminal" "Stations, ports and other terminals"
-                   "rentals" "Vehicle rentals and commercial shared vehicle solutions"
-                   "parking" "General commercial parking services"
-
-                   ;; accessibility tools
-                   "wheelchair" "Wheelchair"
-                   "walkingstick" "Walking stick"
-                   "audio-navigator" "Audio navigation"
-                   "visual-navigator" "Visual navigation"
-                   "passenger-cart" "Henkilökuljetuskärryt"
-                   "pushchair" "Lastenrattaat"
-                   "umbrella" "Sateenvarjo"
-                   "buggy" "Lastenvaunut"
-                   "other" "Other"
-                   "boarding-assistance" "Boarding assistance"
-                   "low-floor" "Low floor"
-                   "accessible-vehicle" "Accessible vehicle"
-                   "escalator" "Escalator"
-                   "lift" "Lift"
-                   "narrow-entrance" "Narrow entrance"
-                   "barrier" "Barrier"
-                   "travelator" "Travelator"
-                   "ramp" "Ramp"
-                   "stairs" "Stairs"
-                   "step-free-access" "Step free access"
-                   "suitable-for-wheelchairs" "Suitable for wheelchairs"
-                   "assistance-dog-space" "Place for an assistance dog"
-                   "crutches" "Crutches"
-                   "walker" "Walker"
-                   "walking-stick" "Walking stick"
-                   "tactile-guiding-strips" "Tactile guiding strips"
-                   "tactile-platform-edges" "Tactile platform edges"
-                   "wheelchair-access-toilet" "Accessible toilet"
-                   "visual-displays" "Visual display"
-                   "large-print-timetables" "Large print timetables"
-                   "displays-for-visually-impaired" "Displays for visually impaired (tactile)"
-                   "audio-information" "Audio information"
-                   "audio-for-hearing-impaired" "Audio for hearing impaired"
-                   "disability-adapted-vehicle" "Cars with handicap hand controls"
-
-                   ;; additional services
-                   "animal-transport" "Animal transport"
-                   "child-seat" "Child safety seat"
-
-                   ;; parking types
-                   "unknown" "Unknown"
-                   "car-park" "Cars"
-                   "park-and-ride-park" "Park and ride"
-                   "motorcycle-park" "Motorcycles"
-                   "cycle-park" "Cycles"
-                   "rental-car-park" "Rental cars"
-                   "coach-park" "Busses"
-                   "disabled-park" "Disabled parking"
-
-                   ;; payment methods
-                   "debit-card" "Debit-card"
-                   "credit-card" "Credit-card"
-                   "cash" "Cash"
-                   "contactless-payment" "Contactless payment"
-                   "mobilepay" "Mobilepay"
-                   "invoice" "Invoice"
-
-                   ;; week days
-                   "MON" "Mon"
-                   "TUE" "Tue"
-                   "WED" "Wed"
-                   "THU" "Thu"
-                   "FRI" "Fri"
-                   "SAT" "Sat"
-                   "SUN" "Sun"
-
-                   ;; Data content
-                   "route-and-schedule" "Route and schedule information"
-                   "luggage-restrictions" "Luggage restrictions"
-                   "realtime-interface" "Real time interface"
-                   "booking-interface" "Booking interface"
-                   "accessibility-services" "Accessibility services"
-                   "other-services" "Other services"
-                   "pricing" "Pricing"
-                   "service-hours" "Service hours"
-                   "disruptions" "Fault situations"
-                   "payment-interface" "Payment and sales interface"
-                   "map-and-location" "Map and location data"
-
-                   ;; rentals
-                   "pick-up" "Pick up"
-                   "return" "Return"
-                   "pick-up-return" "Pick up and return"
-
-                   "advance-reservation" "Advance reservation"
-                   "no" "no"
-                   "road" "Road traffic"
-                   "rail" "Rail traffic"
-                   "sea" "Sea traffic"
-                   "aviation" "Air traffic"
-
-                   "mandatory" "Mandatory"
-                   "possible" "Possible"
-                   }
-
-          ;; External interfaces
-          "external-interfaces" "External interfaces"
-          "license" "License/terms of use"
-          "data-content" "Data content"
-          "format" "Format"
-          "external-interface" "External interface"
-
-          ;; accessibility
-          "accessibility" "Accessibility"
-          "information-service-accessibility" "Info service accessibility"
-          "brokerage?" "Brokering service?"
-          "companies" "Companies providing the service"
-          "accessibility-info-url" "Accessibility description WWW-address"
-          "guaranteed-accessibility-description" "Describe more information about always available accessibility tools when needed"
-          "guaranteed-info-service-accessibility" "Guaranteed info service accessibility"
-          "guaranteed-transportable-aid" "Guaranteed transportable aid"
-          "guaranteed-vehicle-accessibility" "Guaranteed vehicle accessibility"
-          "limited-accessibility-description" "Describe more information about limited available accessibility tools when needed"
-          "limited-info-service-accessibility" "Limited available info service accessibility"
-          "limited-transportable-aid" "Limited available transportable aid"
-          "limited-vehicle-accessibility" "Limited available vehicle accessibility"
-          "payment-method-description" "Accepted payment methods"
-          "pricing" "Pricing"
-          "service-exceptions" "Service hour exceptions"
-          "service-hours" "Service hours"
-          "week-days" "Week days"
-          "from" "From"
-          "to" "To"
-          "from-date" "From date"
-          "to-date" "To date"
-          "sub-type" "Sub type"
-          "terminal" "Terminal"
-
-          ;; Assistance
-          "assistance" "Assistance service"
-          "assistance-place-description" "Assistance service location"
-          "assistance-by-reservation-only" "The assistance service must be reserved in advance"
-          "notification-requirements" "Reservation requirements"
-          "hours-before" "Service requires reservation (hours) before"
-          "telephone" "Phone"}
-
-
  :service-search
  {:label "Transport service catalog"
   :filters-label "Search criteria"
@@ -1348,6 +1137,39 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :check-email-for-link "Your request for changing password has been received. A link for resetting your password has now been sent to your email address."
   :logged-out "You have been logged out."}
+
+ :service-viewer
+ {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :operator-info "Palveluntuottajan tiedot"
+  :transport-service-info "Transport service information"
+  :not-disclosed "Ei ilmoitettu"
+  :brokerage {true "Yes"
+              false "No"}
+  :yes "Yes"
+  :no "No"
+  :service-area "Toiminta-alue"
+  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
+  :luggage-warnings "Matkatavaroita koskevat varoitukset"
+  :advance-reservation "Ennakkovaraus"
+  :reservation-service "Varauspalvelu"
+  :real-time-info "Reaaliaikapalvelu"
+  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
+  :accessibility-website "Esteettömyystietojen nettisivu"
+  :guaranteed-accessibility "Taattu saatavuus"
+  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
+  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
+  :limited-accessibility "Rajoitettu saatavuus"
+  :price-information "Hintatiedot"
+  :service-hours "Palveluajat"
+  :primary-areas "Pääasialliset toiminta-alueet"
+  :other-accessibility-info "Muut esteettömyystiedot"
+  :secondary-areas "Toissijaiset toiminta-alueet"
+  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
+  :price/unit "Hinta/yksikkö"
+  :pricing-basis "Hinnoitteluperuste"
+  :day-of-week "Viikonpäivä"
+  :exception "Poikkeus"}
+
 
  :register
  {:label "Register for an Account"

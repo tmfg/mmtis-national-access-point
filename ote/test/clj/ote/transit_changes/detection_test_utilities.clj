@@ -12,9 +12,12 @@
                                                 :no-traffic-run
                                                 :no-traffic-change
                                                 :route-key
+                                                :route-end-date
                                                 :starting-week])
+
 (def route-name "Raimola")
 (def route-name-2 "Esala")
+(def route-name-3 "Kyykkävaaranmäki")
 
 (defn weeks
   "Give first day of week (monday) as a starting-from."
