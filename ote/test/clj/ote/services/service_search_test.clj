@@ -218,10 +218,10 @@
 
   (testing "Spatial search returns services with operation area defined as a single point when searching with the surrounding area"
     (let [service (assoc (gen/generate service-generators/gen-transport-service)
-                         ::t-service/operation-area [#:ote.db.places{:type "drawn"
-                                                                     :namefin "Kannus rautatieasema"
-                                                                     :primary? true
-                                                                     :geojson "{\"type\":\"Point\",\"coordinates\":[23.914974,63.898401]}"}])
+                         ::t-service/operation-area [{:ote.db.places/type "drawn"
+                                                      :ote.db.places/namefin "Kannus rautatieasema"
+                                                      :ote.db.places/primary? true
+                                                      :geojson "{\"type\":\"Point\",\"coordinates\":[23.914974,63.898401]}"}])
           saved-service (http-post "admin" "transport-service" service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
       (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
@@ -238,7 +238,6 @@
         ;; Doesn't match with exterior areas
         (is (zero? (count (services-in "Sotkamo"))))
         (is (zero? (count (services-in "Kajaani"))))
-
         ;; Matches with enveloping areas
         (is (= 1 (count (services-in "Keski-Pohjanmaa"))))
         (is (= 1 (count (services-in "69100 Kannus Keskus"))))

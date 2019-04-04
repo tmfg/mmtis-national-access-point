@@ -53,7 +53,7 @@ Negative return value is an invalid match"
          (sort-by :match-quality))))
 
 (defn- service-search-match-qualities
-  "Extends the results with quality of the match to the operation area. Results which are clearly not matches area filtered out"
+  "Extends the results with quality of the match to the operation area."
   [db results operation-area]
   (if operation-area
     (let [ids (map ::t-service/id results)
