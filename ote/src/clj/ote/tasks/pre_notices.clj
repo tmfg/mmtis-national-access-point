@@ -151,11 +151,6 @@
                     (count detected-changes) " new detected changes "
                     " from 24 hours for regions " (:finnish-regions user))
 
-          ;; Mark changes in detected-change-history as sent
-          (specql/update! db :gtfs/detected-change-history
-                          {:gtfs/email-sent (java.util.Date.)}
-                          {:gtfs/id (op/in (into #{} (map :history-id detected-changes)))})
-
           (html (notification-template notices detected-changes)))
         (log/info "No new pre-notices or detected changes found.")))
 
@@ -170,7 +165,8 @@
     (localization/with-language
       "fi"
       (tx/with-transaction db
-        (let [authority-users (nap-users/list-authority-users db)] ;; Authority users
+        (let [authority-users (nap-users/list-authority-users db) ;; Authority users
+              unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
           (log/info "Authority users: " (pr-str (map :email authority-users)))
           (doseq [u authority-users]
             (let [notification (user-notification-html db u detected-changes-recipients)]
@@ -189,7 +185,12 @@
                         :body    [{:type "text/html;charset=utf-8" :content notification}]})
                       (catch Exception e
                         (log/warn "Error while sending a notification" e)))))
-                (log/info "Could not find notification for user with email: " (pr-str (:email u)))))))))))
+                (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
+
+          ;; Mark changes in detected-change-history as sent
+          (specql/update! db :gtfs/detected-change-history
+                          {:gtfs/email-sent (java.util.Date.)}
+                          {:gtfs/id (op/in (into #{} (map :history-id unsent-detected-changes)))}))))))
 
 
 (defrecord PreNoticesTasks [detected-changes-recipients]
