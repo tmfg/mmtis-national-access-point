@@ -1043,7 +1043,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :save-user-success "Käyttäjätiedot tallennettu"
   :start-time "Alkamisaika"
   :ending-time "Päättymisaika"
-  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi tai p. 029 534 5454 (arkisin 9 - 15)."}
+  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi tai p. 029 534 5454 (arkisin 9 - 15)."
+  :day-of-week-1-short "Ma"
+  :day-of-week-2-short "Ti"
+  :day-of-week-3-short "Ke"
+  :day-of-week-4-short "To"
+  :day-of-week-5-short "Pe"
+  :day-of-week-6-short "La"
+  :day-of-week-7-short "Su"}
 
 
  :dialog

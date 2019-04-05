@@ -47,7 +47,7 @@
             trip-stop-time-changes-lower trip-stop-time-changes-upper different-week-date] :as diff}
     with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    [:div {:style {:width "15%"}}
+    [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
                                            style/no-change-color
@@ -55,23 +55,23 @@
       [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
 
-    [:div {:style {:width "15%"}}
+    [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                           style/no-change-color
                                                           style/remove-color)}]
-      [:span (or removed-trips (:gtfs/removed-trips diff))
+      [:span (or removed-trips (:gtfs/removed-trips diff) 0)
        (when with-labels? " poistettua vuoroa")]]]
 
-    [:div {:style {:width "25%"}}
+    [:div {:style {:flex "1"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
 
-    [:div {:style {:width "25%"}}
+    [:div {:style {:flex "1"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]
 
     ;; Add route ending icon if route ending change is detected
     (when (str/includes? (str change-type) "removed")
-      [:div {:style {:width "10%"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
+      [:div {:style {:flex "0.5"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
        [icon-l/icon-labeled
         [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))

@@ -77,6 +77,18 @@
    {:background (str "radial-gradient(circle at center, " highlight-color " 50%, " (or hash-color "#FFF") " 40%) 0px 0px")
     :color "#F6C6EA"}))
 
+(def map-different-date-container {:position "relative"
+                                   :margin-right "0.5em"
+                                   :top "-5px"
+                                   :color "red"
+                                   :display "inline-block"
+                                   :width "20px"})
+
+(def map-different-date1 (merge map-different-date-container
+                                {:border-bottom (str "solid 3px " date2-highlight-color)}))
+(def map-different-date2 (merge map-different-date-container
+                                {:border-bottom (str "solid 3px " date1-highlight-color)}))
+
 (def section
   {:border "solid 1px #646464"
    :padding-bottom "1.25rem"
@@ -122,7 +134,7 @@
   {:padding-left "1.25rem"
    :padding-right "1.25rem"})
 
-(def map-checkbox-container {:margin "1.25rem 0"
+(def map-checkbox-container {:margin-top "0.5rem"
                              :display "flex"
                              :flex-direction "row-reverse"
                              :flex-wrap "nowrap"

@@ -133,8 +133,8 @@
                                                               :padding-right "5px"
                                                               :color style-base/link-color}]
                                      (tr [:service-search :back-link])]]
-   [:h1 service-name]
-   [link-with-icon {} open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
+   [:h1 {:style {:margin-top "1rem"}} service-name]
+   [link-with-icon {:target-blank? true} open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
 
 (defn- operator-info
   [title operator]

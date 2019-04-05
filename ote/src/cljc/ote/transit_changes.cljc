@@ -250,21 +250,24 @@
              week-hash-1
              week-hash-2)))
 
-(defn- day-is-change?
-  "Input: d1: baseline day hash, d2: hash of the day to analyze, d1p: day previous to baseline day, d2p: day previous to day being analyzed
-  Output: True if d1 is considered a day when it's traffic has changed compared to baseline, false if not."
+(defn- day-traffic-changes?
+  "Takes hashes of a baseline day and a new day to compare, and similar pair for the previous detected change.
+  Latter pair is used to resolve if this is a new change or an already reported change, which shouldn't be detected for
+  a second time.
+  Input: d1: baseline day hash, d2: hash of the day to analyze, d1p: baseline day hash of the previous changed day, d2p: hash of the previous changed day
+  Output: True if d2 is considered a day when it's traffic has changed compared to baseline, false if not."
   [d1 d2 d1p d2p]
-  (when (not= d1 d2)
-    (let [res (if (and (not (keyword? d1))
-                       (not (keyword? d2))
-                       ;; Not a change if change happened on previous day and it just continues on this day. E.g. AAAAAAA => AABBBBB
-                       (= d1p d1) (= d2p d2))
-                false
-                true)]
-      res)))
+  (let [res (and (not= d1 d2)
+                 (not (keyword? d1))
+                 (not (keyword? d2))
+                 ;; Not a change if change happened on previous day and it just continues on this day. E.g. AAAAAAA => AABBBBB
+                 (or (not= d1p d1)
+                     (not= d2p d2)))]
+    res))
 
 (defn changed-days-of-week
-  "Input:
+  "Takes collections of day hashes for a baseline week and a new week and detects which days change compared to baseline.
+   Input:
    week-hash-2 collection of day hashes for the week used for comparing
    week-hash-2 collection of day hashes for the week which will be evaluated
    Output:
@@ -274,19 +277,21 @@
          ix 0
          d1 (nth week-hash-1 ix)                            ;; Day on "current week" which is the evaluation baseline
          d2 (nth week-hash-2 ix)                            ;; Day on future week, which is being evaluated
-         d1p "."                                            ;; Day previous to d1, if available. Initial value for "not set" is here "." because logic uses nil and keyword.
-         d2p "."]                                           ;; Day previous to d2, if available. Initial value for "not set" is here "." because logic uses nil and keyword.
+         d1p "."                                            ;; Day d1 hash of previous changed day, if available. Initial value for "not set" is here "." because logic uses nil and keyword.
+         d2p "."]                                           ;; Day d2 hash of previous changed day. Initial value for "not set" is here "." because logic uses nil and keyword.
     (if (< ix (count week-hash-2))
-      (recur
-        ;; Logic for detecting if day d2 is a new change or not.
-        (if (day-is-change? d1 d2 d1p d2p)
-          (conj result ix)                                  ;; Day is a change, so append its index to result coll
-          result)                                           ;; No change, no changes added to result coll
-        (inc ix)
-        (nth week-hash-1 (inc ix) nil)
-        (nth week-hash-2 (inc ix) nil)
-        d1
-        d2)
+      (let [day-changed? (day-traffic-changes? d1 d2 d1p d2p)
+            ixn (inc ix)]
+        (recur
+          ;; Logic for detecting if day d2 is a new change or not.
+          (if day-changed?
+            (conj result ix)                                ;; Day is a change, so append its index to result coll
+            result)                                         ;; No change, no changes added to result coll
+          ixn
+          (nth week-hash-1 ixn nil)
+          (nth week-hash-2 ixn nil)
+          (if day-changed? d1 d1p)
+          (if day-changed? d2 d2p)))
       result)))
 
 (s/fdef first-different-day
