@@ -43,12 +43,12 @@ describe('OTE login dialog', () => {
 
     it('should warn about unknown user', () => {
         login(genNaughtyString(20), genNaughtyString(20), 'click');
-        cy.contains('Tuntematon käyttäjä');
+        cy.contains('Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan.');
     });
 
     it('should warn about wrong password', () => {
         login(Cypress.env('NAP_LOGIN'), genNaughtyString(20), 'click');
-        cy.contains('Väärä salasana');
+        cy.contains('Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan.');
     });
 
     it('should login properly with correct credentials', () => {
