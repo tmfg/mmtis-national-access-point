@@ -56,3 +56,4 @@ aws/ansible/jenkins/solita_jenkins_default_password
 
 # Backup and OS files
 .DS_Store
+*.*~

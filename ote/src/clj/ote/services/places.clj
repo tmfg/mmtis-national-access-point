@@ -49,11 +49,12 @@
   (doseq [{::places/keys [id namefin type primary?] :as place} places]
     (case type
       "drawn"
-      (insert-geojson-for-transport-service! db {:transport-service-id transport-service-id
-                                                 :name namefin
-                                                 :geojson (:geojson place)
-                                                 :primary? primary?})
-
+      (let [{id :id} 
+            (insert-geojson-for-transport-service<! db {:transport-service-id transport-service-id
+                                                        :name namefin
+                                                        :geojson (:geojson place)
+                                                        :primary? primary?})]
+        (insert-spatial-search-custom-area! db {:operation-area-id id}))
 
       ;; Stored geometry, update name
       "stored"
@@ -82,6 +83,7 @@
     (assoc this ::stop
            (http/publish!
             http
+            {:authenticated? false}
             (routes
              (GET "/place-completions/:term" [term]
                   (http/transit-response
