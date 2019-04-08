@@ -11,7 +11,6 @@
             [ote.services.index :as index]
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
-            [ote.services.viewer :as viewer]
             [ote.services.external :as external]
             [ote.services.routes :as routes]
             [ote.services.service-search :as service-search]
@@ -60,7 +59,6 @@
 
    ;; Services for the frontend
    :transport (component/using (transport-service/->Transport config) [:http :db])
-   :viewer (component/using (viewer/->Viewer) [:http])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
