@@ -1139,7 +1139,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :forgot-password-help "No problem, use the password reset form."
   :forgot-password-button "Reset password"
 
-  :error {:no-such-user "Unknown user"
+  :error {:login-error "Invalid credentials, please verify them and retry."
+          :no-such-user "Unknown user"
           :incorrect-password "Incorrect password"}
 
   :check-email-for-link "Your request for changing password has been received. A link for resetting your password has now been sent to your email address."
