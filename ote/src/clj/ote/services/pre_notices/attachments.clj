@@ -27,12 +27,11 @@
 
 (defn validate-file [{:keys [tempfile filename]}]
   (let [path (.toPath tempfile)
-        content-mime (Files/probeContentType path)
-        ;; In Mac os x mime types are not handled very well in java 1.8. So we use this as a backup.
-        mime-from-name (URLConnection/guessContentTypeFromName filename)
-        content-mime (if (nil? content-mime)
-                       mime-from-name
-                       content-mime)]
+
+        ;; In Mac os x mime types are not handled very well in java 1.8. So we try to probeContentType and if
+        ;; it fails then we try to guessContentTypeFromName
+        content-mime (or (Files/probeContentType path)
+                         (URLConnection/guessContentTypeFromName filename))]
 
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
