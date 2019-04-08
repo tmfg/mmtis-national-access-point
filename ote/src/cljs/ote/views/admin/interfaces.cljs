@@ -152,7 +152,10 @@
                 :label           "Latausvirheet"}
                {:name            :db-error
                 :type            :checkbox
-                :label           "Käsittelyvirhe"}]))]
+                :label           "Käsittelyvirhe"}
+               {:name            :no-interface
+                :type            :checkbox
+                :label           "Rajapinnattomat"}]))]
        filters]
 
       [ui/raised-button {:primary  true
@@ -174,38 +177,43 @@
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all  false}
            [ui/table-row
-            [ui/table-header-column {:style {:width "15%"}} "Palveluntuottaja"]
-            [ui/table-header-column {:style {:width "15%"}} "Sisältö"]
-            [ui/table-header-column {:width "10%"} "Tyyppi"]
-            [ui/table-header-column {:width "25%"} "Rajapinta"]
-            [ui/table-header-column {:width "15%"} "Viimeisin käsittely"]
-            [ui/table-header-column {:width "20%"} "Katso"]]]
+            [ui/table-header-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} "Palveluntuottaja"]
+            [ui/table-header-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} "Sisältö"]
+            [ui/table-header-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} "Tyyppi"]
+            [ui/table-header-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} "Rajapinta"]
+            [ui/table-header-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} "Viimeisin käsittely"]
+            [ui/table-header-column {:style {:width "20%" :padding "0px 5px 0px 5px"}} "Katso"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{:keys [interface-id operator-name format data-content url imported import-error db-error] :as interface} results]
-               ^{:key (str "link_" interface-id)}
+             (for [{:keys [interface-id service-id operator-name format data-content url imported import-error db-error]
+                    :as interface} results]
+               ^{:key (str "link_" (str interface-id "_" service-id))}
                [ui/table-row {:selectable false}
-                [ui/table-row-column {:style {:width "15%"}} [:a {:href     "#"
+                [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} [:a {:href     "#"
                                                                   :on-click #(do (.preventDefault %)
                                                                                  (e! (admin-controller/->OpenOperatorModal interface-id)))}
                                                               operator-name]]
-                [ui/table-row-column {:style {:width "15%"}} (admin-controller/format-interface-content-values data-content)]
-                [ui/table-row-column {:style {:width "10%"}} (first format)]
-                [ui/table-row-column {:style {:width "25%"}} [linkify url url {:target "_blank"}]]
-                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui imported)]
-                [ui/table-row-column {:style {:width "20%"}}
-                 (when import-error
+                [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (admin-controller/format-interface-content-values data-content)]
+                [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
+                [ui/table-row-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} [linkify url url {:target "_blank"}]]
+                [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui imported)]
+                [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
+                 (when (and import-error (not= "Rajapinta puuttuu" import-error))
                    [:a {:style {:color "red"}
                         :href     "#"
                         :on-click #(do (.preventDefault %)
                                        (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
                     " Latausvirhe "])
-                 (when db-error
+                 (when (and db-error (not= "db-error" db-error))
                    [:a {:style {:color "red"}
                         :href     "#"
                         :on-click #(do (.preventDefault %)
                                        (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
                     " Käsittelyvirhe "])
+
+                 (when (and import-error (= "Rajapinta puuttuu" db-error))
+                   [:span " Rajapinta puuttuu kokonaan "])
+
                  (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
                 (error-modal e! interface)
                 (operator-modal e! interface)]))]]])]]))
