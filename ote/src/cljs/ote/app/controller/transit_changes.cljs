@@ -15,26 +15,10 @@
 
 (define-event TransitChangesResponse [response]
   {:path [:transit-changes]}
-  (assoc app
-         :changes-contains-errors (filter
-                                    (fn [change]
-                                      (or
-                                        (:interfaces-has-errors? change)
-                                        (:no-interfaces-imported? change)))
-                                    (:changes response))
-         :changes-contract-traffic (filter
-                                     (fn [change]
-                                       (= false (:commercial? change)))
-                                     (:changes response))
-         :changes (remove
-                    (fn [change]
-                      (or
-                          (:interfaces-has-errors? change)
-                          (:no-interfaces-imported? change)
-                          (= false (:commercial? change))))
-                    (:changes response))
-         :finnish-regions (:finnish-regions response)
-         :loading? false))
+  (-> app
+      (assoc :changes (:changes response))
+      (assoc :finnish-regions (:finnish-regions response))
+      (assoc :loading? false)))
 
 (define-event LoadTransitChanges []
   {:path [:transit-changes]}
