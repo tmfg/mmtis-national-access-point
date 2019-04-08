@@ -76,18 +76,6 @@
                   (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
         (assoc-in [:open-sections :trip-stop-sequence] true))))
 
-(defn future-changes
-  "Filter routes changes that are in the future. (or no changes)"
-  [detection-date changes]
-  (let [detection-date (time/parse-date-iso-8601 detection-date)]
-    (filter
-      (fn [{:gtfs/keys [change-date]}]
-          (or (nil? change-date)
-              (not (t/before?
-                     (time/native->date-time change-date)
-                     detection-date))))
-      changes)))
-
 (defn count-changes [key coll]
   (count
     (get coll key)))
