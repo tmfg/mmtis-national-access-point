@@ -13,6 +13,7 @@
 (defrecord UpdateSearchFilters [filters])
 (defrecord SearchResponse [response params append?])
 (defrecord InitServiceSearch [])
+(defrecord FacetsResponse [facets])
 (defrecord FetchMore [])
 
 (defrecord FetchServiceGeoJSON [url])
@@ -106,8 +107,10 @@
       ;; a service page.
       app
 
-      ;; Otherwise and do an initial search
+      ;; Otherwise fetch facets and do an initial search
       (do
+        (comm/get! "service-search/facets"
+                   {:on-success (tuck/send-async! ->FacetsResponse)})
         ;; Immediately do a search without any parameters
         (search (update-in app [:service-search :filters] merge
                            {:limit page-size :offset 0})
@@ -124,6 +127,13 @@
                              :limit page-size
                              :offset (count (get-in app [:service-search :results]))))))
      true 0))
+
+  FacetsResponse
+  (process-event [{facets :facets} app]
+    (update app :service-search assoc
+            :facets facets
+            :filters (merge (get-in app [:service-search :filters])
+                            {::t-service/sub-type []})))
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
