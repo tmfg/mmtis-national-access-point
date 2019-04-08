@@ -184,14 +184,14 @@
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-              (assoc app
-                :service-changes-for-date-loading? false
-                :service-info (:service-info response)
-                :changes-all (sort-by :different-week-date < (:route-changes response))
-                :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
-                :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
-                :gtfs-package-info (:gtfs-package-info response)
-                :route-hash-id-type (:route-hash-id-type response)))
+  (assoc app
+    :service-changes-for-date-loading? false
+    :service-info (:service-info response)
+    :changes-all (sort-by :different-week-date < (:route-changes response))
+    :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
+    :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
+    :gtfs-package-info (:gtfs-package-info response)
+    :route-hash-id-type (:route-hash-id-type response)))
 
 (defn- init-view-state [app]
   (let [initial-view-state {:all-route-changes-checkbox nil

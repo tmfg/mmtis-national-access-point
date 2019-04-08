@@ -91,10 +91,7 @@
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
-                   (stylefy/use-style (merge
-                                        {:transition "margin-top 300ms ease"}
-                                        (if (or (not desktop?) @is-scrolled?)
-                                          {:margin-top "56px"}))))
+                   (stylefy/use-style {:transition "margin-top 300ms ease"}))
                  [:div (cond
                          (= :front-page (:page app))
                          {:class "container-fluid"}

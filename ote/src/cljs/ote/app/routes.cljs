@@ -91,10 +91,8 @@
        (nil? (get-in app [:user :username]))
        (contains? auth-required (:page app))))
 
-(defn send-startup-events [event]
-  (let [e! (fn e! [event]
-             (binding [tuck/*current-send-function* e!]
-               (swap! state/app (flip tuck/process-event) event)))]
+(defn- send-startup-events [event]
+  (let [e! (tuck/control state/app)]
     (if (vector? event)
       ;; Received multiple events, apply them all
       (doseq [event event

@@ -4,6 +4,7 @@
             [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! sql-query]]
             [com.stuartsierra.component :as component]
             [clojure.test.check.generators :as gen]
+            [ote.db.generators :as otegen]
             [ote.db.service-generators :as service-generators]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
@@ -23,20 +24,22 @@
              #(gen/generate
                service-generators/gen-transport-service))))
 
+(defn- publish-services! [saved-services]
+  ;; Make all generated test services public (and the generated)
+  ;; so that we can verify query results
+  (sql-execute! "UPDATE \"transport-service\" SET published = NULL")
+  (sql-execute!
+   "UPDATE \"transport-service\" SET published = to_timestamp(0) WHERE id IN ("
+   (str/join "," saved-services)
+   ")"))
+
 (deftest service-search-test
 
   (let [services (generate-services)
         saved-services (mapv (comp :transit
                                    (partial http-post "admin" "transport-service"))
                              services)]
-
-    ;; Make all generated test services public (and the generated)
-    ;; so that we can verify query results
-    (sql-execute! "UPDATE \"transport-service\" SET published = NULL")
-    (sql-execute!
-     "UPDATE \"transport-service\" SET published = to_timestamp(0) WHERE id IN ("
-     (str/join "," (map ::t-service/id saved-services))
-     ")")
+    (publish-services! (map ::t-service/id saved-services))
 
     (testing "Searching by exact name returns it"
       (let [{name ::t-service/name :as s} (first services)
@@ -67,9 +70,9 @@
 
     (testing "Search operators by name"
       (let [operator-names (sql-query
-                             "SELECT * FROM \"transport-operator\" WHERE id IN ("
-                             (str/join "," (map ::t-service/transport-operator-id saved-services))
-                             ")")
+                            "SELECT * FROM \"transport-operator\" WHERE id IN ("
+                            (str/join "," (map ::t-service/transport-operator-id saved-services))
+                            ")")
             name (subs (:name (first operator-names)) 0 5)
             get-url (str "operator-completions/" name)
             result (http-get get-url)
@@ -97,8 +100,168 @@
       (is (some #(= "Ajopalvelu Testinen Oy" (:operator %))
                 (:json result)))))
 
+  (testing "Spatial search returns services which operate in areas intersecting with search areas"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-municipality-105",
+                                                                     :namefin "Hyrynsalmi",
+                                                                     :type "finnish-municipality",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "Hyrynsalmi"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "Suomussalmi"))))
+        (is (zero? (count (services-in "Ristijärvi"))))
+        (is (zero? (count (services-in "Kuhmo"))))
+        (is (zero? (count (services-in "Puolanka"))))
+        ;; Doesn't match with areas close by
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Kainuu"))))
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
+  (testing "Spatial search returns services which operate in areas intersecting with search areas 2nd sample set"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-postal-90900",
+                                                                     :namefin "90900 Kiiminki Keskus",
+                                                                     :type "finnish-postal",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "90900 Kiiminki Keskus"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "90630 Korvensuora"))))
+        (is (zero? (count (services-in "90660 Sanginsuu"))))
+        (is (zero? (count (services-in "91200 Yli-Ii Keskus"))))
+        (is (zero? (count (services-in "91210 Jakkukylä"))))
+        (is (zero? (count (services-in "91260 Pahkakoski-Räinä"))))
+        (is (zero? (count (services-in "90910 Kontio"))))
+        (is (zero? (count (services-in "90940 Jääli"))))
+        (is (zero? (count (services-in "91300 Ylikiiminki Keskus"))))
+        (is (zero? (count (services-in "91310 Arkala"))))
+        ;; Doesn't match with areas close by
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Oulu"))))
+        (is (= 1 (count (services-in "Pohjois-Pohjanmaa"))))
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
+  (testing "Spatial search returns services which operate in areas intersecting with search areas 3rd sample set"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-municipality-249",
+                                                                     :namefin "Keuruu",
+                                                                     :type "finnish-municipality",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "Keuruu"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "Petäjävesi"))))
+        (is (zero? (count (services-in "Virrat"))))
+        (is (zero? (count (services-in "Mänttä-Vilppula"))))
+        (is (zero? (count (services-in "Multia"))))
+        (is (zero? (count (services-in "Jämsä"))))
+        (is (zero? (count (services-in "Ähtäri"))))
+        (is (zero? (count (services-in "Pirkanmaa"))))
+        (is (zero? (count (services-in "Etelä-Pohjanmaa"))))
+        ;; Doesn't match with exterior areas
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with overlapping areas
+        (is (= 1 (count (services-in "Keski-Suomi"))))
+        (is (= 1 (count (services-in "41970 Huttula"))))
+        (is (= 1 (count (services-in "42520 Asunta"))))
+
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
+  (testing "Spatial search returns services which operate in areas intersecting with search areas 4th sample set"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [#:ote.db.places{:id "finnish-postal-33200",
+                                                                     :namefin "33200 Tampere Keskus Läntinen",
+                                                                     :type "finnish-postal",
+                                                                     :primary? true}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Matches with itself
+        (is (= 1 (count (services-in "33200 Tampere Keskus Läntinen"))))
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "33210 Itä-Amuri-Tammerkoski"))))
+        (is (zero? (count (services-in "33230 Länsi-Amuri"))))
+        (is (zero? (count (services-in "33100 Tampere Keskus"))))
+        (is (zero? (count (services-in "33900 Härmälä-Rantaperkiö"))))
+        ;; Doesn't match with exterior areas
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Tampere"))))
+        (is (= 1 (count (services-in "Pirkanmaa"))))
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
+  (testing "Spatial search returns services with operation area defined as a single point when searching with the surrounding area"
+    (let [service (assoc (gen/generate service-generators/gen-transport-service)
+                         ::t-service/operation-area [{:ote.db.places/type "drawn"
+                                                      :ote.db.places/namefin "Kannus rautatieasema"
+                                                      :ote.db.places/primary? true
+                                                      :geojson "{\"type\":\"Point\",\"coordinates\":[23.914974,63.898401]}"}])
+          saved-service (http-post "admin" "transport-service" service)]
+      (publish-services! [(::t-service/id (:transit saved-service))])
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; Doesn't match with neighbouring areas
+        (is (zero? (count (services-in "Petäjävesi"))))
+        (is (zero? (count (services-in "Virrat"))))
+        (is (zero? (count (services-in "Mänttä-Vilppula"))))
+        (is (zero? (count (services-in "Multia"))))
+        (is (zero? (count (services-in "Jämsä"))))
+        (is (zero? (count (services-in "Ähtäri"))))
+        (is (zero? (count (services-in "Pirkanmaa"))))
+        (is (zero? (count (services-in "Etelä-Pohjanmaa"))))
+        ;; Doesn't match with exterior areas
+        (is (zero? (count (services-in "Sotkamo"))))
+        (is (zero? (count (services-in "Kajaani"))))
+        ;; Matches with enveloping areas
+        (is (= 1 (count (services-in "Keski-Pohjanmaa"))))
+        (is (= 1 (count (services-in "69100 Kannus Keskus"))))
+        (is (= 1 (count (services-in "Kannus"))))
+        (is (= 1 (count (services-in "Suomi"))))
+        (is (= 1 (count (services-in "Eurooppa")))))))
+
   (testing "Operator search does not return deleted companies"
     (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
-      (is (zero? (count (:json result)))))))
+      (is (zero? (count (:json result))))))
+
+  (testing "Ranking search results with quality of match against operation-area"
+    (let [match-qualities '({:id 817
+                             :intersection 0.6384818473140419
+                             :difference 66.3123620550177}
+                            {:id 1448
+                             :intersection 0.1
+                             :difference 0.7630913680707156})
+          initial-results  [{::t-service/id 817} {::t-service/id 1448}]
+          results (sut/sort-by-match-quality initial-results match-qualities)]
+      (is (= [1448 817] (map ::t-service/id results)))))
+
+  (testing "Match quality counting"
+    (is (= -1 (sut/match-quality 0 1))
+        (= 2 (sut/match-quality 2 1)))))

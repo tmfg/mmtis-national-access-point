@@ -30,13 +30,37 @@
 (defn- ids [key query-result]
   (into #{} (map key) query-result))
 
-(defn- operation-area-ids [db operation-area]
+(defn- services-operating-in
+  "Returns ids of services which operate in the given areas"
+  [db operation-area]
   (when (seq operation-area)
     (ids
-      ::search/transport-service-id
-      (specql/fetch db ::search/operation-area-facet
-                    #{::search/transport-service-id}
-                    {::search/operation-area (op/in (map str/lower-case operation-area))}))))
+     :id
+     (service-ids-by-operation-areas db {:operation-area operation-area}))))
+
+(defn match-quality
+  "Returns match quality of a search result to the operation-area it was searched against. Greater return values are worse matches.
+Negative return value is an invalid match"
+  [intersection difference]
+  (if (pos? intersection) (/ difference intersection) -1))
+
+(defn sort-by-match-quality
+  "Sorts results by the match quality."
+  [results spatial-diffs]
+  (let [quality-by-id (zipmap (map :id spatial-diffs) (map #(match-quality (:intersection %) (:difference %)) spatial-diffs))]
+    (->> results
+         (map #(assoc % :match-quality (get quality-by-id (::t-service/id %))))
+         (sort-by :match-quality))))
+
+(defn- service-search-match-qualities
+  "Extends the results with quality of the match to the operation area."
+  [db results operation-area]
+  (if operation-area
+    (let [ids (map ::t-service/id results)
+          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
+          valid-results (sort-by-match-quality results qualities)]
+      valid-results)
+    results))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
@@ -131,9 +155,9 @@
                 ::t-service/gtfs-db-error))
     ei-link))
 
-(defn- search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
+(defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
-  (let [result-id-sets [(operation-area-ids db operation-area)
+  (let [result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
                         (transport-type-ids db transport-type)
                         (data-content-ids db data-content)
@@ -169,6 +193,7 @@
                                          (.contains operators (::t-service/business-id company))))
                                      c)))
                   results)
+        results (service-search-match-qualities db results operation-area)
         results-without-personal-info (mapv
                                         (fn [result]
                                           (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))

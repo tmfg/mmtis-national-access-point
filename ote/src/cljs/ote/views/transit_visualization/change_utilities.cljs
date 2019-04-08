@@ -4,9 +4,9 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
-            [ote.app.controller.transit-visualization :as tv]
             [ote.ui.icons :as ote-icons]
-            [ote.ui.icon_labeled :as icon-l]))
+            [ote.ui.icon_labeled :as icon-l]
+            [ote.app.controller.transit-visualization :as tv]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -40,5 +40,5 @@
                                 [ic/action-timeline {} "Pysäkkimuutoksia per vuoro"]
                                 [ic/action-query-builder {} "Aikataulumuutoksia per vuoro"]
                                 [ic/content-remove-circle-outline {:color style/remove-color} "Mahdollisesti päättyvä reitti"]]]
-        ^{:key (str "transit-visualization-route-changes-legend-" label)}
+        ^{:key (str "transit-visualization-route-changes-legend-" (rand-int 9999999))} ;; Ensure that all icons have unique key
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))]])

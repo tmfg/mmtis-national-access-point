@@ -4,10 +4,13 @@
 
 
 (defn link-with-icon
-  [{:keys [id]} icon url link-text on-click]
+  [{:keys [id target-blank?]} icon url link-text on-click]
   [:div
    [:a (merge {:href url
                :style {:margin-right "2rem"}}
+              (when target-blank?
+                {:target "_blank"
+                 :rel "noopener noreferrer"})
               (when id
                 {:id id})
               (when (not-empty on-click)

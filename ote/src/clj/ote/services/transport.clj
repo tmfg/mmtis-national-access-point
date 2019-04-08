@@ -511,6 +511,7 @@
   (let [to (first (fetch db ::t-operator/transport-operator
                          #{::t-operator/business-id
                            ::t-operator/name
+                           ::t-operator/id
                            ::t-operator/homepage}
                          {::t-operator/id id}))]
     (if to

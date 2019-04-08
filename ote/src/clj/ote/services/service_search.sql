@@ -125,3 +125,52 @@ SELECT eid."transport-service-id" as id
                 FROM "transport-service" ts
                WHERE ts.id = eid."transport-service-id"
                  AND ts.published IS NOT NULL)
+
+-- name: service-ids-by-operation-areas
+-- Find services by operation area names using two search tables. Notice the UNION of two selects.
+SELECT oa."transport-service-id" as id
+  FROM "places" pl1,
+       "operation-area-facet" oa,
+       "spatial-relations-places" sr,
+       "transport-service" ts
+ WHERE pl1.namefin in (:operation-area)
+   AND pl1.id = sr."search-area"
+   AND sr."operation-area-search-term" = oa."operation-area"
+   AND oa."primary?" = true
+   AND oa."transport-service-id" = ts.id
+   AND ts.published IS NOT NULL
+
+ UNION
+
+   SELECT oa."transport-service-id" as id
+     FROM "places" pl,
+          "spatial-relations-custom-areas" sr,
+          "operation_area" oa,
+          "transport-service" ts
+    WHERE pl.namefin in (:operation-area)
+      AND pl.id = sr."search-area"
+      AND sr."operation-area-id" = oa.id
+      AND oa."primary?" = true
+      AND oa."transport-service-id" = ts.id
+      AND ts.published IS NOT NULL;
+
+
+-- name: service-match-quality-to-operation-area
+-- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one
+-- If geometry type is not a surface area of some kind, use a carefully chosen constant area. For instance railway stations mark their operating areas as points
+SELECT "oa-agg"."transport-service-id" as id,
+       CASE
+        WHEN ST_GeometryType("oa-agg".location) IN ('ST_Point', 'ST_Linestring') THEN 3e-4
+        ELSE ST_Area(ST_Intersection("oa-agg".location, sa.location))
+        END as intersection,
+       ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
+  FROM
+      (SELECT oa."transport-service-id" as "transport-service-id",
+              ST_Envelope(ST_Union(array_agg(ST_Envelope(oa.location)))) as "location"
+         FROM operation_area oa
+        WHERE oa."transport-service-id" in (:id)
+          AND oa."primary?" = true
+     GROUP BY oa."transport-service-id") as "oa-agg",
+      (SELECT ST_Envelope(ST_Union(array_agg(ST_Envelope(pl.location)))) as "location"
+         FROM places pl
+        WHERE pl.namefin IN (:operation-area)) as "sa";
