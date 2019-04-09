@@ -1041,7 +1041,7 @@
                               (apply concat
                                      (mapv (fn [route-key]
                                              (let [query-params (merge {:route-hash-id route-key} route-query-params)]
-                                                            (service-route-hashes-for-date-range2 db query-params)))
+                                                            (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
