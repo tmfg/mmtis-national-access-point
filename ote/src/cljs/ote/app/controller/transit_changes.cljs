@@ -52,7 +52,8 @@
 (define-event ShowChangesForService [id date]
   {}
   (routes/navigate! :transit-visualization {:service-id id
-                                            :date (time/format-date-iso-8601 date)})
+                                            :date (time/format-date-iso-8601 date)
+                                            :scope "now"})
   app)
 
 (define-event SetRegionFilter [regions]
