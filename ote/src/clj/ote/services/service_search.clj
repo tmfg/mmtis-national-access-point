@@ -170,16 +170,21 @@ Negative return value is an invalid match"
               ;; Combine with intersection (AND)
               (apply set/intersection
                      (remove nil? result-id-sets)))
+        match-qualities (service-search-match-qualities db (map (fn [id] {::t-service/id id}) ids) operation-area)
+        sorted-ids (map ::t-service/id match-qualities)
+        sorted-id-map (zipmap sorted-ids match-qualities)
         options (if (and offset limit)
                   {:specql.core/offset offset
                    :specql.core/limit limit
                    :specql.core/order-by :ote.db.modification/created
                    :specql.core/order-direction :desc}
                   {})
+        limited-ids (if (and offset limit) (take limit (drop offset sorted-ids)) sorted-ids)
         results (specql/fetch db ::t-service/transport-service-search-result
                               search-result-columns
-                              {::t-service/id (op/in ids)}
+                              {::t-service/id (op/in limited-ids)}
                               options)
+        results (sort-by (fn [n] (:match-quality  (sorted-id-map (::t-service/id n)))) results)
         results (mapv (fn [result]
                         (update-in result
                                    [::t-service/external-interface-links]
@@ -193,11 +198,12 @@ Negative return value is an invalid match"
                                          (.contains operators (::t-service/business-id company))))
                                      c)))
                   results)
-        results (service-search-match-qualities db results operation-area)
         results-without-personal-info (mapv
                                         (fn [result]
                                           (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
                                         results)]
+    ;(prn limited-ids)
+    ;(prn sorted-ids)
     (merge
      {:empty-filters? empty-filters?
       :results results-without-personal-info
