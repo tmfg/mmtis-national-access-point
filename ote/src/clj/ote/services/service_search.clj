@@ -227,19 +227,20 @@ Negative return value is an invalid match"
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection
-                     (remove nil? result-id-sets)))
-        results (if operation-area
+                     (remove nil? result-id-sets)))]
+    (-> (if operation-area
                   (transport-services-in-operation-area db ids operation-area offset limit)
                   (transport-services db ids offset limit))
-        results (without-import-errors results)
-        results (without-not-queried-operators results operators)]
-    (merge
-     {:empty-filters? empty-filters?
-      :results (without-personal-info results)
-      :filter-service-count (count ids)}
-     (when empty-filters?
-       {:total-service-count (total-service-count db)
-        :total-company-count (total-company-count db)}))))
+        (without-import-errors)
+        (without-not-queried-operators operators)
+        (without-personal-info)
+        (as-> results (merge
+                       {:empty-filters? empty-filters?
+                        :results results
+                        :filter-service-count (count ids)}
+                       (when empty-filters?
+                         {:total-service-count (total-service-count db)
+                          :total-company-count (total-company-count db)}))))))
 
 (defn- service-search-parameters
   "Extract service search parameters from query parameters."
