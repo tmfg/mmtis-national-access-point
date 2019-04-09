@@ -10,7 +10,7 @@
             [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
-            [ote.transit-changes :as transit-changes]
+            [ote.transit-changes :as tcu]
             [clojure.set :as set]))
 
 (defn ensure-route-hash-id
@@ -73,7 +73,7 @@
     (-> transit-visualization
         (assoc-in [:compare :selected-trip-pair] trip-pair)
         (assoc-in [:compare :combined-stop-sequence]
-                  (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+                  (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
         (assoc-in [:open-sections :trip-stop-sequence] true))))
 
 (defn future-changes
@@ -81,11 +81,11 @@
   [detection-date changes]
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (filter
-      (fn [{:gtfs/keys [change-date]}]
-          (or (nil? change-date)
-              (not (t/before?
-                     (time/native->date-time change-date)
-                     detection-date))))
+      (fn [{:keys [change-date]}]
+        (or (nil? change-date)
+            (not (t/before?
+                   (time/native->date-time change-date)
+                   detection-date))))
       changes)))
 
 (defn count-changes [key coll]
@@ -101,7 +101,7 @@
         only-changes (sort-by :different-week-date (filterv :change-date changes))
 
         ;; Group by only-changes by route-hash-id
-        grouped-changes (group-by #(:route-hash-id %) only-changes)
+        grouped-changes (group-by :route-hash-id only-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
         route-changes (map (fn [x]
@@ -184,30 +184,34 @@
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-  (assoc app
-    :service-changes-for-date-loading? false
-    :service-info (:service-info response)
-    :changes-all (sort-by :different-week-date < (:route-changes response))
-    :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
-    :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
-    :gtfs-package-info (:gtfs-package-info response)
-    :route-hash-id-type (:route-hash-id-type response)))
+  (let [date-filter (if (= "now" (:scope app))
+                      (time/now-iso-date-str)
+                      detection-date)]
+    (assoc app
+      :service-changes-for-date-loading? false
+      :service-info (:service-info response)
+      :changes-all (sort-by :different-week-date < (:route-changes response))
+      :changes-route-no-change (sorted-route-changes true (future-changes date-filter (:route-changes response)))
+      :changes-route-filtered (sorted-route-changes false (future-changes date-filter (:route-changes response)))
+      :gtfs-package-info (:gtfs-package-info response)
+      :route-hash-id-type (:route-hash-id-type response))))
 
-(defn- init-view-state [app]
+(defn- init-view-state [app scope]
   (let [initial-view-state {:all-route-changes-checkbox nil
                             :all-route-changes-display? false
                             :open-sections {:gtfs-package-info false}
+                            :scope scope
                             :service-changes-for-date-loading? true}]
     (assoc app :transit-visualization initial-view-state)))
 
-(define-event InitTransitVisualization [service-id detection-date]
+(define-event InitTransitVisualization [service-id detection-date scope]
   {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (init-view-state app))
+  (init-view-state app scope))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->InitTransitVisualization (:service-id params) (:date params)))
+  (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -239,20 +243,20 @@
      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
 (defn compare-stop-differences [transit-visualization date1-trips date2-trips]
-  (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+  (if-let [first-common-stop (tcu/first-common-stop (concat date1-trips date2-trips))]
           (let [first-common-stop
                 #(assoc %
                    :first-common-stop first-common-stop
-                   :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
+                   :first-common-stop-time (tcu/time-for-stop % first-common-stop))
                 date1-trips (mapv first-common-stop date1-trips)
                 date2-trips (mapv first-common-stop date2-trips)
-                combined-trips (transit-changes/merge-by-closest-time
+                combined-trips (tcu/merge-by-closest-time
                                  :first-common-stop-time
                                  date1-trips date2-trips)]
 
             (assoc-in transit-visualization [:compare :combined-trips]
                       (mapv (fn [[l r]]
-                              [l r (transit-changes/trip-stop-differences l r)])
+                              [l r (tcu/trip-stop-differences l r)])
                             combined-trips)))
 
           ;; Can't find common stop
@@ -510,7 +514,7 @@
   (-> app
       (assoc-in [:transit-visualization :compare :selected-trip-pair] trip-pair)
       (assoc-in [:transit-visualization :compare :combined-stop-sequence]
-                (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+                (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
       (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true)))
 
 (define-event ToggleShowRouteLine [routename]
