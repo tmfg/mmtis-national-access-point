@@ -190,19 +190,41 @@
                                       "Ei löydettyjä muutoksia")
                    :name->label str
                    :label-style (merge style-base/table-col-style-wrap {:font-weight "bold"})
-                   :stripedRows true
-                   :row-style {:cursor "pointer"}
-                   :show-row-hover? true
-                   :on-select (fn [evt]
-                                (let [{:keys [transport-service-id date]} (first evt)]
-                                  (e! (tc/->ShowChangesForService transport-service-id
-                                                                  date))))}
+                   :stripedRows true}
       [{:name "Palveluntuottaja"
-        :read :transport-operator-name
+        :read identity
+        :format (fn [row]
+                  (let [date (:date row)
+                        formatted-date (when date
+                                         (time/format-date-iso-8601 date))
+                        transport-service-id (:transport-service-id row)
+                        operator (:transport-operator-name row)]
+                    (if date
+                      [:a {:href (str "/transit-visualization/" transport-service-id "/" formatted-date)
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (tc/->ShowChangesForService transport-service-id
+                                                                        date)))}
+                       operator]
+                      [:span operator])))
         :col-style style-base/table-col-style-wrap
         :width "20%"}
        {:name "Palvelu"
-        :read :transport-service-name
+        :read identity
+        :format (fn [row]
+                  (let [date (:date row)
+                        formatted-date (when date
+                                         (time/format-date-iso-8601 date))
+                        transport-service-id (:transport-service-id row)
+                        service (:transport-service-name row)]
+                    (if date
+                      [:a {:href (str "/transit-visualization/" transport-service-id "/" formatted-date)
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (tc/->ShowChangesForService transport-service-id
+                                                                        date)))}
+                       service]
+                      [:span service])))
         :col-style style-base/table-col-style-wrap
         :width "20%"}
        {:name "Aikaa 1. muutokseen" :width "15%"
