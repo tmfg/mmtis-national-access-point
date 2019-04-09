@@ -385,7 +385,7 @@
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
-                    [tv-change-icons/labeled-icon [ic/navigation-check] "Ei muutoksia"]
+                    [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
                      (str (time/days-until different-week-date) " pv")
                      [:span (stylefy/use-style {:margin-left "5px"
