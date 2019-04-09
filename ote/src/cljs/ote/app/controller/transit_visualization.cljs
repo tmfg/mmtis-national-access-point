@@ -101,7 +101,7 @@
         only-changes (sort-by :different-week-date (filterv :change-date changes))
 
         ;; Group by only-changes by route-hash-id
-        grouped-changes (group-by #(:route-hash-id %) only-changes)
+        grouped-changes (group-by :route-hash-id only-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
         route-changes (map (fn [x]
@@ -183,18 +183,18 @@
   (days-to-first-diff start-date date->hash))
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
-              {:path [:transit-visualization]}
-              (let [date-filter (if (= "now" (:scope app))
-                                  (time/now-iso-date-str)
-                                  detection-date)]
-                (assoc app
-                  :service-changes-for-date-loading? false
-                  :service-info (:service-info response)
-                  :changes-all (sort-by :different-week-date < (:route-changes response))
-                  :changes-route-no-change (sorted-route-changes true (future-changes date-filter (:route-changes response)))
-                  :changes-route-filtered (sorted-route-changes false (future-changes date-filter (:route-changes response)))
-                  :gtfs-package-info (:gtfs-package-info response)
-                  :route-hash-id-type (:route-hash-id-type response))))
+  {:path [:transit-visualization]}
+  (let [date-filter (if (= "now" (:scope app))
+                      (time/now-iso-date-str)
+                      detection-date)]
+    (assoc app
+      :service-changes-for-date-loading? false
+      :service-info (:service-info response)
+      :changes-all (sort-by :different-week-date < (:route-changes response))
+      :changes-route-no-change (sorted-route-changes true (future-changes date-filter (:route-changes response)))
+      :changes-route-filtered (sorted-route-changes false (future-changes date-filter (:route-changes response)))
+      :gtfs-package-info (:gtfs-package-info response)
+      :route-hash-id-type (:route-hash-id-type response))))
 
 (defn- init-view-state [app scope]
   (let [initial-view-state {:all-route-changes-checkbox nil
