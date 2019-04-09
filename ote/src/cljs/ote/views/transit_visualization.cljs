@@ -712,7 +712,7 @@
                  " Ladattu NAPiin "
                  (if show-link?
                    (common/linkify
-                     (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created))
+                     (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all")
                      (time/format-timestamp-for-ui created))
                    (time/format-timestamp-for-ui created)) ". "
                  "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."]))]
