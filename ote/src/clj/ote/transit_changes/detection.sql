@@ -4,7 +4,7 @@ WITH dates AS (
   SELECT :start-date::DATE + d AS date
     FROM generate_series(0, :end-date::DATE - :start-date::DATE) s (d)
 )
-SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id",
+SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign",  COALESCE(rh."route-hash-id", :route-hash-id) as "route-hash-id",
        string_agg(rh.hash::text, ' ' ORDER BY p."external-interface-description-id" ASC) as hash
   FROM dates d
   LEFT JOIN "gtfs-date-hash" dh

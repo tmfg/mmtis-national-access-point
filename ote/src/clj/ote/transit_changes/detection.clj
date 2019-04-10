@@ -496,9 +496,6 @@
                  :when (pred v)]
              [k v])))
 
-(def new-data-example [{:starting-week :foo
-                        :different-week :foo}])
-
 (defn route-differences
   "
   Takes a vector of weeks for one route and outputs vector of weeks where change or no traffic starts
