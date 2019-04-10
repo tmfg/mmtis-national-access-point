@@ -44,23 +44,19 @@ Negative return value is an invalid match"
   [intersection difference]
   (if (pos? intersection) (/ difference intersection) -1))
 
-(defn sort-by-match-quality
-  "Sorts results by the match quality."
-  [results spatial-diffs]
-  (let [quality-by-id (zipmap (map :id spatial-diffs) (map #(match-quality (:intersection %) (:difference %)) spatial-diffs))]
-    (->> results
-         (map #(assoc % :match-quality (get quality-by-id (::t-service/id %))))
-         (sort-by :match-quality))))
+(defn- id-to-quality
+  "Processes `spatial-diffs` into a mapping of id > match quality"
+  [spatial-diffs]
+  (into {} (map (juxt :id #(match-quality (:intersection %) (:difference %))) spatial-diffs)))
 
 (defn- service-search-match-qualities
-  "Extends the results with quality of the match to the operation area."
-  [db results operation-area]
-  (if operation-area
-    (let [ids (map ::t-service/id results)
-          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
-          valid-results (sort-by-match-quality results qualities)]
-      valid-results)
-    results))
+  "Returns a mapping of service id -> match quality
+  `db` database handle
+  `service-ids` collection of ids for which qualities are returned
+  `operation-area` collection of place names against which match quality is compared"
+  [db service-ids operation-area]
+  (id-to-quality
+   (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
@@ -195,13 +191,12 @@ Negative return value is an invalid match"
   `ids` is a collection of transport service ids.
   `offset` and `limit` make it possible to use paging instead of fetching all the results"
   [db ids operation-area offset limit]
-  (let [match-qualities (service-search-match-qualities db (map (fn [id] {::t-service/id id}) ids) operation-area)
-        sorted-ids (map ::t-service/id match-qualities)
-        sorted-id-map (zipmap sorted-ids match-qualities)
+  (let [match-qualities (service-search-match-qualities db ids operation-area)
+        sorted-ids (sort-by match-qualities (keys match-qualities))
         page (page-of sorted-ids offset limit)
         results (transport-services db page)]
     (sort-by
-     (fn [n] (:match-quality (sorted-id-map (::t-service/id n))))
+     (comp ::t-service/id match-qualities)
      results)))
 
 (defn- without-import-errors [search-result]
