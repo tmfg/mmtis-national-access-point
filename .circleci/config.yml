@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: solita/napote-circleci:latest
+      - image: solita/napote-circleci:2019-04-11
       - image: solita/napotedb:latest
 
     working_directory: ~/repo
