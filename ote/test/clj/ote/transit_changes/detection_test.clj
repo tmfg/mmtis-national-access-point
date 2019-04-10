@@ -622,7 +622,17 @@
 ;; and cross ref with the bug
 
 ;; for case Lohja - Nummela - Vihti we should find
-;; detected-route-change rows containing 
+;; detected-route-change rows containing changes for these
+;; prob: vihti routes missing from detection results (even under :all-routes key)
+;; repl wip:
+;; (detection/service-routes-with-date-range (:db ote.main/ote) {:service-id 2})
+;; -> sql query -> sproc -> gtfs_service_routes_with_daterange
+;; checking routes: select "id", "route-id", "route-long-name" from "gtfs-route" where "route-long-name" like '%ummela%';
+;; ->  142 | r_26     | Lohja - Nummela - Vihti
+;; ok. after redoing import with updated code from master, the original symptom changed:
+;;  - now we get :all routes containing the route:
+;; (filter #(= (:route-long-name %) "Lohja - Nummela - Vihti")  (vals  (:all-routes *nd)))
+
 (deftest test-with-kalkati-package
   (let [;; db (:db ote.test/*ote*)
         db (:db ote.main/ote)
@@ -636,9 +646,9 @@
                             (rewrite-calendar file-data orig-date)
                             file-data)
                           file-data)
-        package-id 2
+        package-id 12
         interface-id 1
-        _ (ote.integration.import.gtfs/save-gtfs-to-db db gtfs-zip-bytes package-id interface-id service-id my-intercept-fn)
+        ;; _ (ote.integration.import.gtfs/save-gtfs-to-db db gtfs-zip-bytes package-id interface-id service-id my-intercept-fn)
         route-query-params {:service-id service-id :start-date (time/days-from (time/now) -120) :end-date (time/days-from (time/now) 1)}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)]
     (def *nd new-diff)
