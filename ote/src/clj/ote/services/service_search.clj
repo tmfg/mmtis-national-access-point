@@ -204,30 +204,34 @@ Negative return value is an invalid match"
      (fn [n] (:match-quality (sorted-id-map (::t-service/id n))))
      results)))
 
-(defn- without-import-errors [results]
-  (mapv (fn [result]
-          (update-in result
-                     [::t-service/external-interface-links]
-                     #(mapv hide-import-errors %)))
-        results))
+(defn- without-import-errors [search-result]
+  (update-in search-result
+             [::t-service/external-interface-links]
+             #(mapv hide-import-errors %)))
 
-(defn- without-personal-info [results]
-  (mapv
-   (fn [result]
-     (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
-   results))
+(defn- without-personal-info
+  "Removes contact information from the `search-result`"
+  [search-result]
+  (dissoc search-result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
 
-(defn- without-not-queried-operators
-  "Removes not interesting companies from the result elements"
-  [results operators]
-  (mapv
-   #(update % ::t-service/service-companies
+(defn- filtering-operators
+  "Returns a function that removes not interesting companies from the `search-result`"
+  [operators]
+  (fn [search-result]
+    (update search-result ::t-service/service-companies
             (fn [c]
               (filter (fn [company]
                         (when (and operators (::t-service/business-id company))
                           (.contains operators (::t-service/business-id company))))
-                      c)))
-   results))
+                      c)))))
+(defn- pare-results
+  "Removes information not intended for the frontend from `search-results`
+  Retains `searched-operators` in the search results"
+  [search-results searched-operators]
+  (->> search-results
+       (mapv without-import-errors)
+       (mapv (filtering-operators searched-operators))
+       (mapv without-personal-info)))
 
 (defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
@@ -247,9 +251,7 @@ Negative return value is an invalid match"
     (-> (if operation-area
                   (transport-services-in-operation-area db ids operation-area offset limit)
                   (transport-services-page db ids offset limit))
-        (without-import-errors)
-        (without-not-queried-operators operators)
-        (without-personal-info)
+        (pare-results operators)
         (as-> results (merge
                        {:empty-filters? empty-filters?
                         :results results
