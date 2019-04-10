@@ -190,12 +190,15 @@
                ^{:key (str "link_" (str interface-id "_" service-id))}
                [ui/table-row {:selectable false}
                 [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} [:a {:href     "#"
-                                                                  :on-click #(do (.preventDefault %)
-                                                                                 (e! (admin-controller/->OpenOperatorModal interface-id)))}
-                                                              operator-name]]
+                                                                                             :on-click #(do (.preventDefault %)
+                                                                                                            (e! (admin-controller/->OpenOperatorModal interface-id)))}
+                                                                                         operator-name]]
                 [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (admin-controller/format-interface-content-values data-content)]
                 [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
-                [ui/table-row-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} [linkify url url {:target "_blank"}]]
+                [ui/table-row-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
+                                                                                          url
+                                                                                          (do (.log js/console " import-error " (pr-str import-error))
+                                                                                            [linkify url url {:target "_blank"}]))]
                 [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui imported)]
                 [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
                  (when (and import-error (not= "Rajapinta puuttuu" import-error))
@@ -211,7 +214,7 @@
                                        (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
                     " Käsittelyvirhe "])
 
-                 (when (and import-error (= "Rajapinta puuttuu" db-error))
+                 (when (and import-error (= "Rajapinta puuttuu" import-error))
                    [:span " Rajapinta puuttuu kokonaan "])
 
                  (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
