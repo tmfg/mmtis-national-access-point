@@ -157,9 +157,19 @@ Negative return value is an invalid match"
 
 (defn- transport-services
   "Queries database for transport services.
-  'db' is the database handle
-  'ids' is a collection of transport service ids.
-  'offset' and 'limit' make it possible to use paging instead of fetching all the results"
+  `db` is the database handle
+  `ids` is a collection of transport service ids."
+  [db ids]
+  (specql/fetch db ::t-service/transport-service-search-result
+                search-result-columns
+                {::t-service/id (op/in ids)}
+                {}))
+
+(defn- transport-services-page
+  "Queries database for a page of transport services.
+  `db` is the database handle
+  `ids` is a collection of transport service ids.
+  `offset` and `limit` make it possible to use paging instead of fetching all the results"
   [db ids offset limit]
   (let [options (if (and offset limit)
                   {:specql.core/offset offset
@@ -172,18 +182,24 @@ Negative return value is an invalid match"
                               {::t-service/id (op/in ids)}
                               options)))
 
+(defn- page-of
+  [seq offset limit]
+  (if (and offset limit)
+    (take limit (drop offset seq))
+    seq))
+
 (defn- transport-services-in-operation-area
   "Queries database for transport services ordered so that best matches to the operation area are first in the results.
-  'db' is the database handle
-  'operation-area' is a collection of operation area names
-  'ids' is a collection of transport service ids.
-  'offset' and 'limit' make it possible to use paging instead of fetching all the results"
+  `db` is the database handle
+  `operation-area` is a collection of operation area names
+  `ids` is a collection of transport service ids.
+  `offset` and `limit` make it possible to use paging instead of fetching all the results"
   [db ids operation-area offset limit]
   (let [match-qualities (service-search-match-qualities db (map (fn [id] {::t-service/id id}) ids) operation-area)
         sorted-ids (map ::t-service/id match-qualities)
         sorted-id-map (zipmap sorted-ids match-qualities)
-        limited-ids (if (and offset limit) (take limit (drop offset sorted-ids)) sorted-ids)
-        results (transport-services db limited-ids offset limit)]
+        page (page-of sorted-ids offset limit)
+        results (transport-services db page)]
     (sort-by
      (fn [n] (:match-quality (sorted-id-map (::t-service/id n))))
      results)))
@@ -230,7 +246,7 @@ Negative return value is an invalid match"
                      (remove nil? result-id-sets)))]
     (-> (if operation-area
                   (transport-services-in-operation-area db ids operation-area offset limit)
-                  (transport-services db ids offset limit))
+                  (transport-services-page db ids offset limit))
         (without-import-errors)
         (without-not-queried-operators operators)
         (without-personal-info)
