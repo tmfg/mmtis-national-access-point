@@ -169,14 +169,25 @@
 
    [transit-change-filters e! transit-changes]])
 
-(defn detected-transit-changes [e! {:keys [loading? changes changes-contains-errors changes-contract-traffic selected-finnish-regions show-errors show-contract-traffic]
+(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions show-errors show-contract-traffic]
                                     :as transit-changes}]
   (let [change-list (if show-errors
-                      (concat changes-contains-errors changes)
-                      changes)
+                      changes
+                      ;; Filter errors out
+                      (filter
+                        (fn [change]
+                          (and
+                            (not (:interfaces-has-errors? change))
+                            (not (:no-interfaces-imported? change))))
+                        changes))
         change-list (if show-contract-traffic
-                      (concat changes-contract-traffic change-list)
-                      change-list)
+                      change-list
+                      ;; Filter contract traffic out
+                      (filter
+                        (fn [change]
+                          (true? (:commercial? change)))
+                          change-list))
+
         filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
         filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
         sorted-change-list (sort-by :different-week-date < filter-different-week-date)

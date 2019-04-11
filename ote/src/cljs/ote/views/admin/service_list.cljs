@@ -73,7 +73,7 @@
                    ::modification/keys [created modified] :as result} results]
               ^{:key (::t-service/id result)}
               [ui/table-row {:selectable false}
-               [ui/table-row-column {:style {:width "20%" :padding 5}} [:a {:href "#"
+               [ui/table-row-column {:style {:width "20%" :padding 5}} [:a {:href (str "/edit-service/" id)
                                                                             :on-click #(do
                                                                                          (.preventDefault %)
                                                                                          (e! (fp/->ChangePage :edit-service {:id id})))} name]]
