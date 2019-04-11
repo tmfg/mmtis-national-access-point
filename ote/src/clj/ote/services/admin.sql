@@ -72,7 +72,7 @@ select '000' as "interface-id", ts.id as "service-id", op.id as "operator-id",
        op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
        op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
        ts."contact-email" as "service-email", '' as "data-content", 'Ei rajapintaa annettu' as url,
-       '' as format, '1900-01-01 00:00:00'::timestamp as imported, 'Rajapinta puuttuu' as "import-error", 'db-error' as "db-error"
+       '' as format, '1900-01-01 00:00:00'::timestamp as imported, 'Rajapinta puuttuu' as "import-error", 'no-db' as "db-error"
 FROM
      "transport-operator" as op,
      "transport-service" as ts

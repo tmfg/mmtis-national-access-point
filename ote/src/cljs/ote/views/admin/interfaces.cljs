@@ -197,8 +197,7 @@
                 [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
                 [ui/table-row-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
                                                                                           url
-                                                                                          (do (.log js/console " import-error " (pr-str import-error))
-                                                                                            [linkify url url {:target "_blank"}]))]
+                                                                                          [linkify url url {:target "_blank"}])]
                 [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui imported)]
                 [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
                  (when (and import-error (not= "Rajapinta puuttuu" import-error))
@@ -207,7 +206,7 @@
                         :on-click #(do (.preventDefault %)
                                        (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
                     " Latausvirhe "])
-                 (when (and db-error (not= "db-error" db-error))
+                 (when (and db-error (not= "no-db" db-error))
                    [:a {:style {:color "red"}
                         :href     "#"
                         :on-click #(do (.preventDefault %)

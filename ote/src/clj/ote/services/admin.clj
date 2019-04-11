@@ -146,8 +146,7 @@
         ;; Get only services that do not have interface.
         services-without-interface (when (:no-interface query)
                                      (search-services-wihtout-interface db {:service-name (when service-name (str "%" service-name "%"))
-                                                                            :operator-name (when operator-name (str "%" operator-name "%"))
-                                                                            :interface-url (when interface-url (str "%" interface-url "%"))}))]
+                                                                            :operator-name (when operator-name (str "%" operator-name "%"))}))]
     (concat services-with-interface services-without-interface)))
 
 (defn- list-sea-routes [db user query]
