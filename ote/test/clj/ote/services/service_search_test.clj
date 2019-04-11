@@ -258,7 +258,7 @@
                                                                                              :namefin "33200 Tampere Keskus Läntinen",
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
-          saved-services (map (partial http-post "admin" "transport-service") services)]
+          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
       (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
                                            [:json :results]))]
@@ -287,7 +287,7 @@
                                                                                              :namefin "33200 Tampere Keskus Läntinen",
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
-          saved-services (map (partial http-post "admin" "transport-service") services)]
+          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
       (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json&limit=25&offset=0"))
                                            [:json :results]))]

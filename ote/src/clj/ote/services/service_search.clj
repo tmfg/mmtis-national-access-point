@@ -196,7 +196,7 @@ Negative return value is an invalid match"
         page (page-of sorted-ids offset limit)
         results (transport-services db page)]
     (sort-by
-     (comp ::t-service/id match-qualities)
+     (comp match-qualities ::t-service/id)
      results)))
 
 (defn- without-import-errors [search-result]
