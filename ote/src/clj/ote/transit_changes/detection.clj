@@ -892,15 +892,15 @@
 
 (defn add-route-hash-id-as-a-map-key
   "Add default route-hash-id (long-short-headsign) to routes"
-  [routes type]
+  [routes route-hash-id-type]
   (map
     (fn [x]
-      (update x :route-hash-id #(set-route-hash-id % x type)))
+      (update x :route-hash-id #(set-route-hash-id % x route-hash-id-type)))
     routes))
 
-(defn map-by-route-key [service-routes type]
+(defn map-by-route-key [service-routes route-hash-id-type]
   (let [service-routes (if (empty? (:route-hash-id (first service-routes)))
-                         (add-route-hash-id-as-a-map-key service-routes type)
+                         (add-route-hash-id-as-a-map-key service-routes route-hash-id-type)
                          service-routes)]
     (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
 
@@ -1030,9 +1030,10 @@
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
   Output: ::detected-route-changes-for-services-coll"
-  (let [;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
+  (let [route-hash-id-type (db-route-detection-type db service-id)
+        ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes type)
+        all-routes (map-by-route-key service-routes route-hash-id-type)
         all-route-keys (set (keys all-routes))
         route-hashes (sort-by :date
                               (apply concat
@@ -1061,9 +1062,10 @@
 
 
 (defn detect-route-changes-for-service-old [db {:keys [start-date service-id] :as route-query-params}]
-  (let [;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
+  (let [route-hash-id-type (db-route-detection-type db service-id)
+        ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes type)
+        all-routes (map-by-route-key service-routes route-hash-id-type)
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db route-query-params)
