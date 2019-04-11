@@ -1143,7 +1143,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :forgot-password-help "Inga problem, använd vårt formulär för återskapande av lösenord för att återställa det."
   :forgot-password-button "Återställ ditt lösenord"
 
-  :error {:no-such-user "Okänd konto"
+  :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
+          :no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"}
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
