@@ -463,7 +463,7 @@
             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
              [information-row-with-selection (tr [:service-viewer :exception]) (format-descriptions description) true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-             [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date] true]
+             [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
              [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]
       [information-row-with-selection

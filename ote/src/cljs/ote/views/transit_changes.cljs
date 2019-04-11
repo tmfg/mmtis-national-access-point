@@ -170,31 +170,44 @@
 
    [transit-change-filters e! transit-changes]])
 
-(defn- link-to-transit-visualization [row e! type]
+(defn- link-to-transit-visualization [row e! link-type]
   (let [date (:date row)
         formatted-date (when date
                          (time/format-date-iso-8601 date))
         transport-service-id (:transport-service-id row)
         operator-name (:transport-operator-name row)
-        service-name(:transport-service-name row)]
+        service-name(:transport-service-name row)
+        link-text (if (= :operator link-type)
+                    [:span operator-name]
+                    [:span service-name])]
     (if date
       [:a {:style {:text-decoration "none" :color colors/gray800}
            :href (str "/transit-visualization/" transport-service-id "/" formatted-date)
            :on-click #(do
                         (.preventDefault %)
                         (e! (tc/->ShowChangesForService transport-service-id date)))}
-      (if (= :operator type)
-        [:span operator-name]
-        [:span service-name])])))
+       link-text]
+      link-text)))
 
-(defn detected-transit-changes [e! {:keys [loading? changes changes-contains-errors changes-contract-traffic selected-finnish-regions show-errors show-contract-traffic]
+(defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions show-errors show-contract-traffic]
                                     :as transit-changes}]
   (let [change-list (if show-errors
-                      (concat changes-contains-errors changes)
-                      changes)
+                      changes
+                      ;; Filter errors out
+                      (filter
+                        (fn [change]
+                          (and
+                            (not (:interfaces-has-errors? change))
+                            (not (:no-interfaces-imported? change))))
+                        changes))
         change-list (if show-contract-traffic
-                      (concat changes-contract-traffic change-list)
-                      change-list)
+                      change-list
+                      ;; Filter contract traffic out
+                      (filter
+                        (fn [change]
+                          (true? (:commercial? change)))
+                          change-list))
+
         filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
         filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
         sorted-change-list (sort-by :different-week-date < filter-different-week-date)
@@ -213,7 +226,8 @@
                    :show-row-hover? true
                    :on-select (fn [evt]
                                 (let [{:keys [transport-service-id date]} (first evt)]
-                                  (e! (tc/->ShowChangesForService transport-service-id date))))}
+                                  (when date
+                                    (e! (tc/->ShowChangesForService transport-service-id date)))))}
       [{:name "Palveluntuottaja"
         :read identity
         :format #(link-to-transit-visualization % e! :operator)

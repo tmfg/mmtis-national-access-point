@@ -1153,7 +1153,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :forgot-password-help "Ei ongelmaa, käytä salasanan uudelleenasetuksen lomaketta."
   :forgot-password-button "Aseta salasana uudelleen"
 
-  :error {:no-such-user "Tuntematon käyttäjä"
+  :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
+          :no-such-user "Tuntematon käyttäjä"
           :incorrect-password "Väärä salasana"}
 
   :check-email-for-link "Salasanan vaihtopyyntösi on vastaanotettu. Olemme nyt lähettäneet salasanan vaihtamiseen tarvittavan linkin sähköpostiisi."

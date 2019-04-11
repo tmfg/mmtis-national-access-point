@@ -14,7 +14,8 @@
             [ote.ui.tabs :as tabs]
             [ote.style.buttons :as button-styles]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.buttons :as buttons]))
+            [ote.ui.buttons :as buttons]
+            [ote.ui.common :as common]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -316,6 +317,7 @@
         selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
         recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
     [:div
+     [common/back-link-with-event :admin "Takaisin ylläpitopaneelin etusivulle"]
      [:h2 "Muutostunnistukseen liittyviä työkaluja"]
 
      ;; If hash recalculations are ongoing disable some of the tabs
