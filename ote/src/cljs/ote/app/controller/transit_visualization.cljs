@@ -186,13 +186,14 @@
   {:path [:transit-visualization]}
   (let [date-filter (if (= "now" (:scope app))
                       (time/now-iso-date-str)
-                      detection-date)]
+                      detection-date)
+        changes (future-changes date-filter (:route-changes response))]
     (assoc app
       :service-changes-for-date-loading? false
       :service-info (:service-info response)
-      :changes-all (sort-by :different-week-date < (:route-changes response))
-      :changes-route-no-change (sorted-route-changes true (future-changes date-filter (:route-changes response)))
-      :changes-route-filtered (sorted-route-changes false (future-changes date-filter (:route-changes response)))
+      :changes-all (sort-by :different-week-date < changes)
+      :changes-route-no-change (sorted-route-changes true changes)
+      :changes-route-filtered (sorted-route-changes false changes)
       :gtfs-package-info (:gtfs-package-info response)
       :route-hash-id-type (:route-hash-id-type response))))
 
