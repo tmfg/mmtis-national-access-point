@@ -268,10 +268,13 @@
          ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
          [info-sections-2-cols (string/upper-case title)
           [:div
-           [common-ui/information-row-with-option (tr [:service-search :homepage]) (when url [common-ui/linkify
-                                                                                              url
-                                                                                              url
-                                                                                              {:target "_blank"}]) false]
+           [common-ui/information-row-with-option
+            (tr [:service-search :homepage])
+            (when url [common-ui/linkify
+                       url
+                       url
+                       {:target "_blank"}])
+            false]
            [common-ui/information-row-with-option
             (tr [:field-labels :transport-service-common ::t-service/license])
             license
