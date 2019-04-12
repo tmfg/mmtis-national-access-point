@@ -383,8 +383,9 @@
       [:div
        [common-ui/information-row-with-option
         (tr [:enums ::t-service/interface-data-content :other-services])
-        (string/capitalize
-          (string/join ", " other-translations))
+        (when (not-empty other-translations)
+          (string/capitalize
+            (string/join ", " other-translations)))
         true]
        [common-ui/information-row-with-option
         (tr [:service-viewer :accessibility-website])
@@ -427,12 +428,15 @@
              [common-ui/information-row-with-option
               (tr [:service-viewer :pricing-basis])
               (::t-service/unit class) true]]]))]
-      [common-ui/information-row-with-option (tr [:parking-page :header-payment-methods])
-       (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods))) true]
+      [common-ui/information-row-with-option
+       (tr [:parking-page :header-payment-methods])
+       (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))
+       true]
       [information-row-with-selection (tr [:common-texts :description]) description true]
       [information-row-with-selection
        (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
-       pricing-description true]
+       pricing-description
+       true]
       [common-ui/information-row-with-option
        (tr [:field-labels :passenger-transportation ::t-service/pricing-url])
        (when pricing-url
