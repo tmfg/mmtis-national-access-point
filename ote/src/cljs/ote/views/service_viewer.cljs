@@ -21,7 +21,7 @@
             [ote.style.base :as base]))
 
 (defonce shown-language
-  (r/atom (string/upper-case (name @selected-language))))
+         (r/atom (string/upper-case (name @selected-language))))
 
 (defn change-lang-fn
   [new-val]
@@ -195,7 +195,7 @@
        [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false]
        #_[common-ui/information-row-with-option
           (tr [:field-labels :transport-service-common ::t-service/contact-email])
-          nil false]                                              ;(::t-service/contact-email service)
+          nil false]                                        ;(::t-service/contact-email service)
        ]
       [:div
        [common-ui/information-row-with-option (tr [:field-labels :transport-service ::t-service/type]) sub-type-text false]
@@ -269,9 +269,9 @@
          [info-sections-2-cols (string/upper-case title)
           [:div
            [common-ui/information-row-with-option (tr [:service-search :homepage]) (when url [common-ui/linkify
-                                                                                           url
-                                                                                           url
-                                                                                           {:target "_blank"}]) false]
+                                                                                              url
+                                                                                              url
+                                                                                              {:target "_blank"}]) false]
            [common-ui/information-row-with-option
             (tr [:field-labels :transport-service-common ::t-service/license])
             license
@@ -326,7 +326,7 @@
    [spacer]])
 
 (defn- booking-service
-  [title data shown-language change-lang-fn]
+  [title data]
   (let [descriptions (format-descriptions (::t-service/description data))
         url (::t-service/url data)]
     [:section
@@ -339,10 +339,14 @@
      [spacer]]))
 
 (defn- accessibility-and-other-services
-  [title data shown-language change-lang-fn]
+  [title data]
   (let [url (:url data)
         guaranteed-descriptions (format-descriptions (get-in data [:descriptions :guaranteed]))
-        limited-descriptions (format-descriptions (get-in data [:descriptions :limited]))]
+        limited-descriptions (format-descriptions (get-in data [:descriptions :limited]))
+        others (:other data)
+        other-translations (map
+                             #(tr [:enums ::t-service/additional-services %])
+                             others)]
     [:section
      [:h4 title]
      (doall
@@ -352,10 +356,8 @@
                                   (assoc
                                     new-col
                                     status
-                                    (mapv
-                                      (fn [key]
-                                        (tr [:enums k key]))
-                                      keys)))
+                                    (mapv #(tr [:enums k %])
+                                          keys)))
                                 {}
                                 v)]]
          ^{:key k}
@@ -376,13 +378,27 @@
           {:sub-title true}]))
      [info-sections-1-col (tr [:service-viewer :other-accessibility-info])
       [:div
-       [common-ui/information-row-with-option (tr [:service-viewer :accessibility-website]) (when url [common-ui/linkify url url {:target "_blank"}]) true]
-       [information-row-with-selection (tr [:service-viewer :guaranteed-accessibility-description]) guaranteed-descriptions true]
-       [information-row-with-selection (tr [:service-viewer :limited-accessibility-description]) limited-descriptions true]]]
+       [common-ui/information-row-with-option
+        (tr [:enums ::t-service/interface-data-content :other-services])
+        (string/capitalize
+          (string/join ", " other-translations))
+        true]
+       [common-ui/information-row-with-option
+        (tr [:service-viewer :accessibility-website])
+        (when url [common-ui/linkify url url {:target "_blank"}])
+        true]
+       [information-row-with-selection
+        (tr [:service-viewer :guaranteed-accessibility-description])
+        guaranteed-descriptions
+        true]
+       [information-row-with-selection
+        (tr [:service-viewer :limited-accessibility-description])
+        limited-descriptions
+        true]]]
      [spacer]]))
 
 (defn- price-information
-  [title data shown-language change-lang-fn]
+  [title data]
   [:section
    [:h4 title]
    (let [price-classes (:price-classes data)
@@ -421,7 +437,7 @@
    [spacer]])
 
 (defn- service-hours
-  [title data shown-language change-lang-fn]
+  [title data]
   [:section
    [:h4 title]
    (let [service-times (:service-hours data)

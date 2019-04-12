@@ -39,7 +39,8 @@
                                              limited-transportable-aid (::t-service/limited-transportable-aid pt)
                                              guaraunteed-desc (::t-service/guaranteed-accessibility-description pt)
                                              limited-desc (::t-service/limited-accessibility-description pt)
-                                             url (::t-service/accessibility-info-url pt)]
+                                             url (::t-service/accessibility-info-url pt)
+                                             other (::t-service/additional-services pt)]
                                          {:accessibility-infos {::t-service/vehicle-accessibility {:guaranteed guaranteed-vehicle-acc
                                                                                                    :limited limited-vehicle-acc}
                                                                 ::t-service/information-service-accessibility {:guaranteed guaranteed-info-acc
@@ -48,7 +49,8 @@
                                                                                                :limited limited-transportable-aid}}
                                           :descriptions {:guaranteed guaraunteed-desc
                                                          :limited limited-desc}
-                                          :url url})
+                                          :url url
+                                          :other other})
                     pricing-data (let [pt (::t-service/passenger-transportation result)
                                        payment-method-desc (::t-service/payment-method-description pt)
                                        payment-methods (::t-service/payment-methods pt)

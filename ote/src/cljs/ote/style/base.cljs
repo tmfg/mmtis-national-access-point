@@ -259,7 +259,8 @@
 
 (def info-content-50 {:flex-basis "50%"
                       :display "flex"
-                      :justify-content "space-between"})
+                      :justify-content "space-between"
+                      :overflow-wrap "anywhere"})
 
 (def info-title-50 {:flex-basis "50%"
                     :color colors/gray800
@@ -268,6 +269,7 @@
 
 (def info-content-75 {:flex-basis "75%"
                       :display "flex"
+                      :overflow-wrap "anywhere"
                       :justify-content "space-between"
                       ::stylefy/media {{:max-width (str width-xs "px")}
                                        {:flex-basis "50%"}}})
