@@ -18,6 +18,7 @@ checkouts/
 .lein-failures
 .lein-deps-sum
 .lein-plugins/
+.clj-kondo/
 .lein-repl-history
 figwheel_server.log
 ote.log
