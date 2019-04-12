@@ -120,7 +120,7 @@
 (defn interface-list [e! app]
   (let [{:keys [loading? results filters]}
         (get-in app [:admin :interface-list])
-        fd (js/Date. 0)]
+        date-0 (js/Date. 0)]
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
@@ -200,7 +200,7 @@
                                                                                           url
                                                                                           [linkify url url {:target "_blank"}])]
                 [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}}
-                 (if (= fd imported)
+                 (if (= date-0 imported)
                    ""
                    (time/format-timestamp-for-ui imported))]
                 [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
