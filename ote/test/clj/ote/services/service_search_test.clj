@@ -245,23 +245,66 @@
         (is (= 1 (count (services-in "Suomi"))))
         (is (= 1 (count (services-in "Eurooppa")))))))
 
+  (testing "Spatial search results are ranked so services with operating areas matching closest to the search term are returned first"
+    (let [tampere-service (assoc (gen/generate service-generators/gen-transport-service)
+                                 ::t-service/operation-area [#:ote.db.places{:id "finnish-municipality-837",
+                                                                             :namefin "Tampere",
+                                                                             :type "finnish-municipality",
+                                                                             :primary? true}])
+          marked-service (assoc tampere-service ::t-service/name "Tampereen keskustan palvelu")
+          services (cons marked-service
+                         (take 30 (repeat (assoc (gen/generate service-generators/gen-transport-service)
+                                                 ::t-service/operation-area [#:ote.db.places{:id "finnish-postal-33200",
+                                                                                             :namefin "33200 Tampere Keskus Läntinen",
+                                                                                             :type "finnish-postal",
+                                                                                             :primary? true}]))))
+          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
+      (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                           [:json :results]))]
+        ;; All services are in Tampere
+        (is (= 31 (count (services-in "Tampere"))))
+        ;; Services are found with postal code as well as it intersects with Tampere 
+        (is (= 31 (count (services-in "33200 Tampere Keskus Läntinen"))))
+
+        ;; Matches with enveloping areas
+        (is (= 31 (count (services-in "Suomi"))))
+        (is (= 31 (count (services-in "Eurooppa"))))
+
+        ;; Best matching result is returned first
+        (is (= "Tampereen keskustan palvelu" (:name (get (services-in "Tampere") 0)))))))
+
+  (testing "Spatial search results are ranked so services with operating areas matching closest to the search term are returned first, even when limited"
+    (let [tampere-service (assoc (gen/generate service-generators/gen-transport-service)
+                                 ::t-service/operation-area [#:ote.db.places{:id "finnish-municipality-837",
+                                                                             :namefin "Tampere",
+                                                                             :type "finnish-municipality",
+                                                                             :primary? true}])
+          marked-service (assoc tampere-service ::t-service/name "Tampereen keskustan palvelu")
+          services (cons marked-service
+                         (take 30 (repeat (assoc (gen/generate service-generators/gen-transport-service)
+                                                 ::t-service/operation-area [#:ote.db.places{:id "finnish-postal-33200",
+                                                                                             :namefin "33200 Tampere Keskus Läntinen",
+                                                                                             :type "finnish-postal",
+                                                                                             :primary? true}]))))
+          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
+      (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
+      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json&limit=25&offset=0"))
+                                           [:json :results]))]
+        ;; All services are in Tampere
+        (is (= 25 (count (services-in "Tampere"))))
+        ;; Services are found with postal code as well as it intersects with Tampere 
+        (is (= 25 (count (services-in "33200 Tampere Keskus Läntinen"))))
+
+        ;; Matches with enveloping areas
+        (is (= 25 (count (services-in "Suomi"))))
+        (is (= 25 (count (services-in "Eurooppa"))))
+
+        ;; Best matching result is returned first
+        (is (= "Tampereen keskustan palvelu" (:name (get (services-in "Tampere") 0)))))))
+
   (testing "Operator search does not return deleted companies"
     (sql-execute! "UPDATE \"transport-operator\" SET \"deleted?\" = TRUE")
     (let [result (http-get "operator-completions/Ajopalvelu?response_format=json")]
       (is (= 200 (:status result)))
-      (is (zero? (count (:json result))))))
-
-  (testing "Ranking search results with quality of match against operation-area"
-    (let [match-qualities '({:id 817
-                             :intersection 0.6384818473140419
-                             :difference 66.3123620550177}
-                            {:id 1448
-                             :intersection 0.1
-                             :difference 0.7630913680707156})
-          initial-results  [{::t-service/id 817} {::t-service/id 1448}]
-          results (sut/sort-by-match-quality initial-results match-qualities)]
-      (is (= [1448 817] (map ::t-service/id results)))))
-
-  (testing "Match quality counting"
-    (is (= -1 (sut/match-quality 0 1))
-        (= 2 (sut/match-quality 2 1)))))
+      (is (zero? (count (:json result)))))))

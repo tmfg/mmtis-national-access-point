@@ -44,23 +44,19 @@ Negative return value is an invalid match"
   [intersection difference]
   (if (pos? intersection) (/ difference intersection) -1))
 
-(defn sort-by-match-quality
-  "Sorts results by the match quality."
-  [results spatial-diffs]
-  (let [quality-by-id (zipmap (map :id spatial-diffs) (map #(match-quality (:intersection %) (:difference %)) spatial-diffs))]
-    (->> results
-         (map #(assoc % :match-quality (get quality-by-id (::t-service/id %))))
-         (sort-by :match-quality))))
+(defn- id-to-quality
+  "Processes `spatial-diffs` into a mapping of id > match quality"
+  [spatial-diffs]
+  (into {} (map (juxt :id #(match-quality (:intersection %) (:difference %))) spatial-diffs)))
 
 (defn- service-search-match-qualities
-  "Extends the results with quality of the match to the operation area."
-  [db results operation-area]
-  (if operation-area
-    (let [ids (map ::t-service/id results)
-          qualities (service-match-quality-to-operation-area db {:id ids :operation-area operation-area} )
-          valid-results (sort-by-match-quality results qualities)]
-      valid-results)
-    results))
+  "Returns a mapping of service id -> match quality
+  `db` database handle
+  `service-ids` collection of ids for which qualities are returned
+  `operation-area` collection of place names against which match quality is compared"
+  [db service-ids operation-area]
+  (id-to-quality
+   (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
@@ -155,6 +151,83 @@ Negative return value is an invalid match"
                 ::t-service/gtfs-db-error))
     ei-link))
 
+(defn- transport-services
+  "Queries database for transport services.
+  `db` is the database handle
+  `ids` is a collection of transport service ids."
+  [db ids]
+  (specql/fetch db ::t-service/transport-service-search-result
+                search-result-columns
+                {::t-service/id (op/in ids)}
+                {}))
+
+(defn- transport-services-page
+  "Queries database for a page of transport services.
+  `db` is the database handle
+  `ids` is a collection of transport service ids.
+  `offset` and `limit` make it possible to use paging instead of fetching all the results"
+  [db ids offset limit]
+  (let [options (if (and offset limit)
+                  {:specql.core/offset offset
+                   :specql.core/limit limit
+                   :specql.core/order-by :ote.db.modification/created
+                   :specql.core/order-direction :desc}
+                  {})]
+    (specql/fetch db ::t-service/transport-service-search-result
+                              search-result-columns
+                              {::t-service/id (op/in ids)}
+                              options)))
+
+(defn- page-of
+  [seq offset limit]
+  (if (and offset limit)
+    (take limit (drop offset seq))
+    seq))
+
+(defn- transport-services-in-operation-area
+  "Queries database for transport services ordered so that best matches to the operation area are first in the results.
+  `db` is the database handle
+  `operation-area` is a collection of operation area names
+  `ids` is a collection of transport service ids.
+  `offset` and `limit` make it possible to use paging instead of fetching all the results"
+  [db ids operation-area offset limit]
+  (let [match-qualities (service-search-match-qualities db ids operation-area)
+        sorted-ids (sort-by match-qualities (keys match-qualities))
+        page (page-of sorted-ids offset limit)
+        results (transport-services db page)]
+    (sort-by
+     (comp match-qualities ::t-service/id)
+     results)))
+
+(defn- without-import-errors [search-result]
+  (update-in search-result
+             [::t-service/external-interface-links]
+             #(mapv hide-import-errors %)))
+
+(defn- without-personal-info
+  "Removes contact information from the `search-result`"
+  [search-result]
+  (dissoc search-result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
+
+(defn- filtering-operators
+  "Returns a function that removes not interesting companies from the `search-result`"
+  [operators]
+  (fn [search-result]
+    (update search-result ::t-service/service-companies
+            (fn [c]
+              (filter (fn [company]
+                        (when (and operators (::t-service/business-id company))
+                          (.contains operators (::t-service/business-id company))))
+                      c)))))
+(defn- pare-results
+  "Removes information not intended for the frontend from `search-results`
+  Retains `searched-operators` in the search results"
+  [search-results searched-operators]
+  (->> search-results
+       (mapv without-import-errors)
+       (mapv (filtering-operators searched-operators))
+       (mapv without-personal-info)))
+
 (defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
   (let [result-id-sets [(services-operating-in db operation-area)
@@ -169,42 +242,18 @@ Negative return value is an invalid match"
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection
-                     (remove nil? result-id-sets)))
-        options (if (and offset limit)
-                  {:specql.core/offset offset
-                   :specql.core/limit limit
-                   :specql.core/order-by :ote.db.modification/created
-                   :specql.core/order-direction :desc}
-                  {})
-        results (specql/fetch db ::t-service/transport-service-search-result
-                              search-result-columns
-                              {::t-service/id (op/in ids)}
-                              options)
-        results (mapv (fn [result]
-                        (update-in result
-                                   [::t-service/external-interface-links]
-                                   #(mapv hide-import-errors %)))
-                      results)
-        results (mapv
-                  #(update % ::t-service/service-companies
-                           (fn [c]
-                             (filter (fn [company]
-                                       (when (and operators (::t-service/business-id company))
-                                         (.contains operators (::t-service/business-id company))))
-                                     c)))
-                  results)
-        results (service-search-match-qualities db results operation-area)
-        results-without-personal-info (mapv
-                                        (fn [result]
-                                          (dissoc result ::t-service/contact-email ::t-service/contact-address ::t-service/contact-phone))
-                                        results)]
-    (merge
-     {:empty-filters? empty-filters?
-      :results results-without-personal-info
-      :filter-service-count (count ids)}
-     (when empty-filters?
-       {:total-service-count (total-service-count db)
-        :total-company-count (total-company-count db)}))))
+                     (remove nil? result-id-sets)))]
+    (-> (if operation-area
+                  (transport-services-in-operation-area db ids operation-area offset limit)
+                  (transport-services-page db ids offset limit))
+        (pare-results operators)
+        (as-> results (merge
+                       {:empty-filters? empty-filters?
+                        :results results
+                        :filter-service-count (count ids)}
+                       (when empty-filters?
+                         {:total-service-count (total-service-count db)
+                          :total-company-count (total-company-count db)}))))))
 
 (defn- service-search-parameters
   "Extract service search parameters from query parameters."
