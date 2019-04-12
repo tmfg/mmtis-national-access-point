@@ -12,6 +12,7 @@ lib/
 classes/
 target/
 checkouts/
+.clj-kondo/
 
 .nrepl-port
 .lein-failures
