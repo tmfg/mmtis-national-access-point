@@ -24,7 +24,8 @@
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.page :as page]
             [ote.style.base :as style-base]
-            [ote.ui.info :as info]))
+            [ote.ui.info :as info]
+            [ote.theme.colors :as colors]))
 
 (defn week-day-short [week-day]
   (tr [:enums :ote.db.transport-service/day :short
@@ -169,6 +170,25 @@
 
    [transit-change-filters e! transit-changes]])
 
+(defn- link-to-transit-visualization [row e! link-type]
+  (let [date (:date row)
+        formatted-date (when date
+                         (time/format-date-iso-8601 date))
+        transport-service-id (:transport-service-id row)
+        operator-name (:transport-operator-name row)
+        service-name(:transport-service-name row)
+        link-text (if (= :operator link-type)
+                    [:span operator-name]
+                    [:span service-name])]
+    (if date
+      [:a {:style {:text-decoration "none" :color colors/gray800}
+           :href (str "/transit-visualization/" transport-service-id "/" formatted-date)
+           :on-click #(do
+                        (.preventDefault %)
+                        (e! (tc/->ShowChangesForService transport-service-id date)))}
+       link-text]
+      link-text)))
+
 (defn detected-transit-changes [e! {:keys [loading? changes selected-finnish-regions show-errors show-contract-traffic]
                                     :as transit-changes}]
   (let [change-list (if show-errors
@@ -206,14 +226,16 @@
                    :show-row-hover? true
                    :on-select (fn [evt]
                                 (let [{:keys [transport-service-id date]} (first evt)]
-                                  (e! (tc/->ShowChangesForService transport-service-id
-                                                                  date))))}
+                                  (when date
+                                    (e! (tc/->ShowChangesForService transport-service-id date)))))}
       [{:name "Palveluntuottaja"
-        :read :transport-operator-name
+        :read identity
+        :format #(link-to-transit-visualization % e! :operator)
         :col-style style-base/table-col-style-wrap
         :width "20%"}
        {:name "Palvelu"
-        :read :transport-service-name
+        :read identity
+        :format #(link-to-transit-visualization % e! :service)
         :col-style style-base/table-col-style-wrap
         :width "20%"}
        {:name "Aikaa 1. muutokseen" :width "15%"
