@@ -602,11 +602,11 @@
   (let [first-different-day (transit-changes/first-different-day starting-week-hash
                                                                  different-week-hash)
         starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
-        different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)]
+        different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)
+        date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
+        date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
     ;(log/debug "Found changes in trips for route: " route-hash-id ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route-hash-id)
-    (let [date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
-          date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
-      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+    (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date)))
 
 (defn compare-route-days-all-changes-for-week [db service-id route-hash-id
                                                {:keys [starting-week starting-week-hash
