@@ -262,8 +262,9 @@
   :name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   ;; Needs a new translation
   :external-interfaces-intro "Om det inte finns gränssnitt i maskinläsbarform för din mobilitetstjänst, lämna den här sektionen tom och fyll i stället i de andra sektionerna i blanketten."
-  :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
+  :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). "
   :external-interfaces-intro-2 "Du kan skapa ruttinformation och tidtabeller för sjötrafiken med rutteditorn för sjötrafik som finns i NAP-tjänsten."
+  :external-interfaces-intro-rae-text "Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda"
   ;; Needs a new translation
   :external-interfaces "Ett maskinläsbart gränssnitt erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON) som kan vidarebehandlas av en dator. Dessa gränssnitt är ämnade för tjänsteutvecklare, som kan använda gränssnittet enligt de användarvillkor som uppgetts."
   ;; Needs a new translation
