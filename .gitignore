@@ -12,11 +12,13 @@ lib/
 classes/
 target/
 checkouts/
+.clj-kondo/
 
 .nrepl-port
 .lein-failures
 .lein-deps-sum
 .lein-plugins/
+.clj-kondo/
 .lein-repl-history
 figwheel_server.log
 ote.log
@@ -56,3 +58,4 @@ aws/ansible/jenkins/solita_jenkins_default_password
 
 # Backup and OS files
 .DS_Store
+*.*~

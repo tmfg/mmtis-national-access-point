@@ -40,39 +40,64 @@ SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
  WHERE o."business-id" IS NOT NULL
  GROUP BY o.id;
 
--- name: search-interfaces
+-- name: search-services-with-interfaces
 -- Find published interfaces using operator name, service name
-SELECT i.id as "interface-id", ts.id as "service-id",
-op.id as "operator-id", op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone", op.gsm as "operator-gsm",
-ts.name as "service-name", ts."contact-phone" as "service-phone", ts."contact-email" as "service-email",
-i."data-content" as "data-content", (i."external-interface").url as url,
-i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error", i."gtfs-db-error" as "db-error"
-  FROM "transport-operator" as op, "transport-service" as ts, "external-interface-description" as i
- WHERE (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
-  AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
-  AND (:interface-url::TEXT IS NULL OR (i."external-interface").url ilike :interface-url)
-  AND (:import-error::BOOLEAN IS NULL OR i."gtfs-import-error" IS NOT NULL)
-  AND (:db-error::BOOLEAN IS NULL OR i."gtfs-db-error" IS NOT NULL)
-  AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(i.format::text)::text[]))
+SELECT i.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+       op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
+       op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
+       ts."contact-email" as "service-email", i."data-content" as "data-content", (i."external-interface").url as url,
+       i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error",
+       i."gtfs-db-error" as "db-error"
+  FROM
+       "transport-operator" as op,
+       "transport-service" as ts,
+       "external-interface-description" as i
+ WHERE
+       (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
+   AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
+   AND (:interface-url::TEXT IS NULL OR (i."external-interface").url ilike :interface-url)
+   AND (:import-error::BOOLEAN IS NULL OR i."gtfs-import-error" IS NOT NULL)
+   AND (:db-error::BOOLEAN IS NULL OR i."gtfs-db-error" IS NOT NULL)
+   AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(i.format::text)::text[]))
    AND ts.published IS NOT NULL
    AND ts."transport-operator-id" = op.id
    AND i."transport-service-id" = ts.id
+   AND ts."sub-type" = 'schedule'
    AND ('gtfs' = ANY(lower(i.format::text)::text[]) OR 'kalkati.net' = ANY(lower(i.format::text)::text[]))
  GROUP BY ts.id, op.id, i.id
- ORDER BY i.format ASC, i."gtfs-import-error" DESC;
+ ORDER BY "format" ASC, "import-error" DESC;
+
+-- name: search-services-wihtout-interface
+select ts.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+       op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
+       op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
+       ts."contact-email" as "service-email", '' as "data-content", 'Ei rajapintaa annettu' as url,
+       '' as format, to_timestamp(0) as imported, 'Rajapinta puuttuu' as "import-error", 'no-db' as "db-error"
+FROM
+     "transport-operator" as op,
+     "transport-service" as ts
+
+WHERE (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
+  AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
+  AND ts.published IS NOT NULL
+  AND ts."transport-operator-id" = op.id
+  AND ts."sub-type" = 'schedule'
+  AND NOT EXISTS (SELECT
+                    FROM "external-interface-description" i
+                   WHERE i."transport-service-id" = ts.id)
+GROUP BY ts.id, op.id
+ORDER BY "format" ASC, "import-error" DESC;
 
 -- name: fetch-commercial-services
 SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" as "commercial?",
        o.id as "operator-id", o.name as "operator-name"
   FROM
-       "transport-service" t,
-       "transport-operator" o,
-       "external-interface-description" eid
+       "transport-service" t
+       LEFT JOIN "external-interface-description" eid ON eid."transport-service-id" = t.id,
+       "transport-operator" o
  WHERE t."transport-operator-id" = o.id
-   AND eid."transport-service-id" = t.id
    AND t."sub-type" = 'schedule'
    AND t.published IS NOT NULL
-   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
  GROUP BY t.id, o.id
  ORDER BY o.name asc;
 

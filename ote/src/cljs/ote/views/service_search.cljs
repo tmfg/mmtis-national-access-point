@@ -26,7 +26,8 @@
             [ote.util.text :as text]
             [ote.ui.page :as page]
             [ote.app.utils :as utils]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.format :as format]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
   [:div {:style {:color "#fff"}}
@@ -91,29 +92,19 @@
         return-value (text/maybe-shorten-text-to 45 value-str)]
     return-value))
 
-(defn information-row
-  [title information]
-  [:div (stylefy/use-sub-style style/result-card :info-row)
-   [:strong (stylefy/use-sub-style style/result-card :info-title)
-    title]
-   [:span (stylefy/use-sub-style style/result-card :info-content)
-    information]])
-
-(defn- external-interface-links [{::t-service/keys [id external-interface-links transport-operator-id]}]
-  (let [bullet-span [:span {:style {:color colors/gray650}} " • "]]
-
-    [:div {:key id}
-     [information-row (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
-     (when-not (empty? external-interface-links)
-       (doall
-         (map-indexed
-           (fn [i {::t-service/keys [external-interface format data-content] :as row}]
-             (let [data-content (if (nil? data-content)
-                                  (::t-service/url external-interface)
-                                  (parse-content-value data-content))]
-               [:div {:key (str i "-" id)}
-                [information-row data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
-           external-interface-links)))]))
+(defn- external-interface-links [{::t-service/keys [id external-interface-links]}]
+  [:div {:key id}
+   [common-ui/information-row-default (tr [:common-texts :title-operator-basic-details]) "GeoJSON"]
+   (when-not (empty? external-interface-links)
+     (doall
+       (map-indexed
+         (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+           (let [data-content (if (nil? data-content)
+                                (::t-service/url external-interface)
+                                (parse-content-value data-content))]
+             [:div {:key (str i "-" id)}
+              [common-ui/information-row-default data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
+         external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
   (when (seq service-companies)
@@ -168,7 +159,8 @@
                          (not-empty service-desc)
                          [:span service-desc]
                          :else
-                         [:span {:style {:color colors/gray650}}
+                         [:span {:style {:color colors/gray650
+                                         :font-style "italic"}}
                           (tr [:service-search :no-description])])
         service-companies (cond
                             (and service-companies companies) (merge service-companies companies)
@@ -193,20 +185,24 @@
           [delete-service-action e! id name (get service :show-delete-modal?)]])
        [:a (merge (stylefy/use-style (merge button-styles/primary-button
                                        {:padding "1rem"}))
-                  {:href (str "/#/service/" transport-operator-id "/" id)})
+                  {:id "all-info-link"
+                   :href (str "/#/service/" transport-operator-id "/" id)})
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
      [:div (stylefy/use-sub-style style/result-card :body)
       [:div (stylefy/use-sub-style style/result-card :body-left)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
         (tr [:service-search :service-information])]
-       [information-row (tr [:service-search :description]) formatted-desc]
-       [information-row (tr [:service-search :type]) (sub-type-tr sub-type)]
-       [information-row (tr [:service-search :transport-type]) (str/join ", " transport-types)]
-       [information-row (tr [:service-search :homepage]) (if homepage
-                                                          [common-ui/linkify homepage homepage {:target "_blank"}]
-                                                          [:span {:style {:color colors/gray650}}
-                                                           (tr [:service-search :no-homepage])])]]
+       [common-ui/information-row-default (tr [:service-search :description]) formatted-desc]
+       [common-ui/information-row-default (tr [:service-search :type]) (sub-type-tr sub-type)]
+       [common-ui/information-row-default (tr [:service-search :transport-type]) (str/join ", " transport-types)]
+       [common-ui/information-row-default
+        (tr [:service-search :homepage])
+        (if homepage
+          [common-ui/linkify homepage homepage {:target "_blank"}]
+          [:span {:style {:color colors/gray650
+                          :font-style "italic"}}
+           (tr [:service-search :no-homepage])])]]
       [:div (stylefy/use-sub-style style/result-card :body-right)
        [:h4 {:style {:margin "0 0 0.5rem 0"}}
         (tr [:service-search :service-api&format])]
@@ -273,8 +269,26 @@
 
 (def transport-types [:road :rail :sea :aviation])
 
+(defn- operation-area-searchbox [e! operation-area-filter-completions]
+  (let [suggestions (mapv (fn [s] {:text (format/postal-code-at-end s) :value s}) operation-area-filter-completions)]
+    {:name ::t-service/operation-area
+     :type :chip-input
+     :container-class "col-xs-12 col-sm-4 col-md-4"
+     :hint-text (tr [:service-search :operation-area-search-placeholder])
+     :filter (constantly true)
+     :hint-style {:top "1.25rem"}
+     :full-width? true
+     :full-width-input? false
+     :suggestions-config {:text :text :value :value}
+     :suggestions suggestions
+     :max-results 10
+     :auto-select? true
+     :should-update-check form/always-update
+     :on-update-input (utils/debounce #(e! (ss/->OperationAreaFilterChanged %1)) 500)}))
+
 (defn filters-form [e! {filters :filters
-                        facets  :facets}]
+                        facets  :facets
+                        operation-area-filter-completions :operation-area-filter-completions}]
   (let [sub-types-to-list (fn [data]
                             (keep (fn [val]
                                     (let [subtype (:sub-type val)]
@@ -357,54 +371,34 @@
             :layout :raw
             :card? false}
 
-         {:name ::t-service/operation-area
-          :type :chip-input
-          :container-class "col-xs-12 col-sm-4 col-md-4"
-          :hint-text (tr [:service-search :operation-area-search-placeholder])
-          :hint-style {:top "20px"}
-          :full-width? true
-          :full-width-input? false
-          :filter (fn [query, key]
-                    (let [k (str/lower-case key)
-                          q (str/lower-case query)]
-                      (when (> (count q) 1)
-                        (if (re-matches #"^\D+" q)
-                          (str/starts-with?
-                            (second (re-matches #"(?:[0-9]+\s*)?(.*)$" k)) q)
-                          (str/starts-with? k q)))))
-          :open-on-focus? true
-          :max-results 10
-          :suggestions-config {:text :text :value :text}
-          :suggestions (sort-places (::t-service/operation-area facets))
-          ;; Select first match from autocomplete filter result list after pressing enter
-          :auto-select? true}
+           (operation-area-searchbox e! operation-area-filter-completions)
 
-         {:id "sub-types"
-          :name ::t-service/sub-type
-          :label (tr [:service-search :type-search])
-          :type :chip-input
-          :container-class "col-xs-12 col-sm-4 col-md-4"
-          :full-width? true
-          :full-width-input? false
-          :suggestions-config {:text :text :value :text}
-          :suggestions (sub-types-to-list (::t-service/sub-type facets))
-          :open-on-focus? true}
+           {:id "sub-types"
+            :name ::t-service/sub-type
+            :label (tr [:service-search :type-search])
+            :type :chip-input
+            :container-class "col-xs-12 col-sm-4 col-md-4"
+            :full-width? true
+            :full-width-input? false
+            :suggestions-config {:text :text :value :text}
+            :suggestions (sub-types-to-list (::t-service/sub-type facets))
+            :open-on-focus? true}
 
-         {:name               ::t-service/data-content
-          :label              (tr [:service-search :data-content-search-label])
-          :type               :chip-input
-          :full-width?        true
-          :container-class    "col-xs-12 col-sm-4 col-md-4"
-          :auto-select?       true
-          :open-on-focus?     true
-          ;; Translate visible suggestion text, but keep the value intact.
-          :suggestions        (sort-by :text (mapv (fn [val]
-                                                     {:text  (tr [:enums ::t-service/interface-data-content val])
-                                                      :value val})
-                                                   t-service/interface-data-contents))
-          :max-results (count t-service/interface-data-contents)
-          :suggestions-config {:text :text :value :value}
-          :is-empty?          validation/empty-enum-dropdown?})]
+           {:name               ::t-service/data-content
+            :label              (tr [:service-search :data-content-search-label])
+            :type               :chip-input
+            :full-width?        true
+            :container-class    "col-xs-12 col-sm-4 col-md-4"
+            :auto-select?       true
+            :open-on-focus?     true
+            ;; Translate visible suggestion text, but keep the value intact.
+            :suggestions        (sort-by :text (mapv (fn [val]
+                                                       {:text  (tr [:enums ::t-service/interface-data-content val])
+                                                        :value val})
+                                                     t-service/interface-data-contents))
+            :max-results (count t-service/interface-data-contents)
+            :suggestions-config {:text :text :value :value}
+            :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
 
 
@@ -428,14 +422,14 @@
     {:component-will-unmount #(e! (ss/->SaveScrollPosition))
      :component-did-mount    #(e! (ss/->RestoreScrollPosition))
      :reagent-render
-       (fn [e! {{results :results :as service-search} :service-search
-                params                                :params
-                :as                                   app}]
-         [:div.service-search
-          [page/page-controls
-           ""
-           (tr [:service-search :label])
-           [filters-form e! service-search]]
-           (if (nil? results)
-             [:div (tr [:service-search :no-filters])]
-             [results-listing e! app])])}))
+     (fn [e! {{results :results :as service-search} :service-search
+              params                                :params
+              :as                                   app}]
+       [:div.service-search
+        [page/page-controls
+         ""
+         (tr [:service-search :label])
+         [filters-form e! service-search]]
+        (if (nil? results)
+          [:div (tr [:service-search :no-filters])]
+          [results-listing e! app])])}))

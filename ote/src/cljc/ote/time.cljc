@@ -163,6 +163,12 @@
   #?(:clj (java.time.LocalDate/of year month date)
      :cljs (goog.date.Date. year (dec month) date)))
 
+;; Change js-date (.js/date) to google datetime
+#?(:cljs
+   (defn js-date->goog-date [d]
+     (let [fields (date-fields d)]
+       (goog.date.Date. (:ote.time/year fields) (dec (:ote.time/month fields)) (:ote.time/date fields)))))
+
 (defn year [dt]
   (::year (date-fields dt)))
 
@@ -197,7 +203,7 @@
                 (str/split date #"-"))]
        (java.time.LocalDate/of year month date)))
    :cljs
-   (defn parse-date-iso-8601
+     (defn parse-date-iso-8601
      "Parse a date in ISO-8601 format."
      [date]
      (let [[year month date]
@@ -512,5 +518,12 @@
                   java.util.Date/from)]
     date1)))
 
+#?(:clj
+(defn sql-date [local-date]
+  (when local-date
+    (java.sql.Date/valueOf local-date))))
 
+#?(:cljs
+   (defn now-iso-date-str []
+     (first (clojure.string/split (.toISOString (js/Date.)) #"T"))))
 

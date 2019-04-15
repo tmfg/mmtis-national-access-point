@@ -10,7 +10,7 @@
             [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
-            [ote.transit-changes :as transit-changes]
+            [ote.transit-changes :as tcu]
             [clojure.set :as set]))
 
 (defn ensure-route-hash-id
@@ -18,11 +18,18 @@
   [route]
   (or (:route-hash-id route) (str (:route-short-name route) "-" (:route-long-name route) "-" (:trip-headsign route))))
 
+;; Order is relevant - change order to create different kind of color scheme in calendar
 (def hash-colors
-  ["#E1F4FD" "#DDF1D2" "#FFF7CE" "#E0B6F3" "#A4C9EB" "#FBDEC4" "#FFAD9A" "#BDECB7" "#BAA2D1" "#F89DC0" "#97D5E8" "#E1C7B0" "#9CCDDC" "#c56c8f" "#b9cf84" "#a4515b" "#23dbe1"]
-  #_["#52ef99" "#c82565" "#8fec2f" "#8033cb" "#5c922f" "#fe74fe" "#02531d"
-   "#ec8fb5" "#23dbe1" "#a4515b" "#169294" "#fd5925" "#3d4e92" "#f4d403"
-   "#66a1e5" "#d07d09" "#9382e9" "#b9cf84" "#544437" "#f2cdb9"])
+  [;; 70% opacity
+   "#b3d1f0" "#b3e6eb" "#b3ebdb" "#b3e6b3" "#e0f0b3" "#f5f0b3" "#ffdbb3" "#f5b3b3" "#ffb3cc" "#f5b3e6" "#e0b3f5" "#c2c2f5"
+   ;; 80% opacity
+   "#cce0f5" "#cceef1" "#ccf1e7" "#cceecc" "#ebf5cc" "#f8f5cc" "#ffe7cc" "#f8cccc" "#ffccdd" "#f8ccee" "#ebccf8" "#d6d6f8"
+   ;; 90% opacity
+   "#e6f0fa" "#e6f7f8" "#e6f8f3" "#e6f7e6" "#f5fae6" "#fcfae6" "#fff3e6" "#fce6e6" "#ffe6ee" "#fce6f7" "#f5e6fc" "#ebebfc"
+   ;; 50% opacity
+   "#80b3e6" "#80d5dd" "#80ddc4" "#80d580" "#cce680" "#eee680" "#ffc480" "#ee8080" "#ff80aa" "#ee80d5" "#cc80ee" "#9999ee"
+   ;; 60% opacity
+   "#99c2eb" "#99dde4" "#99e4cf" "#99dd99" "#d6eb99" "#f1eb99" "#ffcf99" "#f19999" "#ff99bb" "#f199dd" "#d699f1" "#adadf1"])
 
 (defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
   (seq changes-route-no-change))
@@ -66,7 +73,7 @@
     (-> transit-visualization
         (assoc-in [:compare :selected-trip-pair] trip-pair)
         (assoc-in [:compare :combined-stop-sequence]
-                  (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+                  (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
         (assoc-in [:open-sections :trip-stop-sequence] true))))
 
 (defn future-changes
@@ -74,11 +81,11 @@
   [detection-date changes]
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (filter
-      (fn [{:gtfs/keys [change-date]}]
-          (or (nil? change-date)
-              (not (t/before?
-                     (time/native->date-time change-date)
-                     detection-date))))
+      (fn [{:keys [change-date]}]
+        (or (nil? change-date)
+            (not (t/before?
+                   (time/native->date-time change-date)
+                   detection-date))))
       changes)))
 
 (defn count-changes [key coll]
@@ -94,7 +101,7 @@
         only-changes (sort-by :different-week-date (filterv :change-date changes))
 
         ;; Group by only-changes by route-hash-id
-        grouped-changes (group-by #(:route-hash-id %) only-changes)
+        grouped-changes (group-by :route-hash-id only-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
         route-changes (map (fn [x]
@@ -177,30 +184,35 @@
 
 (define-event LoadServiceChangesForDateResponse [response detection-date]
   {:path [:transit-visualization]}
-              (assoc app
-                :service-changes-for-date-loading? false
-                :service-info (:service-info response)
-                :changes-all (sort-by :different-week-date < (:route-changes response))
-                :changes-route-no-change (sorted-route-changes true (future-changes detection-date (:route-changes response)))
-                :changes-route-filtered (sorted-route-changes false (future-changes detection-date (:route-changes response)))
-                :gtfs-package-info (:gtfs-package-info response)
-                :route-hash-id-type (:route-hash-id-type response)))
+  (let [date-filter (if (= "now" (:scope app))
+                      (time/now-iso-date-str)
+                      detection-date)
+        changes (future-changes date-filter (:route-changes response))]
+    (assoc app
+      :service-changes-for-date-loading? false
+      :service-info (:service-info response)
+      :changes-all (sort-by :different-week-date < changes)
+      :changes-route-no-change (sorted-route-changes true changes)
+      :changes-route-filtered (sorted-route-changes false changes)
+      :gtfs-package-info (:gtfs-package-info response)
+      :route-hash-id-type (:route-hash-id-type response))))
 
-(defn- init-view-state [app]
+(defn- init-view-state [app scope]
   (let [initial-view-state {:all-route-changes-checkbox nil
                             :all-route-changes-display? false
                             :open-sections {:gtfs-package-info false}
+                            :scope scope
                             :service-changes-for-date-loading? true}]
     (assoc app :transit-visualization initial-view-state)))
 
-(define-event InitTransitVisualization [service-id detection-date]
+(define-event InitTransitVisualization [service-id detection-date scope]
   {}
   (comm/get! (str "transit-visualization/" service-id "/" detection-date)
              {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (init-view-state app))
+  (init-view-state app scope))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->InitTransitVisualization (:service-id params) (:date params)))
+  (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -232,20 +244,20 @@
      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
 (defn compare-stop-differences [transit-visualization date1-trips date2-trips]
-  (if-let [first-common-stop (transit-changes/first-common-stop (concat date1-trips date2-trips))]
+  (if-let [first-common-stop (tcu/first-common-stop (concat date1-trips date2-trips))]
           (let [first-common-stop
                 #(assoc %
                    :first-common-stop first-common-stop
-                   :first-common-stop-time (transit-changes/time-for-stop % first-common-stop))
+                   :first-common-stop-time (tcu/time-for-stop % first-common-stop))
                 date1-trips (mapv first-common-stop date1-trips)
                 date2-trips (mapv first-common-stop date2-trips)
-                combined-trips (transit-changes/merge-by-closest-time
+                combined-trips (tcu/merge-by-closest-time
                                  :first-common-stop-time
                                  date1-trips date2-trips)]
 
             (assoc-in transit-visualization [:compare :combined-trips]
                       (mapv (fn [[l r]]
-                              [l r (transit-changes/trip-stop-differences l r)])
+                              [l r (tcu/trip-stop-differences l r)])
                             combined-trips)))
 
           ;; Can't find common stop
@@ -503,7 +515,7 @@
   (-> app
       (assoc-in [:transit-visualization :compare :selected-trip-pair] trip-pair)
       (assoc-in [:transit-visualization :compare :combined-stop-sequence]
-                (transit-changes/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+                (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
       (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true)))
 
 (define-event ToggleShowRouteLine [routename]

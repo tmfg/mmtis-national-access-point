@@ -22,6 +22,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.own-services :as os]
+            [ote.views.service-viewer :as sv]
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
@@ -90,10 +91,7 @@
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
-                   (stylefy/use-style (merge
-                                        {:transition "margin-top 300ms ease"}
-                                        (if (or (not desktop?) @is-scrolled?)
-                                          {:margin-top "56px"}))))
+                   (stylefy/use-style {:transition "margin-top 300ms ease"}))
                  [:div (cond
                          (= :front-page (:page app))
                          {:class "container-fluid"}
@@ -143,13 +141,14 @@
                     :edit-route [route/edit-route-by-id e! app]
 
                     :monitor [monitor/monitor-main e! app]
-                    
+
                     ;; 60days pre notice views
                     :new-notice [notice/new-pre-notice e! app]
                     :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
                     :pre-notices [pre-notices-listing/pre-notices e! app]
 
                     :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
+                    :service-view [sv/service-view e! app]
                     :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
 
                     (:transit-changes :authority-pre-notices)

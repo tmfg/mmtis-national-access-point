@@ -133,13 +133,21 @@
         import-error (:import-error query)
         db-error (:db-error query)
         interface-format (:interface-format query)
-        interface-url (:interface-url query)]
-  (interfaces-array->vec (search-interfaces db {:service-name     (when service-name (str "%" service-name "%"))
-                                                :operator-name    (when operator-name (str "%" operator-name "%"))
-                                                :interface-url    (when interface-url (str "%" interface-url "%"))
-                                                :import-error     (when import-error true)
-                                                :db-error         (when db-error true)
-                                                :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}))))
+        interface-url (:interface-url query)
+        ;; Get services that doesn't have any issues or services with errors.
+        services-with-interface (when (not (:no-interface query))
+                                  (interfaces-array->vec
+                                    (search-services-with-interfaces db {:service-name (when service-name (str "%" service-name "%"))
+                                                                         :operator-name (when operator-name (str "%" operator-name "%"))
+                                                                         :interface-url (when interface-url (str "%" interface-url "%"))
+                                                                         :import-error (when import-error true)
+                                                                         :db-error (when db-error true)
+                                                                         :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))})))
+        ;; Get only services that do not have interface.
+        services-without-interface (when (:no-interface query)
+                                     (search-services-wihtout-interface db {:service-name (when service-name (str "%" service-name "%"))
+                                                                            :operator-name (when operator-name (str "%" operator-name "%"))}))]
+    (concat services-with-interface services-without-interface)))
 
 (defn- list-sea-routes [db user query]
   (specql/fetch db ::transit/route
@@ -181,7 +189,7 @@
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
   [nap-config db user {id :id}]
-  (let [deleted-service (transport/get-transport-service db id)
+  (let [deleted-service (transport/all-data-transport-service db id)
         return (transport/delete-transport-service! nap-config db user id)
         auditlog {::auditlog/event-type :delete-service
                   ::auditlog/event-attributes

@@ -113,8 +113,9 @@
 
         ;; No need to hide if the error was in the email or the password
         ;; the registration page can be used to check if an email has an account
-        (http/transit-response {:error :incorrect-password}))
-      (http/transit-response {:error :no-such-user}))))
+        ;; Update 8.4.2019: We decided that in login form we will only indicate error in more general way.
+        (http/transit-response {:error :login-error}))
+      (http/transit-response {:error :login-error}))))
 
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))

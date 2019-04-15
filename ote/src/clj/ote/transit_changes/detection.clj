@@ -11,7 +11,8 @@
             [ote.db.user :as user]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
-            [ote.db.tx :as tx])
+            [ote.db.tx :as tx]
+            [ote.transit-changes.change-history :as change-history])
   (:import (java.time LocalDate DayOfWeek)))
 
 (def ^:const no-traffic-detection-threshold
@@ -39,38 +40,38 @@
                                    (specql/columns :gtfs/hash-recalculation)
                                    {:gtfs/completed op/null?})]
     (when (pos-int? (count calculations))
-       {:calculations calculations})))
+      {:calculations calculations})))
 
 (defn reset-last-hash-recalculations
   "Reset currently running hash-recalculations. Should only be used if caluclation is stuck."
   [db]
   (let [last-calculation (first (specql/fetch db :gtfs/hash-recalculation
                                               (specql/columns :gtfs/hash-recalculation)
-                                              {:gtfs/completed              op/null?}
-                                              {:specql.core/order-by        :gtfs/recalculation-id
+                                              {:gtfs/completed op/null?}
+                                              {:specql.core/order-by :gtfs/recalculation-id
                                                :specql.core/order-direction :desc
-                                               :specql.core/limit           1}))]
+                                               :specql.core/limit 1}))]
     (when last-calculation
       (specql/delete! db :gtfs/hash-recalculation {:gtfs/recalculation-id (:gtfs/recalculation-id last-calculation)}))))
 
- (defn- start-hash-recalculation [db packets-total user]
+(defn- start-hash-recalculation [db packets-total user]
   (let [id (specql/insert! db :gtfs/hash-recalculation
-                  {:gtfs/started (java.sql.Timestamp. (System/currentTimeMillis))
-                   :gtfs/packets-ready 0
-                   :gtfs/packets-total packets-total
-                   :gtfs/completed nil
-                   :gtfs/created-by (:id user) })]
+                           {:gtfs/started (java.sql.Timestamp. (System/currentTimeMillis))
+                            :gtfs/packets-ready 0
+                            :gtfs/packets-total packets-total
+                            :gtfs/completed nil
+                            :gtfs/created-by (:id user)})]
     id))
 
- (defn- update-hash-recalculation [db packages-ready id]
+(defn- update-hash-recalculation [db packages-ready id]
   (specql/update! db :gtfs/hash-recalculation
                   {:gtfs/packets-ready packages-ready}
-                 {:gtfs/recalculation-id id}))
+                  {:gtfs/recalculation-id id}))
 
- (defn- stop-hash-recalculation [db id]
+(defn- stop-hash-recalculation [db id]
   (specql/update! db :gtfs/hash-recalculation
-                 {:gtfs/completed (java.sql.Timestamp. (System/currentTimeMillis))}
-                 {:gtfs/recalculation-id id}))
+                  {:gtfs/completed (java.sql.Timestamp. (System/currentTimeMillis))}
+                  {:gtfs/recalculation-id id}))
 
 (defn calculate-package-hashes-for-service [db service-id package-count user]
   (let [package-ids (get-gtfs-packages db service-id package-count)
@@ -81,10 +82,10 @@
 
     (dotimes [i (count package-ids)]
       (let [package-id (nth package-ids i)]
-          (log/info "Generating hashes for package " package-id "  (service " service-id ")")
-          (generate-date-hashes db {:package-id package-id})
-          (update-hash-recalculation db (inc i) recalculation-id)
-          (log/info "Generation ready! (package " package-id " service " service-id ")")))
+        (log/info "Generating hashes for package " package-id "  (service " service-id ")")
+        (generate-date-hashes db {:package-id package-id})
+        (update-hash-recalculation db (inc i) recalculation-id)
+        (log/info "Generation ready! (package " package-id " service " service-id ")")))
     (stop-hash-recalculation db recalculation-id)))
 
 (defn db-route-detection-type [db service-id]
@@ -122,7 +123,7 @@
           :else
           (calculate-routes-route-hashes-using-headsign db {:package-id package-id}))))))
 
-(defn routes-by-date [date-route-hashes all-routes type]
+(defn routes-by-date [date-route-hashes all-routes]
   ;; date-route-hashes contains all hashes for date range and is sorted
   ;; by date so we can partition by :date to get each date's hashes
   (for [hashes-for-date (partition-by :date date-route-hashes)
@@ -159,9 +160,7 @@
      :routes (merge-week-hash (map :routes days))}))
 
 (defn- vnot [cond msg]
-  #_(when cond
-    (println "debug: not a change because" msg)
-    )
+  #_(when cond (println "debug: not a change because" msg))
   (not cond))
 
 (defn detect-change-for-route
@@ -173,7 +172,7 @@
     (and (nil? starting-week-hash)
          (not (week= curr next1))
          (week= prev next1))
-    {} ;; Ignore this week
+    {}                                                      ;; Ignore this week
 
     ;; No starting week specified yet, use current week
     (nil? starting-week-hash)
@@ -243,7 +242,7 @@
       (dissoc state :no-traffic-start-date :no-traffic-run))))
 
 (defn add-no-traffic-run-dates-old [{:keys [no-traffic-run no-traffic-change
-                                        no-traffic-start-date] :as state} week]
+                                            no-traffic-start-date] :as state} week]
 
   (cond
 
@@ -268,7 +267,7 @@
   week: the week being analysed during this call,
   last-analysis-wk: week map of the last week where analysis will be carried out"
   [{:keys [no-traffic-run no-traffic-change
-                                        no-traffic-start-date] :as state} week last-analysis-wk]
+           no-traffic-start-date] :as state} week last-analysis-wk]
 
   (cond
 
@@ -303,7 +302,7 @@
 
     ;; Change not yet found, try to find one
     (let [route-week-hashes (mapv (comp #(get % route) :routes)
-                            weeks)
+                                  weeks)
           result (-> state
                      (assoc :route-key route)
                      ;; Detect no-traffic run
@@ -315,8 +314,8 @@
                      (add-starting-week curr)
                      (add-different-week curr))]
       #_(if-let [dw (:different-week result)]
-        (println "route-next-different-week found something:" dw )
-        (println "no changes found from:" (:beginning-of-week (first  weeks))))
+          (println "route-next-different-week found something:" dw)
+          (println "no changes found from:" (:beginning-of-week (first weeks))))
       result)))
 
 (defn- route-next-different-week-old
@@ -340,19 +339,19 @@
       result)))
 
 (spec/def
- ::routes
- (spec/map-of
-  string?
-  (spec/coll-of (spec/or :keyword keyword? :string (spec/nilable string?)))))
+  ::routes
+  (spec/map-of
+    string?
+    (spec/coll-of (spec/or :keyword keyword? :string (spec/nilable string?)))))
 (spec/def ::local-date #(instance? java.time.LocalDate %))
 (spec/def ::end-of-week ::local-date)
 (spec/def ::beginning-of-week ::local-date)
 
 (spec/def
- ::route-week
- (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
+  ::route-week
+  (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
 (spec/def
- ::route-weeks-vec
+  ::route-weeks-vec
   (spec/coll-of ::route-week))
 
 (spec/def ::bow-eow-map (spec/keys :req-un [::beginning-of-week ::end-of-week]))
@@ -360,14 +359,14 @@
   ::different-week
   ::bow-eow-map)
 (spec/def
- ::week-hash-vec
+  ::week-hash-vec
   (spec/coll-of (spec/or :keyword keyword? :string string? :nil nil?)))
 (spec/def
- ::different-week-hash
+  ::different-week-hash
   ::week-hash-vec)
 (spec/def
- ::starting-week
- ::bow-eow-map)
+  ::starting-week
+  ::bow-eow-map)
 (spec/def ::starting-week-hash ::week-hash-vec)
 
 (spec/def ::route-change-map
@@ -432,7 +431,7 @@
                        (update route-detection-state route
                                route-next-different-week-old route weeks curr))
                      route-detection-state route-names))
-                 {}    ; initial route detection state is empty
+                 {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
     ;; (println "first-week-difference result: " (pr-str result))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
@@ -464,7 +463,7 @@
                                route-next-different-week-new route weeks curr (first (take-last 3 route-weeks))))
                      route-detection-state
                      route-names))
-                 {}    ; initial route detection state is empty
+                 {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
     ;; (println "first-week-difference result: " (pr-str result))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
@@ -478,7 +477,6 @@
   (clj-time.core/after? (time/native->date-time d1) (time/native->date-time d2)))
 
 (defn route-starting-week-past-date? [rw date]
-  #_(println "route-starting-week-past-date? (:beginning-of-week rw)=" (:beginning-of-week rw) " date=" date)
   (assert (some? date))
   (assert (some? rw))
   (assert (some? (:beginning-of-week rw)) rw)
@@ -497,9 +495,6 @@
   (into {} (for [[k v] map
                  :when (pred v)]
              [k v])))
-
-(def new-data-example [{:starting-week :foo
-                        :different-week :foo }])
 
 (defn route-differences
   "
@@ -532,14 +527,7 @@
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when (or diff-week-date no-traffic-end)
                            (.minusWeeks (or diff-week-date no-traffic-end) 1))]
-      ;(println "filtered-diff-data: " (pr-str filtered-diff-data))
-      ;(println "diff-data: " (pr-str diff-data))
-      ;(println "no-traffic-end: " (pr-str no-traffic-end))
-
-      ;(println "diff-week-beginnings: " (pr-str diff-week-beginnings))
-      ;(println "diff-week-date: " (pr-str diff-week-date) " typeof=" (type diff-week-date))
-      ;(assert (= (count diff-week-beginnings) (count (set diff-week-beginnings))))
-      (if (and (not-empty diff-data) prev-week-date)   ;; end condition: dates returned by f-w-d had nil different-week beginning
+      (if (and (not-empty diff-data) prev-week-date)        ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
           ;; Use the previous week date, because first-week-difference starts comparisons at the second given week
@@ -547,7 +535,7 @@
           (conj results filtered-diff-data))
         (if (empty? results)
           diff-data
-          results))))) ;; Default week data expected when no changes are found
+          results)))))                                      ;; Default week data expected when no changes are found
 
 (defn combine-differences-with-routes
   [route-weeks differences]
@@ -593,11 +581,13 @@
                   combined-trips)
         ;; When dealing with new routes there aren't traffic at date1-trips because traffic is starting
         ;; So calculate only new trips, no other changes or stops
-        added-trip-count (when (and (nil? combined-trips) (pos-int? (count date2-trips)))
-                      (count date2-trips))
+        added-trip-count (if (and (nil? combined-trips) (pos-int? (count date2-trips)))
+                           (count date2-trips)
+                           0)
         ;; When traffic is ending there isn't traffic at date2-trips vector. So calculate only ending trips.
-        removed-trip-count (when (and (nil? combined-trips) (pos-int? (count date1-trips)))
-                           (count date1-trips))]
+        removed-trip-count (if (and (nil? combined-trips) (pos-int? (count date1-trips)))
+                             (count date1-trips)
+                             0)]
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
      :added-trips (if combined-trips (count added) added-trip-count)
@@ -612,15 +602,15 @@
   (let [first-different-day (transit-changes/first-different-day starting-week-hash
                                                                  different-week-hash)
         starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
-        different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)]
+        different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)
+        date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
+        date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
     ;(log/debug "Found changes in trips for route: " route-hash-id ", comparing dates: " starting-week-date " and " different-week-date " route-hash-id " route-hash-id)
-    (let [date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
-          date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
-      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+    (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date)))
 
 (defn compare-route-days-all-changes-for-week [db service-id route-hash-id
-                          {:keys [starting-week starting-week-hash
-                                  different-week different-week-hash] :as r}]
+                                               {:keys [starting-week starting-week-hash
+                                                       different-week different-week-hash] :as r}]
   (let [changed-days (transit-changes/changed-days-of-week starting-week-hash different-week-hash)]
     (for [ix changed-days
           :let [starting-week-date (.plusDays (:beginning-of-week starting-week) ix)
@@ -633,11 +623,10 @@
 (defn route-day-changes
   "Takes in routes with possible different weeks and adds day change comparison."
   [db service-id routes]
-  #_(println routes)
   (let [route-day-changes
         (into {}
               (map (fn [[route {diff :different-week :as detection-result}]]
-                     (if diff ;; If a different week was found, do detailed trip analysis
+                     (if diff                               ;; If a different week was found, do detailed trip analysis
                        [route (assoc detection-result
                                 :changes (compare-route-days db service-id route detection-result))]
                        [route detection-result])))
@@ -663,7 +652,7 @@
   [db service-id routes]
   (let [route-day-changes
         (mapv (fn [{diff :different-week route-key :route-key :as detection-result}]
-                (if diff ;; If a different week was found, do detailed trip analysis
+                (if diff                                    ;; If a different week was found, do detailed trip analysis
                   (assoc detection-result
                     :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
                   detection-result))
@@ -674,11 +663,6 @@
 (defn- date-in-the-past? [^LocalDate date]
   (and date
        (.isBefore date (java.time.LocalDate/now))))
-
-(defn- max-date-within-evaluation-window? [{max-date :max-date}]
-  (and max-date
-       (.isBefore (.toLocalDate max-date) (.plusDays (java.time.LocalDate/now) 180))
-       (.isAfter (.toLocalDate max-date) (.minusDays (java.time.LocalDate/now) 1)))) ; minus 1 day so we are sure the current day is still calculated
 
 (defn- min-date-in-the-future? [{min-date :min-date}]
   (and min-date
@@ -693,10 +677,6 @@
   (.plusDays date (- (.getValue week-day)
                      (.getValue (.getDayOfWeek date)))))
 
-(defn- sql-date [local-date]
-  (when local-date
-    (java.sql.Date/valueOf local-date)))
-
 (defn discard-past-changes
   "Discard past changes by returning a :no-change"
   [{type :gtfs/change-type change-date :gtfs/change-date :as change}]
@@ -710,6 +690,60 @@
 
 (spec/fdef transform-route-change
            :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
+
+(defn- route-change-type [max-date-in-past? added? removed-date changed? no-traffic? starting-week-date different-week-date
+                          no-traffic-start-date no-traffic-end-date route]
+  ;; Change type and type specific dates
+  (discard-past-changes
+    (cond
+
+      max-date-in-past?                                     ; Done because some of the changes listed in transit changes pages are actually in the past
+      {:gtfs/change-type :no-change}
+
+      added?
+      {:gtfs/change-type :added
+
+       ;; For an added route, the change-date is the date when traffic starts
+       :gtfs/different-week-date (:min-date route)
+       :gtfs/change-date (:min-date route)
+       :gtfs/current-week-date (time/sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
+
+      removed-date
+      {:gtfs/change-type :removed
+       ;; For a removed route, the change-date is the day after traffic stops
+       ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
+       :gtfs/change-date (if (.isBefore removed-date (java.time.LocalDate/now))
+                           nil
+                           (time/sql-date removed-date))
+
+       :gtfs/different-week-date (time/sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
+       :gtfs/current-week-date (:max-date route)}
+
+      changed?
+      {:gtfs/change-type :changed
+       :gtfs/current-week-date (time/sql-date starting-week-date)
+       :gtfs/different-week-date (time/sql-date different-week-date)
+       :gtfs/change-date (time/sql-date different-week-date)}
+
+      no-traffic?
+      {:gtfs/change-type :no-traffic
+
+       ;; If the change is a no-traffic period, the different day is the first day that has no traffic
+       :gtfs/current-week-date (time/sql-date
+                                 (.plusDays no-traffic-start-date -1))
+       ;; If no-traffic starts in future set different-week-day the day when no-traffic segment starts
+       ;; if no-traffic segment is in the past (or currenlty on progress) set different-week-date when the traffic starts again
+       :gtfs/different-week-date (if (.isBefore (.toLocalDate (time/sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                                   (time/sql-date no-traffic-end-date)
+                                   (time/sql-date no-traffic-start-date))
+       ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set change date where the traffic starts again.
+       :gtfs/change-date (if (.isBefore (.toLocalDate (time/sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
+                           (time/sql-date no-traffic-end-date) ;; Day when traffic starts again
+                           (time/sql-date no-traffic-start-date))}
+
+      :default
+      {:gtfs/change-type :no-change})))
+
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -719,11 +753,11 @@
   (spec/assert ::detected-route-changes-for-services-coll route-changes-all)
   (let [route-map (map second all-routes)
         route (first (filter #(= route-key (:route-hash-id %)) route-map))
-        added? (min-date-in-the-future? route)
         route-changes-for-key (filter #(= route-key (:route-key %)) route-changes-all)
-        last-route-change? (= route-change (last route-changes-for-key))
-        ;; When there are multiple route change detections for a route which is also ending, only the last detection should be marked :removed instead of all
-        removed? (and last-route-change? (max-date-within-evaluation-window? route))
+        first-route-change? (= route-change (first route-changes-for-key))
+        ;; Overwrite only first change type to "added" for a new route. Otherwise also changes after route start would be marked as "added".
+        added? (and first-route-change? (min-date-in-the-future? route))
+        removed-date (:route-end-date route-change)
         no-traffic? (and no-traffic-start-date
                          (or no-traffic-end-date
                              (and (pos? no-traffic-run)
@@ -737,7 +771,19 @@
                                       (map :stop-seq-changes trip-changes))
         trip-stop-time-changes (reduce update-min-max-range
                                        {}
-                                       (map :stop-time-changes trip-changes))]
+                                       (map :stop-time-changes trip-changes))
+        change (route-change-type max-date-in-past? added? removed-date changed? no-traffic? starting-week-date different-week-date
+                                  no-traffic-start-date no-traffic-end-date route)
+        change-key (change-history/create-change-key-from-change-data (merge route
+                                                                             {:gtfs/route-hash-id (:route-hash-id route)
+                                                                              :gtfs/change-type (:gtfs/change-type change)
+                                                                              :gtfs/different-week-date (:gtfs/different-week-date change)
+                                                                              :gtfs/added-trips added-trips
+                                                                              :gtfs/removed-trips removed-trips
+                                                                              :gtfs/trip-stop-sequence-changes-lower (:lower trip-stop-seq-changes)
+                                                                              :gtfs/trip-stop-sequence-changes-upper (:upper trip-stop-seq-changes)
+                                                                              :gtfs/trip-stop-time-changes-lower (:lower trip-stop-time-changes)
+                                                                              :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)}))]
     (merge
       {;; Route identification
        :gtfs/route-short-name (:route-short-name route)
@@ -751,69 +797,22 @@
        :gtfs/trip-stop-sequence-changes-lower (:lower trip-stop-seq-changes)
        :gtfs/trip-stop-sequence-changes-upper (:upper trip-stop-seq-changes)
        :gtfs/trip-stop-time-changes-lower (:lower trip-stop-time-changes)
-       :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)}
+       :gtfs/trip-stop-time-changes-upper (:upper trip-stop-time-changes)
 
-     ;; Change type and type specific dates
-     (discard-past-changes
-       (cond
+       :gtfs/change-key (:gtfs/change-key change-key)}
+      change)))
 
-         max-date-in-past?                                  ; Done because some of the changes listed in transit changes pages are actually in the past
-         {:gtfs/change-type         :no-change}
-
-         added?
-         {:gtfs/change-type         :added
-
-         ;; For an added route, the change-date is the date when traffic starts
-         :gtfs/different-week-date (:min-date route)
-         :gtfs/change-date         (:min-date route)
-         :gtfs/current-week-date   (sql-date (.plusDays (.toLocalDate (:min-date route)) -1))}
-
-         removed?
-         {:gtfs/change-type         :removed
-          ;; For a removed route, the change-date is the day after traffic stops
-          ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-         :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date (.toLocalDate (:max-date route)))) (java.time.LocalDate/now))
-                             nil
-                             (sql-date (.plusDays (.toLocalDate (:max-date route)) 1)))
-
-         :gtfs/different-week-date (sql-date (.plusDays (.toLocalDate (:max-date route)) 1))
-         :gtfs/current-week-date   (:max-date route)}
-
-         changed?
-         {:gtfs/change-type         :changed
-         :gtfs/current-week-date   (sql-date starting-week-date)
-         :gtfs/different-week-date (sql-date different-week-date)
-         :gtfs/change-date         (sql-date different-week-date)}
-
-         no-traffic?
-         {:gtfs/change-type :no-traffic
-
-          ;; If the change is a no-traffic period, the different day is the first day that has no traffic
-          :gtfs/current-week-date (sql-date
-                                    (.plusDays no-traffic-start-date -1))
-          ;; If no-traffic starts in future set different-week-day the day when no-traffic segment starts
-          ;; if no-traffic segment is in the past (or currenlty on progress) set different-week-date when the traffic starts again
-          :gtfs/different-week-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
-                                      (sql-date no-traffic-end-date)
-                                      (sql-date no-traffic-start-date))
-          ;; If no-traffic is identified and no-traffic segment has begun before or at current date, set change date where the traffic starts again.
-          :gtfs/change-date (if (.isBefore (.toLocalDate (sql-date no-traffic-start-date)) (.plusDays (java.time.LocalDate/now) 1))
-                              (sql-date no-traffic-end-date) ;; Day when traffic starts again
-                              (sql-date no-traffic-start-date))}
-
-         :default
-         {:gtfs/change-type :no-change})))))
 
 (defn- debug-print-change-stats [all-routes route-changes type]
   (doseq [r all-routes
           :let [key (:route-hash-id r)
                 {:keys [changes no-traffic-start-date no-traffic-end-date]
-                 :as   route} (route-changes key)]]
+                 :as route} (route-changes key)]]
     #_(println key " has traffic " (:min-date r) " - " (:max-date r)
-             (when no-traffic-end-date
-               (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
-             (when changes
-               (str " has changes")))))
+               (when no-traffic-end-date
+                 (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
+               (when changes
+                 (str " has changes")))))
 
 (defn- update-route-changes! [db analysis-date service-id route-change-infos]
   {:pre [(some? analysis-date)
@@ -846,7 +845,7 @@
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
           ;; Set change date to future (every 4 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
@@ -862,13 +861,17 @@
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]
-      (update-route-changes! db (sql-date analysis-date) service-id route-change-infos))))
+      (update-route-changes! db (time/sql-date analysis-date) service-id route-change-infos)
+      (change-history/update-change-history db (time/sql-date analysis-date) service-id package-ids route-change-infos))))
 
 (defn override-static-holidays [date-route-hashes]
-  (map (fn [{:keys [date] :as row}]
-         (if-let [holiday-id (transit-changes/is-holiday? date)]
-           (assoc row :hash holiday-id)
-           row))
+  (map (fn [row]
+         (let [date (:date row)
+               holiday-id (when date
+                            (transit-changes/is-holiday? date))]
+           (if holiday-id
+             (assoc row :hash holiday-id)
+             row)))
        date-route-hashes))
 
 (defn- set-route-hash-id [_ route type]
@@ -877,35 +880,33 @@
         headsign (:trip-headsign route)]
     (cond
       (= type "short-long-headsign")
-        (str short "-" long "-" headsign)
+      (str short "-" long "-" headsign)
       (= type "short-long")
-        (str short "-" long)
+      (str short "-" long)
       (= type "long-headsign")
-        (str long "-" headsign)
+      (str long "-" headsign)
       (= type "long")
-        (str long)
+      (str long)
       :else
-        (str short "-" long "-" headsign))))
+      (str short "-" long "-" headsign))))
 
 (defn add-route-hash-id-as-a-map-key
   "Add default route-hash-id (long-short-headsign) to routes"
-  [routes type]
+  [routes route-hash-id-type]
   (map
     (fn [x]
-      (update x :route-hash-id #(set-route-hash-id % x type)))
+      (update x :route-hash-id #(set-route-hash-id % x route-hash-id-type)))
     routes))
 
-(defn map-by-route-key [service-routes type]
+(defn map-by-route-key [service-routes route-hash-id-type]
   (let [service-routes (if (empty? (:route-hash-id (first service-routes)))
-                         (add-route-hash-id-as-a-map-key service-routes type)
+                         (add-route-hash-id-as-a-map-key service-routes route-hash-id-type)
                          service-routes)]
     (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
 
 (defn changed-day-from-changed-week
   [db service-id route-list-with-changed-weeks]
-  #_(println "route-list-with-changed-weeks: " route-list-with-changed-weeks)
   (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
-
 
 (defn changes-by-week->changes-by-route
   "Input: Takes collection of maps (weeks), each map contains all routes of the service for the week.
@@ -946,6 +947,82 @@
   [route-list-with-week-hashes]
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
+(defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
+  (and max-date
+       (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
+       (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
+
+(spec/fdef add-ending-route-change
+           :args (spec/cat :traffic-threshold-d pos? :all-route-changes coll? :all-routes coll?)
+           :ret ::detected-route-changes-for-services-coll)
+(defn add-ending-route-change
+  "Takes a collection of route changes and adds a \"route ending\" change if max-date is before
+  a traffic threshold days value
+  See spec definition for argument validity.
+  Input:
+        all-routes format:
+                    ([\"-Vihtjärvi - Loppi-\"
+                    {:route-short-name \"\",
+                    :route-long-name \"Vihtjärvi - Loppi\",
+                    :trip-headsign \"\",
+                    :min-date #inst \"2019-03-13T22:00:00.000-00:00\",
+                    :max-date #inst \"2019-08-29T21:00:00.000-00:00\",
+                    :route-hash-id \"-Vihtjärvi - Loppi-\"}]
+                    [...])
+        all-route-changes format:
+                    [{:route-key \"-Vihtjärvi - Loppi-\",
+                     :no-traffic-run 78,
+                     :starting-week-hash  [\"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x795102e43a28a709b622b373880dafc7fb842850f13c3af2403f6bb3b2b32ee3\"   nil],
+                     :starting-week  {:beginning-of-week   #object[java.time.LocalDate 0x2af682f8 \"2019-03-25\"], :end-of-week #object[java.time.LocalDate 0x68572428 \"2019-03-31\"]},
+                     :no-traffic-start-date  #object[java.time.LocalDate 0x59e94954 \"2019-06-02\"]
+                     {...}]
+         traffic-window-d: Threshold in number of days, routes with :max-date below this will be marked ending
+   Output:
+        [{:route-key \"-Vihtjärvi - Loppi-\",
+        :no-traffic-run 78,
+        :starting-week-hash  [\"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x09cc9ea6bb7da31623b5393efc6f5cadddb9b8825e0199237775dbab247c82d5\"   \"\\\\x795102e43a28a709b622b373880dafc7fb842850f13c3af2403f6bb3b2b32ee3\"   nil],
+        :starting-week  {:beginning-of-week   #object[java.time.LocalDate 0x2af682f8 \"2019-03-25\"],
+        :end-of-week #object[java.time.LocalDate 0x68572428 \"2019-03-31\"]},
+        :no-traffic-start-date  #object[java.time.LocalDate 0x59e94954 \"2019-06-02\"]
+        REMOVE THIS: :max-date #inst \"2019-08-29T21:00:00.000-00:00\"
+        }
+        {...}]
+  "
+  [date traffic-threshold-d all-routes all-changes]
+  (let [route-max-date (fn [route-hash-id all-routes]
+                         (:max-date (some
+                                      #(when (= route-hash-id (:route-hash-id (second %))) (second %))
+                                      all-routes)))
+        create-end-change (fn [last-chg traffic-threshold-d max-date ^LocalDate date]
+                            (when (route-ends? date max-date traffic-threshold-d)
+                              (merge {:route-end-date (or (and (nil? (:no-traffic-end-date last-chg))
+                                                               ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
+                                                               ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
+                                                               (:no-traffic-start-date last-chg))
+                                                          ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
+                                                          (.plusDays (.toLocalDate max-date) 1))}
+                                     (select-keys last-chg [:route-key :starting-week :starting-week-hash]))))
+        remove-ongoing-or-break (fn [route-chg-group]
+                                  (if (and (= 1 (count route-chg-group))
+                                           (empty? (select-keys (last route-chg-group) [:different-week ;; If map is a traffic change map, don't discard
+                                                                                        ;; If map is an ending no-traffic map, don't discard
+                                                                                        :no-traffic-end-date])))
+                                    []                      ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
+                                    route-chg-group))
+        chg (doall (vec (mapcat
+                          (fn [[route-key route-chg-group]]
+                            (let [last-change (last route-chg-group)
+                                  max-date (route-max-date (:route-key last-change) all-routes)
+                                  end-change (create-end-change last-change traffic-threshold-d max-date date)]
+                              (if end-change
+                                (conj (remove-ongoing-or-break route-chg-group) end-change)
+                                route-chg-group)))
+                          (group-by :route-key all-changes))))
+        res (or chg [])]
+    res))
+
+(def route-end-detection-threshold 90)
+
 (spec/fdef detect-route-changes-for-service-new
            :ret ::detected-route-changes-for-services-coll)
 
@@ -964,15 +1041,20 @@
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
   Output: ::detected-route-changes-for-services-coll"
-  (let [type (db-route-detection-type db service-id)
+  (let [route-hash-id-type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes type)
+        all-routes (map-by-route-key service-routes route-hash-id-type)
         all-route-keys (set (keys all-routes))
-        route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
+        route-hashes (sort-by :date
+                              (apply concat
+                                     (mapv (fn [route-key]
+                                             (let [query-params (merge {:route-hash-id route-key} route-query-params)]
+                                                            (service-route-hashes-for-date-range db query-params)))
+                                           all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)] ;; Format: ({:date routes(=hashes)})
+        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
     (try
       {:all-routes all-routes
        :route-changes
@@ -981,7 +1063,8 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
-                           ;; Fetch detailed day details
+                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           ; Fetch detailed day details
                            (route-day-changes-new db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
@@ -990,16 +1073,16 @@
 
 
 (defn detect-route-changes-for-service-old [db {:keys [start-date service-id] :as route-query-params}]
-  (let [type (db-route-detection-type db service-id)
+  (let [route-hash-id-type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
         service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes type)
+        all-routes (map-by-route-key service-routes route-hash-id-type)
         all-route-keys (set (keys all-routes))
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-static-holidays route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys type)]
+        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)]
     (try
       {:all-routes all-routes
        :route-changes
@@ -1009,7 +1092,7 @@
                            ;; Search next week (for every route) that is different
                            (route-weeks-with-first-difference-old)
                            ;; Fetch detailed route comparison if a change was found
-                           (route-day-changes db service-id)               ;;remove this to run camparing tests of our changed function
+                           (route-day-changes db service-id) ;;remove this to run camparing tests of our changed function
                            )]
          old-data)}
       (catch Exception e
@@ -1050,8 +1133,7 @@
                            :gtfs/transit-change-date (:gtfs/date t)
                            :gtfs/route-short-name (:gtfs/route-short-name r)
                            :gtfs/route-long-name (:gtfs/route-long-name r)
-                           :gtfs/trip-headsign (:gtfs/trip-headsign r)}))
-        #_(println "service id " service-id "date " (:gtfs/date t))))))
+                           :gtfs/trip-headsign (:gtfs/trip-headsign r)}))))))
 
 ;;Use only in local environment and for debugging purposes!
 (defn update-route-hashes [db]
@@ -1066,11 +1148,11 @@
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (dotimes [i (count packages)]
       (let [package-id (nth packages i)]
-          #_(println "Generating" (inc i) "/" package-count " - " package-id)
-          (if future
-            (generate-date-hashes-for-future db {:package-id (:package-id package-id)})
-            (generate-date-hashes db {:package-id (:package-id package-id)}))
-          (update-hash-recalculation db (inc i) recalculation-id))
+        #_(println "Generating" (inc i) "/" package-count " - " package-id)
+        (if future
+          (generate-date-hashes-for-future db {:package-id (:package-id package-id)})
+          (generate-date-hashes db {:package-id (:package-id package-id)}))
+        (update-hash-recalculation db (inc i) recalculation-id))
       (log/info "Generation ready!"))
     (stop-hash-recalculation db recalculation-id)))
 
@@ -1106,15 +1188,15 @@
         (let [route-hashes (:gtfs/route-hashes h)
               chg-hashes (map (fn [x]
                                 (update x :gtfs/route-hash-id #(update-hash % x))) route-hashes)]
-            (when (and route-hashes (:gtfs/hash h))
-              (specql/update! db :gtfs/date-hash
-                              {:gtfs/date (:gtfs/date h)
-                               :gtfs/package-id package-id
-                               :gtfs/route-hashes chg-hashes
-                               :gtfs/modified (java.util.Date.)}
-                              ; where
-                              {:gtfs/package-id package-id
-                               :gtfs/date (:gtfs/date h)})
-              (println "package-id " package-id "date " (:gtfs/date h))))))))
+          (when (and route-hashes (:gtfs/hash h))
+            (specql/update! db :gtfs/date-hash
+                            {:gtfs/date (:gtfs/date h)
+                             :gtfs/package-id package-id
+                             :gtfs/route-hashes chg-hashes
+                             :gtfs/modified (java.util.Date.)}
+                            ; where
+                            {:gtfs/package-id package-id
+                             :gtfs/date (:gtfs/date h)})
+            (println "package-id " package-id "date " (:gtfs/date h))))))))
 
 

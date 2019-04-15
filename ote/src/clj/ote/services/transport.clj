@@ -37,6 +37,11 @@
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
+(def transport-service-personal-columns
+  #{::t-service/contact-phone
+    ::t-service/contact-gsm
+    ::t-service/contact-email})
+
 (defn get-transport-operator
   [db where-parameter]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
@@ -82,7 +87,7 @@
     ;; For some reason type must be a keyword and query returns it as a string so make it keyword.
     (mapv #(update % ::t-service/type keyword) modified-services)))
 
-(defn get-transport-service
+(defn all-data-transport-service
   "Get single transport service by id"
   [db id]
   (let [ts (first (fetch db ::t-service/transport-service
@@ -91,9 +96,10 @@
                                [::t-service/external-interfaces
                                 (specql/columns ::t-service/external-interface-description)])
                          {::t-service/id id}))]
-    (when ts
-      (assoc ts ::t-service/operation-area
-             (places/fetch-transport-service-operation-area db id)))))
+    (if ts
+      (http/transit-response (assoc ts ::t-service/operation-area
+                                       (places/fetch-transport-service-operation-area db id)))
+      {:status 404})))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
@@ -471,23 +477,52 @@
       (log/info (str "Delete association failed with service: " service-id " and operator: " operator-id))
       {:status 404 :body "Association not found"})))
 
+(defn public-data-transport-service
+  "Get single transport service by id"
+  [db id]
+  (let [ts (first (fetch db ::t-service/transport-service
+                         (apply disj
+                                (conj (specql/columns ::t-service/transport-service)
+                                    ;; join external interfaces
+                                    [::t-service/external-interfaces
+                                     (specql/columns ::t-service/external-interface-description)])
+                                transport-service-personal-columns)
+                         {::t-service/id id}))]
+    (if ts
+      (http/transit-response
+        (assoc ts ::t-service/operation-area
+                  (places/fetch-transport-service-operation-area db id)))
+      {:status 404})))
+
+
+(defn private-data-transport-operator
+  "Get single transport service by id"
+  [db id]
+  (let [to (first (fetch db ::t-operator/transport-operator
+                         (specql/columns ::t-operator/transport-operator)
+                         {::t-operator/id id}))]
+    (if to
+      (http/transit-response to)
+      {:status 404})))
+
+(defn public-data-transport-operator
+  "Get single transport service by id"
+  [db id]
+  (let [to (first (fetch db ::t-operator/transport-operator
+                         #{::t-operator/business-id
+                           ::t-operator/name
+                           ::t-operator/id
+                           ::t-operator/homepage}
+                         {::t-operator/id id}))]
+    (if to
+      (http/transit-response to)
+      {:status 404})))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
   [db config]
   (let [nap-config (:nap config)]
     (routes
-
-      (GET "/transport-service/:id" [id]
-        (let [ts (get-transport-service db (Long/parseLong id))]
-          (if-not ts
-            {:status 404}
-            (http/no-cache-transit-response ts))))
-
-      (GET "/t-operator/:id" [id :as {user :user}]
-        (let [to (authenticated-get-operator-with-id db user (Long/parseLong id))]
-          (if-not to
-            {:status 404}
-            (http/no-cache-transit-response to))))
 
       (GET "/transport-operator/ensure-unique-business-id/:business-id" [business-id :as {user :user}]
         (http/transit-response
@@ -548,7 +583,28 @@
   (routes
     (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
+
+    (GET "/transport-service/:id"
+      {{:keys [id]}
+       :params
+       user :user}
+      (let [id (Long/parseLong id)
+            operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
+                                              #{::t-service/transport-operator-id}
+                                              {::t-service/id id})))]
+        (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
+          (all-data-transport-service db id)
+          (public-data-transport-service db id))))
+
+    (GET "/t-operator/:id"
+         {{:keys [id]}
+          :params
+          user :user}
+      (let [id (Long/parseLong id)]
+        (if (or (authorization/admin? user) (authorization/is-author? db user id))
+          (private-data-transport-operator db id)
+          (public-data-transport-operator db id))))))
 
 (defrecord Transport [config]
   component/Lifecycle

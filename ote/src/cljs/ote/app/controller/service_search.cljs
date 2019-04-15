@@ -26,6 +26,9 @@
 (defrecord SaveScrollPosition [])
 (defrecord RestoreScrollPosition [])
 
+(defrecord OperationAreaFilterChanged [input])
+(defrecord PlacesSearchCompletionsResponse [completions])
+
 (defmethod routes/on-navigate-event :service [{{:keys [transport-operator-id transport-service-id]} :params}]
   (->FetchServiceGeoJSON (str js/document.location.protocol "//" js/document.location.host
                               "/export/geojson/" transport-operator-id "/" transport-service-id)))
@@ -43,7 +46,7 @@
                        :as filters}]
   (merge
    (when-not (empty? oa)
-     {:operation_area (str/join "," (map :text oa))})
+     {:operation_area (str/join "," (map :value oa))})
    (when-not (empty? (get operators :chip-results))
      {:operators (str/join "," (map :business-id (get operators :chip-results)))})
    (when text
@@ -104,7 +107,7 @@
       ;; a service page.
       app
 
-      ;; Otherwise fetch facets and do a search
+      ;; Otherwise fetch facets and do an initial search
       (do
         (comm/get! "service-search/facets"
                    {:on-success (tuck/send-async! ->FacetsResponse)})
@@ -130,8 +133,7 @@
     (update app :service-search assoc
             :facets facets
             :filters (merge (get-in app [:service-search :filters])
-                            {::t-service/operation-area []
-                             ::t-service/sub-type []})))
+                            {::t-service/sub-type []})))
 
   UpdateSearchFilters
   (process-event [{filters :filters} app]
@@ -221,4 +223,15 @@
   (process-event [_ app]
     (when-let [p (get-in app [:service-search :scroll-position])]
       (.scrollTo js/window 0 p))
-    (update app :service-search dissoc :scroll-position)))
+    (update app :service-search dissoc :scroll-position))
+
+  OperationAreaFilterChanged
+  (process-event [{input :input} app]
+    (when-not (str/blank? input) ;; only on filled input
+      (comm/get! (str "place-completions/" input) {:on-success (tuck/send-async! ->PlacesSearchCompletionsResponse)}))
+    app)
+
+  PlacesSearchCompletionsResponse
+  (process-event [{completions :completions} app]
+    (let [available-query-terms (map :ote.db.places/namefin completions)]
+      (assoc-in app [:service-search :operation-area-filter-completions] available-query-terms))))

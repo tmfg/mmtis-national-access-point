@@ -19,17 +19,16 @@
                         :color "gray"}}
        opts])))
 
-(defn table [{:keys [height name->label key-fn
-                     label-style
-                     row-style show-row-hover? selected-route
+(defn table [{:keys [height name->label key-fn label-style row-style
                      on-select row-selected? no-rows-message class] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
-        table-row-color-alt colors/gray300
+        table-row-color-alt colors/gray200
         table-row-hover-color colors/gray400]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
                  :body-style {:padding "3px"}
+                 :header-style {:border (str "solid 3px " colors/gray400)}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
                  ;;        For now, leaving this commented out.
@@ -60,7 +59,7 @@
                                       (merge
                                         (when width
                                           {:width width})
-                                        {:white-space "pre-wrap"
+                                        {:white-space "pre-line"
                                          :overflow "visible"
                                          :color (color :grey900)
                                          :font-size "1em"
@@ -88,8 +87,7 @@
                                                           {:outline (str "solid 3px " colors/primary-dark)
                                                            ::stylefy/mode {:hover {:background-color (if (even? i) table-row-color table-row-color-alt)}}})
                                                         (when row-style row-style)))
-                              {:selectable (boolean on-select)
-                               :display-border false})
+                              {:selectable (boolean on-select)})
 
                (doall
                  (map-indexed
@@ -97,7 +95,7 @@
                      (let [value ((or format identity) (if read (read row) (get row name)))]
                        ^{:key (str i "-" random-table-id "-row-col-" name)}
                        [ui/table-row-column {:style (merge
-                                                      {:white-space "pre-wrap"
+                                                      {:white-space "pre-line"
                                                        :overflow "visible"}
                                                       (when width {:width width})
                                                       (when col-style col-style))}
