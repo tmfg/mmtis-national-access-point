@@ -387,7 +387,7 @@
                   (if-not different-week-date
                     [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
-                     (str (time/days-until different-week-date) " pv")
+                     (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
