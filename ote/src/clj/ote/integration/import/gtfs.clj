@@ -303,7 +303,7 @@
                      ::specql/limit 1}))))
 
 (defn download-and-store-transit-package
-  "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
+  "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
   [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3?]
   (let [filename (gtfs-file-name operator-id ts-id)
@@ -323,7 +323,7 @@
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
               old-gtfs-hash (:gtfs/sha256 latest-package)]
 
-          ;; No gtfs import errors catched. Remove old import errors.
+          ;; No gtfs import errors caught. Remove old import errors.
           (specql/update! db ::t-service/external-interface-description
                           {::t-service/gtfs-import-error nil}
                           {::t-service/id interface-id})
@@ -331,8 +331,7 @@
           ;; IF hash doesn't match, save new and upload file to s3
           (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
             (do
-              (let [
-                    package (specql/insert! db :gtfs/package
+              (let [package (specql/insert! db :gtfs/package
                                             {:gtfs/sha256 new-gtfs-hash
                                              :gtfs/first_package (nil? latest-package)
                                              :gtfs/transport-operator-id operator-id
