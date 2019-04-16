@@ -1010,6 +1010,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                :hours "Timmar"
                :days "Dagar"
                :seconds "Sekunder"}
+  :time-days-abbr "d"
   :save-failed "Ett fel inträffade"
   :delete-operator-success "Tjänsteproducenter borttagen."
   :delete-service-success "Tjänsten borttagen."

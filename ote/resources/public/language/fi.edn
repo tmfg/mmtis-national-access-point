@@ -1016,6 +1016,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                :hours "Tuntia"
                :days "Päivää"
                :seconds "Sekuntia"}
+  :time-days-abbr "pv"
   :save-failed "Tallennettaessa sattui virhe. Jos ongelma toistuu "
   :delete-operator-success "Palveluntuottaja poistettiin onnistuneesti."
   :delete-service-success "Palvelu poistettiin onnistuneesti."
