@@ -340,13 +340,15 @@
                                              :gtfs/etag new-etag
                                              :gtfs/license license
                                              :gtfs/external-interface-description-id interface-id})]
+                (log/debug "File: " filename " was stored to db successfully.")
                 (when upload-s3?
-                  (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)}))
-                (log/debug "File: " filename " was uploaded to S3 successfully.")
+                  (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
+                  (log/debug "File: " filename " was uploaded to S3 successfully."))
+                
 
                 ;; Parse gtfs package and save it to database.
                 (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id)))
-            (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying.")))))))
+            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
