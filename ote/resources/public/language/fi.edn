@@ -1186,7 +1186,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :price-information "Hintatiedot"
   :service-hours "Palveluajat"
   :primary-areas "Pääasiallinen toiminta-alue"
-  :other-accessibility-info "Muut esteettömyystiedot"
+  :other-accessibility-info "Lisätietoja esteettömyydestä"
   :secondary-areas "Toissijainen toiminta-alue"
   :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
   :price/unit "Hinta/yksikkö"
