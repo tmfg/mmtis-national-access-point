@@ -115,15 +115,14 @@
     (.eachLayer m (fn [layer]
                     (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
-                      (do
-                        (let [^CSSStyleDeclaration icon-style (aget icon "style")]
-                          (set! (.-visibility icon-style)
-                                (if (and
-                                      (:stops show)
-                                      (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
-                                      (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                                  ""
-                                  "hidden")))))
+                      (let [^CSSStyleDeclaration icon-style (aget icon "style")]
+                        (set! (.-visibility icon-style)
+                              (if (and
+                                    (:stops show)
+                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                ""
+                                "hidden"))))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -732,9 +731,8 @@
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
           :on-click (fn [^SyntheticMouseEvent event]
-                      (do
-                        (.preventDefault event)
-                        (e! (tv/->ToggleSection :gtfs-package-info))))
+                      (.preventDefault event)
+                      (e! (tv/->ToggleSection :gtfs-package-info)))
           :style style/infobox-more-link}]
         (when open?
           [:div
