@@ -244,7 +244,7 @@
         :format (fn [{:keys [different-week-date days-until-change]}]
                   (if (and different-week-date (not (nil? different-week-date)))
                     [:span
-                     (str days-until-change " pv")
+                     (str days-until-change " " (tr [:common-texts :time-days-abbr]))
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]
