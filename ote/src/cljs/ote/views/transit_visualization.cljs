@@ -115,15 +115,14 @@
     (.eachLayer m (fn [layer]
                     (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
-                      (do
-                        (let [^CSSStyleDeclaration icon-style (aget icon "style")]
-                          (set! (.-visibility icon-style)
-                                (if (and
-                                      (:stops show)
-                                      (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
-                                      (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                                  ""
-                                  "hidden")))))
+                      (let [^CSSStyleDeclaration icon-style (aget icon "style")]
+                        (set! (.-visibility icon-style)
+                              (if (and
+                                    (:stops show)
+                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                ""
+                                "hidden"))))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -387,7 +386,7 @@
                   (if-not different-week-date
                     [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
-                     (str (time/days-until different-week-date) " pv")
+                     (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
@@ -732,9 +731,8 @@
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
           :on-click (fn [^SyntheticMouseEvent event]
-                      (do
-                        (.preventDefault event)
-                        (e! (tv/->ToggleSection :gtfs-package-info))))
+                      (.preventDefault event)
+                      (e! (tv/->ToggleSection :gtfs-package-info)))
           :style style/infobox-more-link}]
         (when open?
           [:div

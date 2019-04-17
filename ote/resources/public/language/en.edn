@@ -1006,6 +1006,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                :hours "Hours"
                :days "Days"
                :seconds "Seconds"}
+  :time-days-abbr "d"
   :save-failed "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
   :delete-operator-success "The service provider was deleted successfully."
   :delete-service-success "The service was deleted successfully."

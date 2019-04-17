@@ -119,7 +119,7 @@
                     [:div
                      [:span (stylefy/use-style {;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
                                                 :white-space "nowrap"})
-                      (str (time/days-until different-week-date) " pv ")]
+                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]) " ")]
                      [:span (stylefy/use-style {:color "gray"
                                                 :overflow-wrap "break-word"})
                       (str "("
