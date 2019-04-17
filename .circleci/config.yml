@@ -137,7 +137,7 @@ jobs:
       # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
       - run:
           name: Run all tests for a pull request
-          command: $(npm bin)/cypress run --browser chrome --record
+          command: $(npm bin)/cypress run --browser chrome --record false
 
 workflows:
   version: 2
