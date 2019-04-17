@@ -11,7 +11,7 @@
   "responseTimeout": 30000,
   "trashAssetsBeforeRuns": true,
   "videoCompression": 32,
-  "video": true,
+  "video": false,
   "videoUploadOnPasses": true,
   "viewportHeight": 660,
   "viewportWidth": 1080,
