@@ -10,7 +10,8 @@
             [ote.ui.icons :as ote-icons]
             [clojure.string :as str]
             [ote.time :as time]
-            [ote.theme.colors :as colors]))
+            [ote.theme.colors :as colors]
+            [ote.localization :refer [tr]]))
 
 ;; Utility methods
 
@@ -74,4 +75,9 @@
     (when (str/includes? (str change-type) "removed")
       [:div {:style {:flex "0.5"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
        [icon-l/icon-labeled
-        [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))
+        [ic/content-remove-circle-outline {:color style/remove-color}] nil]])
+
+    (when (str/includes? (str change-type) "no-traffic")
+      [:div {:style {:flex "0.5"} :title (tr [:transit-changes :no-traffic])}
+       [icon-l/icon-labeled
+        [ic/av-not-interested {:color style/remove-color}] nil]])]))
