@@ -923,10 +923,12 @@ You can also draw the operating area or point to the map with drawing tools. You
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
 
  :transit-changes
- {:trips-new "New trips"
+ {:route-new "New route"
+  :trips-new "New trips"
   :trips-removed "Cancelled trips"
   :stop-changes-per-trip "Stop changes per trip"
   :schedule-changes-per-trip "Schedule changes per trip"
+  :no-changes "No changes"
   :no-traffic "No traffic"
   :trip-end-potential "Potentially ending trip"}
 

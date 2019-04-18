@@ -933,10 +933,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
  :transit-changes
- {:trips-new "Uusia vuoroja"
+ {:route-new "Uusi reitti"
+  :trips-new "Uusia vuoroja"
   :trips-removed "Poistuvia vuoroja"
   :stop-changes-per-trip "Pysäkkimuutoksia per vuoro"
   :schedule-changes-per-trip "Aikataulumuutoksia per vuoro"
+  :no-changes "Ei muutoksia"
   :no-traffic "Tauko liikennöinnissä"
   :trip-end-potential "Mahdollisesti päättyvä reitti"}
 
