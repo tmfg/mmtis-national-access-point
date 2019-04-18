@@ -39,7 +39,8 @@
   ["detection-service-route-type" :gtfs/detection-service-route-type]
   ["hash-recalculation" :gtfs/hash-recalculation
    {"id" :gtfs/recalculation-id}]
-  ["detected-change-history" :gtfs/detected-change-history])
+  ["detected-change-history" :gtfs/detected-change-history]
+  ["detection-holidays" :gtfs/detection-holidays])
 
 #?(:clj
    (def ^:const int4range-pattern

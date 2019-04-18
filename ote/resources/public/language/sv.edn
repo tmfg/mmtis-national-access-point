@@ -38,9 +38,9 @@
    :ote.db.transport-service/accessibility "Tillgänglighet"
    :ote.db.transport-service/information-service-accessibility "Tjänstens tillgänglighet"
 
-   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färmedlens tillgänglighet (garanterad)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Färmedlens tillgänglighet (via bokning)"
-   :ote.db.transport-service/vehicle-accessibility "Färmedlens tillgänglighet"
+   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färdmedlens tillgänglighet (garanterad)"
+   :ote.db.transport-service/limited-vehicle-accessibility "Färdmedlens tillgänglighet (via bokning)"
+   :ote.db.transport-service/vehicle-accessibility "Färdmedlens tillgänglighet"
 
    :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
    :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
@@ -291,8 +291,8 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."
                                  :view-routes "Visa rutter"}
-  :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
-  :SEA-ROUTE-link-text " (Öppna rutteditorn för sjötrafik här)"
+  :RAE-link-text "RAE-verktyg"
+  :SEA-ROUTE-link-text " Rutteditorn för sjötrafik"
   ;; FIXME: Partially Google translated: please improve
   :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**
 \n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**")
@@ -1101,7 +1101,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operation-area-search-placeholder "Sök med finska nyckelord"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
-  :limit-search-results "Begränsar katalogen"
+  :limit-search-results "Begränsa katalogen"
   :participating-operator "deltar i produktionen av denna tjänst."
   :released-apis "Gränssnitt publicerade i tjänsten."
   :no-description "Ingen beskrivning har givits till tjänsten än."

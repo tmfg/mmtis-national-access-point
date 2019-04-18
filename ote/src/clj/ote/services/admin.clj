@@ -5,6 +5,9 @@
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [specql.op :as op]
             [taoensso.timbre :as log]
+            [ote.util.csv :as csv-util]
+            [ote.db.gtfs :as gtfs]
+            [ote.transit :refer [clj->transit]]
             [compojure.core :refer [routes GET POST DELETE]]
             [jeesql.core :refer [defqueries]]
             [ote.nap.users :as nap-users]
@@ -26,7 +29,9 @@
             [ote.components.service :refer [define-service-component]]
             [ote.localization :as localization :refer [tr]]
             [clj-time.core :as t]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [clj-http.client :as http-client]
+            [ote.services.external :as external]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -247,7 +252,7 @@
                                  ;; else
                                  0M)))
         monthly-series-for-type (fn [t]
-                                  (vec 
+                                  (vec
                                    (for [month months]
                                      (let [tc (filter #(= t (:sub-type %)) (get by-month month))]
                                        ;; (println "month" month "hs" (find-sum-backwards month t))
@@ -256,7 +261,7 @@
                        {:label (tr [:enums :ote.db.transport-service/sub-type (keyword t)])
                         :data (monthly-series-for-type t)
                         :backgroundColor (get type-colors t)})]
-    
+
     {:labels (vec months)
      :datasets (mapv type-dataset subtypes)}))
 
@@ -286,7 +291,7 @@
               (let [r (monthly-types-for-monitor-report db)
                     months (:labels r)
                     ds (:datasets r)
-                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    sums-by-type (into {} (map (juxt :label :data) ds))
                     type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))))
@@ -335,8 +340,8 @@
 
 (defn- get-user-operators-by-business-id [db business-id]
   (let [result (specql/fetch db ::t-operator/transport-operator
-                (specql/columns ::t-operator/transport-operator)
-                {::t-operator/business-id business-id})]
+                             (specql/columns ::t-operator/transport-operator)
+                             {::t-operator/business-id business-id})]
     (map #(assoc {} :transport-operator %) result)))
 
 (defn- get-commercial-scheduled-services [db]
@@ -346,6 +351,68 @@
   (specql/update! db ::t-service/transport-service
                   {::t-service/commercial-traffic? commercial?}
                   {::t-service/id id}))
+
+(defn- read-csv
+  "Read CSV from input stream. Guesses the separator from the first line."
+  [input]
+  (let [separator (csv-util/csv-separator input)]
+    (csv/read-csv input :separator separator)))
+
+(defn parse-exception-holidays-csv
+  [holidays-string]
+  (let [data (next (read-csv holidays-string))]
+    (map
+      (fn [holiday]
+        (let [timestamp (first holiday)
+              parsed-time (ote.time/parse-date-iso-8601 (first (str/split timestamp #" ")))
+              third-arg (second (next holiday))
+              holiday (if (nil? third-arg)
+                        "holiday"
+                        third-arg)]
+          {:date parsed-time
+           :name holiday}))
+      data)))
+
+(defn empty-old-exceptions
+  [db]
+  (specql/delete! db :gtfs/detection-holidays
+                  {:gtfs/date op/not-null?}))
+
+(defn save-exception-days-to-db
+  [db exceptions]
+  (let [results (for [exception exceptions]
+                  (specql/insert! db :gtfs/detection-holidays
+                                  {:gtfs/date (:date exception)
+                                   :gtfs/reason (:name exception)}))]
+    results))
+
+(defn- fetch-new-exception-csv
+  "Fetches csv and produces a list of exceptions"
+  [db req]
+  (try
+    (let [url "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv"
+          response (try
+                     (http-client/get url {:as "UTF-8"
+                                           :socket-timeout 30000
+                                           :conn-timeout 10000})
+                     (catch clojure.lang.ExceptionInfo e
+                       ;; sadly clj-http wants to communicate status as exceptions
+                       (-> e ex-data)))]
+      (if (= 200 (:status response))
+        (let [response-csv (parse-exception-holidays-csv (:body response))]
+          (when (not-empty response-csv)
+            (empty-old-exceptions db)
+            (http/transit-response (save-exception-days-to-db db response-csv))))
+        {:status 403
+         :headers {"Content-Type" "application/json+transit"}
+         :body (clj->transit {:status 500
+                              :error "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv doesn't respond"})}))
+    (catch Exception e
+      (println "error")
+      {:status 500
+       :headers {"Content-Type" "application/json+transit"}
+       :body (clj->transit {:status 500
+                            :error (str e)})})))
 
 (defn- admin-routes [db http nap-config]
   (routes
@@ -381,6 +448,10 @@
 
     (GET "/admin/commercial-services" req
          (http/transit-response (get-commercial-scheduled-services db )))
+
+    (GET "/admin/csv-fetch" req
+      (require-admin-user "csv" (:user (:user req)))
+      (fetch-new-exception-csv db req))
 
     (POST "/admin/toggle-commercial-services" {form-data :body user :user}
         (toggle-commercial-service db (http/transit-request form-data))
