@@ -77,7 +77,7 @@
 
         [operator-name
          (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
-              transport-service-id "/" date "\">" (escape-html service-name) "</a>")
+              transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
          (str days-until-change " (" different-week-date ")")
          (str/join ", "

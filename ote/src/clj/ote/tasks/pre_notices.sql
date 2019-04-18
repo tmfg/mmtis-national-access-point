@@ -18,29 +18,32 @@ SELECT id, "pre-notice-type", "route-description", created, modified, descriptio
 
 -- name: fetch-unsent-changes-by-regions
 -- Fetch newest changes. Use package table to get regions
-SELECT (SELECT array_agg(fr.nimi)
-          FROM finnish_regions fr
-         WHERE fr.numero = ANY(p."finnish-regions")) AS regions,
-       to_char(h."different-week-date", 'dd.mm.yyyy') as "different-week-date",
-       op.name AS "operator-name",
-       ts.name AS "service-name",
-       ts.id AS "transport-service-id",
-       h."transport-service-id",
-       to_char(h."change-detected",'yyyy-mm-dd') as date,
-       (h."different-week-date" - CURRENT_DATE) AS "days-until-change",
-       h."change-type",
-       h.id as "history-id"
-  FROM
-       "detected-change-history" h
-       JOIN gtfs_package p ON p.id = ANY(h."package-ids")
-       JOIN "detected-route-change" r ON h."change-key" = r."change-key"
-       JOIN "transport-service" ts ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND ts."commercial-traffic?" = TRUE
-       JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
- WHERE h."email-sent" IS NULL
-  AND (p."finnish-regions" IS NULL OR
-         :regions::CHAR(2)[] IS NULL OR
-         :regions::CHAR(2)[] && p."finnish-regions")
- ORDER BY h."different-week-date" ASC;
+SELECT * FROM (
+                SELECT DISTINCT ON (h.id) h.id AS "history-id",
+                       (SELECT array_agg(fr.nimi)
+                          FROM finnish_regions fr
+                         WHERE fr.numero = ANY (p."finnish-regions")) AS regions,
+                      to_char(h."different-week-date", 'dd.mm.yyyy') AS "different-week-date",
+                      op.name AS "operator-name",
+                      ts.name AS "service-name",
+                      ts.id AS "transport-service-id",
+                      h."transport-service-id",
+                      to_char(h."change-detected", 'yyyy-mm-dd') AS date,
+                      (h."different-week-date" - CURRENT_DATE) AS "days-until-change",
+                      h."change-type"
+                FROM "detected-change-history" h
+                     JOIN gtfs_package p ON p.id = ANY (h."package-ids")
+                     JOIN "detected-route-change" r ON h."change-key" = r."change-key"
+                     JOIN "transport-service" ts
+                            ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND
+                               ts."commercial-traffic?" = TRUE
+                     JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
+                WHERE h."email-sent" IS NULL
+                  AND (p."finnish-regions" IS NULL OR
+                       :regions::CHAR(2)[] IS NULL OR
+                       :regions::CHAR(2)[] && p."finnish-regions")
+              ) x
+ ORDER BY x."different-week-date" ASC;
 
 
 -- name: fetch-current-detected-changes-by-regions
