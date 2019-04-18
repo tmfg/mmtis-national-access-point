@@ -291,7 +291,7 @@
               (let [r (monthly-types-for-monitor-report db)
                     months (:labels r)
                     ds (:datasets r)
-                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    sums-by-type (into {} (map (juxt :label :data) ds))
                     type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))))
@@ -340,8 +340,8 @@
 
 (defn- get-user-operators-by-business-id [db business-id]
   (let [result (specql/fetch db ::t-operator/transport-operator
-                (specql/columns ::t-operator/transport-operator)
-                {::t-operator/business-id business-id})]
+                             (specql/columns ::t-operator/transport-operator)
+                             {::t-operator/business-id business-id})]
     (map #(assoc {} :transport-operator %) result)))
 
 (defn- get-commercial-scheduled-services [db]
@@ -388,16 +388,24 @@
   [db req]
   (try
     (let [url "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv"
-          response (http-client/get url {:as "UTF-8"
-                                         :socket-timeout 30000
-                                         :conn-timeout 10000})]
-      (when (and (= 200 (:status response)))
+          response (try
+                     (http-client/get url {:as "UTF-8"
+                                           :socket-timeout 30000
+                                           :conn-timeout 10000})
+                     (catch clojure.lang.ExceptionInfo e
+                       ;; sadly clj-http wants to communicate status as exceptions
+                       (-> e ex-data)))]
+      (if (= 200 (:status response))
         (let [response-csv (parse-exception-holidays-csv (:body response))]
           (when (not-empty response-csv)
-            (do
-              (empty-old-exceptions db)
-              (http/transit-response (save-exception-days-to-db db response-csv)))))))
+            (empty-old-exceptions db)
+            (http/transit-response (save-exception-days-to-db db response-csv))))
+        {:status 403
+         :headers {"Content-Type" "application/json+transit"}
+         :body (clj->transit {:status 500
+                              :error "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv doesn't respond"})}))
     (catch Exception e
+      (println "error")
       {:status 500
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:status 500
