@@ -362,10 +362,10 @@
   [holidays-string]
   (let [data (next (read-csv holidays-string))]
     (map
-      (fn [exception]
-        (let [timestamp (first exception)
+      (fn [holiday]
+        (let [timestamp (first holiday)
               parsed-time (ote.time/parse-date-iso-8601 (first (str/split timestamp #" ")))
-              third-arg (second (next exception))
+              third-arg (second (next holiday))
               holiday (if (nil? third-arg)
                         "holiday"
                         third-arg)]

@@ -317,7 +317,6 @@
                        :icon (ic/content-filter-list)})
        "Lataa uusi CSV"]]]]])
 
-
 (defn upload-gtfs [e! app-state]
   [:div
     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
