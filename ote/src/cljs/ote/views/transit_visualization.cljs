@@ -397,13 +397,12 @@
                   (case change-type
                     :no-traffic
                     [icon-l/icon-labeled
-                     [ic/av-not-interested]
-                     "Tauko liikennöinnissä"]
+                     [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]
 
                     :added
                     [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
-                     "Uusi reitti"]
+                     (tr [:transit-changes :route-new])]
 
                     :removed
                     [icon-l/icon-labeled
@@ -412,12 +411,12 @@
                                          (time/format-timestamp->date-for-ui different-week-date)
                                          ". "
                                          "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
-                      "Mahdollisesti päättyvä reitti"]]
+                      (tr [:transit-changes :trip-end-potential])]]
 
                     :no-change
                     [icon-l/icon-labeled
                      [ic/navigation-check]
-                     "Ei muutoksia"]
+                     (tr [:transit-changes :no-changes])]
 
                     :changed
                     [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
