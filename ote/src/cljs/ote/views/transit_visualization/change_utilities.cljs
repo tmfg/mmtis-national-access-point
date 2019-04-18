@@ -1,12 +1,10 @@
 (ns ote.views.transit-visualization.change-utilities
   "Helper ui components for transit visualization."
-  (:require [reagent.core :as r]
-            [cljs-react-material-ui.icons :as ic]
+  (:require [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
-            [ote.app.controller.transit-visualization :as tv]
             [ote.localization :refer [tr]]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]

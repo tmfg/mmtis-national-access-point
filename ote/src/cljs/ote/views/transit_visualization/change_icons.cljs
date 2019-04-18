@@ -4,12 +4,10 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
-            [ote.app.controller.transit-visualization :as tv]
             [ote.style.base :as style-base]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
             [clojure.string :as str]
-            [ote.time :as time]
             [ote.theme.colors :as colors]
             [ote.localization :refer [tr]]))
 
