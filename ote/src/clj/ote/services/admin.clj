@@ -365,7 +365,10 @@
       (fn [exception]
         (let [timestamp (first exception)
               parsed-time (ote.time/parse-date-iso-8601 (first (str/split timestamp #" ")))
-              holiday (second (next exception))]
+              third-arg (second (next exception))
+              holiday (if (nil? third-arg)
+                        "holiday"
+                        third-arg)]
           {:date parsed-time
            :name holiday}))
       data)))
