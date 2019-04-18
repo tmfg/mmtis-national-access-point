@@ -378,10 +378,9 @@
 (defn save-exception-days-to-db
   [db exceptions]
   (let [results (for [exception exceptions]
-                  (do (println exception)
-                      (specql/insert! db :gtfs/detection-holidays
-                                      {:gtfs/date (:date exception)
-                                       :gtfs/reason (:name exception)})))]
+                  (specql/insert! db :gtfs/detection-holidays
+                                  {:gtfs/date (:date exception)
+                                   :gtfs/reason (:name exception)}))]
     results))
 
 (defn- fetch-new-exception-csv

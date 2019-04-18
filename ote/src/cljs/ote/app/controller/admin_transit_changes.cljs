@@ -183,26 +183,25 @@
 
 
 (define-event CSVLoadSuccess [response]
-              {}
-              (-> app
-                  (update-in [:admin :exceptions-from-csv] dissoc :error)
-                  (assoc-in [:admin :exceptions-from-csv :exceptions] response)
-                  (assoc-in [:admin :exceptions-from-csv :status] 200)))
+  {}
+  (-> app
+      (update-in [:admin :exceptions-from-csv] dissoc :error)
+      (assoc-in [:admin :exceptions-from-csv :exceptions] response)
+      (assoc-in [:admin :exceptions-from-csv :status] 200)))
 
 (define-event CSVLoadFailure [response]
-              {}
-              (println response)
-              (-> app
-                  (update-in [:admin :exceptions-from-csv] dissoc :exceptions)
-                  (assoc-in [:admin :exceptions-from-csv :error] response)
-                  (assoc-in [:admin :exceptions-from-csv :status] 500)))
+  {}
+  (-> app
+      (update-in [:admin :exceptions-from-csv] dissoc :exceptions)
+      (assoc-in [:admin :exceptions-from-csv :error] response)
+      (assoc-in [:admin :exceptions-from-csv :status] 500)))
 
 (define-event StartCSVLoad []
-              {}
-              (comm/get! "admin/csv-fetch"
-                         {:on-success (tuck/send-async! ->CSVLoadSuccess)
-                          :on-failure (tuck/send-async! ->CSVLoadFailure)})
-              app)
+  {}
+  (comm/get! "admin/csv-fetch"
+             {:on-success (tuck/send-async! ->CSVLoadSuccess)
+              :on-failure (tuck/send-async! ->CSVLoadFailure)})
+  app)
 
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
