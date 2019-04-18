@@ -21,7 +21,7 @@ module.exports = (on, config) => {
         // sometimes an array, sometimes an object
 
         if (browser.name === 'chrome') {
-            args.push('--disable-gpu')
+            // args.push('--disable-gpu')
 
             // whatever you return here becomes the new args
             return args
