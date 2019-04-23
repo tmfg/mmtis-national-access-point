@@ -142,7 +142,7 @@ jobs:
           
       - run:
           name: Save any screenshots from test failures to s3
-          command: if test -d cypress/screenshots; then ls -la cypress/screenshots; zip -0r screenshots.zip cypress/screenshots && aws s3 cp screenshots.zip s3://napote-circleci/build-artifacts/screenshots-${CIRCLE_BRANCH}.`date --iso=seconds`.zip; else echo no screenshot dir; fi
+          command: if test -d cypress/screenshots; then ls -la cypress/screenshots; zipfn=screenshots-${CIRCLE_BRANCH}.`date --iso=seconds`.zip; zip -0r $zipfn cypress/screenshots && aws s3 cp $zipfn s3://napote-circleci/build-artifacts/$zipfn; echo screenshots available from https://napote-circleci.s3.amazonaws.com/build-artifacts/$zipfn; else echo no screenshot dir; fi
 
 
 workflows:
