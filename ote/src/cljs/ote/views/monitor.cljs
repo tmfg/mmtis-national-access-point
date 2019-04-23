@@ -104,32 +104,32 @@
           ]
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
-         [:div {:style {:width " 75 % "}}
+         [:div {:style {:width "75%"}}
           [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]
 
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
          [ui-common/linkify " /admin/reports/monitor/csv/tertiili-companies " " Lataa kuvaajan tiedot CSV:nä "]
-         [:div {:style {:width " 75 % "}}
+         [:div {:style {:width "75%"}}
           [barchart-inner " bar-companies-by-tertiili " nil companies-by-tertiili-data]]
 
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
          [:p "Yhdellä liikkumispalveluita tarjovalla palveluntuottajalla voi olla monta erilaista palvelua. Tästä syystä
          palvelutyypeittäin jaottelu tuottaa eri lukumäärän palveluntuottajia."]
          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-         [:div {:style {:width " 75 % "}}
+         [:div {:style {:width "75%"}}
           [barchart-inner " bar-type-by-month " "right" monthly-types]]
 
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
          [:p "Yhdellä liikkumispalveluita tarjovalla palveluntuottajalla voi olla monta erilaista palvelua. Tästä syystä
          palvelutyypeittäin jaottelu tuottaa eri lukumäärän palveluntuottajia."]
          [ui-common/linkify " /admin/reports/monitor/csv/tertiili-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-         [:div {:style {:width " 75 % "}}
+         [:div {:style {:width "75%"}}
           [barchart-inner " bar-type-by-tertiili " "right" tertiili-types]]
 
          [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
          [:p "Yhdellä liikkumispalveluita tarjovalla palveluntuottajalla voi olla monta erilaista palvelua. Tästä syystä
          palvelutyypeittäin jaottelu tuottaa eri lukumäärän palveluntuottajia."]
          [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
-         [:div {:style {:width " 75 % "}}
+         [:div {:style {:width "75%"}}
           [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]]))
     [ui-common/loading-spinner]))
