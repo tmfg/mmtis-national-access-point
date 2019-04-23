@@ -78,7 +78,7 @@ Negative return value is an invalid match"
                                   (op/and {::t-service/published op/not-null?}
                                           (op/or
                                            {::t-service/sub-type (op/in types)}
-                                           {::t-service/brokerage true}))))
+                                           {::t-service/brokerage? true}))))
               (and (seq types) (not (contains? types :brokerage))) ;; Only sub types
                 (ids ::t-service/id
                     (specql/fetch db ::t-service/transport-service

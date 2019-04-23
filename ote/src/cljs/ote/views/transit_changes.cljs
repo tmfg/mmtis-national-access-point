@@ -198,7 +198,8 @@
                         (fn [change]
                           (and
                             (not (:interfaces-has-errors? change))
-                            (not (:no-interfaces-imported? change))))
+                            (not (:no-interfaces-imported? change))
+                            (not (:no-interfaces? change))))
                         changes))
         change-list (if show-contract-traffic
                       change-list
@@ -206,13 +207,12 @@
                       (filter
                         (fn [change]
                           (true? (:commercial? change)))
-                          change-list))
+                        change-list))
 
         filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
         filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
         sorted-change-list (sort-by :different-week-date < filter-different-week-date)
         change-list (concat sorted-change-list filter-missing-different-week-date)]
-
     [:div.transit-changes
      [detected-transit-changes-page-controls e! transit-changes]
      [transit-changes-legend]
