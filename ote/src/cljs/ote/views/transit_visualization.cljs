@@ -6,13 +6,8 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
-            [ote.theme.colors :as colors]
-            [tuck.core :as tuck]
-            [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
-            [taoensso.timbre :as log]
             [ote.time :as time]
-            [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
@@ -397,13 +392,12 @@
                   (case change-type
                     :no-traffic
                     [icon-l/icon-labeled
-                     [ic/av-not-interested]
-                     "Tauko liikennöinnissä"]
+                     [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]
 
                     :added
                     [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
-                     "Uusi reitti"]
+                     (tr [:transit-changes :route-new])]
 
                     :removed
                     [icon-l/icon-labeled
@@ -412,12 +406,12 @@
                                          (time/format-timestamp->date-for-ui different-week-date)
                                          ". "
                                          "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
-                      "Mahdollisesti päättyvä reitti"]]
+                      (tr [:transit-changes :trip-end-potential])]]
 
                     :no-change
                     [icon-l/icon-labeled
                      [ic/navigation-check]
-                     "Ei muutoksia"]
+                     (tr [:transit-changes :no-changes])]
 
                     :changed
                     [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
