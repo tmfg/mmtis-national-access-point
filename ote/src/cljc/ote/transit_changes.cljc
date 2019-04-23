@@ -6,9 +6,10 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
-            [ote.db.gtfs :as gtfs]
-            [specql.core :as specql]
-            [specql.op :as op]))
+            [ote.db.gtfs :as gtfs])
+  #?(:clj
+     (:require [specql.core :as specql]
+               [specql.op :as op])))
 
 ;; Define data type specs
 (s/def ::day-hash (s/nilable string?))
@@ -312,26 +313,28 @@
    [25 12] :xmas-day
    [26 12] :boxing-day})
 
-(defn exception-holidays
-  "returns a map like {[day month year] :holiday} based on detection-holidays table"
-  [db]
-  (let [dates (specql/fetch db
-                            :gtfs/detection-holidays
-                            #{:gtfs/date :gtfs/reason}
-                            {:gtfs/date op/not-null?})]
-    (reduce
-      (fn [map holiday]
-        (let [{::time/keys [month date year]} (time/date-fields (:gtfs/date holiday))]
-          (assoc map
-            [date month year] (keyword (str/lower-case (:gtfs/reason holiday))))))
-      {}
-      dates)))
+#?(:clj
+   (defn exception-holidays
+    "returns a map like {[day month year] :holiday} based on detection-holidays table"
+    [db]
+    (let [dates (specql/fetch db
+                              :gtfs/detection-holidays
+                              #{:gtfs/date :gtfs/reason}
+                              {:gtfs/date op/not-null?})]
+      (reduce
+        (fn [map holiday]
+          (let [{::time/keys [month date year]} (time/date-fields (:gtfs/date holiday))]
+            (assoc map
+              [date month year] (keyword (str/lower-case (:gtfs/reason holiday))))))
+        {}
+        dates))))
 
-(defn is-holiday?
-  "Check if given date is a holiday to be skipped. Returns holiday id if it is or nil otherwise."
-  [db date]
-  (let [{::time/keys [month date year]} (time/date-fields date)
-        exceptions (exception-holidays db)]
-    (if (exceptions [date month year])
-      (exceptions [date month year])
-      (static-holidays [date month]))))
+#?(:clj
+   (defn is-holiday?
+     "Check if given date is a holiday to be skipped. Returns holiday id if it is or nil otherwise."
+     [db date]
+     (let [{::time/keys [month date year]} (time/date-fields date)
+           exceptions (exception-holidays db)]
+       (if (exceptions [date month year])
+         (exceptions [date month year])
+         (static-holidays [date month])))))
