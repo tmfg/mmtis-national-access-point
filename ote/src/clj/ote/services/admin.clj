@@ -221,61 +221,67 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
-(defn monthly-types-for-monitor-report [db]
-  (let [type-month-count-table (monthly-producer-types-and-counts db)
-        months (distinct (keep :month type-month-count-table)) ;; order is important
-        subtypes (distinct (keep :sub-type type-month-count-table))
-        by-subtype (group-by :sub-type type-month-count-table)
+(defn summary-types-for-monitor-report [db summary-type]
+  (let [type-count-table (if (= :month summary-type)
+                           (monthly-producer-types-and-counts db)
+                           (tertiili-producer-types-and-counts db))
+        summary (distinct (keep summary-type type-count-table)) ;; order is important
+        subtypes (distinct (keep :sub-type type-count-table))
+        by-subtype (group-by :sub-type type-count-table)
         ;; the following yields a sequence map like {"taxi" (7M 12M 41M 44M 55M 59M 61M 70M 79M 85M 86M 89M 92M), ... }
         running-totals (into {}
-                             (vec  (for [[st ms] by-subtype]
-                                     [st (reductions + (map :sum  (sort-by :month ms)))])))
-        by-subtype-w-totals (into {}  (for [subtype subtypes]
-                                    [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
-        by-month (group-by :month (apply concat (vals by-subtype-w-totals)))
-        type-colors {"taxi" "rgb(242, 195, 19)"
-                     "request" "rgb(233, 76, 59)"
-                     "schedule" "rgb(24, 189, 155)"
-                     "terminal" "rgb(157, 88, 181)"
-                     "rentals" "rgb(255, 255, 42)"
-                     "parking" "rgb(255, 108, 84)"
-                     "brokerage" "rgb(53, 152, 220)"}
+                             (vec (for [[st ms] by-subtype]
+                                    [st (reductions + (map :sum (sort-by (if (= :month summary-type)
+                                                                           summary-type
+                                                                           {:year :nro}) ms)))])))
+        by-subtype-w-totals (into {} (for [subtype subtypes]
+                                       [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
+        by-summary (group-by summary-type (apply concat (vals by-subtype-w-totals)))
+        type-colors {"taxi" "rgb(0,170,187)"
+                     "request" "rgb(102,214,184)"
+                     "schedule" "rgb(102,204,102)"
+                     "brokerage" "rgb(235,102,204)"
+                     "terminal" "rgb(221,204,0)"
+                     "rentals" "rgb(255,136,0)"
+                     "parking" "rgb(255,102,153)"}
         find-sum-backwards (fn [month subtype]
                              ;; the twist in this function is that it looks up the sum from the most recent
                              ;; previous month, if the given month doesn't have the sum.
                              ;; this is because we are presenting cumulative sums.
                              (let [monthlies-for-subtype (get by-subtype-w-totals subtype)
-                                   without-future-months (filter #(<= 0 (compare month (:month %))) monthlies-for-subtype)
-                                   highest-month (last without-future-months)]
-                               (if highest-month
-                                 (:running-sum highest-month)
+                                   without-future-summary (filter #(<= 0 (compare month (summary-type %))) monthlies-for-subtype)
+                                   highest-summary (last without-future-summary)]
+                               (if highest-summary
+                                 (:running-sum highest-summary)
                                  ;; else
                                  0M)))
         monthly-series-for-type (fn [t]
                                   (vec
-                                   (for [month months]
-                                     (let [tc (filter #(= t (:sub-type %)) (get by-month month))]
-                                       ;; (println "month" month "hs" (find-sum-backwards month t))
-                                       (find-sum-backwards month t)))))
+                                    (for [x summary]
+                                      (let [tc (filter #(= t (:sub-type %)) (get summary-type x))]
+                                        ;(println "month/tertiili" x "hs" (find-sum-backwards x t))
+                                        (find-sum-backwards x t)))))
         type-dataset (fn [t]
                        {:label (tr [:enums :ote.db.transport-service/sub-type (keyword t)])
                         :data (monthly-series-for-type t)
                         :backgroundColor (get type-colors t)})]
 
-    {:labels (vec months)
+    {:labels (vec summary)
      :datasets (mapv type-dataset subtypes)}))
 
 
 (defn monitor-report [db type]
   {:monthly-companies  (monthly-registered-companies db)
+   :tertiili-companies  (tertiili-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
-   :monthly-types (monthly-types-for-monitor-report db)})
+   :monthly-types (summary-types-for-monitor-report db :month)
+   :tertiili-types (summary-types-for-monitor-report db :tertiili)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
 
-(defn monitor-csv-report [db type]
-  (case type
+(defn monitor-csv-report [db report-type]
+  (case report-type
     "monthly-companies"
     (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
               (map (juxt :month :sum) (monthly-registered-companies db)))
@@ -288,10 +294,22 @@
     (csv-data ["kuukausi" "tuottaja-tyyppi" "lkm"]
               ;; the copious vec calls are here because sort blows up on lazyseqs,
               ;; and we end up with nested lazyseqs here despite using mapv etc.
-              (let [r (monthly-types-for-monitor-report db)
+              (let [r (summary-types-for-monitor-report db :month)
                     months (:labels r)
                     ds (:datasets r)
-                    sums-by-type (into {} (map (juxt :label :data) ds))
+                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
+                    final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
+                (sort (vec (map vec (apply concat final-table))))))
+
+    "tertiili-companies-by-service-type"
+    (csv-data ["tertiili" "tuottaja-tyyppi" "lkm"]
+              ;; the copious vec calls are here because sort blows up on lazyseqs,
+              ;; and we end up with nested lazyseqs here despite using mapv etc.
+              (let [r (summary-types-for-monitor-report db :tertiili)
+                    months (:labels r)
+                    ds (:datasets r)
+                    sums-by-type (into {}  (map (juxt :label :data) ds))
                     type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))))
@@ -403,16 +421,15 @@
           (when (not-empty response-csv)
             (empty-old-exceptions db)
             (http/transit-response (save-exception-days-to-db db response-csv))))
-        {:status 403
+        {:status 500
          :headers {"Content-Type" "application/json+transit"}
-         :body (clj->transit {:status 500
-                              :error "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv doesn't respond"})}))
+         :body (clj->transit {:status (:status response)
+                              :response (str response)})}))
     (catch Exception e
-      (println "error")
+      (log/warn "Exception csv error: " e)
       {:status 500
        :headers {"Content-Type" "application/json+transit"}
-       :body (clj->transit {:status 500
-                            :error (str e)})})))
+       :body (clj->transit {:error (str e)})})))
 
 (defn- admin-routes [db http nap-config]
   (routes

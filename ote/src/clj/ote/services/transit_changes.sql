@@ -68,7 +68,8 @@ FROM "transport-service" ts
 WHERE 'road' = ANY(ts."transport-type")
   AND drc."transit-change-date" = c.date
   AND drc."transit-service-id" = c."transport-service-id"
-  AND drc."different-week-date" >= CURRENT_DATE
+  -- Get new changes or changes that can't be found because of invalid gtfs package which makes different-week-date as null
+  AND (drc."different-week-date" >= CURRENT_DATE OR drc."different-week-date" IS NULL)
   AND 'schedule' = ts."sub-type"
   AND ts.published IS NOT NULL
 -- Group so that each group represents a distinct change date, allows summing up changes in SELECT section of this query
