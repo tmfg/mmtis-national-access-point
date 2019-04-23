@@ -403,16 +403,15 @@
           (when (not-empty response-csv)
             (empty-old-exceptions db)
             (http/transit-response (save-exception-days-to-db db response-csv))))
-        {:status 403
+        {:status 500
          :headers {"Content-Type" "application/json+transit"}
-         :body (clj->transit {:status 500
-                              :error "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv doesn't respond"})}))
+         :body (clj->transit {:status (:status response)
+                              :response (str response)})}))
     (catch Exception e
-      (println "error")
+      (log/warn "Exception csv error: " e)
       {:status 500
        :headers {"Content-Type" "application/json+transit"}
-       :body (clj->transit {:status 500
-                            :error (str e)})})))
+       :body (clj->transit {:error (str e)})})))
 
 (defn- admin-routes [db http nap-config]
   (routes

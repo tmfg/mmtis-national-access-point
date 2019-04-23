@@ -864,11 +864,11 @@
       (update-route-changes! db (time/sql-date analysis-date) service-id route-change-infos)
       (change-history/update-change-history db (time/sql-date analysis-date) service-id package-ids route-change-infos))))
 
-(defn override-static-holidays [date-route-hashes]
+(defn override-holidays [db date-route-hashes]
   (map (fn [row]
          (let [date (:date row)
                holiday-id (when date
-                            (transit-changes/is-holiday? date))]
+                            (transit-changes/is-holiday? db date))]
            (if holiday-id
              (assoc row :hash holiday-id)
              row)))
@@ -1042,7 +1042,7 @@
                                                             (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-static-holidays route-hashes)
+        route-hashes-with-holidays (override-holidays db route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
     (try
       {:all-routes all-routes
@@ -1070,7 +1070,7 @@
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db route-query-params)
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-static-holidays route-hashes)
+        route-hashes-with-holidays (override-holidays db route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)]
     (try
       {:all-routes all-routes
