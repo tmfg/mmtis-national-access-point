@@ -132,7 +132,7 @@ describe('Authority pre notice tests', () => {
 
         cy.get('div.container.general-menu').within($el => {
             // Dropdown menu links
-            cy.contains('Saapuneet huutosilmoitukset').click();
+            cy.contains('Saapuneet muutosilmoitukset').click();
 
         });
 
