@@ -335,6 +335,6 @@
      [db date]
      (let [{::time/keys [month date year]} (time/date-fields date)
            exceptions (exception-holidays db)]
-       (if (exceptions [date month year])
-         (exceptions [date month year])
+       (if-let [res (exceptions [date month year])]
+         res
          (static-holidays [date month])))))
