@@ -139,6 +139,11 @@ jobs:
       - run:
           name: Run all tests for a pull request
           command: $(npm bin)/cypress run --browser chrome --record false
+          
+      - run:
+          name: Save any screenshots from test failures to s3
+          command: if test -d screenshots; then ls -la screenshots; zip -0r screenshots.zip screenshots && aws s3 cp screenshots.zip s3://napote-circleci/build-artifacts/screenshots-${CIRCLE_BRANCH}.`date --iso=seconds`.zip; else echo no screenshot dir; fi
+
 
 workflows:
   version: 2
