@@ -3,21 +3,18 @@
 describe('Pre notice tests', () => {
     before(() => {
         cy.login();
-    });
-
-    beforeEach(() => {
-        // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
     });
 
-
     it('should render pre-notice list page', () => {
+        cy.preserveSessionOnce();
         cy.visit('/#/pre-notices');
         cy.contains('Omat säännöllisen henkilöliikenteen muutosilmoitukset');
         cy.contains('Lähetetyt muutosilmoitukset');
     });
 
     it('should render pre-notice form page', () => {
+        cy.preserveSessionOnce();
         cy.visit('/#/pre-notices');
         cy.server();
         cy.route('GET', '/pre-notices/list').as('getPreNotices');
@@ -36,6 +33,7 @@ describe('Pre notice tests', () => {
     });
 
     it('save and send pre-notice', () => {
+        cy.preserveSessionOnce();
         // Open pre notice form
         cy.visit('/#/pre-notices');
         cy.server();
@@ -73,6 +71,7 @@ describe('Pre notice tests', () => {
     });
 
     it('open the pre-notice and check region', () => {
+        cy.preserveSessionOnce();
         // Open pre notice form
         cy.visit('/#/pre-notices');
         cy.server();
@@ -105,14 +104,10 @@ describe('Pre notice tests', () => {
 describe('Authority pre notice tests', () => {
     before(() => {
         cy.login();
-    });
-
-    beforeEach(() => {
-        // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
     });
-
     it('should render authority pre notice list', () => {
+        cy.preserveSessionOnce();
         cy.get('.header-general-menu').click();
 
         cy.get('div.container.general-menu').within($el => {
@@ -127,7 +122,7 @@ describe('Authority pre notice tests', () => {
     });
 
     it('should open authority pre notice modal', () => {
-
+        cy.preserveSessionOnce();
         cy.get('.header-general-menu').click();
 
         cy.get('div.container.general-menu').within($el => {
