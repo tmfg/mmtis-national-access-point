@@ -38,12 +38,12 @@
    :ote.db.transport-service/accessibility "Tillgänglighet"
    :ote.db.transport-service/information-service-accessibility "Tjänstens tillgänglighet"
 
-   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färdmedlens tillgänglighet (garanterad)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Färdmedlens tillgänglighet (via bokning)"
+   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färdmedlens tillgänglighet (Garanterad tillgång)"
+   :ote.db.transport-service/limited-vehicle-accessibility "Färdmedlens tillgänglighet (Begränsad tillgång)"
    :ote.db.transport-service/vehicle-accessibility "Färdmedlens tillgänglighet"
 
-   :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
-   :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (Garanterad tillgång)"
+   :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (Begränsad tillgång)"
    :ote.db.transport-service/info-service-accessibility "Infotjänsternas tillgänglighet"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "garanteras alltid"
@@ -51,8 +51,8 @@
    :ote.db.transport-service/limited-accessibility-tool "Begränsad tillgång till följande tillgänglighetsredskap"
    :ote.db.transport-service/limited-accessibility-description "Beskrivning av tillgänglighetsredskap med begränsad tillgång"
 
-   :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
-   :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (Garanterad tillgång)"
+   :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (Begränsad tillgång)"
    :ote.db.transport-service/transportable-aid "Hjälpmedel som kan transporteras"
 
    :ote.db.transport-service/accessibility-info-url "Beskrivning av tillgänglighetstjänsterna (WWW)"
