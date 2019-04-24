@@ -35,9 +35,7 @@ describe('Pre notice tests', () => {
 
     });
 
-    // TODO: THESE TESTS ARE DISABLED BECAUSE THEY FAIL AT RANDOM ON CI. FIX IT 165441140
-
-    xit('save and send pre-notice', () => {
+    it('save and send pre-notice', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');
         cy.server();
@@ -74,7 +72,7 @@ describe('Pre notice tests', () => {
         cy.get('#confirm-send-pre-notice').click();
     });
 
-    xit('open the pre-notice and check region', () => {
+    it('open the pre-notice and check region', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');
         cy.server();
@@ -114,7 +112,7 @@ describe('Authority pre notice tests', () => {
         cy.preserveSessionOnce();
     });
 
-    xit('should render authority pre notice list', () => {
+    it('should render authority pre notice list', () => {
         cy.get('.header-general-menu').click();
 
         cy.get('div.container.general-menu').within($el => {
@@ -128,7 +126,7 @@ describe('Authority pre notice tests', () => {
         cy.contains('Ilmoitustyyppi');
     });
 
-    xit('should open authority pre notice modal', () => {
+    it('should open authority pre notice modal', () => {
 
         cy.get('.header-general-menu').click();
 
