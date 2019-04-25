@@ -26,7 +26,7 @@ describe('Own services basic tests', function () {
 
     it('should redirect to add new service provider view', function () {
         cy.contains('Lisää uusi palveluntuottaja')
-            .click();
+            .click({force: true});
     });
 });
 
@@ -117,7 +117,7 @@ describe('Add a new service', function () {
 
             cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
 
-            cy.contains('Tallenna ja julkaise').click();
+            cy.contains('Tallenna ja julkaise').click({ force: true });
             cy.wait('@addService');
         });
 
@@ -167,7 +167,7 @@ describe('Add new service provider', function () {
 
         cy.get('input[id*="name--Palveluntuottajannimi-"]').type(this.operatorName);
         cy.get('input[id*="business-id--Y-tunnus-"]').type('1231233-3');
-        cy.contains('button', 'Tallenna').click();
+        cy.contains('button', 'Tallenna').click({ force: true });
         cy.wait('@addOperator');
         cy.contains('Palveluntarjoajan tiedot tallennettu');
     });
@@ -282,7 +282,7 @@ describe('Should add new associated service to Normal users "Terminaali Oy" and 
         });
 
         cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
-        cy.contains('Tallenna ja julkaise').click();
+        cy.contains('Tallenna ja julkaise').click({ force: true });
         cy.wait('@addService');
     });
 
