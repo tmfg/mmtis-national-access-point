@@ -138,7 +138,13 @@ jobs:
       # Note 2: If you change this invocation, be sure to also make a corresponding change in the internal deployment CI.
       - run:
           name: Run all tests for a pull request
-          command: $(npm bin)/cypress run --browser chrome --record false
+          command: $(npm bin)/cypress run --record false
+          
+      - run:
+          when: on_fail
+          name: Save any screenshots from test failures to s3
+          command: if test -d cypress/screenshots; then ls -la cypress/screenshots; zipfn=screenshots-${CIRCLE_BRANCH}.`date --iso=seconds`.zip; zip -0r $zipfn cypress/screenshots && aws s3 cp $zipfn s3://napote-circleci/build-artifacts/$zipfn; echo screenshots available from https://napote-circleci.s3.amazonaws.com/build-artifacts/$zipfn; else echo no screenshot dir; fi
+
 
 workflows:
   version: 2
