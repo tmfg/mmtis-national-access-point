@@ -6,6 +6,8 @@
             [ote.transit-changes.detection-test-utilities :as tu]
             [ote.time :as time]))
 
+(def change-window detection/route-end-detection-threshold)
+
 (def data-no-changes
   (tu/weeks (tu/to-local-date 2019 5 13) (tu/generate-traffic-week 9 ))) ;; Last week starts 2019 07 08
 
@@ -575,8 +577,6 @@
                         :min-date nil,
                         :max-date nil,
                         :route-hash-id tu/route-name-3}]])
-
-(def change-window detection/route-end-detection-threshold)
 
 (def data-ending-route-change
   (tu/weeks (tu/to-local-date 2019 5 13)
