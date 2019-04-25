@@ -2,12 +2,18 @@
 
 describe('Pre notice tests', () => {
     before(() => {
+        cy.clearCookies();
         cy.login();
     });
 
     beforeEach(() => {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
+        cy.getCookies()
+            .should('have.length', 1)
+            .then((cookies => {
+                expect(cookies[0]).to.have.property('name', 'auth_tkt');
+            }));
     });
 
 
