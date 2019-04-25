@@ -1,4 +1,4 @@
-(ns ote.views.monitor
+(ns ote.views.admin.monitor
   (:require [reagent.core :as r]
             [ote.ui.common :as ui-common]
             [ote.localization :refer [tr tr-key]]
@@ -82,12 +82,12 @@
                                                      (mapv :sub-type (:companies-by-service-type monitor-data)))
                                        :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
                                                    :backgroundColor ["rgb(0,170,187)"
-                                                                     "rgb(102,214,184)"
                                                                      "rgb(102,204,102)"
+                                                                     "rgb(153,204,0)"
                                                                      "rgb(221,204,0)"
                                                                      "rgb(255,136,0)"
                                                                      "rgb(255,102,153)"
-                                                                     "rgb(235,102,204)"]
+                                                                     "rgb(153,0,221)"]
                                                    :label " Palvelut tyypeittäin "}]}
           monthly-types (:monthly-types monitor-data)
           tertiili-types (:tertiili-types monitor-data)

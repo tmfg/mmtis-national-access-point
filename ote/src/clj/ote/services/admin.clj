@@ -238,12 +238,12 @@
                                        [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
         by-summary (group-by summary-type (apply concat (vals by-subtype-w-totals)))
         type-colors {"taxi" "rgb(0,170,187)"
-                     "request" "rgb(102,214,184)"
-                     "schedule" "rgb(102,204,102)"
-                     "brokerage" "rgb(235,102,204)"
+                     "request" "rgb(102,204,102)"
+                     "schedule" "rgb(153,204,0)"
                      "terminal" "rgb(221,204,0)"
                      "rentals" "rgb(255,136,0)"
-                     "parking" "rgb(255,102,153)"}
+                     "parking"  "rgb(255,102,153)"
+                     "brokerage" "rgb(153,0,221)"}
         find-sum-backwards (fn [month subtype]
                              ;; the twist in this function is that it looks up the sum from the most recent
                              ;; previous month, if the given month doesn't have the sum.
