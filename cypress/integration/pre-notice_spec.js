@@ -2,7 +2,6 @@
 
 describe('Pre notice tests', () => {
     before(() => {
-        cy.clearCookies();
         cy.login();
     });
 
