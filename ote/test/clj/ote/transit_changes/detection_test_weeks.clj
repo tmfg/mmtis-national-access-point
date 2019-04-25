@@ -56,7 +56,46 @@
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= 1 (count result))))))
 
-(def data-test-no-traffic-run
+(def data-all-routes-2019
+  [[tu/route-name-2
+    {:route-short-name tu/route-name-2,
+     :route-long-name tu/route-name-2,
+     :trip-headsign "",
+     :min-date nil,
+     :max-date nil,
+     :route-hash-id tu/route-name-2}]
+   [tu/route-name
+    {:route-short-name "",
+     :route-long-name tu/route-name,
+     :trip-headsign "",
+     :min-date (time/sql-date (tu/to-local-date 2019 1 1)),
+     :max-date (time/sql-date (tu/to-local-date 2019 12 31)),
+     :route-hash-id tu/route-name}]
+   [tu/route-name-3
+    {:route-short-name "",
+     :route-long-name tu/route-name-3,
+     :trip-headsign "",
+     :min-date nil,
+     :max-date nil,
+     :route-hash-id tu/route-name-3}]])
+
+(def data-route-starts-no-end
+  (tu/weeks (tu/to-local-date 2019 4 15)
+            (concat [{tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [:holiday :holiday nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}] ;; 29.4.
+                    (tu/generate-traffic-week 11 [nil nil nil nil nil "h6" "h6"]))))
+
+(deftest test-route-starts-no-end
+  (let [result (->> data-route-starts-no-end
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) change-window data-all-routes-2019))]
+    (testing "Ensure detection for starting route detects only one change and no route end. No further verification because currently transform-route-change converts it to change-type :added"
+      (is (not (contains? result :route-end-date)))
+      (is (= 1 (count result))))))
+
+(def data-no-traffic-run
   (tu/weeks (tu/to-local-date 2018 10 8)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" nil nil nil nil nil]} ; 4 day run
