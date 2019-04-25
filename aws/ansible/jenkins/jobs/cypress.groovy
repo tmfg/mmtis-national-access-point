@@ -26,6 +26,6 @@ job('Cypress-e2e-tests') {
         shell('npm i cypress@3.x && $(npm bin)/cypress verify')
         shell('CYPRESS_NAP_LOGIN=${vault_cypress_nap_username} '+
               'CYPRESS_NAP_PASSWORD=${vault_cypress_nap_password} '+
-              '$(npm bin)/cypress run --browser chrome --record false')
+              '$(npm bin)/cypress run --record false')
     }
 }
