@@ -196,7 +196,7 @@
   (->> (if beginning?
          weekhash
          (reverse weekhash))
-       (take-while nil?)
+       (take-while #(or (nil? %) (keyword? %)))
        count))
 
 (defn add-current-week-hash [to-key if-key state week]
