@@ -1,3 +1,5 @@
+import { randomBusinessid,randomName } from '../support/util';
+
 
 describe('Operator creation basic tests', function () {
     const testOp1 = {
@@ -12,7 +14,10 @@ describe('Operator creation basic tests', function () {
         mobilePhone: "123 12345678",
         telephone: "555 4567890",
         email: "e2eacmecorp@localhost",
-        web: "www.acmecorp.acme"
+        web: "www.acmecorp.acme",
+        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi',
+        businessIdInvalidWarding: 'Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero.'
+
     };
 
     // Login in only once before tests run
@@ -31,7 +36,62 @@ describe('Operator creation basic tests', function () {
         cy.contains('Omat palvelutiedot');
     });
 
-    it('should validate and invalidate business id', function () {
+    it('should navigate to add new operator', function () {
+        cy.get('#btn-add-new-transport-operator').click();
+        cy.contains('Lisää palveluntuottaja');
+    });
+
+    it('should not be able to save operator with invalid business id', function () {
+        cy.get('#btn-add-new-transport-operator').click();
+        cy.get('#input-business-id').type('1234');
+        // Check warning
+        cy.contains(testOp1.businessIdInvalidWarding);
+
+        // Save button should be disabled
+        cy.get('#btn-operator-save').should('be.disabled');
+    });
+
+    it('should add new operator', function () {
+
+        // Start adding new operator
+        cy.get('#btn-add-new-transport-operator').click();
+
+        // Business id is already added
+        cy.get('#input-business-id').type('1234567-8');
+        // Check warning
+        cy.contains(testOp1.businessIdExistsWarning);
+
+        // Try creating random business-id
+        cy.get('#input-business-id').clear(); // Clear business-id
+        cy.get('#input-business-id').type(randomBusinessid());
+        cy.contains(testOp1.businessIdExistsWarning).should('not.exist');
+
+        // Add name
+        const newOperatorName = randomName('ctest-op-');
+        cy.get('#input-operator-name').type(newOperatorName);
+
+        // Save
+        cy.get('#btn-operator-save').click();
+
+        // Ensure that operator is correctly added - should be selected by default
+        cy.wait(500);
+        cy.contains(newOperatorName);
+
+        // Ensure that other pages have it selected by default
+        cy.visit('/#/pre-notices');
+        cy.contains(newOperatorName);
+        cy.visit('/#/routes');
+        cy.contains(newOperatorName);
+
+        // Delete operator
+        cy.visit('/#/own-services');
+        cy.get('#edit-transport-operator-btn').click();
+        cy.get('#btn-delete-transport-operator').click();
+        cy.get('#confirm-operator-delete').click();
+    });
+
+
+    xit('should validate and invalidate business id', function () {
 
         // Uncomment these when YTJ service is stubbed and creation is tested fully
         // cy.get('#select-operator-at-own-services').click();
