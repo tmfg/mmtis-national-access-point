@@ -37,11 +37,13 @@ describe('Operator creation basic tests', function () {
     });
 
     it('should navigate to add new operator', function () {
+        cy.contains('Omat palvelutiedot');
         cy.get('#btn-add-new-transport-operator').click();
         cy.contains('Lisää palveluntuottaja');
     });
 
     it('should not be able to save operator with invalid business id', function () {
+        cy.contains('Omat palvelutiedot');
         cy.get('#btn-add-new-transport-operator').click();
         cy.get('#input-business-id').type('1234');
         // Check warning
@@ -53,6 +55,8 @@ describe('Operator creation basic tests', function () {
 
     it('should add new operator', function () {
 
+        cy.contains('Omat palvelutiedot');
+        
         // Start adding new operator
         cy.get('#btn-add-new-transport-operator').click();
 
