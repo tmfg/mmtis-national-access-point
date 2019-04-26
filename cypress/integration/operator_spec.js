@@ -51,12 +51,14 @@ describe('Operator creation basic tests', function () {
 
         // Save button should be disabled
         cy.get('#btn-operator-save').should('be.disabled');
+        cy.visit('/#/');
+        cy.get('#btn-confirm-leave-page').click();
     });
 
     it('should add new operator', function () {
 
         cy.contains('Omat palvelutiedot');
-        
+
         // Start adding new operator
         cy.get('#btn-add-new-transport-operator').click();
 
