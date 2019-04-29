@@ -4,7 +4,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.monitor :as monitor-controller]
             [cljsjs.chartjs]
-            [ote.ui.form-fields :as form-fields]))
+            [ote.ui.form-fields :as form-fields]
+            [ote.theme.colors :as colors]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
@@ -80,13 +81,13 @@
            provider-share-by-type-data {:labels (mapv translate-typekw
                                                       (mapv :sub-type (:companies-by-service-type monitor-data)))
                                         :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
-                                                    :backgroundColor ["rgb(0,170,187)"
-                                                                      "rgb(102,204,102)"
-                                                                      "rgb(153,204,0)"
-                                                                      "rgb(221,204,0)"
-                                                                      "rgb(255,136,0)"
-                                                                      "rgb(255,102,153)"
-                                                                      "rgb(153,0,221)"]
+                                                    :backgroundColor [colors/monitor-taxi-color
+                                                                      colors/monitor-request-color
+                                                                      colors/monitor-schedule-color
+                                                                      colors/monitor-terminal-color
+                                                                      colors/monitor-rental-color
+                                                                      colors/monitor-parking-color
+                                                                      colors/monitor-brokerage-color]
                                                     :label " Palvelut tyypeittäin "}]}
            monthly-types (:monthly-types monitor-data)
            tertile-types (:tertile-types monitor-data)
