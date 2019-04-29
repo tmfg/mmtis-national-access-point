@@ -15,7 +15,10 @@
             [ote.style.buttons :as button-styles]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.ui.info :as info]
+            [ote.time :as time]
+            [ote.theme.colors :as colors]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -276,6 +279,44 @@
              [ui/table-row-column (:service s)]
              [ui/table-row-column (:type s)]]))]]]]))
 
+
+(defn csv-loading-status
+  [app-state]
+  (let [status (get-in app-state [:admin :exceptions-from-csv :status])
+        changes (get-in app-state [:admin :exceptions-from-csv :exceptions])
+        error (get-in app-state [:admin :exceptions-from-csv :error])
+        inner-component-success [:ul {:style {:margin-left "3rem"}}
+                                 (for [change changes]
+                                   ^{:key (:gtfs/date change)}
+                                   [:li (str (time/format-timestamp->date-for-ui (:gtfs/date change)) " " (:gtfs/reason change))])]
+        inner-component-fail [:span (str error)]]
+    (if (= status 200)
+      [:div
+       ^{:key "success"}
+       [info/info-toggle [:span {:style {:color "green"}}
+                          "CSV ladattu onnistuneesti. Ladatut päivät sisällä"] inner-component-success false]]
+      [:div
+       ^{:key "error"}
+       [info/info-toggle [:span {:style {:color "red"}}
+                          "CSV lataus epäonnistui. Lähetä sisällön viesti kehittäjille."] inner-component-fail false]])))
+
+
+(defn admin-exception-days [e! app-state]
+  [:div
+   [:div (stylefy/use-style (style-base/flex-container "column"))
+    [:h2 "Poikkeuspäivät"]
+    (when (get-in app-state [:admin :exceptions-from-csv :status])
+      [csv-loading-status app-state])
+    [:div (stylefy/use-style style-admin/detection-button-container)
+     [:div (stylefy/use-style style-admin/detection-info-text)
+      [:span "Lataa osoitteesta: http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv uusi csv poikkeuspäiviä backendin käyttöön."]]
+     [:div {:style {:flex 2}}
+      [:button (merge (stylefy/use-style button-styles/primary-button)
+                      {:id "import-csv"
+                       :on-click #(e! (admin-transit-changes/->StartCSVLoad))
+                       :icon (ic/content-filter-list)})
+       "Lataa uusi CSV"]]]]])
+
 (defn upload-gtfs [e! app-state]
   [:div
     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
@@ -313,7 +354,8 @@
   (let [tabs [{:label "Tunnista muutokset" :value "admin-detected-changes"}
               {:label "Reitin tunnistus" :value "admin-route-id"}
               {:label "Lataa gtfs" :value "admin-upload-gtfs"}
-              {:label "Sopimusliikenne" :value "admin-commercial-services"}]
+              {:label "Sopimusliikenne" :value "admin-commercial-services"}
+              {:label "Poikkeuspäivät" :value "admin-exception-days"}]
         selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
         recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
     [:div
@@ -326,9 +368,10 @@
                        :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
       [:div.container {:style {:margin-top "20px"}}
        (case selected-tab
-             "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
-                                      "admin-route-id" [route-id e! app-state recalc?]
-                                      "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
-                                      "admin-commercial-services" [contract-traffic e! app-state]
-                                      ;;default
-                                      [detect-changes e! app-state])]]]))
+         "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
+         "admin-route-id" [route-id e! app-state recalc?]
+         "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
+         "admin-commercial-services" [contract-traffic e! app-state]
+         "admin-exception-days" [admin-exception-days e! app-state]
+         ;;default
+         [detect-changes e! app-state])]]]))

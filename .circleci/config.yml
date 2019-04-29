@@ -27,15 +27,15 @@ jobs:
 
       - restore_cache:
           keys:
-          - v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          - v4-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           # fallback to using the latest cache if no exact match is found
-          - v3-dependencies-{{ .Branch }}
-          - v3-dependencies-
+          - v4-dependencies-{{ .Branch }}
+          - v4-dependencies-
 
       - run: cd ote && lein deps
 
       - save_cache:
-          key: v3-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
+          key: v4-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
           paths:
             - ~/.m2
 
@@ -111,14 +111,14 @@ jobs:
 
       - restore_cache:
           keys:
-            - v3-npm-deps-
+            - v4-npm-deps-
 
       - run:
           name: Install Cypress
           command: npm i cypress@3.x && $(npm bin)/cypress verify
 
       - save_cache:
-          key: v3-npm-deps-
+          key: v4-npm-deps-
           paths:
             - node_modules
 
@@ -135,9 +135,16 @@ jobs:
             done;
 
       # Note: When running with chrome, it seems we cannot record a video. Only Electron browser can record a video.
+      # Note 2: If you change this invocation, be sure to also make a corresponding change in the internal deployment CI.
       - run:
           name: Run all tests for a pull request
-          command: $(npm bin)/cypress run --browser chrome --record
+          command: $(npm bin)/cypress run --record false
+          
+      - run:
+          when: on_fail
+          name: Save any screenshots from test failures to s3
+          command: if test -d cypress/screenshots; then ls -la cypress/screenshots; zipfn=screenshots-${CIRCLE_BRANCH}.`date --iso=seconds`.zip; zip -0r $zipfn cypress/screenshots && aws s3 cp $zipfn s3://napote-circleci/build-artifacts/$zipfn; echo screenshots available from https://napote-circleci.s3.amazonaws.com/build-artifacts/$zipfn; else echo no screenshot dir; fi
+
 
 workflows:
   version: 2

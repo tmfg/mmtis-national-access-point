@@ -1,0 +1,74 @@
+DATE;NAME;GROUP;MON;TUE;WED;THU;FRI;SAT;SUN;ALLOWED_START;ALLOWED_END;NOTES
+2020-06-20 00:00;Juhannuspäivä;Juhannusaasdasdasd;;;;;;;;;;Juhannuspäivänä liikennettä ei ajeta. Saa ajaa sunnuntailiikenteen (S-vuorot)
+2020-06-19 00:00;Juhannusaatto;Juhannus;;;;;;1;;00:00;13:00;Juhannusaattona ajetaan lauantailiikenne niiden vuorojen osalta, jotka lähtevät viimeistään kello 13.00. Lisäksi saa ajaa myöhemmin lähteviä vuoroja.
+2020-06-18 00:00;Juhannusaaton aatto;Juhannus;;;;1;;;;;;Juhannuksen aatonaattona ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2020-05-21 00:00;Helatorstai;Helatorstai;;;;;;;1;;;Helatorstaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2020-05-20 00:00;;Helatorstai;;;1;;;;;;;Helatorstaita edeltävänä keskiviikkona ajetaan keskiviikkoliikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2020-05-02 00:00;;Vappu;;;;;;1;;;;2.5. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2020-05-01 00:00;Vapunpäivä;Vappu;;;;;;;1;;;1.5. ajetaan sunnuntailiikenne (S-vuorot).
+2020-04-14 00:00;;Pääsiäinen;;1;;;;;;;;Pääsiäisen jälkeisenä tiistaina ajetaan tiistailiikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2020-04-13 00:00;2. Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Toisena pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot ja SS-vuorot)
+2020-04-12 00:00;Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Ensimmäisenä pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot)
+2020-04-10 00:00;Pitkäperjantai;Pääsiäinen;;;;;;;1;;;Pitkäperjantaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2020-04-9 00:00;Kiirastorstai;Pääsiäinen;;;;1;;;;;;Kiirastorstaina ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2020-01-07 00:00;;Loppiainen;;1;;;;;;;;7.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2020-01-06 00:00;Loppiainen;Loppiainen;;;;;;;1;;;6.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2020-01-05 00:00;;Loppiainen;;;;;;;1;;;5.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2020-01-02 00:00;;Vuodenvaihde;;;;1;;;;;;2.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2020-01-01 00:00;;Vuodenvaihde;;;;;;;1;;;1.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2019-12-31 00:00;;Vuodenvaihde;;1;;;;;;;;31.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-12-30 00:00;;Vuodenvaihde;1;;;;;;;;;30.12. ajetaan viikonpäivän mukainen liikenne. Jos viikonpäivä on sunnuntai, ajetaan S-vuorot.
+2019-12-27 00:00;;Joulu;;;;;1;;;;;27.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2019-12-26 00:00;Tapaninpäivä;Joulu;;;;;;;1;;;26.12. ajetaan sunnuntailiikenne (S-vuorot). Jos viikonpäivä on lauantai, ajetaan ainoastaan S-vuorot. Jos viikonpäivä on torstai tai perjantai, ajetaan S-vuorot, ja lisäksi saa ajaa SS-vuorot. Muina viikonpäivinä ajetaan S-vuorot ja SS-vuorot.
+2019-12-25 00:00;Joulupäivä;Joulu;;;;;;;;;;25.12. liikennettä ei ajeta, saa ajaa pyhäliikenteen (S-vuorot).
+2019-12-24 00:00;Jouluaatto;Joulu;;;;;;1;;00:00;13:00;24.12. ajetaan lauantailiikenne vuorojen osalta, jotka lähtevät kello viimeistään 13.00. Lisäksi saa ajaa myöhemmin lähteviä vuoroja.
+2019-12-23 00:00;Jouluaaton aatto;Joulu;1;;;;;;;;;23.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa SS-vuorot tai erilliset perjantaivuorot.
+2019-12-07 00:00;;Itsenäisyyspäivä;;;;;;1;;;;7.12 ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot. Jos viikonpäivä on sunnuntai, ajetaan S-vuorot ja SS-vuorot.
+2019-12-06 00:00;Itsenäisyyspäivä;Itsenäisyyspäivä;;;;;;;1;;;6.12. ajetaan pyhäliikenne (S-vuorot)
+2019-12-05 00:00;;Itsenäisyyspäivä;;;;1;;;;;;5.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-11-02 00:00;Pyhäinpäivä;Pyhäinpäivä;;;;;;;1;;;Pyhäinpäivänä ajetaan sunnuntailiikenne (S-vuorot).
+2019-06-22 00:00;Juhannuspäivä;Juhannus;;;;;;;;;;Juhannuspäivänä liikennettä ei ajeta. Saa ajaa sunnuntailiikenteen (S-vuorot)
+2019-06-21 00:00;Juhannusaatto;Juhannus;;;;;;1;;00:00;13:00;Juhannusaattona ajetaan lauantailiikenne niiden vuorojen osalta, jotka lähtevät viimeistään kello 13.00. Lisäksi saa ajaa myöhemmin lähteviä vuoroja.
+2019-06-20 00:00;Juhannusaaton aatto;Juhannus;;;;1;;;;;;Juhannuksen aatonaattona ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-05-30 00:00;Helatorstai;Helatorstai;;;;;;;1;;;Helatorstaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2019-05-29 00:00;;Helatorstai;;;1;;;;;;;Helatorstaita edeltävänä keskiviikkona ajetaan keskiviikkoliikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-05-02 00:00;;Vappu;;;;1;;;;;;2.5. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2019-05-01 00:00;Vapunpäivä;Vappu;;;;;;;1;;;1.5. ajetaan sunnuntailiikenne (S-vuorot).
+2019-04-23 00:00;;Pääsiäinen;;1;;;;;;;;Pääsiäisen jälkeisenä tiistaina ajetaan tiistailiikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2019-04-22 00:00;2. Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Toisena pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot ja SS-vuorot)
+2019-04-21 00:00;Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Ensimmäisenä pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot)
+2019-04-19 00:00;Pitkäperjantai;Pääsiäinen;;;;;;;1;;;Pitkäperjantaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2019-04-18 00:00;Kiirastorstai;Pääsiäinen;;;;1;;;;;;Kiirastorstaina ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-01-07 00:00;;Loppiainen;1;;;;;;;;;7.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2019-01-06 00:00;Loppiainen;Loppiainen;;;;;;;1;;;6.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2019-01-05 00:00;;Loppiainen;;;;;;1;;;;5.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2019-01-02 00:00;;Vuodenvaihde;;;1;;;;;;;2.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2019-01-01 00:00;;Vuodenvaihde;;;;;;;1;;;1.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2018-12-31 00:00;;Vuodenvaihde;1;;;;;;;;;31.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-12-30 00:00;;Vuodenvaihde;;;;;;;1;;;30.12. ajetaan viikonpäivän mukainen liikenne. Jos viikonpäivä on sunnuntai, ajetaan S-vuorot.
+2018-12-27 00:00;;Joulu;;;;1;;;;;;27.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2018-12-26 00:00;Tapaninpäivä;Joulu;;;;;;;1;;;26.12. ajetaan sunnuntailiikenne (S-vuorot). Jos viikonpäivä on lauantai, ajetaan ainoastaan S-vuorot. Jos viikonpäivä on torstai tai perjantai, ajetaan S-vuorot, ja lisäksi saa ajaa SS-vuorot. Muina viikonpäivinä ajetaan S-vuorot ja SS-vuorot.
+2018-12-25 00:00;Joulupäivä;Joulu;;;;;;;;;;25.12. liikennettä ei ajeta, saa ajaa pyhäliikenteen (S-vuorot).
+2018-12-24 00:00;Jouluaatto;Joulu;;;;;;1;;00:00;13:00;24.12. ajetaan lauantailiikenne vuorojen osalta, jotka lähtevät kello viimeistään 13.00. Lisäksi saa ajaa myöhemmin lähteviä vuoroja.
+2018-12-23 00:00;Jouluaaton aatto;Joulu;;;;;;;1;;;23.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa SS-vuorot tai erilliset perjantaivuorot.
+2018-12-07 00:00;;Itsenäisyyspäivä;;;;;1;;;;;7.12 ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot. Jos viikonpäivä on sunnuntai, ajetaan S-vuorot ja SS-vuorot.
+2018-12-06 00:00;Itsenäisyyspäivä;Itsenäisyyspäivä;;;;;;;1;;;6.12. ajetaan pyhäliikenne (S-vuorot)
+2018-12-05 00:00;;Itsenäisyyspäivä;;;1;;;;;;;5.12. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-11-03 00:00;Pyhäinpäivä;Pyhäinpäivä;;;;;;;1;;;Pyhäinpäivänä ajetaan sunnuntailiikenne (S-vuorot).
+2018-06-23 00:00;Juhannuspäivä;Juhannus;;;;;;;;;;Juhannuspäivänä liikennettä ei ajeta. Saa ajaa sunnuntailiikenteen (S-vuorot)
+2018-06-22 00:00;Juhannusaatto;Juhannus;;;;;;1;;00:00;13:00;Juhannusaattona ajetaan lauantailiikenne niiden vuorojen osalta, jotka lähtevät viimeistään kello 13.00. Lisäksi saa ajaa myöhemmin lähteviä vuoroja.
+2018-06-21 00:00;Juhannusaaton aatto;Juhannus;;;;1;;;;;;Juhannuksen aatonaattona ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-05-10 00:00;Helatorstai;Helatorstai;;;;;;;1;;;Helatorstaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2018-05-09 00:00;;Helatorstai;;;1;;;;;;;Helatorstaita edeltävänä keskiviikkona ajetaan keskiviikkoliikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-05-02 00:00;;Vappu;;;1;;;;;;;2.5. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2018-05-01 00:00;Vapunpäivä;Vappu;;;;;;;1;;;1.5. ajetaan sunnuntailiikenne (S-vuorot).
+2018-04-03 00:00;;Pääsiäinen;;1;;;;;;;;Pääsiäisen jälkeisenä tiistaina ajetaan tiistailiikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2018-04-02 00:00;2. Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Toisena pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot ja SS-vuorot)
+2018-04-01 00:00;Pääsiäispäivä;Pääsiäinen;;;;;;;1;;;Ensimmäisenä pääsiäispäivänä ajetaan sunnuntailiikenne (S-vuorot)
+2018-03-30 00:00;Pitkäperjantai;Pääsiäinen;;;;;;;1;;;Pitkäperjantaina ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2018-03-29 00:00;Kiirastorstai;Pääsiäinen;;;;1;;;;;;Kiirastorstaina ajetaan torstailiikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-01-07 00:00;;Loppiainen;;;;;;;1;;;7.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2018-01-06 00:00;Loppiainen;Loppiainen;;;;;;;1;;;6.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.
+2018-01-05 00:00;;Loppiainen;;;;;1;;;;;5.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset perjantaivuorot.
+2018-01-02 00:00;;Vuodenvaihde;;1;;;;;;;;2.1. ajetaan viikonpäivän mukainen liikenne. Lisäksi saa ajaa erilliset maanantaivuorot.
+2018-01-01 00:00;;Vuodenvaihde;;;;;;;1;;;1.1. ajetaan sunnuntailiikenne (S-vuorot). Lisäksi saa ajaa SS-vuorot.

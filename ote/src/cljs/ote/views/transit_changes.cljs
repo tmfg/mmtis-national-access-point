@@ -198,7 +198,8 @@
                         (fn [change]
                           (and
                             (not (:interfaces-has-errors? change))
-                            (not (:no-interfaces-imported? change))))
+                            (not (:no-interfaces-imported? change))
+                            (not (:no-interfaces? change))))
                         changes))
         change-list (if show-contract-traffic
                       change-list
@@ -206,13 +207,12 @@
                       (filter
                         (fn [change]
                           (true? (:commercial? change)))
-                          change-list))
+                        change-list))
 
         filter-missing-different-week-date (filter #(nil? (:different-week-date %)) change-list)
         filter-different-week-date (filter #(not (nil? (:different-week-date %))) change-list)
         sorted-change-list (sort-by :different-week-date < filter-different-week-date)
         change-list (concat sorted-change-list filter-missing-different-week-date)]
-
     [:div.transit-changes
      [detected-transit-changes-page-controls e! transit-changes]
      [transit-changes-legend]
@@ -239,12 +239,12 @@
         :col-style style-base/table-col-style-wrap
         :width "20%"}
        {:name "Aikaa 1. muutokseen" :width "15%"
-        :read :different-week-date
+        :read identity
         :col-style style-base/table-col-style-wrap
-        :format (fn [different-week-date]
+        :format (fn [{:keys [different-week-date days-until-change]}]
                   (if (and different-week-date (not (nil? different-week-date)))
                     [:span
-                     (str (time/days-until different-week-date) " pv")
+                     (str days-until-change " " (tr [:common-texts :time-days-abbr]))
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]

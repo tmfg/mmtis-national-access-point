@@ -19,15 +19,18 @@
 (defn info
   "Create a new info form element that doesn't have any interaction, just shows a help text."
   [text & [options]]
-  (let [type (:type options)]
-    {:name (keyword (str "info" (swap! keyword-counter inc)))
-     :type :component
-     :container-style style-form/full-width
-     :component (fn [_]
-                  [(if (= :generic type)
-                     common/generic-help
-                     common/help)
-                   text])}))
+  (let [type (:type options)
+        should-update (:should-update-check options)]
+    (merge {:name (keyword (str "info" (swap! keyword-counter inc)))
+            :type :component
+            :container-style style-form/full-width
+            :component (fn [_]
+                         [(if (= :generic type)
+                            common/generic-help
+                            common/help)
+                          text])}
+           (when should-update
+             {:should-update-check should-update}))))
 
 (defn info-with-link
   "Create a new info form element that doesn't have any interaction, just shows a help text."
@@ -310,18 +313,18 @@
             old-argv
 
             [_ {new-closed-groups :closed-groups new-data :data :as new-form-options} {:keys [label] :as new-groups}]
-            new-argv]
-        (let [old-closed (old-closed-groups label)
-              new-closed (new-closed-groups label)
-              old-group-data (read-fn old-data)
-              new-group-data (read-fn new-data)]
-          (or
-           ;; closed/open status has changed, update
-           (not= old-closed new-closed)
+            new-argv
+            old-closed (old-closed-groups label)
+            new-closed (new-closed-groups label)
+            old-group-data (read-fn old-data)
+            new-group-data (read-fn new-data)]
+        (or
+          ;; closed/open status has changed, update
+          (not= old-closed new-closed)
 
-           ;; group is not closed and its data has changed
-           (and (not new-closed)
-                (not= old-group-data new-group-data))))))))
+          ;; group is not closed and its data has changed
+          (and (not new-closed)
+               (not= old-group-data new-group-data)))))))
 
 ;; Utility to set as :should-update-check that always forces update
 (let [c (atom 0)]

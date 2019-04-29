@@ -40,7 +40,8 @@ SELECT COUNT(*)
   FROM (SELECT DISTINCT op."business-id"
           FROM "transport-service" ts
           JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-         WHERE published IS NOT NULL
+         WHERE ts.published IS NOT NULL
+           AND op."deleted?" = FALSE
         UNION
         SELECT DISTINCT (x.c)."business-id"
           FROM (SELECT unnest(COALESCE(sc.companies, ts.companies)) c

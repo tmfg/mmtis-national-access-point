@@ -5,6 +5,9 @@
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [specql.op :as op]
             [taoensso.timbre :as log]
+            [ote.util.csv :as csv-util]
+            [ote.db.gtfs :as gtfs]
+            [ote.transit :refer [clj->transit]]
             [compojure.core :refer [routes GET POST DELETE]]
             [jeesql.core :refer [defqueries]]
             [ote.nap.users :as nap-users]
@@ -26,7 +29,9 @@
             [ote.components.service :refer [define-service-component]]
             [ote.localization :as localization :refer [tr]]
             [clj-time.core :as t]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [clj-http.client :as http-client]
+            [ote.services.external :as external]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -216,61 +221,67 @@
        (upsert! db ::auditlog/auditlog auditlog)
        transport-operator-id))))
 
-(defn monthly-types-for-monitor-report [db]
-  (let [type-month-count-table (monthly-producer-types-and-counts db)
-        months (distinct (keep :month type-month-count-table)) ;; order is important
-        subtypes (distinct (keep :sub-type type-month-count-table))
-        by-subtype (group-by :sub-type type-month-count-table)
+(defn summary-types-for-monitor-report [db summary-type]
+  (let [type-count-table (if (= :month summary-type)
+                           (monthly-producer-types-and-counts db)
+                           (tertiili-producer-types-and-counts db))
+        summary (distinct (keep summary-type type-count-table)) ;; order is important
+        subtypes (distinct (keep :sub-type type-count-table))
+        by-subtype (group-by :sub-type type-count-table)
         ;; the following yields a sequence map like {"taxi" (7M 12M 41M 44M 55M 59M 61M 70M 79M 85M 86M 89M 92M), ... }
         running-totals (into {}
-                             (vec  (for [[st ms] by-subtype]
-                                     [st (reductions + (map :sum  (sort-by :month ms)))])))
-        by-subtype-w-totals (into {}  (for [subtype subtypes]
-                                    [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
-        by-month (group-by :month (apply concat (vals by-subtype-w-totals)))
-        type-colors {"taxi" "rgb(242, 195, 19)"
-                     "request" "rgb(233, 76, 59)"
-                     "schedule" "rgb(24, 189, 155)"
-                     "terminal" "rgb(157, 88, 181)"
-                     "rentals" "rgb(255, 255, 42)"
-                     "parking" "rgb(255, 108, 84)"
-                     "brokerage" "rgb(53, 152, 220)"}
+                             (vec (for [[st ms] by-subtype]
+                                    [st (reductions + (map :sum (sort-by (if (= :month summary-type)
+                                                                           summary-type
+                                                                           {:year :nro}) ms)))])))
+        by-subtype-w-totals (into {} (for [subtype subtypes]
+                                       [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
+        by-summary (group-by summary-type (apply concat (vals by-subtype-w-totals)))
+        type-colors {"taxi" "rgb(0,170,187)"
+                     "request" "rgb(102,214,184)"
+                     "schedule" "rgb(102,204,102)"
+                     "brokerage" "rgb(235,102,204)"
+                     "terminal" "rgb(221,204,0)"
+                     "rentals" "rgb(255,136,0)"
+                     "parking" "rgb(255,102,153)"}
         find-sum-backwards (fn [month subtype]
                              ;; the twist in this function is that it looks up the sum from the most recent
                              ;; previous month, if the given month doesn't have the sum.
                              ;; this is because we are presenting cumulative sums.
                              (let [monthlies-for-subtype (get by-subtype-w-totals subtype)
-                                   without-future-months (filter #(<= 0 (compare month (:month %))) monthlies-for-subtype)
-                                   highest-month (last without-future-months)]
-                               (if highest-month
-                                 (:running-sum highest-month)
+                                   without-future-summary (filter #(<= 0 (compare month (summary-type %))) monthlies-for-subtype)
+                                   highest-summary (last without-future-summary)]
+                               (if highest-summary
+                                 (:running-sum highest-summary)
                                  ;; else
                                  0M)))
         monthly-series-for-type (fn [t]
-                                  (vec 
-                                   (for [month months]
-                                     (let [tc (filter #(= t (:sub-type %)) (get by-month month))]
-                                       ;; (println "month" month "hs" (find-sum-backwards month t))
-                                       (find-sum-backwards month t)))))
+                                  (vec
+                                    (for [x summary]
+                                      (let [tc (filter #(= t (:sub-type %)) (get summary-type x))]
+                                        ;(println "month/tertiili" x "hs" (find-sum-backwards x t))
+                                        (find-sum-backwards x t)))))
         type-dataset (fn [t]
                        {:label (tr [:enums :ote.db.transport-service/sub-type (keyword t)])
                         :data (monthly-series-for-type t)
                         :backgroundColor (get type-colors t)})]
-    
-    {:labels (vec months)
+
+    {:labels (vec summary)
      :datasets (mapv type-dataset subtypes)}))
 
 
 (defn monitor-report [db type]
   {:monthly-companies  (monthly-registered-companies db)
+   :tertiili-companies  (tertiili-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
-   :monthly-types (monthly-types-for-monitor-report db)})
+   :monthly-types (summary-types-for-monitor-report db :month)
+   :tertiili-types (summary-types-for-monitor-report db :tertiili)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
 
-(defn monitor-csv-report [db type]
-  (case type
+(defn monitor-csv-report [db report-type]
+  (case report-type
     "monthly-companies"
     (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
               (map (juxt :month :sum) (monthly-registered-companies db)))
@@ -283,7 +294,19 @@
     (csv-data ["kuukausi" "tuottaja-tyyppi" "lkm"]
               ;; the copious vec calls are here because sort blows up on lazyseqs,
               ;; and we end up with nested lazyseqs here despite using mapv etc.
-              (let [r (monthly-types-for-monitor-report db)
+              (let [r (summary-types-for-monitor-report db :month)
+                    months (:labels r)
+                    ds (:datasets r)
+                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
+                    final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
+                (sort (vec (map vec (apply concat final-table))))))
+
+    "tertiili-companies-by-service-type"
+    (csv-data ["tertiili" "tuottaja-tyyppi" "lkm"]
+              ;; the copious vec calls are here because sort blows up on lazyseqs,
+              ;; and we end up with nested lazyseqs here despite using mapv etc.
+              (let [r (summary-types-for-monitor-report db :tertiili)
                     months (:labels r)
                     ds (:datasets r)
                     sums-by-type (into {}  (map (juxt :label :data) ds))
@@ -335,8 +358,8 @@
 
 (defn- get-user-operators-by-business-id [db business-id]
   (let [result (specql/fetch db ::t-operator/transport-operator
-                (specql/columns ::t-operator/transport-operator)
-                {::t-operator/business-id business-id})]
+                             (specql/columns ::t-operator/transport-operator)
+                             {::t-operator/business-id business-id})]
     (map #(assoc {} :transport-operator %) result)))
 
 (defn- get-commercial-scheduled-services [db]
@@ -346,6 +369,67 @@
   (specql/update! db ::t-service/transport-service
                   {::t-service/commercial-traffic? commercial?}
                   {::t-service/id id}))
+
+(defn- read-csv
+  "Read CSV from input stream. Guesses the separator from the first line."
+  [input]
+  (let [separator (csv-util/csv-separator input)]
+    (csv/read-csv input :separator separator)))
+
+(defn parse-exception-holidays-csv
+  [holidays-string]
+  (let [data (next (read-csv holidays-string))]
+    (map
+      (fn [holiday]
+        (let [timestamp (first holiday)
+              parsed-time (ote.time/parse-date-iso-8601 (first (str/split timestamp #" ")))
+              third-arg (second (next holiday))
+              holiday (if (nil? third-arg)
+                        "holiday"
+                        third-arg)]
+          {:date parsed-time
+           :name holiday}))
+      data)))
+
+(defn empty-old-exceptions
+  [db]
+  (specql/delete! db :gtfs/detection-holidays
+                  {:gtfs/date op/not-null?}))
+
+(defn save-exception-days-to-db
+  [db exceptions]
+  (let [results (for [exception exceptions]
+                  (specql/insert! db :gtfs/detection-holidays
+                                  {:gtfs/date (:date exception)
+                                   :gtfs/reason (:name exception)}))]
+    results))
+
+(defn- fetch-new-exception-csv
+  "Fetches csv and produces a list of exceptions"
+  [db req]
+  (try
+    (let [url "http://traffic.navici.com/tiedostot/poikkeavat_ajopaivat.csv"
+          response (try
+                     (http-client/get url {:as "UTF-8"
+                                           :socket-timeout 30000
+                                           :conn-timeout 10000})
+                     (catch clojure.lang.ExceptionInfo e
+                       ;; sadly clj-http wants to communicate status as exceptions
+                       (-> e ex-data)))]
+      (if (= 200 (:status response))
+        (let [response-csv (parse-exception-holidays-csv (:body response))]
+          (when (not-empty response-csv)
+            (empty-old-exceptions db)
+            (http/transit-response (save-exception-days-to-db db response-csv))))
+        {:status 500
+         :headers {"Content-Type" "application/json+transit"}
+         :body (clj->transit {:status (:status response)
+                              :response (str response)})}))
+    (catch Exception e
+      (log/warn "Exception csv error: " e)
+      {:status 500
+       :headers {"Content-Type" "application/json+transit"}
+       :body (clj->transit {:error (str e)})})))
 
 (defn- admin-routes [db http nap-config]
   (routes
@@ -381,6 +465,10 @@
 
     (GET "/admin/commercial-services" req
          (http/transit-response (get-commercial-scheduled-services db )))
+
+    (GET "/admin/csv-fetch" req
+      (require-admin-user "csv" (:user (:user req)))
+      (fetch-new-exception-csv db req))
 
     (POST "/admin/toggle-commercial-services" {form-data :body user :user}
         (toggle-commercial-service db (http/transit-request form-data))

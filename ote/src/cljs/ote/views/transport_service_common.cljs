@@ -110,8 +110,9 @@
 
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
-  [& [e! type sub-type]]
-  (let [type (or type :other)]
+  [& [e! type sub-type transport-type]]
+  (let [type (or type :other)
+        transport-type (set transport-type)]
 
     (form/group
       {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
@@ -122,12 +123,14 @@
          [:div
           [:b (if (= :schedule sub-type)
                 [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
-                 [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
-                  (str (tr [:form-help :RAE-link-text]) ". ")
-                  {:target "_blank"}]
-                 (when (flags/enabled? :sea-routes)
-                  [:span
-                   (str (tr [:form-help :external-interfaces-intro-2]) " ")
+                 (when (:road transport-type)
+                   [:span (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
+                    [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
+                     (str (tr [:form-help :RAE-link-text]) ". ")
+                     {:target "_blank"}]])
+                 (when (and (flags/enabled? :sea-routes) (:sea transport-type))
+                   [:span
+                   (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
                     [linkify "/ote/#/routes" (tr [:form-help :SEA-ROUTE-link-text])
                       {:target "_blank"}]])]
                 (tr [:form-help :external-interfaces-intro]))]]
@@ -140,7 +143,8 @@
          (when (= :passenger-transportation type)
            [:div {:style {:margin-top "20px"}}
             [:b (tr [:form-help :external-interfaces-payment-systems])]])]
-        {:type :generic})
+        {:type :generic
+         :should-update-check form/always-update})
 
       {:name ::t-service/external-interfaces
        :type :table
@@ -154,8 +158,8 @@
                        :open-on-focus? true
                        ;; Translate visible suggestion text, but keep the value intact.
                        :suggestions (sort-by :text (mapv (fn [val]
-                                                     {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
-                                                   t-service/interface-data-contents))
+                                                           {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
+                                                         t-service/interface-data-contents))
                        :suggestions-config {:text :text :value :value}
                        :max-results (count t-service/interface-data-contents)
                        :write (fn [data vals]
@@ -239,13 +243,12 @@
                        :write (fn [row val]
                                 (let [{eif ::t-service/external-interface} row]
                                   ;; validate external interface again, if changing format.
-                                  (do
-                                    ;; Invoke event asynchronously so that the value will be update before sending the
-                                    ;; validation request to prevent stuttering user interface.
-                                    (.setTimeout
-                                      js/window
-                                      #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
-                                    (assoc row ::t-service/format #{val}))))
+                                  ;; Invoke event asynchronously so that the value will be update before sending the
+                                  ;; validation request to prevent stuttering user interface.
+                                  (.setTimeout
+                                    js/window
+                                    #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
+                                  (assoc row ::t-service/format #{val})))
                        :read #(first (get-in % [::t-service/format]))}
                       {:name ::t-service/license
                        :type :autocomplete
@@ -403,7 +406,7 @@
                        :primary true
                        :on-click #(e! (ts/->SelectBrokeringService false))}])]}
         [:p (tr [:dialog :brokering-service :body])]
-        [:div 
+        [:div
          (linkify (tr [:dialog :brokering-service :link-url])
                   [:span (stylefy/use-style style-base/blue-link-with-icon)
                    (ic/content-create {:style {:width 20

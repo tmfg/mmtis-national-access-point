@@ -196,7 +196,7 @@
   (->> (if beginning?
          weekhash
          (reverse weekhash))
-       (take-while nil?)
+       (take-while #(or (nil? %) (keyword? %)))
        count))
 
 (defn add-current-week-hash [to-key if-key state week]
@@ -657,7 +657,7 @@
                     :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
                   detection-result))
               routes)
-        res (into [] (expand-day-changes route-day-changes))]
+        res (vec (expand-day-changes route-day-changes))]
     res))
 
 (defn- date-in-the-past? [^LocalDate date]
@@ -687,9 +687,6 @@
     {:gtfs/change-type :no-change
      :gtfs/change-date nil}
     change))
-
-(spec/fdef transform-route-change
-           :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
 
 (defn- route-change-type [max-date-in-past? added? removed-date changed? no-traffic? starting-week-date different-week-date
                           no-traffic-start-date no-traffic-end-date route]
@@ -744,6 +741,8 @@
       :default
       {:gtfs/change-type :no-change})))
 
+(spec/fdef transform-route-change
+           :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -864,11 +863,11 @@
       (update-route-changes! db (time/sql-date analysis-date) service-id route-change-infos)
       (change-history/update-change-history db (time/sql-date analysis-date) service-id package-ids route-change-infos))))
 
-(defn override-static-holidays [date-route-hashes]
+(defn override-holidays [db date-route-hashes]
   (map (fn [row]
          (let [date (:date row)
                holiday-id (when date
-                            (transit-changes/is-holiday? date))]
+                            (transit-changes/is-holiday? db date))]
            (if holiday-id
              (assoc row :hash holiday-id)
              row)))
@@ -1053,7 +1052,7 @@
                                                             (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-static-holidays route-hashes)
+        route-hashes-with-holidays (override-holidays db route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
     (try
       {:all-routes all-routes
@@ -1081,7 +1080,7 @@
         ;; Get route hashes from database
         route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-static-holidays route-hashes)
+        route-hashes-with-holidays (override-holidays db route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)]
     (try
       {:all-routes all-routes

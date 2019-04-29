@@ -4,13 +4,12 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
-            [ote.app.controller.transit-visualization :as tv]
             [ote.style.base :as style-base]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
             [clojure.string :as str]
-            [ote.time :as time]
-            [ote.theme.colors :as colors]))
+            [ote.theme.colors :as colors]
+            [ote.localization :refer [tr]]))
 
 ;; Utility methods
 
@@ -70,8 +69,14 @@
     [:div {:style {:flex "1"}}
      [stop-time-changes-icon trip-stop-time-changes-lower trip-stop-time-changes-upper with-labels?]]
 
-    ;; Add route ending icon if route ending change is detected
-    (when (str/includes? (str change-type) "removed")
+    (if (str/includes? (str change-type) "no-traffic")
+      [:div {:style {:flex "0.5"} :title (tr [:transit-changes :no-traffic])}
+       [icon-l/icon-labeled
+        [ic/av-not-interested {:color style/remove-color}] nil]]
+      [:div {:style {:flex "0.5"}}])
+
+    (if (str/includes? (str change-type) "removed")
       [:div {:style {:flex "0.5"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
        [icon-l/icon-labeled
-        [ic/content-remove-circle-outline {:color style/remove-color}] nil]])]))
+        [ic/content-remove-circle-outline {:color style/remove-color}] nil]]
+      [:div {:style {:flex "0.5"}}])]))

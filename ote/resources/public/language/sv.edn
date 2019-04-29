@@ -38,12 +38,12 @@
    :ote.db.transport-service/accessibility "Tillgänglighet"
    :ote.db.transport-service/information-service-accessibility "Tjänstens tillgänglighet"
 
-   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färmedlens tillgänglighet (garanterad)"
-   :ote.db.transport-service/limited-vehicle-accessibility "Färmedlens tillgänglighet (via bokning)"
-   :ote.db.transport-service/vehicle-accessibility "Färmedlens tillgänglighet"
+   :ote.db.transport-service/guaranteed-vehicle-accessibility "Färdmedlens tillgänglighet (Garanterad tillgång)"
+   :ote.db.transport-service/limited-vehicle-accessibility "Färdmedlens tillgänglighet (Begränsad tillgång)"
+   :ote.db.transport-service/vehicle-accessibility "Färdmedlens tillgänglighet"
 
-   :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (garanterad)"
-   :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/guaranteed-info-service-accessibility "Infotjänsternas tillgänglighet (Garanterad tillgång)"
+   :ote.db.transport-service/limited-info-service-accessibility "Infotjänsternas tillgänglighet (Begränsad tillgång)"
    :ote.db.transport-service/info-service-accessibility "Infotjänsternas tillgänglighet"
 
    :ote.db.transport-service/guaranteed-accessibility-tool "garanteras alltid"
@@ -51,8 +51,8 @@
    :ote.db.transport-service/limited-accessibility-tool "Begränsad tillgång till följande tillgänglighetsredskap"
    :ote.db.transport-service/limited-accessibility-description "Beskrivning av tillgänglighetsredskap med begränsad tillgång"
 
-   :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (alltid)"
-   :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (inte garanterad, kontakta tjänsteproducenten)"
+   :ote.db.transport-service/guaranteed-transportable-aid "Hjälpmedel som kan transporteras (Garanterad tillgång)"
+   :ote.db.transport-service/limited-transportable-aid "Hjälpmedel som kan transporteras  (Begränsad tillgång)"
    :ote.db.transport-service/transportable-aid "Hjälpmedel som kan transporteras"
 
    :ote.db.transport-service/accessibility-info-url "Beskrivning av tillgänglighetstjänsterna (WWW)"
@@ -262,8 +262,9 @@
   :name-info "Det rekommenderas att tjänstens namn inte är identiskt med tjänsteproducentens namn. Detta är speciellt viktigt då tjänsteproducenten erbjuder flera tjänster. Tex om företagets namn är Savelas resor Ab, kunde tjänstens namn vara \"Savelas ruttrafik\" eller \"Savelas beställningstrafik\""
   ;; Needs a new translation
   :external-interfaces-intro "Om det inte finns gränssnitt i maskinläsbarform för din mobilitetstjänst, lämna den här sektionen tom och fyll i stället i de andra sektionerna i blanketten."
-  :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda Trafikverkets"
+  :external-interfaces-intro-1 "Här uppger du minst ett maskinläsbart externt gränssnitt omfattande rutter och tidtabeller, (jfr statsrådets förordning nr 643/2017). "
   :external-interfaces-intro-2 "Du kan skapa ruttinformation och tidtabeller för sjötrafiken med rutteditorn för sjötrafik som finns i NAP-tjänsten."
+  :external-interfaces-intro-rae-text "Ifall dylika maskinläsbara gränssnitt inte finns att tillgå kan du använda"
   ;; Needs a new translation
   :external-interfaces "Ett maskinläsbart gränssnitt erbjuder data eller funktioner i ett tekniskt format (t.ex. GTFS, GTFS-Realtime, NeTEx, SIRI, eller REST/XML/JSON) som kan vidarebehandlas av en dator. Dessa gränssnitt är ämnade för tjänsteutvecklare, som kan använda gränssnittet enligt de användarvillkor som uppgetts."
   ;; Needs a new translation
@@ -290,8 +291,8 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."
                                  :view-routes "Visa rutter"}
-  :RAE-link-text "RAE-verktyg (läs mer på www.liikennevirasto.fi/rae)"
-  :SEA-ROUTE-link-text " (Öppna rutteditorn för sjötrafik här)"
+  :RAE-link-text "RAE-verktyg"
+  :SEA-ROUTE-link-text " Rutteditorn för sjötrafik"
   ;; FIXME: Partially Google translated: please improve
   :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**
 \n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**")
@@ -925,6 +926,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
+ :transit-changes
+ {:route-new "Uusi reitti"
+  :trips-new "Uusia vuoroja"
+  :trips-removed "Poistuvia vuoroja"
+  :stop-changes-per-trip "Pysäkkimuutoksia per vuoro"
+  :schedule-changes-per-trip "Aikataulumuutoksia per vuoro"
+  :no-changes "Ei muutoksia"
+  :no-traffic "Tauko liikennöinnissä"
+  :trip-end-potential "Mahdollisesti päättyvä reitti"}
+
  :transit-visualization-page
  {:loading-routes "Laddar rutterna för tjänsten."
   :no-changes-in-routes "Ei reittejä, joissa muutoksia."
@@ -1009,6 +1020,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                :hours "Timmar"
                :days "Dagar"
                :seconds "Sekunder"}
+  :time-days-abbr "d"
   :save-failed "Ett fel inträffade"
   :delete-operator-success "Tjänsteproducenter borttagen."
   :delete-service-success "Tjänsten borttagen."
@@ -1099,7 +1111,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :operation-area-search-placeholder "Sök med finska nyckelord"
   :no-filters "Sök tjänster genom att fylla i uppgifter ovan"
   :type-search "Tjänstetyp"
-  :limit-search-results "Begränsar katalogen"
+  :limit-search-results "Begränsa katalogen"
   :participating-operator "deltar i produktionen av denna tjänst."
   :released-apis "Gränssnitt publicerade i tjänsten."
   :no-description "Ingen beskrivning har givits till tjänsten än."
@@ -1152,36 +1164,36 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
 
  :service-viewer
- {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
-  :operator-info "Palveluntuottajan tiedot"
+ {:open-in-geojson "Öppna informationen i GeoJSON-format"
+  :operator-info "Tjänsteproducentens uppgifter"
   :transport-service-info "Mobilitetstjänstens uppgifter"
-  :not-disclosed "Ei ilmoitettu"
+  :not-disclosed "Har inte angetts"
   :brokerage {true "Ja"
               false "Nej"}
   :yes "Ja"
   :no "Nej"
-  :service-area "Toiminta-alue"
-  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
-  :luggage-warnings "Matkatavaroita koskevat varoitukset"
-  :advance-reservation "Ennakkovaraus"
-  :reservation-service "Varauspalvelu"
-  :real-time-info "Reaaliaikapalvelu"
-  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
-  :accessibility-website "Esteettömyystietojen nettisivu"
-  :guaranteed-accessibility "Taattu saatavuus"
-  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
-  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
-  :limited-accessibility "Rajoitettu saatavuus"
-  :price-information "Hintatiedot"
-  :service-hours "Palveluajat"
-  :primary-areas "Pääasialliset toiminta-alueet"
-  :other-accessibility-info "Muut esteettömyystiedot"
-  :secondary-areas "Toissijaiset toiminta-alueet"
-  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
-  :price/unit "Hinta/yksikkö"
-  :pricing-basis "Hinnoitteluperuste"
-  :day-of-week "Dagar"
-  :exception "Betjäningstider"}
+  :service-area "Verksamhetsområde"
+  :published-interfaces "Externa maskinläsbara gränssnitt"
+  :luggage-warnings "Begränsning gällande resgods"
+  :advance-reservation "Förhandsbokning"
+  :reservation-service "Bokningstjänst"
+  :real-time-info "Tjänstens realtidsuppgifter"
+  :accessibility-and-other-services "Tillgänglighet och andra tjänster"
+  :accessibility-website "Webbsida för tillgänglighetsuppgifter"
+  :guaranteed-accessibility "Garanterad tillgång"
+  :guaranteed-accessibility-description "Tilläggsuppgifter om garanterade tillgänglighetstjänster"
+  :limited-accessibility-description "Tilläggsuppgifter om begränsade tillgänglighetstjänster"
+  :limited-accessibility "Begränsad tillgång"
+  :price-information "Prisinformation"
+  :service-hours "Betjäningstider"
+  :primary-areas "Huvudsakligt verksamhetsområde"
+  :other-accessibility-info "Tilläggsuppgifter om tillgängligheten"
+  :secondary-areas "Sekundärt verksamhetsområde"
+  :reservation-possibilities-responsibilities "Bokningsmöjligheter och -skyldigheter"
+  :price/unit "Pris/enhet"
+  :pricing-basis "Prissättningsgrund"
+  :day-of-week "Veckodag"
+  :exception "Undantag"}
 
  :register
  {:label "Skapa ett nytt konto"

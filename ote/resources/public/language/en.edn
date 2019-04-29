@@ -256,7 +256,8 @@
  {:transport-type-info "Select here the type or types of your transport service. This information is used for a service catalog page search functionality."
   :name-info "Service name should differ from transport operator´s (company´s) name. This is important especially when a company provides many types of transport services. \nE.g. if company´s name is Gigeon´s Travels Ltd., service name could be e.g.\"Gideon´s scheduled transport\" or \"Gideon´s charter traffic.\""
   :external-interfaces-intro "If your service does not have machine-readable interfaces leave this section empty and move to the next section."
-  :external-interfaces-intro-1 "Fill in at least machine-readable route and timetable information. If you do not have the means to produce machine-readable route and timetable infromation, you can do so in FTA's"
+  :external-interfaces-intro-1 "Fill in at least machine-readable route and timetable information."
+  :external-interfaces-intro-rae-text "If you do not have the means to produce machine-readable route and timetable infromation, you can do so in"
   :external-interfaces-intro-2 "Sea traffic’s machine-readable route and timetable information can be created by using NAP service's"
   :external-interfaces "Machine-readable interface means a structured format that can be automatically read without human intervention (eg. CSV, XML, JSON or GTFS). External interfaces are meant for partners and developers who can use them in accordance with the stated license to build their services."
   :external-interfaces-read-more {:link "Read more about the machine-readable interfaces in NAP catalog."
@@ -921,6 +922,16 @@ You can also draw the operating area or point to the map with drawing tools. You
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
 
+ :transit-changes
+ {:route-new "New route"
+  :trips-new "New trips"
+  :trips-removed "Cancelled trips"
+  :stop-changes-per-trip "Stop changes per trip"
+  :schedule-changes-per-trip "Schedule changes per trip"
+  :no-changes "No changes"
+  :no-traffic "No traffic"
+  :trip-end-potential "Potentially ending trip"}
+
  :transit-visualization-page
  {:loading-routes "Loading service routes."
   :no-changes-in-routes "No routes with changes."
@@ -1005,6 +1016,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                :hours "Hours"
                :days "Days"
                :seconds "Seconds"}
+  :time-days-abbr "d"
   :save-failed "An error has occured while saving. If the problem continues, please contact NAP-Helpdesk p. +35829 534 3434"
   :delete-operator-success "The service provider was deleted successfully."
   :delete-service-success "The service was deleted successfully."
@@ -1147,36 +1159,36 @@ You can also draw the operating area or point to the map with drawing tools. You
   :logged-out "You have been logged out."}
 
  :service-viewer
- {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
-  :operator-info "Palveluntuottajan tiedot"
+ {:open-in-geojson "Open information in GeoJSON form"
+  :operator-info "Service provider information"
   :transport-service-info "Transport service information"
-  :not-disclosed "Ei ilmoitettu"
+  :not-disclosed "Not given"
   :brokerage {true "Yes"
               false "No"}
   :yes "Yes"
   :no "No"
-  :service-area "Toiminta-alue"
-  :published-interfaces "Ulkoiset koneluettavat rajapinnat"
-  :luggage-warnings "Matkatavaroita koskevat varoitukset"
-  :advance-reservation "Ennakkovaraus"
-  :reservation-service "Varauspalvelu"
-  :real-time-info "Reaaliaikapalvelu"
-  :accessibility-and-other-services "Esteettömyys ja muut palvelut"
-  :accessibility-website "Esteettömyystietojen nettisivu"
-  :guaranteed-accessibility "Taattu saatavuus"
-  :guaranteed-accessibility-description "Taattujen tietojen kuvaus"
-  :limited-accessibility-description "Rajoitettujen tietojen kuvaus"
-  :limited-accessibility "Rajoitettu saatavuus"
-  :price-information "Hintatiedot"
-  :service-hours "Palveluajat"
-  :primary-areas "Pääasialliset toiminta-alueet"
-  :other-accessibility-info "Muut esteettömyystiedot"
-  :secondary-areas "Toissijaiset toiminta-alueet"
-  :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
-  :price/unit "Hinta/yksikkö"
-  :pricing-basis "Hinnoitteluperuste"
-  :day-of-week "Viikonpäivä"
-  :exception "Poikkeus"}
+  :service-area "Operating area"
+  :published-interfaces "External machine-readable interfaces"
+  :luggage-warnings "Luggage restrictions"
+  :advance-reservation "Advance reservation"
+  :reservation-service "Booking service"
+  :real-time-info "Real-time service information"
+  :accessibility-and-other-services "Accessibility and additional services"
+  :accessibility-website "Accessibility description webpage"
+  :guaranteed-accessibility "Guaranteed availability"
+  :guaranteed-accessibility-description "Additional information on availability services with guaranteed availability"
+  :limited-accessibility-description "Additional information on availability services with limited availability"
+  :limited-accessibility "Limited availability"
+  :price-information "Price information"
+  :service-hours "Service hours"
+  :primary-areas "Primary operating area"
+  :other-accessibility-info "Additional information on accessibility"
+  :secondary-areas "Secondary operating area"
+  :reservation-possibilities-responsibilities "Reservation possibilities and responsibilities"
+  :price/unit "Price/unit"
+  :pricing-basis "Unit"
+  :day-of-week "Day of the week"
+  :exception "Exception description"}
 
 
  :register

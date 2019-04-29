@@ -6,13 +6,8 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
-            [ote.theme.colors :as colors]
-            [tuck.core :as tuck]
-            [ote.ui.service-calendar :as service-calendar]
             [ote.app.controller.transit-visualization :as tv]
-            [taoensso.timbre :as log]
             [ote.time :as time]
-            [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.ui.table :as table]
             [ote.db.transport-service :as t-service]
@@ -115,15 +110,14 @@
     (.eachLayer m (fn [layer]
                     (if-let [^HTMLImageElement icon (aget layer "_icon")]
                       ;; This is a stop, set the icon visibility
-                      (do
-                        (let [^CSSStyleDeclaration icon-style (aget icon "style")]
-                          (set! (.-visibility icon-style)
-                                (if (and
-                                      (:stops show)
-                                      (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
-                                      (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
-                                  ""
-                                  "hidden")))))
+                      (let [^CSSStyleDeclaration icon-style (aget icon "style")]
+                        (set! (.-visibility icon-style)
+                              (if (and
+                                    (:stops show)
+                                    (not (contains? @removed-route-layers (aget layer "feature" "properties" "trip-name")))
+                                    (show (some-> layer (aget "feature") (aget "properties") (aget "trip-name"))))
+                                ""
+                                "hidden"))))
 
                       (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
                         (when-not (show routename)
@@ -387,7 +381,7 @@
                   (if-not different-week-date
                     [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
-                     (str (time/days-until different-week-date) " pv")
+                     (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
@@ -398,13 +392,12 @@
                   (case change-type
                     :no-traffic
                     [icon-l/icon-labeled
-                     [ic/av-not-interested]
-                     "Tauko liikennöinnissä"]
+                     [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]
 
                     :added
                     [icon-l/icon-labeled
                      [ic/content-add-box {:color style/add-color}]
-                     "Uusi reitti"]
+                     (tr [:transit-changes :route-new])]
 
                     :removed
                     [icon-l/icon-labeled
@@ -413,12 +406,12 @@
                                          (time/format-timestamp->date-for-ui different-week-date)
                                          ". "
                                          "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
-                      "Mahdollisesti päättyvä reitti"]]
+                      (tr [:transit-changes :trip-end-potential])]]
 
                     :no-change
                     [icon-l/icon-labeled
                      [ic/navigation-check]
-                     "Ei muutoksia"]
+                     (tr [:transit-changes :no-changes])]
 
                     :changed
                     [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
@@ -732,9 +725,8 @@
                   [ic/navigation-expand-less]
                   [ic/navigation-expand-more])
           :on-click (fn [^SyntheticMouseEvent event]
-                      (do
-                        (.preventDefault event)
-                        (e! (tv/->ToggleSection :gtfs-package-info))))
+                      (.preventDefault event)
+                      (e! (tv/->ToggleSection :gtfs-package-info)))
           :style style/infobox-more-link}]
         (when open?
           [:div

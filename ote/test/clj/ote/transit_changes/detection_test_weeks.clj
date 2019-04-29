@@ -6,7 +6,7 @@
             [ote.transit-changes.detection-test-utilities :as tu]
             [ote.time :as time]))
 
-;;;;;; TESTS for analysing changes in traffic between different weeks
+(def change-window detection/route-end-detection-threshold)
 
 (def data-no-changes
   (tu/weeks (tu/to-local-date 2019 5 13) (tu/generate-traffic-week 9 ))) ;; Last week starts 2019 07 08
@@ -56,7 +56,46 @@
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= 1 (count result))))))
 
-(def data-test-no-traffic-run
+(def data-all-routes-2019
+  [[tu/route-name-2
+    {:route-short-name tu/route-name-2,
+     :route-long-name tu/route-name-2,
+     :trip-headsign "",
+     :min-date nil,
+     :max-date nil,
+     :route-hash-id tu/route-name-2}]
+   [tu/route-name
+    {:route-short-name "",
+     :route-long-name tu/route-name,
+     :trip-headsign "",
+     :min-date (time/sql-date (tu/to-local-date 2019 1 1)),
+     :max-date (time/sql-date (tu/to-local-date 2019 12 31)),
+     :route-hash-id tu/route-name}]
+   [tu/route-name-3
+    {:route-short-name "",
+     :route-long-name tu/route-name-3,
+     :trip-headsign "",
+     :min-date nil,
+     :max-date nil,
+     :route-hash-id tu/route-name-3}]])
+
+(def data-route-starts-no-end
+  (tu/weeks (tu/to-local-date 2019 4 15)
+            (concat [{tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [:holiday :holiday nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]}] ;; 29.4.
+                    (tu/generate-traffic-week 11 [nil nil nil nil nil "h6" "h6"]))))
+
+(deftest test-route-starts-no-end
+  (let [result (->> data-route-starts-no-end
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) change-window data-all-routes-2019))]
+    (testing "Ensure detection for starting route detects only one change and no route end. No further verification because currently transform-route-change converts it to change-type :added"
+      (is (not (contains? result :route-end-date)))
+      (is (= 1 (count result))))))
+
+(def data-no-traffic-run
   (tu/weeks (tu/to-local-date 2018 10 8)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" nil nil nil nil nil]} ; 4 day run
@@ -66,14 +105,14 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
 
-(deftest no-traffic-run-is-detected
+(deftest test-no-traffic-run
   (testing "no-traffic starts and ends middle of week, ensure not no-traffic reported"
     (is (= {:route-key tu/route-name
             :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15) :end-of-week (tu/to-local-date 2018 10 21)}
             :no-traffic-change 17
             :no-traffic-start-date (tu/to-local-date 2018 10 17)
             :no-traffic-end-date (tu/to-local-date 2018 11 3)}
-           (-> data-test-no-traffic-run
+           (-> data-no-traffic-run
                detection/changes-by-week->changes-by-route
                detection/detect-changes-for-all-routes
                first
@@ -176,7 +215,7 @@
         (get-in (detection/route-weeks-with-first-difference-new test-traffic-2-different-weeks)
                 [tu/route-name :different-week]))))
 
-(def normal-to-1-different-to-1-normal-and-rest-are-changed
+(def data-one-week-difference-is-skipped
   (tu/weeks (tu/to-local-date 2019 1 28)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; prev week
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; starting week
@@ -189,14 +228,14 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]} ; New schedule
                   {tu/route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]}))) ; New schedule
 
-(deftest one-week-difference-is-skipped
-  (let [result (detection/route-weeks-with-first-difference-new normal-to-1-different-to-1-normal-and-rest-are-changed)]
+(deftest test-one-week-difference-is-skipped
+  (let [result (detection/route-weeks-with-first-difference-new data-one-week-difference-is-skipped)]
     (is (= {:beginning-of-week (tu/to-local-date 2019 3 11)
             :end-of-week (tu/to-local-date 2019 3 17)}
            (:different-week (first result))
            ))))
 
-(def test-traffic-normal-difference
+(def data-traffic-normal-difference
   (tu/weeks (tu/to-local-date 2018 10 8)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-15, starting point
@@ -205,7 +244,7 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "!!" "h6" "h7"]} ; friday different
                   {tu/route-name ["h1" "h2" "h3" "!!" "!!" "h6" "h7"]}))) ;; thu and fri different
 
-(deftest normal-difference
+(deftest test-traffic-normal-difference
   (is (= {:starting-week-hash ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
           :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                           :end-of-week (tu/to-local-date 2018 10 21)}
@@ -213,7 +252,7 @@
           :different-week {:beginning-of-week (tu/to-local-date 2018 10 22)
                            :end-of-week (tu/to-local-date 2018 10 28)}
           :route-key "Raimola"}
-         (first (detection/route-weeks-with-first-difference-new test-traffic-normal-difference)))))
+         (first (detection/route-weeks-with-first-difference-new data-traffic-normal-difference)))))
 
 (def test-traffic-starting-point-anomalous
   (tu/weeks (tu/to-local-date 2018 10 8)
@@ -263,27 +302,6 @@
                   {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
                   {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
                   {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]})))
-
-(def test-more-than-one-change-2-routes
-  ; Produce change records about individual days -> first change week contains 2 days with differences
-  ; In this test case we need to produce 3 rows in the database
-  (tu/weeks (tu/to-local-date 2019 2 4)
-            (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-                  {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; 18.2. first change -> only one found currently | needs to detect change also on 13.2. -> this is set to current week
-                  {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]} ;; no changes here (25.2.)
-                  {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;; Only tuesday is found (4.3.)
-                  {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
-                  {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]} ;;
-                  {tu/route-name ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]
-                   tu/route-name-2 ["h1" "h2" "!!" "h4" "h5" "h6" "h7"]})))
 
 (def data-two-week-change
   (tu/weeks (tu/to-local-date 2019 2 4)
@@ -559,8 +577,6 @@
                         :min-date nil,
                         :max-date nil,
                         :route-hash-id tu/route-name-3}]])
-
-(def change-window detection/route-end-detection-threshold)
 
 (def data-ending-route-change
   (tu/weeks (tu/to-local-date 2019 5 13)

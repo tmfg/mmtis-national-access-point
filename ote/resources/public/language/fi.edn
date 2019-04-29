@@ -258,7 +258,8 @@
  {:transport-type-info "Ilmoita tässä osiossa liikkumispalvelusi liikennemuoto tai liikennemuodot. Tätä tietoa hyödynnetään Palvelukatalogi-sivun hakutoiminnoissa."
   :name-info "Palvelun nimen on hyvä olla joku muu kuin palveluntuottajan (esim. yrityksen) nimi. Tämä on tärkeää erityisesti silloin, kun tarjoat useita liikkumispalveluita.\nEsim. jos yrityksen nimi on Savelan matkat Oy, voisi palvelun nimi olla \"Savelan reittiliikenne\" tai \"Savelan tilausliikenne.\""
   :external-interfaces-intro "Mikäli liikkumispalvelustasi ei ole koneluettavia rajapintoja, jätä tämä osio tyhjäksi ja siirry täyttämään lomakkeen seuraavia osioita."
-  :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista. Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen "
+  :external-interfaces-intro-1 "Täytä tähän osioon vähintään tiedot palvelusi koneluettavista reitti- ja aikataulutiedoista."
+  :external-interfaces-intro-rae-text "Mikäli teillä ei ole keinoja tuottaa koneluettavia reitti- ja aikataulutietoja itse, voitte tehdä sen"
   :external-interfaces-intro-2 "Merenkulun reitti- ja aikataulutiedot voit luoda NAP-palvelun"
   :external-interfaces "Koneluettava rajapinta tarkoittaa sitä, että tieto on rakenteellisessa muodossa ja käsiteltävissä ilman ihmisen tulkintaa (esim. muodossa csv, xml, json tai gtfs). Ulkoiset rajapinnat on tarkoitettu yhteistyökumppaneille ja kehittäjille, jotka voivat käyttää niitä lisenssi- ja sopimusehtojen mukaisesti omissa palveluissaan."
   :external-interfaces-read-more {:link "Lue lisää NAP-katalogin koneluettavista rajapinnoista."
@@ -931,6 +932,16 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
 
+ :transit-changes
+ {:route-new "Uusi reitti"
+  :trips-new "Uusia vuoroja"
+  :trips-removed "Poistuvia vuoroja"
+  :stop-changes-per-trip "Pysäkkimuutoksia per vuoro"
+  :schedule-changes-per-trip "Aikataulumuutoksia per vuoro"
+  :no-changes "Ei muutoksia"
+  :no-traffic "Tauko liikennöinnissä"
+  :trip-end-potential "Mahdollisesti päättyvä reitti"}
+
  :transit-visualization-page
  {:loading-routes "Palvelun reittejä ladataan."
   :no-changes-in-routes "Ei reittejä, joissa muutoksia."
@@ -940,8 +951,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :calendar-description-1 "Muutoksen vertailupäivät on korostettu lilalla ja sinisellä ympyrällä. Päivät ovat valitun muutoksen tapahtumapäivä (sininen)
   sekä vastaava viikonpäivä aiemmalta viikolta (lila). Kalenterissa samalla värillä väritetyt päivät kuvaavat samanlaista liikennettä. Taustaväreillä ei ole muita merkityksiä."
   :calendar-description-2 "Valitse haluamasi muutos tarkasteluun napsauttamalla muutosriviä alla olevasta taulukosta. Voit myös valita kalenterista itse
-  päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla valitut päivät kalenterista."
-  }
+  päivät, joiden reitti- ja aikatauluja haluat vertailla. Valinta tehdään napsauttamalla valitut päivät kalenterista."}
 
  :common-texts
  {:check-your-input "Ole hyvä ja tarkista, että syötit tiedot oikein."
@@ -1015,6 +1025,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                :hours "Tuntia"
                :days "Päivää"
                :seconds "Sekuntia"}
+  :time-days-abbr "pv"
   :save-failed "Tallennettaessa sattui virhe. Jos ongelma toistuu "
   :delete-operator-success "Palveluntuottaja poistettiin onnistuneesti."
   :delete-service-success "Palvelu poistettiin onnistuneesti."
@@ -1185,7 +1196,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :price-information "Hintatiedot"
   :service-hours "Palveluajat"
   :primary-areas "Pääasiallinen toiminta-alue"
-  :other-accessibility-info "Muut esteettömyystiedot"
+  :other-accessibility-info "Lisätietoja esteettömyydestä"
   :secondary-areas "Toissijainen toiminta-alue"
   :reservation-possibilities-responsibilities "Varausmahdollisuudet- ja velvollisuudet"
   :price/unit "Hinta/yksikkö"

@@ -60,6 +60,7 @@
     ["/admin/detected-changes/route-id" :admin-route-id]
     ["/admin/detected-changes/upload" :admin-upload-gtfs]
     ["/admin/detected-changes/commercial" :admin-commercial-services]
+    ["/admin/detected-changes/exception-days" :admin-exception-days]
     ["/admin/:admin-page" :admin]
 
     ["/monitor" :monitor]]))

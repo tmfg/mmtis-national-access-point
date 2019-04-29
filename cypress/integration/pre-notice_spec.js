@@ -35,7 +35,6 @@ describe('Pre notice tests', () => {
 
     });
 
-
     it('save and send pre-notice', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');

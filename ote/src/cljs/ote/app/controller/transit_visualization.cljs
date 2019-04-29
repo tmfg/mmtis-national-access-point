@@ -81,10 +81,10 @@
   [detection-date changes]
   (let [detection-date (time/parse-date-iso-8601 detection-date)]
     (filter
-      (fn [{:keys [change-date]}]
-        (or (nil? change-date)
+      (fn [{:keys [different-week-date]}]
+        (or (nil? different-week-date)
             (not (t/before?
-                   (time/native->date-time change-date)
+                   (time/native->date-time different-week-date)
                    detection-date))))
       changes)))
 

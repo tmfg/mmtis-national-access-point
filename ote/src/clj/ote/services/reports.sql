@@ -161,35 +161,49 @@ END	AS "service-type",
  WHERE 'payment-interface' = ANY(eid."data-content");
 
 -- name: monthly-registered-companies
--- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's month.
-select
-  to_char(g.created, 'YYYY-MM') as month,
-  sum(count(top."business-id")) over (order by to_char(g.created, 'YYYY-MM'))
-  from "group" g, "transport-operator" top where g.id = top."ckan-group-id" and g.created is not null
-  group by month
-  order by month;
+-- returns a cumulative sum of companies, defined as distinct business-id's of "all-companies", created up until the row's month.
+SELECT to_char(ac.created, 'YYYY-MM') as month,
+       sum(count(ac."business-id")) over (order by to_char(ac.created, 'YYYY-MM')) as sum
+FROM
+  (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
+GROUP BY month
+ORDER BY month;
+
+-- name: tertiili-registered-companies
+-- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's tertiili.
+SELECT
+       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 ') as tertiili,
+       sum(count(ac."business-id")) over (ORDER BY  concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 '))
+   FROM
+     (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
+group by tertiili
+order by tertiili;
 
 -- name: operator-type-distribution
 -- returns a distrubution of transport-service sub-types among all transport services
-select "sub-type", count("sub-type") as count
-  from
-(select distinct top.id as toid,ts."sub-type" from "transport-service" ts, "transport-operator" top where top.id = ts."transport-operator-id" and ts."sub-type" is not null) as unusedname
-  group by "sub-type";
+SELECT ac."sub-type" as "sub-type", count(ac."business-id") as count
+  FROM "all-companies" ac
+ GROUP BY ac."sub-type"
+ ORDER BY ac."sub-type" ASC;
 
 -- subquery name legend is: stq = subtype grouping query, biq = business-id grouping query
 -- 
 -- name: monthly-producer-types-and-counts
- select stq.month, sum(stq.count), stq."sub-type"
-   from
+ SELECT to_char(ac.created, 'YYYY-MM') as month,
+        count(ac."sub-type") as sum,
+        ac."sub-type"
+   FROM
+        "all-companies" ac
+ GROUP BY month, ac."sub-type"
+ ORDER BY month, ac."sub-type";
 
-(select biq.month, count(biq.bid), "sub-type"
-   from
+-- name: tertiili-producer-types-and-counts
+SELECT count(ac."sub-type") as sum,
+       ac."sub-type" as "sub-type",
+       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ', (floor(extract(month FROM ac.created)::int / 4.00001)) + 1 , '/3 ') as tertiili
+  FROM
+       "all-companies" ac
+ GROUP BY tertiili, ac."sub-type"
+ ORDER BY tertiili, ac."sub-type";
 
-(select to_char(gr.created, 'YYYY-MM') as month,
-        ts.id as tsid, top.id as toid, top."business-id" as bid, ts."sub-type"
-   from "transport-service" ts, "transport-operator" top, "group" gr
-   where top.id = ts."transport-operator-id" and gr.id = top."ckan-group-id" and
-         gr.created is not null and "sub-type" is not null and top."business-id" is not null)
-	 as biq group by month, bid, "sub-type" order by month, "sub-type", count)
-         as stq group by (month, "sub-type") order by month, "sub-type";
 
