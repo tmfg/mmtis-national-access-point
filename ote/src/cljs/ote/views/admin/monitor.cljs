@@ -93,7 +93,7 @@
            tertile-types (:tertile-types monitor-data)
            chart-type (get-in app [:admin :monitor :report-type])]
     [:div
-     [:h1 " Valvontanäkymä "]
+     [:h1 "Valvontanäkymä"]
      [:p "Valvontanäkymässä voit tarkastella liikkumispalveluiden tarjoajien kokonaismäärän
               kehitystä kokonaisuutena, sekä jaoteltuna liikkumispalvelutyyppien mukaan."]
      [:p "Termi "
@@ -110,37 +110,33 @@
         :options [:tertile :month]}
        (get-in app [:admin :monitor :report-type])]]
 
-     (when (= chart-type :month)
-       [:div
-        [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
-        [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
-        [:div {:style {:width "100%"}}
-         [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]])
-
-     (when (= chart-type :tertile)
-       [:div
-        [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
-        [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
-        [:div {:style {:width "100%"}}
-         [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]])
-
-     (when (= chart-type :month)
-       [:div
-        [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
-        [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
+     (if (= chart-type :month)
+       [:div {:id "month-charts" :key "month-charts"}
+        [:div {:id "container-bar-companies-by-month" :key "container-bar-companies-by-month"}
+         [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
+         [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
+         [:div {:style {:width "100%"}}
+          [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]]
+        [:div {:id "container-bar-sub-types-by-month" :key "container-bar-sub-types-by-month"}
+         [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
+         [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-        [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-        [:div {:style {:width "100%"}}
-         [barchart-inner " bar-type-by-month " "right" monthly-types]]])
-
-     (when (= chart-type :tertile)
-       [:div
-        [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
-        [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
+         [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+         [:div {:style {:width "100%"}}
+          [barchart-inner " bar-type-by-month " "right" monthly-types]]]]
+       [:div {:id "tertile-charts" :key "tertile-charts"}
+        [:div {:id "container-bar-companies-by-tertile" :key "container-bar-companies-by-tertile"}
+         [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
+         [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
+         [:div {:style {:width "100%"}}
+          [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]]
+        [:div {:id "container-bar-sub-types-by-tertile" :key "container-bar-sub-types-by-tertile"}
+         [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
+         [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-        [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-        [:div {:style {:width "100%"}}
-         [barchart-inner " bar-type-by-tertile " "right" tertile-types]]])
+         [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+         [:div {:style {:width "100%"}}
+          [barchart-inner " bar-type-by-tertile " "right" tertile-types]]]])
 
      [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
      [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]

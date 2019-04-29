@@ -1,5 +1,5 @@
--- Use UNION to take only unique companies (name,id,created,source) into account.
--- This view is really necessary because fetching data from three different source is difficult.
+-- Expose company information from four different sources:
+-- transport-operator, transport-service.companies, service_company.companies and from associated-service-operators
 CREATE OR REPLACE VIEW "all-companies" AS
   -- Get companies only from transport-service.companies composite type
   SELECT null as "operator-id",
