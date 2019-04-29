@@ -66,84 +66,84 @@
                      :component-did-update update})))
 
 (defn monitor-main [e! app]
-  (if (get-in app [:admin :monitor :monitor-data])
-    (let [monitor-data (get-in app [:admin :monitor :monitor-data])
-          translate-typekw (fn [type]
-                             (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
-          companies-by-month-data {:labels (mapv :month (:monthly-companies monitor-data))
-                                   :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
-                                               :data (mapv :sum (:monthly-companies monitor-data))
-                                               :backgroundColor "rgb(0, 170, 187)"}]}
-          companies-by-tertile-data {:labels (mapv :tertile (:tertile-companies monitor-data))
+  (if-let [monitor-data (get-in app [:admin :monitor :monitor-data])]
+    (let [translate-typekw (fn [type]
+                              (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
+           companies-by-month-data {:labels (mapv :month (:monthly-companies monitor-data))
+                                    :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
+                                                :data (mapv :sum (:monthly-companies monitor-data))
+                                                :backgroundColor "rgb(0, 170, 187)"}]}
+           companies-by-tertile-data {:labels (mapv :tertile (:tertile-companies monitor-data))
                                       :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
                                                   :data (mapv :sum (:tertile-companies monitor-data))
                                                   :backgroundColor "rgb(0, 170, 187)"}]}
-          provider-share-by-type-data {:labels (mapv translate-typekw
-                                                     (mapv :sub-type (:companies-by-service-type monitor-data)))
-                                       :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
-                                                   :backgroundColor ["rgb(0,170,187)"
-                                                                     "rgb(102,204,102)"
-                                                                     "rgb(153,204,0)"
-                                                                     "rgb(221,204,0)"
-                                                                     "rgb(255,136,0)"
-                                                                     "rgb(255,102,153)"
-                                                                     "rgb(153,0,221)"]
-                                                   :label " Palvelut tyypeittäin "}]}
-          monthly-types (:monthly-types monitor-data)
-          tertile-types (:tertile-types monitor-data)
-          chart-type (get-in app [:admin :monitor :report-type])]
-      [:div
-       [:h1 " Valvontanäkymä "]
-       [:p "Valvontanäkymässä voit tarkastella liikkumispalveluiden tarjoajien kokonaismäärän
+           provider-share-by-type-data {:labels (mapv translate-typekw
+                                                      (mapv :sub-type (:companies-by-service-type monitor-data)))
+                                        :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
+                                                    :backgroundColor ["rgb(0,170,187)"
+                                                                      "rgb(102,204,102)"
+                                                                      "rgb(153,204,0)"
+                                                                      "rgb(221,204,0)"
+                                                                      "rgb(255,136,0)"
+                                                                      "rgb(255,102,153)"
+                                                                      "rgb(153,0,221)"]
+                                                    :label " Palvelut tyypeittäin "}]}
+           monthly-types (:monthly-types monitor-data)
+           tertile-types (:tertile-types monitor-data)
+           chart-type (get-in app [:admin :monitor :report-type])]
+    [:div
+     [:h1 " Valvontanäkymä "]
+     [:p "Valvontanäkymässä voit tarkastella liikkumispalveluiden tarjoajien kokonaismäärän
               kehitystä kokonaisuutena, sekä jaoteltuna liikkumispalvelutyyppien mukaan."]
-       [:p "Termi "
-        [:strong "Liikkumispalveluiden tarjoajat"] " tarkoittaa sekä NAPiin rekisteröityneitä "
-        [:strong " liikkumispalveluiden tuottajia"] ", jotka vain " [:strong "osallistuvat palveluiden tuottamiseen. "]
-        "Palvelun tuottamiseen osallistuva yritys on esimerkiksi yksityinen elinkeinon harjoittaja, joka ajaa ainoastaan taksivälityskeskusken kyytejä."]
+     [:p "Termi "
+      [:strong "Liikkumispalveluiden tarjoajat"] " tarkoittaa sekä NAPiin rekisteröityneitä "
+      [:strong " liikkumispalveluiden tuottajia"] ", jotka vain " [:strong "osallistuvat palveluiden tuottamiseen. "]
+      "Palvelun tuottamiseen osallistuva yritys on esimerkiksi yksityinen elinkeinon harjoittaja, joka ajaa ainoastaan taksivälityskeskusken kyytejä."]
 
-       [:div {:style {:display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
-        [form-fields/field
-         {:label "Valitse raporttien tyyppi"
-          :type :selection
-          :update! #(e! (monitor-controller/->ChangeReportType %))
-          :show-option (tr-key [:admin-page :report-types])
-          :options [:tertile :month]}
-         (get-in app [:admin :monitor :report-type])]]
+     [:div {:style {:display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
+      [form-fields/field
+       {:label "Valitse raporttien tyyppi"
+        :type :selection
+        :update! #(e! (monitor-controller/->ChangeReportType %))
+        :show-option (tr-key [:admin-page :report-types])
+        :options [:tertile :month]}
+       (get-in app [:admin :monitor :report-type])]]
 
-       (when (= chart-type :month)
-         [:div
-          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
-          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
-          [:div {:style {:width "100%"}}
-           [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]])
+     (when (= chart-type :month)
+       [:div
+        [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
+        [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
+        [:div {:style {:width "100%"}}
+         [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]])
 
-       (when (= chart-type :tertile)
-         [:div
-          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
-          [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
-          [:div {:style {:width "100%"}}
-           [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]])
+     (when (= chart-type :tertile)
+       [:div
+        [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
+        [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
+        [:div {:style {:width "100%"}}
+         [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]])
 
-       (when (= chart-type :month)
-         [:div
-          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
-          [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
+     (when (= chart-type :month)
+       [:div
+        [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
+        [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-          [:div {:style {:width "100%"}}
-           [barchart-inner " bar-type-by-month " "right" monthly-types]]])
+        [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+        [:div {:style {:width "100%"}}
+         [barchart-inner " bar-type-by-month " "right" monthly-types]]])
 
-       (when (= chart-type :tertile)
-         [:div
-          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
-          [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
+     (when (= chart-type :tertile)
+       [:div
+        [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
+        [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-          [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
-          [:div {:style {:width "100%"}}
-           [barchart-inner " bar-type-by-tertile " "right" tertile-types]]])
+        [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+        [:div {:style {:width "100%"}}
+         [barchart-inner " bar-type-by-tertile " "right" tertile-types]]])
 
-       [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
-       [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
-       [:div {:style {:width "100%"}}
-        [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]])
-    [ui-common/loading-spinner]))
+     [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
+     [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
+     [:div {:style {:width "100%"}}
+      [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]])
+    [:div
+     [ui-common/loading-spinner]]))
