@@ -1,19 +1,28 @@
 @startuml
+title __Add or update__ a transport Interface
+autonumber
+hide footbox
 
 actor "Transport operator" as OPER
 participant "NAP UI" as UI
-participant "Interface server" as IFACE
-participant "NAP DB" as DB
+database "NAP DB" as DB
+box external \n service
+    boundary "Interface server" as IFACE
+end box
 
-
-group Adding new transit interface
 OPER->UI: Add interface
+activate UI
         UI->IFACE: Fetch data for validation
-        IFACE->UI: Data / error
-                UI->OPER: Validation response
+        activate IFACE
+        return response (Data/error)
+                return response
 
                 OPER->UI: Save interface
+                activate UI
 UI->DB: Save interface
-end
+                activate DB
+
+return
+return response
 
 @enduml

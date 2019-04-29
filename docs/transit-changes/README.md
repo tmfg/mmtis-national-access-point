@@ -1,33 +1,51 @@
 # Transit changes documentation
 
-All changes in transit traffic must be informed to the transit authorities 60 days in advance.
+## References
+[0]: https://github.com/finnishtransportagency/mmtis-national-access-point/commit/158eddc78bd5ce368dc3afc524b152d691f8b74b
+[1]: http://www.finlex.fi/fi/laki/alkup/2017/20170320 "Laki liikenteen palveluista "
+
+## Release version
+Git version used as baseline for this documentation: [mmtis-national-access-point][0]
+
+## Description
+
+### Need
+EU legislation requires a National Access Point (NAP) to be implemented by member states.
+Finnish NAP implements implements additional custom features. 
+Transit Change detection is a custom feature, which allows ELY centers 
+(Centre for Economic Development, Transport and the Environment in Finland) 
+to examine transit data of transit services. Transit data of a transit service is declared by its transit operator. 
+Transit Change detection of NAP application allows ELY officials to analyze whether any ELY actions will be required as a result 
+of changes to transit data for any service.
+
+## Functionality
+
+### Data gathering
+According to [Finnish national legislation on transport][1], 
+changes to transit traffic must be declared by transport operator to the transit authorities 60 days in advance.
 If the data is available from machine readable interfaces, changes will be automatically detected
-and transit authorities notified. If a proper interface is not available for a transit service, the
-changes must be notified by filling out a manual form.
+and transit authorities notified. 
+If such an interface is not available for a transit service, the
+changes must be declared using a manual form.
 
 To facilitate automatic change detection, NAP reads existing transit route and schedule information
 from interfaces provided by transport operators and stores them.
 
-
-
-## Data gathering
-
-### Interfaces
+#### Interfaces for transit data import
 
 ![add new interface](new-interface.png)
 
-Interfaces are added by transport operators to their service info using the service form.
-Currently, we support [GTFS](https://developers.google.com/transit/gtfs/) and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php) formatted interfaces for route and schedule information.
+Machine-readable interfaces are added by transport operators to transport service record using the application UI, on the edit transport service view.
 
+For the transit data import interfaces NAP supports [GTFS](https://developers.google.com/transit/gtfs/) and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php) format for route and schedule information.
 
-### Storage
+#### Storage of transit data
 
 Interface data is always stored in GTFS format. We archive the raw GTFS zip files in AWS S3 bucket. This enables us to fetch older historical data if so required in future.
 During the import process, GTFS files are parsed and stored into our relational database model in AWS RDS. The model is not exact mirror of the GTFS standard, but it is logically very similar.
 It contains all the same information. GTFS import process does not support other optional GTFS files than calendar_dates.txt and shapes.txt.
 
-
-### Background process
+#### Scheduling of data import
 
 ![background import process](import-process.png)
 
@@ -55,7 +73,7 @@ Above is a basic diagram about database tables related to the transit changes pr
 
 
 
-## Change detection
+### Change Detection functionality
 
 ![Change detection processs animation](detection-process-anim.gif)
 
@@ -63,7 +81,7 @@ After GTFS data has been imported into our database and hashes are computed, we 
 The detection algorithm tries to detect changes in traffic patterns in 60 days in future. The main point of this detection process is to provide transport authorities enough information,
 so they can decide when to order more traffic if so required. Transport authorities also use this change information for oversee that all changes are reported before 60 day time period as required by law.
 
-### Background process
+#### Scheduling of detection process
 
 ![background detection process](detection-process.png)
 
@@ -74,7 +92,7 @@ and have a package that is newer than a previously computed change.
 
 Transit changes are computed one by one for each fetched service using the detection algorithm.
 
-### Detection algorithm
+#### Algorithm of detection process
 
 ![Detection algorithm flow diagram](change-detection-flow.png)
 
@@ -127,7 +145,7 @@ Transit changes are computed one by one for each fetched service using the detec
  
 
 
-### Notifications
+### Notifications on transit change detection results
 
 Notifications about newly detected transit changes are sent via email to transit authorities each day.
 
