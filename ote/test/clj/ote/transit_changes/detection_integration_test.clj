@@ -1,5 +1,8 @@
-(ns ote.transit-changes.detection-test-weeks
+(ns ote.transit-changes.detection-integration-test
   (:require [ote.transit-changes.detection :as detection]
+            [ote.db.transport-service :as t-service]
+            [specql.core :as specql]
+            [ote.integration.import.gtfs :as gtfs-import]
             [clojure.test :as t :refer [deftest testing is]]
             [clojure.spec.test.alpha :as spec-test]
             [ote.transit-changes :as transit-changes]
@@ -19,7 +22,7 @@
     (testing "differences between new and old"
       (is (= old-diff new-diff)))))
 
-#_(defn slurp-bytes
+(defn slurp-bytes
   "Slurp the bytes from a slurpable thing"
   [x]
   (with-open [out (java.io.ByteArrayOutputStream.)]
@@ -32,7 +35,7 @@
    (merge {:ote.time/hours 0 :ote.time/minutes 0 :ote.time/seconds 0}
           (time/date-fields ld))))
 
-#_(defn rewrite-calendar [calendar-data orig-date]
+(defn rewrite-calendar [calendar-data orig-date]
   ;; find out how far past orig-date is in history, and shift all calendar-data
   ;; dates forward by that amount.
   ;; xxx should make sure the weeks align? is is enough to just divmod 7 the interval-in-days?
@@ -76,13 +79,6 @@
                                    :date (java.time.LocalDate/parse "2013-01-06"),
                                    :exception-type 1}] #inst "2013-01-01") )))
 
-(defn first-scheduled-service-id [db]
-  (let [q "select min(id) as id from \"transport-service\" where \"sub-type\" = 'schedule'"
-        res (clojure.java.jdbc/query db q)]
-    (:id (first res))))
-
-
-
 ;; tbd - check some actual changes read from this package (detected-route-change table)
 ;; and cross ref with the bug
 
@@ -91,6 +87,12 @@
 ;; prob: vihti routes missing from detection results (even under :all-routes key)
 ;; repl wip:
 ;; (detection/service-routes-with-date-range (:db ote.main/ote) {:service-id 2})
+;; or ..
+;; (->> (detection/service-routes-with-date-range (:db ote.main/ote) {:service-id 2})
+;;      (filter #(-> %
+;;                   :route-long-name
+;;                   (= "Lohja - Nummela - Vihti")))
+;;      first)
 ;; -> sql query -> sproc -> gtfs_service_routes_with_daterange
 ;; checking routes: select "id", "route-id", "route-long-name" from "gtfs-route" where "route-long-name" like '%ummela%';
 ;; ->  142 | r_26     | Lohja - Nummela - Vihti
@@ -98,11 +100,51 @@
 ;;  - now we get :all routes containing the route:
 ;; (filter #(= (:route-long-name %) "Lohja - Nummela - Vihti")  (vals  (:all-routes *nd)))
 
+;; test setup:
+;; 1. a transit info zip must be about some operator ("transit-operator" table),
+;; and have a record about it in "gtfs_package" table, and be associated with
+;; some operator ("transport-operator" table).
+;; normally in the test data, we have "Ajopalvelu Testinen Oy" with id 1,
+;; and their bus service with service-id 2, so we can use those.
 
-#_(deftest test-with-kalkati-package
+(def test-operator-id 1)
+(def test-service-id 2)
+
+(defn joda-datetime->inst [ld]
+  (ote.time/date-fields->native
+   (merge {:ote.time/hours 0 :ote.time/minutes 0 :ote.time/seconds 0}
+          (time/date-fields ld))))
+
+(defn store-gtfs-helper
+  [gtfs-bytes db operator-id ts-id last-import-date license interface-id intercept-fn]
+  (let [filename (gtfs-import/gtfs-file-name operator-id ts-id)
+        latest-package (gtfs-import/interface-latest-package db interface-id)
+        new-etag nil]
+
+    (let [new-gtfs-hash (gtfs-import/gtfs-hash gtfs-bytes)
+          old-gtfs-hash (:gtfs/sha256 latest-package)]
+
+      ;; No gtfs import errors caught. Remove old import errors.
+      (specql/update! db ::t-service/external-interface-description
+                      {::t-service/gtfs-import-error nil}
+                      {::t-service/id interface-id})
+
+      (let [package (specql/insert! db :gtfs/package
+                                    {:gtfs/sha256 new-gtfs-hash
+                                     :gtfs/first_package (nil? latest-package)
+                                     :gtfs/transport-operator-id operator-id
+                                     :gtfs/transport-service-id ts-id
+                                     :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                     :gtfs/etag new-etag
+                                     :gtfs/license license
+                                     :gtfs/external-interface-description-id interface-id})]            
+        ;; Parse gtfs package and save it to database.
+        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
+
+
+(deftest test-with-kalkati-package
   (let [;; db (:db ote.test/*ote*)
         db (:db ote.main/ote)
-        service-id (first-scheduled-service-id db)
         kalkati-zip-path "../issue163446864_kalkati_anonco.zip"
         gtfs-zip-bytes (ote.gtfs.kalkati-to-gtfs/convert-bytes (slurp-bytes kalkati-zip-path))
         orig-date #inst "2019-03-24T00:00:00"
@@ -112,10 +154,8 @@
                             (rewrite-calendar file-data orig-date)
                             file-data)
                           file-data)
-        package-id 12
-        interface-id 1
-        ;; _ (ote.integration.import.gtfs/save-gtfs-to-db db gtfs-zip-bytes package-id interface-id service-id my-intercept-fn)
-        route-query-params {:service-id service-id :start-date (time/days-from (time/now) -120) :end-date (time/days-from (time/now) 1)}
+        store-result (store-gtfs-helper gtfs-zip-bytes  (:db ote.main/ote)  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242 my-intercept-fn)
+        route-query-params {:service-id test-service-id :start-date (joda-datetime->inst (time/days-from (time/now) -120)) :end-date (joda-datetime->inst (time/days-from (time/now) 1))}
         new-diff (detection/detect-route-changes-for-service-new db route-query-params)]
     (def *nd new-diff)
     (println (:start-date route-query-params))
@@ -126,7 +166,7 @@
 ;; tbd - check some actual changes read from this package (detected-route-change table)
 #_(deftest test-with-gtfs-package-of-a-service
   (let [db (:db ote.test/*ote*)
-        service-id (first-scheduled-service-id db)
+        service-id test-service-id
         gtfs-zipfile-orig-path "/home/ernoku/Downloads/2019-02-24_310_1290_gtfs.zip"
         gtfs-zipfile-orig-date #inst "2019-02-24T00:00:00"
         my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
