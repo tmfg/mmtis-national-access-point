@@ -10,7 +10,7 @@
   (-> app
       (assoc-in [:admin :monitor :monitor-data] response)
       (assoc-in [:admin :monitor :monitor-loading?] false)
-      (assoc-in [:admin :monitor :report-type] :tertiili)))
+      (assoc-in [:admin :monitor :report-type] :tertile)))
 
 
 (define-event QueryMonitorReport []

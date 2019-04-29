@@ -74,9 +74,9 @@
                                    :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
                                                :data (mapv :sum (:monthly-companies monitor-data))
                                                :backgroundColor "rgb(0, 170, 187)"}]}
-          companies-by-tertiili-data {:labels (mapv :tertiili (:tertiili-companies monitor-data))
+          companies-by-tertile-data {:labels (mapv :tertile (:tertile-companies monitor-data))
                                       :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
-                                                  :data (mapv :sum (:tertiili-companies monitor-data))
+                                                  :data (mapv :sum (:tertile-companies monitor-data))
                                                   :backgroundColor "rgb(0, 170, 187)"}]}
           provider-share-by-type-data {:labels (mapv translate-typekw
                                                      (mapv :sub-type (:companies-by-service-type monitor-data)))
@@ -90,7 +90,7 @@
                                                                      "rgb(153,0,221)"]
                                                    :label " Palvelut tyypeittäin "}]}
           monthly-types (:monthly-types monitor-data)
-          tertiili-types (:tertiili-types monitor-data)
+          tertile-types (:tertile-types monitor-data)
           chart-type (get-in app [:admin :monitor :report-type])]
       [:div
        [:h1 " Valvontanäkymä "]
@@ -107,7 +107,7 @@
           :type :selection
           :update! #(e! (monitor-controller/->ChangeReportType %))
           :show-option (tr-key [:admin-page :report-types])
-          :options [:tertiili :month]}
+          :options [:tertile :month]}
          (get-in app [:admin :monitor :report-type])]]
 
        (when (= chart-type :month)
@@ -117,12 +117,12 @@
           [:div {:style {:width "100%"}}
            [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]])
 
-       (when (= chart-type :tertiili)
+       (when (= chart-type :tertile)
          [:div
           [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
-          [ui-common/linkify " /admin/reports/monitor/csv/tertiili-companies " " Lataa kuvaajan tiedot CSV:nä "]
+          [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
           [:div {:style {:width "100%"}}
-           [barchart-inner " bar-companies-by-tertiili " nil companies-by-tertiili-data]]])
+           [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]])
 
        (when (= chart-type :month)
          [:div
@@ -133,14 +133,14 @@
           [:div {:style {:width "100%"}}
            [barchart-inner " bar-type-by-month " "right" monthly-types]]])
 
-       (when (= chart-type :tertiili)
+       (when (= chart-type :tertile)
          [:div
           [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
           [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-          [ui-common/linkify " /admin/reports/monitor/csv/tertiili-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+          [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
           [:div {:style {:width "100%"}}
-           [barchart-inner " bar-type-by-tertiili " "right" tertiili-types]]])
+           [barchart-inner " bar-type-by-tertile " "right" tertile-types]]])
 
        [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
        [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]

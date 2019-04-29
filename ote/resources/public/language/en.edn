@@ -921,7 +921,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:business-id-filter {:operators "Transport operators" :services "Services" :ALL "All"}
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}
-  :report-types {:tertiili "Tertiili" :month "Kuukausi"}}
+  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "New route"

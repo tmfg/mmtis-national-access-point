@@ -224,7 +224,7 @@
 (defn summary-types-for-monitor-report [db summary-type]
   (let [type-count-table (if (= :month summary-type)
                            (monthly-producer-types-and-counts db)
-                           (tertiili-producer-types-and-counts db))
+                           (tertile-producer-types-and-counts db))
         summary (distinct (keep summary-type type-count-table)) ;; order is important
         subtypes (distinct (keep :sub-type type-count-table))
         by-subtype (group-by :sub-type type-count-table)
@@ -259,7 +259,7 @@
                                   (vec
                                     (for [x summary]
                                       (let [tc (filter #(= t (:sub-type %)) (get summary-type x))]
-                                        ;(println "month/tertiili" x "hs" (find-sum-backwards x t))
+                                        ;(println "month/tertile" x "hs" (find-sum-backwards x t))
                                         (find-sum-backwards x t)))))
         type-dataset (fn [t]
                        {:label (tr [:enums :ote.db.transport-service/sub-type (keyword t)])
@@ -272,10 +272,10 @@
 
 (defn monitor-report [db type]
   {:monthly-companies  (monthly-registered-companies db)
-   :tertiili-companies  (tertiili-registered-companies db)
+   :tertile-companies  (tertile-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
    :monthly-types (summary-types-for-monitor-report db :month)
-   :tertiili-types (summary-types-for-monitor-report db :tertiili)})
+   :tertile-types (summary-types-for-monitor-report db :tertile)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
@@ -302,11 +302,11 @@
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))
 
-    "tertiili-companies-by-service-type"
+    "tertile-companies-by-service-type"
     (csv-data ["tertiili" "tuottaja-tyyppi" "lkm"]
               ;; the copious vec calls are here because sort blows up on lazyseqs,
               ;; and we end up with nested lazyseqs here despite using mapv etc.
-              (let [r (summary-types-for-monitor-report db :tertiili)
+              (let [r (summary-types-for-monitor-report db :tertile)
                     months (:labels r)
                     ds (:datasets r)
                     sums-by-type (into {}  (map (juxt :label :data) ds))

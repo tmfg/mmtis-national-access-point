@@ -930,7 +930,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
   :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}
-  :report-types {:tertiili "Tertiili" :month "Kuukausi"}}
+  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "Uusi reitti"
