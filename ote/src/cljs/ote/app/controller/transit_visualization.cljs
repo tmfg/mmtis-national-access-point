@@ -98,7 +98,7 @@
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
         ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
-        only-changes (sort-by :different-week-date (filterv :change-date changes))
+        only-changes (sort-by :different-week-date (filterv :different-week-date changes))
 
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
@@ -198,8 +198,7 @@
       :route-hash-id-type (:route-hash-id-type response))))
 
 (defn- init-view-state [app scope]
-  (let [initial-view-state {:all-route-changes-checkbox nil
-                            :all-route-changes-display? false
+  (let [initial-view-state {:all-route-changes-display? false
                             :open-sections {:gtfs-package-info false}
                             :scope scope
                             :service-changes-for-date-loading? true}]
@@ -535,4 +534,4 @@
   ;; Timeout used because toggling key for route-changes table directly may cause delay in rendering the content with large data set.
   ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
   (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
-  (update app :all-route-changes-checkbox not))
+  app)
