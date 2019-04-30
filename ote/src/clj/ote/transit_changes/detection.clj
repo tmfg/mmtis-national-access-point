@@ -288,7 +288,7 @@
 
     ;; Run ended without reaching threshold, remove start date
     (nil? no-traffic-run)
-    (dissoc state :no-traffic-start)
+    (dissoc state :no-traffic-start-date)
 
     :default
     state))
