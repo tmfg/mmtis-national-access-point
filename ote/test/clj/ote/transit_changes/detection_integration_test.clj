@@ -181,8 +181,11 @@
         ;; Parse gtfs package and save it to database.
         (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
 
-;;  - todo: check detection-result format, can we eliminate one of :changes & :different-week keys
+;;  - todo:
+;;  -  re-enable & check date rewriting
+;;  - check detection-result format, can we eliminate one of :changes & :different-week keys
 ;;  - also check if we can omit maps without change info in why are there maps unde :route-changes
+;;  - the current time travel doesn't solve holidays. so let the tests inject override-holidays behaviour somehow.
 
 (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)
@@ -190,27 +193,28 @@
         gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
         gtfs-zip-bytes (slurp-bytes gtfs-zip-path)
         orig-date #inst "2019-02-02T00:00:00"
-        ;; my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
-        ;;                   ;; (println "hello from intercept fn, type" file-type)
-        ;;                   (if (= file-type :gtfs/calendar-dates-txt)
-        ;;                     (rewrite-calendar file->data orig-date)
-        ;;                     file-data)
-        ;;                   file-data)
+        my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
+                          ;; (println "hello from intercept fn, type" file-type)
+                          (if (= file-type :gtfs/calendar-dates-txt)
+                            (rewrite-calendar file-data orig-date)
+                            file-data)
+                          file-data)
         store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
-                                        ;; my-intercept-fn
-                                        nil
-                                        )
+                                        my-intercept-fn)
         route-query-params {:service-id test-service-id :start-date (joda-datetime->inst (time/days-from (time/now) -120)) :end-date (joda-datetime->inst (time/days-from (time/now) 1))}
         detection-result (detection/detect-route-changes-for-service-new db route-query-params)
         changes (->> detection-result
                     :route-changes
                     (filter :changes))
         changed-route-names (map :route-key changes)
-        lohja-change (first (filterv #(and (= "-Lohja - Nummela - Vihti-" (:route-key %)) (:changes %)) (:route-changes *nd)))]
+        lohja-changes ( (filterv #(and (= "-Lohja - Nummela - Vihti-" (:route-key %)) (:changes %)) (:route-changes *nd)))]
     (println "found" changes "in the following routes:" changed-route-names)
     (def *nd detection-result)
     (println (:start-date route-query-params))
     (testing "got someting"
       (is (not= nil (first detection-result))))
+    (println "lohja-change date is" (-> lohja-change :changes :different-week-date java-localdate->inst))
     (testing "got right date for lohja - nummela - vihti change"
+      ;; wip: with rewrite-calendar call enabled, this should return a date somewhere 90+ days in the past
+      ;; (difference between current time and 2019-02) but for some reason we still get 2019-02-25
       (is (= #inst "2019-02-04" (-> lohja-change :changes :different-week-date java-localdate->inst))))))
