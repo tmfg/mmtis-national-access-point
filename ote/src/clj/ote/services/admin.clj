@@ -286,6 +286,10 @@
     (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
               (map (juxt :month :sum) (monthly-registered-companies db)))
 
+    "tertile-companies"
+    (csv-data ["tertiili" "tuottaja-ytunnus-lkm"]
+              (map (juxt :tertile :sum) (tertile-registered-companies db)))
+
     "company-service-types"
     (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
               (map (juxt :sub-type :count) (operator-type-distribution db)))
