@@ -16,7 +16,7 @@ Git version used as baseline for this documentation: [mmtis-national-access-poin
 
 ### Need
 EU legislation requires a National Access Point (NAP) to be implemented by member states.
-Finnish NAP implements implements additional custom features. 
+Finnish NAP implements additional custom features. 
 Transit Change detection is a custom feature, which allows ELY centers 
 (Centre for Economic Development, Transport and the Environment in Finland) 
 to examine transit data of transit services. Transit data of a transit service is declared by its transit operator. 
@@ -29,7 +29,7 @@ a transport operator must declare changes to transit service routes 60 days in a
 The legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
 
 NAP implements this so, that 
-* Transit data will be automatically imported from service's machine-readable interfaces (refer to [Importing transit data](#Importing transit data)) 
+* Transit data will be automatically imported from service's machine-readable interfaces (refer to [Transit data import](#Transit data import)) 
 * An automated analysis procedure is run on the imported data
 * National Transit authorities are notified on the analysis result. 
 * If a machine readable interface is not available for a transit service, the changes must be declared using a manual online form, available via NAP web application. 
@@ -58,9 +58,9 @@ Important attributes for an interface are the _URL_ and _format_ of provided dat
 
 ![add new interface](new-interface.png)
 
-### Importing transit data
+### Transit data import
 
-Reasoning for Importing transit data: chapter [Requirements](#Requirements).
+Reasoning for feature: chapter [Requirements](#Requirements).
 
 To enable automated transit change analysis, NAP reads existing transit route and schedule information from 
 machine-readable interfaces defined separately for each transit service.  
@@ -103,34 +103,48 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
 0. Store downloaded package to package archive repository
 0. Store parsed transit service data to NAP db.
 0. Update package metadata into NAP db interface table
-   - db: external-interface-description/gtfs-imported
+   - `external-interface-description/gtfs-imported`
 
 ##### References
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
-   - db tables: external-interface-description
+   - [Transit changes related db tables](#Data model)
 
+### Change Detection 
 
-### Change Detection functionality
+#### Description
 
-![Change detection processs animation](detection-process-anim.gif)
+![Change detection processs animation](detection-process-anim.gif)  
+_User UI visualization of transit change detection results_
 
 The hash compresses the traffic per one route during a one day. This includes all the related stop names and stop times used by the route trip stop sequences.
 After GTFS data has been imported into our database and hashes are computed, we can utilize the hashes in the detection algorithm.
 The detection algorithm tries to detect changes in traffic patterns in 60 days in future. The main point of this detection process is to provide transport authorities enough information,
 so they can decide when to order more traffic if so required. Transport authorities also use this change information for oversee that all changes are reported before 60 day time period as required by law.
 
-#### Scheduling of detection process
+
+#### Scheduling
 
 ![background detection process](detection-process.png)
 
-The change detection process runs every night after the data gathering process.
-First, it fetches a list of regular scheduled passenger transport services that have
-a previously calculated change somewhere in future (or it has not yet computed at all)
-and have a package that is newer than a previously computed change.
+0. Change detection task scheduled to run every night _after_ transit data import task scheduling window. 
+   - `detect-new-changes-task`
+   - Resolve detection start and end dates. By default start date is current date, 
+   admin may choose to do a run using a custom date.
+0. Resolve services for which to run change detection
+   - If there's a new package or if earliest change-date is in past 
+0. 
+0. Query for each selecte transport service a list of transit package records
+   - `service-package-ids-for-date-range` 
+0. 
+0. Analysis of transit changes
+   - latest transit package record for each service
+   - detect-route-changes-for-service-new
 
-Transit changes are computed one by one for each fetched service using the detection algorithm.
-
-#### Algorithm of detection process
+##### References
+   - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
+   - [Transit changes related db tables](#Data model)
+   
+#### Detection algorithm
 
 ![Detection algorithm flow diagram](change-detection-flow.png)
 

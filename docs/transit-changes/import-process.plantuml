@@ -1,13 +1,13 @@
 @startuml
-title __Transit data import procedure__
+title __Transit data import procedure__ sequence
 autonumber
 hide footbox
 
-participant "Import process" as IMP
+participant "Import task" as IMP
 database "NAP DB\n" as DB
 database "Package archive\n(AWS S3)" as S3
-box external \n service
-boundary "Interface server \n" as IFACE
+box
+boundary "External interface \n" as IFACE
 end box
 
 group Import procedure
@@ -21,7 +21,7 @@ return Interfaces to update
          alt Kalkati
             IMP->IMP: Convert to GTFS
          end
-         IMP->DB: Calculate package route hashes
+         IMP->DB: Calculate package hashes
          IMP->S3: Store package archive
          IMP->DB: Store parsed transit service data
         else 304 Not Modified

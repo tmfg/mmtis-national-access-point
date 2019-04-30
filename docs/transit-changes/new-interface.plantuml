@@ -1,13 +1,13 @@
 @startuml
-title __Add or update__ a transport Interface
+title __Add or update transport Interface__ sequence
 autonumber
 hide footbox
 
 actor "Transport operator" as OPER
 participant "NAP UI" as UI
 database "NAP DB" as DB
-box external \n service
-    boundary "Interface server" as IFACE
+box
+    boundary "External interface" as IFACE
 end box
 
 OPER->UI: Add interface
@@ -15,13 +15,13 @@ activate UI
         UI->IFACE: Fetch data for validation
         activate IFACE
         return response \n(route & schedule data\n/error)
-                return response
+                return UI indication
 
                 OPER->UI: Save interface
                 activate UI
 UI->DB: Save interface
                 activate DB
-piip
+
 return response
 return UI indication
 
