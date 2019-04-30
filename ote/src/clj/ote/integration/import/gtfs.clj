@@ -123,7 +123,7 @@
                                                  (io/reader stop-times-file)))]
       (when p
         (when (zero? (mod i 1000))
-          (log/debug "Trip partitions stored: " i))
+          (log/debug "Trip partitions stored: " i "/" (count ps)))
 
         (let [;; Use specql internal stringify to turn sequence of stop times
               ;; to a string in PostgreSQL composite array format
@@ -163,7 +163,7 @@
                  (def debug-calendar file-data))
                (doseq [fk (process-rows file-type file-data)]
                  (when (and db-table-name (seq fk))
-                   ;; (println "inserting to" db-table-name ":" (pr-str (assoc fk :gtfs/package-id package-id)))
+                   (println "inserting to" db-table-name ":" (pr-str (assoc fk :gtfs/package-id package-id)))
                    (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
 
       ;; Handle stop times

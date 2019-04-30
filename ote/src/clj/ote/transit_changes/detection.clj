@@ -15,6 +15,7 @@
             [ote.transit-changes.change-history :as change-history])
   (:import (java.time LocalDate DayOfWeek)))
 
+
 (def ^:const no-traffic-detection-threshold
   "The amount of days after a no-traffic run is detected as a change."
   16)
@@ -166,6 +167,7 @@
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
+  (println "dcfr called with route:" (pr-str route))
   (cond
     ;; If this is the first call and the current week is "anomalous".
     ;; Then start at the next week.
@@ -295,7 +297,7 @@
 
 (defn- route-next-different-week-new
   [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr last-analysis-wk]
-  ;; (println "route-next-different-week called with curr= " curr)
+  (println "route-next-different-week called for route " route)
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
     state
@@ -313,9 +315,9 @@
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week curr)
                      (add-different-week curr))]
-      #_(if-let [dw (:different-week result)]
-          (println "route-next-different-week found something:" dw)
-          (println "no changes found from:" (:beginning-of-week (first weeks))))
+      (if-let [dw (:different-week result)]
+          (println "ndw res: route-next-different-week found something:" dw)
+          (println "ndw res: no changes found from:"  (:beginning-of-week (first weeks))))
       result)))
 
 (defn- route-next-different-week-old
@@ -413,7 +415,7 @@
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
-  #_(println "first-week-difference called, #weeks:" (count route-weeks))
+  (tap> "first-week-difference called, #weeks:" (count route-weeks))
   ;(if (= 7  (count route-weeks))
   ;   (def *r7 route-weeks))
   ;; (println "spec for route-weeks:")
@@ -449,10 +451,12 @@
   ;   (def *r7 route-weeks))
   ;; (println "spec for route-weeks:")
   ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
+  (println "rwwfdn called with " (mapv #(keys (:routes %)) route-weeks))
   ;; Take routes from the first week (they are the same in all weeks)
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
+        debug-route-hit? (contains? route-names "-Lohja - Nummela - Vihti-" )
         result (reduce
                  (fn [route-detection-state [_ curr _ _ :as weeks]]
                    (reduce
@@ -465,7 +469,9 @@
                      route-names))
                  {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
-    ;; (println "first-week-difference result: " (pr-str result))
+    (when debug-route-hit?
+      (println "rwwfdn result: " (pr-str result) "count" (count route-weeks))
+      (def *r7 route-weeks))
     ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
     (vals result)))
 
@@ -516,6 +522,8 @@
            :starting-week-hash [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}]
            {...}"
   [route-weeks]
+  ;; (println "in route-differences, first is" (pr-str route-weeks))
+  ;; (def *rdrw)
   (loop [route-weeks route-weeks
          results []]
     (let [diff-data (route-weeks-with-first-difference-new route-weeks)
@@ -743,6 +751,7 @@
 
 (spec/fdef transform-route-change
            :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
+
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -943,7 +952,9 @@
   "Input: takes a vector or routes with their traffic weeks
   Invokes a function in a loop for each route to detect any changes for each route.
   Output: Vector of routes enriched by details if there are changes in traffic for a route on a week."
-  [route-list-with-week-hashes]
+  [route-list-with-week-hashes]  
+  (println "dcfar called")
+  (def *dcrl route-list-with-week-hashes)
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
 (defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
@@ -1049,12 +1060,15 @@
                               (apply concat
                                      (mapv (fn [route-key]
                                              (let [query-params (merge {:route-hash-id route-key} route-query-params)]
-                                                            (service-route-hashes-for-date-range db query-params)))
+                                               (println "query srhfdr params" query-params)
+                                               (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-holidays db route-hashes)
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
+    (def *rh route-hashes)
     (try
+      (def *rd routes-by-date)
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
