@@ -19,6 +19,8 @@
   "The amount of days after a no-traffic run is detected as a change."
   16)
 
+(def detection-interval-days 14)
+
 (defqueries "ote/transit_changes/detection.sql")
 (defqueries "ote/services/transit_changes.sql")
 
@@ -843,8 +845,8 @@
                                                      (or (nil? change-date)
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
-          ;; Set change date to future (every 4 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) 28)))
+          ;; Set change date to future (every 2 weeks at monday) - This is the day when changes are detected for next time
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) detection-interval-days)))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
