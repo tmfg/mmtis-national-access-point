@@ -47,6 +47,8 @@
     (mapv #(update % :gtfs/date date-fwd-fn) calendar-data)))
 
 
+;; [removed - comment with construction notes on this test, check git history if interested]
+
 #_(deftest rewrite-calendar-testutil-works
   (is (= [#:gtfs{:service-id "1",
                  :date (java.time.LocalDate/now),
@@ -62,76 +64,6 @@
                                    :date (java.time.LocalDate/parse "2013-01-06"),
                                    :exception-type 1}] #inst "2013-01-01") )))
 
-;; tbd - check some actual changes read from this package (detected-route-change table)
-;; and cross ref with the bug
-
-;; for case Lohja - Nummela - Vihti we should find
-;; detected-route-change rows containing changes for these
-;; prob: vihti routes missing from detection results (even under :all-routes key)
-;; repl:
-;; (detection/service-routes-with-date-range (:db ote.main/ote) {:service-id 2})
-;; or ..
-#_(->> (detection/service-routes-with-date-range (:db ote.main/ote) {:service-id 2})
-     (filter #(-> %
-                  :route-long-name
-                  (= "Lohja - Nummela - Vihti")))
-     first)
-;; this returns one record
-;; -> sql query -> sproc -> gtfs_service_routes_with_daterange
-;; checking routes: select "id", "route-id", "route-long-name" from "gtfs-route" where "route-long-name" like '%ummela%';
-;; ->  142 | r_26     | Lohja - Nummela - Vihti
-;; ok. after redoing import with updated code from master, the original symptom changed:
-;;  - now we get :all routes containing the route:
-;; (filter #(= (:route-long-name %) "Lohja - Nummela - Vihti")  (vals  (:all-routes *nd)))
-;; but it's not under :route-changes
-;; -> try to work backwards, what would need to happen for route-changes to get filledin
-;;   - detection/detect-route-changes-for-service-new fn calls series of fns on routes-by-date
-;;   - saving routes-by-date in the above fn and looking for our route of interest:
-;;    (filter #(= "-Lohja - Nummela - Vihti-" (first %) ) (mapcat :routes *rd))
-;;    yields records with only a single constant hash (and some nil hashes)
-;;  - track down to this call:
-;;   - (service-route-hashes-for-date-range (:db ote.main/ote) {:route-hash-id "-Lohja - Nummela - Vihti-" :service-id 2, :start-date #inst "2018-12-30T08:45:43.000-00:00", :end-date #inst "2019-04-30T07:45:43.000-00:00"})
-;;      -> get only single hash + nils , evenif start-date is changed way back to 2010
-;;        -> is it possible that no-traffic weeks are nils so this is actually the right data?
-;;        -> need to catch the phase where the week hash is formed and see what the data is in human readable form
-;;           also, find where in the db this is stored? -> it's our old pal gtfs-date-hash table joined variously
-;;         -> transport-service-id is null on thr gtfs-date-hash rows of our packages. maybe it's unused? because we still get some data
-;;         -> checking import path. in integration.import.gtfs there's import-stop-times fn that reads packages. it's sql for updating "gtfs-trip".
-;;         ->  select id, "route-id", "package-id" from "gtfs-trip" where "package-id" = 22 and "route-id" in (select "route-id" from "gtfs-route" where "route-long-name" = 'Lohja - Nummela - Vihti')
-;;           -> ok, looks to be the same sparse info
-;;           -> look at the kalkati data manually
-;;           -> ok, looks like this xml may indeed be missing what we need..
-;;           -> go digging into the napote s3 bucket.
-;;           -> grab https://s3.eu-central-1.amazonaws.com/napote-gtfs/2019-02-07_1149_1712_gtfs.zip
-;;               - this is not kalkati format any more, let's nevertheless try to load it
-;;           -> actually, that is too new also, previous found is 2019-01-10_1149_1712_gtfs.zip,  use that
-;;           -> ok, now we actually get 2 different hashes. but still empty :route-changes in detect-route-changes return map
-;;           -> seems that route-weeks-with-first-difference-new fn only gets weeks with c8 hash
-;;           -> looking at callers to look for where they disappear
-;;             observation: only 2 weeks caught in debug *var in detect-changes-for-all-routes
-;;             using (map :beginning-of-week (mapcat identity *dcrl)),
-;;             also verified that it's only called once so no data overwritten...
-;;           -> found out that first-package must be set to false, otherwise dates in past will be dropped.
-;;           -> for a while got 2 different hashes coming out of
-;;             (filter #(= "-Lohja - Nummela - Vihti-" (first %) ) (mapcat :routes *rd)) - possibly before the first-package change the imports had left in old data in the db? (when running against local napotedb database, not the test fixture one)
-;;              but it somehow stopped after few changes trying to figure out why change detection for that route wasn't reached
-;;           -> learn to look for the week hashes in the db. trying ... select hash, unnest("route-hashes") from "gtfs-date-hash" where "package-id" = 44; - no
-;;           -> right diretion? select gtfs_service_route_date_hash(2, '2019-04-29', '', 'Lohja - Nummela - Vihti', ''); -> same hash as seen in debug
-;;           -> select gtfs_service_route_date_hash(2, ser.d ::date, '', 'Lohja - Nummela - Vihti', '') from (select generate_series('2019-02-01'::date,'2019-07-02'::date,'1 day') d) as ser ;
-;;           -> starting to suspect that the rewrite-calendar functionality might be somehow broken and mess things up? for example, we only adjust the calendar-dates data. are there other dates in the data that are not rewritten?
-;;           -> trying some test runs without the rewrite-calendar call.
-;;           -> meanwhile went back to the gtfs zip and eyeballed the data, and the prod front view. there are 2 hash colors and a blank week.
-;;           -> next: try the sproc call for the date now that rewrite-calendar is disabled. nope, still the same ...b94a hash.
-;;           -> two things to check: 1) see how hash is actually calculated, what are the inputs of the b94a hash.
-;;              2) go back to the gtfs zip data and look for the scheduling change, not the blank trafficless week
-;;           -> ok 2) seems to have been the winning ticket. actually had to use the next later package which had the 2 different schedules for the route. now the test shows changes for me.
-;;  
-;; test setup notes:
-;; a transit info zip must be about some operator ("transit-operator" table),
-;; and have a record about it in "gtfs_package" table, and be associated with
-;; some operator ("transport-operator" table).
-;; normally in the test data, we have "Ajopalvelu Testinen Oy" with id 1,
-;; and their bus service with service-id 2, so we can use those.
 
 (use-fixtures :each
   (ote.test/system-fixture
