@@ -2,7 +2,8 @@
 
 ## References
 [0]: https://github.com/finnishtransportagency/mmtis-national-access-point/commit/158eddc78bd5ce368dc3afc524b152d691f8b74b
-[1]: http://www.finlex.fi/fi/laki/alkup/2017/20170320 "Laki liikenteen palveluista "
+[1]: http://www.finlex.fi/fi/laki/alkup/2017/20170320 "Laki liikenteen palveluista"
+[2]: https://developers.google.com/transit/gtfs/
 
 ## Release version
 Git version used as baseline for this documentation: [mmtis-national-access-point][0]
@@ -18,65 +19,96 @@ to examine transit data of transit services. Transit data of a transit service i
 Transit Change detection of NAP application allows ELY officials to analyze whether any ELY actions will be required as a result 
 of changes to transit data for any service.
 
+### Requirements
+According to [Finnish national legislation on transport][1], 
+a transport operator must declare changes to transit service routes 60 days in advance to the transit authorities.
+The legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
+
+NAP implements this so, that 
+* Transit data will be automatically imported from service's machine-readable interfaces (refer to [Importing transit data](#Importing transit data)) 
+* An automated analysis procedure is run on the imported data
+* National Transit authorities are notified on the analysis result. 
+* If a machine readable interface is not available for a transit service, the changes must be declared using a manual online form, available via NAP web application. 
+Manually declared transit data is not used by the automated analysis procedure. It is visualized separately for transit authorities by NAP application online view.
+
 ## Functionality
 
-### Data gathering
-According to [Finnish national legislation on transport][1], 
-changes to transit traffic must be declared by transport operator to the transit authorities 60 days in advance.
-If the data is available from machine readable interfaces, changes will be automatically detected
-and transit authorities notified. 
-If such an interface is not available for a transit service, the
-changes must be declared using a manual form.
+### Definition of machine-readable interface for transit service
 
-To facilitate automatic change detection, NAP reads existing transit route and schedule information
-from interfaces provided by transport operators and stores them.
-
-#### Interfaces for transit data import
+Machine-readable interfaces of transport service are defined by a user who belongs to organization of the transport operator providing the transport service.  
+Definition is done using the NAP application UI, using the edit transport service view.  
+Interface details are stored to transit service record in NAP database.  
+Important attributes for an interface are the _URL_ and _format_ of provided data.
 
 ![add new interface](new-interface.png)
 
-Machine-readable interfaces are added by transport operators to transport service record using the application UI, on the edit transport service view.
+### Importing transit data
 
-For the transit data import interfaces NAP supports [GTFS](https://developers.google.com/transit/gtfs/) and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php) format for route and schedule information.
+Reasoning for Importing transit data: chapter [Requirements](#Requirements).
 
-#### Storage of transit data
+To enable automated transit change analysis, NAP reads existing transit route and schedule information from 
+machine-readable interfaces defined separately for each transit service.  
+Imported data is stored to NAP internal database. Analysis of imported transit happens at a later stage.
 
-Interface data is always stored in GTFS format. We archive the raw GTFS zip files in AWS S3 bucket. This enables us to fetch older historical data if so required in future.
-During the import process, GTFS files are parsed and stored into our relational database model in AWS RDS. The model is not exact mirror of the GTFS standard, but it is logically very similar.
-It contains all the same information. GTFS import process does not support other optional GTFS files than calendar_dates.txt and shapes.txt.
+Formats supported for machine-readable transit data interfaces are 
+[GTFS][2] and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php).  
+Supported file transfer format for import is **zip** archive file. 
+
+At this stage imported file is parsed and stored into NAP database into relational database model.  
+The model is not an exact mirror of the GTFS standard, but it is logically very similar and contains the same information.  
+The NAP import procedure of GTFS-formatted transit data supports mandatory GTFS files of the GTFS specification and two optional files: **calendar_dates.txt** and **shapes.txt**.  
+For more information on GTFS files refer to [GTFS file requirements](https://developers.google.com/transit/gtfs/reference/#file-requirements)
+
+#### Storing transit data
+
+Imported transit service data is stored inGeneral Transit Feed Specification ([GTFS][2]) format. If necessary, data is converted to GTFS before storing. 
+
+NAP archives the raw GTFS zip files in an AWS S3 bucket to allow fetching historical data if required.
 
 #### Scheduling of data import
 
 ![background import process](import-process.png)
 
-The import process described above runs every night during night hours. The process tries to update any interface data that has not been updated during 24 hours.
-The process queries the interface server for new data. If the server indicates that the data has changed, a new package will be downloaded and processed.
-For this process we utilize `If-None-Match` or `If-Modified-Since` HTTP headers.
-Relevant package meta data, such as ETAG and current timestamp is stored during this process.
+- Import process for transit service data runs every night during specified hours
+- Import run iteratively one service at a time
 
-If there are any errors encountered while fetching the new package or during the import process, the interface will be marked as erroneous.
-First, we check that if the interface URL can be connected to. Then we download the package and check that the downloaded file is a ZIP file and if it contains all the required GTFS or Kalkati.net files depending on the specified interface format. 
+0. Fetch interfaces which quality for import
+   - gtfs_imported timestamp older than one day ago
+0. Take and process **only first interface** record per scheduled iteration
+0. Fetch latest package for interface URL
+   - Package fetch is run for interfaces whose import timestamp in NAP db interface table is not within last **24 hours**.
+   - Check if interface URL can be connected to. 
+   - If interface server indicates that data has changed, downloaded and proceed to process response.
+0. Analyze response
+   - HTTP headers **`If-None-Match`** or **`If-Modified-Since`** are used to resolve if new data is available. 
+   - Verify package contains all files required for the interface format. 
+   - Verify downloaded file is a ZIP archive file 
+0. Update package metadata into NAP db interface table.  
+   - Store relevant package metadata, such as **ETAG** and **timestamp** .
+   - Mark interface as erroneous if there were errors for fetch or import operations. 
+0. Convert if required
+   - Kalkati.net formatted interfaces are converted into GTFS before storing and importing the data.  
+   Conversion is done using a kalkati->gtfs converter which parses Kalkati.net XML-files and outputs a GTFS zip.
+0. Calculate package hash
+0. Store downloaded package to package archive repository
+0. Store parsed transit service data to NAP db.
+0. Update package metadata into NAP db interface table
+   - db: external-interface-description/gtfs-imported
 
-
-Kalkati.net formatted interfaces are converted into GTFS before storing and importing the data. 
-For this, we utilize a kalkati->gtfs converter that parses a Kalkati.net XML-file and outputs a GTFS zip.
-
-After GTFS data has been imported from the interface package, the import process will compute hashes that condense the traffic information stored in the package.
-These hashes will be used later in the change detection process where we compare hashes instead of raw traffic data. The hashes will be computed per day.
-The hash compresses the traffic per one route during a one day. This includes all the related stop names and stop times used by the route trip stop sequences.
-
+References:
+   - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
+   - db tables: external-interface-description
 
 ![Database model](db-diagram.svg)
 
 Above is a basic diagram about database tables related to the transit changes process.
 
 
-
-
 ### Change Detection functionality
 
 ![Change detection processs animation](detection-process-anim.gif)
 
+The hash compresses the traffic per one route during a one day. This includes all the related stop names and stop times used by the route trip stop sequences.
 After GTFS data has been imported into our database and hashes are computed, we can utilize the hashes in the detection algorithm.
 The detection algorithm tries to detect changes in traffic patterns in 60 days in future. The main point of this detection process is to provide transport authorities enough information,
 so they can decide when to order more traffic if so required. Transport authorities also use this change information for oversee that all changes are reported before 60 day time period as required by law.

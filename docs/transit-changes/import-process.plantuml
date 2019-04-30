@@ -1,25 +1,33 @@
 @startuml
+title __Transit data import procedure__
+autonumber
+hide footbox
 
-participant "Interface server" as IFACE
-participant "NAP DB" as DB
 participant "Import process" as IMP
-participant "Package archive (S3)" as S3
+database "NAP DB\n" as DB
+database "Package archive\n(AWS S3)" as S3
+box external \n service
+boundary "Interface server \n" as IFACE
+end box
 
-group Background import process
-IMP->DB: Fetch interfaces that need to be updated
-DB->IMP: Interfaces to be updated
-loop For each interface
-IMP->IFACE: Fetch latest package if changed
-IFACE->IMP: New package (or 304 Not Modified)
-alt New package received
- IMP->S3: Store new package
- IMP->DB: Update package metadata
- IMP->DB: Store parsed transit data
- IMP->DB: Calculate package date hashes
-else 304 Not Modified
- IMP->DB: Update package check timestamp
-end
-end
+group Import procedure
+IMP->DB: Fetch interfaces needing update
+return Interfaces to update
+    loop For each interface
+    IMP->IFACE: Fetch latest package
+    return Response: package archive or HTTP 304 Not Modified
+        alt New package archive
+           IMP->DB: Update package metadata
+         alt Kalkati
+            IMP->IMP: Convert to GTFS
+         end
+         IMP->DB: Calculate package route hashes
+         IMP->S3: Store package archive
+         IMP->DB: Store parsed transit service data
+        else 304 Not Modified
+          IMP->DB: Update package check timestamp \n(gtfs-imported)
+        end
+    end
 end
 
 

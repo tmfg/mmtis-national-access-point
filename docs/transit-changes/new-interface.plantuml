@@ -14,15 +14,15 @@ OPER->UI: Add interface
 activate UI
         UI->IFACE: Fetch data for validation
         activate IFACE
-        return response (Data/error)
+        return response \n(route & schedule data\n/error)
                 return response
 
                 OPER->UI: Save interface
                 activate UI
 UI->DB: Save interface
                 activate DB
-
-return
+piip
 return response
+return UI indication
 
 @enduml
