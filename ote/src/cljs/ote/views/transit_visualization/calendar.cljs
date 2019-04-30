@@ -117,7 +117,6 @@
           :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
                     (let [ddate (if different-week-date different-week-date (time/now))]
-                      (.log js/console "dates " different-week-date ddate)
                       [:div
                        [:span (stylefy/use-style {;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
                                                   :white-space "nowrap"})
