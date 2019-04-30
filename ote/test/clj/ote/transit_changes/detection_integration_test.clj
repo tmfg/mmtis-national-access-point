@@ -12,19 +12,6 @@
             [com.stuartsierra.component :as component]
             [ote.test]))
 
-;; this doesn't compile or work in normal "lein test" run due to the ote.main/ote reference, uncomment for repl use
-
-#_(deftest test-with-gtfs-package-of-a-service-repl
-  (let [db (:db ote.main/ote)
-        route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
-        detection-result (detection/detect-route-changes-for-service-new db route-query-params)
-        old-diff (detection/detect-route-changes-for-service-old db route-query-params)]
-    ;; detection-result structure:
-    ;; :route-changes [ ( [ routeid {dada} ]) etc
-    (println (:start-date route-query-params))
-    (testing "differences between new and old"
-      (is (= old-diff detection-result)))))
-
 (defn slurp-bytes
   "Slurp the bytes from a slurpable thing"
   [x]
@@ -32,11 +19,6 @@
     (clojure.java.io/copy (clojure.java.io/input-stream x) out)
     (.toByteArray out)))
 
-
-#_(defn java-localdate->inst [ld]
-  (ote.time/date-fields->native
-   (merge {:ote.time/hours 0 :ote.time/minutes 0 :ote.time/seconds 0}
-          (time/date-fields ld))))
 
 (defn rewrite-calendar [calendar-data orig-date]
   ;; find out how far past orig-date is in history, and shift all calendar-data
@@ -151,7 +133,7 @@
 ;; normally in the test data, we have "Ajopalvelu Testinen Oy" with id 1,
 ;; and their bus service with service-id 2, so we can use those.
 
-#_(use-fixtures :each
+(use-fixtures :each
   (ote.test/system-fixture
    :transport (component/using
                 (transport-service/->Transport
@@ -199,44 +181,22 @@
         ;; Parse gtfs package and save it to database.
         (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
 
-
-#_(deftest test-with-kalkati-package
-  (let [;; db (:db ote.test/*ote*)
-        db (:db ote.main/ote)
-        kalkati-zip-path "../issue163446864_kalkati_anonco.zip"
-        gtfs-zip-bytes (ote.gtfs.kalkati-to-gtfs/convert-bytes (slurp-bytes kalkati-zip-path))
-        orig-date #inst "2019-03-24T00:00:00"
-        my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
-                          ;; (println "hello from intercept fn, type" file-type)
-                          (if (= file-type :gtfs/calendar-dates-txt)
-                            (rewrite-calendar file-data orig-date)
-                            file-data)
-                          file-data)
-        store-result (store-gtfs-helper gtfs-zip-bytes  (:db ote.main/ote)  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242 my-intercept-fn)
-        route-query-params {:service-id test-service-id :start-date (joda-datetime->inst (time/days-from (time/now) -120)) :end-date (joda-datetime->inst (time/days-from (time/now) 1))}
-        detection-result (detection/detect-route-changes-for-service-new db route-query-params)]
-    (def *nd detection-result)
-    (println (:start-date route-query-params))
-    (testing "got someting"
-      (is (not= nil (first detection-result))))))
-
-
 ;;  - todo: check detection-result format, can we eliminate one of :changes & :different-week keys
 ;;  - also check if we can omit maps without change info in why are there maps unde :route-changes
+
 (deftest test-with-gtfs-package
-  (let [;; db (:db ote.test/*ote*)
-        db (:db ote.main/ote)
-        ;; gtfs-zip-path "../2019-01-10_1149_1712_gtfs.zip" ;; later has the two different trip descs
-        gtfs-zip-path "../2019-02-07_1149_1712_gtfs.zip"
+  (let [db (:db ote.test/*ote*)
+        ;; db (:db ote.main/ote)
+        gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
         gtfs-zip-bytes (slurp-bytes gtfs-zip-path)
         orig-date #inst "2019-02-02T00:00:00"
         ;; my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
         ;;                   ;; (println "hello from intercept fn, type" file-type)
         ;;                   (if (= file-type :gtfs/calendar-dates-txt)
-        ;;                     (rewrite-calendar file-data orig-date)
+        ;;                     (rewrite-calendar file->data orig-date)
         ;;                     file-data)
         ;;                   file-data)
-        store-result (store-gtfs-helper gtfs-zip-bytes  (:db ote.main/ote)  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
+        store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
                                         ;; my-intercept-fn
                                         nil
                                         )
@@ -253,29 +213,4 @@
     (testing "got someting"
       (is (not= nil (first detection-result))))
     (testing "got right date for lohja - nummela - vihti change"
-      (is (-> lohja-change :changes :different-week-date java-localdate->inst (= #inst "2019-02-04"))))))
-
-
-
-
-;; tbd - check some actual changes read from this package (detected-route-change table)
-#_(deftest test-with-gtfs-package-of-a-service
-  (let [db (:db ote.test/*ote*)
-        service-id test-service-id
-        gtfs-zipfile-orig-path "/home/ernoku/Downloads/2019-02-24_310_1290_gtfs.zip"
-        gtfs-zipfile-orig-date #inst "2019-02-24T00:00:00"
-        my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
-                          ;; (println "hello from intercept fn, type" file-type)
-                          (if (= file-type :gtfs/calendar-dates-txt)
-                            (rewrite-calendar file-data gtfs-zipfile-orig-date)
-                            file-data)
-                          file-data)
-        package-id 1
-        interface-id 1
-        _ (ote.integration.import.gtfs/save-gtfs-to-db db (slurp-bytes gtfs-zipfile-orig-path) package-id interface-id service-id my-intercept-fn)
-        route-query-params {:service-id service-id :start-date (time/days-from (time/now) -265) :end-date (time/days-from (time/now) 1)}
-        detection-result (detection/detect-route-changes-for-service-new db route-query-params)]
-    (def *nd detection-result)
-    (println (:start-date route-query-params))
-    (testing "got something"
-      (is (not= nil (first detection-result))))))
+      (is (= #inst "2019-02-04" (-> lohja-change :changes :different-week-date java-localdate->inst))))))
