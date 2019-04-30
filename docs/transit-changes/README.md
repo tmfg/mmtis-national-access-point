@@ -5,7 +5,11 @@
 [1]: http://www.finlex.fi/fi/laki/alkup/2017/20170320 "Laki liikenteen palveluista"
 [2]: https://developers.google.com/transit/gtfs/
 
-## Release version
+- https://github.com/finnishtransportagency/mmtis-national-access-point/commit/158eddc78bd5ce368dc3afc524b152d691f8b74b
+- http://www.finlex.fi/fi/laki/alkup/2017/20170320 "Laki liikenteen palveluista"
+- https://developers.google.com/transit/gtfs/
+
+### Release version
 Git version used as baseline for this documentation: [mmtis-national-access-point][0]
 
 ## Description
@@ -31,9 +35,21 @@ NAP implements this so, that
 * If a machine readable interface is not available for a transit service, the changes must be declared using a manual online form, available via NAP web application. 
 Manually declared transit data is not used by the automated analysis procedure. It is visualized separately for transit authorities by NAP application online view.
 
+
+## Data model
+
+![er-transit-changes](er-transit-changes.png)
+
+### Key tables
+- `detected-change-history` : stores first occurrence when a change is detected using a calculated hash value
+- `detected-route-change` : records link to a gtfs-transit-changes record. Each record represents one detected change for one route for one service.
+- `external-interface-description` : URLs where to import data from and related attributes like a last import timestamp
+- `gtfs-transit-changes`: one record represents the result of one transit detection run for one service 
+
+
 ## Functionality
 
-### Definition of machine-readable interface for transit service
+### Machine-readable interface for transit service
 
 Machine-readable interfaces of transport service are defined by a user who belongs to organization of the transport operator providing the transport service.  
 Definition is done using the NAP application UI, using the edit transport service view.  
@@ -59,13 +75,7 @@ The model is not an exact mirror of the GTFS standard, but it is logically very 
 The NAP import procedure of GTFS-formatted transit data supports mandatory GTFS files of the GTFS specification and two optional files: **calendar_dates.txt** and **shapes.txt**.  
 For more information on GTFS files refer to [GTFS file requirements](https://developers.google.com/transit/gtfs/reference/#file-requirements)
 
-#### Storing transit data
-
-Imported transit service data is stored inGeneral Transit Feed Specification ([GTFS][2]) format. If necessary, data is converted to GTFS before storing. 
-
-NAP archives the raw GTFS zip files in an AWS S3 bucket to allow fetching historical data if required.
-
-#### Scheduling of data import
+#### Key steps
 
 ![background import process](import-process.png)
 
@@ -95,13 +105,9 @@ NAP archives the raw GTFS zip files in an AWS S3 bucket to allow fetching histor
 0. Update package metadata into NAP db interface table
    - db: external-interface-description/gtfs-imported
 
-References:
+##### References
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
    - db tables: external-interface-description
-
-![Database model](db-diagram.svg)
-
-Above is a basic diagram about database tables related to the transit changes process.
 
 
 ### Change Detection functionality
