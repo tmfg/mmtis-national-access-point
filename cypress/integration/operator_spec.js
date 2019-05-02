@@ -57,6 +57,10 @@ describe('Operator creation basic tests', function () {
 
     it('should add new operator', function () {
 
+        cy.server();
+        cy.route('POST', '/transport-operator').as('addOperator');
+        cy.route('POST', '/transport-operator/delete').as('deleteOperator');
+
         cy.contains('Omat palvelutiedot');
 
         // Start adding new operator
@@ -80,7 +84,8 @@ describe('Operator creation basic tests', function () {
         cy.get('#btn-operator-save').click();
 
         // Ensure that operator is correctly added - should be selected by default
-        cy.wait(500);
+        cy.wait('@addOperator');
+        cy.contains('Palveluntarjoajan tiedot tallennettu');
         cy.contains(newOperatorName);
 
         // Ensure that other pages have it selected by default
@@ -95,9 +100,9 @@ describe('Operator creation basic tests', function () {
         cy.get('#btn-delete-transport-operator').click();
         cy.get('#confirm-operator-delete').click();
 
-        // Ensure that operator is correctly deleted and can't be found from own-services page
-        cy.get('#select-operator-at-own-services').click();
-        cy.contains(newOperatorName).should('not.exist');
+        // Ensure that operator is correctly deleted
+        cy.wait('@deleteOperator');
+        cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
 
     });
 
