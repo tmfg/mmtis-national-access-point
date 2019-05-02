@@ -98,7 +98,7 @@ describe('Operator creation basic tests', function () {
         cy.visit('/#/own-services');
         cy.get('#edit-transport-operator-btn').click();
         cy.get('#btn-delete-transport-operator').click();
-        cy.get('#confirm-operator-delete').click();
+        cy.get('#confirm-operator-delete').click({force: true});
 
         // Ensure that operator is correctly deleted
         cy.wait('@deleteOperator');
