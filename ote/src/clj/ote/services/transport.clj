@@ -85,9 +85,10 @@
   [service]
   (let [sub-type (::t-service/sub-type service)
         interface-types (::t-service/interface-types service)]
-    (assoc service :has-errors? (and
-                     (= sub-type :schedule)
-                     (not ((set interface-types) :route-and-schedule))))))
+    (assoc service :has-errors?
+      (and
+        (= sub-type :schedule)
+        (not ((set interface-types) :route-and-schedule))))))
 
 (defn get-transport-services
   "Return Vector of transport-services"
