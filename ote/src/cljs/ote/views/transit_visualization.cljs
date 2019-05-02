@@ -737,7 +737,7 @@
 
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
-                                        all-route-changes-display?]
+                                        all-route-changes-display? all-route-changes-checkbox]
                                  :as transit-visualization}]
   (let [routes (if all-route-changes-display?
                  changes-route-no-change
@@ -771,7 +771,7 @@
                               :style (when-not (tv/route-filtering-available? transit-visualization) style-base/disabled-control)}
            ;; Toggling table key :all-route-changes-display? may cause rendering delay on large data, blocking also rendering checkbox state changes.
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
-           all-route-changes-display?]]]
+           all-route-changes-checkbox]]]
 
         [route-changes e! routes changes-route-no-change selected-route route-hash-id-type changes-all]]]
 

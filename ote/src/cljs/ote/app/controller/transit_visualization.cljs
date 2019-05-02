@@ -199,6 +199,7 @@
 
 (defn- init-view-state [app scope]
   (let [initial-view-state {:all-route-changes-display? false
+                            :all-route-changes-chenckbox false
                             :open-sections {:gtfs-package-info false}
                             :scope scope
                             :service-changes-for-date-loading? true}]
@@ -534,4 +535,4 @@
   ;; Timeout used because toggling key for route-changes table directly may cause delay in rendering the content with large data set.
   ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
   (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
-  app)
+  (update app :all-route-changes-checkbox not))
