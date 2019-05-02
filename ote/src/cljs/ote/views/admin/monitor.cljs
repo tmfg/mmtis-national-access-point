@@ -97,13 +97,13 @@
      [:p "Valvontanäkymässä voit tarkastella liikkumispalveluiden tarjoajien kokonaismäärän
               kehitystä kokonaisuutena, sekä jaoteltuna liikkumispalvelutyyppien mukaan."]
      [:p "Termi "
-      [:strong "Liikkumispalveluiden tarjoajat"] " tarkoittaa sekä NAPiin rekisteröityneitä "
-      [:strong " liikkumispalveluiden tuottajia"] ", jotka vain " [:strong "osallistuvat palveluiden tuottamiseen. "]
+      [:strong "Liikkumispalveluiden tarjoajat"] " tarkoittaa NAPiin rekisteröityneitä "
+      [:strong " liikkumispalveluiden tuottajia"] ", sekä yrityksiä, jotka vain " [:strong "osallistuvat palveluiden tuottamiseen. "]
       "Palvelun tuottamiseen osallistuva yritys on esimerkiksi yksityinen elinkeinon harjoittaja, joka ajaa ainoastaan taksivälityskeskusken kyytejä."]
 
-     [:div {:style {:display "flex" :justify-content "flex-end" :flex-wrap "wrap"}}
+     [:div {:style {:display "flex" :justify-content "flex-start" :flex-wrap "wrap"}}
       [form-fields/field
-       {:label "Valitse raporttien tyyppi"
+       {:label "Kaavioiden aikayksikkö"
         :type :selection
         :update! #(e! (monitor-controller/->ChangeReportType %))
         :show-option (tr-key [:admin-page :report-types])
@@ -112,12 +112,16 @@
 
      (if (= chart-type :month)
        [:div {:id "month-charts" :key "month-charts"}
-        [:div {:id "container-bar-companies-by-month" :key "container-bar-companies-by-month"}
+        [:div {:id "container-bar-companies-by-month"
+               :key "container-bar-companies-by-month"
+               :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
          [:div {:style {:width "100%"}}
           [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]]
-        [:div {:id "container-bar-sub-types-by-month" :key "container-bar-sub-types-by-month"}
+        [:div {:id "container-bar-sub-types-by-month"
+               :key "container-bar-sub-types-by-month"
+               :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan kuukausittain"]
          [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
@@ -125,12 +129,16 @@
          [:div {:style {:width "100%"}}
           [barchart-inner " bar-type-by-month " "right" monthly-types]]]]
        [:div {:id "tertile-charts" :key "tertile-charts"}
-        [:div {:id "container-bar-companies-by-tertile" :key "container-bar-companies-by-tertile"}
+        [:div {:id "container-bar-companies-by-tertile"
+               :key "container-bar-companies-by-tertile"
+               :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
          [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
          [:div {:style {:width "100%"}}
           [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]]
-        [:div {:id "container-bar-sub-types-by-tertile" :key "container-bar-sub-types-by-tertile"}
+        [:div {:id "container-bar-sub-types-by-tertile"
+               :key "container-bar-sub-types-by-tertile"
+               :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
          [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
@@ -138,9 +146,12 @@
          [:div {:style {:width "100%"}}
           [barchart-inner " bar-type-by-tertile " "right" tertile-types]]]])
 
-     [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
-     [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
-     [:div {:style {:width "100%"}}
-      [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]])
+     [:div {:id "container-company-service-types"
+            :key "container-company-service-types"
+            :style {:margin-bottom "4rem"}}
+      [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
+      [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
+      [:div {:style {:width "100%"}}
+       [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]]])
     [:div
      [ui-common/loading-spinner]]))
