@@ -7,22 +7,21 @@ actor "Transport operator" as OPER
 participant "NAP UI" as UI
 database "NAP DB" as DB
 box
-    boundary "External interface" as IFACE
+  boundary "External interface" as IFACE
 end box
 
 OPER->UI: Add interface
 activate UI
-        UI->IFACE: Fetch data for validation
-        activate IFACE
-        return response \n(route & schedule data\n/error)
-                return UI indication
+  UI->IFACE: Fetch data for validation
+  activate IFACE
+  return response
+return UI indication
 
-                OPER->UI: Save interface
-                activate UI
-UI->DB: Save interface
-                activate DB
-
-return response
+OPER->UI: Save interface
+activate UI
+  UI->DB: Save interface
+  activate DB
+  return response
 return UI indication
 
 @enduml

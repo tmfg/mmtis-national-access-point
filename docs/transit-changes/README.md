@@ -16,12 +16,12 @@ Git version used as baseline for this documentation: [mmtis-national-access-poin
 
 ### Need
 EU legislation requires a National Access Point (NAP) to be implemented by member states.
-Finnish NAP implements additional custom features. 
+In addition to mandatory features, Finnish NAP implements additional custom features. 
 Transit Change detection is a custom feature, which allows ELY centers 
 (Centre for Economic Development, Transport and the Environment in Finland) 
 to examine transit data of transit services. Transit data of a transit service is declared by its transit operator. 
-Transit Change detection of NAP application allows ELY officials to analyze whether any ELY actions will be required as a result 
-of changes to transit data for any service.
+Transit Change detection allows ELY officials to analyze whether any ELY actions will be required in order to react to 
+some of the changes in transit service traffic.
 
 ### Requirements
 According to [Finnish national legislation on transport][1], 
@@ -29,10 +29,10 @@ a transport operator must declare changes to transit service routes 60 days in a
 The legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
 
 NAP implements this so, that 
-* Transit data will be automatically imported from service's machine-readable interfaces (refer to [Transit data import](#Transit data import)) 
+* Transit data is automatically imported from service's machine-readable interfaces (refer to [Transit data import](#Transit data import)) 
 * An automated analysis procedure is run on the imported data
-* National Transit authorities are notified on the analysis result. 
-* If a machine readable interface is not available for a transit service, the changes must be declared using a manual online form, available via NAP web application. 
+* National Transit authorities (certain users) are notified on the analysis result. 
+* If a machine readable interface is not available for a transit service, then transit changes must be declared using a manual online form, which is available via NAP web application. 
 Manually declared transit data is not used by the automated analysis procedure. It is visualized separately for transit authorities by NAP application online view.
 
 
@@ -40,7 +40,7 @@ Manually declared transit data is not used by the automated analysis procedure. 
 
 ![er-transit-changes](er-transit-changes.png)
 
-### Key tables
+### Important tables related to transit change detection
 - `detected-change-history` : stores first occurrence when a change is detected using a calculated hash value
 - `detected-route-change` : records link to a gtfs-transit-changes record. Each record represents one detected change for one route for one service.
 - `external-interface-description` : URLs where to import data from and related attributes like a last import timestamp
@@ -51,42 +51,41 @@ Manually declared transit data is not used by the automated analysis procedure. 
 
 ### Machine-readable interface for transit service
 
-Machine-readable interfaces of transport service are defined by a user who belongs to organization of the transport operator providing the transport service.  
-Definition is done using the NAP application UI, using the edit transport service view.  
+Machine-readable interfaces of transport service are defined by a user belonging to organization of the transport operator, which is providing the transport service.  
+Definition of interfaces for a service is done using the NAP application UI, using the edit transport service view.
 Interface details are stored to transit service record in NAP database.  
-Important attributes for an interface are the _URL_ and _format_ of provided data.
+Important attributes for an interface are the **URL** and **format** of provided data.
 
 ![add new interface](new-interface.png)
 
-### Transit data import
+### Transit service data import
 
-Reasoning for feature: chapter [Requirements](#Requirements).
+(Reasoning for feature: chapter [Requirements](#Requirements))
 
-To enable automated transit change analysis, NAP reads existing transit route and schedule information from 
-machine-readable interfaces defined separately for each transit service.  
-Imported data is stored to NAP internal database. Analysis of imported transit happens at a later stage.
+To enable automated transit change analysis, NAP reads existing transit route and schedule information from the 
+machine-readable interfaces of transit service.  
+Imported data is stored to NAP internal database. Analysis of imported transit happens at a later stage.  
+Import process for transit service data runs every night during specified hours.  
+Import runs iteratively one service at a time.
 
 Formats supported for machine-readable transit data interfaces are 
 [GTFS][2] and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php).  
 Supported file transfer format for import is **zip** archive file. 
 
-At this stage imported file is parsed and stored into NAP database into relational database model.  
+An imported package file is parsed and stored into NAP database into relational database model.  
 The model is not an exact mirror of the GTFS standard, but it is logically very similar and contains the same information.  
 The NAP import procedure of GTFS-formatted transit data supports mandatory GTFS files of the GTFS specification and two optional files: **calendar_dates.txt** and **shapes.txt**.  
 For more information on GTFS files refer to [GTFS file requirements](https://developers.google.com/transit/gtfs/reference/#file-requirements)
 
-#### Key steps
-
 ![background import process](import-process.png)
 
-- Import process for transit service data runs every night during specified hours
-- Import run iteratively one service at a time
 
-0. Fetch interfaces which quality for import
-   - gtfs_imported timestamp older than one day ago
-0. Take and process **only first interface** record per scheduled iteration
+1. Fetch interfaces which quality for import
+   - `gtfs_imported timestamp` older than one day ago
+0. Receive list of interfaces. Resolve service which to update.
+   - **Importing done to only _one_ (first) service** per scheduled import task iteration.
 0. Fetch latest package for interface URL
-   - Package fetch is run for interfaces whose import timestamp in NAP db interface table is not within last **24 hours**.
+   - Package fetch is run for interfaces whose import timestamp in NAP db `external-interface-description` is not within last **24 hours**.
    - Check if interface URL can be connected to. 
    - If interface server indicates that data has changed, downloaded and proceed to process response.
 0. Analyze response
@@ -98,7 +97,7 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
    - Mark interface as erroneous if there were errors for fetch or import operations. 
 0. Convert if required
    - Kalkati.net formatted interfaces are converted into GTFS before storing and importing the data.  
-   Conversion is done using a kalkati->gtfs converter which parses Kalkati.net XML-files and outputs a GTFS zip.
+   Conversion is done using a `kalkati->gtfs` converter which parses Kalkati.net XML files and outputs a GTFS zip.
 0. Calculate package hash
 0. Store downloaded package to package archive repository
 0. Store parsed transit service data to NAP db.
@@ -111,34 +110,31 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
 
 ### Change Detection 
 
-#### Description
-
+User UI visualization of transit change detection results
 ![Change detection processs animation](detection-process-anim.gif)  
-_User UI visualization of transit change detection results_
-
-The hash compresses the traffic per one route during a one day. This includes all the related stop names and stop times used by the route trip stop sequences.
-After GTFS data has been imported into our database and hashes are computed, we can utilize the hashes in the detection algorithm.
-The detection algorithm tries to detect changes in traffic patterns in 60 days in future. The main point of this detection process is to provide transport authorities enough information,
-so they can decide when to order more traffic if so required. Transport authorities also use this change information for oversee that all changes are reported before 60 day time period as required by law.
-
 
 #### Scheduling
 
 ![background detection process](detection-process.png)
 
-0. Change detection task scheduled to run every night _after_ transit data import task scheduling window. 
+1. Change detection task is scheduled to run every night _after_ transit data import task scheduling window. 
    - `detect-new-changes-task`
    - Resolve detection start and end dates. By default start date is current date, 
    admin may choose to do a run using a custom date.
-0. Resolve services for which to run change detection
+1. Resolve services for which to run change detection
+   - `services-for-nightly-change-detection`
    - If there's a new package or if earliest change-date is in past 
-0. 
-0. Query for each selecte transport service a list of transit package records
+1. 
+1. Query a list of transit package records for each selected transport service
    - `service-package-ids-for-date-range` 
-0. 
-0. Analysis of transit changes
+1. 
+1. Detect changes
    - latest transit package record for each service
-   - detect-route-changes-for-service-new
+   - `detect-route-changes-for-service-new` parses route day hashes read from db and produces detection result vector per route.
+   - `update-transit-changes!` does further analysis for results and implements the last steps of the detection logic.
+1. Store results to db
+   - `update-transit-changes!` stores final results to db
+   `gtfs-change-result`, `detected-route-change` (For details refer to [Data model](#Data model))
 
 ##### References
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
@@ -195,6 +191,12 @@ so they can decide when to order more traffic if so required. Transport authorit
       Stop time differences are computed per compared trip pair. The departure time differences are computed for each 
       matching stop pair.
  
+
+#### Route hash calculation
+Route analysis is not done using raw data. Instead a hash checksum is calculated from raw data. 
+Reasoning is to simplify comparison of traffic of a route on weekly basis, as well as on daily basis.  
+Hash calculation for traffic for one route during one day compresses all the related stop names and stop times used by the route trip stop sequences.  
+
 
 
 ### Notifications on transit change detection results
