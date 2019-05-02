@@ -924,7 +924,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
-  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}
+  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "Uusi reitti"

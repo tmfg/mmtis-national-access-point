@@ -37,7 +37,7 @@
             [ote.views.transit-visualization :as transit-visualization]
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
-            [ote.views.monitor :as monitor]
+            [ote.views.admin.monitor :as monitor]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
