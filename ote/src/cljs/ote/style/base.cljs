@@ -33,6 +33,9 @@
 (def icon-large {:width 32 :height 32
                  :vertical-align "middle"})
 
+(def icon-with-text {:display "inline-flex"
+                     :align-items "center"})
+
 (def blue-link-with-icon {:color colors/primary
                           :text-decoration "none"
                           :border "none"
