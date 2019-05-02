@@ -1,4 +1,4 @@
-import { randomBusinessid,randomName } from '../support/util';
+import { randomName } from '../support/util';
 
 
 describe('Operator creation basic tests', function () {
@@ -69,7 +69,7 @@ describe('Operator creation basic tests', function () {
 
         // Try creating random business-id
         cy.get('#input-business-id').clear(); // Clear business-id
-        cy.get('#input-business-id').type(randomBusinessid());
+        cy.get('#input-business-id').type('9988776-9');
         cy.contains(testOp1.businessIdExistsWarning).should('not.exist');
 
         // Add name
@@ -94,6 +94,11 @@ describe('Operator creation basic tests', function () {
         cy.get('#edit-transport-operator-btn').click();
         cy.get('#btn-delete-transport-operator').click();
         cy.get('#confirm-operator-delete').click();
+
+        // Ensure that operator is correctly deleted and can't be found from own-services page
+        cy.get('#select-operator-at-own-services').click();
+        cy.contains(newOperatorName).should('not.exist');
+
     });
 
 
