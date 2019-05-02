@@ -196,7 +196,7 @@
   (->> (if beginning?
          weekhash
          (reverse weekhash))
-       (take-while nil?)
+       (take-while #(or (nil? %) (keyword? %)))
        count))
 
 (defn add-current-week-hash [to-key if-key state week]
@@ -657,7 +657,7 @@
                     :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
                   detection-result))
               routes)
-        res (into [] (expand-day-changes route-day-changes))]
+        res (vec (expand-day-changes route-day-changes))]
     res))
 
 (defn- date-in-the-past? [^LocalDate date]
@@ -687,9 +687,6 @@
     {:gtfs/change-type :no-change
      :gtfs/change-date nil}
     change))
-
-(spec/fdef transform-route-change
-           :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
 
 (defn- route-change-type [max-date-in-past? added? removed-date changed? no-traffic? starting-week-date different-week-date
                           no-traffic-start-date no-traffic-end-date route]
@@ -744,6 +741,8 @@
       :default
       {:gtfs/change-type :no-change})))
 
+(spec/fdef transform-route-change
+           :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
