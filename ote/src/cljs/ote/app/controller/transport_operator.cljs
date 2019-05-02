@@ -449,6 +449,8 @@
                                                                                     operator-with-services))
                                                                                 (:transport-operators-with-services app))
                                         :services-changed? true)
+                        ;; Select last operator as selected operator
+                        sending-done? (assoc :transport-operator data)
                         true (save-next-operator!))]
       ;; Stay on page as long as there's items to send - otherwise there will be app state inconsistency problems
       (when sending-done?

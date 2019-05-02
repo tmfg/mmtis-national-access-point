@@ -397,7 +397,8 @@
                        [:br]
                        [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
                        [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) {:default-open? true}]
-                       [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
+                       [buttons/save {:id "btn-delete-transport-operator"
+                                      :on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
                                       :disabled (if (and
                                                       (empty? (:transport-service-vector state))
                                                       (::t-operator/id data))

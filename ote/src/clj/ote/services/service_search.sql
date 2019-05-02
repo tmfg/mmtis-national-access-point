@@ -34,20 +34,9 @@ SELECT COUNT(id) FROM "transport-service" WHERE published IS NOT NULL;
 
 -- name: total-company-count
 -- single?: true
--- Count the total number of companies providing transport services
--- this includes companies reported in CSV files
-SELECT COUNT(*)
-  FROM (SELECT DISTINCT op."business-id"
-          FROM "transport-service" ts
-          JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-         WHERE ts.published IS NOT NULL
-           AND op."deleted?" = FALSE
-        UNION
-        SELECT DISTINCT (x.c)."business-id"
-          FROM (SELECT unnest(COALESCE(sc.companies, ts.companies)) c
-                  FROM "transport-service" ts
-                  LEFT JOIN service_company sc ON sc."transport-service-id" = ts.id
-                 WHERE ts.published IS NOT NULL) x) y;
+-- Count the total number of companies providing transport services or participating in providing
+SELECT COUNT(x."business-id")
+  FROM (SELECT DISTINCT a."business-id" FROM "all-companies" a) x;
 
 -- name: service-search-by-operator
 -- Finds operators by name and by business-id and services that have companies added as "operators.
@@ -63,7 +52,6 @@ SELECT c.name as "operator", c."business-id" as "business-id"
  WHERE (c.name ILIKE :name OR c."business-id" = :businessid)
    AND published IS NOT NULL;
 
-
 -- name: service-search-by-service-name
 -- Finds services by service name or operator name.
 SELECT ts.name as "service-name",
@@ -74,9 +62,8 @@ SELECT ts.name as "service-name",
        CONCAT(ts.name, ' - ', top.name) as "service-operator"
   FROM "transport-service" ts
   JOIN "transport-operator" top ON ts."transport-operator-id" = top.id
- WHERE ts.name ILIKE :name
-    OR top.name ILIKE :name;
-
+ WHERE (ts.name ILIKE :name OR top.name ILIKE :name)
+   AND ts.published IS NOT NULL;
 
 -- name: service-ids-by-business-id
 -- Find service id's using business-id
@@ -98,7 +85,6 @@ UNION
            "transport-operator" top
      WHERE top."business-id" in (:operators)
        AND a."operator-id" = top.id;
-
 
 -- name: service-ids-by-transport-type
 -- Find services using transport type
@@ -154,7 +140,6 @@ SELECT oa."transport-service-id" as id
       AND oa."primary?" = true
       AND oa."transport-service-id" = ts.id
       AND ts.published IS NOT NULL;
-
 
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one
