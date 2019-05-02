@@ -332,7 +332,7 @@
 (defn- operator-merge-section [e! {nap-orphans :ytj-orphan-nap-operators :as operator} ytj-company-names]
   [:div {:style style-base/wizard-container}
    [:div [:h3 (tr [:organization-page :heading-operator-edit])]]
-   [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-merge-company-names]) true]
+   [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-merge-company-names]) {:default-open? true}]
    (doall
      (for [n nap-orphans
            :let [nap-op (:transport-operator n)
@@ -396,7 +396,7 @@
                        [ui/divider]
                        [:br]
                        [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
-                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) true]
+                       [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) {:default-open? true}]
                        [buttons/save {:on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
                                       :disabled (if (and
                                                       (empty? (:transport-service-vector state))

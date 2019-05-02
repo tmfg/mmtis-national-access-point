@@ -166,7 +166,7 @@
     "Taulukossa on listattu säännöllisen aikataulun mukaisen liikenteen palveluissa havaittuja muutoksia "
      [:b "tulevan 30 viikon ajalta." ]
      "Voit tarkastella yksittäisen palvelun liikennöinnissä tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. Yksityiskohtaiset tiedot avautuvat erilliseen näkymään."]
-    false]
+    {:default-open? false}]
 
    [transit-change-filters e! transit-changes]])
 
