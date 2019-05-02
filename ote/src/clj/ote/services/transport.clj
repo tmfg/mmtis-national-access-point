@@ -7,6 +7,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
+            [ote.util.db :as util]
             [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
@@ -99,8 +100,8 @@
             (-> service
                 (update ::t-service/type keyword)
                 (update ::t-service/sub-type keyword)
-                (update ::t-service/interface-types #(mapv keyword (ote.util.db/PgArray->vec %)))
-                (update ::t-service/transport-type #(mapv keyword (ote.util.db/PgArray->vec %)))
+                (update ::t-service/interface-types #(mapv keyword (util/PgArray->vec %)))
+                (update ::t-service/transport-type #(mapv keyword (util/PgArray->vec %)))
                 add-error-data))
           modified-services)))
 
