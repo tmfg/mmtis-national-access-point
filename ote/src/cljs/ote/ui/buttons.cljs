@@ -57,16 +57,11 @@
                                                         :height 30
                                                         :margin-right \"0.5rem\"
                                                         :color colors/primary}})
-  And label-text as text"
-  [options icon-element label-text is-btn?]
-  (if is-btn?
-    [:button (merge options
-                    (stylefy/use-style style-base/blue-link-with-icon)
-                    (stylefy/use-style style-buttons/outline-button))
-     icon-element
-     [:span {:style {:padding-top "7px"}} label-text]]
-    [:a (merge options
-                    (stylefy/use-style style-base/blue-link-with-icon)
-                    (stylefy/use-style style-buttons/outline-button))
-     icon-element
-     [:span {:style {:padding-top "7px"}} label-text]]))
+  And label-text as text.
+  element-tag is :buttor or :a depending on do you want to move the user to different page or do magic right where she/he is."
+  [options icon-element label-text element-tag]
+  [element-tag (merge options
+                  (stylefy/use-style style-base/blue-link-with-icon)
+                  (stylefy/use-style style-buttons/outline-button))
+   icon-element
+   [:span {:style {:padding-top "7px"}} label-text]])

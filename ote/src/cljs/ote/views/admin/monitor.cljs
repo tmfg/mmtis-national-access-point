@@ -117,7 +117,7 @@
                                           :margin-right "0.5rem"
                                           :color colors/primary}}]
         "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
-        false]]
+        :a]]
       [:div
        [form-fields/field
         {:label "Kaavioiden aikayksikkö"
