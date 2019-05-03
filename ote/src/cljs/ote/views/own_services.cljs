@@ -38,7 +38,6 @@
             [ote.app.controller.front-page :as fp]
             [ote.style.dialog :as style-dialog]))
 
-
 (def ic-warning [ic/alert-warning {:style {:color colors/negative-button
                                            :margin-left "0.5rem"
                                            :margin-bottom "5px"}}])
@@ -93,23 +92,21 @@
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column
            [:a (merge {:href (str "/#/edit-service/" id)
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (fp/->ChangePage :edit-service {:id id})))}
+                       :on-click #(do (.preventDefault %)
+                                      (e! (fp/->ChangePage :edit-service {:id id})))}
                       (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "}
-           (let [errors (service-errors row)]
-             (if errors
-               [:span (stylefy/use-style style-base/icon-with-text)
-                (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])
-                [:button {:style {:border 0
-                                  :background "none"
-                                  :cursor "pointer"}
-                          :on-click #(swap! info-open? not)}
-                 [ic/alert-warning {:style {:color colors/negative-button
-                                            :margin-left "0.5rem"
-                                            :margin-bottom "5px"}}]]]
-               (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])))]
+           (if (service-errors row)
+             [:span (stylefy/use-style style-base/icon-with-text)
+              (tr [:field-labels :transport-service ::t-service/published?-values (some? published)])
+              [:button {:style {:border 0
+                                :background "none"
+                                :cursor "pointer"}
+                        :on-click #(swap! info-open? not)}
+               [ic/alert-warning {:style {:color colors/negative-button
+                                          :margin-left "0.5rem"
+                                          :margin-bottom "5px"}}]]]
+             (tr [:field-labels :transport-service ::t-service/published?-values (some? published)]))]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "}
@@ -146,8 +143,10 @@
         (for [error errors]
           ^{:key (:name error)}
           [:p {:style {:margin 0}}
-           [:strong [ic/alert-warning {:style {:color colors/negative-button
-                                               :margin-bottom "-5px"}}] (:name error)]
+           [:strong
+            [ic/alert-warning {:style {:color colors/negative-button
+                                       :margin-bottom "-5px"}}]
+            (:name error)]
            " • " (tr [:own-services-page :missing-schedule])]))
       [:h5 (tr [:own-services-page :guide-to-completion])]
       [:span
@@ -172,7 +171,7 @@
      {:icon ic-warning
       :atom info-open?}]))
 
-(defn transport-services-listing [e! state transport-operator-id services section-label]
+(defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
     (let [errors (filter
                    #(not (nil? %))
@@ -250,7 +249,7 @@
     (tr [:own-services-page :own-services-directions-short])
     [:p (tr [:own-services-page :own-services-info-long])]
     {:default-open? false}]
-   [:a (merge {:href (str "#/new-service/" (::t-operator/id (:transport-operator state)))
+   [:a (merge {:href (str "#/new-service/" (get-in state [:transport-operator ::t-operator/id]))
                :id "new-service-button"
                :on-click #(do
                             (.preventDefault %)
@@ -266,7 +265,6 @@
          ^{:key type}
          [transport-services-listing
           e!
-          state
           (get-in state [:transport-operator ::t-operator/id])
           services (tr [:titles type])])))])
 
@@ -303,7 +301,10 @@
       [ui-common/ckan-iframe-dialog name
        (str "/organization/member_new/" ckan-group-id)
        #(e! (fp/->ToggleAddMemberDialog))])]
-   (let [has-assoc-services? (not (and (empty? (::t-operator/own-associations operator)) (empty? (::t-operator/associated-services operator))))]
+   (let [has-assoc-services? (not
+                               (and
+                                 (empty? (::t-operator/own-associations operator))
+                                 (empty? (::t-operator/associated-services operator))))]
      (if (and (not has-assoc-services?) (not (and has-services? (not (empty? operator-services)))))
        [:div
         [:p
