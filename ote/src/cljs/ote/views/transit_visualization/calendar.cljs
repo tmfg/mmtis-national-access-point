@@ -116,16 +116,17 @@
           :read :different-week-date
           :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
-                    [:div
-                     [:span (stylefy/use-style {;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
-                                                :white-space "nowrap"})
-                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]) " ")]
-                     [:span (stylefy/use-style {:color "gray"
-                                                :overflow-wrap "break-word"})
-                      (str "("
-                           (day-of-week-number->text (t/day-of-week (time/js-date->goog-date different-week-date)))
-                           " "
-                           (time/format-timestamp->date-for-ui different-week-date) ")")]])}
+                    (let [ddate (or different-week-date (time/now))]
+                      [:div
+                       [:span (stylefy/use-style {;; nowrap for the "3 pv" part to prevent breaking "pv" alone to new row.
+                                                  :white-space "nowrap"})
+                        (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]) " ")]
+                       [:span (stylefy/use-style {:color "gray"
+                                                  :overflow-wrap "break-word"})
+                        (str "("
+                             (day-of-week-number->text (t/day-of-week (time/js-date->goog-date ddate)))
+                             " "
+                             (time/format-timestamp->date-for-ui ddate) ")")]]))}
          {:name "Muutos tunnistettu"
           :read :change-detected
           :col-style style-base/table-col-style-wrap
