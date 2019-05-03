@@ -1,11 +1,9 @@
 (ns ote.ui.info
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.localization :refer [tr tr-key]]
-            [cljs-react-material-ui.core :refer [color] :as mui]
+            [cljs-react-material-ui.core :refer [color]]
             [stylefy.core :as stylefy]
             [cljs-react-material-ui.icons :as ic]
-            [ote.style.base :as style-base]
-            [ote.ui.common :as common]
             [reagent.core :as r]
             [ote.style.info-style :as style-info]))
 
