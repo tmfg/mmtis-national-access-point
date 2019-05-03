@@ -160,6 +160,11 @@ END	AS "service-type",
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
 
+-- name: all-registered-companies
+SELECT DISTINCT ON (ac."business-id") "business-id",
+       ac."business-name" AS name
+  FROM "all-companies" ac;
+
 -- name: monthly-registered-companies
 -- returns a cumulative sum of companies, defined as distinct business-id's of "all-companies", created up until the row's month.
 SELECT to_char(ac.created, 'YYYY-MM') as month,
