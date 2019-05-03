@@ -133,7 +133,7 @@ describe('Add a new service', function () {
 
 });
 
-/*describe('Add new service provider', function () { // TODO: remake this when ckan is added
+/*describe('Add new service provider', function () { // TODO: remake this when ckan is removed
     before(function () {
         cy.login();
         cy.wrap(randomName('test-operator-')).as('operatorName')
@@ -181,7 +181,7 @@ describe('Add a new service', function () {
     });
 });*/
 
-/*describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () { TODO: remake this also when CKAN IS TOTALLY REMOVED
+/*describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () { TODO: remake this also when ckan is removed
 
     const testOperator = {
         businessid: '7654321-9',
