@@ -75,10 +75,10 @@
     (let [tr-types (set transport-type)]
       (cond
         (tr-types :road)
-        {:name name
+        {:service-name name
          :error :no-schedule-road}
         (tr-types :sea)
-        {:name name
+        {:service-name name
          :error :no-schedule-sea}))))
 
 (defn transport-services-table-rows [e! services transport-operator-id info-open?]
@@ -141,12 +141,12 @@
       [:h5 {:style {:margin-top 0}} (tr [:own-services-page :flaws])]
       (doall
         (for [error errors]
-          ^{:key (:name error)}
+          ^{:key (:service-name error)}
           [:p {:style {:margin 0}}
            [:strong
             [ic/alert-warning {:style {:color colors/negative-button
                                        :margin-bottom "-5px"}}]
-            (:name error)]
+            (:service-name error)]
            " • " (tr [:own-services-page :missing-schedule])]))
       [:h5 (tr [:own-services-page :guide-to-completion])]
       [:span
