@@ -51,3 +51,22 @@
              (stylefy/use-style style-buttons/svg-button)
              opts)
    label])
+
+(defn big-icon-button-with-label
+  "Give icon-element in format: (ic/action-description {:style {:width 30
+                                                        :height 30
+                                                        :margin-right \"0.5rem\"
+                                                        :color colors/primary}})
+  And label-text as text"
+  [options icon-element label-text is-btn?]
+  (if is-btn?
+    [:button (merge options
+                    (stylefy/use-style style-base/blue-link-with-icon)
+                    (stylefy/use-style style-buttons/outline-button))
+     icon-element
+     [:span {:style {:padding-top "7px"}} label-text]]
+    [:a (merge options
+                    (stylefy/use-style style-base/blue-link-with-icon)
+                    (stylefy/use-style style-buttons/outline-button))
+     icon-element
+     [:span {:style {:padding-top "7px"}} label-text]]))
