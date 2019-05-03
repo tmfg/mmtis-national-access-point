@@ -10,7 +10,6 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.warning_msg :as warning-msg]
             [ote.app.controller.front-page :as fp]
-            [ote.app.controller.login :as login]
             [ote.app.controller.transport-service :as ts]
             [ote.app.utils :as utils]
             [ote.app.controller.transport-operator :as to]
@@ -39,6 +38,10 @@
             [ote.app.controller.front-page :as fp]
             [ote.style.dialog :as style-dialog]))
 
+(def ic-warning [ic/alert-warning {:style {:color colors/negative-button
+                                           :margin-left "0.5rem"
+                                           :margin-bottom "5px"}}])
+
 
 (defn delete-service-action [e! {::t-service/keys [id name]
                                  :keys [show-delete-modal?]
@@ -66,22 +69,44 @@
                     (tr [:buttons :delete])])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
-(defn transport-services-table-rows [e! services transport-operator-id]
-  [ui/table-body (merge {:class "table-body"}
-                        {:display-row-checkbox false})
+(defn- service-errors
+  [{::t-service/keys [transport-type interface-types sub-type name] :as service}]
+  (when (and (= sub-type :schedule) (not ((set interface-types) :route-and-schedule)))
+    (let [tr-types (set transport-type)]
+      (cond
+        (tr-types :road)
+        {:service-name name
+         :error :no-schedule-road}
+        (tr-types :sea)
+        {:service-name name
+         :error :no-schedule-sea}))))
+
+(defn transport-services-table-rows [e! services transport-operator-id info-open?]
+  [ui/table-body {:class "table-body"
+                  :display-row-checkbox false}
    (doall
-     (map-indexed
-       (fn [i {::t-service/keys [id type published name]
-               ::modification/keys [created modified] :as row}]
-         ^{:key i}
+     (map
+       (fn [{::t-service/keys [id type sub-type interface-types published name]
+             ::modification/keys [created modified] :as row}]
+         ^{:key id}
          [ui/table-row {:selectable false :display-border false}
           [ui/table-row-column
            [:a (merge {:href (str "/#/edit-service/" id)
-                       :on-click #(do
-                                    (.preventDefault %)
-                                    (e! (fp/->ChangePage :edit-service {:id id})))}
+                       :on-click #(do (.preventDefault %)
+                                      (e! (fp/->ChangePage :edit-service {:id id})))}
                       (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
-          [ui/table-row-column {:class "hidden-xs "} (tr [:field-labels :transport-service ::t-service/published?-values (not (nil? published))])]
+          [ui/table-row-column {:class "hidden-xs "}
+           (if (service-errors row)
+             [:span (stylefy/use-style style-base/icon-with-text)
+              (tr [:field-labels :transport-service ::t-service/published?-values (some? published)])
+              [:button {:style {:border 0
+                                :background "none"
+                                :cursor "pointer"}
+                        :on-click #(swap! info-open? not)}
+               [ic/alert-warning {:style {:color colors/negative-button
+                                          :margin-left "0.5rem"
+                                          :margin-bottom "5px"}}]]]
+             (tr [:field-labels :transport-service ::t-service/published?-values (some? published)]))]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "}
@@ -103,23 +128,75 @@
            [delete-service-action e! row]]])
        services))])
 
+(defn- route-error
+  [errors info-open?]
+  (let [error-keys (reduce
+                     (fn [set error]
+                       (conj set (:error error)))
+                     #{}
+                     errors)]
+    [info/info-toggle
+     (tr [:own-services-page :missing-service-info])
+     [:div
+      [:h5 {:style {:margin-top 0}} (tr [:own-services-page :flaws])]
+      (doall
+        (for [error errors]
+          ^{:key (:service-name error)}
+          [:p {:style {:margin 0}}
+           [:strong
+            [ic/alert-warning {:style {:color colors/negative-button
+                                       :margin-bottom "-5px"}}]
+            (:service-name error)]
+           " • " (tr [:own-services-page :missing-schedule])]))
+      [:h5 (tr [:own-services-page :guide-to-completion])]
+      [:span
+       [:strong (tr [:own-services-page :add-schedule-to-service]) " "]
+       (tr [:own-services-page :add-schedule-to-service-2]) " ("
+       [ic/content-create {:style {:margin-bottom "-5px"}}]
+       ") " (tr [:own-services-page :add-schedule-to-service-3])
+       [:strong " " (tr [:service-viewer :published-interfaces])]]
+      [:h5 (tr [:own-services-page :schedule-creation])]
+      [:p {:style {:margin-top 0}}
+       (tr [:own-services-page :if-no-interfaces])]
+      (when (error-keys :no-schedule-road)
+        [:p {:style {:margin 0}}
+         [:strong (tr [:enums ::t-service/transport-type :road]) " • "]
+         [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
+          (tr [:own-services-page :open-rae])
+          {:target "_blank"}]])
+      (when (error-keys :no-schedule-sea)
+        [:p {:style {:margin 0}}
+         [:strong (tr [:enums ::t-service/transport-type :sea]) " • "]
+         [linkify "/#/routes" (tr [:own-services-page :open-sea-rae]) {:target "_blank"}]])]
+     {:icon ic-warning
+      :atom info-open?}]))
+
 (defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
-    [:div.row (stylefy/use-style style-base/section-margin)
-     [:div {:class "col-xs-12 col-md-12"}
-      [:h4 section-label]
-      [ui/table (stylefy/use-style style-base/front-page-service-table)
-       [ui/table-header {:adjust-for-checkbox false
-                         :display-select-all false}
-        [ui/table-row {:selectable false}
-         [ui/table-header-column {:class "table-header"} (tr [:front-page :table-header-service-name])]
-         [ui/table-header-column {:class "hidden-xs table-header "} (tr [:front-page :table-header-NAP-status])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-created])]
-         [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
-         [ui/table-header-column {:class "table-header "} (tr [:front-page :table-header-actions])]]]
+    (let [errors (filter
+                   #(not (nil? %))
+                   (map
+                     service-errors
+                     services))
+          info-open? (r/atom false)]
+      [:div.row (stylefy/use-style style-base/section-margin)
+       [:div {:class "col-xs-12 col-md-12"}
+        [:h4 section-label]
+        [ui/table (stylefy/use-style style-base/front-page-service-table)
+         [ui/table-header {:adjust-for-checkbox false
+                           :display-select-all false}
+          [ui/table-row {:selectable false}
+           [ui/table-header-column {:class "table-header"} (tr [:front-page :table-header-service-name])]
+           [ui/table-header-column {:class "hidden-xs table-header "} (tr [:front-page :table-header-NAP-status])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-created])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
+           [ui/table-header-column {:class "table-header "} (tr [:front-page :table-header-actions])]]]
 
-       (transport-services-table-rows e! services transport-operator-id)]]]))
+         (transport-services-table-rows e! services transport-operator-id info-open?)]
+        [:div {:style {:margin-top "2rem"}}
+         (when (not-empty errors)
+           (route-error errors info-open?))]]])))
 
 (defn warn-about-test-server []
   (let [page-url (-> (.-location js/window))]
@@ -138,7 +215,7 @@
         operators (:transport-operators-with-services state)]
     (when (and (not (empty? operators))
                (not (:new? operator)))
-      [:div.row {:style {:margin-bottom "3rem"
+      [:div.row {:style {:margin-bottom "2rem"
                          :margin-top "3rem"
                          :align-items "center"
                          :display "flex"
@@ -171,8 +248,8 @@
    [info/info-toggle
     (tr [:own-services-page :own-services-directions-short])
     [:p (tr [:own-services-page :own-services-info-long])]
-    false]
-   [:a (merge {:href (str "#/new-service/" (::t-operator/id (:transport-operator state)))
+    {:default-open? false}]
+   [:a (merge {:href (str "#/new-service/" (get-in state [:transport-operator ::t-operator/id]))
                :id "new-service-button"
                :on-click #(do
                             (.preventDefault %)
@@ -187,7 +264,8 @@
              :when (not (empty? services))]
          ^{:key type}
          [transport-services-listing
-          e! (get-in state [:transport-operator ::t-operator/id])
+          e!
+          (get-in state [:transport-operator ::t-operator/id])
           services (tr [:titles type])])))])
 
 
@@ -223,7 +301,10 @@
       [ui-common/ckan-iframe-dialog name
        (str "/organization/member_new/" ckan-group-id)
        #(e! (fp/->ToggleAddMemberDialog))])]
-   (let [has-assoc-services? (not (and (empty? (::t-operator/own-associations operator)) (empty? (::t-operator/associated-services operator))))]
+   (let [has-assoc-services? (not
+                               (and
+                                 (empty? (::t-operator/own-associations operator))
+                                 (empty? (::t-operator/associated-services operator))))]
      (if (and (not has-assoc-services?) (not (and has-services? (not (empty? operator-services)))))
        [:div
         [:p
@@ -257,9 +338,9 @@
           [:li {:key (:service-id as)
                 :id (str "service-id-" (:service-id as))}
            [:div {:style {:display "flex"
-                           :align-items "center"
-                           :justify-content "space-between"
-                           :padding "0.25rem 0"}}
+                          :align-items "center"
+                          :justify-content "space-between"
+                          :padding "0.25rem 0"}}
             (str (:service-name as) " - (" (:operator-name as) ", " (:operator-business-id as) ")")
             [buttons/icon-button
              (merge
@@ -322,7 +403,7 @@
      [info/info-toggle
       (tr [:common-texts :instructions])
       [:p (tr [:own-services-page :filling-info-content])]
-      false]
+      {:default-open? false}]
      [added-associations e! a-services oa-services state]
      [add-associated-services e! state]]))
 
