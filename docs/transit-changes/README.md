@@ -140,16 +140,24 @@ User UI visualization of transit change detection results
 ##### Important notes
 - Change detection is run periodically for the **latest imported** transit data packages.  
 - No history data is used from preceding imports or analyses. Latest package is analysed independently
-- Separate detection runs for the same service will detect same changes as the previous run, if the data is the same.  
-
+- Separate detection runs for the same service will detect same changes as the previous run, if the data is the same. 
+- Route traffic changes detected for current week when detection is run, will be reported on next week instead, except **added** and **ending** routes.
+- Thresholds
+  - Detection window: service's route data analyzed into future for: **120** days 
+  - Route end: route marked 'ending' if no traffic within next: **90** days
+  - Detection interval for service: detection for every service scheduled every: **14** days  
+  (Notice: this is different than detectino task scheduling)
+  - Change window: A change is recorded if duration if differences in traffic hash continue at minimum: **2 weeks**
+  - No-traffic threshold: A 'no-traffic' change for route is reported if duration is at mimimum: **16 days**
+  
 ##### Sequence
 
 ![transit-changes-detection-logic](transit-changes-detection-logic.png)
 
 - 1: **Query from db services.**   
 The detection algorithm processes one transport service per time.  
-On this run those services are selected for change detection, which have TODO
-  - Reference: `services-for-nightly-change-detection`
+On this run those services are selected for change detection, which qualify for a new run. 
+(Reference: `services-for-nightly-change-detection`)
 - 2a: **Query route hashes from db.**  
 Fetch all routes for selected services. A route record includes information about route start and end times as well as unique hashes.  
 Routes that have already ended are removed from further inspection.
@@ -162,7 +170,8 @@ Iterate weeks: compare 'current' week and a week in the future. Week is analyzed
 For efficiency, only simple day hash string comparison is done instead of detailed analysis of the daily routes and trips.  
 _Holiday days are skipped in analysis_ because they typically have different traffic, but such short changes are of no interest to user.  
 Return a map which specifies date of detected changed week, and date to which 'current' week it was compared to.
-If algorithm does not find a different week, it returns just that there is traffic for the route.
+If algorithm does not find a different week, it returns just that there is traffic for the route.  
+(Reference: `detection.clj`)  
 - 4: **Analyse days of each changed week**  
    Iterates the list of weeks with traffic changes, received from previous step.  
    First weekday is selected for comparison on both weeks, after analysis is done then second days pair is selected, until all weekdays have been compared as pairs (Mon-Mon, Tue-Tue etc).
@@ -212,3 +221,23 @@ Notifications about newly detected transit changes are sent via email to transit
 In order to have transit changes included to notification only on the first time when they are detected, 
 a unique hash value is calculated on each route change and stored to db`detected-change-history`. 
 Notification is composed using data from this table.
+
+### Holiday dates
+
+A static list of holiday dates is defined statically in `transit-changes/static-holidays`. 
+Operation to import a list of holiday date definitions may be triggered via the admin user on the admin UI. Results are stored into database `detection-holidays`. 
+Transit change detection will prefer the list retrieved from db and if list is not available, fall back to the static list. 
+
+## Notes for developers
+
+### How to run 
+
+- Test using unit tests
+- Test by running locally end-to-end:
+  - Create an operator and service
+  - Add an interface for service, enter a valid URL where a package may be downloaded
+  - On admin view trigger downloading of a new transit data package
+  - Run detection
+    - Run locally via REPL: `(detect-new-changes-task (:db ote.main/ote) true [ids])`
+    - Run run via browser admin view > start change detection
+  - Analyze results on transit-detection view and on db tables
