@@ -1,9 +1,9 @@
 @startuml
-title __Transit data import procedure__ sequence
+title __Transit data import__ sequence
 autonumber
 hide footbox
 
-participant "Import task" as IMP
+participant "NAP" as IMP
 database "NAP DB\n" as DB
 database "Package archive\n(AWS S3)" as S3
 box
@@ -25,7 +25,7 @@ return Interfaces to update
          IMP->S3: Store package archive
          IMP->DB: Store parsed transit service data
         else 304 Not Modified
-          IMP->DB: Update package check timestamp \n(gtfs-imported)
+          IMP->DB: Update package check timestamp
         end
     end
 end

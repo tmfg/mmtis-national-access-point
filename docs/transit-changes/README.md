@@ -10,42 +10,39 @@
 - https://developers.google.com/transit/gtfs/
 
 ### Release version
-Git version used as baseline for this documentation: [mmtis-national-access-point][0]
+Git version used as baseline for this documentation: [link][0]
 
 ## Description
 
 ### Need
 EU legislation requires a National Access Point (NAP) to be implemented by member states.
-In addition to mandatory features, Finnish NAP implements additional custom features. 
+In addition to mandatory features, Finnish NAP implements additional custom features.  
 Transit Change detection is a custom feature, which allows ELY centers 
 (Centre for Economic Development, Transport and the Environment in Finland) 
-to examine transit data of transit services. Transit data of a transit service is declared by its transit operator. 
-Transit Change detection allows ELY officials to analyze whether any ELY actions will be required in order to react to 
+to examine transit data of transit services. Transit data of a transit service is declared by its operator. 
+Transit change detection allows ELY officials to analyze whether any ELY actions will be required in order to react to 
 some of the changes in transit service traffic.
 
 ### Requirements
 According to [Finnish national legislation on transport][1], 
-a transport operator must declare changes to transit service routes 60 days in advance to the transit authorities.
-The legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
+a transport operator must declare changes to transit service routes 60 days in advance to the transit authorities.  
+Legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
 
-NAP implements this so, that 
-* Transit data is automatically imported from service's machine-readable interfaces (refer to [Transit data import](#Transit data import)) 
-* An automated analysis procedure is run on the imported data
+NAP implements in a following way 
+* Transit data for a service is automatically imported by periodically reading machine-readable interfaces of each service. 
+* An automated analysis procedure is run periodically on the imported data
 * National Transit authorities (certain users) are notified on the analysis result. 
 * If a machine readable interface is not available for a transit service, then transit changes must be declared using a manual online form, which is available via NAP web application. 
-Manually declared transit data is not used by the automated analysis procedure. It is visualized separately for transit authorities by NAP application online view.
+Manually declared transit data is visualized separately for transit authorities by NAP application online view. It is not involved in automated Transit change detection feature.
 
-
-## Data model
+## Datamodel
 
 ![er-transit-changes](er-transit-changes.png)
 
-### Important tables related to transit change detection
 - `detected-change-history` : stores first occurrence when a change is detected using a calculated hash value
-- `detected-route-change` : records link to a gtfs-transit-changes record. Each record represents one detected change for one route for one service.
-- `external-interface-description` : URLs where to import data from and related attributes like a last import timestamp
-- `gtfs-transit-changes`: one record represents the result of one transit detection run for one service 
-
+- `detected-route-change` : each record represents one detected change for one route for one service. Includes a link to a `gtfs-transit-changes` record.
+- `external-interface-description` : each record represents an external interface for a transit service. Includes URLs where to import data and related attributes like timestamp of last import.
+- `gtfs-transit-changes`: each record represents the result of one transit detection run for one service 
 
 ## Functionality
 
@@ -62,11 +59,11 @@ Important attributes for an interface are the **URL** and **format** of provided
 
 (Reasoning for feature: chapter [Requirements](#Requirements))
 
-To enable automated transit change analysis, NAP reads existing transit route and schedule information from the 
-machine-readable interfaces of transit service.  
-Imported data is stored to NAP internal database. Analysis of imported transit happens at a later stage.  
-Import process for transit service data runs every night during specified hours.  
-Import runs iteratively one service at a time.
+NAP service reads existing transit route and schedule information from the 
+machine-readable interfaces of transit service. Import is an enabler for automated transit change analysis at a later stage.  
+Imported data is stored to NAP internal database.  
+Import runs every night during specified hours.  
+Import runs iteratively one service at a time during the scheduling window (reference: `GtfsTasks`).
 
 Formats supported for machine-readable transit data interfaces are 
 [GTFS][2] and [Kalkati.net](http://developer.matka.fi/pages/en/kalkati.net-xml-database-dump.php).  
@@ -80,7 +77,7 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
 ![background import process](import-process.png)
 
 
-1. Fetch interfaces which quality for import
+1. Fetch interfaces which qualify for new data import run
    - `gtfs_imported timestamp` older than one day ago
 0. Receive list of interfaces. Resolve service which to update.
    - **Importing done to only _one_ (first) service** per scheduled import task iteration.
@@ -93,7 +90,7 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
    - Verify package contains all files required for the interface format. 
    - Verify downloaded file is a ZIP archive file 
 0. Update package metadata into NAP db interface table.  
-   - Store relevant package metadata, such as **ETAG** and **timestamp** .
+   - Store relevant package metadata, such as **ETAG** and **timestamp**.
    - Mark interface as erroneous if there were errors for fetch or import operations. 
 0. Convert if required
    - Kalkati.net formatted interfaces are converted into GTFS before storing and importing the data.  
@@ -106,7 +103,7 @@ For more information on GTFS files refer to [GTFS file requirements](https://dev
 
 ##### References
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
-   - [Transit changes related db tables](#Data model)
+   - [Transit changes db tables](#Datamodel)
 
 ### Change Detection 
 
@@ -117,89 +114,101 @@ User UI visualization of transit change detection results
 
 ![background detection process](detection-process.png)
 
-1. Change detection task is scheduled to run every night _after_ transit data import task scheduling window. 
+- **1:** Change detection task is scheduled to run every night _after_ transit data import task scheduling window. 
    - `detect-new-changes-task`
    - Resolve detection start and end dates. By default start date is current date, 
-   admin may choose to do a run using a custom date.
-1. Resolve services for which to run change detection
+   admin may choose to do a run using a custom date.  
+- **2**: Resolve services for which to run change detection
    - `services-for-nightly-change-detection`
-   - If there's a new package or if earliest change-date is in past 
-1. 
-1. Query a list of transit package records for each selected transport service
+   - If there's a new package or if earliest change-date is in past  
+- **4:** Query a list of transit package records for each selected transport service
    - `service-package-ids-for-date-range` 
-1. 
-1. Detect changes
+- **6**: Detect changes
    - latest transit package record for each service
    - `detect-route-changes-for-service-new` parses route day hashes read from db and produces detection result vector per route.
    - `update-transit-changes!` does further analysis for results and implements the last steps of the detection logic.
-1. Store results to db
+- **7:**  Store results to db
    - `update-transit-changes!` stores final results to db
-   `gtfs-change-result`, `detected-route-change` (For details refer to [Data model](#Data model))
+   `gtfs-change-result`, `detected-route-change` (For details refer to [Datamodel](#Datamodel))
 
 ##### References
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
-   - [Transit changes related db tables](#Data model)
+   - [Transit changes related db tables](#Datamodel)
    
 #### Detection algorithm
 
-![Detection algorithm flow diagram](change-detection-flow.png)
+##### Important notes
+- Change detection is run periodically for the **latest imported** transit data packages.  
+- No history data is used from preceding imports or analyses. Latest package is analysed independently
+- Separate detection runs for the same service will detect same changes as the previous run, if the data is the same.  
 
-1. **Fetch route data**  
-   The detection algorithm processes one transport service per time. It fetches all the routes per service including 
-   information about route start and end times and the generated route hashes.
-    1. From this data all the routes that are already ended are removed from further inspection.
-    
-1. **Find the first different week in traffic**  
-   Next, the algorithm compares current week and the first week with different traffic somewhere in future.
-   In order to find the first different week, daily traffic of each week is compared and the process tries to find a week
-   from future that has different daily traffic. The daily route hashes are utilized in this process as they provide 
-   an unique signature of the traffic during a specific day.
-    1. Note: Detection skips temporary different weeks in this process, caused by christmas holidays and such, to prevent
-       false positives in detection results.
-   
-   **No different weeks found**  
-   If the algorithm does not find a different week, it can determine if the route is starting or ending using the start
-   and end times information related to the route. If the currently inspected route has a start date in future the
-   algorithm marks it as a new route. If the route has an ending date within 90 days, it is marked as an ending route.
-   Otherwise the algorithm assumes that there is no changes in the route.
-   
-   **A differing week was found**  
-   If there is a different week in future, the alorighm starts comparing specific dates of the week in more depth per 
-   route.
+##### Sequence
 
-1. **Compare differing dates**  
-   After the process has found a week in future that has different traffic than current week, the first day is picked 
-   from the different week that starts the new traffic pattern. Then, the process picks the matching week day from
-   current week and compares the traffic of these two days in depth.
-   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences per route.
-    
-    1. **Trip differences**  
-       ![Trip differences example](trip-differences.png)
-      
-       The algorithm fetches trips of route for the current day and the different week day. The trip comparison works in the
-       following way. First, it tries to find the first common stop that is in every trip. Then the trips of the compared days
-       are combined using the common stop as a basis. This helps lining up the trip stop times next to each other so they
-       can be easily compared. In the merging process, time differences of the trip stop time pairs are computed.
-       Any compared trip stop time that is not within 30 minute time window causes the algorithm to mark the
-       trip either added or removed.
-      
-    1. **Stop sequence differences**  
-      Stop sequence differences are computed per compared trip pair. The algorithm detects stops that are added or
-      removed from a trip by comparing the stop sequences of the trips.
-      
-    1. **Stop time differences**  
-      Stop time differences are computed per compared trip pair. The departure time differences are computed for each 
-      matching stop pair.
- 
+![transit-changes-detection-logic](transit-changes-detection-logic.png)
 
-#### Route hash calculation
-Route analysis is not done using raw data. Instead a hash checksum is calculated from raw data. 
-Reasoning is to simplify comparison of traffic of a route on weekly basis, as well as on daily basis.  
-Hash calculation for traffic for one route during one day compresses all the related stop names and stop times used by the route trip stop sequences.  
+- 1: **Query from db services.**   
+The detection algorithm processes one transport service per time.  
+On this run those services are selected for change detection, which have TODO
+  - Reference: `services-for-nightly-change-detection`
+- 2a: **Query route hashes from db.**  
+Fetch all routes for selected services. A route record includes information about route start and end times as well as unique hashes.  
+Routes that have already ended are removed from further inspection.
+- 2b: **Override holidays in route hashes**  
+Holidays are earmarked by replacing day traffic hash using a keyword value. 
+Replacing allows later steps to handle holidays.  
+Holiday dates are configured to NAP application itself.
+- 3b: **Find next changed week.**  
+Iterate weeks: compare 'current' week and a week in the future. Week is analyzed by comparing _day hashes_ of the same weekdays of the two separate weeks.  
+For efficiency, only simple day hash string comparison is done instead of detailed analysis of the daily routes and trips.  
+_Holiday days are skipped in analysis_ because they typically have different traffic, but such short changes are of no interest to user.  
+Return a map which specifies date of detected changed week, and date to which 'current' week it was compared to.
+If algorithm does not find a different week, it returns just that there is traffic for the route.
+- 4: **Analyse days of each changed week**  
+   Iterates the list of weeks with traffic changes, received from previous step.  
+   First weekday is selected for comparison on both weeks, after analysis is done then second days pair is selected, until all weekdays have been compared as pairs (Mon-Mon, Tue-Tue etc).
+   - 4b: **Query from db detailed trip data** for the selected weekday of analysis week and of baseline week.
+   - 4c: **Compare trips of a day**  
+   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences per route.  
+       - **Trip differences**  
+          ![Trip differences example](trip-differences.png)
+          
+          Trip comparison finds the first common stop that is in every trip. Then the trips of the compared days
+          are combined using the common stop as a basis.  
+          This helps aligning the trip stop times next to each other so they can be easily compared. In the merging process, time differences of the trip stop time pairs are computed.  
+          Any compared trip stop time that is not within 30 minute time window causes the algorithm to mark the
+          trip either added or removed.  
+          (Reference: `route-day-changes-new` iterates changed weeks and adds day change comparison)
+       - **Stop sequence differences**  
+         Stop sequence differences are computed per compared trip pair. The algorithm detects stops that are added or
+         removed from a trip by comparing the stop sequences of the trips.
+       - **Stop time differences**  
+         Stop time differences are computed per compared trip pair. The departure time differences are computed for each 
+         matching stop pair
 
+- 5: **Post-process**
+  - Due to legacy reasons there is an additional post-processing stage.  
+  - Last and final part of logic for resolving transit service change type and route change types.
+  - Resolve next change detection analysis date for service
+  - Resolve summary statistics fro service's changes (sums of different trip changes)
+  - Convert data structures to match the relational data model of database. 
+  - Reference: `update-transit-changes!`, `transform-route-change`
+- 6: **Store to db**
+  - Reference:   
+  `update-transit-changes!`  
+  Updated db tables `transit-changes`, `detected-route-change`, `detected-change-history`
 
+## Additional information
+
+### Route day hash calculation
+Route analysis is not done using raw data. 
+Instead a hash checksum is calculated from raw data. 
+A hash string provides a unique signature of the traffic during a specific day. Hash comparison is efficient in first-level analysis where only days and weeks with different traffic are detected.  
+Hash calculation for traffic of one route during one day compresses all the related stop names and stop times used by the route trip stop sequences.  
+Stop coordinates are also included, but for them accuracy is reduced by using only *three* first decimals of lat and lon coordinates (reference: `calculate-fuzzy-location-for-stops!`).
 
 ### Notifications on transit change detection results
 
-Notifications about newly detected transit changes are sent via email to transit authorities each day.
-
+Notifications about newly detected transit changes are sent via email to transit authorities each day.  
+In order to have transit changes included to notification only on the first time when they are detected, 
+a unique hash value is calculated on each route change and stored to db`detected-change-history`. 
+Notification is composed using data from this table.
