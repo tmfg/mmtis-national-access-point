@@ -146,8 +146,8 @@ User UI visualization of transit change detection results
   - Detection window: service's route data analyzed into future for: **120** days 
   - Route end: route marked 'ending' if no traffic within next: **90** days
   - Detection interval for service: detection for every service scheduled every: **14** days  
-  (Notice: this is different than detectino task scheduling)
-  - Change window: A change is recorded if duration if differences in traffic hash continue at minimum: **2 weeks**
+  (Notice: this is different than detecting task scheduling)
+  - Change window: A change is recorded if duration of differences in traffic hash continue at minimum: **2 weeks**
   - No-traffic threshold: A 'no-traffic' change for route is reported if duration is at mimimum: **16 days**
   
 ##### Sequence
