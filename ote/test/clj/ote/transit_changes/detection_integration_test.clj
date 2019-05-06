@@ -20,12 +20,12 @@
     (.toByteArray out)))
 
 
-(defn rewrite-calendar [calendar-data orig-date]
+(defn rewrite-calendar [calendar-data orig-date filter-fn]
   ;; find out how far past orig-date is in history, and shift all calendar-data
   ;; dates forward by that amount.
   (let [day-diff (ote.time/day-difference (ote.time/native->date-time orig-date) (clj-time.core/now))
         
-        ;; _ (println "diff" day-diff)
+        _ (println "rewrite-calendar: applying day difference:" (ote.time/native->date-time orig-date) (clj-time.core/now) "->" day-diff "- orig date was" orig-date)
         
         date-fwd-fn (fn [java-local-date]                     
                       (let [joda-orig-datetime (ote.time/java-localdate->joda-date-time
@@ -36,33 +36,55 @@
                             dow-diff (- orig-dow future-dow)
                             ;; _ (println "dow diff" orig-dow future-dow "->" dow-diff)
                             dow-corrected (ote.time/days-from joda-future-datetime dow-diff)
-                            ;;_ (println "fd/cfd" joda-future-datetime dow-corrected)
+                            ;; _ (println "fd/cfd" joda-future-datetime dow-corrected)
                             str-future-datetime (ote.time/format-date-iso-8601 dow-corrected)
                             java-future-datetime (java.time.LocalDate/parse str-future-datetime)]
                         
-                        #_(println "weekday adjusted:" (ote.time/day-of-week joda-future-datetime))
-                        java-future-datetime))]
+                        ;; (println "weekday adjusted:" (ote.time/day-of-week joda-future-datetime))
+                        java-future-datetime))
+        calendar-data (if filter-fn
+                        (filterv filter-fn
+                                calendar-data)
+                        calendar-data)
+        rewritten-calendar-data (mapv #(update % :gtfs/date date-fwd-fn) calendar-data)]
        
-    (def *cd calendar-data)
-    (mapv #(update % :gtfs/date date-fwd-fn) calendar-data)))
+    (def *cd rewritten-calendar-data)
+    rewritten-calendar-data))
 
 
 ;; [removed - comment with construction notes on this test, check git history if interested]
 
-#_(deftest rewrite-calendar-testutil-works
-  (is (= [#:gtfs{:service-id "1",
-                 :date (java.time.LocalDate/now),
-                 :exception-type 1}]
-         (rewrite-calendar [#:gtfs{:service-id "1",
-                                   :date (java.time.LocalDate/parse "2013-01-01"),
-                                   :exception-type 1}] #inst "2013-01-01") ))
+(deftest rewrite-calendar-testutil-works
+  (let [same-localdate-weekday? (fn [ld1 ld2]
+                                 (= (.getValue (.getDayOfWeek ld1))
+                                    (.getValue (.getDayOfWeek ld2))))
+        localdate-days-between (fn [ld1 ld2]
+                                 (print ld1 ld2)
+                                 (.getDays  (java.time.Period/between ld1 ld2)))
+        now-localdate (java.time.LocalDate/now)
+        input-localdate (java.time.LocalDate/parse "2018-02-04")
+        reinterpret-inst-date (clojure.instant/read-instant-date "2018-02-07T12:00:00")
+        rewritten-date (->
+                        (rewrite-calendar [#:gtfs{:service-id "1",
+                                                  :date input-localdate,
+                                                  :exception-type 1}] reinterpret-inst-date nil)
+                        first
+                        :gtfs/date)]
+    (println "rewritten date" input-localdate "->" rewritten-date)
+    (is (some? rewritten-date))
 
-  (is (= [#:gtfs{:service-id "1",
-                 :date (.plusDays (java.time.LocalDate/now) 5),
-                 :exception-type 1}]
-         (rewrite-calendar [#:gtfs{:service-id "1",
-                                   :date (java.time.LocalDate/parse "2013-01-06"),
-                                   :exception-type 1}] #inst "2013-01-01") )))
+    ;; weekday should stay same
+    
+    (is (same-localdate-weekday? input-localdate rewritten-date))
+
+    (is (= 1 (localdate-days-between input-localdate rewritten-date)))
+
+    #_(is (= [#:gtfs{:service-id "1",
+                   :date (.plusDays (java.time.LocalDate/now) 5),
+                   :exception-type 1}]
+           (rewrite-calendar [#:gtfs{:service-id "1",
+                                     :date (java.time.LocalDate/parse "2013-01-06"),
+                                     :exception-type 1}] #inst "2013-01-01") ))))
 
 
 (use-fixtures :each
@@ -124,22 +146,29 @@
         ;; db (:db ote.main/ote)
         gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
         gtfs-zip-bytes (slurp-bytes gtfs-zip-path)
-        orig-date #inst "2019-02-02T00:00:00"
+        orig-date #inst "2019-02-10T00:00:00"
         my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
                           ;; (println "hello from intercept fn, type" file-type)
                           (if (= file-type :gtfs/calendar-dates-txt)
-                            (rewrite-calendar file-data orig-date)
+                            (rewrite-calendar file-data orig-date (fn calendar-filter-fn [row]
+                                                                    (contains? #{"11" "22"} (:gtfs/service-id row))))
                             file-data)
                           file-data)
         store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
-                                        my-intercept-fn)
-        route-query-params {:service-id test-service-id :start-date (joda-datetime->inst (time/days-from (time/now) -120)) :end-date (joda-datetime->inst (time/days-from (time/now) 1))}
+                                        my-intercept-fn
+                                        )
+        route-query-params {:service-id test-service-id
+                            :start-date (joda-datetime->inst (time/days-from (time/now) -120))
+                            :end-date (joda-datetime->inst (time/days-from (time/now) 30))
+                            :ignore-holidays? true}
         detection-result (detection/detect-route-changes-for-service-new db route-query-params)
         changes (->> detection-result
                     :route-changes
                     (filter :changes))
         changed-route-names (map :route-key changes)
-        lohja-changes ( (filterv #(and (= "-Lohja - Nummela - Vihti-" (:route-key %)) (:changes %)) (:route-changes *nd)))]
+        lohja-change (first
+                      (filterv #(and (= "-Lohja - Nummela - Vihti-" (:route-key %)) (:changes %))
+                               (:route-changes detection-result)))]
     (println "found" changes "in the following routes:" changed-route-names)
     (def *nd detection-result)
     (println (:start-date route-query-params))
@@ -147,6 +176,6 @@
       (is (not= nil (first detection-result))))
     (println "lohja-change date is" (-> lohja-change :changes :different-week-date java-localdate->inst))
     (testing "got right date for lohja - nummela - vihti change"
-      ;; wip: with rewrite-calendar call enabled, this should return a date somewhere 90+ days in the past
-      ;; (difference between current time and 2019-02) but for some reason we still get 2019-02-25
+      ;; wip: with rewrite-calendar call enabled we should get a date near the current time
+      
       (is (= #inst "2019-02-04" (-> lohja-change :changes :different-week-date java-localdate->inst))))))
