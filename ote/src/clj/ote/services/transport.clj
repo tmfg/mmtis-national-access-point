@@ -7,6 +7,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
+            [ote.util.db :as util]
             [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
@@ -72,11 +73,22 @@
   {:id ::t-service/id
     :transport-operator-id ::t-service/transport-operator-id
     :name ::t-service/name
+    :transport-type ::t-service/transport-type
+    :interface-types ::t-service/interface-types
     :type ::t-service/type
     :sub-type ::t-service/sub-type
     :published ::t-service/published
     :created ::modification/created
     :modified ::modification/modified})
+
+(defn add-error-data
+  [service]
+  (let [sub-type (::t-service/sub-type service)
+        interface-types (::t-service/interface-types service)]
+    (assoc service :has-errors?
+      (and
+        (= sub-type :schedule)
+        (not ((set interface-types) :route-and-schedule))))))
 
 (defn get-transport-services
   "Return Vector of transport-services"
@@ -85,7 +97,14 @@
         ;; Add namespace for non namespaced keywords because sql query returns values without namespace
         modified-services (mapv (fn [x] (set/rename-keys x transport-services-column-keys)) services)]
     ;; For some reason type must be a keyword and query returns it as a string so make it keyword.
-    (mapv #(update % ::t-service/type keyword) modified-services)))
+    (mapv (fn [service]
+            (-> service
+                (update ::t-service/type keyword)
+                (update ::t-service/sub-type keyword)
+                (update ::t-service/interface-types #(mapv keyword (util/PgArray->vec %)))
+                (update ::t-service/transport-type #(mapv keyword (util/PgArray->vec %)))
+                add-error-data))
+          modified-services)))
 
 (defn all-data-transport-service
   "Get single transport service by id"

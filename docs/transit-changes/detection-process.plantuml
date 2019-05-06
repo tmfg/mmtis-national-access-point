@@ -1,18 +1,26 @@
 @startuml
+title __Transit change detection__ sequence
+autonumber
+hide footbox
 
-participant "Detection process" as DEP
-participant "NAP DB" as DB
+participant "NAP" as NAP
+database "NAP DB" as DB
 
+NAP->NAP: Scheduled detection task
+activate NAP
+  NAP->DB: Query services
+  activate DB
+  return
 
-group Background detection process
-DEP->DB: Fetch services for detection
-DB->DEP: Services
-loop For each service
-DEP->DB: Detect next changes for service
-end
-end
-
-
-
+  loop For each service
+    NAP->DB: Query package ids
+    activate DB
+    return
+    NAP->NAP: Detect changes
+    activate NAP
+    NAP->DB: Store result
+    activate DB
+    return
+  end
 
 @enduml

@@ -267,13 +267,7 @@
                        :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
                        :required? false}]
        :delete? true
-       :add-label (tr [:buttons :add-external-interface])}
-
-      {:name ::t-service/notice-external-interfaces?
-       :type :checkbox
-       :required? true
-       :style style-form/padding-top
-       :validate [[:checked?]]})))
+       :add-label (tr [:buttons :add-external-interface])})))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
