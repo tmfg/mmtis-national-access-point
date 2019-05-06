@@ -71,19 +71,19 @@
     (let [translate-typekw (fn [type]
                               (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
            companies-by-month-data {:labels (mapv :month (:monthly-companies monitor-data))
-                                    :datasets [{:label "Palveluita tuottavien lukumäärä"
+                                    :datasets [{:label "Palveluntuottajat"
                                                 :data (mapv :sum-providing (:monthly-companies monitor-data))
-                                                :backgroundColor  colors/monitor-taxi-color}
-                                               {:label "Tuottamiseen osallistuvien lukumäärä"
+                                                :backgroundColor "rgb(0,136,160)"}
+                                               {:label "Palveluiden tuottamiseen osallistuvat yritykset"
                                                 :data (mapv :sum-participating (:monthly-companies monitor-data))
-                                                :backgroundColor  "rgb(51,187,201)"}]}
+                                                :backgroundColor "rgb(102,204,214)"}]}
            companies-by-tertile-data {:labels (mapv :tertile (:tertile-companies monitor-data))
-                                      :datasets [{:label "Palveluita tuottavien lukumäärä"
-                                                  :data (mapv :sum-providing (:monthly-companies monitor-data))
-                                                  :backgroundColor  colors/monitor-taxi-color}
-                                                 {:label "Tuottamiseen osallistuvien lukumäärä"
-                                                  :data (mapv :sum-participating (:monthly-companies monitor-data))
-                                                  :backgroundColor  "rgb(51,187,201)"}]}
+                                      :datasets [{:label "Palveluntuottajat"
+                                                  :data (mapv :sum-providing (:tertile-companies monitor-data))
+                                                  :backgroundColor "rgb(0,136,160)"}
+                                                 {:label "Palveluiden tuottamiseen osallistuvat yritykset"
+                                                  :data (mapv :sum-participating (:tertile-companies monitor-data))
+                                                  :backgroundColor "rgb(102,204,214)"}]}
            provider-share-by-type-data {:labels (mapv translate-typekw
                                                       (mapv :sub-type (:companies-by-service-type monitor-data)))
                                         :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
