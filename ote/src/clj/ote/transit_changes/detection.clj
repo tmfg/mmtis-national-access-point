@@ -243,7 +243,7 @@
       :default
       (dissoc state :no-traffic-start-date :no-traffic-run))))
 
-(defn add-no-traffic-run-dates-new
+(defn add-no-traffic-run-dates
   "
   state: map where analysis results per route and week are concatenated iteratively
   week: the week being analysed during this call,
@@ -275,9 +275,8 @@
     :default
     state))
 
-(defn- route-next-different-week-new
+(defn- route-next-different-week
   [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr last-analysis-wk]
-  ;; (println "route-next-different-week called with curr= " curr)
   (if (or diff no-traffic-end-date)
     ;; change already found, don't try again
     state
@@ -289,15 +288,12 @@
                      (assoc :route-key route)
                      ;; Detect no-traffic run
                      (detect-no-traffic-run route-week-hashes)
-                     (add-no-traffic-run-dates-new curr last-analysis-wk)
+                     (add-no-traffic-run-dates curr last-analysis-wk)
 
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week curr)
                      (add-different-week curr))]
-      #_(if-let [dw (:different-week result)]
-          (println "route-next-different-week found something:" dw)
-          (println "no changes found from:" (:beginning-of-week (first weeks))))
       result)))
 
 (spec/def
@@ -388,7 +384,7 @@
                        ;; value under route key in r-d-s map will be updated by
                        ;; (route-next-different-week *value* route weeks curr)
                        (update route-detection-state route
-                               route-next-different-week-new route weeks curr (first (take-last 3 route-weeks))))
+                               route-next-different-week route weeks curr (first (take-last 3 route-weeks))))
                      route-detection-state
                      route-names))
                  {}                                         ; initial route detection state is empty
