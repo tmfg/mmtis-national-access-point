@@ -152,8 +152,7 @@
                           (if (= file-type :gtfs/calendar-dates-txt)
                             (rewrite-calendar file-data orig-date (fn calendar-filter-fn [row]
                                                                     (contains? #{"11" "22"} (:gtfs/service-id row))))
-                            file-data)
-                          file-data)
+                            file-data))
         store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
                                         my-intercept-fn
                                         )
