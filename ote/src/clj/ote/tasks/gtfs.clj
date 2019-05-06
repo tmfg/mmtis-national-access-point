@@ -64,7 +64,7 @@
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
 ;; To speed up detection, call this with vector of service-ids:
-;; e.g.: (detect-new-changes-task db (time/now) true [1289])
+;; e.g.: `(detect-new-changes-task (:db ote.main/ote) (read-string (slurp "config.edn")) (time/now) true [ids])`
 (defn detect-new-changes-task
   ([db config detection-date force?]
    (detect-new-changes-task db config detection-date force? nil))
