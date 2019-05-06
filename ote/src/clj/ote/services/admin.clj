@@ -282,6 +282,10 @@
 
 (defn monitor-csv-report [db report-type]
   (case report-type
+    "all-companies"
+    (csv-data ["yritys" "y-tunnus"]
+              (map (juxt :name :business-id) (all-registered-companies db)))
+
     "monthly-companies"
     (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
               (map (juxt :month :sum) (monthly-registered-companies db)))

@@ -1,11 +1,17 @@
 (ns ote.views.admin.monitor
   (:require [reagent.core :as r]
             [ote.ui.common :as ui-common]
+            [ote.ui.buttons :as btn]
             [ote.localization :refer [tr tr-key]]
             [ote.app.controller.monitor :as monitor-controller]
             [cljsjs.chartjs]
             [ote.ui.form-fields :as form-fields]
-            [ote.theme.colors :as colors]))
+            [ote.theme.colors :as colors]
+            [stylefy.core :as stylefy]
+            [ote.style.buttons :as style-buttons]
+            [ote.style.base :as style-base]
+            [cljs-react-material-ui.icons :as ic]
+            [ote.time :as time]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
@@ -101,14 +107,25 @@
       [:strong " liikkumispalveluiden tuottajia"] ", sekä yrityksiä, jotka vain " [:strong "osallistuvat palveluiden tuottamiseen. "]
       "Palvelun tuottamiseen osallistuva yritys on esimerkiksi yksityinen elinkeinon harjoittaja, joka ajaa ainoastaan taksivälityskeskusken kyytejä."]
 
-     [:div {:style {:display "flex" :justify-content "flex-start" :flex-wrap "wrap"}}
-      [form-fields/field
-       {:label "Kaavioiden aikayksikkö"
-        :type :selection
-        :update! #(e! (monitor-controller/->ChangeReportType %))
-        :show-option (tr-key [:admin-page :report-types])
-        :options [:tertile :month]}
-       (get-in app [:admin :monitor :report-type])]]
+     [:div {:style {:padding-top "2rem"}}
+      [:div
+       [btn/big-icon-button-with-label
+        {:id "btn-all-companies-csv"
+         :on-click #(e! (monitor-controller/->DownloadCsv "/admin/reports/monitor/csv/all-companies" (str "yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")))
+         :style {:padding "1rem"}}
+        [ic/action-description {:style {:width 30
+                                          :height 30
+                                          :margin-right "0.5rem"
+                                          :color colors/primary}}]
+        "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"]]
+      [:div
+       [form-fields/field
+        {:label "Kaavioiden aikayksikkö"
+         :type :selection
+         :update! #(e! (monitor-controller/->ChangeReportType %))
+         :show-option (tr-key [:admin-page :report-types])
+         :options [:tertile :month]}
+        (get-in app [:admin :monitor :report-type])]]]
 
      (if (= chart-type :month)
        [:div {:id "month-charts" :key "month-charts"}
