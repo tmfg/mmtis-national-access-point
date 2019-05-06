@@ -355,9 +355,9 @@
   (let [diff-maps (-> data-two-week-two-route-change
                       (detection/changes-by-week->changes-by-route)
                       (detection/detect-changes-for-all-routes))
-        fwd-difference-new (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
+        fwd-difference (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
     (testing "first change matches first-week-difference return value"
-      (is (= (-> fwd-difference-new second :different-week) (-> diff-maps first :different-week))))
+      (is (= (-> fwd-difference second :different-week) (-> diff-maps first :different-week))))
 
     (testing "second route's first change date is ok"
       (is (= (tu/to-local-date 2019 2 25)

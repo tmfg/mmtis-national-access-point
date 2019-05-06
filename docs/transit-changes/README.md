@@ -186,7 +186,7 @@ If algorithm does not find a different week, it returns just that there is traff
           This helps aligning the trip stop times next to each other so they can be easily compared. In the merging process, time differences of the trip stop time pairs are computed.  
           Any compared trip stop time that is not within 30 minute time window causes the algorithm to mark the
           trip either added or removed.  
-          (Reference: `route-day-changes-new` iterates changed weeks and adds day change comparison)
+          (Reference: `route-day-changes` iterates changed weeks and adds day change comparison)
        - **Stop sequence differences**  
          Stop sequence differences are computed per compared trip pair. The algorithm detects stops that are added or
          removed from a trip by comparing the stop sequences of the trips.

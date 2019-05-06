@@ -571,7 +571,7 @@
           []
           detection-results))
 
-(defn route-day-changes-new
+(defn route-day-changes
   "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
   [db service-id routes]
   (let [route-day-changes
@@ -977,7 +977,7 @@
                            (detect-changes-for-all-routes)
                            (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
                            ; Fetch detailed day details
-                           (route-day-changes-new db service-id))]
+                           (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
       (catch Exception e
