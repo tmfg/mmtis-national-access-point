@@ -59,9 +59,10 @@
                                                         :color colors/primary}})
   And label-text as text.
   element-tag is :button or :a depending on do you want to move the user to different page or do magic right where she/he is."
-  [options icon-element label-text element-tag]
-  [element-tag (merge options
-                  (stylefy/use-style style-base/blue-link-with-icon)
+  [options icon-element label-text]
+  [:button (merge options
+                      {:style {:align-items "center"}}
+                      (stylefy/use-style style-base/blue-link-with-icon)
                   (stylefy/use-style style-buttons/outline-button))
    icon-element
-   [:span {:style {:padding-top "7px"}} label-text]])
+   [:span label-text]])
