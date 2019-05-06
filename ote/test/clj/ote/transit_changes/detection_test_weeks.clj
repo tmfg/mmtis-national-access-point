@@ -6,7 +6,9 @@
             [ote.transit-changes.detection-test-utilities :as tu]
             [ote.time :as time]))
 
-(def change-window detection/route-end-detection-threshold)
+(def change-window
+  (let [config (read-string (slurp "config.edn"))]
+    (get-in config [:transit-changes :route-end-detection-threshold-days])))
 
 (def data-no-changes
   (tu/weeks (tu/to-local-date 2019 5 13) (tu/generate-traffic-week 9 ))) ;; Last week starts 2019 07 08

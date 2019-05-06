@@ -54,4 +54,9 @@
  :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}
 
  :no-gtfs-update-for-operators #{}
+
+ :transit-changes {
+                   ;; 90 because there is typically a break in traffic during the summer and many operators can't provide data after the summer break early enough.
+                   ;; Motivation is to avoids excessive route ending change detections.
+                   :route-end-detection-threshold-days 90}
  }

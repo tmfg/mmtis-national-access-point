@@ -944,11 +944,9 @@
         res (or chg [])]
     res))
 
-(def route-end-detection-threshold 90)
-
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
-(defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
+(defn detect-route-changes-for-service [db config {:keys [start-date service-id] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
@@ -966,7 +964,8 @@
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-holidays db route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
+        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys) ;; Format: ({:date routes(=hashes)})
+        route-end-detection-threshold-days (get-in config [:transit-changes :route-end-detection-threshold-days])]
     (try
       {:all-routes all-routes
        :route-changes
@@ -975,7 +974,9 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
-                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           (add-ending-route-change (java.time.LocalDate/now)
+                                                    route-end-detection-threshold-days
+                                                    all-routes)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)

@@ -66,9 +66,9 @@
 ;; To speed up detection, call this with vector of service-ids:
 ;; e.g.: (detect-new-changes-task db (time/now) true [1289])
 (defn detect-new-changes-task
-  ([db detection-date force?]
-   (detect-new-changes-task db detection-date force? nil))
-  ([db detection-date force? service-ids] ;; db (time/now) false
+  ([db config detection-date force?]
+   (detect-new-changes-task db config detection-date force? nil))
+  ([db config detection-date force? service-ids] ;; db (time/now) false
    (let [lock-time-in-seconds (if force?
                                 1
                                 1800)
@@ -100,7 +100,7 @@
               (detection/update-transit-changes!
                db today service-id
                (detection/service-package-ids-for-date-range db query-params)
-               (detection/detect-route-changes-for-service db query-params)))
+               (detection/detect-route-changes-for-service db config query-params)))
             (catch Exception e
               (log/warn e "Change detection failed for service " service-id)))
           (log/info "Detection completed for service: " service-id))))))))
@@ -118,7 +118,7 @@
                  (#'update-one-gtfs! config db true)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (detect-new-changes-task db (time/now) false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
+                          (detect-new-changes-task db config (time/now) false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))

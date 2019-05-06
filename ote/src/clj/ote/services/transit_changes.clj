@@ -144,7 +144,7 @@
         (future
           (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
           ;; Detect changes for service
-          (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)]))
+          (gtfs-tasks/detect-new-changes-task db config (time/now) true [(Long/parseLong service-id)]))
         "OK")))
 
   ;; Calculate route-hash-id for given service-id and package-count
@@ -161,14 +161,14 @@
   ;; Force change detection for all services
   (POST "/transit-changes/force-detect/" req
         (when (authorization/admin? (:user req))
-          (gtfs-tasks/detect-new-changes-task db (time/now) true)
+          (gtfs-tasks/detect-new-changes-task db config (time/now) true)
           "OK"))
 
   ;; Force change detection for single service
   (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
                                                      user :user}
         (when (authorization/admin? user)
-          (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
+          (gtfs-tasks/detect-new-changes-task db config (time/now) true [(Long/parseLong service-id)])
           "OK"))
 
   ;; Delete row from gtfs_package to make this work. Don't know why, but it must be done.

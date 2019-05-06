@@ -238,6 +238,6 @@ Transit change detection will prefer the list retrieved from db and if list is n
   - Add an interface for service, enter a valid URL where a package may be downloaded
   - On admin view trigger downloading of a new transit data package
   - Run detection
-    - Run locally via REPL: `(detect-new-changes-task (:db ote.main/ote) true [ids])`
+    - Run locally via REPL: `(detect-new-changes-task (:db ote.main/ote) (read-string (slurp "config.edn")) (time/now) true [ids])`
     - Run run via browser admin view > start change detection
   - Analyze results on transit-detection view and on db tables
