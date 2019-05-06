@@ -312,7 +312,7 @@
                     (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name))))
 
 (deftest more-than-one-change-found
-  (spec-test/instrument `detection/route-weeks-with-first-difference-old)
+  (spec-test/instrument `detection/route-weeks-with-first-difference)
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
@@ -324,8 +324,7 @@
 
   (let [diff-maps (-> test-more-than-one-change
                       detection/changes-by-week->changes-by-route
-                      detection/detect-changes-for-all-routes)
-        old-diff-maps (detection/route-weeks-with-first-difference-old test-more-than-one-change)]
+                      detection/detect-changes-for-all-routes)]
     (testing "got two changes"
       (is (= 2 (count diff-maps))))
     (testing "first change is detected"
@@ -352,15 +351,12 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
 
-(deftest more-than-one-change-found-w-2-routes
+(deftest test-two-week-two-route-change
   (let [diff-maps (-> data-two-week-two-route-change
                       (detection/changes-by-week->changes-by-route)
                       (detection/detect-changes-for-all-routes))
-
-        fwd-difference-old (detection/route-weeks-with-first-difference-old data-two-week-two-route-change)
         fwd-difference-new (detection/route-weeks-with-first-difference-new data-two-week-two-route-change)]
     (testing "first change matches first-week-difference return value"
-      (is (= (-> fwd-difference-old (get "Raimola") :different-week) (-> diff-maps first :different-week)))
       (is (= (-> fwd-difference-new second :different-week) (-> diff-maps first :different-week))))
 
     (testing "second route's first change date is ok"
@@ -370,7 +366,6 @@
                      :let [d (-> dp :different-week :beginning-of-week)]
                      :when (= "Esala" (:route-key dp))]
                  d)))))))
-
 
 (deftest no-change-found
   (spec-test/instrument `detection/route-weeks-with-first-difference-new)
@@ -460,18 +455,6 @@
     :end-of-week (java.time.LocalDate/parse "2019-07-14"),
     :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}])
 
-;; this doesn't compile or work in normal "lein test" run due to the ote.main/ote reference, uncomment for repl use
-#_(deftest test-with-gtfs-package-of-a-service
-    (let [db (:db ote.main/ote)
-          route-query-params {:service-id 5 :start-date (time/parse-date-eu "18.02.2019") :end-date (time/parse-date-eu "06.07.2019")}
-          new-diff (detection/detect-route-changes-for-service-new db route-query-params)
-          old-diff (detection/detect-route-changes-for-service-old db route-query-params)]
-      ;; new-diff structure:
-      ;; :route-changes [ ( [ routeid {dada} ]) etc
-      (println (:start-date route-query-params))
-      (testing "differences between new and old"
-        (is (= old-diff new-diff)))))
-
 (deftest more-than-one-change-found-case-2
   (spec-test/instrument `detection/route-weeks-with-first-difference-new)
 
@@ -485,9 +468,7 @@
 
   (let [diff-maps (-> data-realworld-two-change-case
                       detection/changes-by-week->changes-by-route
-                      detection/detect-changes-for-all-routes)
-        old-diff-map (-> data-realworld-two-change-case
-                         detection/route-weeks-with-first-difference-old)]
+                      detection/detect-changes-for-all-routes)]
     (testing "got two changes"
       (is (= 2 (count diff-maps))))
 

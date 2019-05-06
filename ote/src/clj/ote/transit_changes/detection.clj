@@ -385,7 +385,7 @@
   ::single-route-change
   (spec/coll-of (spec/tuple ::route-key ::route-change-map) :kind map?))
 
-(spec/fdef route-weeks-with-first-difference-old
+(spec/fdef route-weeks-with-first-difference
            :args (spec/cat :rw ::route-weeks-vec)
            :ret ::single-route-change)
 
@@ -405,40 +405,6 @@
 (spec/def
   ::detected-route-changes-for-services-coll
   (spec/coll-of ::service-route-change-map :kind vector?))
-
-(defn route-weeks-with-first-difference-old
-  "Detect the next different week in each route.
-
-  NOTE! starting from the seond week in the given route-weeks, the first given week is considered the \"prev\" week.
-  
-  Takes a list of weeks that have week hashes for each route.
-  Returns map from route [short long headsign] to next different week info.
-  The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
-  [route-weeks]
-  #_(println "first-week-difference called, #weeks:" (count route-weeks))
-  ;(if (= 7  (count route-weeks))
-  ;   (def *r7 route-weeks))
-  ;; (println "spec for route-weeks:")
-  ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
-  ;; Take routes from the first week (they are the same in all weeks)
-  (let [route-names (into #{}
-                          (map first)
-                          (:routes (first route-weeks)))
-        result (reduce
-                 (fn [route-detection-state [_ curr _ _ :as weeks]]
-                   (reduce
-                     (fn [route-detection-state route]
-                       ;; value under route key in r-d-s map will be updated by
-                       ;; (route-next-different-week *value* route weeks curr)
-                       (update route-detection-state route
-                               route-next-different-week-old route weeks curr))
-                     route-detection-state route-names))
-                 {}                                         ; initial route detection state is empty
-                 (partition 4 1 route-weeks))]
-    ;; (println "first-week-difference result: " (pr-str result))
-    ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
-    result))
-
 
 (defn route-weeks-with-first-difference-new
   "Detect the next different week in each route.
@@ -1058,33 +1024,6 @@
                            (route-day-changes-new db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
-      (catch Exception e
-        (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
-
-
-(defn detect-route-changes-for-service-old [db {:keys [start-date service-id] :as route-query-params}]
-  (let [route-hash-id-type (db-route-detection-type db service-id)
-        ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes route-hash-id-type)
-        all-route-keys (set (keys all-routes))
-        ;; Get route hashes from database
-        route-hashes (service-route-hashes-for-date-range db route-query-params)
-        ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-holidays db route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)]
-    (try
-      {:all-routes all-routes
-       :route-changes
-       (let [old-data (->> routes-by-date                   ;; Format of routes-by-date is: [{:date routes(=hashes)}]
-                           ;; Create week hashes so we can find out the differences between weeks
-                           (combine-weeks)
-                           ;; Search next week (for every route) that is different
-                           (route-weeks-with-first-difference-old)
-                           ;; Fetch detailed route comparison if a change was found
-                           (route-day-changes db service-id) ;;remove this to run camparing tests of our changed function
-                           )]
-         old-data)}
       (catch Exception e
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
