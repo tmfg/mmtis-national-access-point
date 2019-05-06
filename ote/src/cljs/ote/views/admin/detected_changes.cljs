@@ -294,11 +294,11 @@
       [:div
        ^{:key "success"}
        [info/info-toggle [:span {:style {:color "green"}}
-                          "CSV ladattu onnistuneesti. Ladatut päivät sisällä"] inner-component-success false]]
+                          "CSV ladattu onnistuneesti. Ladatut päivät sisällä"] inner-component-success {:default-open? false}]]
       [:div
        ^{:key "error"}
        [info/info-toggle [:span {:style {:color "red"}}
-                          "CSV lataus epäonnistui. Lähetä sisällön viesti kehittäjille."] inner-component-fail false]])))
+                          "CSV lataus epäonnistui. Lähetä sisällön viesti kehittäjille."] inner-component-fail {:default-open? false}]])))
 
 
 (defn admin-exception-days [e! app-state]

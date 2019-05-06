@@ -56,7 +56,7 @@ describe('Add a new service', function () {
             cy.route('POST', '/transport-service').as('addService');
 
             cy.visit('/#/own-services');
-            cy.get('a[id*="new-service-button"]').click();
+            cy.get('a[id*="new-service-button"]').click({force: true});
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
                 .click();
@@ -85,13 +85,6 @@ describe('Add a new service', function () {
                         return cy.wait(2000);
                     });
             });
-
-            cy.contains('.form-field', 'Olen lukenut tämän osion')
-                .within($field => {
-                    cy.get('input[type="checkbox"]').check();
-                });
-
-
             // ## Add some data for non-mandatory fields
 
             cy.get('#radio-company-csv-url').click();
@@ -140,7 +133,7 @@ describe('Add a new service', function () {
 
 });
 
-describe('Add new service provider', function () {
+/*describe('Add new service provider', function () { // TODO: remake this when ckan is removed
     before(function () {
         cy.login();
         cy.wrap(randomName('test-operator-')).as('operatorName')
@@ -186,9 +179,9 @@ describe('Add new service provider', function () {
 
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
     });
-});
+});*/
 
-describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () {
+/*describe('Should add new associated service to Normal users "Terminaali Oy" and delete them', function () { TODO: remake this also when ckan is removed
 
     const testOperator = {
         businessid: '7654321-9',
@@ -235,9 +228,9 @@ describe('Should add new associated service to Normal users "Terminaali Oy" and 
         .click();
 
         cy.server();
-        cy.route('/place-completions/*').as('placeCompletion');
+        cy.route('/place-completions/!*').as('placeCompletion');
 
-        cy.contains(/^Taksi*/).click();
+        cy.contains(/^Taksi*!/).click();
         cy.contains('Jatka').click();
 
         // Fill mandatory fields
@@ -254,11 +247,6 @@ describe('Should add new associated service to Normal users "Terminaali Oy" and 
                 cy.contains(area).click();
                 return cy.wait(2000);
             });
-        });
-
-        cy.contains('.form-field', 'Olen lukenut tämän osion')
-        .within($field => {
-            cy.get('input[type="checkbox"]').check();
         });
 
         // ## Add some data for non-mandatory fields
@@ -323,4 +311,4 @@ describe('Should add new associated service to Normal users "Terminaali Oy" and 
         cy.get('[id=delete-transport-operator-btn]').click();
         cy.get('[id=confirm-operator-delete]').click();
     });
-});
+});*/

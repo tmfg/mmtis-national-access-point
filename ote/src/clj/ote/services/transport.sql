@@ -10,7 +10,9 @@ SELECT ts.id,
     ts."sub-type",
     ts."published",
     ts."created",
-    ts."modified"
-FROM "transport-service" ts
+    ts."modified",
+    ts."transport-type",
+    eid."data-content" as "interface-types"
+FROM "transport-service" ts LEFT OUTER JOIN "external-interface-description" eid on (ts.id = eid."transport-service-id")
 WHERE ts."transport-operator-id" in (:operator-ids)
 ORDER BY ts."type" DESC, ts.modified DESC NULLS LAST;
