@@ -362,7 +362,7 @@
   ::detected-route-changes-for-services-coll
   (spec/coll-of ::service-route-change-map :kind vector?))
 
-(defn route-weeks-with-first-difference-new
+(defn route-weeks-with-first-difference
   "Detect the next different week in each route.
   NOTE! starting from the second week in the given route-weeks, the first given week is considered the \"prev\" week.
   Takes a list of weeks that have week hashes for each route.
@@ -442,7 +442,7 @@
   [route-weeks]
   (loop [route-weeks route-weeks
          results []]
-    (let [diff-data (route-weeks-with-first-difference-new route-weeks)
+    (let [diff-data (route-weeks-with-first-difference route-weeks)
           filtered-diff-data (first (filter (fn [value]
                                               (or (:no-traffic-start-date value) (:different-week value)))
                                             diff-data))

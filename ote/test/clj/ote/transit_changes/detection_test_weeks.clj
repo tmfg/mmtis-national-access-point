@@ -176,7 +176,7 @@
             :no-traffic-change 17
             :no-traffic-start-date (tu/to-local-date 2018 11 13)
             :no-traffic-end-date (tu/to-local-date 2018 11 30)}
-           (-> (detection/route-weeks-with-first-difference-new data-no-traffic-run-weekdays)
+           (-> (detection/route-weeks-with-first-difference data-no-traffic-run-weekdays)
                first
                (select-keys tu/select-keys-detect-changes-for-all-routes))))))
 
@@ -212,7 +212,7 @@
 
 (deftest two-week-difference-is-skipped
   (is (nil?
-        (get-in (detection/route-weeks-with-first-difference-new test-traffic-2-different-weeks)
+        (get-in (detection/route-weeks-with-first-difference test-traffic-2-different-weeks)
                 [tu/route-name :different-week]))))
 
 (def data-one-week-difference-is-skipped
@@ -229,7 +229,7 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]}))) ; New schedule
 
 (deftest test-one-week-difference-is-skipped
-  (let [result (detection/route-weeks-with-first-difference-new data-one-week-difference-is-skipped)]
+  (let [result (detection/route-weeks-with-first-difference data-one-week-difference-is-skipped)]
     (is (= {:beginning-of-week (tu/to-local-date 2019 3 11)
             :end-of-week (tu/to-local-date 2019 3 17)}
            (:different-week (first result))
@@ -252,7 +252,7 @@
           :different-week {:beginning-of-week (tu/to-local-date 2018 10 22)
                            :end-of-week (tu/to-local-date 2018 10 28)}
           :route-key "Raimola"}
-         (first (detection/route-weeks-with-first-difference-new data-traffic-normal-difference)))))
+         (first (detection/route-weeks-with-first-difference data-traffic-normal-difference)))))
 
 (def test-traffic-starting-point-anomalous
   (tu/weeks (tu/to-local-date 2018 10 8)
@@ -263,7 +263,7 @@
 (deftest anomalous-starting-point-is-ignored
   (let [{:keys [starting-week different-week] :as res}
         (-> test-traffic-starting-point-anomalous
-            detection/route-weeks-with-first-difference-new
+            detection/route-weeks-with-first-difference
             first)]
     (is (= (tu/to-local-date 2018 10 22) (:beginning-of-week starting-week))); gets -15, should be -22
     (is (= "Raimola" (:route-key res)))
@@ -282,7 +282,7 @@
 
 (deftest static-holidays-are-skipped
   (let [{:keys [starting-week different-week] :as res}
-        (first (detection/route-weeks-with-first-difference-new test-traffic-static-holidays))]
+        (first (detection/route-weeks-with-first-difference test-traffic-static-holidays))]
 
     (testing "detection skipped christmas week"
       (is (= (tu/to-local-date 2018 12 31) (:beginning-of-week different-week))))
@@ -317,7 +317,7 @@
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
     (is (= (tu/to-local-date 2019 2 18) (-> test-more-than-one-change
-                                            detection/route-weeks-with-first-difference-new
+                                            detection/route-weeks-with-first-difference
                                             first
                                             :different-week
                                             :beginning-of-week))))
@@ -355,7 +355,7 @@
   (let [diff-maps (-> data-two-week-two-route-change
                       (detection/changes-by-week->changes-by-route)
                       (detection/detect-changes-for-all-routes))
-        fwd-difference-new (detection/route-weeks-with-first-difference-new data-two-week-two-route-change)]
+        fwd-difference-new (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
     (testing "first change matches first-week-difference return value"
       (is (= (-> fwd-difference-new second :different-week) (-> diff-maps first :different-week))))
 
@@ -368,7 +368,7 @@
                  d)))))))
 
 (deftest no-change-found
-  (spec-test/instrument `detection/route-weeks-with-first-difference-new)
+  (spec-test/instrument `detection/route-weeks-with-first-difference)
 
   (let [diff-maps (-> data-two-week-change
                       detection/changes-by-week->changes-by-route
@@ -456,12 +456,12 @@
     :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}])
 
 (deftest more-than-one-change-found-case-2
-  (spec-test/instrument `detection/route-weeks-with-first-difference-new)
+  (spec-test/instrument `detection/route-weeks-with-first-difference)
 
   ;; first test that the test data and old change detection code agree
   (testing "single-change detection code agrees with test data"
     (is (= (tu/to-local-date 2019 5 27) (-> data-realworld-two-change-case
-                                            detection/route-weeks-with-first-difference-new
+                                            detection/route-weeks-with-first-difference
                                             first
                                             :different-week
                                             :beginning-of-week))))
