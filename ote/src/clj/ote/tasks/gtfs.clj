@@ -100,7 +100,7 @@
               (detection/update-transit-changes!
                db today service-id
                (detection/service-package-ids-for-date-range db query-params)
-               (detection/detect-route-changes-for-service-new db query-params)))
+               (detection/detect-route-changes-for-service db query-params)))
             (catch Exception e
               (log/warn e "Change detection failed for service " service-id)))
           (log/info "Detection completed for service: " service-id))))))))
