@@ -386,15 +386,15 @@
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
-                ;; No-traffic route, return current day always
-                (= :no-traffic (:change-type route))
+                ;; No-traffic route, return current day when the no-traffic start is in the past
+                (and
+                  (= :no-traffic (:change-type route))
+                  (t/after? (time/now) date1))
                 (time/now)
 
                 :else
                 date1)
-        date2 (if (and
-                    (:different-week-date route)
-                    (not= :no-traffic (:change-type route)))
+        date2 (if (:different-week-date route)
                   (:different-week-date route)
                   (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
