@@ -109,8 +109,7 @@
                      :label-style style-base/table-col-style-wrap
                      :show-row-hover? true
                      :on-select #(when (first %)
-                                   (do
-                                     (e! (tv/->SelectRouteForDisplay (first %)))))
+                                   (e! (tv/->SelectRouteForDisplay (first %))))
                      :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
         [{:name "Aikaa muutokseen"
           :read :different-week-date
