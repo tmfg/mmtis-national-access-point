@@ -10,7 +10,8 @@
             [stylefy.core :as stylefy]
             [ote.style.buttons :as style-buttons]
             [ote.style.base :as style-base]
-            [cljs-react-material-ui.icons :as ic]))
+            [cljs-react-material-ui.icons :as ic]
+            [ote.time :as time]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
@@ -110,14 +111,13 @@
       [:div
        [btn/big-icon-button-with-label
         {:id "btn-all-companies-csv"
-         :href "/admin/reports/monitor/csv/all-companies"
+         :on-click #(e! (monitor-controller/->DownloadCsv "/admin/reports/monitor/csv/all-companies" (str "yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")))
          :style {:padding "1rem"}}
         [ic/action-description {:style {:width 30
                                           :height 30
                                           :margin-right "0.5rem"
                                           :color colors/primary}}]
-        "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
-        :a]]
+        "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"]]
       [:div
        [form-fields/field
         {:label "Kaavioiden aikayksikkö"
