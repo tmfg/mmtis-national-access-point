@@ -34,7 +34,6 @@
     ["/edit-service/:id" :edit-service]
     ["/services" :services]
     ["/services/:operator" :services]
-    ["/service-old/:transport-operator-id/:transport-service-id" :service]
     ["/service/:transport-operator-id/:transport-service-id" :service-view]
 
     ["/email-settings" :email-settings]
