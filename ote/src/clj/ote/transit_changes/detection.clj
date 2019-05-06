@@ -243,26 +243,6 @@
       :default
       (dissoc state :no-traffic-start-date :no-traffic-run))))
 
-(defn add-no-traffic-run-dates-old [{:keys [no-traffic-run no-traffic-change
-                                            no-traffic-start-date] :as state} week]
-
-  (cond
-
-    ;; A new no traffic run has started, set date from current week
-    (and no-traffic-run (nil? no-traffic-start-date))
-    (assoc state :no-traffic-start-date (.plusDays (:beginning-of-week week) (- 7 no-traffic-run)))
-
-    ;; No traffic change was detected, add end date
-    no-traffic-change
-    (assoc state :no-traffic-end-date (.plusDays no-traffic-start-date no-traffic-change))
-
-    ;; Run ended without reaching threshold, remove start date
-    (nil? no-traffic-run)
-    (dissoc state :no-traffic-start)
-
-    :default
-    state))
-
 (defn add-no-traffic-run-dates-new
   "
   state: map where analysis results per route and week are concatenated iteratively
@@ -318,26 +298,6 @@
       #_(if-let [dw (:different-week result)]
           (println "route-next-different-week found something:" dw)
           (println "no changes found from:" (:beginning-of-week (first weeks))))
-      result)))
-
-(defn- route-next-different-week-old
-  [{diff :different-week no-traffic-end-date :no-traffic-end-date :as state} route weeks curr]
-  (if (or diff no-traffic-end-date)
-    ;; change already found, don't try again
-    state
-
-    ;; Change not yet found, try to find one
-    (let [route-week-hashes (mapv (comp #(get % route) :routes)
-                                  weeks)
-          result (-> state
-                     ;; Detect no-traffic run
-                     (detect-no-traffic-run route-week-hashes)
-                     (add-no-traffic-run-dates-old curr)
-
-                     ;; Detect other traffic changes
-                     (detect-change-for-route route-week-hashes route)
-                     (add-starting-week curr)
-                     (add-different-week curr))]
       result)))
 
 (spec/def
