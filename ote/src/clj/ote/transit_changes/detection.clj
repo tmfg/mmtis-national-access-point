@@ -946,9 +946,9 @@
 
 (def route-end-detection-threshold 90)
 
-(spec/fdef detect-route-changes-for-service-new
+(spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
-(defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
+(defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.

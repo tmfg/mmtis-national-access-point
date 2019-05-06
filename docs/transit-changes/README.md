@@ -125,7 +125,7 @@ User UI visualization of transit change detection results
    - `service-package-ids-for-date-range` 
 - **6**: Detect changes
    - latest transit package record for each service
-   - `detect-route-changes-for-service-new` parses route day hashes read from db and produces detection result vector per route.
+   - `detect-route-changes-for-service` parses route day hashes read from db and produces detection result vector per route.
    - `update-transit-changes!` does further analysis for results and implements the last steps of the detection logic.
 - **7:**  Store results to db
    - `update-transit-changes!` stores final results to db
