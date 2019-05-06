@@ -1046,7 +1046,7 @@
               v)]))
         m))
 
-(defn detect-route-changes-for-service-new [db {:keys [start-date service-id] :as route-query-params}]
+(defn detect-route-changes-for-service-new [db {:keys [start-date service-id ignore-holidays?] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
@@ -1064,7 +1064,9 @@
                                                (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-holidays db route-hashes)
+        route-hashes-with-holidays (if ignore-holidays?
+                                     route-hashes
+                                     (override-holidays db route-hashes))
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
     (def *rh route-hashes)
     (try
