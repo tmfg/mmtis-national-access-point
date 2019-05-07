@@ -20,6 +20,9 @@
   "The amount of days after a no-traffic run is detected as a change."
   16)
 
+(def current-debug-route -4242)
+;; (def current-debug-route "-Lohja - Nummela - Vihti-")
+
 (defqueries "ote/transit_changes/detection.sql")
 (defqueries "ote/services/transit_changes.sql")
 
@@ -160,6 +163,12 @@
      :end-of-week eow
      :routes (merge-week-hash (map :routes days))}))
 
+
+(defn dcfr-enter-debug
+  [route-key starting-week-hash curr next1 next2]
+  (when (= route-key current-debug-route)
+    (println "doing week: " (map #(when % (subs % 62)) curr))))
+
 (defn- vnot [cond msg]
   #_(when cond (println "debug: not a change because" msg))
   (not cond))
@@ -167,7 +176,7 @@
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
-  (println "dcfr called with route:" (pr-str route))
+  ;; (dcfr-enter-debug route starting-week-hash curr next1 next2)
   (cond
     ;; If this is the first call and the current week is "anomalous".
     ;; Then start at the next week.
@@ -316,8 +325,8 @@
                      (add-starting-week curr)
                      (add-different-week curr))]
       (if-let [dw (:different-week result)]
-          (println "ndw res: route-next-different-week found something:" dw)
-          (println "ndw res: no changes found from:"  (:beginning-of-week (first weeks))))
+          (println "ndw res: route-next-different-week found something, curr=" (:beginning-of-week curr) ":" dw)
+          (println "ndw res: no changes found, curr="  (:beginning-of-week curr)))
       result)))
 
 (defn- route-next-different-week-old
@@ -456,7 +465,7 @@
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
-        debug-route-hit? (contains? route-names "-Lohja - Nummela - Vihti-" )
+        debug-route-hit? (contains? route-names current-debug-route )
         result (reduce
                  (fn [route-detection-state [_ curr _ _ :as weeks]]
                    (reduce
@@ -470,9 +479,8 @@
                  {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
     (when debug-route-hit?
-      (println "rwwfdn result: " (pr-str result) "count" (count route-weeks))
-      (def *r7 route-weeks))
-    ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
+      (println "route-weeks-with-first-difference result: " (pr-str result) "count" (count route-weeks)))
+    
     (vals result)))
 
 
@@ -596,6 +604,8 @@
         removed-trip-count (if (and (nil? combined-trips) (pos-int? (count date1-trips)))
                              (count date1-trips)
                              0)]
+    #_(when added
+      (def *ad [date1-trips date2-trips starting-week-date different-week-date]))
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
      :added-trips (if combined-trips (count added) added-trip-count)
@@ -953,8 +963,6 @@
   Invokes a function in a loop for each route to detect any changes for each route.
   Output: Vector of routes enriched by details if there are changes in traffic for a route on a week."
   [route-list-with-week-hashes]  
-  (println "dcfar called")
-  (def *dcrl route-list-with-week-hashes)
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
 (defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
@@ -1068,9 +1076,9 @@
                                      route-hashes
                                      (override-holidays db route-hashes))
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
-    (def *rh route-hashes)
+    #_(def *rh route-hashes)
     (try
-      (def *rd routes-by-date)
+      #_(def *rd routes-by-date)
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
