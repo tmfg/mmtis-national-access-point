@@ -43,7 +43,7 @@
     rewritten-calendar-data))
 
 
-;; [removed - comment with construction notes on this test, check git history if interested]
+;; [there was comment with construction notes on this test, check git history if interested]
 
 (deftest rewrite-calendar-testutil-works
   (let [same-localdate-weekday? (fn [ld1 ld2]
@@ -64,18 +64,9 @@
     (println "rewritten date" input-localdate "->" rewritten-date)
     (is (some? rewritten-date))
 
-    ;; weekday should stay same
-    
     (is (same-localdate-weekday? input-localdate rewritten-date))
 
-    (is (= 1 (localdate-days-between input-localdate rewritten-date)))
-
-    #_(is (= [#:gtfs{:service-id "1",
-                   :date (.plusDays (java.time.LocalDate/now) 5),
-                   :exception-type 1}]
-           (rewrite-calendar [#:gtfs{:service-id "1",
-                                     :date (java.time.LocalDate/parse "2013-01-06"),
-                                     :exception-type 1}] #inst "2013-01-01") ))))
+    (is (= 1 (localdate-days-between input-localdate rewritten-date)))))
 
 
 (use-fixtures :each
@@ -126,18 +117,12 @@
         ;; Parse gtfs package and save it to database.
         (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
 
-;;  - todo:
-;;  -  re-enable & check date rewriting
-;;  - check detection-result format, can we eliminate one of :changes & :different-week keys
-;;  - also check if we can omit maps without change info in why are there maps unde :route-changes
-;;  - the current time travel doesn't solve holidays. so let the tests inject override-holidays behaviour somehow.
-
 (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)
         ;; db (:db ote.main/ote)
         gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
         gtfs-zip-bytes (slurp-bytes gtfs-zip-path)
-        orig-date #inst "2019-02-10T00:00:00"
+        orig-date #inst "2019-02-15"
         my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
                           ;; (println "hello from intercept fn, type" file-type)
                           (if (= file-type :gtfs/calendar-dates-txt)
@@ -156,16 +141,12 @@
                     :route-changes
                     (filter :changes))
         changed-route-names (map :route-key changes)
-        lohja-change (first
-                      (filterv #(and (= "-Lohja - Nummela - Vihti-" (:route-key %)) (:changes %))
-                               (:route-changes detection-result)))]
-    (println "found" changes "in the following routes:" changed-route-names)
-    (def *nd detection-result)
-    (println (:start-date route-query-params))
-    (testing "got someting"
-      (is (not= nil (first detection-result))))
-    (println "lohja-change date is" (-> lohja-change :changes :different-week-date java-localdate->inst))
-    (testing "got right date for lohja - nummela - vihti change"
-      ;; wip: with rewrite-calendar call enabled we should get a date near the current time
-      
-      (is (= #inst "2019-02-04" (-> lohja-change :changes :different-week-date java-localdate->inst))))))
+        lohja-changes (filterv #(= "-Lohja - Nummela - Vihti-" (:route-key %))
+                               (:route-changes detection-result))]
+    ;; (println "found" changes "in the following routes:" changed-route-names)
+    ;; (def *nd detection-result)
+    ;; (println (:start-date route-query-params))
+    (testing "got sane change figures for lohja - nummela - vihti changes"
+      (is (= 1 (count lohja-changes)))     
+      (is (= 52 (-> lohja-changes first :changes :trip-changes first :stop-time-changes)))
+      (is (= 2  (-> lohja-changes first :no-traffic-run))))))
