@@ -394,9 +394,9 @@
 
                 :else
                 date1)
-        date2 (if (:different-week-date route)
-                  (:different-week-date route)
-                  (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
+        date2 (if-let [date2 (:different-week-date route)]
+                date2
+                (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
         (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
