@@ -193,8 +193,7 @@
               combined-trips)))))
 
 
-;; note: when enabling/testing this version, also change first-different-day to return first-non-nil-in-either index when comparing all-nil week with not-all-nil week
-#_(defn week=
+(defn week=
   "Compare week hashes. Returns true if they represent the same traffic
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
@@ -217,21 +216,6 @@
                          (= h1 h2)))
                    w1 w2)))))
 
-(defn week=
-  "Compare week hashes. Returns true if they represent the same traffic
-  (excluding no-traffic days and static-holidays).
-  Both `w1` and `w2` are vectors of strings that must be the same length."
-  [w1 w2]
-  (every? true?
-          (map (fn [h1 h2]
-                 ;; Only compare hashes where both days have traffic (not nil)
-                 (or (nil? h1) ;; h1 is no-traffic day due to nil value
-                     (nil? h2) ;; h2 is no-traffic day due to nil value
-                     (keyword? h1) ;; h1 is static-holiday due to value is keyword
-                     (keyword? h2) ;; h2 is static-holiday due to value is keyword
-                     (= h1 h2)))
-               w1 w2)))
-
 (s/fdef week=
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)
   :ret boolean?)
@@ -244,17 +228,33 @@
   [week-hash-1 week-hash-2]
   ;(println "week-hash-1: " (pr-str week-hash-1))
   ;(println "week-hash-2: " (pr-str week-hash-2))
-  (some identity
-        (map (fn [i d1 d2]
-               (and (some? d1)
-                    (some? d2)
-                    (not (keyword? d1))
-                    (not (keyword? d2))
-                    (not= d1 d2)
-                    i))
-             (iterate inc 0)
-             week-hash-1
-             week-hash-2)))
+  (let [diff-predicate-1
+        (fn [i d1 d2]
+          (and (some? d1)
+               (some? d2)
+               (not (keyword? d1))
+               (not (keyword? d2))
+               (not= d1 d2)
+               i))
+        diff-predicate-2
+        (fn [i d1 d2]
+          (and (not (keyword? d1))
+               (not (keyword? d2))
+               (not= d1 d2)
+               i))
+        ;; comparison will ignore nil's (using predicate-1 fn),
+        ;; execept when comparing non-nil week with nil week (then use predicate-2)
+        w1-empty? (every? nil? week-hash-1)
+        w2-empty? (every? nil? week-hash-2)
+        one-empty? (not= w1-empty? w2-empty?)
+        diff-predicate (if one-empty?
+                         diff-predicate-2
+                         diff-predicate-1)]
+    (some identity
+          (map diff-predicate
+               (iterate inc 0)
+               week-hash-1
+               week-hash-2))))
 
 (defn- day-traffic-changes?
   "Takes hashes of a baseline day and a new day to compare, and similar pair for the previous detected change.
