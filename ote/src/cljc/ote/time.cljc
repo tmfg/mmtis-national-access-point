@@ -159,8 +159,14 @@
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
+;; note! This returns a different family of data type than date-fields->date-time
+;; (java.time.LocalDate instead of clj-time/JodaTime LocalDate)
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
+     :cljs (goog.date.Date. year (dec month) date)))
+
+(defn date-fields->joda-date [{::keys [year date month]}]
+  #?(:clj (t/local-date year month date)
      :cljs (goog.date.Date. year (dec month) date)))
 
 ;; Change js-date (.js/date) to google datetime
@@ -428,9 +434,14 @@
   (date-fields->date-time (date-fields native-date)))
 
 (defn native->date
-  "Converts different formats into DateFields and converts result into localdate or goog.date"
+  "Converts different formats into DateFields and converts result into java.time.LocalDate or goog.date"
   [native-date]
   (date-fields->date (date-fields native-date)))
+
+(defn native->joda-local-date
+  "Converts different formats into DateFields and converts result into Joda LocalDate or goog.date"
+  [native-date]
+  (date-fields->joda-date (date-fields native-date)))
 
 (defn date-fields->native
   "Convert date fields ma pto native Date object"
