@@ -300,8 +300,8 @@
   :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
   :companies-info "Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här."
 
-  :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Garanterad = behöver inte beställas separat."
-  :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglihet: Beställes = finns inte garanterat i alla fordon, skäl att beställa i förväg."
+  :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglighet. Garanterad tillgång = behöver inte beställas separat."
+  :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglighet. Begränsad tillgång = finns inte garanterat I alla fordon, skäl att beställa I förväg."
 
   :brokerage? (:md "**Fyll inte i denna punkt i formuläret om du tillhör en förmedlingstjänst. Endast själva förmedlingstjänsten fyller i uppgifterna!** \n"
                 "En förmedlingstjänst **förmedlar mot ersättning** andra aktörers enskilda resor. Förmedlingstjänsten kan dessutom också förmedla det egna företagets resor. En beställningscentral för taxiresor är ett exempel på en förmedlingstjänst. Ett företag som förmedlar en beställning till ett annat företag utan ersättning betraktas inte som en förmedlingstjänst.")
@@ -588,7 +588,18 @@
                      :own-services-directions-short "Anvisningar"
                      :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
                      :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
-                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")}
+                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")
+                     :missing-service-info "Palvelun tiedoissa on puutteita"
+                     :flaws "Puutteet"
+                     :missing-schedule "Palvelulta puuttuu lain vaatima reitti- ja aikataulutietorajapinta."
+                     :guide-to-completion "Ohjeet tietojen täydentämiseen"
+                     :add-schedule-to-service "Lisää reitti-ja aikataulutietojenrajapinnan tiedot palvelulle"
+                     :add-schedule-to-service-2 "täppäämällä taulukosta palvelun nimeä tai kynän kuvaa"
+                     :add-schedule-to-service-3 "rivin perässä. Syötä rajapinnan tiedot avautuneella lomakkeella kohdassa"
+                     :schedule-creation "Reitti- ja aikataulutietorajapintojen tuottaminen"
+                     :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
+                     :open-rae "Avaa Traficomin RAE-työkalu"
+                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -924,7 +935,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :admin-page
  {:business-id-filter {:operators "Palveluntuottajista" :services "Palveluista" :ALL "Kaikki"}
   :published-types {:YES "Julkaistu" :NO "Julkaisematta" :ALL "Kaikki"}
-  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "Kaikki"}
+  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "Uusi reitti"

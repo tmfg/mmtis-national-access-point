@@ -160,6 +160,11 @@ END	AS "service-type",
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
 
+-- name: all-registered-companies
+SELECT DISTINCT ON (ac."business-id") "business-id",
+       ac."business-name" AS name
+  FROM "all-companies" ac;
+
 -- name: monthly-registered-companies
 -- returns a cumulative sum of companies, defined as distinct business-id's of "all-companies", created up until the row's month.
 SELECT to_char(ac.created, 'YYYY-MM') as month,
@@ -169,15 +174,15 @@ FROM
 GROUP BY month
 ORDER BY month;
 
--- name: tertiili-registered-companies
--- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's tertiili.
+-- name: tertile-registered-companies
+-- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's tertile.
 SELECT
-       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 ') as tertiili,
+       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 ') as tertile,
        sum(count(ac."business-id")) over (ORDER BY  concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 '))
    FROM
      (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
-group by tertiili
-order by tertiili;
+group by tertile
+order by tertile;
 
 -- name: operator-type-distribution
 -- returns a distrubution of transport-service sub-types among all transport services
@@ -197,13 +202,13 @@ SELECT ac."sub-type" as "sub-type", count(ac."business-id") as count
  GROUP BY month, ac."sub-type"
  ORDER BY month, ac."sub-type";
 
--- name: tertiili-producer-types-and-counts
+-- name: tertile-producer-types-and-counts
 SELECT count(ac."sub-type") as sum,
        ac."sub-type" as "sub-type",
-       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ', (floor(extract(month FROM ac.created)::int / 4.00001)) + 1 , '/3 ') as tertiili
+       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ', (floor(extract(month FROM ac.created)::int / 4.00001)) + 1 , '/3 ') as tertile
   FROM
        "all-companies" ac
- GROUP BY tertiili, ac."sub-type"
- ORDER BY tertiili, ac."sub-type";
+ GROUP BY tertile, ac."sub-type"
+ ORDER BY tertile, ac."sub-type";
 
 

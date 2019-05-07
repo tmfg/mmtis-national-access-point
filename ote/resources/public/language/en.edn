@@ -583,7 +583,18 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :own-services-directions-short "Instructions"
                      :own-services-new-provider1 "Well done! You have now successfully added a service provider "
                      :own-services-new-provider2 (:md " to the NAP service catalog. Please notice that only creating a service provider does not cover the essential information of your transport service/services determined in the legislation (e.g. operating area, pricing and accessibility). \n\nPlease, provide next more detailed information on your transport service or services in section **Own transport services** and/or **Other services in which you are involved in**. If you are a taxi company and you only operate rides through a brokering centre, go directly to the section **Other services in which you are involved in** and give information about the brokering centre. In such a case, you don´t necessarily have to create a transport service of your own in the NAP service catalog.")
-                     :own-services-no-providers (:md "You are not yet a member of any service provider. In order to be able to publish transport service information, you must first **create a new service provider** in the NAP service or **join as a member of an already existing service provider** by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi).\n\nA service provider is a company, community or other organization, which provides its own transport services or participates in the provision of another party’s transport services, A transport operator can be e.g. a taxi company, a bus company, a commercial parking facility operator or a municipality.")}
+                     :own-services-no-providers (:md "You are not yet a member of any service provider. In order to be able to publish transport service information, you must first **create a new service provider** in the NAP service or **join as a member of an already existing service provider** by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi).\n\nA service provider is a company, community or other organization, which provides its own transport services or participates in the provision of another party’s transport services, A transport operator can be e.g. a taxi company, a bus company, a commercial parking facility operator or a municipality.")
+                     :missing-service-info "Palvelun tiedoissa on puutteita"
+                     :flaws "Puutteet"
+                     :missing-schedule "Palvelulta puuttuu lain vaatima reitti- ja aikataulutietorajapinta."
+                     :guide-to-completion "Ohjeet tietojen täydentämiseen"
+                     :add-schedule-to-service "Lisää reitti-ja aikataulutietojenrajapinnan tiedot palvelulle"
+                     :add-schedule-to-service-2 "täppäämällä taulukosta palvelun nimeä tai kynän kuvaa"
+                     :add-schedule-to-service-3 "rivin perässä. Syötä rajapinnan tiedot avautuneella lomakkeella kohdassa"
+                     :schedule-creation "Reitti- ja aikataulutietorajapintojen tuottaminen"
+                     :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
+                     :open-rae "Avaa Traficomin RAE-työkalu"
+                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -920,7 +931,8 @@ You can also draw the operating area or point to the map with drawing tools. You
  :admin-page
  {:business-id-filter {:operators "Transport operators" :services "Services" :ALL "All"}
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}
-  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}}
+  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}
+  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "New route"

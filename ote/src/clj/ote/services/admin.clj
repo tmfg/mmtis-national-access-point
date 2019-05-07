@@ -224,7 +224,7 @@
 (defn summary-types-for-monitor-report [db summary-type]
   (let [type-count-table (if (= :month summary-type)
                            (monthly-producer-types-and-counts db)
-                           (tertiili-producer-types-and-counts db))
+                           (tertile-producer-types-and-counts db))
         summary (distinct (keep summary-type type-count-table)) ;; order is important
         subtypes (distinct (keep :sub-type type-count-table))
         by-subtype (group-by :sub-type type-count-table)
@@ -238,12 +238,12 @@
                                        [subtype (mapv assoc (get by-subtype subtype) (repeat :running-sum) (get running-totals subtype))]))
         by-summary (group-by summary-type (apply concat (vals by-subtype-w-totals)))
         type-colors {"taxi" "rgb(0,170,187)"
-                     "request" "rgb(102,214,184)"
-                     "schedule" "rgb(102,204,102)"
-                     "brokerage" "rgb(235,102,204)"
+                     "request" "rgb(102,204,102)"
+                     "schedule" "rgb(153,204,0)"
                      "terminal" "rgb(221,204,0)"
                      "rentals" "rgb(255,136,0)"
-                     "parking" "rgb(255,102,153)"}
+                     "parking"  "rgb(255,102,153)"
+                     "brokerage" "rgb(153,0,221)"}
         find-sum-backwards (fn [month subtype]
                              ;; the twist in this function is that it looks up the sum from the most recent
                              ;; previous month, if the given month doesn't have the sum.
@@ -259,7 +259,7 @@
                                   (vec
                                     (for [x summary]
                                       (let [tc (filter #(= t (:sub-type %)) (get summary-type x))]
-                                        ;(println "month/tertiili" x "hs" (find-sum-backwards x t))
+                                        ;(println "month/tertile" x "hs" (find-sum-backwards x t))
                                         (find-sum-backwards x t)))))
         type-dataset (fn [t]
                        {:label (tr [:enums :ote.db.transport-service/sub-type (keyword t)])
@@ -272,19 +272,27 @@
 
 (defn monitor-report [db type]
   {:monthly-companies  (monthly-registered-companies db)
-   :tertiili-companies  (tertiili-registered-companies db)
+   :tertile-companies  (tertile-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
    :monthly-types (summary-types-for-monitor-report db :month)
-   :tertiili-types (summary-types-for-monitor-report db :tertiili)})
+   :tertile-types (summary-types-for-monitor-report db :tertile)})
 
 (defn- csv-data [header rows]
   (concat [header] rows))
 
 (defn monitor-csv-report [db report-type]
   (case report-type
+    "all-companies"
+    (csv-data ["yritys" "y-tunnus"]
+              (map (juxt :name :business-id) (all-registered-companies db)))
+
     "monthly-companies"
     (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
               (map (juxt :month :sum) (monthly-registered-companies db)))
+
+    "tertile-companies"
+    (csv-data ["tertiili" "tuottaja-ytunnus-lkm"]
+              (map (juxt :tertile :sum) (tertile-registered-companies db)))
 
     "company-service-types"
     (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
@@ -302,11 +310,11 @@
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))
 
-    "tertiili-companies-by-service-type"
+    "tertile-companies-by-service-type"
     (csv-data ["tertiili" "tuottaja-tyyppi" "lkm"]
               ;; the copious vec calls are here because sort blows up on lazyseqs,
               ;; and we end up with nested lazyseqs here despite using mapv etc.
-              (let [r (summary-types-for-monitor-report db :tertiili)
+              (let [r (summary-types-for-monitor-report db :tertile)
                     months (:labels r)
                     ds (:datasets r)
                     sums-by-type (into {}  (map (juxt :label :data) ds))
@@ -459,20 +467,25 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))
-    (GET "/admin/user-operators-by-business-id/:business-id" [business-id]
+    (GET "/admin/user-operators-by-business-id/:business-id" {{:keys [business-id]}
+                                                              :params
+                                                              user :user}
+      (require-admin-user "/admin/user-operators-by-business-id/:business-id" (:user user))
       (http/transit-response
         (get-user-operators-by-business-id db business-id)))
 
     (GET "/admin/commercial-services" req
-         (http/transit-response (get-commercial-scheduled-services db )))
+      (require-admin-user "/admin/commercial-services" (:user (:user req)))
+      (http/transit-response (get-commercial-scheduled-services db )))
 
     (GET "/admin/csv-fetch" req
       (require-admin-user "csv" (:user (:user req)))
       (fetch-new-exception-csv db req))
 
     (POST "/admin/toggle-commercial-services" {form-data :body user :user}
-        (toggle-commercial-service db (http/transit-request form-data))
-        (http/transit-response "OK"))))
+      (require-admin-user "/admin/toggle-commercial-services" (:user user))
+      (toggle-commercial-service db (http/transit-request form-data))
+      (http/transit-response "OK"))))
 
 
 (define-service-component CSVAdminReports

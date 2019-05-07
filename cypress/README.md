@@ -48,6 +48,14 @@ https://docs.cypress.io/guides/guides/command-line.html#cypress-open
 $ CYPRESS_NAP_LOGIN=username CYPRESS_NAP_PASSWORD=password cypress open
 ```
 
+#### Run headlessly single test
+
+https://docs.cypress.io/guides/guides/command-line.html#cypress-run
+
+```bash
+$ CYPRESS_NAP_LOGIN=username CYPRESS_NAP_PASSWORD=password cypress --headed --spec "cypress/integration/operator_spec.js"
+```
+
 #### Run headlessly and capture screenshots and video
 
 https://docs.cypress.io/guides/guides/command-line.html#cypress-run

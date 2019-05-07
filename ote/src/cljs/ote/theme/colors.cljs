@@ -43,3 +43,11 @@
 (def progress primary)
 (def success green-basic)
 (def warning red-basic)
+
+(def monitor-taxi-color "rgb(0,170,187)")
+(def monitor-request-color "rgb(102,204,102)")
+(def monitor-schedule-color "rgb(153,204,0)")
+(def monitor-terminal-color "rgb(221,204,0)")
+(def monitor-rental-color "rgb(255,136,0)")
+(def monitor-parking-color "rgb(255,102,153)")
+(def monitor-brokerage-color "rgb(153,0,221)")
