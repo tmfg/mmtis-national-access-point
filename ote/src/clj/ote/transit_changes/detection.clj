@@ -970,22 +970,8 @@
 
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
-<<<<<<< HEAD
 
-(defn joda->inst-vals [m]
-  (into {}
-        (map
-         (fn [[k v]]
-           [k
-            (if (instance? org.joda.time.DateTime v)
-              (clj-time.coerce/to-timestamp v)
-              v)]))
-        m))
-
-(defn detect-route-changes-for-service-new [db {:keys [start-date service-id ignore-holidays?] :as route-query-params}]
-=======
-(defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
->>>>>>> origin/master
+(defn detect-route-changes-for-service [db {:keys [start-date service-id ignore-holidays?] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
@@ -1025,36 +1011,6 @@
       (catch Exception e
         (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
 
-<<<<<<< HEAD
-
-(defn detect-route-changes-for-service-old [db {:keys [start-date service-id] :as route-query-params}]
-  (let [route-hash-id-type (db-route-detection-type db service-id)
-        ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes route-hash-id-type)
-        all-route-keys (set (keys all-routes))
-        ;; Get route hashes from database
-        route-hashes (service-route-hashes-for-date-range db (joda->inst-vals route-query-params))
-        ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-holidays db route-hashes)
-        routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)]
-    (try
-      {:all-routes all-routes
-       :route-changes
-       (let [old-data (->> routes-by-date                   ;; Format of routes-by-date is: [{:date routes(=hashes)}]
-                           ;; Create week hashes so we can find out the differences between weeks
-                           (combine-weeks)
-                           ;; Search next week (for every route) that is different
-                           (route-weeks-with-first-difference-old)
-                           ;; Fetch detailed route comparison if a change was found
-                           (route-day-changes db service-id) ;;remove this to run camparing tests of our changed function
-                           )]
-         old-data)}
-      (catch Exception e
-        (log/warn e "Error when detecting route changes using route-query-params: " route-query-params " service-id:" service-id)))))
-
-=======
->>>>>>> origin/master
 (defn- update-hash [old x]
   (let [short (:gtfs/route-short-name x)
         long (:gtfs/route-long-name x)

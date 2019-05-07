@@ -136,7 +136,7 @@
                             :start-date (joda-datetime->inst (time/days-from (time/now) -120))
                             :end-date (joda-datetime->inst (time/days-from (time/now) 30))
                             :ignore-holidays? true}
-        detection-result (detection/detect-route-changes-for-service-new db route-query-params)
+        detection-result (detection/detect-route-changes-for-service db route-query-params)
         changes (->> detection-result
                     :route-changes
                     (filter :changes))
