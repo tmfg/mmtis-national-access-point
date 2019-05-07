@@ -77,13 +77,19 @@
     (let [translate-typekw (fn [type]
                               (tr [:enums :ote.db.transport-service/sub-type (keyword type)]))
            companies-by-month-data {:labels (mapv :month (:monthly-companies monitor-data))
-                                    :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
-                                                :data (mapv :sum (:monthly-companies monitor-data))
-                                                :backgroundColor "rgb(0, 170, 187)"}]}
+                                    :datasets [{:label "Palveluntuottajat"
+                                                :data (mapv :sum-providing (:monthly-companies monitor-data))
+                                                :backgroundColor "rgb(0,136,160)"}
+                                               {:label "Palveluiden tuottamiseen osallistuvat yritykset"
+                                                :data (mapv :sum-participating (:monthly-companies monitor-data))
+                                                :backgroundColor "rgb(102,204,214)"}]}
            companies-by-tertile-data {:labels (mapv :tertile (:tertile-companies monitor-data))
-                                      :datasets [{:label "Liikkumispalveluiden tarjoajien lukumäärä"
-                                                  :data (mapv :sum (:tertile-companies monitor-data))
-                                                  :backgroundColor "rgb(0, 170, 187)"}]}
+                                      :datasets [{:label "Palveluntuottajat"
+                                                  :data (mapv :sum-providing (:tertile-companies monitor-data))
+                                                  :backgroundColor "rgb(0,136,160)"}
+                                                 {:label "Palveluiden tuottamiseen osallistuvat yritykset"
+                                                  :data (mapv :sum-participating (:tertile-companies monitor-data))
+                                                  :backgroundColor "rgb(102,204,214)"}]}
            provider-share-by-type-data {:labels (mapv translate-typekw
                                                       (mapv :sub-type (:companies-by-service-type monitor-data)))
                                         :datasets [{:data (mapv :count (:companies-by-service-type monitor-data))
@@ -133,9 +139,9 @@
                :key "container-bar-companies-by-month"
                :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys kuukausittain "]
-         [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies " " Lataa kuvaajan tiedot CSV:nä "]
+         [ui-common/linkify "/admin/reports/monitor/csv/monthly-companies" "Lataa kuvaajan tiedot CSV:nä"]
          [:div {:style {:width "100%"}}
-          [barchart-inner " bar-companies-by-month " nil companies-by-month-data]]]
+          [barchart-inner "bar-companies-by-month" "right" companies-by-month-data]]]
         [:div {:id "container-bar-sub-types-by-month"
                :key "container-bar-sub-types-by-month"
                :style {:margin-bottom "4rem"}}
@@ -144,24 +150,24 @@
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
          [ui-common/linkify " /admin/reports/monitor/csv/monthly-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
          [:div {:style {:width "100%"}}
-          [barchart-inner " bar-type-by-month " "right" monthly-types]]]]
+          [barchart-inner "bar-type-by-month" "right" monthly-types]]]]
        [:div {:id "tertile-charts" :key "tertile-charts"}
         [:div {:id "container-bar-companies-by-tertile"
                :key "container-bar-companies-by-tertile"
                :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärän kehitys tertiileittäin "]
-         [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies " " Lataa kuvaajan tiedot CSV:nä "]
+         [ui-common/linkify "/admin/reports/monitor/csv/tertile-companies" "Lataa kuvaajan tiedot CSV:nä"]
          [:div {:style {:width "100%"}}
-          [barchart-inner " bar-companies-by-tertile " nil companies-by-tertile-data]]]
+          [barchart-inner "bar-companies-by-tertile" "right" companies-by-tertile-data]]]
         [:div {:id "container-bar-sub-types-by-tertile"
                :key "container-bar-sub-types-by-tertile"
                :style {:margin-bottom "4rem"}}
          [:h2 " Liikkumispalveluiden tarjoajien lukumäärä jaoteltuna liikkumispalvelutyypin mukaan tertiileittäin"]
          [:p "Yksittäinen palveluntuottaja voi tarjota useita erilaisia liikkumispalveluita. Tästä syystä alla olevan
           kuvaajan yhteenlaskettu lukumäärä on suurempi, kuin NAP:issa ilmoitettu liikkumispalveluiden tarjoajien kokonaismäärä."]
-         [ui-common/linkify " /admin/reports/monitor/csv/tertile-companies-by-service-type " " Lataa kuvaajan tiedot CSV:nä "]
+         [ui-common/linkify "/admin/reports/monitor/csv/tertile-companies-by-service-type" "Lataa kuvaajan tiedot CSV:nä"]
          [:div {:style {:width "100%"}}
-          [barchart-inner " bar-type-by-tertile " "right" tertile-types]]]])
+          [barchart-inner "bar-type-by-tertile" "right" tertile-types]]]])
 
      [:div {:id "container-company-service-types"
             :key "container-company-service-types"
@@ -169,6 +175,6 @@
       [:h2 " Liikkumispalveluiden tarjoajien tämänhetkinen lukumäärä liikkumispalvelutyypeittäin "]
       [ui-common/linkify " /admin/reports/monitor/csv/company-service-types " " Lataa kuvaajan tiedot CSV:nä "]
       [:div {:style {:width "100%"}}
-       [doughnut-inner " donughnut-share-by-type " "right" provider-share-by-type-data]]]])
+       [doughnut-inner "donughnut-share-by-type" "right" provider-share-by-type-data]]]])
     [:div
      [ui-common/loading-spinner]]))
