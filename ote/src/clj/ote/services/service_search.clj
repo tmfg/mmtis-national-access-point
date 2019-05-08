@@ -27,14 +27,15 @@
          (map #(update % :sub-type keyword))
          (sub-type-facet db))})
 
-(defn- ids [key query-result]
+(defn- map->set [key query-result]
   (into #{} (map key) query-result))
 
 (defn- services-operating-in
   "Returns ids of services which operate in the given areas"
   [db operation-area]
+  (println "haetaan operation arean perusteella " (seq operation-area))
   (when (seq operation-area)
-    (ids
+    (map->set
      :id
      (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
@@ -61,7 +62,7 @@ Negative return value is an invalid match"
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
     (let [text (str/trim text)]
-      (ids ::t-service/id
+      (map->set ::t-service/id
            (specql/fetch db ::t-service/transport-service
                          #{::t-service/id}
                          {::t-service/published op/not-null?
@@ -72,7 +73,7 @@ Negative return value is an invalid match"
   [db types]
   (let [ids (cond
               (and (> (count types) 1) (contains? types :brokerage)) ;; Get sub types and brokerage
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   (op/and {::t-service/published op/not-null?}
@@ -80,13 +81,13 @@ Negative return value is an invalid match"
                                            {::t-service/sub-type (op/in types)}
                                            {::t-service/brokerage? true}))))
               (and (seq types) (not (contains? types :brokerage))) ;; Only sub types
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   {::t-service/sub-type   (op/in types)
                                    ::t-service/published op/not-null?}))
               (and (= 1 (count types)) (contains? types :brokerage)) ;; Only brokerage
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   {::t-service/published op/not-null?
@@ -95,19 +96,19 @@ Negative return value is an invalid match"
 
 (defn- transport-type-ids [db transport-types]
   (when (seq transport-types)
-    (ids
+    (map->set
       :id
       (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
 
 (defn- operator-ids [db operators]
   (when (seq operators)
-    (ids
+    (map->set
       :id
       (service-ids-by-business-id db {:operators (apply list operators)}))))
 
 (defn- data-content-ids [db data-content]
   (when (seq data-content)
-    (ids
+    (map->set
       :id
       (service-ids-by-data-content db {:dc (apply list data-content)}))))
 
@@ -194,10 +195,17 @@ Negative return value is an invalid match"
   (let [match-qualities (service-search-match-qualities db ids operation-area)
         sorted-ids (sort-by match-qualities (keys match-qualities))
         page (page-of sorted-ids offset limit)
-        results (transport-services db page)]
-    (sort-by
-     (comp match-qualities ::t-service/id)
-     results)))
+        results (transport-services db page)
+        results (map
+                  (fn [result]
+                    (let [service-id (::t-service/id result)
+                          matching-value (get match-qualities service-id)]
+                      (assoc result ::t-service/difference matching-value)))
+                  results)
+        results (sort-by
+                  (comp match-qualities ::t-service/id)
+                  results)]
+    results))
 
 (defn- without-import-errors [search-result]
   (update-in search-result
@@ -230,19 +238,19 @@ Negative return value is an invalid match"
 
 (defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
-  (let [result-id-sets [(services-operating-in db operation-area)
+  (let [;; Get service id's using different filters. If filter is not given no results will be returned.
+        result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
                         (transport-type-ids db transport-type)
                         (data-content-ids db data-content)
                         (text-search-ids db text)
                         (operator-ids db operators)]
-        empty-filters? (every? nil? result-id-sets)
+        empty-filters? (every? nil? result-id-sets)         ;; filters are empty if results are nil
         ids (if empty-filters?
               ;; No filters specified, show latest services
               (latest-service-ids db)
               ;; Combine with intersection (AND)
-              (apply set/intersection
-                     (remove nil? result-id-sets)))]
+              (apply set/intersection (remove nil? result-id-sets)))]
     (-> (if operation-area
                   (transport-services-in-operation-area db ids operation-area offset limit)
                   (transport-services-page db ids offset limit))

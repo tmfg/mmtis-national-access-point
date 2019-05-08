@@ -162,10 +162,10 @@ END	AS "service-type",
 
 -- name: monthly-registered-companies
 -- returns a cumulative sum of companies, defined as distinct business-id's of "all-companies", created up until the row's month.
-SELECT to_char(ac.created, 'YYYY-MM') as month,
-       sum(count(ac."business-id")) over (order by to_char(ac.created, 'YYYY-MM')) as sum
+SELECT to_char(ac.created, 'YYYY-MM') AS month,
+       sum(count(ac."business-id")) OVER (ORDER BY to_char(ac.created, 'YYYY-MM')) AS sum
 FROM
-  (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
+  (SELECT DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
 GROUP BY month
 ORDER BY month;
 
