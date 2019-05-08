@@ -254,7 +254,51 @@
           :route-key "Raimola"}
          (first (detection/route-weeks-with-first-difference data-traffic-normal-difference)))))
 
-(def test-traffic-starting-point-anomalous
+(def data-traffic-change-middle-of-week
+  (tu/weeks (tu/to-local-date 2019 4 15)
+            (list
+              {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 2019-04-15
+              {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 2019-04-22
+              {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 2019-04-29
+              {tu/route-name ["AA" "AA" "AA" "BB" "BB" "BB" "BB"]} ;; Week 2019-05-06
+              {tu/route-name ["BB" "BB" "BB" "BB" "BB" "BB" "BB"]}
+              {tu/route-name ["BB" "BB" "BB" "BB" "BB" "BB" "BB"]}
+              {tu/route-name ["BB" "BB" "BB" "BB" "BB" "BB" "BB"]}
+              {tu/route-name ["BB" "BB" "BB" "BB" "BB" "BB" "BB"]})))
+
+;; A traffic change middle of week should produce two detections.
+(deftest test-traffic-change-middle-of-week
+  (let [result (-> data-traffic-change-middle-of-week
+                   (detection/changes-by-week->changes-by-route)
+                   (detection/detect-changes-for-all-routes))
+        expect-first {:route-key tu/route-name
+                      :starting-week {:beginning-of-week (tu/to-local-date 2019 4 22)
+                                      :end-of-week (tu/to-local-date 2019 4 28)}
+                      :different-week {:beginning-of-week (tu/to-local-date 2019 5 6)
+                                       :end-of-week (tu/to-local-date 2019 5 12)}}
+
+        expect-second {:route-key tu/route-name
+                       :starting-week {:beginning-of-week (tu/to-local-date 2019 5 6)
+                                       :end-of-week (tu/to-local-date 2019 5 12)}
+                       :different-week {:beginning-of-week (tu/to-local-date 2019 5 13)
+
+                                        :end-of-week (tu/to-local-date 2019 5 19)}}]
+    (testing "Ensure first change middle of week is found, when end of week traffic changes (AAAAAAA=>AAABBBB)"
+      (is (=
+            expect-first
+            (select-keys
+              (first result)
+              tu/select-keys-detect-changes-for-all-routes))))
+    (testing "Ensure second change is found next week, when also the beginning part of the week changes (AAABBBB=>BBBBBBB)"
+      (is (=
+            expect-second
+            (select-keys
+              (second result)
+              tu/select-keys-detect-changes-for-all-routes))))
+
+    (testing "Ensure that right number of changes are found and there are no extra changes."
+      (is (= 2 (count result))))))
+
 (def data-traffic-starting-point-anomalous
   (tu/weeks (tu/to-local-date 2018 10 8)
             (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
