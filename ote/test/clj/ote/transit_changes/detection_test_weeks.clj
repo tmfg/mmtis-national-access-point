@@ -255,14 +255,15 @@
          (first (detection/route-weeks-with-first-difference data-traffic-normal-difference)))))
 
 (def test-traffic-starting-point-anomalous
+(def data-traffic-starting-point-anomalous
   (tu/weeks (tu/to-local-date 2018 10 8)
             (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2018-10-08
                      {tu/route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h5!" "h7!"]}] ; 2018-10-15, starting week is an exception
                     (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name))))
 
-(deftest anomalous-starting-point-is-ignored
+(deftest test-traffic-starting-point-anomalous
   (let [{:keys [starting-week different-week] :as res}
-        (-> test-traffic-starting-point-anomalous
+        (-> data-traffic-starting-point-anomalous
             detection/route-weeks-with-first-difference
             first)]
     (is (= (tu/to-local-date 2018 10 22) (:beginning-of-week starting-week))); gets -15, should be -22
