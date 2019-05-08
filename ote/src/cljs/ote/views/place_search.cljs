@@ -35,7 +35,7 @@
          (let [old (aget chip "handleKeyDown")]
            (aset chip "handleKeyDown"
                  (fn [event]
-                   (when-not (= 8 event.keyCode)
+                   (when-not (= 8 event.keyCode)            ;8 = backspace
                      (old event))))
            (aset chip "__backspace_monkey_patch" true)))))))
 
@@ -65,7 +65,7 @@
                 :value namefin
                 :floating-label-text (tr [:place-search :rename-place])
                 :on-key-press (fn [event]
-                                (when (= 13 event.charCode)
+                                (when (= 13 event.charCode) ;charCode 13 = ENTER
                                   (e! (ps/->EditDrawnGeometryName id))))
                 :on-change #(e! (ps/->SetDrawnGeometryName id %2))}]
               namefin)]])])}))
