@@ -589,17 +589,17 @@
                      :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
                      :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
                      :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller joukkoliikenne@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")
-                     :missing-service-info "Palvelun tiedoissa on puutteita"
-                     :flaws "Puutteet"
-                     :missing-schedule "Palvelulta puuttuu lain vaatima reitti- ja aikataulutietorajapinta."
-                     :guide-to-completion "Ohjeet tietojen täydentämiseen"
-                     :add-schedule-to-service "Lisää reitti-ja aikataulutietojenrajapinnan tiedot palvelulle"
-                     :add-schedule-to-service-2 "täppäämällä taulukosta palvelun nimeä tai kynän kuvaa"
-                     :add-schedule-to-service-3 "rivin perässä. Syötä rajapinnan tiedot avautuneella lomakkeella kohdassa"
-                     :schedule-creation "Reitti- ja aikataulutietorajapintojen tuottaminen"
-                     :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
-                     :open-rae "Avaa Traficomin RAE-työkalu"
-                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
+                     :missing-service-info "Uppgifterna om tjänsten är bristfälliga"
+                     :flaws "Bristfälliga punkter"
+                     :missing-schedule "Tjänsten saknar det lagstadgade gränssnittet för rutt- och tidtabellsdata."
+                     :guide-to-completion "Anvisningar för att komplettera uppgifterna"
+                     :add-schedule-to-service "Lägg till information om gränssnittet för rutt- och tidtabellsdata för tjänsten i fråga"
+                     :add-schedule-to-service-2 "genom att klicka på tjänstens namn eller pennsymbolen i tabellen"
+                     :add-schedule-to-service-3 "i slutet av raden. Fyll i informationen om gränssnittet i blanketten som öppnas i sektionen"
+                     :schedule-creation "Skapa gränssnitt för rutt- och tidtabellsdata"
+                     :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
+                     :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
+                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
