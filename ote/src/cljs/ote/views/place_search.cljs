@@ -35,39 +35,40 @@
          (let [old (aget chip "handleKeyDown")]
            (aset chip "handleKeyDown"
                  (fn [event]
-                   (when-not (= "Backspace" (.-key event))
+                   (when-not (= 8 event.keyCode)
                      (old event))))
            (aset chip "__backspace_monkey_patch" true)))))))
 
 (defn result-chips [e! results primary?]
   (r/create-class
-   {:component-did-mount monkey-patch-chip-backspace
-    :component-did-update monkey-patch-chip-backspace
-    :reagent-render
-    (fn [e! results]
-      [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
-       (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
-         ^{:key id}
-         [:span
-          [ui/chip {:ref id
-                    :style {:margin 4 :background-color (if primary? "green" "orange") }
-                    :labelStyle {:color "white" :font-weight "bold"}
-                    ;; Toggle edit mode when clicking (for hand drawn geometries)
-                    :on-click
-                    (if (and (= "drawn" type) (not editing?))
-                      #(e! (ps/->EditDrawnGeometryName id))
-                      (constantly false))
+    {:component-did-mount monkey-patch-chip-backspace
+     :component-did-update monkey-patch-chip-backspace
+     :reagent-render
+     (fn [e! results]
+       [:div.place-search-results {:style {:display "flex" :flex-wrap "wrap"}}
+        (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
+          ^{:key id}
+          [:span
+           [ui/chip {:ref id
+                     :style {:margin 4 :background-color (if primary? "green" "orange")}
+                     :labelStyle {:color "white" :font-weight "bold"}
+                     ;; Toggle edit mode when clicking (for hand drawn geometries)
+                     :on-click
+                     (if (and (= "drawn" type) (not editing?))
+                       #(e! (ps/->EditDrawnGeometryName id))
+                       (constantly false))
 
-                    :on-request-delete #(e! (ps/->RemovePlaceById id))}
-          (if editing?
-            [ui/text-field
-             {:id (str "result-" namefin)
-              :value namefin
-              :floating-label-text (tr [:place-search :rename-place])
-              :on-key-press #(when (= "Enter" (.-key %1))
-                               (e! (ps/->EditDrawnGeometryName id)))
-              :on-change #(e! (ps/->SetDrawnGeometryName id %2))}]
-            namefin)]])])}))
+                     :on-request-delete #(e! (ps/->RemovePlaceById id))}
+            (if editing?
+              [ui/text-field
+               {:id (str "result-" namefin)
+                :value namefin
+                :floating-label-text (tr [:place-search :rename-place])
+                :on-key-press (fn [event]
+                                (when (= 13 event.charCode)
+                                  (e! (ps/->EditDrawnGeometryName id))))
+                :on-change #(e! (ps/->SetDrawnGeometryName id %2))}]
+              namefin)]])])}))
 
 (defn result-geometry [{::places/keys [name location]}]
   [leaflet/FeatureGroup
@@ -186,8 +187,7 @@
                            :primary true
                            :label (tr [:place-search :draw-primary])
                            :name :draw-primary
-                           :on-click #(e! (do
-                                            (ps/->SetDrawControl true true)))}]
+                           :on-click #(e! (ps/->SetDrawControl true true))}]
           [ui/flat-button {:id :draw-secondary
                            :primary true
                            :label (tr [:place-search :draw-secondary])
