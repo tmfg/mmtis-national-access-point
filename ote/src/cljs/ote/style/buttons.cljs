@@ -11,7 +11,7 @@
 
 (def outline-btn-hover-focus
   {:text-decoration "none"
-   :border-width "2px"
+   :outline (str "1px solid " colors/primary)
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
    :transform "scale(0.98)"})
 
@@ -71,6 +71,7 @@
          {:background-color "white"
           :color colors/primary
           :border "1px solid"
+          :cursor "pointer"
           :border-color colors/primary
           ::stylefy/mode {:hover outline-btn-hover-focus
                           :focus outline-btn-hover-focus
