@@ -39,9 +39,7 @@
             [ote.style.dialog :as style-dialog]))
 
 (def ic-warning [ic/alert-warning {:style {:color colors/negative-button
-                                           :margin-left "0.5rem"
                                            :margin-bottom "5px"}}])
-
 
 (defn delete-service-action [e! {::t-service/keys [id name]
                                  :keys [show-delete-modal?]
@@ -81,7 +79,7 @@
         {:service-name name
          :error :no-schedule-sea}))))
 
-(defn transport-services-table-rows [e! services transport-operator-id info-open?]
+(defn transport-services-table-rows [e! services transport-operator-id]
   [ui/table-body {:class "table-body"
                   :display-row-checkbox false}
    (doall
@@ -99,13 +97,9 @@
            (if (service-errors row)
              [:span (stylefy/use-style style-base/icon-with-text)
               (tr [:field-labels :transport-service ::t-service/published?-values (some? published)])
-              [:button {:style {:border 0
-                                :background "none"
-                                :cursor "pointer"}
-                        :on-click #(swap! info-open? not)}
-               [ic/alert-warning {:style {:color colors/negative-button
-                                          :margin-left "0.5rem"
-                                          :margin-bottom "5px"}}]]]
+              [ic/alert-warning {:style {:color colors/negative-button
+                                         :margin-left "0.5rem"
+                                         :margin-bottom "5px"}}]]
              (tr [:field-labels :transport-service ::t-service/published?-values (some? published)]))]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
           [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
@@ -129,7 +123,7 @@
        services))])
 
 (defn- route-error
-  [errors info-open?]
+  [errors]
   (let [error-keys (reduce
                      (fn [set error]
                        (conj set (:error error)))
@@ -169,7 +163,7 @@
          [:strong (tr [:enums ::t-service/transport-type :sea]) " • "]
          [linkify "/#/routes" (tr [:own-services-page :open-sea-rae]) {:target "_blank"}]])]
      {:icon ic-warning
-      :atom info-open?}]))
+      :default-open? true}]))
 
 (defn transport-services-listing [e! transport-operator-id services section-label]
   (when (> (count services) 0)
@@ -177,8 +171,7 @@
                    #(not (nil? %))
                    (map
                      service-errors
-                     services))
-          info-open? (r/atom false)]
+                     services))]
       [:div.row (stylefy/use-style style-base/section-margin)
        [:div {:class "col-xs-12 col-md-12"}
         [:h4 section-label]
@@ -193,10 +186,10 @@
            [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
            [ui/table-header-column {:class "table-header "} (tr [:front-page :table-header-actions])]]]
 
-         (transport-services-table-rows e! services transport-operator-id info-open?)]
+         (transport-services-table-rows e! services transport-operator-id)]
         [:div {:style {:margin-top "2rem"}}
          (when (not-empty errors)
-           (route-error errors info-open?))]]])))
+           (route-error errors))]]])))
 
 (defn warn-about-test-server []
   (let [page-url (-> (.-location js/window))]
