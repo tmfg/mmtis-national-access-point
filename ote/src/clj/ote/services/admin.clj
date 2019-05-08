@@ -282,13 +282,17 @@
 
 (defn monitor-csv-report [db report-type]
   (case report-type
+    "all-companies"
+    (csv-data ["yritys" "y-tunnus"]
+              (map (juxt :name :business-id) (all-registered-companies db)))
+
     "monthly-companies"
-    (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
-              (map (juxt :month :sum) (monthly-registered-companies db)))
+    (csv-data ["kuukausi" "tuottaja-ytunnus-lkm" "tuottavien_lkm" "osallistuvien_lkm"]
+              (map (juxt :month :sum :sum-providing :sum-participating) (monthly-registered-companies db)))
 
     "tertile-companies"
-    (csv-data ["tertiili" "tuottaja-ytunnus-lkm"]
-              (map (juxt :tertile :sum) (tertile-registered-companies db)))
+    (csv-data ["tertiili" "tuottaja-ytunnus-lkm" "tuottavien_lkm" "osallistuvien_lkm"]
+              (map (juxt :tertile :sum :sum-providing :sum-participating) (tertile-registered-companies db)))
 
     "company-service-types"
     (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
@@ -463,20 +467,25 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))
-    (GET "/admin/user-operators-by-business-id/:business-id" [business-id]
+    (GET "/admin/user-operators-by-business-id/:business-id" {{:keys [business-id]}
+                                                              :params
+                                                              user :user}
+      (require-admin-user "/admin/user-operators-by-business-id/:business-id" (:user user))
       (http/transit-response
         (get-user-operators-by-business-id db business-id)))
 
     (GET "/admin/commercial-services" req
-         (http/transit-response (get-commercial-scheduled-services db )))
+      (require-admin-user "/admin/commercial-services" (:user (:user req)))
+      (http/transit-response (get-commercial-scheduled-services db )))
 
     (GET "/admin/csv-fetch" req
       (require-admin-user "csv" (:user (:user req)))
       (fetch-new-exception-csv db req))
 
     (POST "/admin/toggle-commercial-services" {form-data :body user :user}
-        (toggle-commercial-service db (http/transit-request form-data))
-        (http/transit-response "OK"))))
+      (require-admin-user "/admin/toggle-commercial-services" (:user user))
+      (toggle-commercial-service db (http/transit-request form-data))
+      (http/transit-response "OK"))))
 
 
 (define-service-component CSVAdminReports

@@ -1108,7 +1108,7 @@
      [:p label])])
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
-  [info/info-toggle label body default-state])
+  [info/info-toggle label body {:default-open? default-state}])
 
 (defmethod field :divider [{:keys [_]}]
   [ui/divider])

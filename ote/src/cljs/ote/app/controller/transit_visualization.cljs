@@ -98,7 +98,7 @@
   (let [;; Removed in past routes won't be displayed at the moment. They are ended routes and we do not need to list them.
         ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
-        only-changes (sort-by :different-week-date (filterv :change-date changes))
+        only-changes (sort-by :different-week-date (filterv :different-week-date changes))
 
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
@@ -198,8 +198,8 @@
       :route-hash-id-type (:route-hash-id-type response))))
 
 (defn- init-view-state [app scope]
-  (let [initial-view-state {:all-route-changes-checkbox nil
-                            :all-route-changes-display? false
+  (let [initial-view-state {:all-route-changes-display? false
+                            :all-route-changes-chenckbox false
                             :open-sections {:gtfs-package-info false}
                             :scope scope
                             :service-changes-for-date-loading? true}]
@@ -386,17 +386,17 @@
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
-                ;; No-traffic route, return current day always
-                (= :no-traffic (:change-type route))
+                ;; No-traffic route, return current day when the no-traffic start is in the past
+                (and
+                  (= :no-traffic (:change-type route))
+                  (t/after? (time/now) date1))
                 (time/now)
 
                 :else
                 date1)
-        date2 (if (and
-                    (:different-week-date route)
-                    (not= :no-traffic (:change-type route)))
-                  (:different-week-date route)
-                  (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
+        date2 (if-let [date2 (:different-week-date route)]
+                date2
+                (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
         (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
