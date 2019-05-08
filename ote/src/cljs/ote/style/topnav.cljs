@@ -4,7 +4,7 @@
 (def topnav-wrapper {:position "fixed"
                      :width "100%"
                      :top 0
-                     :z-index 999
+                     :z-index 1001
                      :transition "all 300ms ease"
                      ::stylefy/vendors ["webkit" "moz" "ms"]
                      ::stylefy/auto-prefix #{:transition}})
