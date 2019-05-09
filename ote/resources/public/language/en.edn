@@ -983,6 +983,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-dataset "Transport service catalog"
   :navigation-give-feedback "Give feedback"
   :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-email "joukkoliikenne@traficom.fi"
   :navigation-login "Login"
   :navigation-register "Register"
   :navigation-admin "Admin panel"
