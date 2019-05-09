@@ -191,6 +191,54 @@
              (-> (second test-result)
                  (select-keys tu/select-keys-detect-changes-for-all-routes)))))))
 
+;;;;;;;; Test traffic change and two patterns of no-traffic which do NOT exceed reporting threshold
+
+;; Data adapted from a real-world use-case
+(def data-no-traffic-two-patterns-consecutive
+  (tu/weeks (tu/to-local-date 2019 5 13)
+            (list {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 13.5.
+                  {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 20.5.
+                  {tu/route-name ["AA" "AA" "AA" "AA" "AA" "AA" "AA"]} ;; Week 27.5.
+                  {tu/route-name ["BB" "CC" nil nil nil nil nil]} ;; Week 3.6.
+                  {tu/route-name ["BB" "CC" nil nil nil nil nil]} ;; Week 10.6.
+                  {tu/route-name ["DD" "DD" "DD" "DD" "DD" nil nil]} ;; Week 17.6.
+                  {tu/route-name ["DD" "DD" "DD" "DD" "DD" nil nil]}
+                  {tu/route-name ["DD" "DD" "DD" "DD" "DD" nil nil]}
+                  {tu/route-name ["DD" "DD" "DD" "DD" "DD" nil nil]})))
+
+(deftest test-no-traffic-two-patterns-consecutive
+  (let [result (-> data-no-traffic-two-patterns-consecutive
+                        detection/changes-by-week->changes-by-route
+                        detection/detect-changes-for-all-routes)]
+    (testing "Ensure first change is reported"
+      (is (=
+            {:route-key tu/route-name
+             :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20)
+                             :end-of-week (tu/to-local-date 2019 5 26)}
+             :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                              :end-of-week (tu/to-local-date 2019 6 9)}}
+           (-> result
+               first
+               (select-keys tu/select-keys-detect-changes-for-all-routes)
+               ;; no-traffic keys ignored in analysis because :different-week takes priority over them so let's just not examine them. Update test when logic changes.
+               (dissoc :no-traffic-run :no-traffic-start-date )))))
+
+    (testing "Ensure second change is reported"
+      (is (=
+            {:route-key tu/route-name
+             :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                             :end-of-week (tu/to-local-date 2019 6 9)}
+             :different-week {:beginning-of-week (tu/to-local-date 2019 6 17)
+                              :end-of-week (tu/to-local-date 2019 6 24)}}
+            (-> result
+                second
+                (select-keys tu/select-keys-detect-changes-for-all-routes)
+                ;; no-traffic keys ignored in analysis because :different-week takes priority over them so let's just not examine them. Update test when logic changes.
+                (dissoc :no-traffic-run :no-traffic-start-date )))))
+
+    (testing "Ensure that a right amount of changes are found and there are no extra changes."
+      (is (= 2 (count result))))))
+
 ;;;;;;;; Test no-traffic run start and end when normal traffic pattern includes also no-traffic days
 
 (def data-no-traffic-run-weekdays
@@ -526,98 +574,6 @@
 
 ;;;;;;;;;
 
-(def data-realworld-two-change-case
-  [{:beginning-of-week (java.time.LocalDate/parse "2019-02-18"),
-    :end-of-week (java.time.LocalDate/parse "2019-02-24"),
-    :routes {tu/route-name [nil nil nil nil nil nil "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-02-25"),
-    :end-of-week (java.time.LocalDate/parse "2019-03-03"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-03-04")
-    :end-of-week (java.time.LocalDate/parse "2019-03-10"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-03-11"),
-    :end-of-week (java.time.LocalDate/parse "2019-03-17"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-03-18"),
-    :end-of-week (java.time.LocalDate/parse "2019-03-24"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-03-25"),
-    :end-of-week (java.time.LocalDate/parse "2019-03-31"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-04-01"),
-    :end-of-week (java.time.LocalDate/parse "2019-04-07"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-04-08"),
-    :end-of-week (java.time.LocalDate/parse "2019-04-14"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-04-15"),
-    :end-of-week (java.time.LocalDate/parse "2019-04-21"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "hkolmas" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-04-22"),
-    :end-of-week (java.time.LocalDate/parse "2019-04-28"),
-    :routes {tu/route-name ["hkolmas" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-04-29"),
-    :end-of-week (java.time.LocalDate/parse "2019-05-05"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}} ;; In data third value was :first-of-may
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-06"),
-    :end-of-week (java.time.LocalDate/parse "2019-05-12"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-13"),
-    :end-of-week (java.time.LocalDate/parse "2019-05-19"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-20"),
-    :end-of-week (java.time.LocalDate/parse "2019-05-26"),
-    :routes {tu/route-name ["heka" "heka" "heka" "heka" "heka" "htoka" "hkolmas"]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-05-27"), ;; first change
-    :end-of-week (java.time.LocalDate/parse "2019-06-02"),
-    :routes {tu/route-name ["heka" "hkolmas" nil nil nil nil nil]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-03"),
-    :end-of-week (java.time.LocalDate/parse "2019-06-09"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-10"),
-    :end-of-week (java.time.LocalDate/parse "2019-06-16"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" "hneljas" nil nil]}}
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-17"),
-    :end-of-week (java.time.LocalDate/parse "2019-06-23"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
-
-
-   ;; padding added
-   {:beginning-of-week (java.time.LocalDate/parse "2019-06-24"),
-    :end-of-week (java.time.LocalDate/parse "2019-06-30"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
-
-   {:beginning-of-week (java.time.LocalDate/parse "2019-07-01"),
-    :end-of-week (java.time.LocalDate/parse "2019-07-01"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}
-
-   {:beginning-of-week (java.time.LocalDate/parse "2019-07-08"),
-    :end-of-week (java.time.LocalDate/parse "2019-07-14"),
-    :routes {tu/route-name ["hneljas" "hneljas" "hneljas" "hneljas" nil nil nil]}}])
-
-(deftest more-than-one-change-found-case-2
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
-
-  ;; first test that the test data and old change detection code agree
-  (testing "single-change detection code agrees with test data"
-    (is (= (tu/to-local-date 2019 5 27) (-> data-realworld-two-change-case
-                                            detection/route-weeks-with-first-difference
-                                            first
-                                            :different-week
-                                            :beginning-of-week))))
-
-  (let [diff-maps (-> data-realworld-two-change-case
-                      detection/changes-by-week->changes-by-route
-                      detection/detect-changes-for-all-routes)]
-    (testing "got two changes"
-      (is (= 2 (count diff-maps))))
-
-    (testing "first change is detected"
-      (is (= (tu/to-local-date 2019 5 27) (-> diff-maps first :different-week :beginning-of-week))))
-
-    (testing "second change date is correct"
-      (is (= (tu/to-local-date 2019 6 3) (-> diff-maps second :different-week :beginning-of-week))))))
 
 (def data-change-to-summer-schedule-nil-weeks-with-midsummer
   (tu/weeks (tu/to-local-date 2019 5 13)
