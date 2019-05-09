@@ -463,24 +463,6 @@
                      :when (= tu/route-name-2 (:route-key dp))]
                  d)))))))
 
-(def data-two-week-change
-  (tu/weeks (tu/to-local-date 2019 2 4)
-            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 4.2.
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; first current week (11.2.)
-                     {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}
-                     {tu/route-name ["h1" "!!" "!!" "h4" "h5" "h6" "h7"]}]
-                    (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name))))
-
-(deftest no-change-found
-  (spec-test/instrument `detection/route-weeks-with-first-difference)
-
-  (let [diff-maps (-> data-two-week-change
-                      detection/changes-by-week->changes-by-route
-                      detection/detect-changes-for-all-routes)
-        pairs-with-changes (filterv :different-week diff-maps)]
-    (testing "got no changes"
-      (is (= 0 (count pairs-with-changes))))))
-
 ; Dev tip: Put *symname in ns , evaluate, load, run (=define) and inspect in REPL
 ; Fetched from routes like below
 ; <snippet>
