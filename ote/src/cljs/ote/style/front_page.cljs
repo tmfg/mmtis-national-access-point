@@ -2,7 +2,8 @@
   "Front page styles related to hero images and other front page components"
   (:require
     [stylefy.core :as stylefy :refer [use-style use-sub-style]]
-    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
+    [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
+    [ote.theme.colors :as colors]))
 
 (def hero-img {:height          "540px"
                :margin-top      "-20px"
@@ -200,3 +201,6 @@
 
 (def footer-3-container {:padding-top "60px"
                          ::stylefy/media {{:max-width (str width-xs "px")} {:padding-top "40px" }}})
+
+(def footer-gray-info-text {:color colors/gray550
+                            :margin-left "30px"})
