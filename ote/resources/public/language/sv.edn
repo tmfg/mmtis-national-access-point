@@ -987,6 +987,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-dataset "Tjänstekatalog"
   :navigation-give-feedback "Ge feedback"
   :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-email "joukkoliikenne@traficom.fi"
   :navigation-login "Logga in"
   :navigation-register "Registrera"
   :navigation-admin "Admin panel"
