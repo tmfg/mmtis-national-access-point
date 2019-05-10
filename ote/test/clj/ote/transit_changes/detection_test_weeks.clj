@@ -119,7 +119,7 @@
   (let [result (->> data-route-starts-no-end
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) (:detection-threshold-route-end-days config-tc) data-all-routes-2019))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes-2019))]
     (testing "Ensure detection for starting route detects only one change and no route end. No further verification because currently transform-route-change converts it to change-type :added"
       (is (not (contains? result :route-end-date))))
 
@@ -654,7 +654,7 @@
   (let [result (->> data-traffic-winter-to-summer-and-end-traffic
                     detection/changes-by-week->changes-by-route
                     detection/detect-changes-for-all-routes
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) (:detection-threshold-route-end-days config-tc) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
 
     (testing "Expect route end instead of no-traffic, when no-traffic starts within route end threshold"
       (is (= {:route-key tu/route-name
@@ -682,7 +682,7 @@
   (let [result (->> data-change-nil-and-ending-route        ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) (:detection-threshold-route-end-days config-tc) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (testing "Ensure route end is reported when no-traffic starts, even if route max-date is later. If that is possible..."
       (is (= {:route-end-date (tu/to-local-date 2019 6 5)
               :route-key tu/route-name
@@ -703,7 +703,7 @@
   (let [result (->> data-ending-route-change                ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) (:detection-threshold-route-end-days config-tc) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (is (= {:route-end-date (tu/to-local-date 2019 7 15)
             :route-key tu/route-name
             :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
@@ -725,7 +725,7 @@
   (let [result (->> data-change-and-ending-route            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) (:detection-threshold-route-end-days config-tc) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (testing "Ensure a traffic change and route end within detection window are reported."
       (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 6 17)
                                :end-of-week (tu/to-local-date 2019 6 23)}
