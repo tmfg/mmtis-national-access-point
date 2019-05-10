@@ -17,7 +17,8 @@
             [clojure.string :as str]
             [ote.util.functor :refer [fmap]]
             [ote.util.collections :refer [map-by]]
-            [ote.transit-changes.detection :as detection])
+            [ote.transit-changes.detection :as detection]
+            [ote.config.transit-changes-config :as config-tc])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -63,21 +64,19 @@
 (defn night-time? [dt]
   (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
 
-;; To speed up detection, call this with vector of service-ids:
-;; e.g.: (detect-new-changes-task db (time/now) true [1289])
+;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task db (time/now) true [1289])`
 (defn detect-new-changes-task
   ([db detection-date force?]
    (detect-new-changes-task db detection-date force? nil))
-  ([db detection-date force? service-ids] ;; db (time/now) false
+  ([db detection-date force? service-ids] ;; db (time/now) false`
    (let [lock-time-in-seconds (if force?
                                 1
                                 1800)
          today detection-date ;; Today is the default but detection may be run "in the past" if admin wants to
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
-
-         ;; Continue 30 weeks from the current week -> 31 week
-         end-date (time/days-from start-date (dec (* 7 31)))
+         ;; Date in future up to where traffic should be analysed
+         end-date (time/days-from start-date (:detection-window-days (config-tc/config)))
 
          ;; Convert to LocalDate instances
          [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
@@ -118,7 +117,7 @@
                  (#'update-one-gtfs! config db true)))
               (chime-at (daily-at 5 15)
                         (fn [_]
-                          (detect-new-changes-task db (time/now) false)))] ;; Run from repl: (detect-new-changes-task (:db ote.main/ote) (t/date-time 2018 11 11) true)
+                          (detect-new-changes-task db (time/now) false)))]
              (do
                (log/debug "GTFS IMPORT IS NOT ENABLED!")
                nil))))

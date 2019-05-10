@@ -12,14 +12,11 @@
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
             [ote.db.tx :as tx]
-            [ote.transit-changes.change-history :as change-history])
+            [ote.transit-changes.change-history :as change-history]
+            [ote.config.transit-changes-config :as config-transit-chg])
   (:import (java.time LocalDate DayOfWeek)))
 
-(def ^:const no-traffic-detection-threshold
-  "The amount of days after a no-traffic run is detected as a change."
-  16)
-
-(def detection-interval-days 14)
+(def config-tc (config-transit-chg/config))
 
 (defqueries "ote/transit_changes/detection.sql")
 (defqueries "ote/services/transit_changes.sql")
@@ -228,7 +225,7 @@
 
       ;; If current run + beginning run is above threshold, mark this as a change
       (and no-traffic-run
-           (> (+ no-traffic-run beginning-run) no-traffic-detection-threshold))
+           (> (+ no-traffic-run beginning-run) (:detection-threshold-no-traffic-days config-tc)))
       (-> state
           (dissoc :no-traffic-run)
           (assoc :no-traffic-change (+ no-traffic-run beginning-run)))
@@ -768,7 +765,7 @@
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
           ;; Set change date to future (every 2 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) detection-interval-days)))
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) (:detection-interval-service-days config-tc))))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
@@ -944,8 +941,6 @@
         res (or chg [])]
     res))
 
-(def route-end-detection-threshold 90)
-
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
 (defn detect-route-changes-for-service [db {:keys [start-date service-id] :as route-query-params}]
@@ -975,7 +970,7 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
-                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           (add-ending-route-change (java.time.LocalDate/now) (:detection-threshold-route-end-days config-tc) all-routes)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
