@@ -144,7 +144,7 @@ User UI visualization of transit change detection results
 
 
 - Thresholds (reference: `ote/cljc/config/transit_changes_config.cljc`)
-  - Detection window: service's route data analyzed into future for: **120** days 
+  - Detection window: service's route data analyzed into future for: **216** days 
   - Route end: route marked 'ending' if no traffic within next: **90** days
   - Change window: A change is recorded if duration of differences in traffic hash continue more than: **2** weeks
   - No-traffic threshold: A 'no-traffic' change for route is reported if duration is at mimimum: **16** days
