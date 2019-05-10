@@ -264,8 +264,11 @@
          [:li
           [linkify (tr [:common-texts :navigation-feedback-link]) (tr [:common-texts :navigation-give-feedback])
            (merge (stylefy/use-style
-                    style-topnav/topnav-dropdown-link)
-                  {:target "_blank"})]]]]]]]))
+                    (merge style-topnav/topnav-dropdown-link
+                           {:padding "10px 0 0 0"}))
+                  {:target "_blank"})]
+          [:span (stylefy/use-style style-topnav/gray-info-text)
+           (tr [:common-texts :navigation-feedback-email])]]]]]]]))
 
 (defn- top-nav-links [e! app is-scrolled?]
   (let [current-language @localization/selected-language]
