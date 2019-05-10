@@ -49,7 +49,7 @@
                    detection/changes-by-week->changes-by-route
                    detection/detect-changes-for-all-routes)]
 
-    (testing ""
+    (testing "Ensure no change is reported, ongoing traffic is reported"
       (is (= {:route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20)
                               :end-of-week (tu/to-local-date 2019 5 26)}}
