@@ -15,8 +15,6 @@
 ;;  *res)
 ;; </snippet>
 
-(def config-tc (config-tc/config))
-
 ;;;;;;;; Test Ongoing traffic no changes
 
 (def data-no-changes
