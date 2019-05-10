@@ -127,3 +127,7 @@
 (def active (merge link active-style))
 
 (def right {:float "right"})
+
+(def gray-info-text {:color "lightgray"
+                     :font-size "0.875rem"
+                     :padding-bottom "10px"})
