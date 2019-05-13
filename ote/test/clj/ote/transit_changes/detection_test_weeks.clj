@@ -273,7 +273,8 @@
   (tu/weeks (tu/to-local-date 2018 10 8)
             (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name)
                     [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
-                    (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name))))
+                    (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name)
+                    (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name))))
 
 (deftest test-no-traffic-run-full-detection-window
   (let [result (-> no-traffic-run-full-detection-window
