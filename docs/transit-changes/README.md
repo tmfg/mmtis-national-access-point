@@ -138,18 +138,21 @@ User UI visualization of transit change detection results
 #### Detection algorithm
 
 ##### Important notes
-- Change detection is run periodically for the **latest imported** transit data packages.  
 - No history data is used from preceding imports or analyses. Latest package is analysed independently
-- Separate detection runs for the same service will detect same changes as the previous run, if the data is the same. 
-- Route traffic changes detected for current week when detection is run, will be reported on next week instead, except **added** and **ending** routes.
-- Thresholds
-  - Detection window: service's route data analyzed into future for: **120** days 
+- Separate detection runs for the same service will detect same changes as the previous run, if the data for the in the package is the same. 
+- Route traffic changes which are marked for rhe same week when detection task runs, will be reported to happen next week instead, except **added** and **ending** routes (those handled by `update-transit-changes!`)
+
+
+- Thresholds (reference: `ote/cljc/config/transit_changes_config.cljc`)
+  - Detection window: service's route data analyzed into future for: **216** days 
   - Route end: route marked 'ending' if no traffic within next: **90** days
-  - Detection interval for service: detection for every service scheduled every: **14** days  
+  - Change window: A change is recorded if duration of differences in traffic hash continue more than: **2** weeks
+  - No-traffic threshold: A 'no-traffic' change for route is reported if duration is at mimimum: **16** days
+  - Detection task interval for service: 
+    - Detection for every service scheduled every **14** days 
+    - Detection run also **when service has a package imported** on the same date when the detection task runs
   (Notice: this is different than detecting task scheduling)
-  - Change window: A change is recorded if duration of differences in traffic hash continue at minimum: **2 weeks**
-  - No-traffic threshold: A 'no-traffic' change for route is reported if duration is at mimimum: **16 days**
-  
+
 ##### Sequence
 
 ![transit-changes-detection-logic](transit-changes-detection-logic.png)

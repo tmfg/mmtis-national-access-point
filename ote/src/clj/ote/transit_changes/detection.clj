@@ -12,14 +12,11 @@
             [ote.util.collections :refer [map-by count-matching]]
             [ote.util.functor :refer [fmap]]
             [ote.db.tx :as tx]
-            [ote.transit-changes.change-history :as change-history])
+            [ote.transit-changes.change-history :as change-history]
+            [ote.config.transit-changes-config :as config-tc])
   (:import (java.time LocalDate DayOfWeek)))
 
-(def ^:const no-traffic-detection-threshold
-  "The amount of days after a no-traffic run is detected as a change."
-  16)
-
-(def detection-interval-days 14)
+(def settings-tc (config-tc/config))
 
 (defqueries "ote/transit_changes/detection.sql")
 (defqueries "ote/services/transit_changes.sql")
@@ -228,7 +225,7 @@
 
       ;; If current run + beginning run is above threshold, mark this as a change
       (and no-traffic-run
-           (> (+ no-traffic-run beginning-run) no-traffic-detection-threshold))
+           (> (+ no-traffic-run beginning-run) (:detection-threshold-no-traffic-days settings-tc)))
       (-> state
           (dissoc :no-traffic-run)
           (assoc :no-traffic-change (+ no-traffic-run beginning-run)))
@@ -768,7 +765,7 @@
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
           ;; Set change date to future (every 2 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) detection-interval-days)))
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) (:detection-interval-service-days settings-tc))))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
@@ -876,7 +873,7 @@
        (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
 
 (spec/fdef add-ending-route-change
-           :args (spec/cat :traffic-threshold-d pos? :all-route-changes coll? :all-routes coll?)
+           :args (spec/cat :all-route-changes coll? :all-routes coll?)
            :ret ::detected-route-changes-for-services-coll)
 (defn add-ending-route-change
   "Takes a collection of route changes and adds a \"route ending\" change if max-date is before
@@ -911,13 +908,13 @@
         }
         {...}]
   "
-  [date traffic-threshold-d all-routes all-changes]
+  [date all-routes all-changes]
   (let [route-max-date (fn [route-hash-id all-routes]
                          (:max-date (some
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))
                                       all-routes)))
-        create-end-change (fn [last-chg traffic-threshold-d max-date ^LocalDate date]
-                            (when (route-ends? date max-date traffic-threshold-d)
+        create-end-change (fn [last-chg max-date ^LocalDate date]
+                            (when (route-ends? date max-date (:detection-threshold-route-end-days settings-tc))
                               (merge {:route-end-date (or (and (nil? (:no-traffic-end-date last-chg))
                                                                ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
                                                                ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
@@ -936,15 +933,13 @@
                           (fn [[route-key route-chg-group]]
                             (let [last-change (last route-chg-group)
                                   max-date (route-max-date (:route-key last-change) all-routes)
-                                  end-change (create-end-change last-change traffic-threshold-d max-date date)]
+                                  end-change (create-end-change last-change max-date date)]
                               (if end-change
                                 (conj (remove-ongoing-or-break route-chg-group) end-change)
                                 route-chg-group)))
                           (group-by :route-key all-changes))))
         res (or chg [])]
     res))
-
-(def route-end-detection-threshold 90)
 
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
@@ -975,7 +970,7 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
-                           (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           (add-ending-route-change (java.time.LocalDate/now) all-routes)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
