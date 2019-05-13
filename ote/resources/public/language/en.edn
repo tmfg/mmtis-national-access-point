@@ -1130,11 +1130,18 @@ You can also draw the operating area or point to the map with drawing tools. You
                   [:count " services found"])
   :nap-interface ["An interface containing essential data saved in NAP-service: "]
   :external-interfaces ["Other external interfaces"]
-  :showing-latest-services "No search filters. Showing latest modified services."
-  :total-services ["The service catalog has a total of " :total-service-count " services. A total of " :total-company-count " companies are contributing to the provision of services."]
+  :no-services-found "Hakuehdoilla ei löydy palveluita."
+  :no-search-filters "Hakuehtoja ei ole valittu."
+  :found-x-services ["Hakuehdoilla löytyi " :count " kpl palveluita. "]
+  :operation-area-search-filter-result ["Palvelut, joiden toiminta-alueeksi on ilmoitettu: " :operation-area-filter]
+  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :other-operation-area-services "Muut valitun toiminta-alueen kattavat palvelut"
+  :no-operation-area-services "Yhdellekään palvelulle ei ole ilmoitettu kyseistä toiminta-aluetta."
+  :service-summary-text "Palvelukatalogissa on yhteensä "
+  :service-count [:count " palvelua"]
+  :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
+  :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
   :fetching-more "Fetching more services..."
-  :operator-services ["Transport operator " :name " has " :count " services"]
-  :operator-no-services "Transport operator has no services."
   :view-routes "View routes"
   :view-routes-failure "Route viewing not possible"
   :load-csv-file "Load csv file"

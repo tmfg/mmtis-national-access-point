@@ -1134,11 +1134,18 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                   ["Hittades " :count " tjänst."])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
-  :showing-latest-services "Ingen sökning gjord. Nedan visas alla katalogens tjänster."
-  :total-services ["Katalogen innehåller totalt " :total-service-count " tjänster. Totalt " :total-company-count " företag är involverade i tillhandahållandet av tjänster."]
+  :no-services-found "Hakuehdoilla ei löydy palveluita."
+  :no-search-filters "Hakuehtoja ei ole valittu."
+  :found-x-services ["Hakuehdoilla löytyi " :count " kpl palveluita. "]
+  :operation-area-search-filter-result ["Palvelut, joiden toiminta-alueeksi on ilmoitettu: " :operation-area-filter]
+  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :other-operation-area-services "Muut valitun toiminta-alueen kattavat palvelut"
+  :no-operation-area-services "Yhdellekään palvelulle ei ole ilmoitettu kyseistä toiminta-aluetta."
+  :service-summary-text "Palvelukatalogissa on yhteensä "
+  :service-count [:count " palvelua"]
+  :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
+  :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
   :fetching-more "Sökning av tjänster pågår..."
-  :operator-services ["Tjänsteproducenten" :name " har " :count " tjänster."]
-  :operator-no-services "Tjänsteproducenten har inga tjänster."
   :view-routes "Visa rutter"
   :view-routes-failure "Rutterna kan inte visas"
   :load-csv-file "Ladda csv"

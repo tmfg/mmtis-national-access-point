@@ -33,7 +33,6 @@
 (defn- services-operating-in
   "Returns ids of services which operate in the given areas"
   [db operation-area]
-  (println "haetaan operation arean perusteella " (seq operation-area))
   (when (seq operation-area)
     (map->set
      :id

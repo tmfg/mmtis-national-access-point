@@ -1141,11 +1141,18 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    ["löytyi " :count " palvelua"]) "."]
   :nap-interface ["NAP-palvelussa tallennettujen tietojen koneluettava rajapinta: "]
   :external-interfaces ["Palvelun muut koneluettavat rajapinnat"]
-  :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
-  :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua. Palveluiden tuottamiseen osallistuu yhteensä " :total-company-count " yritystä."]
+  :no-services-found "Hakuehdoilla ei löydy palveluita."
+  :no-search-filters "Hakuehtoja ei ole valittu."
+  :found-x-services ["Hakuehdoilla löytyi " :count " kpl palveluita. "]
+  :operation-area-search-filter-result ["Palvelut, joiden toiminta-alueeksi on ilmoitettu: " :operation-area-filter]
+  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :other-operation-area-services "Muut valitun toiminta-alueen kattavat palvelut"
+  :no-operation-area-services "Yhdellekään palvelulle ei ole ilmoitettu kyseistä toiminta-aluetta."
+  :service-summary-text "Palvelukatalogissa on yhteensä "
+  :service-count [:count " palvelua"]
+  :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
+  :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
   :fetching-more "Haetaan lisää palveluita..."
-  :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
-  :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
   :view-routes-failure "Reittejä ei voi katsella"
   :load-csv-file "Lataa csv tiedosto"
