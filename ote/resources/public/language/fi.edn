@@ -991,6 +991,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-dataset "Liikkumispalvelukatalogi"
   :navigation-give-feedback "Anna palautetta"
   :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-email "joukkoliikenne@traficom.fi"
   :navigation-login "Kirjaudu"
   :navigation-register "Rekisteröidy"
   :navigation-admin "Ylläpitopaneeli"

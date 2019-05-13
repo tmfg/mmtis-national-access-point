@@ -287,12 +287,12 @@
               (map (juxt :name :business-id) (all-registered-companies db)))
 
     "monthly-companies"
-    (csv-data ["kuukausi" "tuottaja-ytunnus-lkm"]
-              (map (juxt :month :sum) (monthly-registered-companies db)))
+    (csv-data ["kuukausi" "tuottaja-ytunnus-lkm" "tuottavien_lkm" "osallistuvien_lkm"]
+              (map (juxt :month :sum :sum-providing :sum-participating) (monthly-registered-companies db)))
 
     "tertile-companies"
-    (csv-data ["tertiili" "tuottaja-ytunnus-lkm"]
-              (map (juxt :tertile :sum) (tertile-registered-companies db)))
+    (csv-data ["tertiili" "tuottaja-ytunnus-lkm" "tuottavien_lkm" "osallistuvien_lkm"]
+              (map (juxt :tertile :sum :sum-providing :sum-participating) (tertile-registered-companies db)))
 
     "company-service-types"
     (csv-data ["tuottaja-tyyppi" "tuottaja-ytunnus-lkm"]
