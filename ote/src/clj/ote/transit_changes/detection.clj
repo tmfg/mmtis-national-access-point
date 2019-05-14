@@ -890,6 +890,62 @@
   [route-list-with-week-hashes]  
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
+
+(defn changes-straddle-trafficless-period? [a b]
+  (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
+       (= [nil nil nil nil nil nil nil] (:starting-week-hash b))
+       (= (:different-week a) (:starting-week b))
+       (= (:route-key a) (:route-key b))
+       (some? (:no-traffic-change b))))
+
+(defn change-pair->no-traffic [a b]
+  (let [;; use the latter record as starting point
+        m b
+        ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
+        m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
+        ;; if a's preceding week hash and b's trailing week hash are the same,
+        ;; there is no change and we just remove the different-week keys
+        m (if (= (:different-week-hash b) (= (:starting-week-hash a)))            
+            (dissoc m :different-week-hash
+                    :different-week-start-date)
+            m)
+        ;; if a trafficless days to count, we add them to :no-traffic-change
+        m (if-let [a-no-traffic-count (and (:no-traffic-change m) (or (:no-traffic-run a) (:no-traffic-change a)))]
+            (update m :no-traffic-change (partial + (:no-traffic-run a)))
+            ;; else
+            m)
+        ;; - different-week - keep or remove?
+        ;;   -> keep if different week is really different from starting-week?
+        
+        
+        ]
+    m))
+
+(defn trafficless-differences->no-traffic-changes [detected-changes-by-route]
+  ;; (println "tdnc called")
+  ;; (def *tddc detected-changes)
+  ;; we get a vec of maps describing route changes with keys like :route-key, :different-week etc
+  ;; we want to detect pair of changes to the same route that are adjacent in calendar
+  ;; and are traffic changes for non-nil traffic to nil-traffic and back, and replace
+  ;; the pair with one no-traffic map.
+
+  ;; should we rely on the route maps being sorted by route and date in the input?
+  ;; the previous phase is detet-changesfor-all-routes which gets input by-route and by-week,
+  ;; so it should be safe. we can add an assert to verify the assumption.
+
+  ;; one way to do this would be to iterate (or map) with a window (curr/next)
+  ;; and mark a deleted map with nil. we only return one map per call so how to change data and delete other map at same time?
+  ;; one way would be to make another pass over the data...
+
+  (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)])
+  (mapv (fn [[this-change next-change]]
+          (if-let [trafficless-replacement (changes-straddle-trafficless-period? this-change next-change)]
+            trafficless-replacement
+            ;; else
+            this-change
+            ))
+        detected-changes-by-route))
+
 (defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
   (and max-date
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
@@ -898,6 +954,7 @@
 (spec/fdef add-ending-route-change
            :args (spec/cat :traffic-threshold-d pos? :all-route-changes coll? :all-routes coll?)
            :ret ::detected-route-changes-for-services-coll)
+
 (defn add-ending-route-change
   "Takes a collection of route changes and adds a \"route ending\" change if max-date is before
   a traffic threshold days value
@@ -1001,6 +1058,7 @@
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
+                           (trafficless-differences->no-traffic-changes)
                            (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
@@ -1109,5 +1167,3 @@
                             {:gtfs/package-id package-id
                              :gtfs/date (:gtfs/date h)})
             (println "package-id " package-id "date " (:gtfs/date h))))))))
-
-
