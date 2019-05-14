@@ -900,7 +900,7 @@
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
-        m b
+        m (assoc b :no-traffic-converted-from-different-weeks true)
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
         m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
         ;; if a's preceding week hash and b's trailing week hash are the same,
@@ -936,15 +936,32 @@
   ;; one way to do this would be to iterate (or map) with a window (curr/next)
   ;; and mark a deleted map with nil. we only return one map per call so how to change data and delete other map at same time?
   ;; one way would be to make another pass over the data...
-
-  (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)])
-  (mapv (fn [[this-change next-change]]
-          (if-let [trafficless-replacement (changes-straddle-trafficless-period? this-change next-change)]
-            trafficless-replacement
-            ;; else
-            this-change
-            ))
-        detected-changes-by-route))
+  
+  (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)
+        _ (println "got weeks")
+        weeks (mapv (fn [[this-change next-change]]
+                      (if (changes-straddle-trafficless-period? this-change next-change)
+                        (change-pair->no-traffic this-change next-change)
+                        ;; else
+                        this-change))
+                    curr-next-pairs)
+        reduce-initial {:weeks []
+                       :cull-next false}
+        reduce-fn (fn [state item]
+                    (println "reducer: item" (:n item) " -" (:no-traffic-converted-from-different-weeks item))
+                    (if (:no-traffic-converted-from-different-weeks item)
+                       (assoc state
+                             :weeks (conj (:weeks state) item)
+                             :cull-next true)
+                      (if (:cull-next state)
+                        state
+                        (assoc state
+                               :weeks (conj (:weeks state) item)
+                               :cull-next false))))
+        weeks-with-nexts-culled (reduce reduce-fn reduce-initial weeks)]
+    (println "tt" (type weeks-with-nexts-culled))
+    (clojure.pprint/pprint weeks-with-nexts-culled)
+    (:weeks weeks-with-nexts-culled)))
 
 (defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
   (and max-date

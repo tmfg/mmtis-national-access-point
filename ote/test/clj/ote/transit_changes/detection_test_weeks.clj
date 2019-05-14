@@ -801,6 +801,7 @@
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
     (is (= {:route-key "Raimola",
+            :no-traffic-converted-from-different-weeks true,
             :no-traffic-start-date
             (java.time.LocalDate/parse "2018-11-13"),
             :starting-week-hash [nil nil nil nil nil nil nil],
@@ -816,4 +817,9 @@
             {:beginning-of-week
              (java.time.LocalDate/parse "2019-02-11"),
              :end-of-week (java.time.LocalDate/parse "2019-02-17")}}
-           (detection/change-pair->no-traffic diff-a diff-b)))))
+           (detection/change-pair->no-traffic diff-a diff-b)))
+    (let [merge-result (detection/trafficless-differences->no-traffic-changes [(assoc diff-a :n 1)
+                                                                               (assoc diff-a :n 2)
+                                                                               (assoc diff-b :n 3)])]
+      (is (= 2 (count merge-result)))
+      (is (:no-traffic-converted-from-different-weeks (second merge-result))))))
