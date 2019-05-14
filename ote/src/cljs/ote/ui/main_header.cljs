@@ -198,16 +198,14 @@
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/admin"
-                        :on-click #(do
-                                     (e! (fp-controller/->OpenHeader)))})
+                        :on-click #(e! (fp-controller/->OpenHeader))})
              (tr [:document-title :admin])]])
          (when (:admin? (:user app))
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/monitor"
-                        :on-click #(do
-                                     (e! (fp-controller/->OpenHeader)))})
+                        :on-click #(e! (fp-controller/->OpenHeader))})
              (tr [:document-title :monitor])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
