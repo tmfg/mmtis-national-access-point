@@ -5,7 +5,8 @@
             [ote.style.transit-changes :as style]
             [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [ote.style.base :as style-base]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -40,5 +41,10 @@
                                 [ic/action-query-builder {} (tr [:transit-changes :schedule-changes-per-trip])]
                                 [ic/av-not-interested {:color style/remove-color} (tr [:transit-changes :no-traffic])]
                                 [ic/content-remove-circle-outline {:color style/remove-color} (tr [:transit-changes :trip-end-potential])]]]
-        ^{:key (str "transit-visualization-route-changes-legend-" (rand-int 9999999))} ;; Ensure that all icons have unique key
-        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))]])
+        ^{:key (str "transit-visualization-route-changes-legend-" label)} ;; Ensure that all icons have unique key
+        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
+    [:div {:style {:display "flex"
+                   :align-items "center"}}
+     [:div (stylefy/use-style style-base/new-change-legend-icon)
+      [:div (stylefy/use-style style-base/new-change-indicator)]]
+     [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])
