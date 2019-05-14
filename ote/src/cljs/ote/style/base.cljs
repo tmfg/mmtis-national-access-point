@@ -197,7 +197,7 @@
                      :position "relative"
                      :display "block"
                      :width "calc(100% - 38px)"
-                     :line-height "24p"                     ;
+                     :line-height "24p"
                      :font-family "Roboto, sans-serif"})
 (def checkbox-label-with-width (assoc checkbox-label :width "260px"))
 
