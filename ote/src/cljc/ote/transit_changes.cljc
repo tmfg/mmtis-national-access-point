@@ -220,42 +220,6 @@
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)
   :ret boolean?)
 
-(defn first-different-day
-  "Return the index of first different day in two week hash vectors.
-  A day is considered different if both weeks have a hash (non nil)
-  that is not a static-holiday (keyword)
-  for that day and the hash is different."
-  [week-hash-1 week-hash-2]
-  ;(println "week-hash-1: " (pr-str week-hash-1))
-  ;(println "week-hash-2: " (pr-str week-hash-2))
-  (let [diff-predicate-1
-        (fn [i d1 d2]
-          (and (some? d1)
-               (some? d2)
-               (not (keyword? d1))
-               (not (keyword? d2))
-               (not= d1 d2)
-               i))
-        diff-predicate-2
-        (fn [i d1 d2]
-          (and (not (keyword? d1))
-               (not (keyword? d2))
-               (not= d1 d2)
-               i))
-        ;; comparison will ignore nil's (using predicate-1 fn),
-        ;; execept when comparing non-nil week with nil week (then use predicate-2)
-        w1-empty? (every? nil? week-hash-1)
-        w2-empty? (every? nil? week-hash-2)
-        one-empty? (not= w1-empty? w2-empty?)
-        diff-predicate (if one-empty?
-                         diff-predicate-2
-                         diff-predicate-1)]
-    (some identity
-          (map diff-predicate
-               (iterate inc 0)
-               week-hash-1
-               week-hash-2))))
-
 (defn- day-traffic-changes?
   "Takes hashes of a baseline day and a new day to compare, and similar pair for the previous detected change.
   Latter pair is used to resolve if this is a new change or an already reported change, which shouldn't be detected for
@@ -299,11 +263,6 @@
           (if day-changed? d1 d1p)
           (if day-changed? d2 d2p)))
       result)))
-
-(s/fdef first-different-day
-  :args (s/cat :week-hash-1 ::week-hash
-               :week-hash-2 ::week-hash)
-  :ret (s/nilable integer?))
 
 (def static-holidays
   "Static holidays e.g. Christmas that are skipped in. Key is a vector [day month] and value is the holiday id"

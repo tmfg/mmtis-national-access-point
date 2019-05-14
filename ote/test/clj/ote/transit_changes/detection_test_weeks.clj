@@ -511,7 +511,7 @@
       (is (= (tu/to-local-date 2018 12 31) (:beginning-of-week different-week))))
 
     (testing "Ensure first different day is wednesday because tuesday is new year"
-      (is (= 2 (transit-changes/first-different-day (:starting-week-hash res) (:different-week-hash res)))))))
+      (is (= [true false] (take 2 (mapv = (:starting-week-hash res) (:different-week-hash res))) )))))
 
 ;;;;;;;; Test holiday/keyword day handling for week detection
 
