@@ -76,16 +76,22 @@
         (doall
           (map-indexed
             (fn [i row]
-              ^{:key (if key-fn (key-fn row) (str i "-" random-table-id "-body-row"))}
+              ^{:key (if key-fn
+                       (key-fn row)
+                       (str i "-" random-table-id "-body-row"))}
               [ui/table-row (merge
-                              (stylefy/use-style (merge {:background-color (if (even? i) table-row-color table-row-color-alt)} ; Add stripes
+                              (stylefy/use-style (merge {:background-color (if (even? i)
+                                                                             table-row-color
+                                                                             table-row-color-alt)} ; Add stripes
                                                         (when on-select
                                                           {:cursor "pointer"
                                                            :transition (str "background-color " transitions/fast-ease-in-out)
                                                            ::stylefy/mode {:hover {:background-color table-row-hover-color}}})
                                                         (when (if row-selected? (row-selected? row) false)
                                                           {:outline (str "solid 3px " colors/primary-dark)
-                                                           ::stylefy/mode {:hover {:background-color (if (even? i) table-row-color table-row-color-alt)}}})
+                                                           ::stylefy/mode {:hover {:background-color (if (even? i)
+                                                                                                       table-row-color
+                                                                                                       table-row-color-alt)}}})
                                                         (when row-style row-style)))
                               {:selectable (boolean on-select)})
 

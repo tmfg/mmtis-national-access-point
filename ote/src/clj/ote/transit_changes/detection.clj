@@ -560,13 +560,14 @@
   Output: returns a coll of maps, each describing one single changed day on a week.
   There may be multiple maps per one week if there are multiple changed days on the week."
   [detection-results]
-  (reduce (fn [result detection]
-            (if-let [changes (:changes detection)]
-              (concat result (for [chg changes]
-                               (assoc detection :changes chg)))
-              (conj result detection)))
-          []
-          detection-results))
+  (reduce
+    (fn [result detection]
+      (if-let [changes (:changes detection)]
+        (vec (concat result (for [chg changes]
+                              (assoc detection :changes chg))))
+        (conj result detection)))
+    []
+    detection-results))
 
 (defn route-day-changes
   "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
@@ -957,7 +958,7 @@
                               (apply concat
                                      (mapv (fn [route-key]
                                              (let [query-params (merge {:route-hash-id route-key} route-query-params)]
-                                                            (service-route-hashes-for-date-range db query-params)))
+                                               (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
         route-hashes-with-holidays (override-holidays db route-hashes)
