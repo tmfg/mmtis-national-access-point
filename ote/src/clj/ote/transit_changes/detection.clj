@@ -946,15 +946,13 @@
                         this-change))
                     curr-next-pairs)
         weeks-without-combined-leftovers (loop [i 0
-                                                out-weeks []
-                                                prev-was-combined? false]
+                                                out-weeks []]
                                            (let [curr-week (get weeks i)]        
                                              (if curr-week
-                                               (recur (inc i)
-                                                      (if prev-was-combined?
-                                                        out-weeks ;; skip adding this one
-                                                        (conj out-weeks curr-week))
-                                                      (:combined curr-week))
+                                               (recur (+ i (if (:combined curr-week)
+                                                             2 ;; skip over the leftover week
+                                                             1))
+                                                      (conj out-weeks curr-week))
                                                out-weeks)))]
     weeks-without-combined-leftovers))
 
