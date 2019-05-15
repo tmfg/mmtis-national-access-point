@@ -57,30 +57,48 @@
   (when-not (:admin? user)
     (throw (SecurityException. "admin only"))))
 
+(defn- authorization-fail-response [user]
+  (when-not (:admin? user)
+    (http/transit-response "Not authorized" 403)))
+
 (defn- admin-service [route {user :user
                              form-data :body :as req} db handler]
   (require-admin-user route (:user user))
   (http/transit-response
    (handler db user (http/transit-request form-data))))
 
-(defn- list-users [db user query]
+(defn- list-users-response [db query]
   (let [users (nap-users/list-users db {:email (str "%" query "%")
                                         :name (str "%" query "%")
                                         :group (str "%" query "%")
-                                        :transit-authority? nil})]
-    (mapv
-      (fn [{groups :groups :as user}]
-        (if groups
-          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
-          user))
-      users)))
+                                        :transit-authority? nil})
+        result (mapv
+                (fn [{groups :groups :as user}]
+                  (if groups
+                    (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
+                    user))
+                users)]
 
-(defn- delete-user [db user query]
+    (http/transit-response
+      result
+      (if (pos-int? (count result))
+        200
+        404))))
+
+(defn- delete-user-response
+  "Description: Deletes a user
+  Input: db=database instance, query=operation argument collection
+  Output: Number or affected records, thus 0 means a failure."
+  [db query]
   (let [id (:id query)
-        timestamp (java.util.Date.)]
-    (log/info "Deleting user with id: " (pr-str id))
-    (nap-users/delete-user! db {:id id :name timestamp})
-    id))
+        affected-records (nap-users/delete-user! db {:id id
+                                                     :name (java.util.Date.)})]
+    (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
+    (http/transit-response
+      nil
+      (if (= affected-records 1)
+        200
+        404))))
 
 (defn- user-operator-members [db user query]
   (let [user-id (:id query)
@@ -441,9 +459,16 @@
 
 (defn- admin-routes [db http nap-config]
   (routes
-    (POST "/admin/users" req (admin-service "users" req db #'list-users))
 
-    (POST "/admin/delete-user" req (admin-service "delete-user" req db #'delete-user))
+    (POST "/admin/users" req
+      (let [user (get-in req [:user :user])]
+        (or (authorization-fail-response user)
+            (list-users-response db (http/transit-request (:body req))))))
+
+    (POST "/admin/delete-user" req
+      (let [user (get-in req [:user :user])]
+        (or (authorization-fail-response user)
+            (delete-user-response db (http/transit-request (:body req))))))
 
     (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))
 
@@ -487,7 +512,6 @@
       (toggle-commercial-service db (http/transit-request form-data))
       (http/transit-response "OK"))))
 
-
 (define-service-component CSVAdminReports
   {}
   ^{:format :csv
@@ -524,5 +548,3 @@
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
-
-
