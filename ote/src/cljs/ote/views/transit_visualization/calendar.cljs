@@ -111,7 +111,16 @@
                      :on-select #(when (first %)
                                    (e! (tv/->SelectRouteForDisplay (first %))))
                      :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
-        [{:name "Aikaa muutokseen"
+        [{:name ""
+          :read identity
+          :format (fn [{:keys [recent-change? change-detected]}]
+                    (when recent-change?
+                      [:div (merge (stylefy/use-style style/new-change-container)
+                                   {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui change-detected)) })
+                       [:div (stylefy/use-style style/new-change-indicator)]]))
+          :col-style style-base/table-col-style-wrap
+          :width "2%"}
+         {:name "Aikaa muutokseen"
           :read :different-week-date
           :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
