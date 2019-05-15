@@ -86,9 +86,11 @@
 ;; Ui
 (defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-changes] :as transit-visualization} routes selected-route]
   (let [current-year (time/year (time/now))
-        changes (filter (fn [x]
-                          (if (= (:route-hash-id x) (:route-hash-id selected-route)) true false)
-                          ) routes)]
+        changes (filter
+                  (fn [x]
+                    (= (:route-hash-id x)
+                       (:route-hash-id selected-route)))
+                  routes)]
     [:div.route-service-calendar
      [tv-section/section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
                :open? (get open-sections :route-service-calendar true)}
@@ -131,7 +133,7 @@
           :col-style style-base/table-col-style-wrap
           :format (fn [change-detected]
                     (time/format-timestamp->date-for-ui change-detected))}
-         {:name "Vertailupäivien väliset muutokset" :width "30%"
+         {:name "Vertailupäivien väliset muutokset" :width "35%"
           :read identity
           :col-style style-base/table-col-style-wrap
           :format (fn [{change-type :change-type :as route}]
