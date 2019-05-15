@@ -240,26 +240,6 @@
    :padding-right "0"
    :overflow-wrap "break-word"})
 
-(def new-change-indicator
-  {:height "6px"
-   :width "6px"
-   :background-color colors/primary
-   :border-radius "50%"})
-
-(def new-change-container
-  {:height "100%"
-   :width "100%"
-   :display "flex"
-   :justify-content "center"
-   :align-items "center"})
-
-(def new-change-legend-icon
-  {:height "20px"
-   :width "20px"
-   :display "flex"
-   :justify-content "center"
-   :align-items "center"})
-
 (def info-row {:border-bottom (str "1px solid " colors/gray350)
                :display "flex"
                :margin-bottom "0.5rem"
