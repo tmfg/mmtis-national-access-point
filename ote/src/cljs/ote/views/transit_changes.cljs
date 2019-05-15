@@ -52,8 +52,8 @@
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
     [:div {:style {:display "flex"
                    :align-items "center"}}
-     [:div (stylefy/use-style style-base/new-change-legend-icon)
-      [:div (stylefy/use-style style-base/new-change-indicator)]]
+     [:div (stylefy/use-style style/new-change-legend-icon)
+      [:div (stylefy/use-style style/new-change-indicator)]]
      [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
@@ -237,9 +237,9 @@
         :read identity
         :format (fn [{:keys [recent-change? date]}]
                   (when recent-change?
-                    [:div {:style (stylefy/use-style style-base/new-change-container)
-                           :title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui date))}
-                     [:div (stylefy/use-style style-base/new-change-indicator)]]))
+                    [:div (merge (stylefy/use-style style/new-change-container)
+                                 {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui date))})
+                     [:div (stylefy/use-style style/new-change-indicator)]]))
         :col-style style-base/table-col-style-wrap
         :width "2%"}
        {:name "Palveluntuottaja"

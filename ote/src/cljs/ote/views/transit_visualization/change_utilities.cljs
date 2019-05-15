@@ -45,6 +45,6 @@
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
     [:div {:style {:display "flex"
                    :align-items "center"}}
-     [:div (stylefy/use-style style-base/new-change-legend-icon)
-      [:div (stylefy/use-style style-base/new-change-indicator)]]
+     [:div (stylefy/use-style style/new-change-legend-icon)
+      [:div (stylefy/use-style style/new-change-indicator)]]
      [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])

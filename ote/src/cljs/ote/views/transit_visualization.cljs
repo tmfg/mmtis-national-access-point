@@ -357,9 +357,9 @@
         :read identity
         :format (fn [{:keys [recent-change? change-detected]}]
                   (when recent-change?
-                    [:div {:style (stylefy/use-style style-base/new-change-container)
-                           :title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui change-detected))}
-                     [:div (stylefy/use-style style-base/new-change-indicator)]]))
+                    [:div (merge (stylefy/use-style style/new-change-container)
+                                 {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui change-detected))})
+                     [:div (stylefy/use-style style/new-change-indicator)]]))
         :col-style style-base/table-col-style-wrap
         :width "2%"}
        {:name "Reitti" :width "20%"
