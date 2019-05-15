@@ -4,7 +4,7 @@
             [ote.db.auditlog :as auditlog]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [clojure.test :as t :refer [deftest testing is]]
-            [ote.test :refer [system-fixture http-get http-post]]
+            [ote.test :refer [system-fixture http-get http-post http-delete]]
             [clojure.test.check.generators :as gen]
             [com.stuartsierra.component :as component]
             [ote.db.generators :as generators]
@@ -58,6 +58,13 @@
     (is (= 404 (:status result))
         "Ensure http status code is correct")
     (is (= 0 (count (:transit result))))))
+
+(deftest test-user-delete-not-found
+  (let [result (try (http-delete "admin" "admin/user/0" )
+                    (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
+                      (-> e ex-data)))]
+    (is (= 404 (:status result))
+        "Ensure http status code is correct")))
 
 (deftest test-delete-service-made-by-normaluser
   (let [generated-service (gen/generate s-generators/gen-transport-service)
