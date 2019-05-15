@@ -89,9 +89,8 @@
   "Description: Deletes a user
   Input: db=database instance, query=operation argument collection
   Output: Number or affected records, thus 0 means a failure."
-  [db query]
-  (let [id (:id query)
-        affected-records (nap-users/delete-user! db {:id id
+  [db id]
+  (let [affected-records (nap-users/delete-user! db {:id id
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
     (http/transit-response
@@ -465,10 +464,10 @@
         (or (authorization-fail-response user)
             (list-users-response db (http/transit-request (:body req))))))
 
-    (POST "/admin/delete-user" req
+    (DELETE "/admin/user/:id" [id :as req]
       (let [user (get-in req [:user :user])]
         (or (authorization-fail-response user)
-            (delete-user-response db (http/transit-request (:body req))))))
+            (delete-user-response db id))))
 
     (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))
 
