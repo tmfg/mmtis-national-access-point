@@ -197,6 +197,17 @@
                             {:cookie-store (cookie-store-for-unauthenticated)})))
        read-response)))
 
+(defn http-delete
+  "Helper for HTTP DELETE requests to the test system."
+  [user path]
+  (-> path url-for-path
+      (http-client/delete (merge
+                          {:headers {"X-CSRF-Token" anti-csrf-token}}
+                          (if user
+                            {:cookie-store (cookie-store-for-user user)}
+                            {:cookie-store (cookie-store-for-unauthenticated)})))
+      read-response))
+
 (defn sql-query [& sql-string-parts]
   (jdbc/query (:db *ote*) [(str/join sql-string-parts)]))
 
