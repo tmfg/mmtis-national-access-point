@@ -154,10 +154,11 @@
   ConfirmDeleteUser
   (process-event [{id :id} app]
     (if (= id (:ensured-id (get-user-by-id app id)))
-      (comm/post! "admin/delete-user" {:id id}
-                  {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
-                   :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
-      (.log js/console "Could not delete user! Check given id."))
+      (comm/delete! (str "admin/user/" id)
+                    nil
+                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
+                     :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
+      (.log js/console "Could not delete user! Check given id:" id))
     app)
 
   ConfirmDeleteUserResponse
