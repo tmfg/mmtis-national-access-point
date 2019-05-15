@@ -900,7 +900,7 @@
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
-        m (assoc b :no-traffic-converted-from-different-weeks true)
+        m (assoc b :combined true)
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
         m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
         ;; if a's preceding week hash and b's trailing week hash are the same,
@@ -945,23 +945,18 @@
                         ;; else
                         this-change))
                     curr-next-pairs)
-        reduce-initial {:weeks []
-                       :cull-next false}
-        reduce-fn (fn [state item]
-                    (println "reducer: item" (:n item) " -" (:no-traffic-converted-from-different-weeks item))
-                    (if (:no-traffic-converted-from-different-weeks item)
-                       (assoc state
-                             :weeks (conj (:weeks state) item)
-                             :cull-next true)
-                      (if (:cull-next state)
-                        state
-                        (assoc state
-                               :weeks (conj (:weeks state) item)
-                               :cull-next false))))
-        weeks-with-nexts-culled (reduce reduce-fn reduce-initial weeks)]
-    (println "tt" (type weeks-with-nexts-culled))
-    (clojure.pprint/pprint weeks-with-nexts-culled)
-    (:weeks weeks-with-nexts-culled)))
+        weeks-without-combined-leftovers (loop [i 0
+                                                out-weeks []
+                                                prev-was-combined? false]
+                                           (let [curr-week (get weeks i)]        
+                                             (if curr-week
+                                               (recur (inc i)
+                                                      (if prev-was-combined?
+                                                        out-weeks ;; skip adding this one
+                                                        (conj out-weeks curr-week))
+                                                      (:combined curr-week))
+                                               out-weeks)))]
+    weeks-without-combined-leftovers))
 
 (defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
   (and max-date
