@@ -77,14 +77,14 @@
 ;; Validate input in list-users-bad-req-response
 (defn- list-users-response [db search]
   (let [result (->> (nap-users/list-users db {:email (str "%" search "%")
-                                             :name (str "%" search "%")
-                                             :group (str "%" search "%")
-                                             :transit-authority? nil})
-                   (mapv
-                     (fn [{groups :groups :as user}]
-                       (if groups
-                         (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
-                         user))))]
+                                              :name (str "%" search "%")
+                                              :group (str "%" search "%")
+                                              :transit-authority? nil})
+                    (mapv
+                      (fn [{groups :groups :as user}]
+                        (if groups
+                          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
+                          user))))]
 
     (http/transit-response
       result
@@ -94,10 +94,10 @@
 
 (defn- delete-user-response
   "Description: Deletes a user
-  Input: db=database instance, query=operation argument collection
+  Input: db=database instance, id=id of record to delete
   Output: Number or affected records, thus 0 means a failure."
-  [db id]
-  (let [affected-records (nap-users/delete-user! db {:id id
+  [db ^Long id]
+  (let [affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
     (http/transit-response
@@ -472,8 +472,8 @@
           (list-users-response db search)))
 
     (DELETE "/admin/user/:id" [id :as req]
-      (let [user (get-in req [:user :user])]
-        (or (authorization-fail-response user)
+      (let [id (Long/parseLong id)]                         ;; Parse id for security before passing to db operations
+        (or (authorization-fail-response (get-in req [:user :user]))
             (delete-user-response db id))))
 
     (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))

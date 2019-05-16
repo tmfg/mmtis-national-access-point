@@ -57,14 +57,24 @@
                       (-> e ex-data)))]
     (is (= 404 (:status result))
         "Ensure http status code is correct")
-    (is (= 0 (count (:transit result))))))
+    (is (= 0 (count (:transit result)))
+        "Ensure no data is returned")))
 
 (deftest test-user-delete-not-found
-  (let [result (try (http-delete "admin" "admin/user/0" )
+  (let [result (try (http-delete "admin" "admin/user/0")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 404 (:status result))
         "Ensure http status code is correct")))
+
+(deftest test-user-delete-bad-id
+  (let [result (try (http-delete "admin" "admin/user/i_am_a_bad_id")
+                    (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
+                      (-> e ex-data)))]
+    (is (= 500 (:status result))
+        "Ensure bad id is rejected")
+    (is (= 0 (count (:transit result)))
+        "Ensure no data is returned")))
 
 (deftest test-delete-service-made-by-normaluser
   (let [generated-service (gen/generate s-generators/gen-transport-service)
