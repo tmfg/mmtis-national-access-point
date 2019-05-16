@@ -21,7 +21,7 @@
                                [:http :db])))
 
 (deftest test-user-listing-admin
-  (let [result (try (http-post "admin" "admin/users" "admin@napoteadmin123.com")
+  (let [result (try (http-post "admin" "admin/user?type=any&search=admin@napoteadmin123.com" nil)
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 200 (:status result))
@@ -30,19 +30,19 @@
         "Ensure admin user gets a list of users")))
 
 (deftest test-user-listing-normaluser
-  (let [result (try (http-post "normaluser" "admin/users" "napoteadmin")
+  (let [result (try (http-post "normaluser" "admin/user?type=any&search=napoteadmin" nil)
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 403 (:status result))
         "Ensure normal user not allowed to query users")))
 
 (deftest test-user-search-with-partial-name
-  (let [users (:transit (http-post "admin" "admin/users" "Userso"))]
+  (let [users (:transit (http-post "admin" "admin/user?type=any&search=Userso" nil))]
     (is (= 1 (count users)))
     (is (= "User Userson" (:name (first users))))))
 
 (deftest test-user-search-with-partial-email
-  (let [result (http-post "admin" "admin/users" "napoteadmin123")
+  (let [result (http-post "admin" "admin/user?type=any&search=napoteadmin123" nil)
         transit (:transit result)]
     (is (= 200 (:status result))
         "Ensure http status code is correct")
@@ -52,7 +52,7 @@
         "Ensure response email is correct for user search using a partial email")))
 
 (deftest test-user-not-found-name
-  (let [result (try (http-post "admin" "admin/users" "xxxxxxxxyyyyyyyyzzzzzzzz")
+  (let [result (try (http-post "admin" "admin/user?type=any&search=xxxxxxxxyyyyyyyyzzzzzzzzääääääääööööööööåååååååå" nil)
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 404 (:status result))
