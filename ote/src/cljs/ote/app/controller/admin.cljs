@@ -147,7 +147,8 @@
 
   SearchUsers
   (process-event [_ app]
-    (comm/post! "admin/users" (get-in app [:admin :user-listing :user-filter])
+    (comm/post! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
+                nil
                 {:on-success (tuck/send-async! ->SearchUsersResponse)})
     (assoc-in app [:admin :user-listing :loading?] true))
 
