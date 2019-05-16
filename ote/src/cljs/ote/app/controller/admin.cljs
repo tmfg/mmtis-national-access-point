@@ -147,9 +147,9 @@
 
   SearchUsers
   (process-event [_ app]
-    (comm/post! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
-                nil
-                {:on-success (tuck/send-async! ->SearchUsersResponse)})
+    (comm/get! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
+                {:on-success (tuck/send-async! ->SearchUsersResponse)
+                 :on-failure (tuck/send-async! ->SearchUsersResponse)})
     (assoc-in app [:admin :user-listing :loading?] true))
 
   ConfirmDeleteUser
@@ -174,10 +174,12 @@
     (assoc app :flash-message-error "Käyttäjän poistaminen epäonnistui"))
 
   SearchUsersResponse
-  (process-event [{response :response} app]
+  (process-event [{response :response :as all} app]
     (update-in app [:admin :user-listing] assoc
                :loading? false
-               :results response))
+               :results (if (vector? response)              ;; :response contains data in vector on success, otherwise http error in a map
+                          response
+                          [])))
 
   OpenDeleteUserModal
   (process-event [{id :id} app]
