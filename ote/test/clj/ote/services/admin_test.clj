@@ -21,7 +21,7 @@
                                [:http :db])))
 
 (deftest test-user-listing-admin
-  (let [result (try (http-post "admin" "admin/user?type=any&search=admin@napoteadmin123.com" nil)
+  (let [result (try (http-get "admin" "admin/user?type=any&search=admin@napoteadmin123.com")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 200 (:status result))
@@ -30,19 +30,19 @@
         "Ensure admin user gets a list of users")))
 
 (deftest test-user-listing-normaluser
-  (let [result (try (http-post "normaluser" "admin/user?type=any&search=napoteadmin" nil)
+  (let [result (try (http-get "normaluser" "admin/user?type=any&search=napoteadmin")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 403 (:status result))
         "Ensure normal user not allowed to query users")))
 
 (deftest test-user-search-with-partial-name
-  (let [users (:transit (http-post "admin" "admin/user?type=any&search=Userso" nil))]
+  (let [users (:transit (http-get "admin" "admin/user?type=any&search=Userso"))]
     (is (= 1 (count users)))
     (is (= "User Userson" (:name (first users))))))
 
 (deftest test-user-search-with-partial-email
-  (let [result (http-post "admin" "admin/user?type=any&search=napoteadmin123" nil)
+  (let [result (http-get "admin" "admin/user?type=any&search=napoteadmin123")
         transit (:transit result)]
     (is (= 200 (:status result))
         "Ensure http status code is correct")
@@ -52,7 +52,7 @@
         "Ensure response email is correct for user search using a partial email")))
 
 (deftest test-user-not-found-name
-  (let [result (try (http-post "admin" "admin/user?type=any&search=xxxxxxxxyyyyyyyyzzzzzzzzääääääääööööööööåååååååå" nil)
+  (let [result (try (http-get "admin" "admin/user?type=any&search=xxxxxxxxyyyyyyyyzzzzzzzzääääääääööööööööåååååååå")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 404 (:status result))

@@ -466,7 +466,7 @@
 (defn- admin-routes [db http nap-config]
   (routes
 
-    (POST "/admin/user" [search type :as req]
+    (GET "/admin/user" [search type :as req]
       (or (authorization-fail-response (get-in req [:user :user]))
           (list-users-bad-req-response search type)
           (list-users-response db search)))
