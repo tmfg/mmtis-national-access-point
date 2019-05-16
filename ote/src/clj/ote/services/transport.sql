@@ -19,6 +19,6 @@ SELECT ts.id,
 FROM "transport-service" ts
          LEFT JOIN "external-interface-description" eid on (ts.id = eid."transport-service-id")
          LEFT JOIN LATERAL unnest("data-content") types ON true
-WHERE ts."transport-operator-id" in (:operator)
+WHERE ts."transport-operator-id" in (:operator-ids)
 GROUP BY ts.id
 ORDER BY ts."type" DESC, ts.modified DESC NULLS LAST;
