@@ -374,7 +374,7 @@
                     "0"
                     (:count row)))}
        {:name "Aikaa 1. muutokseen"
-        :width "15%"
+        :width "14%"
         :read :different-week-date
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
@@ -385,14 +385,13 @@
                      [:span (stylefy/use-style {:margin-left "5px"
                                                 :color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-       {:name "Muutosten yhteenveto" :width "32%"
+       {:name "Muutosten yhteenveto" :width "33%"
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
                   (case change-type
                     :no-traffic
-                    [icon-l/icon-labeled
-                     [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]
+                    [tv-change-icons/no-traffic-icons (route-change-summary route-changes changes-all)]
 
                     :added
                     [icon-l/icon-labeled
