@@ -31,7 +31,9 @@
        [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
              [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-for-developers])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :navigation-feedback-link])
-             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]]
+             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]
+        [:span (stylefy/use-style style-front-page/footer-gray-info-text)
+         (tr [:common-texts :navigation-feedback-email])]]
        [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :footer-livi-url-link])

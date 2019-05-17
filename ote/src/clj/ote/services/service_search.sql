@@ -111,7 +111,7 @@ SELECT eid."transport-service-id" as id
    AND EXISTS(SELECT ts.id
                 FROM "transport-service" ts
                WHERE ts.id = eid."transport-service-id"
-                 AND ts.published IS NOT NULL)
+                 AND ts.published IS NOT NULL);
 
 -- name: service-ids-by-operation-areas
 -- Find services by operation area names using two search tables. Notice the UNION of two selects.
@@ -144,19 +144,19 @@ SELECT oa."transport-service-id" as id
 -- name: service-match-quality-to-operation-area
 -- Finds service's match quality to a given operation area. Uses ST_Envelope to create a rough estimate of the quality instead of calculating an exact one
 -- If geometry type is not a surface area of some kind, use a carefully chosen constant area. For instance railway stations mark their operating areas as points
-SELECT "oa-agg"."transport-service-id" as id,
+SELECT oa."transport-service-id" as id,
        CASE
-        WHEN ST_GeometryType("oa-agg".location) IN ('ST_Point', 'ST_Linestring') THEN 3e-4
-        ELSE ST_Area(ST_Intersection("oa-agg".location, sa.location))
+        WHEN ST_GeometryType(oa.location) IN ('ST_Point', 'ST_Linestring') THEN 3e-4
+        ELSE ST_Area(ST_Intersection(oa.location, sa.location))
         END as intersection,
-       ST_Area(ST_SymDifference("oa-agg".location, sa.location)) as "difference"
+       ST_Area(ST_SymDifference(oa.location, sa.location)) as "difference"
   FROM
       (SELECT oa."transport-service-id" as "transport-service-id",
               ST_Envelope(ST_Union(array_agg(ST_Envelope(oa.location)))) as "location"
          FROM operation_area oa
         WHERE oa."transport-service-id" in (:id)
           AND oa."primary?" = true
-     GROUP BY oa."transport-service-id") as "oa-agg",
+        GROUP BY oa."transport-service-id") oa,
       (SELECT ST_Envelope(ST_Union(array_agg(ST_Envelope(pl.location)))) as "location"
          FROM places pl
-        WHERE pl.namefin IN (:operation-area)) as "sa";
+        WHERE pl.namefin IN (:operation-area)) sa;
