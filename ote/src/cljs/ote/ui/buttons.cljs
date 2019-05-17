@@ -51,3 +51,18 @@
              (stylefy/use-style style-buttons/svg-button)
              opts)
    label])
+
+(defn big-icon-button-with-label
+  "Give icon-element in format: (ic/action-description {:style {:width 30
+                                                        :height 30
+                                                        :margin-right \"0.5rem\"
+                                                        :color colors/primary}})
+  And label-text as text.
+  element-tag is :button or :a depending on do you want to move the user to different page or do magic right where she/he is."
+  [options icon-element label-text]
+  [:button (merge options
+                      {:style {:align-items "center"}}
+                      (stylefy/use-style style-base/blue-link-with-icon)
+                  (stylefy/use-style style-buttons/outline-button))
+   icon-element
+   [:span label-text]])

@@ -160,22 +160,51 @@ END	AS "service-type",
   JOIN "external-interface-description" eid ON ts.id = eid."transport-service-id"
  WHERE 'payment-interface' = ANY(eid."data-content");
 
+-- name: all-registered-companies
+SELECT DISTINCT ON (ac."business-id") "business-id",
+       ac."business-name" AS name
+  FROM "all-companies" ac;
+
 -- name: monthly-registered-companies
 -- returns a cumulative sum of companies, defined as distinct business-id's of "all-companies", created up until the row's month.
-SELECT to_char(ac.created, 'YYYY-MM') as month,
-       sum(count(ac."business-id")) over (order by to_char(ac.created, 'YYYY-MM')) as sum
-FROM
-  (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
+SELECT ac.c as month,
+       sum(count(ac.providing)) over (order by c) as "sum-providing",
+       sum(count(ac.participating)) over (order by c) as "sum-participating",
+       sum(count(ac.participating) + count(ac.providing)) over (order by c) as sum
+  FROM
+       (SELECT DISTINCT ON ("business-id") "business-id",
+              to_char(created, 'YYYY-MM') as c,
+              CASE source
+                WHEN 'transport_operator' THEN 'providing'
+                END AS providing,
+              CASE source
+                WHEN 'transport_service' THEN 'participating'
+                WHEN 'service_company' THEN 'participating'
+                WHEN 'associated_service_operator' THEN 'participating'
+                END AS participating
+         FROM "all-companies") ac
 GROUP BY month
 ORDER BY month;
 
 -- name: tertile-registered-companies
 -- returns a cumulative sum of companies, defined as distinct business-id's of operators, created up until the row's tertile.
 SELECT
-       concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 ') as tertile,
-       sum(count(ac."business-id")) over (ORDER BY  concat(to_char(date_trunc('year', ac.created), 'YYYY'), ' ',floor(extract(month FROM ac.created)::int / 4.00001) + 1 , '/3 '))
+       ac.tertile,
+       sum(count(ac."business-id")) over (ORDER BY ac.tertile) AS sum,
+       sum(count(ac.providing)) over (ORDER BY ac.tertile) AS "sum-providing",
+       sum(count(ac.participating)) over (ORDER BY ac.tertile) AS "sum-participating"
    FROM
-     (select DISTINCT ON ("business-id") "business-id", created FROM "all-companies") ac
+        (SELECT DISTINCT ON ("business-id") "business-id",
+                concat(to_char(date_trunc('year', created), 'YYYY'), ' ',floor(extract(month FROM created)::int / 4.00001) + 1 , '/3 ') as tertile,
+                CASE source
+                  WHEN 'transport_operator' THEN 'providing'
+                  END AS providing,
+                CASE source
+                  WHEN 'transport_service' THEN 'participating'
+                  WHEN 'service_company' THEN 'participating'
+                  WHEN 'associated_service_operator' THEN 'participating'
+                  END AS participating
+           FROM "all-companies") ac
 group by tertile
 order by tertile;
 

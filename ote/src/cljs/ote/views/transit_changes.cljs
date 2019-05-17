@@ -45,11 +45,16 @@
    [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
       (for [[icon color label] [[ic/content-add-circle-outline {:color style/add-color} " Uusia reittejä"]
-                          [ic/content-remove-circle-outline {:color style/remove-color} " Mahdollisesti päättyviä reittejä"]
-                          [ui-icons/outline-ballot {:color style/remove-color} " Reittimuutoksia"]
-                          [ic/av-not-interested {:color style/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
+                                [ic/content-remove-circle-outline {:color style/remove-color} " Mahdollisesti päättyviä reittejä"]
+                                [ui-icons/outline-ballot {:color style/remove-color} " Reittimuutoksia"]
+                                [ic/av-not-interested {:color style/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
         ^{:key (str "transit-changes-legend-" label)}
-        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))]])
+        [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
+    [:div {:style {:display "flex"
+                   :align-items "center"}}
+     [:div (stylefy/use-style style/new-change-legend-icon)
+      [:div (stylefy/use-style style/new-change-indicator)]]
+     [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
                    :interfaces-has-errors? :no-interfaces? :no-interfaces-imported?})
@@ -78,8 +83,8 @@
 
    [:div {:style {:width "25%"}}
     [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
-                                                style/no-change-color
-                                                style/remove-color)}]
+                                    style/no-change-color
+                                    style/remove-color)}]
     (cap-number no-traffic-routes)]])
 
 
@@ -163,10 +168,10 @@
    [info/info-toggle
     "Ohjeet"
     [:span
-    "Taulukossa on listattu säännöllisen aikataulun mukaisen liikenteen palveluissa havaittuja muutoksia "
-     [:b "tulevan 30 viikon ajalta." ]
+     "Taulukossa on listattu säännöllisen aikataulun mukaisen liikenteen palveluissa havaittuja muutoksia "
+     [:b "tulevan 30 viikon ajalta."]
      "Voit tarkastella yksittäisen palvelun liikennöinnissä tapahtuvia muutoksia yksityiskohtaisemmin napsauttamalla taulukon riviä. Yksityiskohtaiset tiedot avautuvat erilliseen näkymään."]
-    false]
+    {:default-open? false}]
 
    [transit-change-filters e! transit-changes]])
 
@@ -176,7 +181,7 @@
                          (time/format-date-iso-8601 date))
         transport-service-id (:transport-service-id row)
         operator-name (:transport-operator-name row)
-        service-name(:transport-service-name row)
+        service-name (:transport-service-name row)
         link-text (if (= :operator link-type)
                     [:span operator-name]
                     [:span service-name])]
@@ -228,7 +233,16 @@
                                 (let [{:keys [transport-service-id date]} (first evt)]
                                   (when date
                                     (e! (tc/->ShowChangesForService transport-service-id date)))))}
-      [{:name "Palveluntuottaja"
+      [{:name ""
+        :read identity
+        :format (fn [{:keys [recent-change? date]}]
+                  (when recent-change?
+                    [:div (merge (stylefy/use-style style/new-change-container)
+                                 {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui date))})
+                     [:div (stylefy/use-style style/new-change-indicator)]]))
+        :col-style style-base/table-col-style-wrap
+        :width "2%"}
+       {:name "Palveluntuottaja"
         :read identity
         :format #(link-to-transit-visualization % e! :operator)
         :col-style style-base/table-col-style-wrap
@@ -252,7 +266,7 @@
        {:name "Tiedot saatavilla (asti)"
         :read (comp time/format-timestamp->date-for-ui :max-date)
         :col-style style-base/table-col-style-wrap
-        :width "15%"}
+        :width "13%"}
        {:name "Muutokset"
         :width "30%"
         :tooltip "Palvelun kaikkien reittien tulevien muutosten yhteenlaskettu lukumäärä."
@@ -278,7 +292,7 @@
     [:div
      [page/page-controls "" "Markkinaehtoisen liikenteen muutokset"
       [:div
-       [tabs/tabs tabs {:update-fn    #(e! (tc/->ChangeTab %))
+       [tabs/tabs tabs {:update-fn #(e! (tc/->ChangeTab %))
                         :selected-tab selected-tab}]]]
      [:div.container
       (case selected-tab

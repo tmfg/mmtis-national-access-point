@@ -33,6 +33,9 @@
 (def icon-large {:width 32 :height 32
                  :vertical-align "middle"})
 
+(def icon-with-text {:display "inline-flex"
+                     :align-items "center"})
+
 (def blue-link-with-icon {:color colors/primary
                           :text-decoration "none"
                           :border "none"
@@ -120,7 +123,7 @@
    :border-color colors/orange-basic
    :padding "0rem 1.25rem 2rem 1.25rem"})
 
-(def flex-child {:flex 1 })
+(def flex-child {:flex 1})
 
 (def item-list-container
   (merge (flex-container "row")
@@ -194,7 +197,7 @@
                      :position "relative"
                      :display "block"
                      :width "calc(100% - 38px)"
-                     :line-height "24p";
+                     :line-height "24p"
                      :font-family "Roboto, sans-serif"})
 (def checkbox-label-with-width (assoc checkbox-label :width "260px"))
 

@@ -102,11 +102,20 @@
 
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
+        group-recent? (map
+                         (fn [[_ changes]]
+                           (some? (some #(:recent-change? %) changes)))
+                         grouped-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
+        route-changes-with-recent (map
+                                    (fn [change recent?]
+                                      (assoc change :recent-change? recent?))
+                                    route-changes
+                                    group-recent?)
         route-changes (map (fn [x]
                              (assoc x :count (count-changes (:route-hash-id x) grouped-changes)))
-                           route-changes)
+                           route-changes-with-recent)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) route-changes)
         all-sorted-changes (if show-no-change
                              (concat sorted-changes no-changes)
@@ -386,17 +395,17 @@
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
-                ;; No-traffic route, return current day always
-                (= :no-traffic (:change-type route))
+                ;; No-traffic route, return current day when the no-traffic start is in the past
+                (and
+                  (= :no-traffic (:change-type route))
+                  (t/after? (time/now) date1))
                 (time/now)
 
                 :else
                 date1)
-        date2 (if (and
-                    (:different-week-date route)
-                    (not= :no-traffic (:change-type route)))
-                  (:different-week-date route)
-                  (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
+        date2 (if-let [date2 (:different-week-date route)]
+                date2
+                (time/days-from (tc/from-date (time/native->date-time date1)) 7))]
     (-> app
         (assoc-in [:transit-visualization :route-lines-for-date-loading?] true)
         (assoc-in [:transit-visualization :route-trips-for-date1-loading?] true)
