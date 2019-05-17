@@ -15,7 +15,7 @@ SELECT ts.id,
        (SELECT array_agg(dc)
           FROM "external-interface-description" eid
                JOIN LATERAL unnest(eid."data-content") dc ON TRUE
-        WHERE ts.id = eid."transport-service-id") as "interface-types"
+         WHERE ts.id = eid."transport-service-id") as "interface-types"
   FROM "transport-service" ts
  WHERE ts."transport-operator-id" in (:operator-ids)
  ORDER BY ts."type" DESC, ts.modified DESC NULLS LAST;
