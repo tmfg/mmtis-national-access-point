@@ -1134,17 +1134,17 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                   ["Hittades " :count " tjänst."])
   :nap-interface ["Tekniskt gränssnitt för denna mobilitetstjänst: "]
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
-  :no-services-found "Hakuehdoilla ei löydy palveluita."
-  :no-search-filters "Hakuehtoja ei ole valittu."
-  :found-x-services ["Hakuehdoilla löytyi " :count " kpl palveluita. "]
-  :operation-area-search-filter-result ["Palvelut, joiden toiminta-alueeksi on ilmoitettu: " :operation-area-filter]
+  :no-services-found "Inga tjänster hittades med dessa sökvillkor."
+  :no-search-filters "Inga sökvillkor har valts."
+  :found-x-services [:count "tjänster hittades med dessa sökvillkor."]
+  :operation-area-search-filter-result ["Tjänsterna för vilka har angetts verksamhetsområdet:" :operation-area-filter]
   :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
-  :other-operation-area-services "Muut valitun toiminta-alueen kattavat palvelut"
-  :no-operation-area-services "Yhdellekään palvelulle ei ole ilmoitettu kyseistä toiminta-aluetta."
-  :service-summary-text "Palvelukatalogissa on yhteensä "
-  :service-count [:count " palvelua"]
-  :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
-  :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
+  :other-operation-area-services "Andra tjänster som täcker det valda verksamhetsområdet"
+  :no-operation-area-services "Verksamhetsområdet i fråga har inte angetts för någon tjänst."
+  :service-summary-text "Tjänstekatalogen innehåller totalt  "
+  :service-count [:count " tjänster"]
+  :service-providing-text ",i vars produktion medverkar totalt "
+  :service-and-operator-summary-text [:count " företag eller organisationer."]
   :fetching-more "Sökning av tjänster pågår..."
   :view-routes "Visa rutter"
   :view-routes-failure "Rutterna kan inte visas"
