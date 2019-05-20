@@ -1137,9 +1137,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :external-interfaces ["Övriga maskinläsbara gränssnitt för tjänsten"]
   :no-services-found "Inga tjänster hittades med dessa sökvillkor."
   :no-search-filters "Inga sökvillkor har valts."
-  :found-x-services [:count "tjänster hittades med dessa sökvillkor."]
-  :operation-area-search-filter-result ["Tjänsterna för vilka har angetts verksamhetsområdet:" :operation-area-filter]
-  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :found-x-services [:count " tjänster hittades med dessa sökvillkor. "]
+  :operation-area-search-filter-result ["Tjänsterna för vilka har angetts verksamhetsområdet: " :operation-area-filter]
+  :search-order "Tjänsterna sorteras enligt tidpunkten för den senaste informationsuppdateringen med den nyaste högst upp."
   :other-operation-area-services "Andra tjänster som täcker det valda verksamhetsområdet"
   :no-operation-area-services "Verksamhetsområdet i fråga har inte angetts för någon tjänst."
   :service-summary-text "Tjänstekatalogen innehåller totalt  "

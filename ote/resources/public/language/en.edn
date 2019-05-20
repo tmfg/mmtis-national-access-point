@@ -1133,9 +1133,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :external-interfaces ["Other external interfaces"]
   :no-services-found "No services found with these search criteria."
   :no-search-filters "No search criteria have been selected."
-  :found-x-services [:count " services were found with these search criteria."]
+  :found-x-services [:count " services were found with these search criteria. "]
   :operation-area-search-filter-result ["The services for which the region of operation has been indicated as: " :operation-area-filter]
-  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :search-order "The services are sorted by the time of the last information update with the most recent on top. "
   :other-operation-area-services "Other services covering the selected region of operation"
   :no-operation-area-services "The region of operation in question has not been indicated for any of the services."
   :service-summary-text "The service catalogue includes a total of "
