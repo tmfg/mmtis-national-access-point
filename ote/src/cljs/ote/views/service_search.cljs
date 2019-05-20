@@ -146,7 +146,7 @@
 (defn- result-card
   [e! admin?
    {::t-service/keys [id name sub-type description transport-type homepage
-                      operator-name business-id transport-operator-id service-companies companies]
+                      operator-name business-id transport-operator-id service-companies companies difference]
     :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links service]
@@ -219,34 +219,43 @@
              [:span (tr [:service-search :participating-operator])]]))])]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
-  (let [{:keys [results empty-filters? total-service-count total-company-count
-                filter-service-count fetching-more?]} service-search
-        operator (:operator (:params app))]
+  (let [{:keys [results empty-filters? total-service-count filter-service-count fetching-more?]} service-search
+        operation-area-filter (get-in app [:service-search :params :operation_area])
+        operating-area-match-results (filter #(= (::t-service/difference %) 0) results)
+        other-results (filter #(not= (::t-service/difference %) 0) results)]
     [:div.container
-      [:div.col-xs-12.col-md-12.col-lg-12
-       [:span
-        (if operator
-          (tr (if (zero? filter-service-count)
-                [:service-search :operator-no-services]
-                [:service-search :operator-services])
-              {:name (::t-service/operator-name (first results))
-               :count filter-service-count})
-          (tr [:service-search (if empty-filters?
-                                 :showing-latest-services
-                                 :result-count)]
-              {:count filter-service-count}))
-        " "
-        (tr [:service-search :total-services] {:total-service-count total-service-count
-                                               :total-company-count total-company-count})]
-       (doall
-         (for [result results]
-           ^{:key (::t-service/id result)}
-           [result-card e! (:admin? user) result service-search (:width app)]))
+     (if (or (> (count operating-area-match-results) 0) (> (count other-results) 0))
+       [:div.col-xs-12.col-md-12.col-lg-12
+        (if empty-filters?
+          [:span (tr [:service-search :no-search-filters])]
+          [:span (tr [:service-search :found-x-services] {:count filter-service-count})])
+        [:span (tr [:service-search :search-order])]
+        [:div
+         (when operation-area-filter
+           [:div
+            [:h3 (tr [:service-search :operation-area-search-filter-result] {:operation-area-filter operation-area-filter})]
+            (if (seq operating-area-match-results)
+              (doall
+                (for [result operating-area-match-results]
+                  ^{:key (::t-service/id result)}
+                  [result-card e! (:admin? user) result service-search (:width app)]))
+              [:span (tr [:service-search :no-operation-area-services])])])
 
-       (if fetching-more?
-         [:span (tr [:service-search :fetching-more])]
-         (when (> filter-service-count (count results))
-           [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]]))
+         (when (seq other-results)
+           [:div
+            (when operation-area-filter
+              [:h3 (tr [:service-search :other-operation-area-services])])
+            (doall
+              (for [result other-results]
+                ^{:key (::t-service/id result)}
+                [result-card e! (:admin? user) result service-search (:width app)]))])
+
+         (if fetching-more?
+           [:span (tr [:service-search :fetching-more])]
+           (when (> filter-service-count (count results))
+             [common-ui/scroll-sensor #(e! (ss/->FetchMore))]))]]
+       [:div.col-xs-12.col-md-12.col-lg-12
+        [:span (tr [:service-search :no-services-found])]])]))
 
 
 (defn- capitalize-operation-area-postal-code [sentence]
@@ -288,7 +297,9 @@
 
 (defn filters-form [e! {filters :filters
                         facets  :facets
-                        operation-area-filter-completions :operation-area-filter-completions}]
+                        operation-area-filter-completions :operation-area-filter-completions
+                        total-company-count :total-company-count
+                        total-service-count :total-service-count}]
   (let [sub-types-to-list (fn [data]
                             (keep (fn [val]
                                     (let [subtype (:sub-type val)]
@@ -307,7 +318,11 @@
                                         data))]
 
     [:div
-     [:h2 {:style {:font-weight 500 }} (tr [:service-search :limit-search-results])]
+     [:p (stylefy/use-style style/title-group-description) (tr [:service-search :service-summary-text])
+      [:strong (tr [:service-search :service-count] {:count total-service-count})]
+     (tr [:service-search :service-providing-text])
+      [:strong (tr [:service-search :service-and-operator-summary-text] {:count total-company-count})]]
+     [:h3 (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]
                                       [:field-labels :transport-service-common]

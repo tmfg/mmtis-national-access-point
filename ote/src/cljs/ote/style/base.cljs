@@ -123,7 +123,7 @@
    :border-color colors/orange-basic
    :padding "0rem 1.25rem 2rem 1.25rem"})
 
-(def flex-child {:flex 1 })
+(def flex-child {:flex 1})
 
 (def item-list-container
   (merge (flex-container "row")
@@ -197,7 +197,7 @@
                      :position "relative"
                      :display "block"
                      :width "calc(100% - 38px)"
-                     :line-height "24p";
+                     :line-height "24p"
                      :font-family "Roboto, sans-serif"})
 (def checkbox-label-with-width (assoc checkbox-label :width "260px"))
 
