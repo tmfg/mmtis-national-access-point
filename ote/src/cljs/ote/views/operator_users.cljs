@@ -47,8 +47,7 @@
                         :name :add-member
                         :update! #(e! (ou/->EmailFieldOnChange %))
                         :label (tr [:transport-users-page :add-member])
-                        :placeholder (tr [:transport-users-page :email-placeholder])
-                        :on-enter #(println %)}
+                        :placeholder (tr [:transport-users-page :email-placeholder])}
      new-member-email]
     [:div {:style {:display "flex"
                    :align-items "center"}}
