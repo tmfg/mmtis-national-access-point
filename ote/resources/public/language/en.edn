@@ -596,6 +596,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"}
 
+ :transport-users-page {:username "Name"
+                        :add-member "Lisää jäsen"
+                        :email-placeholder "Kirjoita sähköpostiosoite"
+                        :manage-users "Hallinnoi jäseniä"}
+
  :front-page
  {:title-NAP "NAP - National Access Point"
   :title-transport-services "Transport services"
