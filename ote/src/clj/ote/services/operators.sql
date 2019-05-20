@@ -56,3 +56,11 @@ FROM "transport-service" ts
        JOIN LATERAL unnest(ts.companies) tsc ON "business-id" = :business-id
        JOIN "transport-operator" po
          ON ts."transport-operator-id" = po.id;
+
+
+-- name: fetch-operator-users
+SELECT u.id, u.name, u.fullname, u.email
+FROM "transport-operator" t
+    JOIN member m ON m.group_id = t."ckan-group-id"
+    JOIN "user" u ON m.table_id = u.id
+WHERE t.id = :operator-id;
