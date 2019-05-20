@@ -715,10 +715,10 @@
               :route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
              (-> result
-                 second
+                 first
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (testing "Ensure that a right amount of changes are found and there are no extra changes."
-        (is (= 2 (count result)))))))
+        (is (= 1 (count result)))))))
 
 ;;;;;; Test route END reporting when last traffic date below route end detection threshold
 
