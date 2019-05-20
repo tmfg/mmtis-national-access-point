@@ -603,6 +603,7 @@
 
  :transport-users-page {:username "Namn"
                         :add-member "Lisää jäsen"
+                        :members "Medlemmar"
                         :email-placeholder "E-postaddress"
                         :manage-users "Hanterar användarrättigheter"}
 

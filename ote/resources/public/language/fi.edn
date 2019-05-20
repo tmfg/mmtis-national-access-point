@@ -598,6 +598,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
 
  :transport-users-page {:username "Nimi"
+                        :members "Jäsenet"
                         :add-member "Lisää jäsen"
                         :email-placeholder "Kirjoita sähköpostiosoite"
                         :manage-users "Hallinnoi jäseniä"}
