@@ -820,14 +820,7 @@
              :end-of-week       (java.time.LocalDate/parse "2018-10-21")},
             :no-traffic-change 90,
             :no-traffic-end-date
-            (java.time.LocalDate/parse "2019-02-11"),
-            ;; :different-week-hash ["h1" "h2" "h3" "h4" "h5" nil nil]
-            ,
-            ;; :different-week
-            ;; {:beginning-of-week
-            ;;  (java.time.LocalDate/parse "2019-02-11"),
-            ;;  :end-of-week (java.time.LocalDate/parse "2019-02-17")}
-            }
+            (java.time.LocalDate/parse "2019-02-11")}
            (detection/change-pair->no-traffic diff-a diff-b)))
     (let [merge-result (detection/trafficless-differences->no-traffic-changes [(assoc diff-a :n 1)
                                                                                (assoc diff-a :n 2)

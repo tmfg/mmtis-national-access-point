@@ -173,7 +173,7 @@
     (println "doing week: " (week->short curr))))
 
 (defn- vnot [cond msg]
-  (when cond (println "debug: not a change because" msg))
+  #_(when cond (println "debug: not a change because" msg))
   (not cond))
 
 (defn detect-change-for-route
@@ -320,8 +320,7 @@
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week curr)
-                     (add-different-week curr)
-                     )]
+                     (add-different-week curr))]
       #_(if-let [dw (:different-week result)]
           (println "ndw res: route-next-different-week found something, curr=" (:beginning-of-week curr) ":" dw)
           (println "ndw res: no changes found, curr="  (:beginning-of-week curr)))
@@ -480,6 +479,7 @@
   (loop [route-weeks route-weeks
          results []]
     (let [diff-data (route-weeks-with-first-difference route-weeks)
+          ;; for accidental reasons, route-weeks-with-first-difference returns also weeks without differences
           first-interesting-diff (first (filter (fn [value]
                                               (or (:no-traffic-start-date value) (:different-week value)))
                                             diff-data))
@@ -488,7 +488,7 @@
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when (or diff-week-date no-traffic-end)
                            (.minusWeeks (or diff-week-date no-traffic-end) 1))]
-      (println "in route-differences loop, first-interesting-diff is" first-interesting-diff)
+      ;; (println "in route-differences loop, first-interesting-diff is" first-interesting-diff)
       (if (and (not-empty diff-data) prev-week-date)        ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
@@ -889,7 +889,6 @@
 
 
 (defn trafficless-route-change-before-route-end? [a b]
-  (println "b: ")
   (clojure.pprint/pprint b)
   (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
        (= (:starting-week-hash a) (:starting-week-hash b))
@@ -926,22 +925,18 @@
             (dissoc m :different-week-hash
                       :different-week-start-date
                       :different-week)
-            (do
-              ;; else we keep different-week
-              (println "keeping differnt-week for" m)
-              (println "because hashes differ:" (:starting-week-hash a) (:different-week-hash b))
-              m))]
+            m)]
     m))
 
 (defn trafficless-differences->no-traffic-changes [detected-changes-by-route]
   ;; (println "tdnc called")
   ;; (def *tddc detected-changes)
-  ;; we get a vec of maps describing route changes with keys like :route-key, :different-week etc
-  ;; we want to detect pair of changes to the same route that are adjacent in calendar
+  ;; We get a vec of maps describing route changes with keys like :route-key, :different-week etc.
+  ;; We want to detect pair of changes to the same route that are adjacent in calendar
   ;; and are traffic changes for non-nil traffic to nil-traffic and back, and replace
   ;; the pair with one no-traffic map.
 
-  ;; should we rely on the route maps being sorted by route and date in the input?
+  ;; Should we rely on the route maps being sorted by route and date in the input?
   ;; the previous phase is detet-changesfor-all-routes which gets input by-route and by-week,
   ;; so it should be safe. we can add an assert to verify the assumption.
 
@@ -952,13 +947,13 @@
   (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)
         _ (println "got weeks")
         weeks (mapv (fn [[this-change next-change]]
-                      (println "this/next week map a: " this-change)
-                      (println "this/next week map b: " next-change)
+                      ;; (println "this/next week map a: " this-change)
+                      ;; (println "this/next week map b: " next-change)
                       (if (or
                            (trafficless-route-change-before-route-end? this-change next-change)
                            (changes-straddle-trafficless-period? this-change next-change))
                         (do
-                          (println "->calling change-pair->no-traffic")
+                          ;; (println "->calling change-pair->no-traffic")
                           (change-pair->no-traffic this-change next-change))
                         ;; else
                         this-change))
