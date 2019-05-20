@@ -36,32 +36,39 @@
 
 (defn pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                               first-effective-date description]}]
-  [[:b id]
-   [:a {:href (str (environment/base-url) "#/authority-pre-notices/" id)} (escape-html route-description)]
-   (str/join ",<br />" (db-util/PgArray->seqable regions))
+  [[:a {:href (str (environment/base-url) "#/authority-pre-notices/" id)} (escape-html route-description)]
    (escape-html operator-name)
+   (str/join ",<br />" (db-util/PgArray->seqable regions))
    (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
                              (db-util/PgArray->seqable pre-notice-type)))
    first-effective-date
    (escape-html description)])
 
 (defn- table [headers rows]
-  [:table
-   [:colgroup
-    (for [{width :width} headers]
-      [:col {:style (str "width: " width)}])]
-   [:tbody
+  [:table {:class "tg" :cellpadding "0" :cellspacing "0"}
+   [:thead
     [:tr
-     (for [{label :label} headers]
-       [:th [:b label]])]
-    (for [row rows]
-      [:tr
-       (for [cell row]
-         [:td cell])])]])
+     (for [{width :width class :class label :label} headers]
+       [:th {:class class
+             :style (str "width: " width)}
+        label])]]
+   [:tbody
+    (map-indexed (fn [index row]
+                   [:tr {:class (if (even? index) "even-row" "odd-row")}
+                    (for [cell row]
+                      [:td cell])])
+                 rows)]])
+
+(defn- sort-by-first-different-date [element]
+  "Works with vector which is formatted like this:
+  [<id> {:foo value :bar value :different-week-date 2019-02-01}
+   <id> {:foo value :bar value :different-week-date 2019-03-01}]"
+  (:different-week-date (first (second element))))
 
 (defn detected-change-row [unsent-changes]
-  (let [grouped-changes (group-by :transport-service-id unsent-changes)]
-    (for [grouped-change grouped-changes]
+  (let [grouped-changes (group-by :transport-service-id unsent-changes)
+        sorted-changes (sort-by #(sort-by-first-different-date %) grouped-changes)]
+    (for [grouped-change sorted-changes]
       (let [change-list (second grouped-change)
             transport-service-id (:transport-service-id (first change-list))
             operator-name (:operator-name (first change-list))
@@ -79,7 +86,7 @@
          (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
               transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
-         (str days-until-change " (" different-week-date ")")
+         (str days-until-change " pv (" different-week-date ")")
          (str/join ", "
                    (remove nil?
                            [(when (and added-routes (> added-routes 0))
@@ -91,51 +98,109 @@
                             (when (and no-traffic-routes (> no-traffic-routes 0))
                               (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))]))))
 
-(defn notification-template [pre-notices detected-changes]
-  [:html
-   [:head
-    [:style
-     "table { border-collapse: collapse; font-size: 10px; table-layout: fixed;}
-      table,td,tr,th { border: 1px solid black; }
-      td,tr,th { padding: 5px; }"]]
-   [:body
-    (when (seq pre-notices)
-      [:span
-       [:p [:b "Uudet 60 päivän muutosilmoitukset NAP:ssa"]]
-       [:ul
-        [:li
-         "Muutosilmoitukset on listattu voimaantulopäivämäärän mukaisesti."]
-        [:li
-         "Pääset tarkastelemaan muutosilmoitusta NAP:ssa klikkaamalla reitin nimeä taulukossa."]]
-       (table
-        [{:width "5%" :label "#"}
-         {:width "10%" :label "Reitin nimi"}
-         {:width "10%" :label "Alue"}
-         {:width "10%" :label "Palveluntuottajan nimi"}
-         {:width "20%" :label "Muutoksen tyyppi"}
-         {:width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
-         {:width "30%" :label "Muutoksen tarkemmat tiedot"}]
-        (for [n pre-notices]
-          (pre-notice-row n)))
-       [:br]])
+(defn html-divider-border [_]
+  [:div
 
-    (when (seq detected-changes)
-      [:span
-       [:p [:b "Uudet tunnistetut liikennöintimuutokset NAP:ssa"]]
-       (table
-        [{:width "20%" :label "Palveluntuottaja"}
-         {:width "20%" :label "Palvelu"}
-         {:width "20%" :label "Alue"}
-         {:width "20%" :label "Aikaa 1. muutokseen"}
-         {:width "20%" :label "Muutokset"}]
-        (detected-change-row detected-changes))
-       [:br]])
+   [:table {:border "0", :width "80%", :cellpadding "0", :cellspacing "0"}
+    [:tbody
+     [:tr
+      [:td {:style "background:none; border-bottom: 1px solid #d7dfe3; height:1px; width:100%; margin:0px 0px 0px 0px;"} "&nbsp;"]]]]
+   [:br]])
 
-    [:p "Tämän viestin lähetti NAP."]
-    [:p "Ongelmia? Ota yhteys NAP-Helpdeskiin," [:br]
-     [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
-     [:span " tai 029 534 5454 (arkisin 10-16)"]]]])
+(defn- blue-button [link text]
+  [:table
+   [:tr
+    [:td.btn
+     [:a {:class "mcnButton"
+          :title text
+          :href link
+          :target "_blank"
+          :style "font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;"}
+      text]]]])
 
+(defn notification-html [pre-notices detected-changes]
+  (println "pre-notices" (pr-str pre-notices))
+  [:html {:xmlns "http://www.w3.org/1999/xhtml"
+          :xmlns:v "urn:schemas-microsoft-com:vml"
+          :xmlns:o "urn:schemas-microsoft-com:office:office"}
+   [:head "<!-- NAME: 1 COLUMN - FULL WIDTH -->" "<!--
+                    [if gte mso 15]>\n<xml>\n<o:OfficeDocumentSettings>\n<o:AllowPNG/>\n<o:PixelsPerInch>96</o:PixelsPerInch>\n</o:OfficeDocumentSettings>\n</xml>\n<!
+                    [endif]-->"
+    [:meta {:charset "UTF-8"}]
+    [:meta {:http-equiv "X-UA-Compatible", :content "IE=edge"}]
+    [:meta {:name "viewport", :content "width=device-width, initial-scale=1"}]
+    [:title "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
+    [:style {:type "text/css"}
+     ".headerText1 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
+     .headerText2 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
+     .whiteBackground {background-color:#FFFFFF}
+     .grayBackground {background-color:#EFEFEF}
+     .btn {background-color:#0066CC;padding:15px;}
+     .footer {font-size:0.75rem}
+     a.mcnButton{display:block;}
+     .even-row {background-color:#EFEFEF;}
+     .odd-row {background-color:#FFFFFF;}
+      .tg  {border-collapse:collapse;border-spacing:0;}
+      .tg td{font-family:roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
+      .tg th{font-family:roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
+      .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
+      .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
+      .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
+      .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
+      .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}"]]
+   [:body.grayBackground
+    [:center
+     [:div.whiteBackground {:width "80%" :style "padding-left: 20px; padding-right:20px;"}
+      [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
+             :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]
+      [:br]
+      [:p [:span.headerText1 "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
+      [:p [:span {:class "headerText2"} "Tunnistusajankohta " (time/format-date (time/now))]]
+
+      (when (seq pre-notices)
+        [:div
+         (html-divider-border nil)
+         [:p
+          [:span {:class "headerText2"}
+           "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
+
+         (table
+           [{:class "tg-lusz" :width "10%" :label "Reitin nimi"}
+            {:class "tg-lusz" :width "15%" :label "Palveluntuottajan nimi"}
+            {:class "tg-lusz" :width "10%" :label "Alue"}
+            {:class "tg-lusz" :width "20%" :label "Muutoksen tyyppi"}
+            {:class "tg-lusz" :width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
+            {:class "tg-lusz" :width "30%" :label "Lisätiedot muutoksesta"}]
+           (for [n pre-notices]
+             (pre-notice-row n)))
+         [:br]
+         (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
+
+      (when (seq detected-changes)
+        [:div
+         (html-divider-border nil)
+         [:div
+          [:p.headerText2 "Rajapinnoista tunnistetut muutokset"]
+          (table
+            [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
+             {:class "tg-lusz" :width "20%" :label "Palvelu"}
+             {:class "tg-lusz" :width "20%" :label "Alue"}
+             {:class "tg-lusz" :width "20%" :label "Aikaa 1. muutokseen"}
+             {:class "tg-lusz" :width "20%" :label "Muutokset"}]
+            (detected-change-row detected-changes))
+          [:br]]
+         (blue-button (str (environment/base-url) "/#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+      (html-divider-border nil)]
+
+     [:div.grayBackground.footer
+      [:p "Tämän viestin lähetti NAP."]
+      [:span [:strong "NAP-yhteystiedot:"]]
+      [:p
+       [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
+       [:span " tai 029 534 5454 (arkisin 09-15)"]]
+      [:p "Haluatko muuttaa sähköpostiasetuksiasi?"
+       [:br]
+       [:a {:href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]]]]])
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -151,7 +216,7 @@
                     (count detected-changes) " new detected changes "
                     " from 24 hours for regions " (:finnish-regions user))
 
-          (html (notification-template notices detected-changes)))
+          (html (notification-html notices detected-changes)))
         (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
