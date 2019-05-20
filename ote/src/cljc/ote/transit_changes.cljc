@@ -197,14 +197,19 @@
   "Compare week hashes. Returns true if they represent the same traffic
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
-  [w1 w2]
+  [w1 w2]  
   (let [w1-empty? (every? nil? w1)
         w2-empty? (every? nil? w2)]
     ;; if one of the weekhashes is all nil's (no traffic),
     ;; they are equal if both of them are not-empty
     ;; or both of them are empty
     (if (or w1-empty? w2-empty?)
-      (= w1-empty? w2-empty?)
+      (do
+        (when (= w1 ))
+        (println "week= comparing empties" w1 w2 "->" (= w1-empty? w2-empty?))
+        ;; (clojure.stacktrace/print-stack-trace (Exception. "foo"))
+        (= w1-empty? w2-empty?)
+        )
       ;; otherwise, do day-by-day comparison ignoring no-traffic days and holidays
       (every? true?
               (map (fn [h1 h2]

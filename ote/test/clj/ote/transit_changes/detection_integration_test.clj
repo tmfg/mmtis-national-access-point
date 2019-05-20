@@ -144,7 +144,7 @@
         lohja-changes (filterv #(= "-Lohja - Nummela - Vihti-" (:route-key %))
                                (:route-changes detection-result))]
     ;; (println "found" changes "in the following routes:" changed-route-names)
-    ;; (def *nd detection-result)
+    (def *nd detection-result)
     ;; (println (:start-date route-query-params))
     (testing "got sane change figures for lohja - nummela - vihti changes"
       (is (= 1 (count lohja-changes)))     

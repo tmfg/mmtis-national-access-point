@@ -891,6 +891,14 @@
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
 
+(defn trafficless-route-change-before-route-end? [a b]
+  (println "b: ")
+  (clojure.pprint/pprint b)
+  (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
+       (= (:starting-week-hash a) (:starting-week-hash b))
+       (some? (:route-end-date b))
+       (nil? (:end-of-week b))))
+
 (defn changes-straddle-trafficless-period? [a b]
   (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
        (= [nil nil nil nil nil nil nil] (:starting-week-hash b))
@@ -900,25 +908,32 @@
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
-        m (assoc b :combined true)
+        m (assoc b :combined true
+                   :starting-week (:starting-week a))
+        
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
         m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
+        m (if (= (:no-traffic-start-date m) (:route-end-date m))
+            (dissoc m :no-traffic-start-date)
+            m)
+
+        ntc (when (and (:no-traffic-start-date m) (:no-traffic-end-date m))
+              (.between java.time.temporal.ChronoUnit/DAYS (:no-traffic-start-date m) (:no-traffic-end-date m)))
+        m (if ntc
+            (assoc m :no-traffic-change ntc)
+            m)
+
         ;; if a's preceding week hash and b's trailing week hash are the same,
         ;; there is no change and we just remove the different-week keys
-        m (if (= (:different-week-hash b) (= (:starting-week-hash a)))            
+        m (if (= (:different-week-hash b) (:starting-week-hash a))            
             (dissoc m :different-week-hash
-                    :different-week-start-date)
-            m)
-        ;; if a trafficless days to count, we add them to :no-traffic-change
-        m (if-let [a-no-traffic-count (and (:no-traffic-change m) (or (:no-traffic-run a) (:no-traffic-change a)))]
-            (update m :no-traffic-change (partial + (:no-traffic-run a)))
-            ;; else
-            m)
-        ;; - different-week - keep or remove?
-        ;;   -> keep if different week is really different from starting-week?
-        
-        
-        ]
+                      :different-week-start-date
+                      :different-week)
+            (do
+              ;; else we keep different-week
+              (println "keeping differnt-week for" m)
+              (println "because hashes differ:" (:starting-week-hash a) (:different-week-hash b))
+              m))]
     m))
 
 (defn trafficless-differences->no-traffic-changes [detected-changes-by-route]
@@ -936,12 +951,18 @@
   ;; one way to do this would be to iterate (or map) with a window (curr/next)
   ;; and mark a deleted map with nil. we only return one map per call so how to change data and delete other map at same time?
   ;; one way would be to make another pass over the data...
-  
+  (println "dcbr end-dates: " (mapv :route-end-date detected-changes-by-route))
   (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)
         _ (println "got weeks")
         weeks (mapv (fn [[this-change next-change]]
-                      (if (changes-straddle-trafficless-period? this-change next-change)
-                        (change-pair->no-traffic this-change next-change)
+                      (println "this/next week map a: " this-change)
+                      (println "this/next week map b: " next-change)
+                      (if (or
+                           (trafficless-route-change-before-route-end? this-change next-change)
+                           (changes-straddle-trafficless-period? this-change next-change))
+                        (do
+                          (println "->calling change-pair->no-traffic")
+                          (change-pair->no-traffic this-change next-change))
                         ;; else
                         this-change))
                     curr-next-pairs)
@@ -1067,9 +1088,9 @@
                            ;; Create week hashes so we can find out the differences between weeks
                            (combine-weeks)
                            (changes-by-week->changes-by-route)
-                           (detect-changes-for-all-routes)
-                           (trafficless-differences->no-traffic-changes)
+                           (detect-changes-for-all-routes)                           
                            (add-ending-route-change (java.time.LocalDate/now) route-end-detection-threshold all-routes)
+                           (trafficless-differences->no-traffic-changes)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
