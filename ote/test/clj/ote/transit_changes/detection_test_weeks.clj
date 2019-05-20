@@ -281,7 +281,7 @@
                    detection/changes-by-week->changes-by-route
                    detection/detect-changes-for-all-routes
                    detection/trafficless-differences->no-traffic-changes)]
-      (def *r result)
+      ;; (def *r result)
       ;; debug note after week= & first-different-day change:
       ;; - change is caused by week= change, reverting f-d-d made no diff
       ;; - judging from debug prints the traffic-run 13 is found first and a second one goes up to 70-something
@@ -801,7 +801,7 @@
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
     (is (= {:route-key "Raimola",
-            :no-traffic-converted-from-different-weeks true,
+            :combined true,
             :no-traffic-start-date
             (java.time.LocalDate/parse "2018-11-13"),
             :starting-week-hash [nil nil nil nil nil nil nil],
@@ -822,4 +822,4 @@
                                                                                (assoc diff-a :n 2)
                                                                                (assoc diff-b :n 3)])]
       (is (= 2 (count merge-result)))
-      (is (:no-traffic-converted-from-different-weeks (second merge-result))))))
+      (is (:combined (second merge-result))))))
