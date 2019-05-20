@@ -20,8 +20,8 @@
   "The amount of days after a no-traffic run is detected as a change."
   16)
 
-;; (def current-debug-route -4242)
-(def current-debug-route "Raimola")
+(def current-debug-route -4242)
+;; (def current-debug-route "Raimola")
 
 (def detection-interval-days 14)
 
@@ -203,7 +203,7 @@
          (vnot (week= starting-week-hash next2) "curr = next2 (3)"))
     ;; this is a change
     (do
-      (log/debug "mark as change because curr/next1/next2 are all different from starting-week-hash - starting vs curr/n1/n2 hashes are:" (mapv week->short [starting-week-hash curr next1 next2]))
+      ;; (log/debug "mark as change because curr/next1/next2 are all different from starting-week-hash - starting vs curr/n1/n2 hashes are:" (mapv week->short [starting-week-hash curr next1 next2]))
       (assoc state :different-week-hash curr))
 
     ;; No change found, return state as is
@@ -232,7 +232,7 @@
   (partial add-current-week-hash :different-week :different-week-hash))
 
 (defn vassoc [m k v id]
-  (log/debug "vassoc" id k v)
+  ;; (log/debug "vassoc" id k v)
   (assoc m k v))
 
 (defn detect-no-traffic-run
@@ -245,7 +245,7 @@
 
         ;; How many continuous days have no traffic at the end of the week
         end-run (week-hash-no-traffic-run false curr)]
-    (log/debug "detect-no-traffic-run called" (week->short curr) "- beg/end:" beginning-run end-run)
+    ;; (log/debug "detect-no-traffic-run called" (week->short curr) "- beg/end:" beginning-run end-run)
     (cond
 
       ;; If a no traffic run is in progress and this week has no traffic
@@ -262,7 +262,7 @@
       ;; Current week ends in no traffic, start new run
       (pos? end-run)
       (do
-        (log/debug "end-run positive -> dissoc start date & assoc :no-traffic-run" end-run)
+        ;; (log/debug "end-run positive -> dissoc start date & assoc :no-traffic-run" end-run)
         (-> state
             (vassoc :no-traffic-run end-run 2)
             (dissoc :no-traffic-start-date)))
@@ -270,7 +270,7 @@
       ;; No condition matched, remove any partial run
       :default
       (do
-        (log/debug "no match -> dissoc no-traffic-run")
+        ;; (log/debug "no match -> dissoc no-traffic-run")
         (dissoc state :no-traffic-start-date :no-traffic-run)))))
 
 (defn add-no-traffic-run-dates
@@ -281,7 +281,7 @@
   [{:keys [no-traffic-run no-traffic-change
            no-traffic-start-date] :as state} week last-analysis-wk]
 
-  (log/debug "add-no-traffic-run-dates: called, no-traffic-run value:", no-traffic-run)
+  ;; (log/debug "add-no-traffic-run-dates: called, no-traffic-run value:", no-traffic-run)
   (cond
 
     ;; Dissoc'd no-traffic keys because if normal week has traffic on weekdays and nil on last day,
