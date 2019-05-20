@@ -19,11 +19,9 @@
                  :show-row-hover? true
                  :no-selection? true}
     [{:name (tr [:transport-users-page :username])
-      :read identity
-      :format :fullname}
+      :read :fullname}
      {:name (tr [:register :fields :email])
-      :read identity
-      :format :email}
+      :read :email}
      {:name (tr [:front-page :table-header-actions])
       :read identity
       :format (fn [x]
