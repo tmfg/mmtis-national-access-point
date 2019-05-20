@@ -597,9 +597,9 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"}
 
  :transport-users-page {:username "Name"
-                        :add-member "Lisää jäsen"
-                        :email-placeholder "Kirjoita sähköpostiosoite"
-                        :manage-users "Hallinnoi jäseniä"}
+                        :add-member "Add member"
+                        :email-placeholder "Email address"
+                        :manage-users "Manage members"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

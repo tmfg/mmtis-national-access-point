@@ -603,8 +603,8 @@
 
  :transport-users-page {:username "Namn"
                         :add-member "Lisää jäsen"
-                        :email-placeholder "Kirjoita sähköpostiosoite"
-                        :manage-users "Hallinnoi jäseniä"}
+                        :email-placeholder "E-postaddress"
+                        :manage-users "Hanterar användarrättigheter"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
