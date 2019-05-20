@@ -102,11 +102,20 @@
 
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
+        group-recent? (map
+                         (fn [[_ changes]]
+                           (some? (some #(:recent-change? %) changes)))
+                         grouped-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
+        route-changes-with-recent (map
+                                    (fn [change recent?]
+                                      (assoc change :recent-change? recent?))
+                                    route-changes
+                                    group-recent?)
         route-changes (map (fn [x]
                              (assoc x :count (count-changes (:route-hash-id x) grouped-changes)))
-                           route-changes)
+                           route-changes-with-recent)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) route-changes)
         all-sorted-changes (if show-no-change
                              (concat sorted-changes no-changes)
