@@ -57,7 +57,7 @@
         (stylefy/use-style buttons/disabled-button))
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
-       [spinner/primary-loading {:style {:margin-left "1rem"}}])]]])
+       [spinner/primary-spinner {:style {:margin-left "1rem"}}])]]])
 
 (defn manage-access
   [e! state]
@@ -72,4 +72,4 @@
        [:div
         [access-table e! access-users name]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
-       [spinner/primary-loading])]))
+       [spinner/primary-spinner])]))
