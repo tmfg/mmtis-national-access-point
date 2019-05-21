@@ -42,6 +42,7 @@ SELECT * FROM (
                   AND (p."finnish-regions" IS NULL OR
                        :regions::CHAR(2)[] IS NULL OR
                        :regions::CHAR(2)[] && p."finnish-regions")
+                GROUP BY h.id,p."finnish-regions", op.name, ts.name,ts.id
               ) x
  ORDER BY x."different-week-date" ASC;
 
