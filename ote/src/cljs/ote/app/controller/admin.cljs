@@ -147,17 +147,19 @@
 
   SearchUsers
   (process-event [_ app]
-    (comm/post! "admin/users" (get-in app [:admin :user-listing :user-filter])
-                {:on-success (tuck/send-async! ->SearchUsersResponse)})
+    (comm/get! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
+                {:on-success (tuck/send-async! ->SearchUsersResponse)
+                 :on-failure (tuck/send-async! ->SearchUsersResponse)})
     (assoc-in app [:admin :user-listing :loading?] true))
 
   ConfirmDeleteUser
   (process-event [{id :id} app]
     (if (= id (:ensured-id (get-user-by-id app id)))
-      (comm/post! "admin/delete-user" {:id id}
-                  {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
-                   :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
-      (.log js/console "Could not delete user! Check given id."))
+      (comm/delete! (str "admin/user/" id)
+                    nil
+                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
+                     :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
+      (.log js/console "Could not delete user! Check given id:" id))
     app)
 
   ConfirmDeleteUserResponse
@@ -175,7 +177,9 @@
   (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
                :loading? false
-               :results response))
+               :results (if (vector? response)              ;; :response contains data in vector on success, otherwise http error in a map
+                          response
+                          [])))
 
   OpenDeleteUserModal
   (process-event [{id :id} app]

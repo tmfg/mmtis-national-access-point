@@ -57,30 +57,54 @@
   (when-not (:admin? user)
     (throw (SecurityException. "admin only"))))
 
+(defn- authorization-fail-response [user]
+  (when-not (:admin? user)
+    (log/warn "authorization-fail-response: id=" (:id user))
+    (http/transit-response "Not authorized. Bad role." 403)))
+
 (defn- admin-service [route {user :user
                              form-data :body :as req} db handler]
   (require-admin-user route (:user user))
   (http/transit-response
-   (handler db user (http/transit-request form-data))))
+    (handler db user (http/transit-request form-data))))
 
-(defn- list-users [db user query]
-  (let [users (nap-users/list-users db {:email (str "%" query "%")
-                                        :name (str "%" query "%")
-                                        :group (str "%" query "%")
-                                        :transit-authority? nil})]
-    (mapv
-      (fn [{groups :groups :as user}]
-        (if groups
-          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
-          user))
-      users)))
+(defn- list-users-bad-req-response [search type]
+  ;; list-users-response supports only "any" type at the moment
+  (when (not= "any" type)
+    (log/warn "list-users-bad-req-response: type=" type)
+    (http/transit-response "Type not supported" 400)))
 
-(defn- delete-user [db user query]
-  (let [id (:id query)
-        timestamp (java.util.Date.)]
-    (log/info "Deleting user with id: " (pr-str id))
-    (nap-users/delete-user! db {:id id :name timestamp})
-    id))
+;; Validate input in list-users-bad-req-response
+(defn- list-users-response [db search]
+  (let [result (->> (nap-users/list-users db {:email (str "%" search "%")
+                                              :name (str "%" search "%")
+                                              :group (str "%" search "%")
+                                              :transit-authority? nil})
+                    (mapv
+                      (fn [{groups :groups :as user}]
+                        (if groups
+                          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
+                          user))))]
+
+    (http/transit-response
+      result
+      (if (pos-int? (count result))
+        200
+        404))))
+
+(defn- delete-user-response
+  "Description: Deletes a user
+  Input: db=database instance, id=id of record to delete
+  Output: Number or affected records, thus 0 means a failure."
+  [db ^Long id]
+  (let [affected-records (nap-users/delete-user! db {:id (str id)
+                                                     :name (java.util.Date.)})]
+    (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
+    (http/transit-response
+      nil
+      (if (= affected-records 1)
+        200
+        404))))
 
 (defn- user-operator-members [db user query]
   (let [user-id (:id query)
@@ -103,9 +127,9 @@
             {::t-service/name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
-         service-search-result-columns
-         search-params
-         {:specql.core/order-by ::t-service/name})))
+           service-search-result-columns
+           search-params
+           {:specql.core/order-by ::t-service/name})))
 
 (defn- list-operators
   "Returns list of transport-operators. Query parameters aren't mandatory, but it can be used to filter results."
@@ -123,9 +147,9 @@
             {::t-service/operator-name (op/ilike (str "%" (:query query) "%"))})
         search-params (merge q (published-search-param query))]
     (fetch db ::t-service/transport-service-search-result
-         service-search-result-columns
-         search-params
-         {:specql.core/order-by ::t-service/operator-name})))
+           service-search-result-columns
+           search-params
+           {:specql.core/order-by ::t-service/operator-name})))
 
 (defn- interfaces-array->vec [db-interfaces]
   (mapv (fn [d] (-> d
@@ -167,24 +191,24 @@
 (defn- PGobj->clj
   [data]
   (mapv
-   (fn [{services :services :as row}]
-     (if services
-       (assoc row :services (cheshire/parse-string (.getValue  services) keyword))
-       row))
-   data))
+    (fn [{services :services :as row}]
+      (if services
+        (assoc row :services (cheshire/parse-string (.getValue services) keyword))
+        row))
+    data))
 
 (defn- business-id-report [db user query]
   (let [services (when
-                     (or
-                      (nil? (:business-id-filter query))
-                      (= :ALL (:business-id-filter query))
-                      (= :services (:business-id-filter query)))
+                   (or
+                     (nil? (:business-id-filter query))
+                     (= :ALL (:business-id-filter query))
+                     (= :services (:business-id-filter query)))
                    (PGobj->clj (fetch-service-business-ids db)))
         operators (when
-                      (or
-                       (nil? (:business-id-filter query))
-                       (= :ALL (:business-id-filter query))
-                       (= :operators (:business-id-filter query)))
+                    (or
+                      (nil? (:business-id-filter query))
+                      (= :ALL (:business-id-filter query))
+                      (= :operators (:business-id-filter query)))
                     (PGobj->clj (fetch-operator-business-ids db)))
 
         report (concat services operators)]
@@ -210,16 +234,16 @@
   [db user transport-operator-id]
   (let [auditlog {::auditlog/event-type :delete-operator
                   ::auditlog/event-attributes
-                                        [{::auditlog/name "transport-operator-id"
-                                          ::auditlog/value (str transport-operator-id)}]
+                  [{::auditlog/name "transport-operator-id"
+                    ::auditlog/value (str transport-operator-id)}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}]
-  (authorization/with-transport-operator-check
-    db user transport-operator-id
-    #(do
-       (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" transport-operator-id)})
-       (upsert! db ::auditlog/auditlog auditlog)
-       transport-operator-id))))
+    (authorization/with-transport-operator-check
+      db user transport-operator-id
+      #(do
+         (operators/delete-transport-operator db {:operator-group-name (str "transport-operator-" transport-operator-id)})
+         (upsert! db ::auditlog/auditlog auditlog)
+         transport-operator-id))))
 
 (defn summary-types-for-monitor-report [db summary-type]
   (let [type-count-table (if (= :month summary-type)
@@ -242,7 +266,7 @@
                      "schedule" "rgb(153,204,0)"
                      "terminal" "rgb(221,204,0)"
                      "rentals" "rgb(255,136,0)"
-                     "parking"  "rgb(255,102,153)"
+                     "parking" "rgb(255,102,153)"
                      "brokerage" "rgb(153,0,221)"}
         find-sum-backwards (fn [month subtype]
                              ;; the twist in this function is that it looks up the sum from the most recent
@@ -271,8 +295,8 @@
 
 
 (defn monitor-report [db type]
-  {:monthly-companies  (monthly-registered-companies db)
-   :tertile-companies  (tertile-registered-companies db)
+  {:monthly-companies (monthly-registered-companies db)
+   :tertile-companies (tertile-registered-companies db)
    :companies-by-service-type (operator-type-distribution db)
    :monthly-types (summary-types-for-monitor-report db :month)
    :tertile-types (summary-types-for-monitor-report db :tertile)})
@@ -305,7 +329,7 @@
               (let [r (summary-types-for-monitor-report db :month)
                     months (:labels r)
                     ds (:datasets r)
-                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    sums-by-type (into {} (map (juxt :label :data) ds))
                     type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))
@@ -317,7 +341,7 @@
               (let [r (summary-types-for-monitor-report db :tertile)
                     months (:labels r)
                     ds (:datasets r)
-                    sums-by-type (into {}  (map (juxt :label :data) ds))
+                    sums-by-type (into {} (map (juxt :label :data) ds))
                     type-month-tmp-table (vec (for [[t vs] sums-by-type] (interleave months (repeat t) vs)))
                     final-table (mapv #(partition 3 (mapv str %)) type-month-tmp-table)]
                 (sort (vec (map vec (apply concat final-table))))))))
@@ -441,9 +465,16 @@
 
 (defn- admin-routes [db http nap-config]
   (routes
-    (POST "/admin/users" req (admin-service "users" req db #'list-users))
 
-    (POST "/admin/delete-user" req (admin-service "delete-user" req db #'delete-user))
+    (GET "/admin/user" [search type :as req]
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (list-users-bad-req-response search type)
+          (list-users-response db search)))
+
+    (DELETE "/admin/user/:id" [id :as req]
+      (let [id (Long/parseLong id)]                         ;; Parse id for security before passing to db operations
+        (or (authorization-fail-response (get-in req [:user :user]))
+            (delete-user-response db id))))
 
     (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))
 
@@ -476,7 +507,7 @@
 
     (GET "/admin/commercial-services" req
       (require-admin-user "/admin/commercial-services" (:user (:user req)))
-      (http/transit-response (get-commercial-scheduled-services db )))
+      (http/transit-response (get-commercial-scheduled-services db)))
 
     (GET "/admin/csv-fetch" req
       (require-admin-user "csv" (:user (:user req)))
@@ -486,7 +517,6 @@
       (require-admin-user "/admin/toggle-commercial-services" (:user user))
       (toggle-commercial-service db (http/transit-request form-data))
       (http/transit-response "OK"))))
-
 
 (define-service-component CSVAdminReports
   {}
@@ -512,17 +542,15 @@
   (GET "/admin/reports/monitor/csv/:type"
        {{:keys [type]} :params
         user :user}
-       (require-admin-user "reports/monitor" (:user user))
-       (monitor-csv-report db type)))
+    (require-admin-user "reports/monitor" (:user user))
+    (monitor-csv-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-           (http/publish! http (admin-routes db http nap-config))))
+                (http/publish! http (admin-routes db http nap-config))))
 
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
-
-
