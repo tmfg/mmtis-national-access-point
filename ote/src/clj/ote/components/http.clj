@@ -145,11 +145,13 @@
   (update response :headers merge no-cache-headers))
 
 (defn transit-response
-  "Return the given Clojure `data` as a Transit response with status code 200."
-  [data]
-  {:status 200
-   :headers {"Content-Type" "application/json+transit"}
-   :body (transit/clj->transit data)})
+  "Return the given Clojure `data` as a Transit response"
+  ([data]
+   (transit-response data 200))
+  ([data status]
+   {:status status
+    :headers {"Content-Type" "application/json+transit"}
+    :body (transit/clj->transit data)}))
 
 (defn no-cache-transit-response
   "Return the given Clojure `data` as a Transit response with status code 200 and no-cache headers."

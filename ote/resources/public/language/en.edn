@@ -596,6 +596,12 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"}
 
+ :transport-users-page {:username "Name"
+                        :members "Användare"
+                        :add-member "Add member"
+                        :email-placeholder "Email address"
+                        :manage-users "Manage members"}
+
  :front-page
  {:title-NAP "NAP - National Access Point"
   :title-transport-services "Transport services"
@@ -947,7 +953,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  :transit-visualization-page
  {:loading-routes "Loading service routes."
   :no-changes-in-routes "No routes with changes."
-  :checkbox-show-no-change  "Näytä myös reitit, joihin ei ole tulossa muutoksia"
+  :checkbox-show-no-change "Näytä myös reitit, joihin ei ole tulossa muutoksia"
   :route-description "Taulukkoon on listattu palvelun reitit, joissa on havaittu muutoksia.
   Voit valita listalta yhden reitin kerrallaan tarkasteluun. Valitun reitin muutokset näytetään taulukon alapuolella."
   :calendar-description-1 "Muutoksen vertailupäivät on korostettu lilalla ja sinisellä ympyrällä. Päivät ovat valitun muutoksen tapahtumapäivä (sininen)
@@ -1090,7 +1096,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :brokering-service
   {:title "Are you sure, that service you are announcing is a brokering service?"
-   :body  "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom. Registration as a brokering service is chargeable."
+   :body "Please, notice, that besides filling up the NAP form, you also have to register as a brokering service to the Finnish Transport and Communication Agency, Traficom. Registration as a brokering service is chargeable."
    :link-text "Register as a brokering service to Traficom"
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "No"
@@ -1131,11 +1137,18 @@ You can also draw the operating area or point to the map with drawing tools. You
                   [:count " services found"])
   :nap-interface ["An interface containing essential data saved in NAP-service: "]
   :external-interfaces ["Other external interfaces"]
-  :showing-latest-services "No search filters. Showing latest modified services."
-  :total-services ["The service catalog has a total of " :total-service-count " services. A total of " :total-company-count " companies are contributing to the provision of services."]
+  :no-services-found "No services found with these search criteria."
+  :no-search-filters "No search criteria have been selected."
+  :found-x-services [:count " services were found with these search criteria. "]
+  :operation-area-search-filter-result ["The services for which the region of operation has been indicated as: " :operation-area-filter]
+  :search-order "The services are sorted by the time of the last information update with the most recent on top. "
+  :other-operation-area-services "Other services covering the selected region of operation"
+  :no-operation-area-services "The region of operation in question has not been indicated for any of the services."
+  :service-summary-text "The service catalogue includes a total of "
+  :service-count [:count " services"]
+  :service-providing-text ", the production of which involves a total of "
+  :service-and-operator-summary-text [:count " companies or organisations."]
   :fetching-more "Fetching more services..."
-  :operator-services ["Transport operator " :name " has " :count " services"]
-  :operator-no-services "Transport operator has no services."
   :view-routes "View routes"
   :view-routes-failure "Route viewing not possible"
   :load-csv-file "Load csv file"
