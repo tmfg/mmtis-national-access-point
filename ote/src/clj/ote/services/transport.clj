@@ -537,6 +537,10 @@
       (http/transit-response to)
       {:status 404})))
 
+(defn transport-operator-users
+  [db operator-id]
+  (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
   [db config]
@@ -565,6 +569,21 @@
               operator-id (Long/parseLong operator-id)]
           (authorization/with-transport-operator-check db user operator-id
                                                        #(delete-associated-operator db service-id operator-id))))
+
+      (GET "/transport-operator/:operator-id/users"
+           {{:keys [operator-id]}
+            :params
+            user :user}
+        (let [op-id (Long/parseLong operator-id)]
+          (authorization/with-transport-operator-check db user op-id
+                                                       #(transport-operator-users db op-id))))
+
+      (POST "/transport-operator/:operator-id/users"
+            {{:keys [operator-id]}
+             :params
+             user :user
+             form-data :body}
+        (http/transit-response (http/transit-request form-data))) ;THIS IS JUST PLACEHOLDER
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response

@@ -20,20 +20,21 @@
        opts])))
 
 (defn table [{:keys [height name->label key-fn label-style row-style
-                     on-select row-selected? no-rows-message class] :as opts} headers rows]
+                     on-select row-selected? no-rows-message class no-selection?] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
         table-row-color-alt colors/gray200
         table-row-hover-color colors/gray400]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
-                 :body-style {:padding "3px"}
                  :header-style {:border (str "solid 3px " colors/gray400)}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
                  ;;        For now, leaving this commented out.
                  ;:bodyStyle {:overflow "visible"}
                  }
+                (when no-selection?
+                  :body-style {:padding "3px"})
                 (when on-select
                   {:on-row-selection (fn [selected-rows]
                                        (when (seq selected-rows)
