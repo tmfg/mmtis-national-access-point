@@ -31,7 +31,10 @@
             [clj-time.core :as t]
             [ote.time :as time]
             [clj-http.client :as http-client]
-            [ote.services.external :as external]))
+            [ote.services.external :as external]
+            [ote.tasks.pre-notices :as pn]
+            [hiccup.core :refer [html]]
+            [ote.email :as email]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -463,7 +466,7 @@
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:error (str e)})})))
 
-(defn- admin-routes [db http nap-config]
+(defn- admin-routes [db http nap-config email-config]
   (routes
 
     (GET "/admin/user" [search type :as req]
@@ -516,7 +519,32 @@
     (POST "/admin/toggle-commercial-services" {form-data :body user :user}
       (require-admin-user "/admin/toggle-commercial-services" (:user user))
       (toggle-commercial-service db (http/transit-request form-data))
-      (http/transit-response "OK"))))
+      (http/transit-response "OK"))
+
+    ;; For development purposes only - remove/hide before pr
+    #_(GET "/admin/html-email" req
+        (require-admin-user "csv" (:user (:user req)))
+        {:status 200
+         :headers {"Content-Type" "text/html; charset=utf-8"}
+         :body (html (pn/notification-html (pn/fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions nil)})
+                                           (pn/fetch-unsent-changes-by-regions db {:regions nil})))})
+
+    ;; For development purposes only - remove/hide before pr
+    ;; To make email sending to work from local machine add host, port, username and password to config.edn
+    #_(GET "/admin/send-email" req
+        (require-admin-user "jotain" (:user (:user req)))
+        (try
+          (email/send!
+            email-config
+            {:to "*********** email ******************"
+             :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                           (time/format-date (t/now)))
+             :body [{:type "text/html;charset=utf-8"
+                     :content (html (pn/notification-html (pn/fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions nil)})
+                                                          (pn/fetch-unsent-changes-by-regions db {:regions nil})))}]})
+          (catch Exception e
+            (log/warn "Error while sending a notification" e))))))
+
 
 (define-service-component CSVAdminReports
   {}
@@ -547,9 +575,9 @@
 
 (defrecord Admin [nap-config]
   component/Lifecycle
-  (start [{db :db http :http :as this}]
+  (start [{db :db http :http email :email :as this}]
     (assoc this ::stop
-                (http/publish! http (admin-routes db http nap-config))))
+           (http/publish! http (admin-routes db http nap-config email))))
 
   (stop [{stop ::stop :as this}]
     (stop)
