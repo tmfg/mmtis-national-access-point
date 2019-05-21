@@ -244,7 +244,7 @@
          (when (seq other-results)
            [:div
             (when operation-area-filter
-              [:h3 (tr [:service-search :other-operation-area-services])])
+              [:h3 {:style {:margin-top "2.5rem"}} (tr [:service-search :other-operation-area-services])])
             (doall
               (for [result other-results]
                 ^{:key (::t-service/id result)}
