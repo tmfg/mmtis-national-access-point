@@ -9,7 +9,8 @@
             [ote.ui.icons :as ote-icons]
             [clojure.string :as str]
             [ote.theme.colors :as colors]
-            [ote.localization :refer [tr]]))
+            [ote.localization :refer [tr]]
+            [ote.time :as time]))
 
 ;; Utility methods
 
@@ -38,6 +39,17 @@
       changes
       (when with-labels? " aikataulumuutosta")]]))
 
+(defn no-traffic-icons [{:keys [change-type] :as change-summary}]
+  [:div (stylefy/use-style (style-base/flex-container "row"))
+   [:div {:style {:flex "0.5"}}
+   [icon-l/icon-labeled
+    [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]]
+   ;; If route has ending change, add icon at the end of the icon list.
+   (if (str/includes? (str change-type) "removed")
+     [:div {:style {:flex "0.5" } :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
+      [icon-l/icon-labeled
+       [ic/content-remove-circle-outline {:color style/remove-color}] nil]])])
+
 (defn change-icons
   ([diff]
    [change-icons diff false])
@@ -54,7 +66,7 @@
       [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
        (when with-labels? " lisättyä vuoroa")]]]
 
-    [:div {:style {:flex "1"}}
+    [:div {:style {:flex "0.8"}}
      [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
                                                           style/no-change-color
@@ -62,7 +74,7 @@
       [:span (or removed-trips (:gtfs/removed-trips diff) 0)
        (when with-labels? " poistettua vuoroa")]]]
 
-    [:div {:style {:flex "1"}}
+    [:div {:style {:flex "1.3"}}
      [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
 
 
@@ -76,7 +88,7 @@
       [:div {:style {:flex "0.5"}}])
 
     (if (str/includes? (str change-type) "removed")
-      [:div {:style {:flex "0.5"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
+      [:div {:style {:flex "0.4"} :title "Reitti on mahdollisesti päättymässä. Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja."}
        [icon-l/icon-labeled
         [ic/content-remove-circle-outline {:color style/remove-color}] nil]]
       [:div {:style {:flex "0.5"}}])]))

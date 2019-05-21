@@ -79,7 +79,9 @@
             different-week-date (:different-week-date (first change-list))
             added-routes (count (filter #(= "added" (:change-type %)) change-list))
             removed-routes (count (filter #(= "removed" (:change-type %)) change-list))
-            changed-routes (count (filter #(= "changed" (:change-type %)) change-list))
+            changed-routes (filter #(= "changed" (:change-type %)) change-list)
+            grouped-changed-routes (group-by :route-hash-id changed-routes)
+            changed-routes-count (count grouped-changed-routes)
             no-traffic-routes (count (filter #(= "no-traffic" (:change-type %)) change-list))]
 
         [operator-name
@@ -93,8 +95,8 @@
                               (str added-routes " uutta reittiä"))
                             (when (and removed-routes (> removed-routes 0))
                               (str removed-routes " päättyvää reittiä"))
-                            (when (and changed-routes (> changed-routes 0))
-                              (str changed-routes " muuttunutta reittiä"))
+                            (when (and changed-routes (> changed-routes-count 0))
+                              (str changed-routes-count " muuttunutta reittiä"))
                             (when (and no-traffic-routes (> no-traffic-routes 0))
                               (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))]))))
 
