@@ -520,30 +520,30 @@
 
 (define-service-component CSVAdminReports
                           {}
-                          ^{:format :csv
-                            :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
-                          (GET "/admin/reports/transport-operator/:type"
-                               {{:keys [type]} :params
-                                user :user}
-                            (require-admin-user "reports/transport-operator" (:user user))
-                            (transport-operator-report db type)))
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/transport-operator/:type"
+       {{:keys [type]} :params
+        user :user}
+    (require-admin-user "reports/transport-operator" (:user user))
+    (transport-operator-report db type)))
 
 (define-service-component MonitorReport []
-                          {}
-                          (GET "/admin/reports/monitor-report"
-                               {user :user}
-                            (require-admin-user "reports/monitor" (:user user))
-                            (http/transit-response (monitor-report db "all"))))
+  {}
+  (GET "/admin/reports/monitor-report"
+       {user :user}
+    (require-admin-user "reports/monitor" (:user user))
+    (http/transit-response (monitor-report db "all"))))
 
 (define-service-component MonitorReportCSV
                           {}
-                          ^{:format :csv
-                            :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
-                          (GET "/admin/reports/monitor/csv/:type"
-                               {{:keys [type]} :params
-                                user :user}
-                            (require-admin-user "reports/monitor" (:user user))
-                            (monitor-csv-report db type)))
+  ^{:format :csv
+    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/monitor/csv/:type"
+       {{:keys [type]} :params
+        user :user}
+    (require-admin-user "reports/monitor" (:user user))
+    (monitor-csv-report db type)))
 
 (defrecord Admin [nap-config]
   component/Lifecycle
