@@ -519,7 +519,7 @@
       (http/transit-response "OK"))))
 
 (define-service-component CSVAdminReports
-                          {}
+  {}
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/transport-operator/:type"
@@ -536,7 +536,7 @@
     (http/transit-response (monitor-report db "all"))))
 
 (define-service-component MonitorReportCSV
-                          {}
+  {}
   ^{:format :csv
     :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/monitor/csv/:type"
