@@ -174,7 +174,7 @@
     (assoc app :flash-message-error "Käyttäjän poistaminen epäonnistui"))
 
   SearchUsersResponse
-  (process-event [{response :response :as all} app]
+  (process-event [{response :response} app]
     (update-in app [:admin :user-listing] assoc
                :loading? false
                :results (if (vector? response)              ;; :response contains data in vector on success, otherwise http error in a map
