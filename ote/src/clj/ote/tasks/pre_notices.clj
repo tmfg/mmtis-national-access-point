@@ -110,9 +110,8 @@
 (defn- blue-button [link text]
   [:table
    [:tr
-    [:td.btn
-     [:a {:class "mcnButton"
-          :title text
+    [:td
+     [:a.btn.mcnButton {:title text
           :href link
           :target "_blank"
           :style "font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;"}
@@ -151,8 +150,9 @@
    [:body.grayBackground
     [:center
      [:div.whiteBackground {:width "80%" :style "padding-left: 20px; padding-right:20px;"}
-      [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
-             :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]
+      [:a {:href (str (environment/base-url))}
+       [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
+                                                     :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
       [:br]
       [:p [:span.headerText1 "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
       [:p [:span {:class "headerText2"} "Tunnistusajankohta " (time/format-date (time/now))]]
