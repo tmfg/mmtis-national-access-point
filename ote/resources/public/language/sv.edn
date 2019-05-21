@@ -1150,7 +1150,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-operation-area-services "Verksamhetsområdet i fråga har inte angetts för någon tjänst."
   :service-summary-text "Tjänstekatalogen innehåller totalt  "
   :service-count [:count " tjänster"]
-  :service-providing-text ",i vars produktion medverkar totalt "
+  :service-providing-text ", i vars produktion medverkar totalt "
   :service-and-operator-summary-text [:count " företag eller organisationer."]
   :fetching-more "Sökning av tjänster pågår..."
   :view-routes "Visa rutter"
