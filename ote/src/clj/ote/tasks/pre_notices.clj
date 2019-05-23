@@ -112,11 +112,21 @@
 (defn- blue-button [link text]
   [:table
    [:tr
-    [:td
-     [:a.btn.mcnButton {:title text
+    [:td {:align "center"
+          :valign "middle"
+          :class "mcnButtonContent"
+          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 15px;"}
+     [:a.mcnButton {:title text
           :href link
           :target "_blank"
-          :style "font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;"}
+          :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+          font-size:16px;
+          font-weight: normal;
+          letter-spacing: normal;
+          line-height: 25px;
+          text-align: center;
+          text-decoration: none;
+          color: #FFFFFF;"}
       text]]]])
 
 (defn notification-html [pre-notices detected-changes]
@@ -125,45 +135,61 @@
           :xmlns:v "urn:schemas-microsoft-com:vml"
           :xmlns:o "urn:schemas-microsoft-com:office:office"}
    [:head "<!-- NAME: 1 COLUMN - FULL WIDTH -->" "<!--
-                    [if gte mso 15]>\n<xml>\n<o:OfficeDocumentSettings>\n<o:AllowPNG/>\n<o:PixelsPerInch>96</o:PixelsPerInch>\n</o:OfficeDocumentSettings>\n</xml>\n<!
-                    [endif]-->"
-    [:meta {:charset "UTF-8"}]
+                    [if gte mso 9]>
+                    <xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+                    <![endif]-->"
+    [:meta {:http-equiv "Content-Type", :content "text/html; charset=utf-8"}]
     [:meta {:http-equiv "X-UA-Compatible", :content "IE=edge"}]
-    [:meta {:name "viewport", :content "width=device-width, initial-scale=1"}]
+    [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]
+    [:meta {:name "format-detection", :content "telephone=no"}]
     [:title "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
+    "<!--[if !mso]><!-->
+    <link href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,600,700,800\" rel=\"stylesheet\" />
+    <!--<![endif]-->"
     [:style {:type "text/css"}
-     ".headerText1 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
-     .headerText2 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
+     "body { margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; -ms-text-size-adjust: 100% !important; -webkit-font-smoothing: antialiased !important;font-family:Roboto,helvetica neue,arial,sans-serif;}
+     img { border: 0 !important; outline: none !important;}
+     p { Margin: 0px !important; Padding: 0px !important;}
+     table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
+     td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
+     .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
+     .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
      .whiteBackground {background-color:#FFFFFF}
      .grayBackground {background-color:#EFEFEF}
-     .btn {background-color:#0066CC;padding:15px;}
-     .footer {font-size:0.75rem}
+     .mcnButtonContent {background-color:#0066CC;padding:15px;}
+     .footer {font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;}
      a.mcnButton{display:block;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
-      .tg  {border-collapse:collapse;border-spacing:0;}
-      .tg td{font-family:roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
-      .tg th{font-family:roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
-      .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
-      .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
-      .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
-      .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
-      .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}"]]
-   [:body.grayBackground
+     .tg  {border-collapse:collapse;border-spacing:0;}
+     .tg td{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg th{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
+     .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
+     .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
+     .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
+     .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}
+     @media only screen and (min-width:481px) and (max-width:599px) {
+      .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
+      .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1rem; font-weight:700;}
+     }"]]
+   [:body
     [:center
      [:div.whiteBackground {:width "80%" :style "padding-left: 20px; padding-right:20px;"}
       [:a {:href (str (environment/base-url))}
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
-                                                     :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
+              :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
       [:br]
-      [:p [:span.headerText1 "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
-      [:p [:span {:class "headerText2"} "Tunnistusajankohta " (time/format-date (time/now))]]
+      [:p [:span {:class "headerText1"
+                  :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;"}
+           "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
 
       (when (seq pre-notices)
-        [:div
+        [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
          [:p
-          [:span {:class "headerText2"}
+          [:span {:class "headerText2"
+                  :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
            "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
          (table
@@ -179,10 +205,16 @@
          (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
 
       (when (seq detected-changes)
-        [:div
+        [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
          [:div
-          [:p.headerText2 "Rajapinnoista tunnistetut muutokset"]
+          [:p [:span {:class "headerText2"
+                      :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+               "Rajapinnoista tunnistetut muutokset"]]
+          [:p [:span
+               {:class "headerText2"
+                :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+               "Tunnistusajankohta " (time/format-date (time/now))]]
           (table
             [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
              {:class "tg-lusz" :width "20%" :label "Palvelu"}
@@ -191,18 +223,30 @@
              {:class "tg-lusz" :width "20%" :label "Muutokset"}]
             (detected-change-row detected-changes))
           [:br]]
-         (blue-button (str (environment/base-url) "/#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+         (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
       (html-divider-border nil)]
 
      [:div.grayBackground.footer
-      [:p "Tämän viestin lähetti NAP."]
-      [:span [:strong "NAP-yhteystiedot:"]]
+      [:br]
+      [:br]
+      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       "Tämän viestin lähetti NAP."]
+      [:br]
+      [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+              "NAP-yhteystiedot:"]]
       [:p
-       [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
-       [:span " tai 029 534 5454 (arkisin 09-15)"]]
-      [:p "Haluatko muuttaa sähköpostiasetuksiasi?"
+       [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+            :href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
+       [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+        " tai 029 534 5454 (arkisin 09-15)"]]
+      [:br]
+      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       "Haluatko muuttaa sähköpostiasetuksiasi?"
        [:br]
-       [:a {:href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]]]]])
+       [:a
+        {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+         :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]
+      [:br]]]]])
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -218,7 +262,9 @@
                     (count detected-changes) " new detected changes "
                     " from 24 hours for regions " (:finnish-regions user))
 
-          (html (notification-html notices detected-changes)))
+          ;; Add doctype which can't be addid using hiccup template
+          (str "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+               (html (notification-html notices detected-changes))))
         (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
