@@ -147,9 +147,11 @@
 
   SearchUsers
   (process-event [_ app]
-    (comm/get! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
-                {:on-success (tuck/send-async! ->SearchUsersResponse)
-                 :on-failure (tuck/send-async! ->SearchUsersResponse)})
+    (let [filter (get-in app [:admin :user-listing :user-filter])]
+      (comm/get! (str "admin/user"
+                      (when filter (str "?type=any&search=" filter)))
+                 {:on-success (tuck/send-async! ->SearchUsersResponse)
+                  :on-failure (tuck/send-async! ->SearchUsersResponse)}))
     (assoc-in app [:admin :user-listing :loading?] true))
 
   ConfirmDeleteUser
@@ -157,8 +159,7 @@
     (if (= id (:ensured-id (get-user-by-id app id)))
       (comm/delete! (str "admin/user/" id)
                     nil
-                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
-                     :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
+                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)})
       (.log js/console "Could not delete user! Check given id:" id))
     app)
 
@@ -183,8 +184,8 @@
 
   OpenDeleteUserModal
   (process-event [{id :id} app]
-    (comm/post! "admin/user-operator-members" {:id id}
-                {:on-success (tuck/send-async! ->OpenDeleteUserModalResponse id)})
+    (comm/get! (str "admin/member?userid=" id)
+               {:on-success (tuck/send-async! ->OpenDeleteUserModalResponse id)})
     app)
 
   OpenDeleteUserModalResponse
