@@ -7,10 +7,6 @@
             [compojure.core :refer [routes GET]]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.service-search :as search]
-            [ote.db.common :as common]
-            [ote.db.modification :as modification]
             [specql.op :as op]
             [clojure.set :as set]
             [clojure.string :as str]))
@@ -47,7 +43,12 @@ Negative return value is an invalid match"
 (defn- id-to-quality
   "Processes `spatial-diffs` into a mapping of id > match quality"
   [spatial-diffs]
-  (into {} (map (juxt :id #(match-quality (:intersection %) (:difference %))) spatial-diffs)))
+  (into [] (map
+             (fn [row]
+               {:id (:id row)
+                :difference (match-quality (:intersection row) (:difference row))
+                :modified (:modified row)})
+             spatial-diffs)))
 
 (defn- service-search-match-qualities
   "Returns a mapping of service id -> match quality
@@ -55,8 +56,9 @@ Negative return value is an invalid match"
   `service-ids` collection of ids for which qualities are returned
   `operation-area` collection of place names against which match quality is compared"
   [db service-ids operation-area]
-  (id-to-quality
-   (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})))
+  (let  [services (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})
+         services (id-to-quality services)]
+    services))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
@@ -158,8 +160,9 @@ Negative return value is an invalid match"
   [db ids]
   (specql/fetch db ::t-service/transport-service-search-result
                 search-result-columns
-                {::t-service/id (op/in ids)}
-                {}))
+                {::t-service/id (op/in (map :id ids))}
+                {:specql.core/order-by :ote.db.modification/modified
+                 :specql.core/order-direction :desc}))
 
 (defn- transport-services-page
   "Queries database for a page of transport services.
@@ -192,18 +195,19 @@ Negative return value is an invalid match"
   `offset` and `limit` make it possible to use paging instead of fetching all the results"
   [db ids operation-area offset limit]
   (let [match-qualities (service-search-match-qualities db ids operation-area)
-        sorted-ids (sort-by match-qualities (keys match-qualities))
-        page (page-of sorted-ids offset limit)
-        results (transport-services db page)
+        sorted-ids (sort-by (juxt :difference :modified) match-qualities)
+        paged-result (page-of sorted-ids offset limit)
+        results (transport-services db paged-result)
         results (map
                   (fn [result]
-                    (let [service-id (::t-service/id result)
-                          matching-value (get match-qualities service-id)]
-                      (assoc result ::t-service/difference matching-value)))
+                    (let [maps-by-id (zipmap (map :id match-qualities) match-qualities)
+                          service-id (::t-service/id result)
+                          r (maps-by-id service-id)]
+                      (-> result
+                          (assoc :modified (:modified r))
+                          (assoc :difference (:difference r)))))
                   results)
-        results (sort-by
-                  (comp match-qualities ::t-service/id)
-                  results)]
+        results (sort-by (juxt :difference :modified) results)]
     results))
 
 (defn- without-import-errors [search-result]
