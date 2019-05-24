@@ -38,7 +38,7 @@ SELECT * FROM (
                             ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND
                                ts."commercial-traffic?" = TRUE
                      JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
-                WHERE h."email-sent" IS NULL
+                WHERE h."email-sent" > '2019-05-20'
                   AND (p."finnish-regions" IS NULL OR
                        :regions::CHAR(2)[] IS NULL OR
                        :regions::CHAR(2)[] && p."finnish-regions")
