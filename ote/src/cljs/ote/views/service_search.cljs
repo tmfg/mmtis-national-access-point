@@ -220,7 +220,7 @@
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count filter-service-count fetching-more?]} service-search
-        _ (.log js/console "Results " (clj->js results))
+  (let [{:keys [results empty-filters? total-service-count filter-service-count fetching-more?]} service-search
         operation-area-filter (get-in app [:service-search :params :operation_area])
         operating-area-match-results (filter #(= (:difference %) 0) results)
         other-results (filter #(not= (:difference %) 0) results)]
