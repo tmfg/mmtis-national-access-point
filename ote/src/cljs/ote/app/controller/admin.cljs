@@ -102,12 +102,11 @@
 
 (defn- update-user-by-id [app id update-fn & args]
   (update-in app [:admin :user-listing :results]
-             (fn [operators]
+             (fn [users]
                (map #(if (= (:id %) id)
                        (apply update-fn % args)
                        %)
-                    operators))))
-
+                    users))))
 
 (defn- get-search-result-operator-by-id [app id]
   (some
