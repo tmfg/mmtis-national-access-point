@@ -11,7 +11,8 @@
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
             [ote.transit-changes :as tcu]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.string :as str]))
 
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
@@ -92,6 +93,11 @@
   (count
     (get coll key)))
 
+(defn- combine-change-types
+  "Convert change collection types to one string"
+  [coll]
+  (str/join "/" (map :change-type coll)))
+
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [show-no-change changes]
@@ -114,7 +120,9 @@
                                     route-changes
                                     group-recent?)
         route-changes (map (fn [x]
-                             (assoc x :count (count-changes (:route-hash-id x) grouped-changes)))
+                             (-> x
+                                 (assoc :count (count-changes (:route-hash-id x) grouped-changes))
+                                 (assoc :combined-change-types (combine-change-types (get grouped-changes (:route-hash-id x))))))
                            route-changes-with-recent)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) route-changes)
         all-sorted-changes (if show-no-change

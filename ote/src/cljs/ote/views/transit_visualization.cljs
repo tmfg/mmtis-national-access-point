@@ -340,6 +340,9 @@
                               (pos-int? no-change-routes-count))
                           (tr [:transit-visualization-page :no-changes-in-routes])
                           (tr [:transit-visualization-page :loading-routes]))]
+    (.log js/console " reittien määrä " (count route-changes))
+    (.log js/console " tyypit " (pr-str (map #(route-change-summary % changes-all) route-changes)))
+    (.log js/console "(route-change-summary route-changes changes-all)" (pr-str (route-change-summary route-changes changes-all)))
     [:div.route-changes
      [tv-utilities/route-changes-legend]
      [table/table {:no-rows-message no-rows-message
@@ -374,16 +377,16 @@
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
-       {:name "Muutoksia (kpl)"
-        :width "10%"
+       {:name "Muutoksia"
+        :width "8%"
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [row]
                   (if (= :no-change (:change-type row))
-                    "0"
-                    (:count row)))}
+                    "0 kpl"
+                    (str (:count row) " kpl")))}
        {:name "Aikaa 1. muutokseen"
-        :width "14%"
+        :width "9%"
         :read :different-week-date
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
@@ -391,38 +394,13 @@
                     [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
-                     [:span (stylefy/use-style {:margin-left "5px"
-                                                :color "gray"})
+                     [:div (stylefy/use-style {:color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-       {:name "Muutosten yhteenveto" :width "33%"
+       {:name "Muutosten yhteenveto" :width "40%"
         :read identity
         :col-style style-base/table-col-style-wrap
-        :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
-                  (case change-type
-                    :no-traffic
-                    [tv-change-icons/no-traffic-icons (route-change-summary route-changes changes-all)]
-
-                    :added
-                    [icon-l/icon-labeled
-                     [ic/content-add-box {:color style/add-color}]
-                     (tr [:transit-changes :route-new])]
-
-                    :removed
-                    [icon-l/icon-labeled
-                     [ic/content-remove-circle-outline {:color style/remove-color}]
-                     [:span {:title (str "Reitti päättyy mahdollisesti "
-                                         (time/format-timestamp->date-for-ui different-week-date)
-                                         ". "
-                                         "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
-                      (tr [:transit-changes :trip-end-potential])]]
-
-                    :no-change
-                    [icon-l/icon-labeled
-                     [ic/navigation-check]
-                     (tr [:transit-changes :no-changes])]
-
-                    :changed
-                    [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
+        :format (fn [grouped-route-data]
+        [tv-change-icons/route-change-icons grouped-route-data])}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
