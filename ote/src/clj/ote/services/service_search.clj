@@ -43,12 +43,12 @@ Negative return value is an invalid match"
 (defn- id-to-quality
   "Processes `spatial-diffs` into a mapping of id > match quality"
   [spatial-diffs]
-  (into [] (map
-             (fn [row]
-               {:id (:id row)
-                :difference (match-quality (:intersection row) (:difference row))
-                :modified (:modified row)})
-             spatial-diffs)))
+  (mapv
+    (fn [row]
+      {:id (:id row)
+       :difference (match-quality (:intersection row) (:difference row))
+       :modified (:modified row)})
+    spatial-diffs))
 
 (defn- service-search-match-qualities
   "Returns a mapping of service id -> match quality
@@ -198,10 +198,10 @@ Negative return value is an invalid match"
         sorted-ids (sort-by (juxt :difference :modified) match-qualities)
         paged-result (page-of sorted-ids offset limit)
         results (transport-services db paged-result)
+        maps-by-id (zipmap (map :id match-qualities) match-qualities)
         results (map
                   (fn [result]
-                    (let [maps-by-id (zipmap (map :id match-qualities) match-qualities)
-                          service-id (::t-service/id result)
+                    (let [service-id (::t-service/id result)
                           r (maps-by-id service-id)]
                       (-> result
                           (assoc :modified (:modified r))
