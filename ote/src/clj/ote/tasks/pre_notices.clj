@@ -76,7 +76,7 @@
             date (:date (first change-list))
             regions (:regions (first change-list))
             days-until-change (:days-until-change (first change-list))
-            different-week-date (:different-week-date (first change-list))
+            different-week-date (:different-week-date (first (sort-by :different-week-date change-list)))
             added-routes (count (filter #(= "added" (:change-type %)) change-list))
             removed-routes (count (filter #(= "removed" (:change-type %)) change-list))
             changed-routes (filter #(= "changed" (:change-type %)) change-list)
@@ -88,7 +88,7 @@
          (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
               transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
-         (str days-until-change " pv (" different-week-date ")")
+         (str days-until-change " pv (" (time/format-date different-week-date) ")")
          (str/join ", "
                    (remove nil?
                            [(when (and added-routes (> added-routes 0))
