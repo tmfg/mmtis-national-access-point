@@ -340,9 +340,6 @@
                               (pos-int? no-change-routes-count))
                           (tr [:transit-visualization-page :no-changes-in-routes])
                           (tr [:transit-visualization-page :loading-routes]))]
-    (.log js/console " reittien määrä " (count route-changes))
-    (.log js/console " tyypit " (pr-str (map #(route-change-summary % changes-all) route-changes)))
-    (.log js/console "(route-change-summary route-changes changes-all)" (pr-str (route-change-summary route-changes changes-all)))
     [:div.route-changes
      [tv-utilities/route-changes-legend]
      [table/table {:no-rows-message no-rows-message
