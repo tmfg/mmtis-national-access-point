@@ -238,7 +238,7 @@
               "NAP-yhteystiedot:"]]
       [:p
        [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-            :href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
+            :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
       [:br]
