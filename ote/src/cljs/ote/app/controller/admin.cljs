@@ -158,7 +158,8 @@
     (if (= id (:ensured-id (get-user-by-id app id)))
       (comm/delete! (str "admin/user/" id)
                     nil
-                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)})
+                    {:on-success (tuck/send-async! ->ConfirmDeleteUserResponse)
+                     :on-failure (tuck/send-async! ->ConfirmDeleteUserResponseFailure)})
       (.log js/console "Could not delete user! Check given id:" id))
     app)
 
