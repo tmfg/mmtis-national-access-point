@@ -102,7 +102,6 @@
 
 (defn html-divider-border [_]
   [:div
-
    [:table {:border "0", :width "80%", :cellpadding "0", :cellspacing "0"}
     [:tbody
      [:tr
@@ -110,20 +109,25 @@
    [:br]])
 
 (defn- blue-button [link text]
-  [:div
-   [:a.mcnButton.mcnButtonContent {:title text
-                                   :href link
-                                   :target "_blank"
-                                   :style "font-family:Roboto,helvetica neue,arial,sans-serif;
-                          font-size:16px;
-                          font-weight: normal;
-                          letter-spacing: normal;
-                          line-height: 25px;
-                          text-align: center;
-                          text-decoration: none;
-                          display: inline-block;
-                          color: #FFFFFF !important;"}
-    text]])
+  [:table {:style "background-color: #fff;" :cellpadding "16"}
+   [:tr
+    [:td {:align "center"
+          :valign "middle"
+          :class "mcnButtonContent"
+          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px;"}
+     [:a.mcnButton {:title text
+                    :href link
+                    :target "_blank"
+                    :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+                            font-size: 16px;
+                            font-weight: normal;
+                            letter-spacing: normal;
+                            line-height: 25px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            color: #FFFFFF !important;"}
+      text]]]])
 
 (defn notification-html [pre-notices detected-changes]
   (println "pre-notices" (pr-str pre-notices))
@@ -145,7 +149,7 @@
     [:style {:type "text/css"}
      "body { margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; -ms-text-size-adjust: 100% !important; -webkit-font-smoothing: antialiased !important;font-family:Roboto,helvetica neue,arial,sans-serif;}
      img { border: 0 !important; outline: none !important;}
-     p { margin: 0px !important; }
+     p { margin: 0px; }
      table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
      td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
      .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
@@ -165,11 +169,11 @@
      .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
      .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
      .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}
-     .spacing-left-right{padding-left:20px;padding-right:20px;}
-     @media screen and (max-width:599px) {
-      .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
-      .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1rem; font-weight:700;}
-      .spacing-left-right{padding-left:0;padding-right:0;}
+     .spacing-left-right{padding-left:0;padding-right:0;}
+     @media screen and (min-width:699px) {
+      .headerText1 {font-size:2rem !important;}
+      .headerText2 {font-size:1.5rem !important;}
+      .spacing-left-right{padding-left:20px;padding-right:20px;}
      }"]]
    [:body
     [:center
@@ -178,16 +182,16 @@
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
               :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
       [:br]
-      [:p [:span {:class "headerText1"
-                  :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;"}
-           "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
+      [:h1 {:class "headerText1"
+            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+       "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
 
       (when (seq pre-notices)
         [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
-         [:p {:style "padding-bottom:  20px;"}
-          [:span {:class "headerText2"
-                  :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+         [:p {:style "margin-bottom:  20px;"}
+          [:h2 {:class "headerText2"
+                :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
            "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
          (table
@@ -205,21 +209,20 @@
       (when (seq detected-changes)
         [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
-         [:div
-          [:p [:span {:class "headerText2"
-                      :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-               "Rajapinnoista tunnistetut muutokset"]]
-          [:p {:style "padding-bottom:  20px;"}
-           [:span
-            {:class "headerText2"
-             :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-            "Tunnistusajankohta " (time/format-date (time/now))]]
+         [:p
+          [:h2 {:class "headerText2"
+                :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+           "Rajapinnoista tunnistetut muutokset"]
+          [:h2
+           {:class "headerText2"
+            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
+           "Tunnistusajankohta " (time/format-date (time/now))]
           (table
             [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
              {:class "tg-lusz" :width "15%" :label "Palvelu"}
-             {:class "tg-lusz" :width "30%" :label "Alue"}
+             {:class "tg-lusz" :width "25%" :label "Alue"}
              {:class "tg-lusz" :width "15%" :label "Aikaa 1. muutokseen"}
-             {:class "tg-lusz" :width "20%" :label "Muutokset"}]
+             {:class "tg-lusz" :width "25%" :label "Muutokset"}]
             (detected-change-row detected-changes))
           [:br]]
          (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
@@ -254,6 +257,7 @@
     (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
           detected-changes (when (detected-changes-recipients (:email user))
                              (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))]
+
       (if (or (seq notices) (seq detected-changes))
         (do
           (log/info "For user " (:email user) " we found "

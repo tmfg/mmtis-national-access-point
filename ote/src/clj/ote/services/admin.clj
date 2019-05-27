@@ -468,11 +468,10 @@
 
 (defn- admin-email
   [email-config db]
-  (println "foo")
   (try
     (email/send!
       email-config
-      {:to "joni.korpelin@solita.fi"
+      {:to "*******EMAIL*********"
        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
                      (time/format-date (t/now)))
        :body [{:type "text/html;charset=utf-8"
@@ -538,7 +537,7 @@
       (http/transit-response "OK"))
 
     ;; For development purposes only - remove/hide before pr
-    (GET "/admin/html-email" req
+    #_(GET "/admin/html-email" req
         (require-admin-user "csv" (:user (:user req)))
         {:status 200
          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -547,7 +546,7 @@
 
     ;; For development purposes only - remove/hide before pr
     ;; To make email sending to work from local machine add host, port, username and password to config.edn
-    (GET "/admin/send-email" req
+    #_(GET "/admin/send-email" req
         (require-admin-user "jotain" (:user (:user req)))
         (admin-email email-config db))))
 
