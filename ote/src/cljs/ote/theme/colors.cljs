@@ -29,6 +29,7 @@
 (def green-basic "#00AA00")
 (def red-basic "#DD0000")
 (def red-dark "#CF0000")
+(def red-darker "#DD0000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
 
@@ -47,6 +48,10 @@
 (def progress primary)
 (def success green-basic)
 (def warning red-basic)
+(def add-color green-basic)
+(def remove-color red-darker)
+(def icon-disabled gray550)
+(def icon-gray gray900)
 
 (def monitor-taxi-color "rgb(0,170,187)")
 (def monitor-request-color "rgb(102,204,102)")
