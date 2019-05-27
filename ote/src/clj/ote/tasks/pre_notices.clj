@@ -102,7 +102,6 @@
 
 (defn html-divider-border [_]
   [:div
-
    [:table {:border "0", :width "80%", :cellpadding "0", :cellspacing "0"}
     [:tbody
      [:tr
@@ -110,13 +109,24 @@
    [:br]])
 
 (defn- blue-button [link text]
-  [:table
+  [:table {:style "background-color: #fff;" :cellpadding "16"}
    [:tr
-    [:td
-     [:a.btn.mcnButton {:title text
-          :href link
-          :target "_blank"
-          :style "font-weight: normal;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;"}
+    [:td {:align "center"
+          :valign "middle"
+          :class "mcnButtonContent"
+          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px;"}
+     [:a.mcnButton {:title text
+                    :href link
+                    :target "_blank"
+                    :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+                            font-size: 16px;
+                            font-weight: normal;
+                            letter-spacing: normal;
+                            line-height: 25px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            color: #FFFFFF !important;"}
       text]]]])
 
 (defn notification-html [pre-notices detected-changes]
@@ -125,52 +135,70 @@
           :xmlns:v "urn:schemas-microsoft-com:vml"
           :xmlns:o "urn:schemas-microsoft-com:office:office"}
    [:head "<!-- NAME: 1 COLUMN - FULL WIDTH -->" "<!--
-                    [if gte mso 15]>\n<xml>\n<o:OfficeDocumentSettings>\n<o:AllowPNG/>\n<o:PixelsPerInch>96</o:PixelsPerInch>\n</o:OfficeDocumentSettings>\n</xml>\n<!
-                    [endif]-->"
-    [:meta {:charset "UTF-8"}]
+                    [if gte mso 9]>
+                    <xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+                    <![endif]-->"
+    [:meta {:http-equiv "Content-Type", :content "text/html; charset=utf-8"}]
     [:meta {:http-equiv "X-UA-Compatible", :content "IE=edge"}]
-    [:meta {:name "viewport", :content "width=device-width, initial-scale=1"}]
+    [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]
+    [:meta {:name "format-detection", :content "telephone=no"}]
     [:title "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
+    "<!--[if !mso]><!-->
+    <link href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,600,700,800\" rel=\"stylesheet\" />
+    <!--<![endif]-->"
     [:style {:type "text/css"}
-     ".headerText1 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
-     .headerText2 {font-family:roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
+     "body { margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; -ms-text-size-adjust: 100% !important; -webkit-font-smoothing: antialiased !important;font-family:Roboto,helvetica neue,arial,sans-serif;}
+     img { border: 0 !important; outline: none !important;}
+     p { margin: 0px; }
+     table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
+     td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
+     .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
+     .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
      .whiteBackground {background-color:#FFFFFF}
      .grayBackground {background-color:#EFEFEF}
-     .btn {background-color:#0066CC;padding:15px;}
-     .footer {font-size:0.75rem}
-     a.mcnButton{display:block;}
+     .mcnButtonContent {background-color:#0066CC;padding:15px;}
+     .footer {font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;}
+     a.mcnButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
-      .tg  {border-collapse:collapse;border-spacing:0;}
-      .tg td{font-family:roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
-      .tg th{font-family:roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
-      .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
-      .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
-      .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
-      .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
-      .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}"]]
-   [:body.grayBackground
+     .tg  {border-collapse:collapse;border-spacing:0;}
+     .tg td{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg th{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
+     .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
+     .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
+     .tg .tg-m03x{text-decoration:underline;background-color:#efefef;color:#0066cc;text-align:left;vertical-align:top}
+     .tg .tg-fkgn{background-color:#efefef;border-color:#efefef;text-align:left;vertical-align:top}
+     .spacing-left-right{padding-left:0;padding-right:0;}
+     @media screen and (min-width:699px) {
+      .headerText1 {font-size:2rem !important;}
+      .headerText2 {font-size:1.5rem !important;}
+      .spacing-left-right{padding-left:20px;padding-right:20px;}
+     }"]]
+   [:body
     [:center
-     [:div.whiteBackground {:width "80%" :style "padding-left: 20px; padding-right:20px;"}
+     [:div.whiteBackground.spacing-left-right
       [:a {:href (str (environment/base-url))}
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
-                                                     :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
+              :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
       [:br]
-      [:p [:span.headerText1 "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]]
-      [:p [:span {:class "headerText2"} "Tunnistusajankohta " (time/format-date (time/now))]]
+      [:h1 {:class "headerText1"
+            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+       "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
 
       (when (seq pre-notices)
-        [:div
+        [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
-         [:p
-          [:span {:class "headerText2"}
+         [:p {:style "margin-bottom:  20px;"}
+          [:h2 {:class "headerText2"
+                :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
            "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
          (table
            [{:class "tg-lusz" :width "10%" :label "Reitin nimi"}
-            {:class "tg-lusz" :width "15%" :label "Palveluntuottajan nimi"}
-            {:class "tg-lusz" :width "10%" :label "Alue"}
-            {:class "tg-lusz" :width "20%" :label "Muutoksen tyyppi"}
+            {:class "tg-lusz" :width "10%" :label "Palveluntuottajan nimi"}
+            {:class "tg-lusz" :width "20%" :label "Alue"}
+            {:class "tg-lusz" :width "15%" :label "Muutoksen tyyppi"}
             {:class "tg-lusz" :width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
             {:class "tg-lusz" :width "30%" :label "Lisätiedot muutoksesta"}]
            (for [n pre-notices]
@@ -179,30 +207,48 @@
          (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
 
       (when (seq detected-changes)
-        [:div
+        [:div {:style "background-color:#FFFFFF"}
          (html-divider-border nil)
-         [:div
-          [:p.headerText2 "Rajapinnoista tunnistetut muutokset"]
+         [:p
+          [:h2 {:class "headerText2"
+                :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+           "Rajapinnoista tunnistetut muutokset"]
+          [:h2
+           {:class "headerText2"
+            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
+           "Tunnistusajankohta " (time/format-date (time/now))]
           (table
             [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
-             {:class "tg-lusz" :width "20%" :label "Palvelu"}
-             {:class "tg-lusz" :width "20%" :label "Alue"}
-             {:class "tg-lusz" :width "20%" :label "Aikaa 1. muutokseen"}
-             {:class "tg-lusz" :width "20%" :label "Muutokset"}]
+             {:class "tg-lusz" :width "15%" :label "Palvelu"}
+             {:class "tg-lusz" :width "25%" :label "Alue"}
+             {:class "tg-lusz" :width "15%" :label "Aikaa 1. muutokseen"}
+             {:class "tg-lusz" :width "25%" :label "Muutokset"}]
             (detected-change-row detected-changes))
           [:br]]
-         (blue-button (str (environment/base-url) "/#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+         (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
       (html-divider-border nil)]
 
      [:div.grayBackground.footer
-      [:p "Tämän viestin lähetti NAP."]
-      [:span [:strong "NAP-yhteystiedot:"]]
+      [:br]
+      [:br]
+      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       "Tämän viestin lähetti NAP."]
+      [:br]
+      [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+              "NAP-yhteystiedot:"]]
       [:p
-       [:a {:href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
-       [:span " tai 029 534 5454 (arkisin 09-15)"]]
-      [:p "Haluatko muuttaa sähköpostiasetuksiasi?"
+       [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+            :href "mailto:joukkoliikenne@traficom.fi"} "joukkoliikenne@traficom.fi"]
+       [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+        " tai 029 534 5454 (arkisin 09-15)"]]
+      [:br]
+      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       "Haluatko muuttaa sähköpostiasetuksiasi?"
        [:br]
-       [:a {:href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]]]]])
+       [:a
+        {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+         :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]
+      [:br]]]]])
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -210,7 +256,8 @@
   (try
     (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
           detected-changes (when (detected-changes-recipients (:email user))
-               (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))]
+                             (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))]
+
       (if (or (seq notices) (seq detected-changes))
         (do
           (log/info "For user " (:email user) " we found "
@@ -218,11 +265,13 @@
                     (count detected-changes) " new detected changes "
                     " from 24 hours for regions " (:finnish-regions user))
 
-          (html (notification-html notices detected-changes)))
+          ;; Add doctype which can't be addid using hiccup template
+          (str "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+               (html (notification-html notices detected-changes))))
         (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
-      (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e ))))
+      (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e))))
 
 (defn send-notification! [db email detected-changes-recipients]
   (log/info "Starting pre-notices notification task...")
@@ -232,41 +281,41 @@
     (localization/with-language
       "fi"
       (tx/with-transaction db
-        (let [authority-users (nap-users/list-authority-users db) ;; Authority users
-              unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
-          (log/info "Authority users: " (pr-str (map :email authority-users)))
-          (doseq [u authority-users]
-            (let [notification (user-notification-html db u detected-changes-recipients)]
-              (if notification
-                (do
-                  (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
-                  ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
-                  ;; same time. Using sleep, we can't exceed that limit.
-                  (with-throttle-ms 200
-                    (try
-                      (email/send!
-                       email
-                       {:to      (:email u)
-                        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                                      (datetime-string (t/now) timezone))
-                        :body    [{:type "text/html;charset=utf-8" :content notification}]})
-                      (catch Exception e
-                        (log/warn "Error while sending a notification" e)))))
-                (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
+                           (let [authority-users (nap-users/list-authority-users db) ;; Authority users
+                                 unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
+                             (log/info "Authority users: " (pr-str (map :email authority-users)))
+                             (doseq [u authority-users]
+                               (let [notification (user-notification-html db u detected-changes-recipients)]
+                                 (if notification
+                                   (do
+                                     (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
+                                     ;; SES have limit of 14/email per second. We can send multiple emails from prod and dev at the
+                                     ;; same time. Using sleep, we can't exceed that limit.
+                                     (with-throttle-ms 200
+                                                       (try
+                                                         (email/send!
+                                                           email
+                                                           {:to (:email u)
+                                                            :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                                                                          (datetime-string (t/now) timezone))
+                                                            :body [{:type "text/html;charset=utf-8" :content notification}]})
+                                                         (catch Exception e
+                                                           (log/warn "Error while sending a notification" e)))))
+                                   (log/info "Could not find notification for user with email: " (pr-str (:email u))))))
 
-          ;; Mark changes in detected-change-history as sent
-          (specql/update! db :gtfs/detected-change-history
-                          {:gtfs/email-sent (java.util.Date.)}
-                          {:gtfs/id (op/in (into #{} (map :history-id unsent-detected-changes)))}))))))
+                             ;; Mark changes in detected-change-history as sent
+                             (specql/update! db :gtfs/detected-change-history
+                                             {:gtfs/email-sent (java.util.Date.)}
+                                             {:gtfs/id (op/in (into #{} (map :history-id unsent-detected-changes)))}))))))
 
 
 (defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
     (assoc this
-           ::stop-tasks [(chime-at (daily-at 8 15)
-                                   (fn [_]
-                                     (#'send-notification! db email detected-changes-recipients)))]))
+      ::stop-tasks [(chime-at (daily-at 8 15)
+                              (fn [_]
+                                (#'send-notification! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
