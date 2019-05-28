@@ -129,11 +129,7 @@
           res (when (pos? (count members))
                 (mapv (fn [x]
                         (update x :members #(db-util/PgArray->vec %))) members))]
-      (http/transit-response
-        res
-        (if (seq res)
-          200
-          404)))))
+      (http/transit-response res 200))))
 
 (defn- published-search-param [query]
   (case (:published-type query)
