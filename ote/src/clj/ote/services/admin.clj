@@ -104,13 +104,13 @@
 (defn- delete-user-response
   "Description: Deletes a user
   Input: db=database instance, id=id of record to delete
-  Output: Number or affected records, thus 0 means a failure."
+  Output: id of the removed record."
   [db ^String id]
   (let [affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
     (http/transit-response
-      nil
+      id
       (if (= affected-records 1)
         200
         404))))
