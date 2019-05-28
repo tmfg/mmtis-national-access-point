@@ -20,7 +20,18 @@
                                  (:nap nil))
                                [:http :db])))
 
-(deftest test-user-listing-admin
+(deftest test-user-list-normaluser
+  (let [result (try (http-get "normaluser" "admin/user?type=any&search=napoteadmin")
+                    (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
+                      (-> e ex-data)))]
+    (is (= 403 (:status result))
+        "Ensure normal user not allowed to query users")))
+
+(deftest test-user-list-all
+  (let [users (:transit (http-get "admin" "admin/user"))]
+    (is (= 2 (count users)))))
+
+(deftest test-user-list-email
   (let [result (try (http-get "admin" "admin/user?type=any&search=admin@napoteadmin123.com")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
@@ -29,19 +40,17 @@
     (is (= 1 (count (:transit result)))
         "Ensure admin user gets a list of users")))
 
-(deftest test-user-listing-normaluser
-  (let [result (try (http-get "normaluser" "admin/user?type=any&search=napoteadmin")
-                    (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
-                      (-> e ex-data)))]
-    (is (= 403 (:status result))
-        "Ensure normal user not allowed to query users")))
+(deftest test-user-list-partial-name
+  (let [resp (try (http-get "admin" "admin/user?type=any&search=userso")
+                    (catch clojure.lang.ExceptionInfo e
+                      (-> e ex-data)))
+        result (:transit resp)]
+    (is (= 200 (:status resp))
+        "Ensure user found by partial username")
+    (is (= "User Userson" (:name (first result))))
+    (is (= 1 (count result)))))
 
-(deftest test-user-search-with-partial-name
-  (let [users (:transit (http-get "admin" "admin/user?type=any&search=Userso"))]
-    (is (= 1 (count users)))
-    (is (= "User Userson" (:name (first users))))))
-
-(deftest test-user-search-with-partial-email
+(deftest test-user-list-partial-email
   (let [result (http-get "admin" "admin/user?type=any&search=napoteadmin123")
         transit (:transit result)]
     (is (= 200 (:status result))
@@ -61,20 +70,29 @@
         "Ensure no data is returned")))
 
 (deftest test-user-delete-not-found
-  (let [result (try (http-delete "admin" "admin/user/0")
+  (let [result (try (http-delete "admin" "admin/user/000-000-000-000")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
     (is (= 404 (:status result))
         "Ensure http status code is correct")))
 
-(deftest test-user-delete-bad-id
-  (let [result (try (http-delete "admin" "admin/user/i_am_a_bad_id")
+(deftest test-user-memberships-not-found-normaluser
+  (let [result (try (http-get "normaluser" "admin/member?user=0")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
-    (is (= 500 (:status result))
-        "Ensure bad id is rejected")
+    (is (= 403 (:status result))
+        "Ensure normal user not allowed to query user memberships")
     (is (= 0 (count (:transit result)))
-        "Ensure no data is returned")))
+        "Ensure there is no content")))
+
+(deftest test-user-memberships-not-found-admin
+  (let [result (try (http-get "admin" "admin/member?userid=123")
+                    (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
+                      (-> e ex-data)))]
+    (is (= 404 (:status result))
+        "Ensure admin allowed to query user memberships")
+    (is (= 0 (count (:transit result)))
+        "Ensure no results on bad userid")))
 
 (deftest test-delete-service-made-by-normaluser
   (let [generated-service (gen/generate s-generators/gen-transport-service)

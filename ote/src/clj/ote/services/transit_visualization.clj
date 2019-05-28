@@ -11,7 +11,6 @@
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [ote.util.fn :refer [flip]]
-            [ote.util.clojure :as util-clj]
             [ote.transit-changes.detection :as detection]
             [clojure.set :as set]
             [digest]))

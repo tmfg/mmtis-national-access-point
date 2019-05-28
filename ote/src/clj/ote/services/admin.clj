@@ -34,7 +34,9 @@
             [ote.services.external :as external]
             [ote.tasks.pre-notices :as pn]
             [hiccup.core :refer [html]]
-            [ote.email :as email]))
+            [ote.email :as email]
+            [clojure.spec.alpha :as spec]
+            [ote.util.collections :as ote-coll]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -62,7 +64,7 @@
 
 (defn- authorization-fail-response [user]
   (when-not (:admin? user)
-    (log/warn "authorization-fail-response: id=" (:id user))
+    (log/info  "authorization-fail-response: id=" (:id user))
     (http/transit-response "Not authorized. Bad role." 403)))
 
 (defn- admin-service [route {user :user
@@ -71,35 +73,39 @@
   (http/transit-response
     (handler db user (http/transit-request form-data))))
 
-(defn- list-users-bad-req-response [search type]
-  ;; list-users-response supports only "any" type at the moment
-  (when (not= "any" type)
-    (log/warn "list-users-bad-req-response: type=" type)
-    (http/transit-response "Type not supported" 400)))
+(spec/def :list-users/type #(= "any" %))
+(spec/def :list-users/search string?)
+(spec/def ::list-users-params-map
+  (spec/keys
+    :opt-un [:list-users/type :list-users/search]))
 
-;; Validate input in list-users-bad-req-response
-(defn- list-users-response [db search]
-  (let [result (->> (nap-users/list-users db {:email (str "%" search "%")
-                                              :name (str "%" search "%")
-                                              :group (str "%" search "%")
-                                              :transit-authority? nil})
-                    (mapv
-                      (fn [{groups :groups :as user}]
-                        (if groups
-                          (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
-                          user))))]
+;; query users service domain logic
+(defn- list-users-response [db {search :search :as params}]
+  (or
+    (http/response-bad-args ::list-users-params-map params)
 
-    (http/transit-response
-      result
-      (if (pos-int? (count result))
-        200
-        404))))
+    (let [result (->> (nap-users/list-users db {:email (str "%" search "%")
+                                                :name (str "%" search "%")
+                                                :group (str "%" search "%")
+                                                :transit-authority? nil})
+                      (mapv
+                        (fn [{groups :groups :as user}]
+                          (if groups
+                            (assoc user :groups (cheshire/parse-string (.getValue groups) keyword))
+                            user))))]
 
+      (http/transit-response
+        result
+        (if (pos-int? (count result))
+          200
+          404)))))
+
+;; domain logic for delete user service
 (defn- delete-user-response
   "Description: Deletes a user
   Input: db=database instance, id=id of record to delete
   Output: Number or affected records, thus 0 means a failure."
-  [db ^Long id]
+  [db ^String id]
   (let [affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
@@ -109,11 +115,25 @@
         200
         404))))
 
-(defn- user-operator-members [db user query]
-  (let [user-id (:id query)
-        members (vec (nap-users/search-user-operators-and-members db {:user-id user-id}))]
-    (mapv (fn [x]
-            (update x :members #(db-util/PgArray->vec %))) members)))
+(spec/def :user-memberships/userid (spec/and string? some?))
+(spec/def ::user-memberships-params-map
+  (spec/keys
+    :req-un [:user-memberships/userid]))
+
+;; domain logic for query user membership service
+(defn- user-operator-memberships-response [db params]
+  (or
+    (http/response-bad-args ::user-memberships-params-map params)
+
+    (let [members (vec (nap-users/search-user-operators-and-members db {:user-id (:userid params)}))
+          res (when (pos? (count members))
+                (mapv (fn [x]
+                        (update x :members #(db-util/PgArray->vec %))) members))]
+      (http/transit-response
+        res
+        (if (seq res)
+          200
+          404)))))
 
 (defn- published-search-param [query]
   (case (:published-type query)
@@ -484,17 +504,17 @@
 (defn- admin-routes [db http nap-config email-config]
   (routes
 
-    (GET "/admin/user" [search type :as req]
+    (GET "/admin/user" req
       (or (authorization-fail-response (get-in req [:user :user]))
-          (list-users-bad-req-response search type)
-          (list-users-response db search)))
+          (list-users-response db (ote-coll/map->keyed (:params req)))))
 
     (DELETE "/admin/user/:id" [id :as req]
-      (let [id (Long/parseLong id)]                         ;; Parse id for security before passing to db operations
-        (or (authorization-fail-response (get-in req [:user :user]))
-            (delete-user-response db id))))
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (delete-user-response db id)))
 
-    (POST "/admin/user-operator-members" req (admin-service "user-operators" req db #'user-operator-members))
+    (GET "/admin/member" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (user-operator-memberships-response db (ote-coll/map->keyed (:params req)))))
 
     (POST "/admin/transport-services" req (admin-service "services" req db #'list-services))
 
