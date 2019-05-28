@@ -89,7 +89,7 @@
   (let [result (try (http-get "admin" "admin/member?userid=123")
                     (catch clojure.lang.ExceptionInfo e     ;; sadly clj-http wants to communicate status as exceptions
                       (-> e ex-data)))]
-    (is (= 404 (:status result))
+    (is (= 200 (:status result))
         "Ensure admin allowed to query user memberships")
     (is (= 0 (count (:transit result)))
         "Ensure no results on bad userid")))
