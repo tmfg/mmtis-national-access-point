@@ -96,7 +96,7 @@
                             (when (and removed-routes (> removed-routes 0))
                               (str removed-routes " päättyvää reittiä"))
                             (when (and changed-routes (> changed-routes-count 0))
-                              (str changed-routes-count " muuttunutta reittiä"))
+                              (str changed-routes-count " muuttuvaa reittiä"))
                             (when (and no-traffic-routes (> no-traffic-routes 0))
                               (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))]))))
 

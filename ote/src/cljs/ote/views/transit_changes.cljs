@@ -46,7 +46,7 @@
     (doall
       (for [[icon color label] [[ic/content-add-circle-outline {:color style/add-color} " Uusia reittejä"]
                                 [ic/content-remove-circle-outline {:color style/remove-color} " Mahdollisesti päättyviä reittejä"]
-                                [ui-icons/outline-ballot {:color style/remove-color} " Reittimuutoksia"]
+                                [ui-icons/outline-ballot {:color style/remove-color} " Muuttunutta reittiä"]
                                 [ic/av-not-interested {:color style/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
         ^{:key (str "transit-changes-legend-" label)}
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
