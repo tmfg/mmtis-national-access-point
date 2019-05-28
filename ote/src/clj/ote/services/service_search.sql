@@ -149,7 +149,8 @@ SELECT oa."transport-service-id" as id,
         WHEN ST_GeometryType(oa.location) IN ('ST_Point', 'ST_Linestring') THEN 3e-4
         ELSE ST_Area(ST_Intersection(oa.location, sa.location))
         END as intersection,
-       ST_Area(ST_SymDifference(oa.location, sa.location)) as "difference"
+       ST_Area(ST_SymDifference(oa.location, sa.location)) as "difference",
+       EXTRACT(epoch FROM (NOW() - (COALESCE (ts.modified, ts.created))))::INTEGER as "modified"
   FROM
       (SELECT oa."transport-service-id" as "transport-service-id",
               ST_Envelope(ST_Union(array_agg(ST_Envelope(oa.location)))) as "location"
@@ -159,4 +160,7 @@ SELECT oa."transport-service-id" as id,
         GROUP BY oa."transport-service-id") oa,
       (SELECT ST_Envelope(ST_Union(array_agg(ST_Envelope(pl.location)))) as "location"
          FROM places pl
-        WHERE pl.namefin IN (:operation-area)) sa;
+        WHERE pl.namefin IN (:operation-area)) sa,
+      "transport-service" ts
+WHERE ts.id IN (:id)
+  AND ts.id = oa."transport-service-id";
