@@ -747,40 +747,6 @@
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= 2 (count result))))))
 
-; =============== Test the route starts with certain weekly schedule and then changes
-
-(def data-1-of-current-traf
-  (tu/weeks (tu/to-local-date 2019 5 13)
-            (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 13
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2019 05 20
-                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 05 27
-                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 04
-                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 04
-                     {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 10
-                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 06 17
-                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 06 17
-                     {tu/route-name ["A" "A" nil "A" "A" "A" nil]} ;; 2019 06 17
-                     {tu/route-name ["A" "A" nil "A" "A" "A" nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 10
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 10
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 10
-                     {tu/route-name [nil nil nil nil nil nil nil]}])))
-
-(deftest test-nil-days-and-ending-route
-  (let [result (->> data-1-of-current-traf            ;; Notice thread-last
-                    (detection/changes-by-week->changes-by-route)
-                    (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))
-        result2 (->> data-1-of-current-traf            ;; Notice thread-last
-                    (detection/changes-by-week->changes-by-route)
-                    (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
-    (testing "Ensure a traffic change and route end within detection window are reported."
-      (is (= result result2)))))
-
-
 
 (def data-paused-traffic-with-end
   (tu/weeks (tu/to-local-date 2019 5 13)
