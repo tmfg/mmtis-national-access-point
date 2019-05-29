@@ -924,9 +924,6 @@
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))
                                       all-routes)))
         create-end-change (fn [last-chg max-date ^LocalDate date]
-                            (println "last-change: ")
-                            (clojure.pprint/pprint last-chg)
-                            (println "last-change: " max-date)
                             (when (route-ends? date max-date (:detection-threshold-route-end-days settings-tc))
                               (merge {:route-end-date (or
                                                         (and
