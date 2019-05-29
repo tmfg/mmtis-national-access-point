@@ -173,7 +173,8 @@
          (week= prev next1))
     {}                                                      ;; Ignore this week
 
-    (:no-traffic-end-date state)                            ;; THIS NEEDS TO BE CHANGED IF WE WANT MORE CHANGES AFTER NO_TRAFFIC_PERIOD
+    ;;THIS HIDES A DIFFERENCE DETECTED AFTER A NO TRAFFIC CHANGE. This makes it so we don't add different week data to a change that already has traffic end.
+    (:no-traffic-end-date state)
     state
 
     ;; No starting week specified yet, use current week
