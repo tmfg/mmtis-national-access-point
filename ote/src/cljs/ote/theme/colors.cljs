@@ -7,6 +7,8 @@
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
 
+(def cyan "#00AABB")
+
 (def gray950 "#191919")
 (def gray900 "#323232")
 (def gray800 "#4b4b4b")
@@ -29,6 +31,8 @@
 (def red-dark "#CF0000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
+
+(def spinner cyan)
 
 (def negative-button red-basic)
 (def negative-text white-basic)

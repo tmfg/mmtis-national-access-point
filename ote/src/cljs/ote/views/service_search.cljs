@@ -221,10 +221,12 @@
 (defn results-listing [e! {service-search :service-search user :user :as app}]
   (let [{:keys [results empty-filters? total-service-count filter-service-count fetching-more?]} service-search
         operation-area-filter (get-in app [:service-search :params :operation_area])
-        operating-area-match-results (filter #(= (::t-service/difference %) 0) results)
-        other-results (filter #(not= (::t-service/difference %) 0) results)]
+        operating-area-match-results (filter #(zero? (:difference %)) results)
+        other-results (filter #(or (pos? (:difference %))
+                                   (nil? (:difference %)))
+                              results)]
     [:div.container
-     (if (or (> (count operating-area-match-results) 0) (> (count other-results) 0))
+     (if (or (pos? (count operating-area-match-results)) (pos? (count other-results)))
        [:div.col-xs-12.col-md-12.col-lg-12
         (if empty-filters?
           [:span (tr [:service-search :no-search-filters])]
@@ -244,7 +246,7 @@
          (when (seq other-results)
            [:div
             (when operation-area-filter
-              [:h3 (tr [:service-search :other-operation-area-services])])
+              [:h3 {:style {:margin-top "2.5rem"}} (tr [:service-search :other-operation-area-services])])
             (doall
               (for [result other-results]
                 ^{:key (::t-service/id result)}

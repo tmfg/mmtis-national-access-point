@@ -93,7 +93,7 @@
 
    :admin (component/using
            (admin-service/->Admin (:nap config))
-           [:db :http])
+           [:db :http :email])
 
    :admin-reports (component/using
                     (admin-service/->CSVAdminReports)

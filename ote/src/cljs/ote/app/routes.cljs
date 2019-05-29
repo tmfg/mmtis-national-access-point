@@ -23,6 +23,7 @@
     ["/register" :register]
     ["/user" :user]
     ["/own-services" :own-services]
+    ["/transport-operator/:operator-id/users" :access-management]
     ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
@@ -67,7 +68,7 @@
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:own-services :transport-service :transport-operator :edit-service :new-service :admin :routes
                      :new-route :edit-route :new-notice :edit-pre-notice :pre-notices :authority-pre-notices
-                     :transit-visualization :transit-changes :email-settings})
+                     :transit-visualization :transit-changes :email-settings :access-management})
 
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.

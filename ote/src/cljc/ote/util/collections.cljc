@@ -35,3 +35,14 @@
       c
       (recur (+ c (if (pred (first coll)) 1 0))
              (rest coll)))))
+
+(defn remove-coll-key-ns [c]
+  (into {} (map (fn [[k v]] [(keyword (name k)) v]) c)))
+
+;; Input: coll=map
+;; Output: coll, where keys are converted to keywords
+(defn map->keyed [coll]
+  (into {} (map
+             (fn [[key val]]
+               [(keyword key) val])
+             coll)))

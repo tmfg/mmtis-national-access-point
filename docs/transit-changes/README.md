@@ -139,7 +139,7 @@ User UI visualization of transit change detection results
 
 ##### Important notes
 - No history data is used from preceding imports or analyses. Latest package is analysed independently
-- Separate detection runs for the same service will detect same changes as the previous run, if the data for the in the package is the same. 
+- Separate detection runs for the same service will detect same changes as the previous run, if the data for the package is the same. 
 - Route traffic changes which are marked for rhe same week when detection task runs, will be reported to happen next week instead, except **added** and **ending** routes (those handled by `update-transit-changes!`)
 
 

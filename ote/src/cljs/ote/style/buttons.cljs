@@ -55,6 +55,7 @@
                        {:color colors/primary-text
                         :background-color colors/primary-disabled
                         :pointer-events "none"
+                        :border 0
                         :box-shadow "none"
                         :cursor "not-allowed"}))
 

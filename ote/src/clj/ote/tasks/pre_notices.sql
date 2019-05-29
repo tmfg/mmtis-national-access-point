@@ -27,10 +27,10 @@ SELECT * FROM (
                       op.name AS "operator-name",
                       ts.name AS "service-name",
                       ts.id AS "transport-service-id",
-                      h."transport-service-id",
                       to_char(h."change-detected", 'yyyy-mm-dd') AS date,
                       (h."different-week-date" - CURRENT_DATE) AS "days-until-change",
-                      h."change-type"
+                      h."change-type",
+                      h."route-hash-id"
                 FROM "detected-change-history" h
                      JOIN gtfs_package p ON p.id = ANY (h."package-ids")
                      JOIN "detected-route-change" r ON h."change-key" = r."change-key"
@@ -42,6 +42,7 @@ SELECT * FROM (
                   AND (p."finnish-regions" IS NULL OR
                        :regions::CHAR(2)[] IS NULL OR
                        :regions::CHAR(2)[] && p."finnish-regions")
+                GROUP BY h.id,p."finnish-regions", op.name, ts.name,ts.id
               ) x
  ORDER BY x."different-week-date" ASC;
 

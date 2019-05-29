@@ -22,6 +22,7 @@
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.own-services :as os]
+            [ote.views.operator-users :as ou]
             [ote.views.service-viewer :as sv]
             [ote.views.login :as login]
             [ote.views.user :as user]
@@ -117,7 +118,7 @@
                     :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
                     :transport-operator [to/operator e! app]
-
+                    :access-management [ou/manage-access e! app]
                     ;; Routes for the service form, one for editing an existing one by id
                     ;; and another when creating a new service
                     :edit-service [t-service/edit-service-by-id e! app]
