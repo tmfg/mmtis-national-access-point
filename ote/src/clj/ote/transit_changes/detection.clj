@@ -173,6 +173,9 @@
          (week= prev next1))
     {}                                                      ;; Ignore this week
 
+    (:no-traffic-end-date state)                            ;; THIS NEEDS TO BE CHANGED IF WE WANT MORE CHANGES AFTER NO_TRAFFIC_PERIOD
+    state
+
     ;; No starting week specified yet, use current week
     (nil? starting-week-hash)
     (assoc state :starting-week-hash curr)
@@ -440,9 +443,12 @@
   (loop [route-weeks route-weeks
          results []]
     (let [diff-data (route-weeks-with-first-difference route-weeks)
-          filtered-diff-data (first (filter (fn [value]
-                                              (or (:no-traffic-start-date value) (:different-week value)))
-                                            diff-data))
+          filtered-diff-data (first
+                               (filter
+                                 (fn [value]
+                                   (or (:no-traffic-start-date value)
+                                       (:different-week value)))
+                                 diff-data))
           diff-week-beginnings (keep (comp :beginning-of-week :different-week) diff-data)
           no-traffic-end (:no-traffic-end-date (first diff-data))
           diff-week-date (first diff-week-beginnings)
@@ -456,7 +462,9 @@
           (conj results filtered-diff-data))
         (if (empty? results)
           diff-data
-          results)))))                                      ;; Default week data expected when no changes are found
+          (if (some? filtered-diff-data)
+            (conj results filtered-diff-data)
+            results))))))                                   ;; Default week data expected when no changes are found
 
 (defn combine-differences-with-routes
   [route-weeks differences]
@@ -873,6 +881,17 @@
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
        (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
 
+(defn is-after-end-date
+  "Check if the change is either the route-end event or before the end date"
+  [single-change end-date]
+  (let [single-change-end (get-in single-change [:different-week :end-of-week])]
+    (or
+      (not single-change-end)
+      (:route-end-date single-change)
+      (or
+        (.isEqual single-change-end end-date)
+        (.isBefore single-change-end end-date)))))
+
 (spec/fdef add-ending-route-change
            :args (spec/cat :all-route-changes coll? :all-routes coll?)
            :ret ::detected-route-changes-for-services-coll)
@@ -915,20 +934,28 @@
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))
                                       all-routes)))
         create-end-change (fn [last-chg max-date ^LocalDate date]
+                            (println "last-change: ")
+                            (clojure.pprint/pprint last-chg)
+                            (println "last-change: " max-date)
                             (when (route-ends? date max-date (:detection-threshold-route-end-days settings-tc))
-                              (merge {:route-end-date (or (and (nil? (:no-traffic-end-date last-chg))
-                                                               ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
-                                                               ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
-                                                               (:no-traffic-start-date last-chg))
-                                                          ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
-                                                          (.plusDays (.toLocalDate max-date) 1))}
+                              (merge {:route-end-date (or
+                                                        (and
+                                                          (nil? (:no-traffic-end-date last-chg))
+                                                          ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
+                                                          ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
+                                                          (:no-traffic-start-date last-chg))
+                                                        ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
+                                                        (.plusDays (.toLocalDate max-date) 1))}
                                      (select-keys last-chg [:route-key :starting-week :starting-week-hash]))))
         remove-ongoing-or-break (fn [route-chg-group]
-                                  (if (and (= 1 (count route-chg-group))
-                                           (empty? (select-keys (last route-chg-group) [:different-week ;; If map is a traffic change map, don't discard
-                                                                                        ;; If map is an ending no-traffic map, don't discard
-                                                                                        :no-traffic-end-date])))
-                                    []                      ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
+                                  (if (or (and (= 1 (count route-chg-group))
+                                               (empty? (select-keys (last route-chg-group) [:different-week ;; If map is a traffic change map, don't discard
+                                                                                            ;; If map is an ending no-traffic map, don't discard
+                                                                                            :no-traffic-end-date])))
+                                          (and
+                                            (:no-traffic-start-date (last route-chg-group))
+                                            (nil? (:no-traffic-end-date (last route-chg-group)))))
+                                    (vec (take (dec (count route-chg-group)) route-chg-group)) ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
                                     route-chg-group))
         chg (doall (vec (mapcat
                           (fn [[route-key route-chg-group]]
@@ -941,6 +968,70 @@
                           (group-by :route-key all-changes))))
         res (or chg [])]
     res))
+
+(defn remove-changes-past-route-end-per-route
+  "remove all the changes that are after the route end-date"
+  [data-set]
+  (let [end-date (:route-end-date
+                   (first
+                     (filter :route-end-date data-set)))]
+    (if end-date
+      (vec (filter
+             #(is-after-end-date % end-date)
+             data-set))
+      data-set)))
+
+(defn remove-overlapping-no-traffic
+  "Remove changes that overlap with a no-traffic-change, because they are unnecessary"
+  [data-set]
+  (let [no-traffic-changes (filter
+                             :no-traffic-change
+                             data-set)]
+    (filter
+      (fn [change]
+        (let [change-start (get-in change [:different-week :beginning-of-week])
+              change-end (get-in change [:different-week :end-of-week])
+              change-week-start (get-in change [:starting-week :beginning-of-week])
+              change-week-end (get-in change [:starting-week :end-of-week])
+              is-between-no-traffics (map
+                                       (fn [no-traf]
+                                         (let [no-traf-start (.minusDays (:no-traffic-start-date no-traf) 1)
+                                               no-traf-end (.plusDays (:no-traffic-end-date no-traf) 1)]
+                                           (if (or (:route-end-date change) (:no-traffic-change change))
+                                             true
+                                             (not (or
+                                                    (and (.isAfter change-week-start no-traf-start) (.isBefore change-week-start no-traf-end))
+                                                    (and (.isAfter change-week-end no-traf-start) (.isBefore change-week-end no-traf-end))
+                                                    (and (.isAfter change-start no-traf-start) (.isBefore change-start no-traf-end))
+                                                    (and (.isAfter change-end no-traf-start) (.isBefore change-start no-traf-end)))))))
+                                       no-traffic-changes)]
+          (every? true? is-between-no-traffics)))
+      data-set)))
+
+(defn remove-different-week-from-no-traf
+  [changes]
+  (mapv
+    (fn [change]
+      (if (and (:no-traffic-change change) (:different-week change))
+        (dissoc change :different-week :different-week-hash)
+        change))
+    changes))
+
+(defn remove-extra-changes
+  "Removes all the extra changes caused by the change to week= function, where it started to
+  consider the changes to and from NIL"
+  [data-set]
+  (let [group (group-by :route-key data-set)]
+    (apply
+      concat
+      (mapv
+        (fn [[route-key changes]]
+          (let [changes (-> changes
+                            remove-changes-past-route-end-per-route
+                            remove-overlapping-no-traffic
+                            remove-different-week-from-no-traf)]
+            changes))
+        group))))
 
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
@@ -972,6 +1063,7 @@
                            (changes-by-week->changes-by-route)
                            (detect-changes-for-all-routes)
                            (add-ending-route-change (java.time.LocalDate/now) all-routes)
+                           #_(remove-different-week-from-no-traf)
                            ; Fetch detailed day details
                            (route-day-changes db service-id))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
