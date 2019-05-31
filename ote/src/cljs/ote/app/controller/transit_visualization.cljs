@@ -477,7 +477,8 @@
                   (or (and date1 date2) (t/equal? goog-date1 goog-date)) ;; Re-selection of day pair after to replace previous day pair selection
                   (-> app
                       (assoc-in [:transit-visualization :compare :date1] date)
-                      (update-in [:transit-visualization :compare] remove-date2-keys))
+                      (update-in [:transit-visualization :compare] remove-date2-keys)
+                      (assoc-in [:transit-visualization :route-dates-selected-from-calendar?] true))
 
                   (nil? date2)
                   (do

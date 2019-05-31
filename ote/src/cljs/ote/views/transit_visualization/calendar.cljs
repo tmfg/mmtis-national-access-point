@@ -87,7 +87,9 @@
      [tv-change-icons/change-icons diff true])])
 
 ;; Ui
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-changes] :as transit-visualization} routes selected-route]
+(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-dates-selected-from-calendar?]
+                          :as transit-visualization}
+                      routes selected-route]
   (let [current-year (time/year (time/now))
         changes (filter
                   (fn [x]
@@ -115,7 +117,9 @@
                      :show-row-hover? true
                      :on-select #(when (first %)
                                    (e! (tv/->SelectRouteForDisplay (first %))))
-                     :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
+                     :row-selected? #(and
+                                       (= (:different-week-date %) (:different-week-date selected-route))
+                                       (not route-dates-selected-from-calendar?))}
         [{:name ""
           :read identity
           :format (fn [{:keys [recent-change? change-detected]}]
