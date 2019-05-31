@@ -16,7 +16,8 @@
             [ote.style.base :as style-base]
             [ote.views.transit-visualization.change-utilities :as tv-section]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
-            [ote.app.controller.transit-visualization :as tv]))
+            [ote.app.controller.transit-visualization :as tv]
+            [ote.ui.circular_progress :as prog]))
 
 ;; Utility methods
 (defn day-of-week-number->text [dof]
@@ -185,7 +186,12 @@
                                                                hash-color (hash->color hash)]
                                                            (style/date-highlight-style hash-color
                                                                                        style/date-highlight-color-hover))}]
-       (when (and (:date1 compare) (:date2 compare))
-         [:div
-          [:h3 "Valittujen päivämäärien väliset muutokset"]
-          [comparison-date-changes compare]])]]]]))
+
+       [:h3 "Valittujen päivämäärien väliset muutokset"]
+       ;; :differences used to detect when new route selection or new calendar day selection is being loaded
+       (if (empty? (:differences compare))
+         (prog/circular-progress (tr [:common-texts :loading]))
+         ;; :date2 used to hide difference statistics but not the title, when user selects new diff dates from calendar
+         (when (some? (:date2 compare))
+           [:div
+            [comparison-date-changes compare]]))]]]]))
