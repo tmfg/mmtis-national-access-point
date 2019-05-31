@@ -660,6 +660,18 @@
                     detection/detect-changes-for-all-routes
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
 
+    (testing "Expect change to a week with nils"
+      (is (= {:route-key tu/route-name
+              :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                               :end-of-week (tu/to-local-date 2019 6 9)}
+              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20)
+                              :end-of-week (tu/to-local-date 2019 5 26)}
+              :no-traffic-run 1
+              :no-traffic-start-date (tu/to-local-date 2019 6 9)}
+             (select-keys
+               (first result)
+               tu/select-keys-detect-changes-for-all-routes))))
+
     (testing "Expect route end instead of no-traffic, when no-traffic starts within route end threshold"
       (is (= {:route-key tu/route-name
               :route-end-date (tu/to-local-date 2019 6 23)
