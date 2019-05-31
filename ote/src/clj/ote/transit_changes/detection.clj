@@ -173,7 +173,7 @@
          (week= prev next1))
     {}                                                      ;; Ignore this week
 
-    ;;THIS HIDES A DIFFERENCE DETECTED AFTER A NO TRAFFIC CHANGE. This makes it so we don't add different week data to a change that already has traffic end.
+    ;;THIS HIDES A DIFFERENCE DETECTED AFTER A NO TRAFFIC CHANGE. This makes it so we don't add different week data to a change that already specifies end of a no-traffic period.
     (:no-traffic-end-date state)
     state
 
