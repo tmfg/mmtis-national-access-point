@@ -66,7 +66,8 @@
                                :width "20px"
                                :height "20px"}
                               (style/date1-highlight-style))}]
-    (time/format-date date1)]
+    (when date1
+      (time/format-date date1))]
    [:div
     [:div {:style (merge {:display "inline-block"
                                :position "relative"
@@ -75,7 +76,8 @@
                                :width "20px"
                                :height "20px"}
                               (style/date2-highlight-style))}]
-    (time/format-date date2)]])
+    (when date2
+      (time/format-date date2))]])
 
 (defn comparison-date-changes [{diff :differences :as compare}]
   [:div
