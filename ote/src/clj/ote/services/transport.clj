@@ -33,6 +33,7 @@
 (defqueries "ote/services/transport.sql")
 (defqueries "ote/services/operators.sql")
 (defqueries "ote/services/associations.sql")
+(defqueries "ote/nap/users.sql")
 
 (def transport-operator-columns
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
@@ -177,11 +178,11 @@
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
 
-(defn- create-member! [db user-id group]
+(defn- create-member! [db user-id group-id]
   (specql/insert! db ::user/member
                   {::user/id         (str (UUID/randomUUID))
                    ::user/table_id   user-id
-                   ::user/group_id   (:ote.db.transport-operator/group-id group)
+                   ::user/group_id   group-id
                    ::user/table_name "user"
                    ::user/capacity   "admin"
                    ::user/state      "active"}))
@@ -201,7 +202,7 @@
                                ::t-operator/type            "organization"
                                ::t-operator/approval_status "approved"
                                ::t-operator/is_organization true})
-        member (create-member! db user-id group)
+        member (create-member! db user-id (:ote.db.transport-operator/group-id group))
         ;; Ensure that other users get permissions to new operator as well
         ;; Get other possible users that need permissions
         other-users (fetch-users-within-same-business-id-family db {:business-id (::t-operator/business-id op)
@@ -209,7 +210,7 @@
     (when other-users
       (doall
         (for [u other-users]
-          (create-member! db (:user-id u) group))))
+          (create-member! db (:user-id u) (:ote.db.transport-operator/group-id group)))))
     group))
 
 (defn- update-group!
@@ -541,6 +542,46 @@
   [db operator-id]
   (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
 
+(defn add-user-to-operator [db user operator]
+  (let [group (create-member! db (:user_id user) (::t-operator/ckan-group-id operator))]
+    ;; Return added user data
+    {:id (:user_id user)
+     :username (:user_username user)
+     :name (:user_name user)
+     :email (:user_email user)}))
+
+(defn invite-new-user [db operator user]
+  nil)
+
+(defn manage-adding-users-to-operator [db operator-id form-data]
+  (println "form-data" (pr-str form-data))
+  (let [user (first (fetch-user-by-email db {:email (:email form-data)}))
+        operator (first (specql/fetch db ::t-operator/transport-operator
+                                      #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
+                                      {::t-operator/id operator-id}))
+        operator-users (fetch-operator-users db {:operator-id operator-id})
+        user-is-operator-member  (some #(= (:user_id user) (:id %)) operator-users)
+        ;; If user exists, add it to the organization if not, invite
+        response-user (cond
+                        ;; Existing user, existing operator
+                        (and (not user-is-operator-member) (not (empty? user)) (not (empty? operator)))
+                        (add-user-to-operator db user operator)
+
+                        ;; new user, existing operator -> invite user
+                        (and (empty? user) (not (empty? operator)))
+                        (invite-new-user db operator (:email form-data))
+
+                        ;; User is already a member
+                        (and (not (empty? user)) user-is-operator-member)
+                        false
+
+                        ;; Something wrong is happening
+                        :else
+                        false)]
+    (if response-user
+      (http/transit-response response-user 200)
+      (http/transit-response "Cannot add user" 400))))
+
 (defn- transport-routes-auth
   "Routes that require authentication"
   [db config]
@@ -583,7 +624,10 @@
              :params
              user :user
              form-data :body}
-        (http/transit-response (http/transit-request form-data))) ;THIS IS JUST PLACEHOLDER
+            (authorization/with-transport-operator-check
+              db user (Long/parseLong operator-id)
+              #(manage-adding-users-to-operator db (Long/parseLong operator-id)
+                                                (http/transit-request form-data))))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response

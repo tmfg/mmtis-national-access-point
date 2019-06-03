@@ -42,7 +42,8 @@
                         (.preventDefault e)
                         (when (re-matches utils/email-regex new-member-email)
                           (e! (ou/->PostNewUser new-member-email op-id))))}
-    [form-fields/field {:type :string
+    [form-fields/field {:element-id "operator-user-email"
+                        :type :string
                         :full-width? true
                         :name :add-member
                         :update! #(e! (ou/->EmailFieldOnChange %))
