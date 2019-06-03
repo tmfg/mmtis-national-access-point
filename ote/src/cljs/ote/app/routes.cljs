@@ -131,7 +131,7 @@
                      app (merge app navigation-data)]
 
                  (if (requires-authentication? app)
-                   (do (navigate! :front-page)
+                   (do (navigate! :login)
                        (assoc orig-app
                          :login {:show? true
                                  :navigate-to navigation-data}))

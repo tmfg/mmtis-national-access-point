@@ -102,12 +102,11 @@
 
 (defn- update-user-by-id [app id update-fn & args]
   (update-in app [:admin :user-listing :results]
-             (fn [operators]
+             (fn [users]
                (map #(if (= (:id %) id)
                        (apply update-fn % args)
                        %)
-                    operators))))
-
+                    users))))
 
 (defn- get-search-result-operator-by-id [app id]
   (some
@@ -147,9 +146,11 @@
 
   SearchUsers
   (process-event [_ app]
-    (comm/get! (str "admin/user?type=any&search=" (get-in app [:admin :user-listing :user-filter]))
-                {:on-success (tuck/send-async! ->SearchUsersResponse)
-                 :on-failure (tuck/send-async! ->SearchUsersResponse)})
+    (let [filter (get-in app [:admin :user-listing :user-filter])]
+      (comm/get! (str "admin/user"
+                      (when filter (str "?type=any&search=" filter)))
+                 {:on-success (tuck/send-async! ->SearchUsersResponse)
+                  :on-failure (tuck/send-async! ->SearchUsersResponse)}))
     (assoc-in app [:admin :user-listing :loading?] true))
 
   ConfirmDeleteUser
@@ -183,8 +184,8 @@
 
   OpenDeleteUserModal
   (process-event [{id :id} app]
-    (comm/post! "admin/user-operator-members" {:id id}
-                {:on-success (tuck/send-async! ->OpenDeleteUserModalResponse id)})
+    (comm/get! (str "admin/member?userid=" id)
+               {:on-success (tuck/send-async! ->OpenDeleteUserModalResponse id)})
     app)
 
   OpenDeleteUserModalResponse
