@@ -10,7 +10,7 @@
             [specql.op :as op]
             [ote.db.user :as user]
             [ote.util.collections :refer [map-by count-matching]]
-            [ote.util.functor :refer [fmap]]
+            [ote.tasks.util :as task-util]
             [ote.db.tx :as tx]
             [ote.transit-changes.change-history :as change-history]
             [ote.config.transit-changes-config :as config-tc])
@@ -768,7 +768,7 @@
     (let [route-change-infos (map (fn [detection-result]
                                     (transform-route-change all-routes detection-result route-changes))
                                   route-changes)
-          change-count-by-type (fmap count (group-by :gtfs/change-type route-change-infos))
+          change-infos-group (group-by :gtfs/change-type route-change-infos)
           earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
                                                      ;; Remove change-date from the route-changes-infos list if it is nil or it is in the past
                                                      (or (nil? change-date)
@@ -784,10 +784,10 @@
                                            :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
                                            :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
 
-                                           :gtfs/removed-routes (:removed change-count-by-type 0)
-                                           :gtfs/added-routes (:added change-count-by-type 0)
-                                           :gtfs/changed-routes (:changed change-count-by-type 0)
-                                           :gtfs/no-traffic-routes (:no-traffic change-count-by-type 0)
+                                           :gtfs/removed-routes (count (group-by :gtfs/route-hash-id (:removed change-infos-group)))
+                                           :gtfs/added-routes (count (group-by :gtfs/route-hash-id (:added change-infos-group)))
+                                           :gtfs/changed-routes (count (group-by :gtfs/route-hash-id (:changed change-infos-group)))
+                                           :gtfs/no-traffic-routes (count (group-by :gtfs/route-hash-id (:no-traffic change-infos-group)))
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]
