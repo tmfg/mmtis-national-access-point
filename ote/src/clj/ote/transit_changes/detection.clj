@@ -886,7 +886,6 @@
 
 
 (defn trafficless-route-change-before-route-end? [a b]
-  (clojure.pprint/pprint b)
   (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
        (= (:starting-week-hash a) (:starting-week-hash b))
        (some? (:route-end-date b))
@@ -901,7 +900,7 @@
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
-        m (assoc b :combined true
+        m (assoc b :combined true ;; use :combined key to signal that the next week should be deleted from the weeks vector
                    :starting-week (:starting-week a))
         
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
