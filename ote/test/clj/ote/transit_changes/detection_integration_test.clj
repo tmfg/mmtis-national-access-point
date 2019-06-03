@@ -33,13 +33,10 @@
         ;; _ (println "rewrite-calendar: day difference (rounded to week):" day-diff-weekfixed)
         
         calendar-data (if filter-fn
-                        (filterv filter-fn
-                                calendar-data)
+                        (filterv filter-fn calendar-data)
                         calendar-data)
-        rewritten-calendar-data (mapv (fn [record] (update record :gtfs/date #(.plusDays % day-diff-weekfixed))) calendar-data)
-        ]
+        rewritten-calendar-data (mapv (fn [record] (update record :gtfs/date #(.plusDays % day-diff-weekfixed))) calendar-data)]
        
-    ;; (def *cd rewritten-calendar-data)
     rewritten-calendar-data))
 
 
@@ -131,9 +128,8 @@
                             (rewrite-calendar file-data orig-date (fn calendar-filter-fn [row]
                                                                     (contains? #{"11" "22"} (:gtfs/service-id row))))
                             file-data))
-        store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
-                                        my-intercept-fn
-                                        )
+        store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
+                                        my-intercept-fn)
         route-query-params {:service-id test-service-id
                             :start-date (joda-datetime->inst (time/days-from (time/now) -120))
                             :end-date (joda-datetime->inst (time/days-from (time/now) 30))

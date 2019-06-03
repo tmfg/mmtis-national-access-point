@@ -158,21 +158,20 @@
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 15.10.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 22.10.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 29.10.
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 5.11. - orig 2 
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 5.11.
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 12.11.
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 19.11.
-                     {tu/route-name [nil nil nil nil nil nil nil]} ; 26.11. -changed 2
+                     {tu/route-name [nil nil nil nil nil nil nil]} ; 26.11.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 3.12. 
                      {tu/route-name [nil nil nil nil nil nil nil]}] ; 10.12.
-                    (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] ; 17/24/31.12.
-                                              ))))
+                    ; rest are 17/24/31.12.
+                    (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]))))
 
 (deftest test-no-traffic-run-twice-is-detected
   (let [test-result (-> data-no-traffic-run-twice
                         detection/changes-by-week->changes-by-route
                         detection/detect-changes-for-all-routes
-                        detection/trafficless-differences->no-traffic-changes
-                        )]
+                        detection/trafficless-differences->no-traffic-changes)]
     (testing "Ensure first no-traffic run is reported"
       (is (= 2 (count test-result)))
       (is (= {:no-traffic-start-date (tu/to-local-date 2018 10 15)
@@ -417,7 +416,7 @@
 
 (deftest test-more-than-one-change-found
   (spec-test/instrument `detection/route-weeks-with-first-difference)
-
+  
   ;; first test that the test data and old change detection code agree
   (testing "Ensure single-change detection code agrees with test data"
     (is (= (tu/to-local-date 2019 2 18) (-> data-more-than-one-change
@@ -749,6 +748,7 @@
                     (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]))))
 
 (deftest test-change-and-ending-route
+  (spec-test/instrument `detection/changes-by-week->changes-by-route)
   (let [result (->> data-change-and-ending-route            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
@@ -808,6 +808,7 @@
      (java.time.LocalDate/parse "2019-02-17")}}])
 
 (deftest test-change->no-traffic
+  
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
     (is (= {:route-key "Raimola",

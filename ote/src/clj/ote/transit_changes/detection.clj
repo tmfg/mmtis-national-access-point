@@ -1,6 +1,6 @@
 (ns ote.transit-changes.detection
   "Detect changes in transit traffic patterns.
-  Interfaces with stored GTFS transit data."
+  Interfaces with stored GTFS transit data. "
   (:require [ote.transit-changes :as transit-changes :refer [week=]]
             [ote.time :as time]
             [jeesql.core :refer [defqueries]]
@@ -355,6 +355,7 @@
 (spec/def
   ::starting-week
   ::bow-eow-map)
+
 (spec/def ::starting-week-hash ::week-hash-vec)
 
 (spec/def ::route-change-map
@@ -844,10 +845,6 @@
                          service-routes)]
     (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
 
-(defn changed-day-from-changed-week
-  [db service-id route-list-with-changed-weeks]
-  (mapv #(route-day-changes db service-id %) route-list-with-changed-weeks))
-
 (defn changes-by-week->changes-by-route
   "Input: Takes collection of maps (weeks), each map contains all routes of the service for the week.
     Input format:
@@ -1068,9 +1065,7 @@
                                      route-hashes
                                      (override-holidays db route-hashes))
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys)] ;; Format: ({:date routes(=hashes)})
-    #_(def *rh route-hashes)
     (try
-      #_(def *rd routes-by-date)
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
