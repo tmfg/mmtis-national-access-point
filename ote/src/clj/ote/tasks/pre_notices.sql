@@ -23,7 +23,7 @@ SELECT * FROM (
                        (SELECT array_agg(fr.nimi)
                           FROM finnish_regions fr
                          WHERE fr.numero = ANY (p."finnish-regions")) AS regions,
-                      to_char(h."different-week-date", 'dd.mm.yyyy') AS "different-week-date",
+                      h."different-week-date" AS "different-week-date",
                       op.name AS "operator-name",
                       ts.name AS "service-name",
                       ts.id AS "transport-service-id",

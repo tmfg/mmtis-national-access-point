@@ -154,12 +154,12 @@
 
                       :added
                       [icon-l/icon-labeled style/transit-changes-icon
-                       [ic/content-add-box {:color style/add-color}]
+                       [ic/content-add-box {:color colors/add-color}]
                        "Uusi reitti"]
 
                       :removed
                       [icon-l/icon-labeled
-                       [ic/content-remove-circle-outline {:color style/remove-color}]
+                       [ic/content-remove-circle-outline {:color colors/remove-color}]
                        "Mahdollisesti päättyvä reitti"]
 
                       :no-change

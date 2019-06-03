@@ -44,10 +44,10 @@
     [:b "Taulukon ikonien selitteet"]]
    [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
-      (for [[icon color label] [[ic/content-add-circle-outline {:color style/add-color} " Uusia reittejä"]
-                                [ic/content-remove-circle-outline {:color style/remove-color} " Mahdollisesti päättyviä reittejä"]
-                                [ui-icons/outline-ballot {:color style/remove-color} " Reittimuutoksia"]
-                                [ic/av-not-interested {:color style/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
+      (for [[icon color label] [[ic/content-add-circle-outline {:color colors/add-color} " Uusia reittejä"]
+                                [ic/content-remove-circle-outline {:color colors/remove-color} " Mahdollisesti päättyviä reittejä"]
+                                [ui-icons/outline-ballot {:color colors/remove-color} " Reittimuutoksia"]
+                                [ic/av-not-interested {:color colors/remove-color} " Reittejä, joissa tauko liikenteessä"]]]
         ^{:key (str "transit-changes-legend-" label)}
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
     [:div {:style {:display "flex"
@@ -69,13 +69,13 @@
   [:div.transit-change-icons (stylefy/use-style style/transit-changes-icon-row-container)
    [:div {:style {:width "25%"}}
     [ic/content-add-circle-outline {:color (if (= 0 added-routes)
-                                             style/no-change-color
-                                             style/add-color)}]
+                                             colors/icon-gray
+                                             colors/add-color)}]
     (cap-number added-routes)]
    [:div {:style {:width "25%"}}
     [ic/content-remove-circle-outline {:color (if (= 0 removed-routes)
-                                                style/no-change-color
-                                                style/remove-color)}]
+                                                colors/icon-disabled
+                                                colors/remove-color)}]
     (cap-number removed-routes)]
 
    [:div {:style {:width "25%"}}
@@ -83,8 +83,8 @@
 
    [:div {:style {:width "25%"}}
     [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
-                                    style/no-change-color
-                                    style/remove-color)}]
+                                    colors/icon-disabled
+                                    colors/remove-color)}]
     (cap-number no-traffic-routes)]])
 
 
@@ -149,14 +149,14 @@
        #_(and (not (empty? (:days-with-traffic current-week-traffic)))
               (empty? (:days-with-traffic different-week-traffic)))
        #_[:div
-          [ic/communication-business {:color style/remove-color}]
+          [ic/communication-business {:color colors/remove-color}]
           [:div (use-style style/change-icon-value)
            "Mahdollinen liikenteen päättyminen"]]
 
        #_(and (empty? (:days-with-traffic current-week-traffic))
               (not (empty? (:days-with-traffic different-week-traffic))))
        #_[:div
-          [ic/communication-business {:color style/add-color}] ;; FIXME: Seems that there is no domain_disabled icon available in our MUI version
+          [ic/communication-business {:color colors/add-color}] ;; FIXME: Seems that there is no domain_disabled icon available in our MUI version
           [:div (use-style style/change-icon-value)
            "Mahdollinen liikenteen alkaminen"]]
        :default
