@@ -14,7 +14,3 @@
                     (t/plus first-time (t/days 1))
                     first-time)
                   (t/days 1))))
-
-(defn distinct-by [f coll]
-  (let [groups (group-by f coll)]
-    (map #(first (groups %)) (distinct (map f coll)))))
