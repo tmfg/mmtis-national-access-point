@@ -889,7 +889,6 @@
 
 
 (defn trafficless-route-change-before-route-end? [a b]
-  (clojure.pprint/pprint b)
   (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
        (= (:starting-week-hash a) (:starting-week-hash b))
        (some? (:route-end-date b))
