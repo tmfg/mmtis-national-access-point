@@ -162,7 +162,7 @@
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 12.11.
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 19.11.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 26.11.
-                     {tu/route-name [nil nil nil nil nil nil nil]} ; 3.12. 
+                     {tu/route-name [nil nil nil nil nil nil nil]} ; 3.12.
                      {tu/route-name [nil nil nil nil nil nil nil]}] ; 10.12.
                     ; rest are 17/24/31.12.
                     (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]))))
@@ -178,7 +178,7 @@
               :no-traffic-end-date (tu/to-local-date 2018 11 5)
               :route-key tu/route-name
               :no-traffic-change 21
-              :different-week	    
+              :different-week
 	      {:beginning-of-week (java.time.LocalDate/parse "2018-11-05"),
 	       :end-of-week (java.time.LocalDate/parse "2018-11-11")}
               :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
@@ -295,7 +295,7 @@
       ;; - judging from debug prints the traffic-run 13 is found first and a second one goes up to 70-something
       ;; - at some point the first one is dropped before its returned here, where?
       ;; - the week-hash-no-traffic-run fn is the workhorse, seems to detect a break in trafficless run right after the first all-nil week when called week by week
-      ;; - stack traces from week= tell us the 3 invocations come from detection.clj:200 & :201 & :203 ("If current week does not equal starting week...") 
+      ;; - stack traces from week= tell us the 3 invocations come from detection.clj:200 & :201 & :203 ("If current week does not equal starting week...")
       ;; - thinking about the length of the no-traffic run, 13, it's 1 day short of 2 weeks, matching 2 weeks with the first one being the tue-sun trafficless period
       ;; - ok, looks like due to old nil handling the trafficless period was never considered a change in traffic, but now it is. is this ok?
       ;; - not ok if we want to keep detecting longer no-traffic runs?
@@ -419,7 +419,7 @@
 
 (deftest test-more-than-one-change-found
   (spec-test/instrument `detection/route-weeks-with-first-difference)
-  
+
   ;; first test that the test data and old change detection code agree
   (testing "Ensure single-change detection code agrees with test data"
     (is (= (tu/to-local-date 2019 2 18) (-> data-more-than-one-change
@@ -826,7 +826,7 @@
      (java.time.LocalDate/parse "2019-02-17")}}])
 
 (deftest test-change->no-traffic
-  
+
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
     (is (= {:route-key "Raimola",
@@ -953,3 +953,31 @@
 
     (testing "Ensure that both of the changes are detected"
       (is (= 2 (count result))))))
+
+(def data-one-week-pause-with-change
+  (tu/weeks (tu/to-local-date 2019 5 6)
+            (concat [{tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 6
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 13
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 20
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 03
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]}])))
+
+
+(deftest test-one-week-pause-with-change
+  (let [result (->> data-one-week-pause-with-change            ;; Notice thread-last
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    (detection/add-ending-route-change (tu/to-local-date 2040 5 13) data-all-routes)
+                    (detection/trafficless-differences->no-traffic-changes))]
+
+    (testing "Ensure that both of the changes are detected"
+      (is (= 2 result)))))

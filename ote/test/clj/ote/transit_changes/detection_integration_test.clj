@@ -24,19 +24,19 @@
     (+ n (- 7 (rem n 7)))
     n))
 
-(defn rewrite-calendar 
+(defn rewrite-calendar
   "Find out how far past orig-date is in history, and shift all calendar-data
   dates forward by that amount."
   [calendar-data orig-date filter-fn]
   (let [day-diff (ote.time/day-difference (ote.time/native->date-time orig-date) (clj-time.core/now))
         day-diff-weekfixed (round-up-to-nearest-multiple-of-7 day-diff)
         ;; _ (println "rewrite-calendar: day difference (rounded to week):" day-diff-weekfixed)
-        
+
         calendar-data (if filter-fn
                         (filterv filter-fn calendar-data)
                         calendar-data)
         rewritten-calendar-data (mapv (fn [record] (update record :gtfs/date #(.plusDays % day-diff-weekfixed))) calendar-data)]
-       
+
     rewritten-calendar-data))
 
 
@@ -112,7 +112,7 @@
                                      :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
                                      :gtfs/etag new-etag
                                      :gtfs/license license
-                                     :gtfs/external-interface-description-id interface-id})]            
+                                     :gtfs/external-interface-description-id interface-id})]
         ;; Parse gtfs package and save it to database.
         (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
 
@@ -142,9 +142,8 @@
         lohja-changes (filterv #(= "-Lohja - Nummela - Vihti-" (:route-key %))
                                (:route-changes detection-result))]
     ;; (println "found" changes "in the following routes:" changed-route-names)
-    (def *nd detection-result)
     ;; (println (:start-date route-query-params))
     (testing "got sane change figures for lohja - nummela - vihti changes"
-      (is (= 1 (count lohja-changes)))     
+      (is (= 1 lohja-changes))
       (is (= 52 (-> lohja-changes first :changes :trip-changes first :stop-time-changes)))
       (is (= 2  (-> lohja-changes first :no-traffic-run))))))

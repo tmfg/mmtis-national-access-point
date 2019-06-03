@@ -429,7 +429,7 @@
     (when debug-route-hit?
       (println "route-weeks-with-first-difference result: " (pr-str result) "count" (count route-weeks))
       (println "route-weeks-with-first-difference, dw date: " (str (get-in result [current-debug-route :different-week :beginning-of-week]))))
-    
+
     (vals result)))
 
 
@@ -484,7 +484,8 @@
   (loop [route-weeks route-weeks
          results []]
     (let [diff-data (route-weeks-with-first-difference route-weeks)
-          first-interesting-diff (first (filter
+          filtered-diff-data (first
+                               (filter
                                  (fn [value]
                                    (or (:no-traffic-start-date value)
                                        (:different-week value)))
@@ -494,13 +495,13 @@
           diff-week-date (first diff-week-beginnings)
           prev-week-date (when (or diff-week-date no-traffic-end)
                            (.minusWeeks (or diff-week-date no-traffic-end) 1))]
-      ;; (println "in route-differences loop, first-interesting-diff is" first-interesting-diff)
+      ;; (println "in route-differences loop, filtered-diff-data is" filtered-diff-data)
       (if (and (not-empty diff-data) prev-week-date)        ;; end condition: dates returned by f-w-d had nil different-week beginning
         (recur
           ;; Filter out different weeks before current week, because different week is starting week for next change.
           ;; Use the previous week date, because first-week-difference starts comparisons at the second given week
           (filter #(route-starting-week-not-before? % prev-week-date) route-weeks)
-          (conj results first-interesting-diff))
+          (conj results filtered-diff-data))
         (if (empty? results)
           diff-data
           (if (some? filtered-diff-data)
@@ -888,7 +889,7 @@
   "Input: takes a vector or routes with their traffic weeks
   Invokes a function in a loop for each route to detect any changes for each route.
   Output: Vector of routes enriched by details if there are changes in traffic for a route on a week, including no-traffic detection."
-  [route-list-with-week-hashes]  
+  [route-list-with-week-hashes]
   (vec (mapcat route-differences route-list-with-week-hashes)))
 
 
@@ -909,7 +910,7 @@
   (let [;; use the latter record as starting point
         m (assoc b :combined true ;; use :combined key to signal that the next week should be deleted from the weeks vector
                    :starting-week (:starting-week a))
-        
+
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
         m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
         m (if (= (:no-traffic-start-date m) (:route-end-date m))
@@ -924,7 +925,7 @@
 
         ;; if a's preceding week hash and b's trailing week hash are the same,
         ;; there is no change and we just remove the different-week keys
-        m (if (= (:different-week-hash b) (:starting-week-hash a))            
+        m (if (= (:different-week-hash b) (:starting-week-hash a))
             (dissoc m :different-week-hash
                       :different-week-start-date
                       :different-week)
@@ -963,7 +964,7 @@
                     curr-next-pairs)
         weeks-without-combined-leftovers (loop [i 0
                                                 out-weeks []]
-                                           (let [curr-week (get weeks i)]        
+                                           (let [curr-week (get weeks i)]
                                              (if curr-week
                                                (recur (+ i (if (:combined curr-week)
                                                              2 ;; skip over the leftover week
