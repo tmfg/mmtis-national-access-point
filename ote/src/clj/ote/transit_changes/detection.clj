@@ -173,6 +173,10 @@
          (week= prev next1))
     {}                                                      ;; Ignore this week
 
+    ;;THIS HIDES A DIFFERENCE DETECTED AFTER A NO TRAFFIC CHANGE. This makes it so we don't add different week data to a change that already specifies end of a no-traffic period.
+    (:no-traffic-end-date state)
+    state
+
     ;; No starting week specified yet, use current week
     (nil? starting-week-hash)
     (assoc state :starting-week-hash curr)
@@ -440,9 +444,12 @@
   (loop [route-weeks route-weeks
          results []]
     (let [diff-data (route-weeks-with-first-difference route-weeks)
-          filtered-diff-data (first (filter (fn [value]
-                                              (or (:no-traffic-start-date value) (:different-week value)))
-                                            diff-data))
+          filtered-diff-data (first
+                               (filter
+                                 (fn [value]
+                                   (or (:no-traffic-start-date value)
+                                       (:different-week value)))
+                                 diff-data))
           diff-week-beginnings (keep (comp :beginning-of-week :different-week) diff-data)
           no-traffic-end (:no-traffic-end-date (first diff-data))
           diff-week-date (first diff-week-beginnings)
@@ -456,7 +463,9 @@
           (conj results filtered-diff-data))
         (if (empty? results)
           diff-data
-          results)))))                                      ;; Default week data expected when no changes are found
+          (if (some? filtered-diff-data)
+            (conj results filtered-diff-data)
+            results))))))                                   ;; Default week data expected when no changes are found
 
 (defn combine-differences-with-routes
   [route-weeks differences]
@@ -873,6 +882,7 @@
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
        (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
 
+
 (spec/fdef add-ending-route-change
            :args (spec/cat :all-route-changes coll? :all-routes coll?)
            :ret ::detected-route-changes-for-services-coll)
@@ -916,19 +926,24 @@
                                       all-routes)))
         create-end-change (fn [last-chg max-date ^LocalDate date]
                             (when (route-ends? date max-date (:detection-threshold-route-end-days settings-tc))
-                              (merge {:route-end-date (or (and (nil? (:no-traffic-end-date last-chg))
-                                                               ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
-                                                               ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
-                                                               (:no-traffic-start-date last-chg))
-                                                          ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
-                                                          (.plusDays (.toLocalDate max-date) 1))}
+                              (merge {:route-end-date (or
+                                                        (and
+                                                          (nil? (:no-traffic-end-date last-chg))
+                                                          ;; If last change starts a no-traffic earlier than route max-date, use start of no-traffic. Not sure if this is possible.
+                                                          ;; +1 NOT added because :no-traffic-start-date defines the first no-traffic day, i.e. traffic end
+                                                          (:no-traffic-start-date last-chg))
+                                                        ;; +1 because max-date defines the LAST day with traffic, hence no-traffic starts on the next day
+                                                        (.plusDays (.toLocalDate max-date) 1))}
                                      (select-keys last-chg [:route-key :starting-week :starting-week-hash]))))
         remove-ongoing-or-break (fn [route-chg-group]
-                                  (if (and (= 1 (count route-chg-group))
-                                           (empty? (select-keys (last route-chg-group) [:different-week ;; If map is a traffic change map, don't discard
-                                                                                        ;; If map is an ending no-traffic map, don't discard
-                                                                                        :no-traffic-end-date])))
-                                    []                      ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
+                                  (if (or (and (= 1 (count route-chg-group))
+                                               (empty? (select-keys (last route-chg-group) [:different-week ;; If map is a traffic change map, don't discard
+                                                                                            ;; If map is an ending no-traffic map, don't discard
+                                                                                            :no-traffic-end-date])))
+                                          (and
+                                            (:no-traffic-start-date (last route-chg-group))
+                                            (nil? (:no-traffic-end-date (last route-chg-group)))))
+                                    (vec (take (dec (count route-chg-group)) route-chg-group)) ;; Discard content because end-change map should replace the sole normal "traffic ongoing" map
                                     route-chg-group))
         chg (doall (vec (mapcat
                           (fn [[route-key route-chg-group]]

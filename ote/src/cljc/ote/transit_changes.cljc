@@ -220,15 +220,14 @@
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
   [w1 w2]
-  (every? true?
-          (map (fn [h1 h2]
-                 ;; Only compare hashes where both days have traffic (not nil)
-                 (or (nil? h1) ;; h1 is no-traffic day due to nil value
-                     (nil? h2) ;; h2 is no-traffic day due to nil value
-                     (keyword? h1) ;; h1 is static-holiday due to value is keyword
-                     (keyword? h2) ;; h2 is static-holiday due to value is keyword
-                     (= h1 h2)))
-               w1 w2)))
+  (if (or (every? nil? w1) (every? nil? w2))
+    true
+    (every? true?
+            (map (fn [h1 h2]
+                   (or (keyword? h1)                        ;; h1 is static-holiday due to value is keyword
+                       (keyword? h2)                        ;; h2 is static-holiday due to value is keyword
+                       (= h1 h2)))
+                 w1 w2))))
 
 (s/fdef week=
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)
