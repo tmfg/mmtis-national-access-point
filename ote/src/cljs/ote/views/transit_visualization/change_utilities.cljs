@@ -6,7 +6,8 @@
             [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
             [ote.localization :refer [tr]]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.theme.colors :as colors]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -35,12 +36,13 @@
     [:b "Taulukon ikonien selitteet"]]
    [:div (stylefy/use-style style/transit-changes-icon-legend-row-container)
     (doall
-      (for [[icon color label] [[ote-icons/outline-add-box {} (tr [:transit-changes :trips-new])]
+      (for [[icon color label] [[ic/content-add-circle-outline {:color colors/add-color} " Uusi reitti"]
+                                [ote-icons/outline-add-box {} (tr [:transit-changes :trips-new])]
                                 [ote-icons/outline-indeterminate-checkbox {} (tr [:transit-changes :trips-removed])]
-                                [ic/action-timeline {} (tr [:transit-changes :stop-changes-per-trip])]
-                                [ic/action-query-builder {} (tr [:transit-changes :schedule-changes-per-trip])]
-                                [ic/av-not-interested {:color style/remove-color} (tr [:transit-changes :no-traffic])]
-                                [ic/content-remove-circle-outline {:color style/remove-color} (tr [:transit-changes :trip-end-potential])]]]
+                                [ic/action-timeline {:style {:color colors/icon-gray}} (tr [:transit-changes :stop-changes-per-trip])]
+                                [ic/action-query-builder {:style {:color colors/gray700}} (tr [:transit-changes :schedule-changes-per-trip])]
+                                [ic/av-not-interested {:color colors/remove-color} (tr [:transit-changes :no-traffic])]
+                                [ic/content-remove-circle-outline {:color colors/remove-color} (tr [:transit-changes :trip-end-potential])]]]
         ^{:key (str "transit-visualization-route-changes-legend-" label)} ;; Ensure that all icons have unique key
         [icon-l/icon-labeled style/transit-changes-icon [icon color] label]))
     [:div {:style {:display "flex"
