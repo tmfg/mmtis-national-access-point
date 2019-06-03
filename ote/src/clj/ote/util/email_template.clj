@@ -251,14 +251,14 @@
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   (str "Sinut on kutsuttu " (:name operator) "-nimisen palveluntuottajan jäseneksi.")]
+                   (str "Sinut on kutsuttu " (::t-operator/name operator) "-nimisen palveluntuottajan jäseneksi.")]
 
                   (html-divider-border nil)
                   [:p
-                   [:strong (:email requester)]
+                   [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"} (:user_email requester)]
                    "on kutsunut sinut NAP-palveluun "
-                   [:strong (:name operator)]
-                   (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (:name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")
+                   [:strong (::t-operator/name operator)]
+                   (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")
                    ]
                   [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
                   [:br]
