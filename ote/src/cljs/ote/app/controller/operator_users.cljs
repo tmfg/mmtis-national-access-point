@@ -61,6 +61,21 @@
      :on-failure (tuck/send-async! ->NewUserFailure)})
   (assoc-in app [:manage-access :new-member-loading?] true))
 
+;; TODO: remove deleted user from app-state
+(define-event DeleteMemberSuccess [result]
+  {}
+  (.log js/console "member deleted " (pr-str result))
+  app)
+
+(define-event DeleteMember [member operator-id]
+  {}
+  (comm/delete!
+    (str "transport-operator/" (url-util/encode-url-component operator-id) "/users/" (:email member))
+    {}
+    {:on-success (tuck/send-async! ->DeleteMemberSuccess)
+     :on-failure (tuck/send-async! ->ServerError)})
+  app)                                                      ;;TODO: Remove deleted user from app-state
+
 (define-event InitTransportUserView []
   {}
   (GetOperatorUsers (GetTransportOperator app)))

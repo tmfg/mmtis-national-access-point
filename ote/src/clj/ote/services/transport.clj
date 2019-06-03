@@ -6,26 +6,23 @@
             [specql.op :as op]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
             [ote.util.db :as util]
+            [ote.util.email-template :as email-template]
             [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
-            [specql.impl.composite :as specql-composite]
             [ote.services.places :as places]
             [ote.services.operators :as operators]
             [ote.services.external :as external]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
-            [cheshire.core :as cheshire]
             [ote.db.tx :as tx]
             [ote.db.modification :as modification]
-            [ote.access-rights :as access]
             [clojure.string :as str]
-            [ote.nap.ckan :as ckan]
             [clojure.set :as set]
-            [ote.time :as time])
+            [ote.email :as email]
+            [hiccup.core :refer [html]])
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
@@ -542,49 +539,80 @@
   [db operator-id]
   (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
 
-(defn add-user-to-operator [db user operator]
-  (let [group (create-member! db (:user_id user) (::t-operator/ckan-group-id operator))]
-    ;; Return added user data
-    {:id (:user_id user)
-     :username (:user_username user)
-     :name (:user_name user)
-     :email (:user_email user)}))
+(defn add-user-to-operator [email db new-member requester operator]
+  (println " add-user-to-operator email " (pr-str email))
+  (let [group (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
+        ;; Ensure that we do not send email to test user
+        new-member (if (= "user.userson@example.com" (:user_email new-member))
+               (assoc new-member :user_email "success@simulator.amazonses.com")
+               new-member)
+        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")]
 
-(defn invite-new-user [db operator user]
+    (do
+      ;; Send email to user to inform about the new membership.
+      (try
+        (email/send!
+          email
+          {:to (:user_email new-member)
+           :subject title
+           :body [{:type "text/html;charset=utf-8"
+                   :content (html (email-template/notify-user-new-member new-member requester operator title))}]})
+        (catch Exception e
+          (log/warn "Error while sending a email to new member" e)))
+
+      ;; Return added new-member data
+      {:id (:user_id new-member)
+       :username (:user_username new-member)
+       :name (:user_name new-member)
+       :email (:user_email new-member)})))
+
+(defn invite-new-user [email db requester operator user]
   nil)
 
-(defn manage-adding-users-to-operator [db operator-id form-data]
+(defn manage-adding-users-to-operator [email db requester operator-id form-data]
   (println "form-data" (pr-str form-data))
-  (let [user (first (fetch-user-by-email db {:email (:email form-data)}))
+  (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
                                       {::t-operator/id operator-id}))
         operator-users (fetch-operator-users db {:operator-id operator-id})
-        user-is-operator-member  (some #(= (:user_id user) (:id %)) operator-users)
-        ;; If user exists, add it to the organization if not, invite
-        response-user (cond
-                        ;; Existing user, existing operator
-                        (and (not user-is-operator-member) (not (empty? user)) (not (empty? operator)))
-                        (add-user-to-operator db user operator)
+        new-member-is-operator-member  (some #(= (:user_id new-member) (:id %)) operator-users)
+        ;; If member exists, add it to the organization if not, invite
+        response (cond
+                        ;; Existing new-member, existing operator
+                        (and (not new-member-is-operator-member) (not (empty? new-member)) (not (empty? operator)))
+                        (add-user-to-operator email db new-member requester operator)
 
-                        ;; new user, existing operator -> invite user
-                        (and (empty? user) (not (empty? operator)))
-                        (invite-new-user db operator (:email form-data))
+                        ;; new new-member, existing operator -> invite new-member
+                        (and (empty? new-member) (not (empty? operator)))
+                        (invite-new-user email db requester operator (:email form-data))
 
-                        ;; User is already a member
-                        (and (not (empty? user)) user-is-operator-member)
+                        ;; new-member is already a member
+                        (and (not (empty? new-member)) new-member-is-operator-member)
                         false
 
                         ;; Something wrong is happening
                         :else
                         false)]
-    (if response-user
-      (http/transit-response response-user 200)
-      (http/transit-response "Cannot add user" 400))))
+    (if response
+      (http/transit-response response 200)
+      (http/transit-response "Cannot add member" 400))))
+
+(defn remove-member-from-operator [email db user operator-id member-email]
+  (let [_ (println "member-email " member-email)
+        member (first (fetch-user-by-email db {:email member-email}))
+        operator (first (specql/fetch db ::t-operator/transport-operator
+                                      #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
+                                      {::t-operator/id operator-id}))]
+    (specql/delete! db ::user/member
+                    {::user/table_id   (:user_id member)
+                     ::user/group_id   (::t-operator/ckan-group-id operator)
+                     ::user/table_name "user"})
+    (http/transit-response "OK")))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
-  [db config]
+  [db config email]
   (let [nap-config (:nap config)]
     (routes
 
@@ -626,8 +654,17 @@
              form-data :body}
             (authorization/with-transport-operator-check
               db user (Long/parseLong operator-id)
-              #(manage-adding-users-to-operator db (Long/parseLong operator-id)
+              #(manage-adding-users-to-operator email db user (Long/parseLong operator-id)
                                                 (http/transit-request form-data))))
+
+      ;; This is not ready, only implemented to help add-member implementation
+      (DELETE "/transport-operator/:operator-id/users/:member-email"
+            {{:keys [operator-id member-email]}
+             :params
+             user :user}
+            (authorization/with-transport-operator-check
+              db user (Long/parseLong operator-id)
+              #(remove-member-from-operator email db user (Long/parseLong operator-id) member-email)))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response
@@ -690,10 +727,10 @@
 
 (defrecord Transport [config]
   component/Lifecycle
-  (start [{:keys [db http] :as this}]
+  (start [{:keys [db http email] :as this}]
     (assoc
       this ::stop
-      [(http/publish! http (transport-routes-auth db config))
+      [(http/publish! http (transport-routes-auth db config email))
        (http/publish! http {:authenticated? false} (transport-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]

@@ -36,7 +36,8 @@
             [hiccup.core :refer [html]]
             [ote.email :as email]
             [clojure.spec.alpha :as spec]
-            [ote.util.collections :as ote-coll]))
+            [ote.util.collections :as ote-coll]
+            [ote.util.email-template :as email-template]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -491,8 +492,9 @@
        :subject (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
                      (time/format-date (t/now)))
        :body [{:type "text/html;charset=utf-8"
-               :content (html (pn/notification-html (pn/fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions nil)})
-                                                    (pn/fetch-unsent-changes-by-regions db {:regions nil})))}]})
+               :content (html (email-template/notification-html (pn/fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions nil)})
+                                                                (pn/fetch-unsent-changes-by-regions db {:regions nil})
+                                                                (pn/notification-html-subject)))}]})
     (catch Exception e
       (log/warn "Error while sending a notification" e))))
 

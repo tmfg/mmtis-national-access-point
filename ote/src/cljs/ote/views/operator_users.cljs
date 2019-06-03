@@ -10,7 +10,7 @@
             [ote.style.buttons :as buttons]))
 
 (defn access-table
-  [e! users]
+  [e! users operator-id]
   [:div
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
@@ -24,9 +24,9 @@
       :read :email}
      {:name (tr [:front-page :table-header-actions])
       :read identity
-      :format (fn [x]
+      :format (fn [member]
                 [:div
-                 [:button (merge {:on-click #(println (:id x))}
+                 [:button (merge {:on-click #(e! (ou/->DeleteMember member operator-id))}
                                  (stylefy/use-style
                                    (merge buttons/svg-button
                                           {:display "flex"
@@ -71,6 +71,6 @@
      [:h2 name]
      (if loaded?
        [:div
-        [access-table e! access-users name]
+        [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
        [spinner/primary-spinner])]))
