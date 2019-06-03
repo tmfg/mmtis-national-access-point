@@ -158,7 +158,7 @@
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 15.10.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 22.10.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 29.10.
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 5.11. - orig 2 
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 5.11. 
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 12.11.
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 19.11.
                      {tu/route-name [nil nil nil nil nil nil nil]} ; 26.11. -changed 2
