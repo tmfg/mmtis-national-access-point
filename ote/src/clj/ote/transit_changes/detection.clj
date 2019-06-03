@@ -903,7 +903,7 @@
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
-        m (assoc b :combined true
+        m (assoc b :combined true ;; use :combined key to signal that the next week should be deleted from the weeks vector
                    :starting-week (:starting-week a))
         
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
