@@ -118,17 +118,21 @@
     [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
-                                           colors/icon-disabled
-                                           colors/add-color)}]
-      [:span (or added-trips (:gtfs/added-trips diff))      ;; :changes and :changes-route* have different namespace
+                                           style/icon-disabled
+                                           style/add-color)}]
+      [:span (or added-trips
+                 (:gtfs/added-trips diff)  ;; :changes and :changes-route* have different namespace
+                 0)
        (when with-labels? " lisättyä vuoroa")]]]
 
     [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
-                                                          colors/icon-disabled
-                                                          colors/remove-color)}]
-      [:span (or removed-trips (:gtfs/removed-trips diff) 0)
+                                                          style/icon-disabled
+                                                          style/remove-color)}]
+      [:span (or removed-trips
+                 (:gtfs/removed-trips diff)
+                 0)
        (when with-labels? " poistettua vuoroa")]]]
 
     [:div {:style {:flex "1"}}
