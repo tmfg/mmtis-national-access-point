@@ -346,7 +346,7 @@
                 
 
                 ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id)))
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
             (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]
