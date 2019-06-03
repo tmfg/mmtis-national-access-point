@@ -1,9 +1,9 @@
 {:environment {:base-url "http://localhost:3000/"}
  :dev-mode? true
  :testing-env? true
- :db {:url "jdbc:postgresql://localhost:5433/napote"
-      :username "ote"
-      :password "m7FRuRTRePjNCfPJPnXvDfclynXg8"}
+ :db {:url "jdbc:postgresql://localhost:5432/napote"
+      :username "napote"
+      :password ""}
  ;; example for reading password from a file:
  ;; :db {:url "jdbc:postgresql://localhost:5435/napote"
  ;;      :username "ote"
