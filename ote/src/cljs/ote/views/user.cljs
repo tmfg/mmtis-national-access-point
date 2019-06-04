@@ -13,14 +13,6 @@
             [clojure.string :as str]
             [ote.ui.list-header :as list-header]))
 
-(defn require-current-password? [user form-data]
-  (or (and (not (str/blank? (:username form-data)))
-           (not= (:username user) (:username form-data)))
-      (and (not (str/blank? (:email form-data)))
-           (not= (:email user) (:email form-data)))
-      (not (str/blank? (:password form-data)))))
-
-
 (defn merge-user-data [user form-data]
   (merge (select-keys user #{:username :name :email})
          form-data))
