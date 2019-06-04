@@ -6,6 +6,7 @@
             [hiccup.core :refer [html]]
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.tx :as tx]
             [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
@@ -255,13 +256,14 @@
 
                   (html-divider-border nil)
                   [:p
-                   [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"} (:user_email requester)]
-                   "on kutsunut sinut NAP-palveluun "
+                   [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+                    (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
                    [:strong (::t-operator/name operator)]
-                   (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")
-                   ]
-                  [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+                   (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
                   [:br]
-                  (blue-button (str (environment/base-url) "#/") "Siirry NAP-palveluun")
+                  [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
+                   [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+                  [:br]
+                  (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
                   (html-divider-border nil)]))
