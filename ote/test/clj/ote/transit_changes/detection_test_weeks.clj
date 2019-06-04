@@ -829,7 +829,7 @@
 
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
-    (is (= {:route-key "Raimola",
+    (is (= {:route-key tu/route-name,
             :combined true,
             :no-traffic-start-date
             (java.time.LocalDate/parse "2018-11-13"),
