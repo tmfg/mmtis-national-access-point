@@ -68,8 +68,7 @@
        [:span removed-trips]]]
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
-       [ote-icons/outline-indeterminate-checkbox-gray]
-       [:span removed-trips]]])
+       [ote-icons/outline-indeterminate-checkbox-gray] nil]])
 
    (if (or (and trip-stop-sequence-changes-upper (pos? trip-stop-sequence-changes-upper))
            (and trip-stop-sequence-changes-lower (pos? trip-stop-sequence-changes-lower)))
@@ -79,8 +78,7 @@
        [:span (or trip-stop-sequence-changes-upper trip-stop-sequence-changes-lower)]]]
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
-       [ic/action-timeline {:style {:color colors/icon-disabled}}]
-       [:span (or trip-stop-sequence-changes-upper trip-stop-sequence-changes-lower)]]])
+       [ic/action-timeline {:style {:color colors/icon-disabled}}] nil]])
 
    (if (or (and trip-stop-time-changes-lower (pos? trip-stop-time-changes-lower))
            (and trip-stop-time-changes-upper (pos? trip-stop-time-changes-upper)))
@@ -90,8 +88,7 @@
        [:span (or trip-stop-time-changes-upper trip-stop-time-changes-lower)]]]
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
-       [ic/action-query-builder {:style {:color colors/icon-disabled}}]
-       [:span (or trip-stop-time-changes-upper trip-stop-time-changes-lower)]]])
+       [ic/action-query-builder {:style {:color colors/icon-disabled}}]  nil]])
 
    (if (str/includes? (str combined-change-types) ":no-traffic")
      [:div {:style {:flex "0.5"}}
