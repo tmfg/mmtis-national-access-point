@@ -36,12 +36,11 @@
     (if (and (empty? transport-operators)
              (not= :services page))
       ;; If page is :transport-operator and user has no operators, start creating a new one
-      (do
-        (if (= (:page app) :transport-operator)
-          (assoc app
-                 :transport-operator {:new? true}
-                 :services-changed? true)
-          app))
+      (if (= (:page app) :transport-operator)
+        (assoc app
+          :transport-operator {:new? true}
+          :services-changed? true)
+        app)
 
         ;; Get services from response.
         ;; Use selected operator if possible, if not, use the first one from the response.
@@ -71,12 +70,11 @@
                     (not (empty? navigate-to)) (:page navigate-to)
                     (and authority? (= 0 operators-count)) :authority-pre-notices
                     :else :own-services)]
-     (do
-       (routes/navigate! new-page (:params navigate-to))
-       (-> app
-           (dissoc :login)
-           (update-transport-operator-data (:session-data response))
-           (assoc :flash-message flash-message))))))
+     (routes/navigate! new-page (:params navigate-to))
+     (-> app
+         (dissoc :login)
+         (update-transport-operator-data (:session-data response))
+         (assoc :flash-message flash-message)))))
 
 (extend-protocol tuck/Event
 
