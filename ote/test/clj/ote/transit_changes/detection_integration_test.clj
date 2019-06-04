@@ -143,7 +143,8 @@
                                (:route-changes detection-result))]
     ;; (println "found" changes "in the following routes:" changed-route-names)
     ;; (println (:start-date route-query-params))
+    (def *lc lohja-changes)
     (testing "got sane change figures for lohja - nummela - vihti changes"
-      (is (= 1 lohja-changes))
+      (is (= 2 (count lohja-changes)))
       (is (= 52 (-> lohja-changes first :changes :trip-changes first :stop-time-changes)))
       (is (= 2  (-> lohja-changes first :no-traffic-run))))))

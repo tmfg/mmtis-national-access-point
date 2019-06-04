@@ -18,8 +18,8 @@
 
 (def settings-tc (config-tc/config))
 
-(def current-debug-route -4242)
-;; (def current-debug-route "Raimola")
+;; (def current-debug-route -4242)
+(def current-debug-route "Raimola")
 
 (defqueries "ote/transit_changes/detection.sql")
 (defqueries "ote/services/transit_changes.sql")
@@ -173,13 +173,13 @@
     (println "doing week: " (week->short curr))))
 
 (defn- vnot [cond msg]
-  #_(when cond (println "debug: not a change because" msg))
+  (when cond (println "debug: not a change because" msg))
   (not cond))
 
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
-  ;; (dcfr-enter-debug route starting-week-hash curr next1 next2)
+  (dcfr-enter-debug route starting-week-hash curr next1 next2)
   (cond
     ;; If this is the first call and the current week is "anomalous".
     ;; Then start at the next week.
@@ -192,7 +192,8 @@
     (:no-traffic-end-date state)
     state
 
-    ;; No starting week specified yet, use current week
+
+;; No starting week specified yet, use current week
     (nil? starting-week-hash)
     (assoc state :starting-week-hash curr)
 
@@ -203,7 +204,7 @@
          (vnot (week= starting-week-hash next2) "curr = next2 (3)"))
     ;; this is a change
     (do
-      ;; (log/debug "mark as change because curr/next1/next2 are all different from starting-week-hash - starting vs curr/n1/n2 hashes are:" (mapv week->short [starting-week-hash curr next1 next2]))
+      (println "mark as change because curr/next1/next2 are all different from starting-week-hash - starting vs curr/n1/n2 hashes are:" (mapv week->short [starting-week-hash curr next1 next2]))
       (assoc state :different-week-hash curr))
 
     ;; No change found, return state as is
@@ -933,8 +934,8 @@
     m))
 
 (defn trafficless-differences->no-traffic-changes [detected-changes-by-route]
-  ;; (println "tdnc called")
-  ;; (def *tddc detected-changes)
+  (println "tdnc called")
+  ;; (def *tddc detected-changes-by-route)
   ;; We get a vec of maps describing route changes with keys like :route-key, :different-week etc.
   ;; We want to detect pair of changes to the same route that are adjacent in calendar
   ;; and are traffic changes for non-nil traffic to nil-traffic and back, and replace
@@ -951,8 +952,8 @@
   (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)
         _ (println "got weeks")
         weeks (mapv (fn [[this-change next-change]]
-                      ;; (println "this/next week map a: " this-change)
-                      ;; (println "this/next week map b: " next-change)
+                      (println "this/next week map a: " this-change)
+                      (println "this/next week map b: " next-change)
                       (if (or
                            (trafficless-route-change-before-route-end? this-change next-change)
                            (changes-straddle-trafficless-period? this-change next-change))
@@ -1017,6 +1018,7 @@
         {...}]
   "
   [date all-routes all-changes]
+  ;; xxx document & rename "date" parameter - is it 
   (let [route-max-date (fn [route-hash-id all-routes]
                          (:max-date (some
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))

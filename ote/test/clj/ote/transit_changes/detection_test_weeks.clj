@@ -960,15 +960,15 @@
                      {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 13
                      {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 20
                      {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 03
-                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 05 27
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
-                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06  3
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 06 10
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 06 17
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 06 24
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 07 1
+                     {tu/route-name ["B" "B" "B" "B" "B" nil nil]} ;; 2019 07 8
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 07 15
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;;
                      {tu/route-name [nil nil nil nil nil nil nil]}])))
 
 
@@ -976,8 +976,12 @@
   (let [result (->> data-one-week-pause-with-change            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2040 5 13) data-all-routes)
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 30) data-all-routes)
                     (detection/trafficless-differences->no-traffic-changes))]
-
-    (testing "Ensure that both of the changes are detected"
-      (is (= 2 result)))))
+    (def *re result)
+    (testing "Ensure that change is detected on the correct date"
+      (is (= (tu/to-local-date  2019 5 20) (-> result first :different-week :beginning-of-week))))
+    (testing "Ensure that traffic end is detected"
+      (is (= (tu/to-local-date  2019 7 13) (-> result second :route-end-date))))
+    (testing "Ensure that both of the changes are detected"      
+      (is (= 2 (count result))))))

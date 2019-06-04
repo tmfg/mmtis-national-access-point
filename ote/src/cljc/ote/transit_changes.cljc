@@ -193,7 +193,7 @@
               combined-trips)))))
 
 
-(defn week=
+(defn erno-week=
   "Compare week hashes. Returns true if they represent the same traffic
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
@@ -216,7 +216,7 @@
                          (= h1 h2)))
                    w1 w2)))))
 
-#_(defn week=
+(defn joni-week=
   "Compare week hashes. Returns true if they represent the same traffic
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
@@ -229,6 +229,8 @@
                        (keyword? h2)                        ;; h2 is static-holiday due to value is keyword
                        (= h1 h2)))
                  w1 w2))))
+
+(def week= erno-week=)
 
 (s/fdef week=
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)
