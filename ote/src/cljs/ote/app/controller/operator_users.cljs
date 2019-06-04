@@ -45,10 +45,10 @@
         (assoc-in [:manage-access :new-member-email] "")
         (assoc-in [:manage-access :new-member-loading?] false))))
 
-(define-event NewUserFailure [result]
+(define-event NewUserFailure [response]
   {}
   (-> app
-      (assoc :flash-message-error (tr [:common-texts :server-error]))
+      (assoc :flash-message-error (tr [:transport-users-page (get-in response [:response :error])]))
       (assoc-in [:manage-access :new-member-email] "")
       (assoc-in [:manage-access :new-member-loading?] false)))
 
@@ -61,20 +61,19 @@
      :on-failure (tuck/send-async! ->NewUserFailure)})
   (assoc-in app [:manage-access :new-member-loading?] true))
 
-;; TODO: remove deleted user from app-state
-(define-event DeleteMemberSuccess [result]
+;; TODO: remove removed user from app-state
+(define-event RemoveMemberSuccess [result]
   {}
-  (.log js/console "member deleted " (pr-str result))
   app)
 
-(define-event DeleteMember [member operator-id]
+(define-event RemoveMember [member operator-id]
   {}
   (comm/delete!
     (str "transport-operator/" (url-util/encode-url-component operator-id) "/users/" (:email member))
     {}
-    {:on-success (tuck/send-async! ->DeleteMemberSuccess)
+    {:on-success (tuck/send-async! ->RemoveMemberSuccess)
      :on-failure (tuck/send-async! ->ServerError)})
-  app)                                                      ;;TODO: Remove deleted user from app-state
+  app)                                                      ;;TODO: Remove removed user from app-state
 
 (define-event InitTransportUserView []
   {}

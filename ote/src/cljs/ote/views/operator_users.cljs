@@ -26,7 +26,7 @@
       :read identity
       :format (fn [member]
                 [:div
-                 [:button (merge {:on-click #(e! (ou/->DeleteMember member operator-id))}
+                 [:button.remove-member (merge {:on-click #(e! (ou/->RemoveMember member operator-id))}
                                  (stylefy/use-style
                                    (merge buttons/svg-button
                                           {:display "flex"
