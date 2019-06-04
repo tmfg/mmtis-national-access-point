@@ -39,21 +39,6 @@
           :hide-error-until-modified? true}
          [(form/group
            {:expandable? false :columns 3 :card? false :layout :raw}
-           {:name :username :type :string :required? true :full-width? true
-            :placeholder (tr [:register :placeholder :username])
-            :validate [(fn [data _]
-                         (if (< (count data) 3)
-                           (tr [:common-texts :required-field])
-                           (when (not (user/username-valid? data))
-                             (tr [:register :errors :username-invalid]))))
-                       (fn [data _]
-                         (when (and username-taken (username-taken data))
-                           (tr [:register :errors :username-taken])))]
-            :on-blur #(edit! :username)
-            :show-errors? (or (and username-taken
-                                   (username-taken (:username form-data)))
-                              (@edited :username))
-            :should-update-check form/always-update}
            {:type :component
             :name :spacer
             :component (fn [_]
