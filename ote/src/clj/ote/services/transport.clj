@@ -6,6 +6,7 @@
             [specql.op :as op]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.auditlog :as auditlog]
             [ote.util.db :as util]
             [ote.util.email-template :as email-template]
             [ote.db.user :as user]
@@ -540,25 +541,35 @@
   (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
 
 (defn add-user-to-operator [email db new-member requester operator]
-  (println " add-user-to-operator email " (pr-str email))
   (let [group (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
         ;; Ensure that we do not send email to test user
-        new-member (if (= "user.userson@example.com" (:user_email new-member))
+        updated-member (if (= "user.userson@example.com" (:user_email new-member))
                (assoc new-member :user_email "success@simulator.amazonses.com")
                new-member)
-        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")]
+        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")
+        auditlog {::auditlog/event-type :add-member-to-operator
+                  ::auditlog/event-attributes
+                  [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
+                   {::auditlog/name "transport-operator-name", ::auditlog/value (str (::t-operator/name operator))}
+                   {::auditlog/name "new-member-id", ::auditlog/value (str (:user_id updated-member))}
+                   {::auditlog/name "new-member-email", ::auditlog/value (str (:user_email updated-member))}]
+                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                  ::auditlog/created-by (get-in requester [:user :id])}]
 
     (do
       ;; Send email to user to inform about the new membership.
       (try
         (email/send!
           email
-          {:to (:user_email new-member)
+          {:to (:user_email updated-member)
            :subject title
            :body [{:type "text/html;charset=utf-8"
-                   :content (html (email-template/notify-user-new-member new-member requester operator title))}]})
+                   :content (html (email-template/notify-user-new-member updated-member requester operator title))}]})
         (catch Exception e
           (log/warn "Error while sending a email to new member" e)))
+
+      ;; Create auditlog
+      (specql/insert! db ::auditlog/auditlog auditlog)
 
       ;; Return added new-member data
       {:id (:user_id new-member)
@@ -570,7 +581,7 @@
   nil)
 
 (defn manage-adding-users-to-operator [email db requester operator-id form-data]
-  (println "form-data" (pr-str form-data))
+
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
@@ -589,18 +600,17 @@
 
                         ;; new-member is already a member
                         (and (not (empty? new-member)) new-member-is-operator-member)
-                        false
+                        {:error :already-member}
 
                         ;; Something wrong is happening
                         :else
-                        false)]
-    (if response
+                        {:error :something-went-wrong})]
+    (if (and response (not (:error response)))
       (http/transit-response response 200)
-      (http/transit-response "Cannot add member" 400))))
+      (http/transit-response response 400))))
 
 (defn remove-member-from-operator [email db user operator-id member-email]
-  (let [_ (println "member-email " member-email)
-        member (first (fetch-user-by-email db {:email member-email}))
+  (let [member (first (fetch-user-by-email db {:email member-email}))
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
                                       {::t-operator/id operator-id}))]
