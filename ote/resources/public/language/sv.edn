@@ -602,10 +602,12 @@
                      :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"}
 
  :transport-users-page {:username "Namn"
-                        :add-member "Lisää jäsen"
+                        :add-member "Lägg till medlem"
                         :members "Medlemmar"
-                        :email-placeholder "E-postaddress"
-                        :manage-users "Hanterar användarrättigheter"}
+                        :email-placeholder "Mata in e-postadress"
+                        :manage-users "Hantera användarrättigheter"
+                        :something-went-wrong "Jotain meni pieleen. Koita hetken päästä uudestaan."
+                        :already-member "Käyttäjä on jo lisätty."}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
