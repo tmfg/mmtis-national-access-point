@@ -829,7 +829,7 @@
 
   (let [[diff-a diff-b] change->no-traffic-data]
     (is (= true (detection/changes-straddle-trafficless-period? diff-a diff-b)))
-    (is (= {:route-key tu/route-name,
+    (is (= {:route-key "Raimola",
             :combined true,
             :no-traffic-start-date
             (java.time.LocalDate/parse "2018-11-13"),
@@ -979,9 +979,11 @@
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 30) data-all-routes)
                     (detection/trafficless-differences->no-traffic-changes))]
     (def *re result)
+    ;; gets 3 changes:
+    ;; 1. 
     (testing "Ensure that change is detected on the correct date"
       (is (= (tu/to-local-date  2019 5 20) (-> result first :different-week :beginning-of-week))))
     (testing "Ensure that traffic end is detected"
-      (is (= (tu/to-local-date  2019 7 13) (-> result second :route-end-date))))
+      (is (= (tu/to-local-date  2019 7 15) (-> result last :route-end-date))))
     (testing "Ensure that both of the changes are detected"      
-      (is (= 2 (count result))))))
+      (is (= 3 (count result))))))
