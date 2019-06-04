@@ -51,7 +51,7 @@
       [icon-l/icon-labeled
        [ic/content-add-circle-outline {:color colors/icon-disabled}] nil]])
 
-   (if added-trips
+   (if (and added-trips (pos? added-trips))
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
        [ote-icons/outline-add-box]
@@ -61,7 +61,7 @@
        [ote-icons/outline-add-box-gray]
        [:span added-trips]]])
 
-   (if removed-trips
+   (if (and removed-trips (pos? removed-trips))
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
        [ote-icons/outline-indeterminate-checkbox]
@@ -71,7 +71,8 @@
        [ote-icons/outline-indeterminate-checkbox-gray]
        [:span removed-trips]]])
 
-   (if (or trip-stop-sequence-changes-upper trip-stop-sequence-changes-lower)
+   (if (or (and trip-stop-sequence-changes-upper (pos? trip-stop-sequence-changes-upper))
+           (and trip-stop-sequence-changes-lower (pos? trip-stop-sequence-changes-lower)))
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
        [ic/action-timeline {:style {:color colors/icon-gray}}]
@@ -81,7 +82,8 @@
        [ic/action-timeline {:style {:color colors/icon-disabled}}]
        [:span (or trip-stop-sequence-changes-upper trip-stop-sequence-changes-lower)]]])
 
-   (if (or trip-stop-time-changes-lower trip-stop-time-changes-upper)
+   (if (or (and trip-stop-time-changes-lower (pos? trip-stop-time-changes-lower))
+           (and trip-stop-time-changes-upper (pos? trip-stop-time-changes-upper)))
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
        [ic/action-query-builder {:style {:color colors/icon-gray}}]
@@ -118,8 +120,8 @@
     [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-add-box {:color (if (= 0 added-trips)
-                                           style/icon-disabled
-                                           style/add-color)}]
+                                           colors/icon-disabled
+                                           colors/add-color)}]
       [:span (or added-trips
                  (:gtfs/added-trips diff)  ;; :changes and :changes-route* have different namespace
                  0)
@@ -128,8 +130,8 @@
     [:div {:style {:flex "1"}}
      [icon-l/icon-labeled
       [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 removed-trips)
-                                                          style/icon-disabled
-                                                          style/remove-color)}]
+                                                          colors/icon-disabled
+                                                          colors/remove-color)}]
       [:span (or removed-trips
                  (:gtfs/removed-trips diff)
                  0)
