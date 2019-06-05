@@ -930,7 +930,8 @@
        (= [nil nil nil nil nil nil nil] (:starting-week-hash b))
        (= (:different-week a) (:starting-week b))
        (= (:route-key a) (:route-key b))
-       (some? (:no-traffic-change b))))
+       (or (some? (:no-traffic-change b))
+           (some? (:route-end-date b)))))
 
 (defn change-pair->no-traffic [a b]
   (let [;; use the latter record as starting point
