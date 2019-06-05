@@ -117,15 +117,15 @@
         (http/transit-response {:error :login-error}))
       (http/transit-response {:error :login-error}))))
 
-(defn logout [auth-tkt-config]
-  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
+(defn- logout [auth-tkt-config]
+  (with-auth-tkt (http/transit-response :ok 200) "" (:domain auth-tkt-config)))
 
-(defn valid-registration? [{:keys [username name email password]}]
+(defn- valid-registration? [{:keys [name email password]}]
   (and (user/password-valid? password)
        (user/email-valid? email)
        (string? name) (not (str/blank? name))))
 
-(defn valid-user-save? [{:keys [username name email]}]
+(defn- valid-user-save? [{:keys [username name email]}]
   (and (user/email-valid? email)
        (user/username-valid? username)
        (string? name) (not (str/blank? name))))
@@ -163,10 +163,7 @@
         ;; User created, log in immediately with the user info
         (login db auth-tkt-config form-data)
 
-        ;; Registration failed, return errors
-        (http/transit-response result)))))
-
-(defn save-user! [db auth-tkt-config user form-data]
+(defn- save-user! [db auth-tkt-config user form-data]
   (if-not (valid-user-save? form-data)
     {:success? false}
     (with-transaction db
@@ -199,7 +196,7 @@
                                      {::user/id (:id user)})]
             {:success? true}))))))
 
-(defn save-user [db auth-tkt-config user form-data]
+(defn- save-user [db auth-tkt-config user form-data]
 
   (let [result (save-user! db auth-tkt-config user form-data)]
     (if (:success? result)
@@ -213,7 +210,7 @@
       ;; Failed, return errors to form
       (http/transit-response result))))
 
-(defn request-password-reset! [db {:keys [email]}]
+(defn- request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
     (when-let [user (first (fetch-login-info db {:email email}))]
       (log/info "User " (:id user) " requested password reset.")
@@ -222,7 +219,7 @@
                                                {::user/reset-key (java.util.UUID/randomUUID)
                                                 ::modification/created-by (:id user)})})))
 
-(defn send-password-reset-email [email {:keys [user password-reset-request]} language]
+(defn- send-password-reset-email [email {:keys [user password-reset-request]} language]
   (log/debug "Sending password reset email to " user)
   (localization/with-language language
     (email/send! email
@@ -235,7 +232,7 @@
                                               "&id="
                                               (:id user) " ")})})))
 
-(defn request-password-reset [db email form-data]
+(defn- request-password-reset [db email form-data]
   (with-throttle-ms 1000 ; always take 1sec to prevent spamming requests
     (try
       (when-let [reset-request (request-password-reset! db form-data)]
@@ -245,7 +242,7 @@
     ;; Always send :ok back, no matter what
     :ok))
 
-(defn reset-password! [db reset-request new-password]
+(defn- reset-password! [db reset-request new-password]
   (log/info "Reset password:" reset-request)
   (specql/update! db ::user/user
                   {::user/password (buddy->passlib (encrypt new-password))}
@@ -254,7 +251,7 @@
                   {::user/used (java.util.Date.)}
                   {::user/request-id (::user/request-id reset-request)}))
 
-(defn reset-password [db {:keys [id key new-password] :as form-data}]
+(defn- reset-password [db {:keys [id key new-password] :as form-data}]
   (with-throttle-ms 1000
     (if-not (user/password-valid? new-password)
       {:success? false :error :invalid-new-password}
