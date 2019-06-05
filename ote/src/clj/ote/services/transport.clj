@@ -541,7 +541,7 @@
   (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
 
 (defn add-user-to-operator [email db new-member requester operator]
-  (let [group (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
+  (let [member (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
         ;; Ensure that we do not send email to test user
         updated-member (if (= "user.userson@example.com" (:user_email new-member))
                (assoc new-member :user_email "success@simulator.amazonses.com")
@@ -582,31 +582,30 @@
   nil)
 
 (defn manage-adding-users-to-operator [email db requester operator-id form-data]
-
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
                                       {::t-operator/id operator-id}))
         operator-users (fetch-operator-users db {:operator-id operator-id})
-        new-member-is-operator-member  (some #(= (:user_id new-member) (:id %)) operator-users)
+        new-member-is-operator-member (some #(= (:user_id new-member) (:id %)) operator-users)
         ;; If member exists, add it to the organization if not, invite
         response (cond
-                        ;; Existing new-member, existing operator
-                        (and (not new-member-is-operator-member) (not (empty? new-member)) (not (empty? operator)))
-                        (add-user-to-operator email db new-member requester operator)
+                   ;; Existing new-member, existing operator
+                   (and (not new-member-is-operator-member) (not (empty? new-member)) (not (empty? operator)))
+                   (add-user-to-operator email db new-member requester operator)
 
-                        ;; new new-member, existing operator -> invite new-member
-                        (and (empty? new-member) (not (empty? operator)))
-                        (invite-new-user email db requester operator (:email form-data))
+                   ;; new new-member, existing operator -> invite new-member
+                   (and (empty? new-member) (not (empty? operator)))
+                   (invite-new-user email db requester operator (:email form-data))
 
-                        ;; new-member is already a member
-                        (and (not (empty? new-member)) new-member-is-operator-member)
-                        {:error :already-member}
+                   ;; new-member is already a member
+                   (and (not (empty? new-member)) new-member-is-operator-member)
+                   {:error :already-member}
 
-                        ;; Something wrong is happening
-                        :else
-                        {:error :something-went-wrong})]
-    (if (and response (not (:error response)))
+                   ;; Something wrong is happening
+                   :else
+                   {:error :something-went-wrong})]
+    (if (not (:error response))
       (http/transit-response response 200)
       (http/transit-response response 400))))
 
