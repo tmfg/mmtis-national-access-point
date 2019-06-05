@@ -952,18 +952,27 @@
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2040 5 13) data-all-routes)
                     (detection/trafficless-differences->no-traffic-changes))]
-    (clojure.pprint/pprint result)
+    (def *kr result)
     (testing "Ensure a traffic change and route end within detection window are reported."
+      (is (= {:route-key tu/route-name
+              :no-traffic-start-date (tu/to-local-date 2019 6 1)
+              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13) :end-of-week (tu/to-local-date 2019 5 19)}
+              :no-traffic-run 2
+              :different-week {:beginning-of-week (tu/to-local-date 2019 5 27) :end-of-week (tu/to-local-date 2019 6 2)}}
+             (-> result
+                 (first)
+                 (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= {:no-traffic-change 33
               :route-key tu/route-name
               :no-traffic-start-date (tu/to-local-date 2019 6 1)
               :no-traffic-end-date (tu/to-local-date 2019 7 4)
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13) :end-of-week (tu/to-local-date 2019 5 19)}}
+              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 27) :end-of-week (tu/to-local-date 2019 6 2)}
+              :different-week {:beginning-of-week (tu/to-local-date 2019 7 1) :end-of-week (tu/to-local-date 2019 7 7)}}
              (-> result
-                 (first)
+                 (second)
                  (select-keys tu/select-keys-detect-changes-for-all-routes)))))
-    (testing "Ensure that only 1 change is detected"
-      (is (= 1 (count result))))))
+    (testing "Expected amount of changes" ;; used to be 1, when nils were ignored in week=
+      (is (= 3 (count result))))))
 
 
 (def data-2-changes-with-nil-days
