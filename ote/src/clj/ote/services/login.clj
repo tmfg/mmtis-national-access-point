@@ -101,7 +101,8 @@
            {:success? true
             :session-data
             (let [user (users/find-user db (:name login-info))]
-              (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))})
+              (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+           200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
                           {:digest-algorithm (:digest-algorithm auth-tkt-config)
                            :timestamp (java.util.Date.)
@@ -109,11 +110,9 @@
                            :user-data ""})
           (:domain auth-tkt-config))
 
-        ;; No need to hide if the error was in the email or the password
-        ;; the registration page can be used to check if an email has an account
-        ;; Update 8.4.2019: We decided that in login form we will only indicate error in more general way.
-        (http/transit-response {:error :login-error}))
-      (http/transit-response {:error :login-error}))))
+        ;; Login will only indicate error in a general way and not reveal which credential was invalid
+        (http/transit-response {:error :login-error} 200))
+      (http/transit-response {:error :login-error} 200))))
 
 (defn- logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok 200) "" (:domain auth-tkt-config)))
@@ -156,10 +155,12 @@
 
 (defn- register-response [db auth-tkt-config form-data]
   (feature/when-enabled :ote-register
-    (let [result (register-user! db auth-tkt-config form-data )]
-      (if (:success? result)
-        ;; User created, log in immediately with the user info
-        (login db auth-tkt-config form-data)
+                        (let [result (register-user! db auth-tkt-config form-data )]
+                          (if-not (:success? result)
+                            (http/transit-response result)
+
+                            ;; User created, log in immediately with the user info
+                            (login-response db auth-tkt-config form-data)))))
 
 (defn- save-user! [db auth-tkt-config user form-data]
   (if-not (valid-user-save? form-data)
