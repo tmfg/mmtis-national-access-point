@@ -867,7 +867,7 @@
             :combined true,
             :no-traffic-start-date
             (java.time.LocalDate/parse "2018-11-13"),
-            :starting-week-hash [nil nil nil nil nil nil nil],
+            :starting-week-hash ["h1" "h2" "h3" "h4" "h5" nil nil],
             :starting-week
             {:beginning-of-week (java.time.LocalDate/parse "2018-10-15"),
              :end-of-week       (java.time.LocalDate/parse "2018-10-21")},
@@ -880,6 +880,7 @@
                                                                                (assoc diff-b :n 3)])]
       (is (= 2 (count merge-result)))
       (is (:combined (second merge-result))))))
+
 (def data-paused-traffic-with-end
   (tu/weeks (tu/to-local-date 2019 5 13)
             (concat [{tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 05 13
