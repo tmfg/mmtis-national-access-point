@@ -26,7 +26,9 @@ SELECT u.id as user_id,
 FROM "user" u
        LEFT JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
        LEFT JOIN "group" g ON g.id = m.group_id
-WHERE u.email = :email;
+WHERE u.state = 'active'
+  AND u.email IS NOT NULL
+  AND u.email = :email;
 
 -- name: list-users
 SELECT u.id as id,
