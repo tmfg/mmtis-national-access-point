@@ -91,7 +91,7 @@
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
                                      "; Domain=." domain "; Secure")])))
 
-(defn login [db auth-tkt-config
+(defn- login-response [db auth-tkt-config
              {:keys [email password] :as credentials}]
   (let [login-info (first (fetch-login-info db {:email email}))]
     (if login-info
@@ -123,7 +123,6 @@
 (defn valid-registration? [{:keys [username name email password]}]
   (and (user/password-valid? password)
        (user/email-valid? email)
-       (user/username-valid? username)
        (string? name) (not (str/blank? name))))
 
 (defn valid-user-save? [{:keys [username name email]}]
@@ -131,23 +130,22 @@
        (user/username-valid? username)
        (string? name) (not (str/blank? name))))
 
-(defn- register-user! [db auth-tkt-config {:keys [username name email password] :as form-data}]
+(defn- register-user! [db auth-tkt-config {:keys [name email password] :as form-data}]
   (if-not (valid-registration? form-data)
     ;; Check errors that should have been checked on the form
     {:success? false}
     (with-transaction db
-      (let [username-taken? (username-exists? db {:username username})
-            email-taken? (email-exists? db {:email email})]
-        (if (or username-taken? email-taken?)
+      (let [email-taken? (email-exists? db {:email email})
+            user-id (str (UUID/randomUUID))]
+        (if email-taken?
           ;; Username or email taken, return errors to form
           {:success? false
-           :username-taken (when username-taken? username)
            :email-taken (when email-taken? email)}
 
-          ;; Registration data is valid and username/email is not taken
+          ;; Registration data is valid
           (do (specql/insert! db ::user/user
-                              {::user/id (str (UUID/randomUUID))
-                               ::user/name username
+                              {::user/id user-id
+                               ::user/name user-id
                                ::user/fullname name
                                ::user/email email
                                ::user/password (buddy->passlib (encrypt password))
@@ -158,7 +156,7 @@
                                ::user/activity_streams_email_notifications false})
               {:success? true}))))))
 
-(defn register [db auth-tkt-config form-data]
+(defn- register-response [db auth-tkt-config form-data]
   (feature/when-enabled :ote-register
     (let [result (register-user! db auth-tkt-config form-data )]
       (if (:success? result)
@@ -206,8 +204,8 @@
   (let [result (save-user! db auth-tkt-config user form-data)]
     (if (:success? result)
       ;; User updated, re-login immediately with updated info
-      (login db auth-tkt-config
-             {:email (:email form-data)
+      (login-response db auth-tkt-config
+                      {:email (:email form-data)
               :password (if (str/blank? (:password form-data))
                           (:current-password form-data)
                           (:password form-data))})
@@ -286,8 +284,8 @@
 
   ^:unauthenticated
   (POST "/login" {form-data :body}
-        (#'login db auth-tkt-config
-                 (http/transit-request form-data)))
+    (#'login-response db auth-tkt-config
+      (http/transit-request form-data)))
 
   ^:unauthenticated
   (POST "/logout" []
@@ -296,11 +294,10 @@
   ^:unauthenticated
   (POST "/register" {form-data :body
                      user :user}
-        (if user
-          ;; Trying to register while logged in
-          (http/transit-response {:success? false})
-          (#'register db auth-tkt-config
-                      (http/transit-request form-data))))
+    (if user
+      ;; Trying to register while logged in
+      (http/transit-response {:success? false} 400)
+      (#'register-response db auth-tkt-config (http/transit-request form-data))))
 
   (POST "/save-user" {form-data :body
                       user :user}
