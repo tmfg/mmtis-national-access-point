@@ -3,7 +3,6 @@
   (:require [buddy.hashers :as hashers]
             [clojure.string :as str]
             [jeesql.core :refer [defqueries]]
-            [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [compojure.core :refer [routes POST]]
             [ote.nap.cookie :as cookie]
@@ -13,7 +12,6 @@
             [ote.db.tx :as tx :refer [with-transaction]]
             [specql.core :as specql]
             [ote.db.user :as user]
-            [ote.time :as time]
             [ote.util.feature :as feature]
             [taoensso.timbre :as log]
             [ote.db.modification :as modification]
@@ -24,7 +22,7 @@
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [ote.util.throttle :refer [with-throttle-ms]])
-  (:import (java.util UUID Base64 Base64$Decoder)))
+  (:import (java.util UUID Base64)))
 
 (defqueries "ote/services/login.sql")
 
