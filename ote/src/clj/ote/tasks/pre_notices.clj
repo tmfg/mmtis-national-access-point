@@ -54,7 +54,7 @@
                     " from 24 hours for regions " (:finnish-regions user))
 
           ;; Add doctype which can't be addid using hiccup template
-          (str (email-template/html-header)
+          (str email-template/html-header
                (html (email-template/notification-html notices detected-changes notification-html-subject))))
         (log/info "No new pre-notices or detected changes found.")))
 

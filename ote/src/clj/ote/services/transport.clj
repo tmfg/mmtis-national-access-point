@@ -564,7 +564,8 @@
           {:to (:user_email updated-member)
            :subject title
            :body [{:type "text/html;charset=utf-8"
-                   :content (html (email-template/notify-user-new-member updated-member requester operator title))}]})
+                   :content (str email-template/html-header
+                                 (html (email-template/notify-user-new-member updated-member requester operator title)))}]})
         (catch Exception e
           (log/warn "Error while sending a email to new member" e)))
 
@@ -720,8 +721,8 @@
        user :user}
       (let [id (Long/parseLong id)
             operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
-                                              #{::t-service/transport-operator-id}
-                                              {::t-service/id id})))]
+                                                                                #{::t-service/transport-operator-id}
+                                                                                {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
           (all-data-transport-service db id)
           (public-data-transport-service db id))))
