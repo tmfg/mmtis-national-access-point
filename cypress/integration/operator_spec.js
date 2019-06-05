@@ -116,7 +116,7 @@ describe('Operator creation basic tests', function () {
 
         // Add user to operator
         cy.visit('/#/transport-operator/1/users');
-        cy.contains('Hallinnoi jäseniä');
+        cy.contains('Hallinnoi käyttöoikeuksia');
 
         // HOX!!!! We need to use Amazon SES email simulator.
         // So the email address that is used here is converted to success@simulator.amazonses.com in backend
