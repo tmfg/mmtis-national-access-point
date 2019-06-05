@@ -137,7 +137,7 @@
         (if email-taken?
           ;; Username or email taken, return errors to form
           {:success? false
-           :email-taken (when email-taken? email)}
+           :email-taken email}
 
           ;; Registration data is valid
           (do (specql/insert! db ::user/user
