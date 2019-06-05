@@ -35,6 +35,7 @@
         id-vector (vec (sort < id-map))]
     id-vector))
 
+
 (defn hash-recalculations
   "List currently running hash-recalculations"
   [db]
@@ -163,9 +164,40 @@
 
 (defn week->short [w]
   (mapv #(if (string? %)
-          (apply str (take-last 4 %))
-          %)
+           (apply str (take-last 4 %))
+          (or % "()"))
        w))
+
+(spec/def ::route-change-map
+  (spec/keys
+    :req-un
+    [::different-week
+     ::different-week-hash
+     ::starting-week
+     ::starting-week-hash]
+    :opt-un
+    [::no-traffic-start-date
+     ::no-traffic-end-date
+     ::no-traffic-run
+     ::combined
+     ::different-week
+     ::different-week-hash]))
+
+(defn print-change-maps [change-map-seq]
+    
+  (println (format "%13s |%13s |%13s |%13s |%13s |%13s |%s" "starting-date" "starting-hash" "different-date" "different-hash" "no-traf-start" "no-traf-end" "combined"))
+  (doseq [m (filter some? change-map-seq)]
+    (when-not (spec/valid? ::route-change-map m)
+      (println "change-map-seq fails spec. printing anyway but spec failures are:")
+      (spec/explain ::route-change-map m))
+    (println (format "%13s |%13s |%13s |%13s |%13s |%13s |%s"
+                     (-> m :starting-week :beginning-of-week)
+                     (-> m :starting-week-hash week->short clojure.string/join)
+                     (-> m :different-week :beginning-of-week)
+                     (-> m :different-week-hash week->short clojure.string/join)
+                     (-> m :no-traffic-start-date)
+                     (-> m :no-traffic-end-date)
+                     (-> m :combined some?)))))
 
 (defn dcfr-enter-debug
   [route-key starting-week-hash curr next1 next2]
@@ -343,6 +375,7 @@
 (spec/def
   ::route-week
   (spec/keys :req-un [::beginning-of-week ::end-of-week ::routes]))
+
 (spec/def
   ::route-weeks-vec
   (spec/coll-of ::route-week))
@@ -362,14 +395,6 @@
   ::bow-eow-map)
 
 (spec/def ::starting-week-hash ::week-hash-vec)
-
-(spec/def ::route-change-map
-  (spec/keys
-    :req-un
-    [::different-week
-     ::different-week-hash
-     ::starting-week
-     ::starting-week-hash]))
 
 (spec/def ::route-key (spec/every string? :count 3))
 
@@ -913,11 +938,11 @@
                    :starting-week (:starting-week a))
 
         ;; use any existing no-traffic-start-date value  (prefer a becaue it's earlier)
-        m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))
+        m (assoc m :no-traffic-start-date (or (:no-traffic-start-date a) (:no-traffic-start-date b)))        
         m (if (= (:no-traffic-start-date m) (:route-end-date m))
             (dissoc m :no-traffic-start-date)
             m)
-
+        
         ntc (when (and (:no-traffic-start-date m) (:no-traffic-end-date m))
               (.between java.time.temporal.ChronoUnit/DAYS (:no-traffic-start-date m) (:no-traffic-end-date m)))
         m (if ntc
@@ -933,32 +958,37 @@
             m)]
     m))
 
+
+
+(def ndc-dprint println)
+; (defn ndc-dprint [& rest])
+
 (defn trafficless-differences->no-traffic-changes [detected-changes-by-route]
-  (println "tdnc called")
+  (ndc-dprint "tdnc called")
   ;; (def *tddc detected-changes-by-route)
   ;; We get a vec of maps describing route changes with keys like :route-key, :different-week etc.
   ;; We want to detect pair of changes to the same route that are adjacent in calendar
   ;; and are traffic changes for non-nil traffic to nil-traffic and back, and replace
   ;; the pair with one no-traffic map.
 
-  ;; Should we rely on the route maps being sorted by route and date in the input?
-  ;; the previous phase is detet-changesfor-all-routes which gets input by-route and by-week,
-  ;; so it should be safe. we can add an assert to verify the assumption.
-
-  ;; one way to do this would be to iterate (or map) with a window (curr/next)
-  ;; and mark a deleted map with nil. we only return one map per call so how to change data and delete other map at same time?
-  ;; one way would be to make another pass over the data...
-  (println "dcbr end-dates: " (mapv :route-end-date detected-changes-by-route))
+  ;; We rely on the route maps being sorted by route and date in the input, as they are data about sequential weeks by convention.
+  ;; We iterate over the change maps with a window (curr/next) and mark a combined map with a :combined key,
+  ;; and remove the next maps that come after :changed ones in a second pass loop.
+  (ndc-dprint "dcbr end-dates: " (mapv :route-end-date detected-changes-by-route))
   (let [curr-next-pairs (partition 2 1 nil detected-changes-by-route)
-        _ (println "got weeks")
+        _ (ndc-dprint "got weeks")
         weeks (mapv (fn [[this-change next-change]]
-                      (println "this/next week map a: " this-change)
-                      (println "this/next week map b: " next-change)
+                      (ndc-dprint "this/next change maps:")
+                      (print-change-maps [this-change next-change])
                       (if (or
                            (trafficless-route-change-before-route-end? this-change next-change)
                            (changes-straddle-trafficless-period? this-change next-change))
                         (do
-                          ;; (println "->calling change-pair->no-traffic")
+                          (ndc-dprint "will combine, reasons: "
+                                   (trafficless-route-change-before-route-end? this-change next-change)
+                                   (changes-straddle-trafficless-period? this-change next-change))
+                          (ndc-dprint "->calling change-pair->no-traffic producing:")
+                          (print-change-maps [(change-pair->no-traffic this-change next-change)])
                           (change-pair->no-traffic this-change next-change))
                         ;; else
                         this-change))
