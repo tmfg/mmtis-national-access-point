@@ -29,5 +29,6 @@
     [linkify "/admin/reports/transport-operator/taxi-operators" "Taksipalveluita tuottavat yritykset ja aliyritykset"]
     [linkify "/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
     [linkify "/admin/reports/transport-operator/schedule-operators" "Säännöllistä aikataulun mukaista liikennettä tuottavat yritykset ja aliyritykset"]
-    [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]]])
+    [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
+    [linkify "/admin/reports/all-ports" "Satama-aineisto csv"]]])
 
