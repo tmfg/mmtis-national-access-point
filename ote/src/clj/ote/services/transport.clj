@@ -9,6 +9,7 @@
             [ote.db.auditlog :as auditlog]
             [ote.util.db :as util]
             [ote.util.email-template :as email-template]
+            [ote.config.email-config :as email-config]
             [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
@@ -543,8 +544,8 @@
 (defn add-user-to-operator [email db new-member requester operator]
   (let [member (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
         ;; Ensure that we do not send email to test user
-        updated-member (if (= "user.userson@example.com" (:user_email new-member))
-               (assoc new-member :user_email "success@simulator.amazonses.com")
+        updated-member (if (= (:e2e-test-email (email-config/config)) (:user_email new-member))
+               (assoc new-member :user_email (:e2e-test-amazon-simulator-email (email-config/config)))
                new-member)
         title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")
         auditlog {::auditlog/event-type :add-member-to-operator
