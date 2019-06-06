@@ -71,8 +71,8 @@
   [options]
   [:div (stylefy/use-style
           (merge
-            (when-let [style (:style options)]
-              style)
+            (when (:style options) (:style options))
+            (when (:id options) {:id (:id options)})
             fading-circle))
    (for [x (map #(+ 1 %) (range 12))
          :let [rotation (* x 30)

@@ -1,6 +1,7 @@
 (ns ote.app.controller.operator-users
   "Organization access management controller"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
+            [ote.localization :refer [tr]]
             [ote.communication :as comm]
             [ote.util.url :as url-util]
             [ote.app.routes :as routes]
@@ -38,11 +39,18 @@
 (define-event NewUserSuccess [result]
   {}
   (let [users (vec (get-in app [:manage-access :users]))
-        users-long (conj users {:fullname "Pending" :email (:email result) :id (rand-int 9999) :name "pending"})]
+        users-long (conj users {:fullname (:name result) :email (:email result) :id (:id result)})]
     (-> app
         (assoc-in [:manage-access :users] users-long)
         (assoc-in [:manage-access :new-member-email] "")
         (assoc-in [:manage-access :new-member-loading?] false))))
+
+(define-event NewUserFailure [response]
+  {}
+  (-> app
+      (assoc :flash-message-error (tr [:transport-users-page (get-in response [:response :error])]))
+      (assoc-in [:manage-access :new-member-email] "")
+      (assoc-in [:manage-access :new-member-loading?] false)))
 
 (define-event PostNewUser [email operator-id]
   {}
@@ -50,8 +58,22 @@
     (str "transport-operator/" (url-util/encode-url-component operator-id) "/users")
     {:email email}
     {:on-success (tuck/send-async! ->NewUserSuccess)
-     :on-failure (tuck/send-async! ->ServerError)})
+     :on-failure (tuck/send-async! ->NewUserFailure)})
   (assoc-in app [:manage-access :new-member-loading?] true))
+
+;; TODO: remove removed user from app-state
+(define-event RemoveMemberSuccess [result]
+  {}
+  app)
+
+(define-event RemoveMember [member operator-id]
+  {}
+  (comm/delete!
+    (str "transport-operator/" (url-util/encode-url-component operator-id) "/users/" (:email member))
+    {}
+    {:on-success (tuck/send-async! ->RemoveMemberSuccess)
+     :on-failure (tuck/send-async! ->ServerError)})
+  app)                                                      ;;TODO: Remove removed user from app-state
 
 (define-event InitTransportUserView []
   {}

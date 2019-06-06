@@ -163,19 +163,19 @@
           (compare-key fetched)))))
 
 (defspec save-and-fetch-generated-passenger-transport-service
-  50
+  25
   (prop/for-all
    [transport-service (s-generators/service-type-generator :passenger-transportation)]
    (save-and-fetch-compare transport-service ::t-service/passenger-transportation)))
 
 (defspec save-and-fetch-generated-parking-service
-  50
+  25
   (prop/for-all
    [transport-service (s-generators/service-type-generator :parking)]
    (save-and-fetch-compare transport-service ::t-service/parking)))
 
 (defspec save-and-fetch-generated-rental-service
-  50
+  25
   (prop/for-all
    [transport-service (s-generators/service-type-generator :rentals)]
     (save-and-fetch-compare transport-service ::t-service/rentals)))

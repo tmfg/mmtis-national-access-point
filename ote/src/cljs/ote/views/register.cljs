@@ -39,7 +39,11 @@
           :hide-error-until-modified? true}
          [(form/group
            {:expandable? false :columns 3 :card? false :layout :raw}
-           {:name :username :type :string :required? true :full-width? true
+           {:element-id "register-username"
+            :name :username
+            :type :string
+            :required? true
+            :full-width? true
             :placeholder (tr [:register :placeholder :username])
             :validate [(fn [data _]
                          (if (< (count data) 3)
@@ -58,12 +62,20 @@
             :name :spacer
             :component (fn [_]
                          [:div {:style {:margin-top "20px"}}])}
-           {:name :name :type :string :required? true :full-width? true
+           {:element-id "register-name"
+            :name :name
+            :type :string
+            :required? true
+            :full-width? true
             :placeholder (tr [:register :placeholder :name])
             :on-blur #(edit! :name)
             :show-errors? (@edited :name)
             :should-update-check form/always-update}
-           {:name :email :type :string :autocomplete "email" :required? true
+           {:element-id "register-email"
+            :name :email
+            :type :string
+            :autocomplete "email"
+            :required? true
             :full-width? true :placeholder (tr [:register :placeholder :email])
             :validate [(fn [data _]
                          (when (not (user/email-valid? data))
@@ -76,7 +88,11 @@
                                    (email-taken (:email form-data)))
                               (@edited :email))
             :should-update-check form/always-update}
-           {:name :password :type :string :password? true :required? true
+           {:element-id "register-password"
+            :name :password
+            :type :string
+            :password? true
+            :required? true
             :full-width? true
             :validate [(fn [data _]
                          (when (not (user/password-valid? data))
@@ -84,7 +100,11 @@
             :on-blur #(edit! :password)
             :show-errors? (@edited :password)
             :should-update-check form/always-update}
-           {:name :confirm :type :string :password? true :required? true
+           {:element-id "register-confirm"
+            :name :confirm
+            :type :string
+            :password? true
+            :required? true
             :full-width? true
             :validate [(fn [data row]
                          (when (not= data (:password row))

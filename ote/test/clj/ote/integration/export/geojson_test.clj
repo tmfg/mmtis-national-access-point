@@ -20,7 +20,7 @@
 
 (use-fixtures :each
   (system-fixture
-   :transport (component/using (transport-service/->Transport nil) [:http :db])
+   :transport (component/using (transport-service/->Transport nil) [:http :db :email])
    :export-geojson (component/using (geojson/->GeoJSONExport) [:db :http])))
 
 (defn interval-value [{:keys [years months days hours minutes seconds]}]
@@ -89,7 +89,7 @@
               geojson-values))))))
 
 (defspec maximum-stay-iso-8601-transform
-  50
+  25
   (prop/for-all
    [{:keys [years months days hours minutes seconds] :as maximum-stay} generators/gen-interval]
    (let [transformed (transform/transform-deep {::t-service/maximum-stay (time/->PGInterval maximum-stay)})
@@ -122,7 +122,7 @@
 
 
 (defspec validate-exported-geojson
-  50
+  25
   (prop/for-all
    [generated-service service-generators/gen-transport-service]
    (let [service (assoc generated-service ::t-service/operation-area test-operation-area)

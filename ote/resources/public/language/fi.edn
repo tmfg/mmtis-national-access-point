@@ -601,7 +601,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :members "Jäsenet"
                         :add-member "Lisää jäsen"
                         :email-placeholder "Kirjoita sähköpostiosoite"
-                        :manage-users "Hallinnoi jäseniä"}
+                        :manage-users "Hallinnoi käyttöoikeuksia"
+                        :something-went-wrong "Jotain meni pieleen."
+                        :already-member "Käyttäjä on jo lisätty."}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

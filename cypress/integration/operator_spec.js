@@ -106,6 +106,28 @@ describe('Operator creation basic tests', function () {
 
     });
 
+    it('add user to opeperator', function () {
+
+        cy.server();
+        cy.route('POST', '/transport-operator/1/users').as('addMember');
+        cy.route('DELETE', '/transport-operator/1/users').as('removeMember');
+
+
+
+        // Add user to operator
+        cy.visit('/#/transport-operator/1/users');
+        cy.contains('Hallinnoi käyttöoikeuksia');
+
+        // HOX!!!! We need to use Amazon SES email simulator.
+        // So the email address that is used here is converted to success@simulator.amazonses.com in backend
+        cy.get('#operator-user-email').type('user.userson@example.com');
+        cy.get('button').contains('Lisää jäsen').click({force: true});
+        cy.wait('@addMember');
+        cy.contains('User Userson');
+        cy.get('button.remove-member').last().click({force: true}); // When confirmation dialog is added, this has to change
+        //cy.wait('@removeMember'); // Take into use when removing members is implemented
+
+    });
 
     xit('should validate and invalidate business id', function () {
 
