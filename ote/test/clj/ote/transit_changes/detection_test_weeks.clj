@@ -868,7 +868,7 @@
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}])))
 
 
-(deftest test-2-changes-with-nil-days
+(deftest test-2-changes-with-nil-days-with-route-end
   (let [result (->> data-2-changes-with-nil-days            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
