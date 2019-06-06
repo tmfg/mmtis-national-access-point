@@ -617,6 +617,8 @@
 
 ;;;;;;;;; Data for all routes, needed in tests where have to resolve for how long route has traffic declared
 
+(def route-1-min-date (tu/to-local-date 2019 1 1))
+(def route-1-max-date (tu/to-local-date 2019 7 14))
 (def data-all-routes [[tu/route-name-2
                        {:route-short-name tu/route-name-2,
                         :route-long-name tu/route-name-2,
@@ -628,8 +630,8 @@
                        {:route-short-name "",
                         :route-long-name tu/route-name,
                         :trip-headsign "",
-                        :min-date (time/sql-date (tu/to-local-date 2019 1 1)),
-                        :max-date (time/sql-date (tu/to-local-date 2019 7 14)),
+                        :min-date (time/sql-date route-1-min-date),
+                        :max-date (time/sql-date route-1-max-date),
                         :route-hash-id tu/route-name}]
                       [tu/route-name-3
                        {:route-short-name "",
@@ -759,7 +761,6 @@
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (is (= 2 (count result))))))
 
-
 (def data-paused-traffic-with-end
   (tu/weeks (tu/to-local-date 2019 5 13)
             (concat [{tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 05 13
@@ -830,20 +831,28 @@
   (let [result (->> data-paused-traffic-with-keyword            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2040 5 13) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
-    (testing "Ensure a traffic change and route end within detection window are reported."
-      (is (= {:no-traffic-change 33
-              :route-key tu/route-name
-              :no-traffic-start-date (tu/to-local-date 2019 6 1)
-              :no-traffic-end-date (tu/to-local-date 2019 7 4)
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13) :end-of-week (tu/to-local-date 2019 5 19)}}
-             (-> result
-                 (first)
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))
-    (testing "Ensure that only 1 change is detected"
-      (is (= 1 (count result))))))
+    (is (= {:no-traffic-change 33
+            :route-key tu/route-name
+            :no-traffic-start-date (tu/to-local-date 2019 6 1)
+            :no-traffic-end-date (tu/to-local-date 2019 7 4)
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13) :end-of-week (tu/to-local-date 2019 5 19)}}
+           (-> result
+               first
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure a traffic change and route end within detection window are reported.")
 
+    (is (= {:route-key tu/route-name
+            :route-end-date (tu/to-local-date 2019 7 15)
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
+                            :end-of-week (tu/to-local-date 2019 5 19)}}
+           (-> result
+               second
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure a traffic change and route end within detection window are reported.")
+
+    (is (= 2 (count result)))))
 
 (def data-2-changes-with-nil-days
   (tu/weeks (tu/to-local-date 2019 5 6)
@@ -855,15 +864,48 @@
                      {tu/route-name [nil nil nil nil nil "X" nil]} ;; 2019 06 10
                      {tu/route-name [nil nil nil nil nil "X" nil]} ;; 2019 06 17
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 06 24
-                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 06 24
+                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 07 01
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}])))
 
 
-(deftest test-2-changes-with-nil-days
+(deftest test-2-changes-with-nil-days-with-route-end
   (let [result (->> data-2-changes-with-nil-days            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2040 5 13) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
-    (testing "Ensure that both of the changes are detected"
-      (is (= 2 (count result))))))
+    (is (= {:route-key tu/route-name
+            :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                             :end-of-week (tu/to-local-date 2019 6 9)}
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
+                            :end-of-week (tu/to-local-date 2019 5 19)}
+            :no-traffic-run 1
+            :no-traffic-start-date (tu/to-local-date 2019 6 9)}
+           (-> result
+               first
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure a traffic change is reported.")
+
+    (is (= {:route-key tu/route-name
+            :different-week {:beginning-of-week (tu/to-local-date 2019 6 24)
+                             :end-of-week (tu/to-local-date 2019 6 30)}
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                            :end-of-week (tu/to-local-date 2019 6 9)}}
+           (-> result
+               second
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure a traffic change is reported.")
+
+    (is (= {:route-key tu/route-name
+            :route-end-date (tu/to-local-date 2019 7 15)
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                            :end-of-week (tu/to-local-date 2019 6 9)}}
+           (-> result
+               (nth 2)
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure route end is reported.")
+
+    (testing "Ensure that a right amount of changes are reported"
+      (is (= 3 (count result))))))
+
+
