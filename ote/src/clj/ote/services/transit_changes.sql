@@ -90,3 +90,12 @@ SELECT ts.id as "service-id", ts.name as service, op.name as operator, d."route-
  WHERE d."transport-service-id" = ts.id
    AND op.id = ts."transport-operator-id"
    ORDER BY d."route-hash-id-type" , ts.id;
+
+-- name: valid-detected-route-changes
+-- Changes will expire and to keep statistic up to date return only changes that are not yet exipred
+SELECT c."route-hash-id", c."different-week-date", c."change-type"
+FROM "detected-route-change" c
+       LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key" AND h."different-week-date" >= :date
+WHERE c."transit-change-date" = :date
+  AND c."transit-service-id" = :service-id
+  AND c."different-week-date" >= CURRENT_DATE;
