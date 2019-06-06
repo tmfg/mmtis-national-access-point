@@ -1,9 +1,5 @@
 (ns ote.util.email-template
-  (:require [chime :refer [chime-at]]
-            [jeesql.core :refer [defqueries]]
-            [clj-time.periodic :refer [periodic-seq]]
-            [clojure.string :as str]
-            [hiccup.core :refer [html]]
+  (:require [clojure.string :as str]
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
@@ -11,15 +7,8 @@
             [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
-            [ote.nap.users :as nap-users]
-            [ote.tasks.util :refer [daily-at]]
             [ote.util.db :as db-util]
-            [ote.email :as email]
-            [ote.util.throttle :refer [with-throttle-ms]]
-            [ote.environment :as environment]
-            [clojure.string :as string]
-            [specql.core :as specql]
-            [specql.op :as op])
+            [ote.environment :as environment])
   (:import (org.joda.time DateTimeZone)))
 
 (def html-header
@@ -267,3 +256,24 @@
                   (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
                   (html-divider-border nil)]))
+
+(defn new-user-invite [requester operator title token]
+  (let [op-name (::t-operator/name operator)]
+   (html-template title
+     [:div
+      [:br]
+      [:h1 {:class "headerText1"
+            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+       (str "Sinut on kutsuttu " op-name "-nimisen palveluntuottajan jäseneksi.")]
+
+      (html-divider-border nil)
+      [:p
+       [:strong (get-in requester [:user :email])]
+       " on kutsunut sinut NAP-palveluun "
+       [:strong op-name]
+       (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+      [:br]
+      (blue-button (str (environment/base-url) "#/register/" token) "Siirry rekisteröimään käyttäjä")
+
+      (html-divider-border nil)])))
