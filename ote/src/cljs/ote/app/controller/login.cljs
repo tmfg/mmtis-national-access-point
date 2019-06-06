@@ -18,7 +18,6 @@
 (defrecord LogoutResponse [response])
 (defrecord LogoutFailed [response])
 
-
 (defn unauthenticated
   "Init session without user."
   [app]
@@ -177,9 +176,13 @@
 
 (define-event Register [form-data]
   {}
-  (comm/post! "register" form-data
-              {:on-success (tuck/send-async! ->RegisterResponse)
-               :on-failure (tuck/send-async! ->ServerError)})
+  (let [token (get-in app [:params :token])
+        form-data (if (some? token)
+                    (assoc form-data :token token)
+                    form-data)]
+    (comm/post! "register" form-data
+                {:on-success (tuck/send-async! ->RegisterResponse)
+                 :on-failure (tuck/send-async! ->ServerError)}))
   app)
 
 (define-event UpdateUser [user]
@@ -249,3 +252,28 @@
               {:on-success (tuck/send-async! ->RequestPasswordResetResponse (:email app))
                :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(define-event ValiditySuccess [response]
+  {:path [:register]}
+  (println app)
+  (-> app
+    (assoc-in [:token-info] response)))
+
+(define-event ValidityFailure [response]
+  {:path [:register]}
+  (-> app
+    (assoc-in [:token-info] :token-invalid)))
+
+(define-event CheckTokenValidity []
+  {}
+  (let [token (get-in app [:params :token])]
+    (if (some? token)
+      (do
+        (comm/post! "token/validate" {:token (get-in app [:params :token])}
+          {:on-success (tuck/send-async! ->ValiditySuccess)
+           :on-failure (tuck/send-async! ->ValidityFailure)})
+        (assoc-in app [:register :token-info :loading?] true))
+      app)))
+
+(defmethod routes/on-navigate-event :register [_]
+  (->CheckTokenValidity))
