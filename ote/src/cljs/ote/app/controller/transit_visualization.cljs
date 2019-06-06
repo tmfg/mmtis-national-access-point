@@ -35,21 +35,18 @@
 (defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
   (seq changes-route-no-change))
 
-(defn loaded-from-server? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
-                                   route-trips-for-date2-loading? route-calendar-hash-loading?
-                                   route-differences-loading? routes-for-dates-loading?
-                                   service-changes-for-dates-loading?]
-                            :as   transit-visualization}]
-  (and (not route-lines-for-date-loading?)
-       (not route-trips-for-date1-loading?)
-       (not route-trips-for-date2-loading?)
-       (not route-calendar-hash-loading?)
-       (not route-differences-loading?)
-       (not routes-for-dates-loading?)
-       (not service-changes-for-dates-loading?)
-       ;; Hide trip and stop comparison elements until both compared trip datas are available, to avoids runtime errors
-       ;; and to avoid displaying invalid data.
-       (some? (get-in transit-visualization [:compare :date2]))))
+(defn loading-trips? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
+                                route-trips-for-date2-loading? route-calendar-hash-loading?
+                                route-differences-loading? routes-for-dates-loading?
+                                service-changes-for-dates-loading?]
+                         :as   transit-visualization}]
+  (or route-lines-for-date-loading?
+      route-trips-for-date1-loading?
+      route-trips-for-date2-loading?
+      route-calendar-hash-loading?
+      route-differences-loading?
+      routes-for-dates-loading?
+      service-changes-for-dates-loading?))
 
 (defn parse-date [date-str]
   (tf/parse (tf/formatter "dd.MM.yyyy") date-str))
@@ -286,10 +283,10 @@
 
           :default
           app)
-        app (if (loaded-from-server? app)
+        app (if (loading-trips? app)
+              app
               ;; Combine only after all data available to avoid rendering incorrect numbers
-              (combine-trips app)
-              app)]
+              (combine-trips app))]
     ;; Wait until both trips are loaded
     ;; No need to render trips and stops while they are not ready
     (if (and (not (:route-trips-for-date1-loading? app))
