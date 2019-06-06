@@ -7,6 +7,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.auditlog :as auditlog]
+            [ote.db.user :as user]
             [ote.util.db :as util]
             [ote.util.email-template :as email-template]
             [ote.config.email-config :as email-config]
@@ -21,10 +22,10 @@
             [jeesql.core :refer [defqueries]]
             [ote.db.tx :as tx]
             [ote.db.modification :as modification]
-            [clojure.string :as str]
             [clojure.set :as set]
             [ote.email :as email]
-            [hiccup.core :refer [html]])
+            [hiccup.core :refer [html]]
+            [ote.time :as time])
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
@@ -177,7 +178,7 @@
      :transport-service-vector transport-services-vector
      :user cleaned-user}))
 
-(defn- create-member! [db user-id group-id]
+(defn create-member! [db user-id group-id]
   (specql/insert! db ::user/member
                   {::user/id         (str (UUID/randomUUID))
                    ::user/table_id   user-id
@@ -579,8 +580,25 @@
        :name (:user_name new-member)
        :email (:user_email new-member)})))
 
-(defn invite-new-user [email db requester operator user]
-  nil)
+(defn invite-new-user [email-config db requester operator user-email]
+  (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 1))
+        token (UUID/randomUUID)
+        inserted-token (specql/insert! db ::user/user-tokens
+                                       {::user/user-email user-email
+                                        ::user/token (str token)
+                                        ::user/operator-id (::t-operator/id operator)
+                                        ::user/expiration expiration-date
+                                        ::user/requester-id (get-in requester [:user :id])})
+        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")]
+    (try
+      (email/send!
+        email-config
+        {:to user-email
+         :subject title
+         :body [{:type "text/html;charset=utf-8"
+                 :content (html (email-template/new-user-invite requester operator title (::user/token inserted-token)))}]})
+      (catch Exception e
+        (log/warn (str "Error while inviting " user-email " ") e)))))
 
 (defn manage-adding-users-to-operator [email db requester operator-id form-data]
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
@@ -721,8 +739,8 @@
        user :user}
       (let [id (Long/parseLong id)
             operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
-                                                                                #{::t-service/transport-operator-id}
-                                                                                {::t-service/id id})))]
+                                              #{::t-service/transport-operator-id}
+                                              {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
           (all-data-transport-service db id)
           (public-data-transport-service db id))))
