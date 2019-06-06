@@ -20,7 +20,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
             [ote.views.transit-visualization.change-utilities :as tv-utilities]
-            [ote.views.transit-visualization.change-icons :as tv-change-icons]))
+            [ote.views.transit-visualization.change-icons :as tv-change-icons]
+            [ote.ui.circular_progress :as prog]))
 
 (set! *warn-on-infer* true)
 
@@ -761,10 +762,15 @@
       (when selected-route
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: " route-name]
-
          [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
-         (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
-           [:span
-            [selected-route-map-section e! open-sections date->hash hash->color compare]
-            [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])]]))
+
+         (if (tv/loading-trips? transit-visualization)
+           (prog/circular-progress (tr [:common-texts :loading]))
+           ;; Selecting a new date1 from calendar clears date2 related keys which are used by selected-route-map-section
+           ;; Also, displaying below data is always in connection with the date1&date2 pair which is outdated after a
+           ;; new selection from calendar.
+           (when (:date2-trips compare)
+             [:span
+              [selected-route-map-section e! open-sections date->hash hash->color compare]
+              [route-trips e! open-sections compare]
+              [trip-stop-sequence e! open-sections compare]]))])]]))
