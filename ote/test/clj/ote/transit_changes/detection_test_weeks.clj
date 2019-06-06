@@ -908,5 +908,4 @@
     (testing "Ensure that a right amount of changes are reported"
       (is (= 3 (count result))))))
 
-    (testing "Ensure that both of the changes are detected"
-      (is (= 2 (count result))))))
+
