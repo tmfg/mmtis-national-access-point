@@ -1,6 +1,5 @@
 (ns ote.views.operator-users
   (:require [ote.app.controller.operator-users :as ou]
-            [ote.ui.spinner :as spinner]
             [ote.ui.table :as table]
             [ote.app.utils :as utils]
             [ote.localization :refer [tr tr-key]]
