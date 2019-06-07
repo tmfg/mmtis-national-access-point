@@ -6,6 +6,10 @@
             [taoensso.timbre :as log]
             [ote.nap.users :as users]))
 
+(defn require-transit-authority [user]
+  (when-not (get-in user [:user :transit-authority?])
+       (throw (SecurityException. "transit authority only"))))
+
 (defn admin? [user]
   (boolean (get-in user [:user :admin?])))
 

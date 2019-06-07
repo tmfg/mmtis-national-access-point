@@ -104,9 +104,10 @@
 
 (define-service-component TransitChanges {:fields [config]}
 
-  ^{:unauthenticated true :format :transit}
-  (GET "/transit-changes/current" []
-       (#'list-current-changes db))
+  ^{:unauthenticated false :format :transit}
+  (GET "/transit-changes/current" {user :user :as request}
+    (authorization/require-transit-authority user)
+    (list-current-changes db))
 
   (GET "/transit-changes/hash-calculation/" {user :user :as request}
        (when (authorization/admin? user)

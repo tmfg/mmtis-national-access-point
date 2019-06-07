@@ -13,7 +13,8 @@
             [ote.util.fn :refer [flip]]
             [ote.transit-changes.detection :as detection]
             [clojure.set :as set]
-            [digest]))
+            [digest]
+            [ote.authorization :as authorization]))
 
 (defqueries "ote/services/transit_visualization.sql")
 
@@ -106,10 +107,15 @@
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
-  ^{:unauthenticated true :format :transit}
+  ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
-       {{:keys [service-id date]} :params}
+       {{:keys [service-id date]} :params
+        user :user}
     (let [service-id (Long/parseLong service-id)]
+      ;; Is transit authority
+      (authorization/require-transit-authority user)
+
+      ;; Return result
       {:service-info (first (fetch-service-info db {:service-id service-id}))
        :changes (first (detected-service-change-by-date db
                                                         {:service-id service-id
@@ -123,42 +129,50 @@
                                                 {:gtfs/transport-service-id service-id}))
        :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
 
-  ^{:unauthenticated true :format :transit}
+  ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
-        {:strs [route-hash-id]} :query-params}
-      {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id)})
+        {:strs [route-hash-id]} :query-params
+        user :user}
+    (authorization/require-transit-authority user)
+    {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id)})
 
 
-  ^:unauthenticated
+  ^{:unauthenticated false}
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
-        {:strs [date route-hash-id]} :query-params}
-       (http/geojson-response
-         (cheshire/encode
-         {:type "FeatureCollection"
-          :features (trip-lines
+        {:strs [date route-hash-id]} :query-params
+        user :user}
+    (authorization/require-transit-authority user)
+    (http/geojson-response
+      (cheshire/encode
+        {:type "FeatureCollection"
+         :features (trip-lines
                      (fetch-route-trips-by-hash-and-date
-                      db
-                      {:service-id (Long/parseLong service-id)
-                       :date (time/parse-date-iso-8601 date)
-                       :route-hash-id route-hash-id}))}
-         {:key-fn name})))
+                       db
+                       {:service-id (Long/parseLong service-id)
+                        :date (time/parse-date-iso-8601 date)
+                        :route-hash-id route-hash-id}))}
+        {:key-fn name})))
 
-  ^{:unauthenticated true :format :transit}
+  ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
-        {:strs [date short-name long-name headsign route-hash-id]} :query-params}
-      (into []
-            (map #(update % :stoptimes parse-gtfs-stoptimes))
-            (fetch-route-trip-info-by-name-and-date
-              db
-              {:service-id       (Long/parseLong service-id)
-               :date             (time/parse-date-iso-8601 date)
-               :route-hash-id route-hash-id})))
+        {:strs [date short-name long-name headsign route-hash-id]} :query-params
+        user :user}
+    (authorization/require-transit-authority user)
+    (into []
+          (map #(update % :stoptimes parse-gtfs-stoptimes))
+          (fetch-route-trip-info-by-name-and-date
+            db
+            {:service-id (Long/parseLong service-id)
+             :date (time/parse-date-iso-8601 date)
+             :route-hash-id route-hash-id})))
 
-  ^{:unauthenticated true :format :transit}
+  ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
-        {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params}
+        {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params
+        user :user}
+    (authorization/require-transit-authority user)
     (trip-differences-for-dates db service-id date1 date2 route-hash-id)))
