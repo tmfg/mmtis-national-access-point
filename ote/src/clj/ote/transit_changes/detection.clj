@@ -185,19 +185,20 @@
 
 (defn print-change-maps [change-map-seq]
     
-  (println (format "%13s |%13s |%13s |%13s |%13s |%13s |%s" "starting-date" "starting-hash" "different-date" "different-hash" "no-traf-start" "no-traf-end" "combined"))
+  (println (format "%10s |%13s |%13s |%13s |%13s |%13s |%s|%s" "start-dte" "start-hash" "different-date" "different-hash" "no-traf-start" "no-traf-end" "combined" "end"))
   (doseq [m (filter some? change-map-seq)]
-    (when-not (spec/valid? ::route-change-map m)
+    #_(when-not (spec/valid? ::route-change-map m)
       (println "change-map-seq fails spec. printing anyway but spec failures are:")
       (spec/explain ::route-change-map m))
-    (println (format "%13s |%13s |%13s |%13s |%13s |%13s |%s"
+    (println (format "%10s |%13s |%13s |%13s |%13s |%13s |%s|%s"
                      (-> m :starting-week :beginning-of-week)
                      (-> m :starting-week-hash week->short clojure.string/join)
                      (-> m :different-week :beginning-of-week)
                      (-> m :different-week-hash week->short clojure.string/join)
                      (-> m :no-traffic-start-date)
                      (-> m :no-traffic-end-date)
-                     (-> m :combined some?)))))
+                     (-> m :combined (if "t" "f"))
+                     (-> m :route-end-date)))))
 
 (defn dcfr-enter-debug
   [route-key starting-week-hash curr next1 next2]
@@ -920,10 +921,12 @@
 
 
 (defn trafficless-route-change-before-route-end? [a b]
-  (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
-       (= (:starting-week-hash a) (:starting-week-hash b))
-       (some? (:route-end-date b))
-       (nil? (:end-of-week b))))
+  ;; remove this fn, left in as temporary sanity check
+  (assert (not 
+           (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))
+                (= (:starting-week-hash a) (:starting-week-hash b))
+                (some? (:route-end-date b))
+                (nil? (:end-of-week b))))))
 
 (defn changes-straddle-trafficless-period? [a b]
   (and (= [nil nil nil nil nil nil nil] (:different-week-hash a))

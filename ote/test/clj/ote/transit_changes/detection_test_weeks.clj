@@ -299,7 +299,7 @@
                       :starting-week
                       :different-week-hash
                       :starting-week-hash]]
-      ;; (def *r result)
+    (def *r result)
       ;; debug note after week= & first-different-day change:
       ;; - change is caused by week= change, reverting f-d-d made no diff
       ;; - judging from debug prints the traffic-run 13 is found first and a second one goes up to 70-something
@@ -760,16 +760,26 @@
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes)
-                    (detection/trafficless-differences->no-traffic-changes))]
+                    (detection/trafficless-differences->no-traffic-changes)
+                    )]
+    (def *r result)
     (testing "Ensure route end is reported when no-traffic starts, even if route max-date is later. If that is possible..."
-      (is (= {:route-end-date (tu/to-local-date 2019 6 5)
+      (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 6 3) :end-of-week (tu/to-local-date 2019 6 9)}
               :route-key tu/route-name
+              :no-traffic-start-date (tu/to-local-date 2019 6 5)
+              :no-traffic-run 5
               :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
              (-> result
                  first
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
+      (is (= {:route-end-date (tu/to-local-date 2019 6 5)
+              :route-key tu/route-name
+              :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3) :end-of-week (tu/to-local-date 2019 6 9)}}
+             (-> result
+                 second
+                 (select-keys tu/select-keys-detect-changes-for-all-routes))))
       (testing "Ensure that a right amount of changes are found and there are no extra changes."
-        (is (= 1 (count result)))))))
+        (is (= 2 (count result)))))))
 
 ;;;;;; Test route END reporting when last traffic date below route end detection threshold
 
