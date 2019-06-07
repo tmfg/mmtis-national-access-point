@@ -19,7 +19,7 @@
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
             [ote.app.controller.flags :as flags]
-            [ote.ui.common :as common]
+            [ote.ui.circular_progress :as spinner]
             [ote.ui.form-fields :as form-fields]
             [ote.views.own-services :as os]
             [ote.views.operator-users :as ou]
@@ -81,14 +81,14 @@
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           (if (nil? app)
-            [common/loading-spinner]
+            [spinner/circular-progress]
             [:div.ote-sovellus {:style {:display "flex"
                                         :flex-direction "column"}}
              [top-nav e! app is-scrolled? desktop?]
              [:div (merge (stylefy/use-style style-base/sticky-footer)
                      {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
               (if (not loaded?)
-                [common/loading-spinner]
+                [spinner/circular-progress]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
