@@ -288,7 +288,7 @@
   (let [result (-> no-traffic-run-full-detection-window
                    detection/changes-by-week->changes-by-route
                    detection/detect-changes-for-all-routes
-                   detection/trafficless-differences->no-traffic-changes
+                   #_ detection/trafficless-differences->no-traffic-changes
                    )
         compare-keys [:different-week
                       :no-traffic-start-date
@@ -300,8 +300,9 @@
                       :starting-week
                       :different-week-hash
                       :starting-week-hash]]
-    (def *r result)
-    
+    ;(def *r result)
+    (println "Kohta data ")
+    (clojure.pprint/pprint no-traffic-run-full-detection-window)
     (testing "Ensure traffic with normal no-traffic days detects a no-traffic change correctly"
       ;; WIP: currently getting these 2 maps (wrongly)
       #_(is (= {:route-key tu/route-name
@@ -323,10 +324,42 @@
               :no-traffic-end-date (tu/to-local-date 2019 2 11)
 	      :starting-week-hash ["h1" nil nil nil nil nil nil]
               }
-             (select-keys (second result) compare-keys))))
+             result #_ (select-keys (first result) compare-keys))))
 
     (testing "Ensure that a right amount of changes are found and there are no extra changes."
       (is (= 1 (count result))))))
+
+(def data-2-changes-with-nil-days2
+  (tu/weeks (tu/to-local-date 2019 5 6)
+            (concat [{tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 6
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 13
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 05 20
+                     {tu/route-name ["A" nil nil nil nil nil nil]} ;; 2019 05 27
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 03
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 10
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 17
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 06 24
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019 07 01
+                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]}])))
+
+(deftest test-2-changes-with-nil-days-with-route-end
+  (let [result (->> data-2-changes-with-nil-days2            ;; Notice thread-last
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/detect-changes-for-all-routes)
+                    #_(detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
+
+    (is (= {:route-key tu/route-name
+            :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
+                             :end-of-week (tu/to-local-date 2019 6 9)}
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
+                            :end-of-week (tu/to-local-date 2019 5 19)}
+            :no-traffic-run 1
+            :no-traffic-start-date (tu/to-local-date 2019 6 9)}
+           result)
+        "Ensure a traffic change is reported.")
+
+    (testing "Ensure that a right amount of changes are reported"
+      (is (= 3 (count result))))))
 
 ;;;;;;;; Test traffic change window when change does not reach change threshold
 

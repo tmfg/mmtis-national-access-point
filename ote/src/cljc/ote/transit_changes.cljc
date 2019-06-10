@@ -228,7 +228,7 @@
                        (= h1 h2)))
                  w1 w2))))
 
-(def week= erno-joni-hybrid-week=)
+;(def week= erno-joni-hybrid-week=)
 
 ;;(def week= erno-week=)
 
