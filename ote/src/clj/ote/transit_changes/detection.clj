@@ -187,9 +187,6 @@
     
   (println (format "%10s |%13s |%13s |%13s |%13s |%13s |%s|%s" "start-dte" "start-hash" "different-date" "different-hash" "no-traf-start" "no-traf-end" "combined" "end"))
   (doseq [m (filter some? change-map-seq)]
-    #_(when-not (spec/valid? ::route-change-map m)
-      (println "change-map-seq fails spec. printing anyway but spec failures are:")
-      (spec/explain ::route-change-map m))
     (println (format "%10s |%13s |%13s |%13s |%13s |%13s |%s|%s"
                      (-> m :starting-week :beginning-of-week)
                      (-> m :starting-week-hash week->short clojure.string/join)
@@ -213,7 +210,6 @@
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route seq-of-previous-change-maps]
   (dcfr-enter-debug route starting-week-hash curr next1 next2)
-  ;; todo: check if we are inside no-traffic-run
   (let [prev-change (last seq-of-previous-change-maps)
         no-traffic-ongoing? (and (:no-traffic-start-date prev-change)
                                  (nil? (:no-traffic-end-date prev-change)))
@@ -222,6 +218,7 @@
                              ;; else
                              joni-week=
                              )]
+    (println "no-traffic?" no-traffic-ongoing? "->" "using week fn" week-comparison-fn)
     (cond
       ;; If this is the first call and the current week is "anomalous".
       ;; Then start at the next week.
