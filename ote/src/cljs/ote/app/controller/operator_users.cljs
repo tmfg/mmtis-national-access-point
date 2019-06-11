@@ -39,7 +39,7 @@
 (define-event NewUserSuccess [result]
   {}
   (let [users (vec (get-in app [:manage-access :users]))
-        users-long (conj users {:fullname (:name result) :email (:email result) :id (:id result)})]
+        users-long (conj users result)]
     (-> app
         (assoc-in [:manage-access :users] users-long)
         (assoc-in [:manage-access :new-member-email] "")

@@ -7,19 +7,28 @@
             [ote.ui.form-fields :as form-fields]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.buttons :as buttons]))
+            [ote.style.buttons :as buttons]
+            [ote.theme.colors :as colors]))
 
 (defn access-table
   [e! users operator-id]
   [:div
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
-                 :key-fn :id
+                 :key-fn #(or (:id %) (:token %))
                  :name->label identity
                  :show-row-hover? true
                  :no-selection? true}
     [{:name (tr [:transport-users-page :username])
-      :read :fullname}
+      :read identity
+      :format (fn [row]
+                (if (:pending? row)
+                  [:span {:style {:display "flex"
+                                  :align-items "center"}}
+                   [ic/action-info {:style {:color colors/primary-light
+                                            :margin-right "3px"}}]
+                   (tr [:transport-users-page :invite-pending])]
+                  (:fullname row)))}
      {:name (tr [:register :fields :email])
       :read :email}
      {:name (tr [:front-page :table-header-actions])
