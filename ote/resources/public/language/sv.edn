@@ -606,9 +606,11 @@
                         :members "Medlemmar"
                         :email-placeholder "Mata in e-postadress"
                         :manage-users "Hantera användarrättigheter"
+                        :already-invited "Käyttäjä on jo kutsuttu."
                         :something-went-wrong "Jotain meni pieleen. Koita hetken päästä uudestaan."
                         :already-member "Käyttäjä on jo lisätty."
-                        :invite-pending "Odottaa kutsun vahvistusta"}
+                        :invite-pending "Odottaa kutsun vahvistusta"
+                        :invite-sent-success "Kutsu lähetetty onnistuneesti"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

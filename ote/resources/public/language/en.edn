@@ -601,9 +601,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                         :add-member "Add a member"
                         :email-placeholder "Enter email adress"
                         :manage-users "Manage access rights"
+                        :already-invited "User is already invited."
                         :something-went-wrong "Something went wrong."
                         :already-member "User is already a member."
-                        :invite-pending "Waiting for confirmation"}
+                        :invite-pending "Waiting for confirmation."
+                        :invite-sent-success "Invitation sent successfully."}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

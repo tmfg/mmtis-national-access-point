@@ -604,7 +604,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :manage-users "Hallinnoi käyttöoikeuksia"
                         :something-went-wrong "Jotain meni pieleen."
                         :already-member "Käyttäjä on jo lisätty."
-                        :invite-pending "Odottaa kutsun vahvistusta"}
+                        :already-invited "Käyttäjä on jo kutsuttu"
+                        :invite-pending "Odottaa kutsun vahvistusta"
+                        :invite-sent-success "Kutsu lähetetty onnistuneesti"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
