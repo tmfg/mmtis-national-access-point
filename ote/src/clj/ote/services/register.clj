@@ -51,7 +51,7 @@
                               ::user/activity_streams_email_notifications false})]
               (when (and token operator-info)
                 (transport/create-member! db (::user/id new-user) (:ckan-group-id operator-info))
-                (specql/delete! db ::user/user-tokens
+                (specql/delete! db ::user/user-token
                   {::user/token token})
                 (log/info "New user (" email ") registered with token from " (:name operator-info))))
             {:success? true}))))))
