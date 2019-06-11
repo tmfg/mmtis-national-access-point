@@ -544,7 +544,7 @@
 (defn transport-operator-users
   [db operator-id]
   (let [users (fetch-operator-users db {:operator-id operator-id})
-        invites (fetch db ::user/user-tokens
+        invites (fetch db ::user/user-token
                   #{::user/user-email ::user/token}
                   {::user/operator-id operator-id
                    ::user/expiration (op/>= (tc/to-sql-date (t/now)))})
@@ -598,13 +598,20 @@
 (defn invite-new-user [email-config db requester operator user-email]
   (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 1))
         token (UUID/randomUUID)
-        inserted-token (specql/insert! db ::user/user-tokens
+        inserted-token (specql/insert! db ::user/user-token
                                        {::user/user-email user-email
                                         ::user/token (str token)
                                         ::user/operator-id (::t-operator/id operator)
                                         ::user/expiration expiration-date
                                         ::user/requester-id (get-in requester [:user :id])})
-        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")]
+        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")
+        auditlog {::auditlog/event-type :invite-new-user
+                  ::auditlog/event-attributes
+                  [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
+                   {::auditlog/name "transport-operator-name", ::auditlog/value (str (::t-operator/name operator))}
+                   {::auditlog/name "new-member-email", ::auditlog/value (str user-email)}]
+                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                  ::auditlog/created-by (get-in requester [:user :id])}]
     (try
       (email/send!
         email-config
@@ -612,7 +619,12 @@
          :subject title
          :body [{:type "text/html;charset=utf-8"
                  :content (html (email-template/new-user-invite requester operator title (::user/token inserted-token)))}]})
-      {:pending? true :token (::user/token inserted-token) :email (::user/user-email inserted-token)}
+
+      (specql/insert! db ::auditlog/auditlog auditlog)
+
+      {:pending? true
+       :token (::user/token inserted-token)
+       :email (::user/user-email inserted-token)}
       (catch Exception e
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
@@ -622,7 +634,14 @@
                                       #{::t-operator/id ::t-operator/name ::t-operator/ckan-group-id}
                                       {::t-operator/id operator-id}))
         operator-users (fetch-operator-users db {:operator-id operator-id})
+        not-invited? (empty?
+                       (specql/fetch db ::user/user-token
+                        #{::user/user-email}
+                        {::user/operator-id operator-id
+                         ::user/user-email (:email form-data)
+                         ::user/expiration (op/>= (tc/to-sql-date (t/now)))}))
         new-member-is-operator-member (some #(= (:user_id new-member) (:id %)) operator-users)
+
         ;; If member exists, add it to the organization if not, invite
         response (cond
                    ;; Existing new-member, existing operator
@@ -630,12 +649,15 @@
                    (add-user-to-operator email db new-member requester operator)
 
                    ;; new new-member, existing operator -> invite new-member
-                   (and (empty? new-member) (not (empty? operator)))
+                   (and (empty? new-member) (not (empty? operator)) not-invited?)
                    (invite-new-user email db requester operator (:email form-data))
 
                    ;; new-member is already a member
                    (and (not (empty? new-member)) new-member-is-operator-member)
                    {:error :already-member}
+
+                   (not not-invited?)
+                   {:error :already-invited}
 
                    ;; Something wrong is happening
                    :else
