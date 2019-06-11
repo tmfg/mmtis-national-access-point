@@ -607,7 +607,8 @@
                         :email-placeholder "Mata in e-postadress"
                         :manage-users "Hantera användarrättigheter"
                         :something-went-wrong "Jotain meni pieleen. Koita hetken päästä uudestaan."
-                        :already-member "Käyttäjä on jo lisätty."}
+                        :already-member "Käyttäjä on jo lisätty."
+                        :invite-pending "Odottaa kutsun vahvistusta"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

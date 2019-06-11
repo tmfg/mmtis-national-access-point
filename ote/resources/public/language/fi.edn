@@ -603,7 +603,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :email-placeholder "Kirjoita sähköpostiosoite"
                         :manage-users "Hallinnoi käyttöoikeuksia"
                         :something-went-wrong "Jotain meni pieleen."
-                        :already-member "Käyttäjä on jo lisätty."}
+                        :already-member "Käyttäjä on jo lisätty."
+                        :invite-pending "Odottaa kutsun vahvistusta"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
