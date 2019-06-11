@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.localization :refer [tr]]
             [ote.communication :as comm]
+            [ote.app.controller.front-page :as fp]
             [ote.util.url :as url-util]
             [ote.app.routes :as routes]
             [ote.app.controller.common :refer [->ServerError]]
@@ -26,7 +27,7 @@
   (comm/get!
     (str "transport-operator/" (url-util/encode-url-component (get-in app [:params :operator-id])) "/users")
     {:on-success (tuck/send-async! ->GetUsersSuccess)
-     :on-failure (tuck/send-async! ->ServerError)})
+     :on-failure (tuck/send-async! #(fp/->ChangePage :front-page nil))})
   (assoc-in app [:manage-access :loaded?] false))
 
 (defn GetTransportOperator [app]

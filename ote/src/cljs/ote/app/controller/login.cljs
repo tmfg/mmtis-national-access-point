@@ -255,7 +255,6 @@
 
 (define-event ValiditySuccess [response]
   {:path [:register]}
-  (println app)
   (-> app
     (assoc-in [:token-info] response)))
 

@@ -26,7 +26,6 @@
     ;; Check errors that should have been checked on the form
     {:success? false}
     (with-transaction db
-      (println form-data)
       (let [username-taken? (username-exists? db {:username username})
             email-taken? (email-exists? db {:email email})
             operator-info (when token
@@ -79,7 +78,6 @@
           (if (some? operator)
             (http/transit-response operator)
             (http/transit-response "Invalid token" 400))))
-
 
       (POST "/register" {form-data :body
                          user :user}

@@ -554,7 +554,6 @@
                       (assoc :pending? true)
                       (rename-keys {::user/user-email :email ::user/token :token})))
                   invites)]
-    (clojure.pprint/pprint (concat users invites))
     (http/transit-response (concat users invites))))
 
 (defn add-user-to-operator [email db new-member requester operator]
@@ -616,7 +615,8 @@
         {:to user-email
          :subject title
          :body [{:type "text/html;charset=utf-8"
-                 :content (html (email-template/new-user-invite requester operator title (::user/token inserted-token)))}]})
+                 :content (str email-template/html-header
+                            (html (email-template/new-user-invite requester operator title (::user/token inserted-token))))}]})
 
       (specql/insert! db ::auditlog/auditlog auditlog)
 
