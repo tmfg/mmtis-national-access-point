@@ -572,28 +572,26 @@
                    {::auditlog/name "new-member-email", ::auditlog/value (str (:user_email updated-member))}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in requester [:user :id])}]
+    ;; Send email to user to inform about the new membership.
+    (try
+      (email/send!
+        email
+        {:to (:user_email updated-member)
+         :subject title
+         :body [{:type "text/html;charset=utf-8"
+                 :content (str email-template/html-header
+                            (html (email-template/notify-user-new-member updated-member requester operator title)))}]})
+      (catch Exception e
+        (log/warn "Error while sending a email to new member" e)))
 
-    (do
-      ;; Send email to user to inform about the new membership.
-      (try
-        (email/send!
-          email
-          {:to (:user_email updated-member)
-           :subject title
-           :body [{:type "text/html;charset=utf-8"
-                   :content (str email-template/html-header
-                                 (html (email-template/notify-user-new-member updated-member requester operator title)))}]})
-        (catch Exception e
-          (log/warn "Error while sending a email to new member" e)))
+    ;; Create auditlog
+    (specql/insert! db ::auditlog/auditlog auditlog)
 
-      ;; Create auditlog
-      (specql/insert! db ::auditlog/auditlog auditlog)
-
-      ;; Return added new-member data
-      {:id (:user_id new-member)
-       :username (:user_username new-member)
-       :name (:user_name new-member)
-       :email (:user_email new-member)})))
+    ;; Return added new-member data
+    {:id (:user_id new-member)
+     :name (:user_username new-member)
+     :fullname (:user_name new-member)
+     :email (:user_email new-member)}))
 
 (defn invite-new-user [email-config db requester operator user-email]
   (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 1))
