@@ -40,7 +40,7 @@
 (define-event NewUserSuccess [result]
   {}
   (let [users (vec (get-in app [:manage-access :users]))
-        users-long (conj users result)]
+        users-long (sort-by :pending? (conj users result))]
     (-> app
         (assoc :flash-message (tr [:transport-users-page :invite-sent-success]))
         (assoc-in [:manage-access :users] users-long)
