@@ -1,6 +1,6 @@
 (ns ote.views.operator-users
   (:require [ote.app.controller.operator-users :as ou]
-            [ote.ui.spinner :as spinner]
+            [ote.ui.circular_progress :as spinner]
             [ote.ui.table :as table]
             [ote.app.utils :as utils]
             [ote.localization :refer [tr tr-key]]
@@ -67,7 +67,8 @@
         (stylefy/use-style buttons/disabled-button))
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
-       [spinner/primary-spinner {:id "new-member-loading-spinner" :style {:margin-left "1rem"}}])]]])
+       [:div {:id "new-member-loading-spinner" :style {:margin-left "1rem"}}
+        [spinner/circular-progress]])]]])
 
 (defn manage-access
   [e! state]
@@ -82,4 +83,5 @@
        [:div
         [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
-       [spinner/primary-spinner :id "waiting-loading-event-spinner"])]))
+       [:div {:id "waiting-loading-event-spinner"}
+        [spinner/circular-progress]])]))
