@@ -25,7 +25,10 @@
             [clojure.set :as set]
             [ote.email :as email]
             [hiccup.core :refer [html]]
-            [ote.time :as time])
+            [ote.time :as time]
+            [clj-time.core :as t]
+            [clojure.set :refer [rename-keys]]
+            [clj-time.coerce :as tc])
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
@@ -540,7 +543,19 @@
 
 (defn transport-operator-users
   [db operator-id]
-  (http/transit-response (fetch-operator-users db {:operator-id operator-id})))
+  (let [users (fetch-operator-users db {:operator-id operator-id})
+        invites (fetch db ::user/user-tokens
+                  #{::user/user-email ::user/token}
+                  {::user/operator-id operator-id
+                   ::user/expiration (op/>= (tc/to-sql-date (t/now)))})
+        invites (map
+                  (fn [invite]
+                    (-> invite
+                      (assoc :pending? true)
+                      (rename-keys {::user/user-email :email ::user/token :token})))
+                  invites)]
+    (clojure.pprint/pprint (concat users invites))
+    (http/transit-response (concat users invites))))
 
 (defn add-user-to-operator [email db new-member requester operator]
   (let [member (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
@@ -597,6 +612,7 @@
          :subject title
          :body [{:type "text/html;charset=utf-8"
                  :content (html (email-template/new-user-invite requester operator title (::user/token inserted-token)))}]})
+      {:pending? true :token (::user/token inserted-token) :email (::user/user-email inserted-token)}
       (catch Exception e
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
