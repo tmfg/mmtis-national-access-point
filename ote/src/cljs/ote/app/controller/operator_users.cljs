@@ -41,6 +41,7 @@
   (let [users (vec (get-in app [:manage-access :users]))
         users-long (conj users result)]
     (-> app
+        (assoc :flash-message (tr [:transport-users-page :invite-sent-success]))
         (assoc-in [:manage-access :users] users-long)
         (assoc-in [:manage-access :new-member-email] "")
         (assoc-in [:manage-access :new-member-loading?] false))))
