@@ -12,7 +12,6 @@
 
 (defn token-check
   [token-info]
-  (println token-info)
   (if (not (= token-info :token-invalid))
     (notification/notification
       {:text (str "Olet liittymässä osaksi palvelua " (:name token-info))
@@ -32,7 +31,6 @@
   (let [edited (r/atom #{})                                 ; keep track of blurred fields
         edit! #(swap! edited conj %)]
     (fn [e! {:keys [token] :as params} {:keys [form-data email-taken username-taken token-info] :as register} user]
-      (println "token-info register: " token-info)
       [:div
        [:div.col-xs-12.col-md-6
         [:h1 (tr [:register :label])]
