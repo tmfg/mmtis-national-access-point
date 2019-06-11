@@ -23,7 +23,7 @@
    {"created" :ote.db.modification/created
     "created-by" :ote.db.modification/created-by}]
 
-  ["user-tokens" ::user-tokens]
+  ["user-token" ::user-token]
 
   ["member" ::member])
 
