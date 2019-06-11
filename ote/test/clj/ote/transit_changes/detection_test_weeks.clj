@@ -343,20 +343,42 @@
                      {tu/route-name ["A" "A" "A" "A" "A" nil nil]}])))
 
 (deftest test-2-changes-with-nil-days-with-route-end
-  (let [result (->> data-2-changes-with-nil-days2            ;; Notice thread-last
+  (let [result (->> data-2-changes-with-nil-days2           ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    #_(detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes)
+                    #_(detection/trafficless-differences->no-traffic-changes)
+                    )
+        ]
+    (def *r result)
+    (detection/print-change-maps result)
+    ;; we should find a different-week change, a no-traffic change and a route end change.
 
+    ;; 1. change should be the traffic change
+    ;; - is ok: different-week should be 05-27 - it's a different week from start and traffic does not revert in next 2 weeks
+    ;; - is ok no-traffic run 6 & no-traffic-start-date 05-28
     (is (= {:route-key tu/route-name
-            :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
-                             :end-of-week (tu/to-local-date 2019 6 9)}
+            :different-week {:beginning-of-week (tu/to-local-date 2019 5 27)
+                             :end-of-week (tu/to-local-date 2019 6 2)}
             :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
                             :end-of-week (tu/to-local-date 2019 5 19)}
-            :no-traffic-run 1
-            :no-traffic-start-date (tu/to-local-date 2019 6 9)}
-           result)
-        "Ensure a traffic change is reported.")
+            :no-traffic-run 6
+            :no-traffic-start-date (tu/to-local-date 2019 5 28)
+            :different-week-hash ["A" nil nil nil nil nil nil]
+            :starting-week-hash ["A" "A" "A" "A" "A" nil nil]}
+           (first result))
+        "Ensure a different-week change is reported.")
+
+    ;; 2. change should be the no-traffic period
+    (is (= {:no-traffic-start-date (tu/to-local-date 2019 5 28)
+            :no-traffic-end-date (tu/to-local-date 2019 6 24)}
+           (select-keys (second result) [:no-traffic-start-date :no-traffic-end-date]))
+        "Ensure a no-traffic change is reported.")
+
+    (is (= (tu/to-local-date 2019 7 15)
+           (:route-end-date 
+            (last result)))
+        "Ensure a route-end change is reported.")
 
     (testing "Ensure that a right amount of changes are reported"
       (is (= 3 (count result))))))

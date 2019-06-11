@@ -219,8 +219,15 @@
         week-comparison-fn (if no-traffic-ongoing?
                              joni-week=
                              ;; else
-                             erno-joni-hybrid-week=
-                             )]
+                             erno-joni-hybrid-week=)
+        future-week-comparison-fn (fn [start next]
+                                    (if (nil? (last next))
+                                      (joni-week= start next)
+                                      ;; else
+                                      (erno-joni-hybrid-week= start next)))
+        
+        ]
+    
     (println "no-traffic?" no-traffic-ongoing? "->" "using week fn" week-comparison-fn)
     (println "miksi kahdesti prev curr next1 " (pr-str prev) (pr-str curr) (pr-str next1))
     (cond
@@ -242,11 +249,10 @@
       (assoc state :starting-week-hash curr)
 
       ;; If current week does not equal starting week...
-      ;; HOX!! joni-week= on vain väliaikainen settei. Fixaileppa se pois.
       (and (vnot (week-comparison-fn starting-week-hash curr) (str "curr = start (1) sw:" starting-week-hash " curr:" curr))
-           (vnot (joni-week= starting-week-hash next1) "curr = next1 (2)")
+           (vnot (week-comparison-fn starting-week-hash next1) "curr = next1 (2)")
            ;; ...and traffic does not revert back to previous in two weeks
-           (vnot (joni-week= starting-week-hash next2) "curr = next2 (3)"))
+           (vnot (week-comparison-fn starting-week-hash next2) "curr = next2 (3)"))
       ;; this is a change
       (do
         ;(println "mark as change because curr/next1/next2 are all different from starting-week-hash - starting vs curr/n1/n2 hashes are:" (mapv week->short [starting-week-hash curr next1 next2]))
@@ -461,7 +467,7 @@
                           (:routes (first route-weeks)))
         debug-route-hit? (contains? route-names current-debug-route)
         ;_ (clojure.pprint/pprint (partition 4 1 route-weeks))
-        _ (clojure.pprint/pprint route-names)
+        ;_ (clojure.pprint/pprint route-names)
         result (doall (reduce
                         (fn [route-detection-state [_ curr _ _ :as weeks]]
                           (doall (reduce
