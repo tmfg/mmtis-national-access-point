@@ -499,6 +499,11 @@
       (log/warn "Error while sending a notification" e))))
 
 
+(defn- all-ports-response [db]
+  (csv-data ["Koodi" "Nimi" "Leveyspiiri (lat)" "Pituuspiiri (lon)" "Käyttäjän lisäämä?" "Luontihetki"]
+            (map (juxt :code :name :lat :long :user-added? :created)
+                 (fetch-all-ports db))))
+
 (defn- admin-routes [db http nap-config email-config]
   (routes
 
@@ -577,7 +582,14 @@
        {{:keys [type]} :params
         user :user}
     (require-admin-user "reports/transport-operator" (:user user))
-    (transport-operator-report db type)))
+    (transport-operator-report db type))
+
+
+  ^{:format :csv
+    :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/port" {user :user}
+    (or (authorization-fail-response (:user user))
+        (all-ports-response db))))
 
 (define-service-component MonitorReport []
   {}
