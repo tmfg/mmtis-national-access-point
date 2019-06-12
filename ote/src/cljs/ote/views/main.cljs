@@ -40,7 +40,8 @@
             [ote.views.register :as register]
             [ote.views.admin.monitor :as monitor]
             [ote.ui.common :as common-ui]
-            [ote.ui.main-header :refer [top-nav] :as main-header]))
+            [ote.ui.main-header :refer [top-nav] :as main-header]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (def pages {:own-services #{:own-services :transport-service :new-service
                             :edit-service :transport-operator :organizations}
@@ -81,14 +82,14 @@
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           (if (nil? app)
-            [common/loading-spinner]
+            [circular-progress/circular-progress]
             [:div.ote-sovellus {:style {:display "flex"
                                         :flex-direction "column"}}
              [top-nav e! app is-scrolled? desktop?]
              [:div (merge (stylefy/use-style style-base/sticky-footer)
                      {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
               (if (not loaded?)
-                [common/loading-spinner]
+                [circular-progress/circular-progress]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}

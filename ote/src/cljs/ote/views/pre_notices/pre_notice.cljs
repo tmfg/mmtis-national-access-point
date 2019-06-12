@@ -18,7 +18,8 @@
             [ote.ui.leaflet :as leaflet]
             [ote.ui.mui-chip-input :as chip-input]
             [clojure.string :as str]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -323,5 +324,5 @@
 
 (defn edit-pre-notice-by-id [e! {:keys [pre-notice] :as app}]
   (if (or (nil? pre-notice) (:loading pre-notice))
-    [common/loading-spinner]
+    [circular-progress/circular-progress]
     [pre-notice-form e! app]))
