@@ -106,7 +106,7 @@ describe('Operator creation basic tests', function () {
 
     });
 
-    it('add user to opeperator', function () {
+    xit('add user to opeperator', function () {
 
         cy.server();
         cy.route('POST', '/transport-operator/1/users').as('addMember');
