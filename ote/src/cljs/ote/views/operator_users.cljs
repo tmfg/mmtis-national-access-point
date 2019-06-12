@@ -59,7 +59,7 @@
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
        [:span {:style {:margin-left "1rem"}}
-        (prog/circular-progress (tr [:common-texts :loading]))])]]])
+        [prog/circular-progress (tr [:common-texts :loading])]])]]])
 
 (defn manage-access
   [e! state]
@@ -74,4 +74,4 @@
        [:div
         [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
-       (prog/circular-progress (tr [:common-texts :loading])))]))
+       [prog/circular-progress (tr [:common-texts :loading])])]))
