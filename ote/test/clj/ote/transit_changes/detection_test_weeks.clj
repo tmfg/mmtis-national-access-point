@@ -139,16 +139,16 @@
 (deftest test-no-traffic-run
   (testing "Ensure no-traffic starts and ends middle of week and lasts just above threshold, ensure no-traffic is reported"
     (let [result (->> data-no-traffic-run
-               detection/changes-by-week->changes-by-route
-               detection/detect-changes-for-all-routes
-               (detection/add-ending-route-change (tu/to-local-date 2018 10 8) data-all-routes-2019)
-               ;; detection/trafficless-differences->no-traffic-changes
-               )]
+                      detection/changes-by-week->changes-by-route
+                      detection/detect-changes-for-all-routes
+                      (detection/add-ending-route-change (tu/to-local-date 2018 10 8) data-all-routes-2019)
+                      detection/trafficless-differences->no-traffic-changes)]
       (is (= 1 (count result)))
       (is (= {:route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                               :end-of-week (tu/to-local-date 2018 10 21)}
-              :no-traffic-run 12 ;; should be -change 17? but end date matches
+
+              :no-traffic-change 17
               :no-traffic-start-date (tu/to-local-date 2018 10 17)
               :no-traffic-end-date (tu/to-local-date 2018 11 3)}
              (-> result

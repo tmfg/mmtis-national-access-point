@@ -292,6 +292,7 @@
   Sufficiently long no-traffic-runs are marked as :no-traffic-change.
   Starts and ends of no-traffic runs are marked by presence of no-traffic-run key in state."
   [{no-traffic-run :no-traffic-run :as state} [_ curr _ _]]
+  
   (let [;; How many continuous days have no traffic at the start of the week
         beginning-run (week-hash-no-traffic-run true curr)
 
@@ -353,7 +354,9 @@
 
     ;; A "no traffic" change was detected, add end date
     no-traffic-change
-    (assoc state :no-traffic-end-date (.plusDays no-traffic-start-date no-traffic-change))
+    (do
+      ;(println "no-traffic-end-date is here, ntc" no-traffic-change)
+      (assoc state :no-traffic-end-date (.plusDays no-traffic-start-date no-traffic-change)))
 
     ;; Run ended without reaching threshold, remove start date
     (nil? no-traffic-run)
@@ -371,18 +374,31 @@
     state
 
     ;; Change not yet found, try to find one
-    (let [_ (println "route-next-different-week curr" (pr-str curr))
+    (let [_ (println "route-next-different-week curr" (pr-str curr) "weeks count" (count weeks))
           route-week-hashes (mapv (comp #(get % route) :routes)
                                   weeks)
+          s1 state          
+          nt-spy (fn [m id]
+                   (println "nt-spy probe" id "- state of no-traffic keys:" (select-keys m [:no-traffic-run :no-traffic-change :route-key :starting-week-hash]))
+                   m)
           result (-> state
                      (assoc :route-key route)
                      ;; Detect no-traffic run
+                     (nt-spy 1)
                      (detect-no-traffic-run route-week-hashes)
+                     (nt-spy 2)
                      (add-no-traffic-run-dates curr last-analysis-wk)
+                     (nt-spy 3)
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route seq-of-previous-change-maps)
+                     (nt-spy 4)
                      (add-starting-week curr)
-                     (add-different-week curr))]
+                     (add-different-week curr))
+          s2 result]
+      (println "state before:")
+      (clojure.pprint/pprint s1)
+      (println "state after:")
+      (clojure.pprint/pprint s2)
       #_(if-let [dw (:different-week result)]
           (println "ndw res: route-next-different-week found something, curr=" (:beginning-of-week curr) ":" dw)
           (println "ndw res: no changes found, curr=" (:beginning-of-week curr)))
@@ -450,8 +466,11 @@
   (spec/coll-of ::service-route-change-map :kind vector?))
 
 (defn single-route-first-difference [route-name route-weeks seq-of-previous-change-maps]
+  ;; this happens twice in test-no-traffic-run,first with 7 and then with 6 weeks.
+  (println "starting with zero state in srfd, count" (count route-weeks) "firstof prev:" (first seq-of-previous-change-maps) )
   (reduce   
-   (fn [route-detection-state [_ curr _ _ :as weeks]]
+   (fn [route-detection-state [_ curr _ _ :as weeks]]          
+     (println "one 4-partition, state of no-traffic keys:" (select-keys route-detection-state [:no-traffic-run :no-traffic-change :route-key :starting-week-hash]))
      (route-next-different-week route-detection-state seq-of-previous-change-maps route-name weeks curr
                                 (first (take-last 3 route-weeks))))
    {}                                  ; initial route detection state is empty
@@ -465,13 +484,12 @@
   
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks seq-of-previous-change-maps]
-  ;; Take route names from the first week (they are the same in all weeks)  
-
+  ;; Take route names from the first week (they are the same in all weeks)    
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
         debug-route-hit? (contains? route-names current-debug-route)
-        results (map #(single-route-first-difference % route-weeks seq-of-previous-change-maps) route-names)]
+        results (mapv #(single-route-first-difference % route-weeks seq-of-previous-change-maps) route-names)]
     (when debug-route-hit?
       (println "route-weeks-with-first-difference results: " (pr-str results))
       (println (count results) "results /" (count route-weeks) "weeks"))
