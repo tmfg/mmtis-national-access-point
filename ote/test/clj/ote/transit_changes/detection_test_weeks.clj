@@ -264,27 +264,41 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]})))
 
 (deftest test-no-traffic-run-weekdays
-  (let [result (detection/route-weeks-with-first-difference data-no-traffic-run-weekdays [])]
+  (let [result (detection/route-differences data-no-traffic-run-weekdays)]
     (testing "Ensure no-traffic run is reported and normal no-traffic weekends are not. "
-      (is (= 1 (count result)))
+      (is (= 2 (count result)))
+      (is (nil? (:combined (first result))))
       (is (= {:route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                               :end-of-week (tu/to-local-date 2018 10 21)}
+              :different-week {:beginning-of-week (tu/to-local-date 2018 11 12)
+                               :end-of-week (tu/to-local-date 2018 11 18)}
+              :no-traffic-start-date (tu/to-local-date 2018 11 13)
+              :no-traffic-run 6}
+           (-> result
+               first
+                  (select-keys tu/select-keys-detect-changes-for-all-routes)
+                  )))
+      (is (= {:route-key tu/route-name
+              :starting-week {:beginning-of-week (tu/to-local-date 2018 11 12)
+                              :end-of-week (tu/to-local-date 2018 11 18)}
               :no-traffic-change 17
               :no-traffic-start-date (tu/to-local-date 2018 11 13)
               :no-traffic-end-date (tu/to-local-date 2018 11 30)}
              (-> result
-                 first
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))))
+                 second
+                 (select-keys tu/select-keys-detect-changes-for-all-routes))))))
+  
+  
 
 ;;;;;;;; Test no-traffic run start and end when normal week pattern includes also no-traffic days
 
-(def no-traffic-run-full-detection-window
-  (tu/weeks (tu/to-local-date 2018 10 8)
-            (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name) ;; 8.10.                    
-                    [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
-                    (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name)
-                    (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name))))
+  (def no-traffic-run-full-detection-window
+    (tu/weeks (tu/to-local-date 2018 10 8)
+              (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name) ;; 8.10.                    
+                      [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
+                      (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name)
+                      (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name)))))
 
 (deftest test-no-traffic-run-full-detection-window
   (let [result (-> no-traffic-run-full-detection-window
@@ -1093,11 +1107,7 @@
                (select-keys tu/select-keys-detect-changes-for-all-routes))))
 
     (testing "Ensure that a right amount of changes are reported"
-      (is (= 3 (count result))))
-
-
-    (testing "Ensure that both of the changes are detected"
-      (is (= 2 (count result))))))
+      (is (= 3 (count result))))))
 
 (def data-one-week-pause-with-change
   (tu/weeks (tu/to-local-date 2019 5 6)
