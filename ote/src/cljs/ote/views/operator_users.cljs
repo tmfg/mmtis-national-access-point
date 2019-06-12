@@ -36,10 +36,10 @@
       :format (fn [member]
                 [:div
                  [:button.remove-member (merge {:on-click #(e! (ou/->RemoveMember member operator-id))}
-                                 (stylefy/use-style
-                                   (merge buttons/svg-button
-                                          {:display "flex"
-                                           :align-items "center"})))
+                                          (stylefy/use-style
+                                            (merge buttons/svg-button
+                                              {:display "flex"
+                                               :align-items "center"})))
                   [ic/action-delete]
                   (tr [:buttons :delete])]])}]
     users]])

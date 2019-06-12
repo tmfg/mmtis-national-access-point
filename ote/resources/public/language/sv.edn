@@ -607,8 +607,8 @@
                         :email-placeholder "Mata in e-postadress"
                         :manage-users "Hantera användarrättigheter"
                         :already-invited "Käyttäjä on jo kutsuttu."
-                        :something-went-wrong "Jotain meni pieleen. Koita hetken päästä uudestaan."
-                        :already-member "Käyttäjä on jo lisätty."
+                        :something-went-wrong "Ett fel uppstod."
+                        :already-member "Användaren har redan lagts till"
                         :invite-pending "Odottaa kutsun vahvistusta"
                         :invite-sent-success "Kutsu lähetetty onnistuneesti"}
 
