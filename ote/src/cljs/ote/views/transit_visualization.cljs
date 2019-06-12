@@ -765,7 +765,7 @@
          [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
 
          (if (tv/loading-trips? transit-visualization)
-           (prog/circular-progress (tr [:common-texts :loading]))
+           [prog/circular-progress (tr [:common-texts :loading])]
            ;; Selecting a new date1 from calendar clears date2 related keys which are used by selected-route-map-section
            ;; Also, displaying below data is always in connection with the date1&date2 pair which is outdated after a
            ;; new selection from calendar.
