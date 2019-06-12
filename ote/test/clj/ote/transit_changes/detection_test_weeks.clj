@@ -264,22 +264,24 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]})))
 
 (deftest test-no-traffic-run-weekdays
-  (testing "Ensure no-traffic run is reported and normal no-traffic weekends are not. "
-    (is (= {:route-key tu/route-name
-            :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
-                            :end-of-week (tu/to-local-date 2018 10 21)}
-            :no-traffic-change 17
-            :no-traffic-start-date (tu/to-local-date 2018 11 13)
-            :no-traffic-end-date (tu/to-local-date 2018 11 30)}
-           (-> (detection/route-weeks-with-first-difference data-no-traffic-run-weekdays [])
-               first
-               (select-keys tu/select-keys-detect-changes-for-all-routes))))))
+  (let [result (detection/route-weeks-with-first-difference data-no-traffic-run-weekdays [])]
+    (testing "Ensure no-traffic run is reported and normal no-traffic weekends are not. "
+      (is (= 1 (count result)))
+      (is (= {:route-key tu/route-name
+              :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
+                              :end-of-week (tu/to-local-date 2018 10 21)}
+              :no-traffic-change 17
+              :no-traffic-start-date (tu/to-local-date 2018 11 13)
+              :no-traffic-end-date (tu/to-local-date 2018 11 30)}
+             (-> result
+                 first
+                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))))
 
 ;;;;;;;; Test no-traffic run start and end when normal week pattern includes also no-traffic days
 
 (def no-traffic-run-full-detection-window
   (tu/weeks (tu/to-local-date 2018 10 8)
-            (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name)
+            (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name) ;; 8.10.                    
                     [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
                     (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name)
                     (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name))))
@@ -288,7 +290,7 @@
   (let [result (-> no-traffic-run-full-detection-window
                    detection/changes-by-week->changes-by-route
                    detection/detect-changes-for-all-routes
-                   #_ detection/trafficless-differences->no-traffic-changes
+                   detection/trafficless-differences->no-traffic-changes
                    )
         compare-keys [:different-week
                       :no-traffic-start-date
@@ -300,12 +302,13 @@
                       :starting-week
                       :different-week-hash
                       :starting-week-hash]]
-    ;(def *r result)
-    (println "Kohta data ")
-    (clojure.pprint/pprint no-traffic-run-full-detection-window)
+    (def *r result)
+    (detection/print-change-maps result)
     (testing "Ensure traffic with normal no-traffic days detects a no-traffic change correctly"
-      ;; WIP: currently getting these 2 maps (wrongly)
-      #_(is (= {:route-key tu/route-name
+      ;; should get one traffic change (different-week), beginning 2018-11-12,
+      ;; and one long no-traffic period, and maybe one more differnt-week at the end?
+      ;; currently getting these in 1 or 2 maps depending on next handling
+      (is (= {:route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                               :end-of-week (tu/to-local-date 2018 10 21)}
               :no-traffic-start-date (tu/to-local-date 2018 11 13)
@@ -324,10 +327,10 @@
               :no-traffic-end-date (tu/to-local-date 2019 2 11)
 	      :starting-week-hash ["h1" nil nil nil nil nil nil]
               }
-             result #_ (select-keys (first result) compare-keys))))
+             (select-keys (second result) compare-keys))))
 
     (testing "Ensure that a right amount of changes are found and there are no extra changes."
-      (is (= 1 (count result))))))
+      (is (= 2 (count result))))))
 
 (def data-2-changes-with-nil-days2
   (tu/weeks (tu/to-local-date 2019 5 6)
@@ -353,7 +356,7 @@
     (def *r result)
     (detection/print-change-maps result)
     ;; we should find a different-week change, a no-traffic change and a route end change.
-
+    
     ;; 1. change should be the traffic change
     ;; - is ok: different-week should be 05-27 - it's a different week from start and traffic does not revert in next 2 weeks
     ;; - is ok no-traffic run 6 & no-traffic-start-date 05-28
