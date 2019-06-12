@@ -213,18 +213,19 @@
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route seq-of-previous-change-maps]
   ;(dcfr-enter-debug route starting-week-hash curr next1 next2)
   (let [_ (println " curr week" (pr-str curr))
-        prev-change (last seq-of-previous-change-maps)
+        prev-change (last (filter #(= route (:route-key %))
+                                  seq-of-previous-change-maps))
         no-traffic-ongoing? (and (:no-traffic-start-date prev-change)
                                  (nil? (:no-traffic-end-date prev-change)))
         week-comparison-fn (if no-traffic-ongoing?
                              joni-week=
                              ;; else
                              erno-joni-hybrid-week=)
-        future-week-comparison-fn (fn [start next]
-                                    (if (nil? (last next))
-                                      (joni-week= start next)
-                                      ;; else
-                                      (erno-joni-hybrid-week= start next)))
+        ;; future-week-comparison-fn (fn [start next]
+        ;;                             (if (nil? (last next))
+        ;;                               (joni-week= start next)
+        ;;                               ;; else
+        ;;                               (erno-joni-hybrid-week= start next)))
         
         ]
     
@@ -378,20 +379,13 @@
           route-week-hashes (mapv (comp #(get % route) :routes)
                                   weeks)
           s1 state          
-          nt-spy (fn [m id]
-                   (println "nt-spy probe" id "- state of no-traffic keys:" (select-keys m [:no-traffic-run :no-traffic-change :route-key :starting-week-hash]))
-                   m)
           result (-> state
                      (assoc :route-key route)
                      ;; Detect no-traffic run
-                     (nt-spy 1)
                      (detect-no-traffic-run route-week-hashes)
-                     (nt-spy 2)
                      (add-no-traffic-run-dates curr last-analysis-wk)
-                     (nt-spy 3)
                      ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route seq-of-previous-change-maps)
-                     (nt-spy 4)
                      (add-starting-week curr)
                      (add-different-week curr))
           s2 result]
