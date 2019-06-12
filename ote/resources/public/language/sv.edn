@@ -610,7 +610,9 @@
                         :something-went-wrong "Ett fel uppstod."
                         :already-member "Användaren har redan lagts till"
                         :invite-pending "Odottaa kutsun vahvistusta"
-                        :invite-sent-success "Kutsu lähetetty onnistuneesti"}
+                        :invite-sent-success "Kutsu lähetetty onnistuneesti"
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
+                        :confirm-remove "Poista jäsen"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
