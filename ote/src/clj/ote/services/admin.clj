@@ -499,7 +499,7 @@
       (log/warn "Error while sending a notification" e))))
 
 
-(defn- all-ports [db]
+(defn- all-ports-response [db]
   (csv-data ["Koodi" "Nimi" "Leveyspiiri (lat)" "Pituuspiiri (lon)" "Käyttäjän lisäämä?" "Luontihetki"]
             (map (juxt :code :name :lat :long :user-added? :created)
                  (fetch-all-ports db))))
@@ -586,12 +586,10 @@
 
 
   ^{:format :csv
-    :filename (str "raportti-" (time/format-date-iso-8601 (time/now)) ".csv")}
-  (GET "/admin/reports/all-ports"
-       {{:keys [type]} :params
-        user :user}
-    (require-admin-user "reports" (:user user))
-    (all-ports db)))
+    :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/port" {user :user}
+    (or (authorization-fail-response (:user user))
+        (all-ports-response db))))
 
 (define-service-component MonitorReport []
   {}
