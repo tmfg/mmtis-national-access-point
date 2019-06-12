@@ -259,7 +259,7 @@
   (let [result (->> data-no-traffic-run-weekdays
                    (detection/changes-by-week->changes-by-route)
                    (detection/detect-changes-for-all-routes)
-                   (detection/add-ending-route-change (tu/to-local-date 2018 10 15) data-all-routes))]
+                   (detection/add-ending-route-change (tu/to-local-date 2018 10 15) data-all-routes-2019))]
     (is (= {:route-key tu/route-name
                 :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                                 :end-of-week (tu/to-local-date 2018 10 21)}
