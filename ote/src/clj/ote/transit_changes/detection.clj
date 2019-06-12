@@ -1029,7 +1029,10 @@
                                                out-weeks)))]
     weeks-without-combined-leftovers))
 
-(defn- route-ends? [^LocalDate date max-date ^Integer traffic-threshold-d]
+(defn- route-ends?
+  "Input: date=analysis date, max-date=last day with traffic for route, traffic-threshold-d=route end threshold of days in future for reporting route end
+  Output: returns true if max-date is below traffic-threshold-d"
+  [^LocalDate date max-date ^Integer traffic-threshold-d]
   (and max-date
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
        (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
@@ -1055,6 +1058,7 @@
   a traffic threshold days value
   See spec definition for argument validity.
   Input:
+        date: Analysis date when detection routine is run
         all-routes format:
                     ([\"-Vihtjärvi - Loppi-\"
                     {:route-short-name \"\",
@@ -1071,7 +1075,6 @@
                      :starting-week  {:beginning-of-week   #object[java.time.LocalDate 0x2af682f8 \"2019-03-25\"], :end-of-week #object[java.time.LocalDate 0x68572428 \"2019-03-31\"]},
                      :no-traffic-start-date  #object[java.time.LocalDate 0x59e94954 \"2019-06-02\"]
                      {...}]
-         traffic-window-d: Threshold in number of days, routes with :max-date below this will be marked ending
    Output:
         [{:route-key \"-Vihtjärvi - Loppi-\",
         :no-traffic-run 78,

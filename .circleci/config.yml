@@ -151,6 +151,7 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - e2e-pr:
-          requires:
-            - build
+      # e2e commented out here because of flakiness. uncomment in your branch to run them in circleci.
+      # - e2e-pr:
+      #    requires:
+      #      - build

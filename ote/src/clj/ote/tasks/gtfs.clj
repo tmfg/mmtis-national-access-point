@@ -22,6 +22,7 @@
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
+(defqueries "ote/services/transit_changes.sql")
 
 (def daily-update-time (t/from-time-zone (t/today-at 0 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
@@ -105,6 +106,34 @@
                  (log/warn e "Change detection failed for service " service-id)))
              (log/info "Detection completed for service: " service-id))))))))
 
+(defn recalculate-detected-changes-count
+"Change detection (detect-new-changes-task) stores detected changes. These changes will expire after some period of time.
+All changes occur on a certain day and they will get old. Transit-changes page shows how many changes there are and
+if we don't recalculate them every night expired changes will be show also. So in this fn we recalculate change counts again using
+different-week-date value and skip all expired changes."
+  [db]
+  (let [upcoming-changes (upcoming-changes db)
+        _ (log/info "Detected change count recalculation started!")]
+    ;; Loop upcoming-changes
+    (dotimes [i (count upcoming-changes)]
+      (let [change-row (nth upcoming-changes i)
+            changes (map #(assoc % :change-type (keyword (:change-type %)))
+                         (valid-detected-route-changes db
+                                                         {:date (:date change-row)
+                                                          :service-id (:transport-service-id change-row)}))
+            grouped-changes (group-by :change-type changes)]
+
+        (log/info (inc i) "/" (count upcoming-changes) " Recalculating detected change amounts (by change type) for service " (:transport-service-id change-row) " detection date " (:date change-row))
+        ;; Update sinle transit-change (change-row)
+        (specql/update! db :gtfs/transit-changes
+                        {:gtfs/removed-routes (count (group-by :route-hash-id (:removed grouped-changes)))
+                         :gtfs/added-routes (count (group-by :route-hash-id (:added grouped-changes)))
+                         :gtfs/changed-routes (count (group-by :route-hash-id (:changed grouped-changes)))
+                         :gtfs/no-traffic-routes (count (group-by :route-hash-id (:no-traffic grouped-changes)))}
+                        {:gtfs/date (:date change-row)
+                         :gtfs/transport-service-id (:transport-service-id change-row)})))
+    (log/info "Detected change count recalculation ready!")))
+
 (defrecord GtfsTasks [at config]
   component/Lifecycle
   (start [{db :db :as this}]
@@ -118,7 +147,10 @@
              (#'update-one-gtfs! config db true)))
          (chime-at (daily-at 5 15)
                    (fn [_]
-                     (detect-new-changes-task db (time/now) false)))]
+                     (detect-new-changes-task db (time/now) false)))
+         (chime-at (daily-at 0 15)
+                   (fn [_]
+                     (recalculate-detected-changes-count db)))]
         (do
           (log/debug "GTFS IMPORT IS NOT ENABLED!")
           nil))))

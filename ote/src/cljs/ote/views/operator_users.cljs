@@ -1,16 +1,16 @@
 (ns ote.views.operator-users
   (:require [ote.app.controller.operator-users :as ou]
-            [ote.ui.spinner :as spinner]
             [ote.ui.table :as table]
             [ote.app.utils :as utils]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form-fields :as form-fields]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.buttons :as buttons]))
+            [ote.style.buttons :as buttons]
+            [ote.ui.circular_progress :as prog]))
 
 (defn access-table
-  [e! users]
+  [e! users operator-id]
   [:div
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
@@ -24,9 +24,9 @@
       :read :email}
      {:name (tr [:front-page :table-header-actions])
       :read identity
-      :format (fn [x]
+      :format (fn [member]
                 [:div
-                 [:button (merge {:on-click #(println (:id x))}
+                 [:button.remove-member (merge {:on-click #(e! (ou/->RemoveMember member operator-id))}
                                  (stylefy/use-style
                                    (merge buttons/svg-button
                                           {:display "flex"
@@ -42,7 +42,8 @@
                         (.preventDefault e)
                         (when (re-matches utils/email-regex new-member-email)
                           (e! (ou/->PostNewUser new-member-email op-id))))}
-    [form-fields/field {:type :string
+    [form-fields/field {:element-id "operator-user-email"
+                        :type :string
                         :full-width? true
                         :name :add-member
                         :update! #(e! (ou/->EmailFieldOnChange %))
@@ -57,7 +58,8 @@
         (stylefy/use-style buttons/disabled-button))
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
-       [spinner/primary-spinner {:style {:margin-left "1rem"}}])]]])
+       [:span {:style {:margin-left "1rem"}}
+        [prog/circular-progress (tr [:common-texts :loading])]])]]])
 
 (defn manage-access
   [e! state]
@@ -70,6 +72,6 @@
      [:h2 name]
      (if loaded?
        [:div
-        [access-table e! access-users name]
+        [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
-       [spinner/primary-spinner])]))
+       [prog/circular-progress (tr [:common-texts :loading])])]))
