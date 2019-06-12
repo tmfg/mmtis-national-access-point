@@ -449,47 +449,33 @@
   ::detected-route-changes-for-services-coll
   (spec/coll-of ::service-route-change-map :kind vector?))
 
+(defn single-route-first-difference [route-name route-weeks seq-of-previous-change-maps]
+  (reduce   
+   (fn [route-detection-state [_ curr _ _ :as weeks]]
+     (route-next-different-week route-detection-state seq-of-previous-change-maps route-name weeks curr
+                                (first (take-last 3 route-weeks))))
+   {}                                  ; initial route detection state is empty
+   (partition 4 1 route-weeks)))
+
 (defn route-weeks-with-first-difference
   "Detect the next different week in each route.
   NOTE! starting from the second week in the given route-weeks, the first given week is considered the \"prev\" week.
   Takes a list of weeks that have week hashes for each route.
-  Returns map from route [short long headsign] to next different week info.
+  Returns a seq of route change maps.
+  
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks seq-of-previous-change-maps]
-  ;(if (= 7  (count route-weeks))
-  ;   (def *r7 route-weeks))
-  ;; (println "spec for route-weeks:")
-  ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
-  ;; (println "rwwfdn called with " (mapv #(keys (:routes %)) route-weeks))
-  ;; Take routes from the first week (they are the same in all weeks)
+  ;; Take route names from the first week (they are the same in all weeks)  
+
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
         debug-route-hit? (contains? route-names current-debug-route)
-        ;_ (clojure.pprint/pprint (partition 4 1 route-weeks))
-        ;_ (clojure.pprint/pprint route-names)
-        result (doall (reduce
-                        (fn [route-detection-state [_ curr _ _ :as weeks]]
-                          (doall (reduce
-                                   (fn [route-detection-state route]
-                                     (let [_ (println "update **  curr" (pr-str curr) "route " route "route-detection-state" (pr-str route-detection-state))]
-                                       ;; value under route key in r-d-s map will be updated by
-                                       ;; (route-next-different-week *value* route weeks curr)
-                                       (update route-detection-state route
-                                               #(route-next-different-week % seq-of-previous-change-maps route weeks curr
-                                                                           (first (take-last 3 route-weeks))
-                                                                           ))))
-                                   route-detection-state
-                                   route-names)))
-                        {}                                  ; initial route detection state is empty
-                        (partition 4 1 route-weeks)))]
+        results (map #(single-route-first-difference % route-weeks seq-of-previous-change-maps) route-names)]
     (when debug-route-hit?
-      ;(println "route-weeks-with-first-difference result: " (pr-str result) "count" (count route-weeks))
-      ;(println "route-weeks-with-first-difference, dw date: " (str (get-in result [current-debug-route :different-week :beginning-of-week])))
-      )
-
-    (vals result)))
-
+      (println "route-weeks-with-first-difference results: " (pr-str results))
+      (println (count results) "results /" (count route-weeks) "weeks"))
+    results))
 
 (defn local-date-before? [d1 d2]
   (.isBefore d1 d2))
@@ -540,9 +526,12 @@
   ;; (println "in route-differences, first is" (pr-str route-weeks))
   ;; (def *rdrw)
   (println "Count of route-weeks: " (count route-weeks))
+  ;; refactoring need: route-weeks-with-first-difference always returns 1-length vec with single map
   (loop [route-weeks route-weeks
          results []]
+    (println "passing route-weeks of type" (type route-weeks))
     (let [diff-data (route-weeks-with-first-difference route-weeks results)
+          _ (assert (< (count diff-data) 2) (str "result count was" (count diff-data)))
           first-interesting-diff (first
                                   (filter
                                    (fn [value]
@@ -559,7 +548,7 @@
       (if (and (not-empty diff-data) prev-week-date)        ;; end condition: dates returned by f-w-d had nil different-week beginning
         (do
           (println "************************* filter " )
-          (clojure.pprint/pprint (filter #(route-starting-week-not-before? % prev-week-date) route-weeks))
+          ;; (clojure.pprint/pprint (filter #(route-starting-week-not-before? % prev-week-date) route-weeks))
           (recur
               ;; Filter out different weeks before current week, because different week is starting week for next change.
               ;; Use the previous week date, because first-week-difference starts comparisons at the second given week
@@ -949,12 +938,13 @@
                     weeks))))
 
 (defn detect-changes-for-all-routes
-  "Input: takes a vector or routes with their traffic weeks
+  "Input: takes a vector of routes with their traffic weeks
   Invokes a function in a loop for each route to detect any changes for each route.
-  Output: Vector of routes enriched by details if there are changes in traffic for a route on a week, including no-traffic detection."
+  Output: Vector of routes enriched by details if there are changes in traffic for a route on a week, including no-traffic detection.
+  In the output there is one map per route of the general form {:route-key <route-name> :starting-week xxx :foo etc }."
   [route-list-with-week-hashes]
+  (println "route list lengths:" (mapv count route-list-with-week-hashes))
   (vec (mapcat route-differences route-list-with-week-hashes)))
-
 
 (defn trafficless-route-change-before-route-end? [a b]
   ;; remove this fn, left in as temporary sanity check
