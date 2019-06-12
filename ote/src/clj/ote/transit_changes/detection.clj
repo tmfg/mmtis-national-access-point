@@ -531,7 +531,6 @@
          results []]
     (println "passing route-weeks of type" (type route-weeks))
     (let [diff-data (route-weeks-with-first-difference route-weeks results)
-          _ (assert (< (count diff-data) 2) (str "result count was" (count diff-data)))
           first-interesting-diff (first
                                   (filter
                                    (fn [value]
