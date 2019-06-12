@@ -1255,7 +1255,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
            :password-not-valid "Pituus vähintään 6 merkkiä. Salasanan tulee sisältää kirjaimia ja vähintään yksi numero."}
   :confirm-changes "Varmista muutokset"
-  :change-password "Vaihda salasana"}
+  :change-password "Vaihda salasana"
+  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
 
  :reset-password
  {:label "Salasanan vaihto"

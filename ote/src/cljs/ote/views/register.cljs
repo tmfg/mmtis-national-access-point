@@ -14,10 +14,10 @@
   [token-info]
   (if (not (= token-info :token-invalid))
     (notification/notification
-      {:text (str "Olet liittymässä osaksi palvelua " (:name token-info))
+      {:text (tr [:register :valid-token] {:operator-name (:name token-info)})
        :type :success})
     (notification/notification
-      {:text "Kutsusi on vanhentunut. Voit pyytää kutsun lähettäjältä uutta kutsua tai jatkaa rekisteröitymistä ja pyytää kutsun lähettäjää kutsumaan luotu käyttäjä"
+      {:text (tr [:register :invalid-token])
        :type :warning})))
 
 ;; PENDING:

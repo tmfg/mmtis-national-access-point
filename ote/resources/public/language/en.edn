@@ -1243,7 +1243,9 @@ You can also draw the operating area or point to the map with drawing tools. You
            :logged-in ["You are already logged in as: " :name]
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
   :confirm-changes "Confirm changes"
-  :change-password "Change password"}
+  :change-password "Change password"
+  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
 
  :reset-password
  {:label "Reset your password"
