@@ -263,7 +263,6 @@
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/name operator)]
-     (println requester)
      (html-template title
        [:div {:style "max-width: 800px"}
         [:br]
