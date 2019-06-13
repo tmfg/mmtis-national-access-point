@@ -162,6 +162,11 @@
   #_(when cond (println "debug: not a change because" msg))
   (not cond))
 
+;; TODO: utilize here prev-change to get :starting-week-hash if it's available, to allow detecting traffic change after no-traffic period. AAAnil16nilBBB
+;; :starting-week-hash is lost in earlier loop if no-traffic is reported on :nt-last.
+;; Current workaround puts no-traffic reporting to week after :nt-last, which puts it into same map with :different week and has to be split later.
+;; Using `prev-change` :starting-week-hash here allows detecting BBB even if state is empty.
+
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
@@ -195,7 +200,7 @@
   (->> (if beginning?
          weekhash
          (reverse weekhash))
-       (take-while #(or (:nt %) (keyword? %)))              ;; :nt means a day within no-traffic period
+       (take-while #(or (:nt %) (:nt-first %) (:nt-last %) (keyword? %))) ;; :nt means a day within no-traffic period
        count))
 
 (defn add-current-week-hash [to-key if-key state week]
@@ -215,33 +220,39 @@
   (let [;; How many continuous days have no traffic at the start of the week
         beginning-run (week-hash-no-traffic-run-keyword true wk-hash-current)
         ;; How many continuous days have no traffic at the end of the week
-        end-run (week-hash-no-traffic-run-keyword false wk-hash-current)]
-
-    ;(println "detect-no-traffic-run-change: wk-hashes=" wk-hashes) TODO: remove
-    ;(println "detect-no-traffic-run-change: change-map=" change-map)
+        end-run (week-hash-no-traffic-run-keyword false wk-hash-current)
+        trafficless-first? (boolean (some #(= :nt-first %) wk-hash-current))
+        trafficless-last? (boolean (some #(= :nt-last %) wk-hash-current))]
     (cond
-      ;; No trafficless period detected - most common case so have that first for efficiency
-      (and (zero? beginning-run)
-           (zero? end-run)
-           (nil? (:no-traffic-start-date change-map)))
-      (do (println "detect-no-traffic-run-change: not trafficless") ;; TODO: remove
-          change-map)
-
-
-      (and (:no-traffic-start-date change-map) (= beginning-run 7))
-      (do (println "detect-no-traffic-run-change: trafficless continues");; TODO: remove
-          change-map)
-
-      ;; Trafficless period ends
-      ;; not-traffic period which ends on last weekday is detected on next week's analysis when traffic starts
-      (and (:no-traffic-start-date change-map)
-           ;; beginning-run can be zero (=ends on last week's last day) or positive (=ends on this week)
-           (zero? end-run))
-      (do (println "detect-no-traffic-run-change: trafficless ends, change-map=" change-map);; TODO: remove
+      ;; END: No-traffic i.e. trafficless period ends on current week:
+      ;; Trafficless period end is detected on the week when new traffic starts, not on the last traficless week
+      ;; Could be done on last no-traffic week based on :nt-last, but that would mess up the main detection loop
+      ;; when :starting-week is cleared and traffic after
+      (and (:no-traffic-start-date change-map) (not (:no-traffic-end-date change-map)) (zero? end-run))
+      (do (println "detect-no-traffic-run-change: trafficless ends, change-map=" change-map
+                   "\n beginning-run=" beginning-run "\n wk-map-current=" wk-map-current) ;; TODO: remove
           (assoc change-map :no-traffic-end-date (.plusDays (:beginning-of-week wk-map-current) beginning-run)))
 
-      ;; Exception case: previous no-traffic period ends and new  starts on the same week!
+      ;; NORMAL: No trafficless period start/end on current week, do nothing
+      (and (not trafficless-first?) (not trafficless-last?))
+      (do (println "detect-no-traffic-run-change: No trafficless period week OR already started trafficless period continues change-map=\n" change-map)
+          change-map)
+
+      ;; START: No-traffic i.e. trafficless period starts on current week
+      (and trafficless-first? (not trafficless-last?))
+      (do (println "detect-no-traffic-run-change: trafficless starts") ;; TODO: remove
+          (assoc change-map :no-traffic-start-date (.plusDays (:beginning-of-week wk-map-current) (- 7 end-run))))
+
+      ;; TODO: after seq-of-previous-change-maps available from route-next-different-week to detect-change-for-route
+      ; then this function could be changed to detect no-traffic end on the actual week when it ends and not on the
+      ; next week when traffic continues. Current end detection cond case could be replaced like this:
+      ;(and (not trafficless-first?) trafficless-last?)
+      ;(assoc change-map :no-traffic-end-date (.plusDays (:beginning-of-week wk-map-current) beginning-run))
+
+      ;; END & START: previous no-traffic period ends and new starts on the same week!
       ;; For example: [:no-traffic "A" "A" "A" "A" "A" :no-traffic :no-traffic]
+      ;; TODO: fixme  how to handle new starting trafficless period? Setting :no-traffic-start-date here would overwrite
+      ;; previous change's date incorrectly.
       (and (:no-traffic-start-date change-map)
            (pos? beginning-run)
            (pos? end-run)
@@ -249,23 +260,15 @@
       (do
         (log/debug
           "detect-no-traffic-run-change: previous no-traffic period ends and new  starts on the same week! change-map= \n " change-map
-          " \n wk-hash-current= \n" wk-hash-current) ;; TODO: remove
+          " \n wk-hash-current= \n" wk-hash-current)        ;; TODO: remove
         (-> change-map
             (assoc :no-traffic-end-date (.plusDays no-traffic-start-date beginning-run))
-            (assoc :no-traffic-start-date (.plusDays (:beginning-of-week wk-map-current) (- 7 end-run)))))
+            #_(assoc :no-traffic-start-date (.plusDays (:beginning-of-week wk-map-current) (- 7 end-run)))))
 
-      ;; Trafficless period starts
-      (and (nil? (:no-traffic-start-date change-map))
-           (pos? end-run)
-           ;; beginning-run can be whatever: starts either on 1st day or middle of week
-           )
-      (do (println "detect-no-traffic-run-change: trafficless starts") ;; TODO: remove
-          (assoc change-map :no-traffic-start-date (.plusDays (:beginning-of-week wk-map-current) (- 7 end-run))))
-
-      ;; No condition matched
+      ;; UNEXPECTED: no condition matched
       :default
       (do
-        (log/warn "detect-no-traffic-run-change: Unexpected logical branch! change-map= \n " change-map " \n wk-hash-current= \n" wk-hash-current)
+        (log/debug "detect-no-traffic-run-change: Unexpected logical branch! change-map= \n " change-map " \n wk-hash-current= \n" wk-hash-current)
         change-map))))
 
 (defn- route-next-different-week
@@ -274,18 +277,15 @@
     ;; change already found, don't try again
     state
 
-    ;; Change not yet found, try to find one
     (let [route-week-hashes (mapv (comp #(get % route) :routes)
                                   week-maps)
           result (-> state
                      (assoc :route-key route)
                      (detect-no-traffic-run-change route-week-hashes week-map-current)
-
-                     ;; Detect other traffic changes
                      (detect-change-for-route route-week-hashes route)
                      (add-starting-week week-map-current)
                      (add-different-week week-map-current))]
-      result)))
+    result)))
 
 (spec/def
   ::routes
@@ -436,7 +436,12 @@
   ;(println "route-hashes->keyed-notraffic-hashes: \n" route-hashes) TODO: remove
   (mapcat
     #(if (and (some nil? %) (> (count %) (:detection-threshold-no-traffic-days settings-tc)))
-       (repeat (count %) :nt)                               ;; :nt means a day within a no-traffic period
+       (seq
+         (concat
+           [:nt-first]                                      ;; First and last marked to allow detecting start/end dates
+           (vec
+             (repeat (- (count %) 2) :nt))                  ;; Negative shouldn't be possible because of :detection-threshold-no-traffic-days
+           [:nt-last]))
        %)
     (partition-by nil? route-hashes)))
 
@@ -494,10 +499,7 @@
            :starting-week-hash [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}]
            {...}"
   [route-weeks]
-  ;(println "route-differences: route-weeks=") ; TODO: remove
-  ;(clojure.pprint/pprint route-weeks)
-
-  (let [route-weeks-trafficless  (route-wks->keyed-notraffic-wks route-weeks)]
+  (let [route-weeks-trafficless (route-wks->keyed-notraffic-wks route-weeks)]
     (loop [route-weeks route-weeks-trafficless
            results []]
       (let [diff-data (route-weeks-with-first-difference route-weeks)
