@@ -220,14 +220,7 @@
         week-comparison-fn (if no-traffic-ongoing?
                              joni-week=
                              ;; else
-                             erno-joni-hybrid-week=)
-        ;; future-week-comparison-fn (fn [start next]
-        ;;                             (if (nil? (last next))
-        ;;                               (joni-week= start next)
-        ;;                               ;; else
-        ;;                               (erno-joni-hybrid-week= start next)))
-        
-        ]
+                             erno-joni-hybrid-week=)]
     
     (println "no-traffic?" no-traffic-ongoing? "->" "using week fn" week-comparison-fn)
     (println "miksi kahdesti prev curr next1 " (pr-str prev) (pr-str curr) (pr-str next1))
@@ -251,8 +244,10 @@
 
       ;; If current week does not equal starting week...
       (and (vnot (week-comparison-fn starting-week-hash curr) (str "curr = start (1) sw:" starting-week-hash " curr:" curr))
-           (vnot (week-comparison-fn starting-week-hash next1) "curr = next1 (2)")
            ;; ...and traffic does not revert back to previous in two weeks
+           ;; - potentially we'd use the no-traffic information of next1 and next2 weeks too
+           ;;   to pick week comparison fn but we don't have n-t info for those yet
+           (vnot (week-comparison-fn starting-week-hash next1) "curr = next1 (2)")
            (vnot (week-comparison-fn starting-week-hash next2) "curr = next2 (3)"))
       ;; this is a change
       (do
