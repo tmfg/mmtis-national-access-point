@@ -446,7 +446,8 @@
     (partition-by nil? route-hashes)))
 
 (defn route-wks->hashes-flat
-  ""
+  "Input: collection of maps, each describing a week of traffic (or lack of it) for same one route
+  Output: vector where all day hashes are appended as one flat consecutive collection."
   [route-weeks]
   (vec
     (reduce (fn [result {:keys [routes] :as route-week}]
@@ -456,9 +457,9 @@
 
 
 (defn route-wks->keyed-notraffic-wks
-  ""
+  "Input: route-weeks = collection of maps, each describing a week of traffic (or lack of it) for same one route
+  Output: route-weeks where each day hashes replaced by keyword, if the day belongs to a 'no-traffic' period."
   [route-weeks]
-  ;(println "route-wks->keyed-notraffic-wks") TODO: remove
   (-> route-weeks
       route-wks->hashes-flat
       route-hashes->keyed-notraffic-hashes
@@ -467,7 +468,6 @@
 (defn separate-if-trafficless-and-different
   ""
   [change-map]
-  ;(println "separate-if-trafficless-and-different: " change-map) TODO: remove
    (if (and (:no-traffic-start-date change-map)
            (:different-week change-map))
     [
