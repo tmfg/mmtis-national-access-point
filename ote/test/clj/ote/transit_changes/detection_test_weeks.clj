@@ -563,31 +563,60 @@
 (def data-two-week-two-route-change                         ;; This is the same format as the (combine-weeks) function
   (tu/weeks (tu/to-local-date 2019 2 4)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 11.2. prev week start
-                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 18.2. first change in route1
-                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
+                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2019-02-11
+                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2019-02-18
+                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]} ; 2019-02-25
+                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]} ; 2019-03-04
+                  {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]} ; 2019-03-11
+                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2019-03-18
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
 
 (deftest test-two-week-two-route-change
-  (let [diff-maps (-> data-two-week-two-route-change
+  (let [result (-> data-two-week-two-route-change
                       (detection/changes-by-week->changes-by-route)
-                      (detection/detect-changes-for-all-routes))
-        fwd-difference (detection/route-weeks-with-first-difference data-two-week-two-route-change)]
-    (testing "first change matches first-week-difference return value"
-      (is (= (-> fwd-difference second :different-week)
-             (-> diff-maps first :different-week))))
+                      (detection/detect-changes-for-all-routes))]
+    (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 2 18)
+                             :end-of-week (tu/to-local-date 2019 2 24)}
+            :route-key tu/route-name
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 2 11)
+                            :end-of-week (tu/to-local-date 2019 2 17)}}
+           (select-keys
+             (nth result 0)
+             tu/select-keys-detect-changes-for-all-routes))
+        "Ensure 1st change on 1st route matches")
 
-    (testing "second route's first change date is ok"
-      (is (= (tu/to-local-date 2019 2 25)
-             (first
-               (for [dp diff-maps
-                     :let [d (-> dp :different-week :beginning-of-week)]
-                     :when (= tu/route-name-2 (:route-key dp))]
-                 d)))))))
+    (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 3 18)
+                             :end-of-week (tu/to-local-date 2019 3 24)}
+            :route-key tu/route-name
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 2 18)
+                            :end-of-week (tu/to-local-date 2019 2 24)}}
+           (select-keys
+             (nth result 1)
+             tu/select-keys-detect-changes-for-all-routes))
+        "Ensure first change matches the right route and date")
+
+    (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 2 25)
+                             :end-of-week (tu/to-local-date 2019 3 3)}
+            :route-key tu/route-name-2
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 2 11)
+                            :end-of-week (tu/to-local-date 2019 2 17)}}
+           (select-keys
+             (nth result 2)
+             tu/select-keys-detect-changes-for-all-routes))
+        "Ensure 1st change on 2nd route matches")
+
+    (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 3 18)
+                             :end-of-week (tu/to-local-date 2019 3 24)}
+            :route-key tu/route-name-2
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 2 25)
+                            :end-of-week (tu/to-local-date 2019 3 3)}}
+           (select-keys
+             (nth result 3)
+             tu/select-keys-detect-changes-for-all-routes))
+        "Ensure 2nd change on 2nd route matches")
+
+    (is (= 4 (count result)))))
 
 ;;;;;;;;; Test traffic change to pattern with nils. Adapted from production case.
 
