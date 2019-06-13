@@ -795,23 +795,24 @@
   (let [result (->> data-paused-traffic-with-end            ;; Notice thread-last
                     (detection/changes-by-week->changes-by-route)
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
-    (testing "Ensure that the pause is detected properly"
-      (is (= {:route-key tu/route-name
-              :no-traffic-start-date (tu/to-local-date 2019 6 10)
-              :no-traffic-end-date (tu/to-local-date 2019 7 11)
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
-             (-> result
-                 (first)
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
 
-    (testing "Ensure that the route end is detected properly"
-      (is (= {:route-key tu/route-name
-              :route-end-date (tu/to-local-date 2019 8 5)
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 7 15) :end-of-week (tu/to-local-date 2019 7 21)}}
-             (-> result
-                 (second)
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))
+    (is (= {:route-key tu/route-name
+            :no-traffic-start-date (tu/to-local-date 2019 6 10)
+            :no-traffic-end-date (tu/to-local-date 2019 7 11)
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
+           (-> result
+               (first)
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure that the pause is detected properly")
+
+    (is (= {:route-key tu/route-name
+            :route-end-date (tu/to-local-date 2019 8 5)
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 7 15) :end-of-week (tu/to-local-date 2019 7 21)}}
+           (-> result
+               (second)
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure that the route end is detected properly")
 
     (testing "Ensure the amount of changes"
       (is (= 2 (count result))))))
