@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.localization :refer [tr]]
             [ote.communication :as comm]
+            [ote.app.controller.front-page :as fp]
             [ote.util.url :as url-util]
             [ote.app.routes :as routes]
             [ote.app.controller.common :refer [->ServerError]]
@@ -26,7 +27,7 @@
   (comm/get!
     (str "transport-operator/" (url-util/encode-url-component (get-in app [:params :operator-id])) "/users")
     {:on-success (tuck/send-async! ->GetUsersSuccess)
-     :on-failure (tuck/send-async! ->ServerError)})
+     :on-failure (tuck/send-async! #(fp/->ChangePage :front-page nil))})
   (assoc-in app [:manage-access :loaded?] false))
 
 (defn GetTransportOperator [app]
@@ -39,8 +40,9 @@
 (define-event NewUserSuccess [result]
   {}
   (let [users (vec (get-in app [:manage-access :users]))
-        users-long (conj users {:fullname (:name result) :email (:email result) :id (:id result)})]
+        users-long (sort-by :pending? (conj users result))]
     (-> app
+        (assoc :flash-message (tr [:transport-users-page :invite-sent-success]))
         (assoc-in [:manage-access :users] users-long)
         (assoc-in [:manage-access :new-member-email] "")
         (assoc-in [:manage-access :new-member-loading?] false))))

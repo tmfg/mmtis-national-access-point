@@ -601,8 +601,13 @@ You can also draw the operating area or point to the map with drawing tools. You
                         :add-member "Add a member"
                         :email-placeholder "Enter email adress"
                         :manage-users "Manage access rights"
+                        :already-invited "User is already invited."
                         :something-went-wrong "Something went wrong."
-                        :already-member "User is already a member."}
+                        :already-member "The user has already been added."
+                        :invite-pending "Waiting for confirmation."
+                        :invite-sent-success "Invitation sent successfully."
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
+                        :confirm-remove "Poista jäsen"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -1238,7 +1243,9 @@ You can also draw the operating area or point to the map with drawing tools. You
            :logged-in ["You are already logged in as: " :name]
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
   :confirm-changes "Confirm changes"
-  :change-password "Change password"}
+  :change-password "Change password"
+  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
 
  :reset-password
  {:label "Reset your password"

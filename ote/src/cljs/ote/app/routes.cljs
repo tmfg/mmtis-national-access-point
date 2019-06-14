@@ -2,8 +2,7 @@
   "Routes for the frontend app."
   (:require [bide.core :as r]
             [ote.app.state :as state]
-            [tuck.core :as tuck]
-            [ote.util.fn :refer [flip]]))
+            [tuck.core :as tuck]))
 
 (def ga-tracking-code
   (.getAttribute js/document.body "data-ga-tracking-code"))
@@ -21,6 +20,7 @@
     ["/login" :login]
     ["/reset-password" :reset-password]
     ["/register" :register]
+    ["/register/:token" :register]
     ["/user" :user]
     ["/own-services" :own-services]
     ["/transport-operator/:operator-id/users" :access-management]

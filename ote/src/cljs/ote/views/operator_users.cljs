@@ -7,6 +7,7 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.buttons :as buttons]
+            [ote.theme.colors :as colors]
             [ote.ui.circular_progress :as prog]))
 
 (defn access-table
@@ -14,12 +15,20 @@
   [:div
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
-                 :key-fn :id
+                 :key-fn #(or (:id %) (:token %))
                  :name->label identity
                  :show-row-hover? true
                  :no-selection? true}
     [{:name (tr [:transport-users-page :username])
-      :read :fullname}
+      :read identity
+      :format (fn [row]
+                (if (:pending? row)
+                  [:span {:style {:display "flex"
+                                  :align-items "center"}}
+                   [ic/action-info {:style {:color colors/primary-light
+                                            :margin-right "3px"}}]
+                   (tr [:transport-users-page :invite-pending])]
+                  (:fullname row)))}
      {:name (tr [:register :fields :email])
       :read :email}
      {:name (tr [:front-page :table-header-actions])
@@ -27,10 +36,10 @@
       :format (fn [member]
                 [:div
                  [:button.remove-member (merge {:on-click #(e! (ou/->RemoveMember member operator-id))}
-                                 (stylefy/use-style
-                                   (merge buttons/svg-button
-                                          {:display "flex"
-                                           :align-items "center"})))
+                                          (stylefy/use-style
+                                            (merge buttons/svg-button
+                                              {:display "flex"
+                                               :align-items "center"})))
                   [ic/action-delete]
                   (tr [:buttons :delete])]])}]
     users]])
@@ -75,3 +84,4 @@
         [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
        [prog/circular-progress (tr [:common-texts :loading])])]))
+
