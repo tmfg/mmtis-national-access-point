@@ -4,11 +4,13 @@
             [ote.db.transport-operator :as t-operator]
             [specql.op :as op]
             [taoensso.timbre :as log]
-            [ote.nap.users :as users]))
+            [ote.nap.users :as users]
+            [ote.components.http :as http]))
 
-(defn require-transit-authority [user]
+(defn transit-authority-authorization-response [user]
   (when-not (get-in user [:user :transit-authority?])
-       (throw (SecurityException. "transit authority only"))))
+    (log/info  "Not authorized. Bad role. transit-authority-authorization-response: id=" (get-in user [:user :id]))
+    (http/transit-response "Not authorized. Bad role." 403)))
 
 (defn admin? [user]
   (boolean (get-in user [:user :admin?])))

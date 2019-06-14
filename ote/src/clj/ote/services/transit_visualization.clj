@@ -113,29 +113,29 @@
         user :user}
     (let [service-id (Long/parseLong service-id)]
       ;; Is transit authority
-      (authorization/require-transit-authority user)
+      (or (authorization/transit-authority-authorization-response user)
 
-      ;; Return result
-      {:service-info (first (fetch-service-info db {:service-id service-id}))
-       :changes (first (detected-service-change-by-date db
-                                                        {:service-id service-id
-                                                         :date (time/iso-8601-date->sql-date date)}))
-       :route-changes (map #(assoc % :change-type (keyword (:change-type %)))
-                           (detected-route-changes-by-date db
-                                                           {:date (time/iso-8601-date->sql-date date)
-                                                            :service-id service-id}))
-       :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
-                                                #{:gtfs/route-hash-id-type}
-                                                {:gtfs/transport-service-id service-id}))
-       :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})}))
+          ;; Return result
+          {:service-info (first (fetch-service-info db {:service-id service-id}))
+           :changes (first (detected-service-change-by-date db
+                                                            {:service-id service-id
+                                                             :date (time/iso-8601-date->sql-date date)}))
+           :route-changes (map #(assoc % :change-type (keyword (:change-type %)))
+                               (detected-route-changes-by-date db
+                                                               {:date (time/iso-8601-date->sql-date date)
+                                                                :service-id service-id}))
+           :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
+                                                    #{:gtfs/route-hash-id-type}
+                                                    {:gtfs/transport-service-id service-id}))
+           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})})))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
         {:strs [route-hash-id]} :query-params
         user :user}
-    (authorization/require-transit-authority user)
-    {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id)})
+    (or (authorization/transit-authority-authorization-response user)
+        {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id)}))
 
 
   ^{:unauthenticated false}
@@ -143,36 +143,36 @@
        {{service-id :service-id} :params
         {:strs [date route-hash-id]} :query-params
         user :user}
-    (authorization/require-transit-authority user)
-    (http/geojson-response
-      (cheshire/encode
-        {:type "FeatureCollection"
-         :features (trip-lines
-                     (fetch-route-trips-by-hash-and-date
-                       db
-                       {:service-id (Long/parseLong service-id)
-                        :date (time/parse-date-iso-8601 date)
-                        :route-hash-id route-hash-id}))}
-        {:key-fn name})))
+    (or (authorization/transit-authority-authorization-response user)
+        (http/geojson-response
+          (cheshire/encode
+            {:type "FeatureCollection"
+             :features (trip-lines
+                         (fetch-route-trips-by-hash-and-date
+                           db
+                           {:service-id (Long/parseLong service-id)
+                            :date (time/parse-date-iso-8601 date)
+                            :route-hash-id route-hash-id}))}
+            {:key-fn name}))))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
         {:strs [date short-name long-name headsign route-hash-id]} :query-params
         user :user}
-    (authorization/require-transit-authority user)
-    (into []
-          (map #(update % :stoptimes parse-gtfs-stoptimes))
-          (fetch-route-trip-info-by-name-and-date
-            db
-            {:service-id (Long/parseLong service-id)
-             :date (time/parse-date-iso-8601 date)
-             :route-hash-id route-hash-id})))
+    (or (authorization/transit-authority-authorization-response user)
+        (into []
+              (map #(update % :stoptimes parse-gtfs-stoptimes))
+              (fetch-route-trip-info-by-name-and-date
+                db
+                {:service-id (Long/parseLong service-id)
+                 :date (time/parse-date-iso-8601 date)
+                 :route-hash-id route-hash-id}))))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
         {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params
         user :user}
-    (authorization/require-transit-authority user)
-    (trip-differences-for-dates db service-id date1 date2 route-hash-id)))
+    (or (authorization/transit-authority-authorization-response user)
+        (trip-differences-for-dates db service-id date1 date2 route-hash-id))))
