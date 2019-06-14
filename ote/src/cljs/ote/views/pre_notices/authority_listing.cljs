@@ -16,6 +16,7 @@
             [stylefy.core :as stylefy]
             [ote.style.pre-notice :as styles]
             [ote.ui.form-fields :as form-fields]
+            [ote.ui.circular_progress :as circular-progress]
             [ote.views.service-search :as service-search]
             [ote.style.service-search :as style-service-search]
             [ote.style.dialog :as style-dialog]))
@@ -137,7 +138,7 @@
 
 (defn pre-notices-listing [e! pre-notices]
   (if (= :loading pre-notices)
-    [common/loading-spinner]
+    [circular-progress/circular-progress]
     [:div
      [:div.row
       [:div.col-xs-12.col-sm-12.col-md-12

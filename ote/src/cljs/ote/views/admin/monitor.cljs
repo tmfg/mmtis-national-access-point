@@ -11,7 +11,8 @@
             [ote.style.buttons :as style-buttons]
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.ui.circular_progress :as circular-progress]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
@@ -177,4 +178,4 @@
       [:div {:style {:width "100%"}}
        [doughnut-inner "donughnut-share-by-type" "right" provider-share-by-type-data]]]])
     [:div
-     [ui-common/loading-spinner]]))
+     [circular-progress/circular-progress]]))
