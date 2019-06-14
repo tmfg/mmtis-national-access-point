@@ -501,7 +501,7 @@
 
 (defn- all-ports-response [db]
   (csv-data ["Koodi" "Nimi" "Leveyspiiri (lat)" "Pituuspiiri (lon)" "Käyttäjän lisäämä?" "Luontihetki"]
-            (map (juxt :code :name :lat :long :user-added? :created)
+            (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
 (defn- admin-routes [db http nap-config email-config]
