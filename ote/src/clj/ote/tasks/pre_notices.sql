@@ -35,8 +35,10 @@ SELECT * FROM (
                      JOIN gtfs_package p ON p.id = ANY (h."package-ids")
                      JOIN "detected-route-change" r ON h."change-key" = r."change-key"
                      JOIN "transport-service" ts
-                            ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND
-                               ts."commercial-traffic?" = TRUE
+                            ON ts.id = h."transport-service-id"
+                                   AND ts."sub-type" = 'schedule'
+                                   AND ts."commercial-traffic?" = TRUE
+                                   AND ts."transport-type" @> ARRAY['road'::transport_type]
                      JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
                 WHERE h."email-sent" IS NULL
                   AND (p."finnish-regions" IS NULL OR
