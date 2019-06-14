@@ -21,7 +21,8 @@
             [ote.util.values :as values]
             cljsjs.leaflet
             [ote.time :as time]
-            [cljs-time.coerce :as coerce]))
+            [cljs-time.coerce :as coerce]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (defn ignore-key? [key]
   (let [ends-with-keys-to-ignore ["-imported" "-csv-url" "operator-id"]
@@ -212,7 +213,7 @@
   (e! (v/->StartViewer))
   (fn [e! {:keys [authorized? logged-in? loading? geojson resource] :as app}]
     (if loading?
-      [common/loading-spinner]
+      [circular-progress/circular-progress]
       [theme e! app
         [:div.transport-service-view
           [:div.row.pull-right
