@@ -1,9 +1,5 @@
 (ns ote.util.email-template
-  (:require [chime :refer [chime-at]]
-            [jeesql.core :refer [defqueries]]
-            [clj-time.periodic :refer [periodic-seq]]
-            [clojure.string :as str]
-            [hiccup.core :refer [html]]
+  (:require [clojure.string :as str]
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
@@ -11,15 +7,8 @@
             [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
-            [ote.nap.users :as nap-users]
-            [ote.tasks.util :refer [daily-at]]
             [ote.util.db :as db-util]
-            [ote.email :as email]
-            [ote.util.throttle :refer [with-throttle-ms]]
-            [ote.environment :as environment]
-            [clojure.string :as string]
-            [specql.core :as specql]
-            [specql.op :as op])
+            [ote.environment :as environment])
   (:import (org.joda.time DateTimeZone)))
 
 (def html-header
@@ -61,13 +50,17 @@
                             color: #FFFFFF !important;"}
       text]]]])
 
-(defn- html-divider-border [_]
-  [:div
-   [:table {:border "0", :width "80%", :cellpadding "0", :cellspacing "0"}
-    [:tbody
-     [:tr
-      [:td {:style "background:none; border-bottom: 1px solid #d7dfe3; height:1px; width:100%; margin:0px 0px 0px 0px;"} "&nbsp;"]]]]
-   [:br]])
+(defn- html-divider-border
+  [width]
+  (let [width (if width
+                width
+                "80%")]
+    [:div
+     [:table {:border "0", :width width, :cellpadding "0", :cellspacing "0"}
+      [:tbody
+       [:tr
+        [:td {:style "background:none; border-bottom: 1px solid #d7dfe3; height:1px; width:100%; margin:0px 0px 0px 0px;"} "&nbsp;"]]]]
+     [:br]]))
 
 (defn- sort-by-first-different-date [element]
   "Works with vector which is formatted like this:
@@ -248,13 +241,13 @@
 
 (defn notify-user-new-member [new-member requester operator title]
   (html-template title
-                 [:div
+                 [:div {:style "max-width 800px"}
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
                    (str "Sinut on kutsuttu " (::t-operator/name operator) "-nimisen palveluntuottajan jäseneksi.")]
 
-                  (html-divider-border nil)
+                  (html-divider-border "100%")
                   [:p
                    [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
                     (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
@@ -266,4 +259,25 @@
                   [:br]
                   (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
-                  (html-divider-border nil)]))
+                  (html-divider-border "100%")]))
+
+(defn new-user-invite [requester operator title token]
+  (let [op-name (::t-operator/name operator)]
+     (html-template title
+       [:div {:style "max-width: 800px"}
+        [:br]
+        [:h1 {:class "headerText1"
+              :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+         (str "Olet saanut kutsun liittyä NAP:iin")]
+
+        (html-divider-border "100%")
+        [:p
+         [:strong (get-in requester [:user :name])]
+         " on kutsunut sinut NAP-palveluun "
+         [:strong op-name]
+         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+        [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+        [:br]
+        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+
+        (html-divider-border "100%")])))

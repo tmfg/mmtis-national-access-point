@@ -26,12 +26,16 @@
 (def gray100 "#f5f5f5")
 (def gray50 "#fafafa")
 
+(def green-dark "#008800")
 (def green-basic "#00AA00")
+(def green-light "#66cc66")
 (def red-basic "#DD0000")
 (def red-dark "#CF0000")
 (def red-darker "#DD0000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
+(def yellow-basic "#ddcc00")
+(def yellow-dark "#cfb800")
 
 (def spinner cyan)
 

@@ -606,8 +606,13 @@
                         :members "Medlemmar"
                         :email-placeholder "Mata in e-postadress"
                         :manage-users "Hantera användarrättigheter"
-                        :something-went-wrong "Jotain meni pieleen. Koita hetken päästä uudestaan."
-                        :already-member "Käyttäjä on jo lisätty."}
+                        :already-invited "Käyttäjä on jo kutsuttu."
+                        :something-went-wrong "Ett fel uppstod."
+                        :already-member "Användaren har redan lagts till"
+                        :invite-pending "Odottaa kutsun vahvistusta"
+                        :invite-sent-success "Kutsu lähetetty onnistuneesti"
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
+                        :confirm-remove "Poista jäsen"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -1242,7 +1247,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :logged-in ["Du är redan inloggad som: " :name]
            :password-not-valid "Minst 6 tecken krävs. Lösenordet bör innehålla bokstäver och minst en siffra."}
   :confirm-changes "Bekräfta ändringar"
-  :change-password "Ändra lösenord"}
+  :change-password "Ändra lösenord"
+  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
 
  :reset-password
  {:label "Återställ ditt lösenord"
