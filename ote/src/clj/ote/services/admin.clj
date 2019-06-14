@@ -65,7 +65,7 @@
 
 (defn- authorization-fail-response [user]
   (when-not (:admin? user)
-    (log/info  "authorization-fail-response: id=" (:id user))
+    (log/info  "Not authorized. Bad role. authorization-fail-response: id=" (:id user))
     (http/transit-response "Not authorized. Bad role." 403)))
 
 (defn- admin-service [route {user :user

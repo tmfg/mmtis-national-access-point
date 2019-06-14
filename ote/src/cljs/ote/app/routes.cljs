@@ -66,9 +66,16 @@
     ["/monitor" :monitor]]))
 
 ;; Add pages that needs authenticating to this list
-(def auth-required #{:own-services :transport-service :transport-operator :edit-service :new-service :admin :routes
-                     :new-route :edit-route :new-notice :edit-pre-notice :pre-notices :authority-pre-notices
-                     :transit-visualization :transit-changes :email-settings :access-management})
+(def auth-required #{:own-services :transport-service :edit-service :new-service
+                     :transport-operator :access-management
+                     :routes :new-route :edit-route
+                     :new-notice :edit-pre-notice :pre-notices
+                     :email-settings})
+
+;; Add pages that needs :transit-authority? authenticating to this list
+(def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes})
+
+(def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-commercial-services :admin-exception-days})
 
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.
@@ -86,6 +93,13 @@
 
 (defmethod on-leave-event :default [_] nil)
 
+(defn requires-admin? [app]
+  (and (contains? admin-required (:page app))
+       (not (get-in app [:user :admin?]))))
+
+(defn requires-transit-authority? [app]
+  (and (contains? transit-authority-required (:page app))
+       (not (get-in app [:user :transit-authority?]))))
 
 (defn requires-authentication? [app]
   (and
@@ -130,7 +144,9 @@
                      orig-app app
                      app (merge app navigation-data)]
 
-                 (if (requires-authentication? app)
+                 (if (or (requires-authentication? app)
+                         (requires-transit-authority? app)
+                         (requires-admin? app))
                    (do (navigate! :login)
                        (assoc orig-app
                          :login {:show? true
