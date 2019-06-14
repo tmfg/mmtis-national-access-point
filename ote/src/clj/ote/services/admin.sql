@@ -101,3 +101,7 @@ SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" a
  GROUP BY t.id, o.id
  ORDER BY o.name asc;
 
+-- name: fetch-all-ports
+SELECT p.code as code, (p.name[1]::localized_text).text as name, ST_X(p.location) as lat, ST_Y(p.location) as lon,
+       CASE WHEN p."created-by" IS NULL THEN 'ei' ELSE 'kyllä' END AS "user-added?", p.created as created
+  FROM "finnish_ports" as p;

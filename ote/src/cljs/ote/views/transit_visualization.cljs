@@ -298,33 +298,9 @@
 (def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
                             :trip-stop-sequence-changes-upper :route-hash-id
                             :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips
-                            :different-week-date})
-
-(defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
-	;; Filter nil values
-	(keep
-		(fn [c]
-			;; Return nil if route-hash-id doesn't match because keep won't work with false values.
-			(when (= (:route-hash-id c) (:route-hash-id single-change))
-				(if (= :removed (:change-type c))
-					;; Remove trip and stop changes from route summary if route has change-type :removed
-					(dissoc c :trip-stop-sequence-changes-lower
-									:trip-stop-time-changes-lower
-									:trip-stop-sequence-changes-upper
-									:trip-stop-time-changes-upper
-									:removed-trips)
-					c)))
-		all-changes))
-
-(defn- route-change-summary
-  "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
-  need to merge-with them together."
-  [single-change all-changes]
-  (let [all-changes (map #(select-keys % selected-change-keys) all-changes)
-        single-change (select-keys single-change selected-change-keys)
-        all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
-        merged-changes (apply merge-with + all-route-changes)]
-    merged-changes))
+                            :different-week-date
+                            :route-short-name :route-long-name
+                            :count})
 
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
   (let [route-count (count route-changes)
@@ -398,7 +374,7 @@
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [grouped-route-data]
-        [tv-change-icons/route-change-icons grouped-route-data])}]
+                  [tv-change-icons/route-change-icons grouped-route-data])}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
@@ -765,7 +741,7 @@
          [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
 
          (if (tv/loading-trips? transit-visualization)
-           (prog/circular-progress (tr [:common-texts :loading]))
+           [prog/circular-progress (tr [:common-texts :loading])]
            ;; Selecting a new date1 from calendar clears date2 related keys which are used by selected-route-map-section
            ;; Also, displaying below data is always in connection with the date1&date2 pair which is outdated after a
            ;; new selection from calendar.

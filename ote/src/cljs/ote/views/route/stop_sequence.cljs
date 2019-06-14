@@ -15,7 +15,8 @@
             [stylefy.core :as stylefy]
             [ote.db.transport-service :as t-service]
             [ote.style.base :as style-base]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.circular_progress :as circular-progress]))
 
 
 (def stop-marker-style
@@ -176,7 +177,7 @@
   (e! (rw/->LoadStops))
   (fn [e! {route :route :as app}]
     (if (nil? (get route :stops))
-      [common/loading-spinner]
+      [circular-progress/circular-progress]
       [:div (stylefy/use-style style-form/form-card)
        [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-stop-sequence])]
        [:div (stylefy/use-style style-form/form-card-body)

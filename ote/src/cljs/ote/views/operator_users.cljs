@@ -1,6 +1,5 @@
 (ns ote.views.operator-users
   (:require [ote.app.controller.operator-users :as ou]
-            [ote.ui.circular_progress :as spinner]
             [ote.ui.table :as table]
             [ote.app.utils :as utils]
             [ote.localization :refer [tr tr-key]]
@@ -8,7 +7,8 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.buttons :as buttons]
-            [ote.theme.colors :as colors]))
+            [ote.theme.colors :as colors]
+            [ote.ui.circular_progress :as prog]))
 
 (defn access-table
   [e! users operator-id]
@@ -67,8 +67,8 @@
         (stylefy/use-style buttons/disabled-button))
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
-       [:div {:id "new-member-loading-spinner" :style {:margin-left "1rem"}}
-        [spinner/circular-progress]])]]])
+       [:span {:style {:margin-left "1rem"}}
+        [prog/circular-progress (tr [:common-texts :loading])]])]]])
 
 (defn manage-access
   [e! state]
@@ -83,5 +83,5 @@
        [:div
         [access-table e! access-users (get-in state [:params :operator-id])]
         [invite-member e! access-state (get-in state [:params :operator-id])]]
-       [:div {:id "waiting-loading-event-spinner"}
-        [spinner/circular-progress]])]))
+       [prog/circular-progress (tr [:common-texts :loading])])]))
+

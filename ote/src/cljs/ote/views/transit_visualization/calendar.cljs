@@ -196,7 +196,7 @@
        [:h3 "Valittujen päivämäärien väliset muutokset"]
        ;; :differences used to detect when new route selection or new calendar day selection is being loaded
        (if (empty? (:differences compare))
-         (prog/circular-progress (tr [:common-texts :loading]))
+         [prog/circular-progress (tr [:common-texts :loading])]
          ;; :date2 used to hide difference statistics but not the title, when user selects new diff dates from calendar
          (when (some? (:date2 compare))
            [:div
