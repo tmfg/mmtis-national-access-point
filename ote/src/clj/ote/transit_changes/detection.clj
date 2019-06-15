@@ -922,25 +922,29 @@
   Function splits the input maps so that routes are not grouped together, instead each route will be in its own collection.
   Output: A vector of 'route-vectors'. Each route-vector contains maps, each representing a week for the specific route.
     Output format:
-       [[{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
-        {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route1\" [\"h1\" \"h1\"]}}
-        {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route1\" [\"h1\" \"h1\"]}}]
-        [{:beginning-of-week 1.1, :end-of-week 7.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
-         {:beginning-of-week 8.1, :end-of-week 15.1, :routes {\"route2\" [\"h1\" \"h1\"]}}
-         {:beginning-of-week 16.1, :end-of-week 23.1, :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
-  [weeks]
-  (vals (group-by (fn [d]
-                    (keys (:routes d)))
-                  (reduce
-                    (fn [result week]
-                      (let [routes (:routes week)
-                            r-weeks
-                            (map (fn [route]
-                                   (assoc week :routes (conj {} route)))
-                                 routes)]
-                        (concat result r-weeks)))
-                    []
-                    weeks))))
+       [[{:beginning-of-week 1.1, :end-of-week 7.1, :route-key \"name\" :routes {\"route1\" [\"h1\" \"h1\"]}}
+        {:beginning-of-week 8.1, :end-of-week 15.1, :route-key \"name\" :routes {\"route1\" [\"h1\" \"h1\"]}}
+        {:beginning-of-week 16.1, :end-of-week 23.1, :route-key \"name\" :routes {\"route1\" [\"h1\" \"h1\"]}}]
+        [{:beginning-of-week 1.1, :end-of-week 7.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}
+         {:beginning-of-week 8.1, :end-of-week 15.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}
+         {:beginning-of-week 16.1, :end-of-week 23.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
+  [weeks-routes]
+  (->> weeks-routes
+       ;; Take each route object from a week object and duplicate them so route weeks are independent week objects
+       (reduce
+         (fn [result week-routes]
+           (let [routes (:routes week-routes)
+                 r-weeks
+                 (map (fn [route]
+                        (assoc week-routes :routes (conj {} route)))
+                      routes)]
+             (concat result r-weeks)))
+         [])
+       ;; Group week objects of same routes into same vectors
+       (group-by (fn [d]
+                   (keys (:routes d))))
+       ;; Remove useless route key, it's contained in the val objects
+       (vals)))
 
 (defn detect-changes-for-all-routes
   "Input: route-list-with-week-hashes = sequence of routes with their traffic weeks
