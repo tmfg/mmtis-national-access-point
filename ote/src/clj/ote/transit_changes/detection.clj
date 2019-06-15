@@ -162,11 +162,6 @@
   #_(when cond (println "debug: not a change because" msg))
   (not cond))
 
-;; TODO: utilize here prev-change to get :starting-week-hash if it's available, to allow detecting traffic change after no-traffic period. AAAnil16nilBBB
-;; :starting-week-hash is lost in earlier loop if no-traffic is reported on :nt-last.
-;; Current workaround puts no-traffic reporting to week after :nt-last, which puts it into same map with :different week and has to be split later.
-;; Using `prev-change` :starting-week-hash here allows detecting BBB even if state is empty.
-
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
