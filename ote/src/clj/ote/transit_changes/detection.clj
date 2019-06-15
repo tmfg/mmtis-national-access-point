@@ -848,7 +848,7 @@
                holiday-id (when date
                             (transit-changes/is-holiday? db date))]
            (if holiday-id
-             (assoc row :hash holiday-id)
+             (assoc row :hash :holiday)
              row)))
        date-route-hashes))
 
