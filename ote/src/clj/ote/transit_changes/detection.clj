@@ -779,17 +779,17 @@
        :gtfs/change-key (:gtfs/change-key change-key)}
       change)))
 
-
-(defn- debug-print-change-stats [all-routes route-changes type]
-  (doseq [r all-routes
-          :let [key (:route-hash-id r)
-                {:keys [changes no-traffic-start-date no-traffic-end-date]
-                 :as route} (route-changes key)]]
-    #_(println key " has traffic " (:min-date r) " - " (:max-date r)
-               (when no-traffic-end-date
-                 (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
-               (when changes
-                 (str " has changes")))))
+; Development-time utility
+;(defn- debug-print-change-stats [all-routes route-changes type]
+;  (doseq [r all-routes
+;          :let [key (:route-hash-id r)
+;                {:keys [changes no-traffic-start-date no-traffic-end-date]
+;                 :as route} (route-changes key)]]
+;    #_(println key " has traffic " (:min-date r) " - " (:max-date r)
+;               (when no-traffic-end-date
+;                 (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
+;               (when changes
+;                 (str " has changes")))))
 
 (defn- update-route-changes! [db analysis-date service-id route-change-infos]
   {:pre [(some? analysis-date)
@@ -800,11 +800,12 @@
                   {:gtfs/transit-change-date analysis-date
                    :gtfs/transit-service-id service-id})
   (doseq [r route-change-infos]
-    (specql/insert! db :gtfs/detected-route-change
-                    (merge {:gtfs/transit-change-date analysis-date
-                            :gtfs/transit-service-id service-id
-                            :gtfs/created-date (java.util.Date.)}
-                           r))))
+    (when r
+      (specql/insert! db :gtfs/detected-route-change
+                      (merge {:gtfs/transit-change-date analysis-date
+                              :gtfs/transit-service-id service-id
+                              :gtfs/created-date (java.util.Date.)}
+                             r)))))
 
 (defn update-transit-changes! [db analysis-date service-id package-ids {:keys [all-routes route-changes]}]
   {:pre [(some? analysis-date)
@@ -954,8 +955,10 @@
          route-differences route-list-with-week-hashes)))
 
 (defn- route-ends?
-  "Input: date=analysis date, max-date=last day with traffic for route, traffic-threshold-d=route end threshold of days in future for reporting route end
-  Output: returns true if max-date is below traffic-threshold-d"
+  "Input: date = analysis date,
+    max-date = last day with traffic for route,
+    traffic-threshold-d = Number of days from analysis date for which route should have traffic
+  Output: true if `max-date` is below date plus `traffic-threshold-d`"
   [^LocalDate date max-date ^Integer traffic-threshold-d]
   (and max-date
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
