@@ -21,12 +21,12 @@
   (tu/weeks (tu/to-local-date 2019 5 13) (tu/generate-traffic-week 9))) ;; Last week starts 2019 07 08
 
 (deftest test-no-changes
-  (let [result (-> data-no-changes
+  (let [result (->> data-no-changes
                    detection/changes-by-week->changes-by-route
+                   (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 5 13) '(2019 7 31))))
                    detection/detect-changes-for-all-routes)]
     (testing "Ensure ongoing traffic without changes is reported as ongoing traffic."
-      (is (=
-            {:route-key tu/route-name
+      (is (= {:route-key tu/route-name
              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
             (-> result
                 first
@@ -44,9 +44,10 @@
                      {tu/route-name ["h1" "h2" "h3" "h4" "h5" "!!" "h7"]}])))
 
 (deftest test-change-on-2nd-to-last-wk
-  (let [result (-> data-change-on-2nd-to-last-wk
-                   detection/changes-by-week->changes-by-route
-                   detection/detect-changes-for-all-routes)]
+  (let [result (->> data-change-on-2nd-to-last-wk
+                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 5 13) '(2019 12 31))))
+                    detection/detect-changes-for-all-routes)]
 
     (testing "Ensure no change is reported, ongoing traffic is reported"
       (is (= {:route-key tu/route-name
@@ -67,8 +68,9 @@
             (tu/generate-traffic-week 9 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name))) ;; Last week starts 2019 06 24
 
 (deftest test-no-changes-weekend-nil
-  (let [result (-> data-no-changes-weekend-nil
+  (let [result (->> data-no-changes-weekend-nil
                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 5 13) '(2019 12 31))))
                    detection/detect-changes-for-all-routes)]
     (testing "Test traffic with nil weekend and no changes, ensure :no-traffic is not reported"
       (is (= {:route-key tu/route-name
@@ -83,29 +85,6 @@
 
 ;;;;;;;; Test new route
 
-(def data-all-routes-2019
-  [[tu/route-name-2
-    {:route-short-name tu/route-name-2,
-     :route-long-name tu/route-name-2,
-     :trip-headsign "",
-     :min-date nil,
-     :max-date nil,
-     :route-hash-id tu/route-name-2}]
-   [tu/route-name
-    {:route-short-name "",
-     :route-long-name tu/route-name,
-     :trip-headsign "",
-     :min-date (time/sql-date (tu/to-local-date 2019 1 1)),
-     :max-date (time/sql-date (tu/to-local-date 2019 12 31)),
-     :route-hash-id tu/route-name}]
-   [tu/route-name-3
-    {:route-short-name "",
-     :route-long-name tu/route-name-3,
-     :trip-headsign "",
-     :min-date nil,
-     :max-date nil,
-     :route-hash-id tu/route-name-3}]])
-
 (def data-route-starts-no-end
   (tu/weeks (tu/to-local-date 2019 4 15)
             (concat [{tu/route-name [nil nil nil nil nil nil nil]}
@@ -114,10 +93,12 @@
                     (tu/generate-traffic-week 11 [nil nil nil nil nil "h6" "h6"]))))
 
 (deftest test-route-starts-no-end
-  (let [result (->> data-route-starts-no-end
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 4 15) '(2019 7 22)))
+        result (->> data-route-starts-no-end
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 4 15) '(2019 12 31))))
                     (detection/detect-changes-for-all-routes)
-                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes-2019))]
+                    (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (testing "Ensure detection for starting route detects only one change and no route end. No further verification because currently transform-route-change converts it to change-type :added"
       (is (not (contains? result :route-end-date))))
 
@@ -129,66 +110,62 @@
 (def data-no-traffic-run
   (tu/weeks (tu/to-local-date 2018 10 8)
             (list {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" nil nil nil nil nil]} ;; 4 day run
-                  {tu/route-name [nil nil nil nil nil nil nil]} ;; 7 days
-                  {tu/route-name [nil nil nil nil nil "h6" "h7"]} ;; 4 days => sum 17
+                  {tu/route-name ["h1" "h2" nil nil nil nil nil]} ;; 2018-10-15, 5 day run
+                  {tu/route-name [nil nil nil nil nil nil nil]}   ;; 2018-10-22, 7 days
+                  {tu/route-name [nil nil nil nil nil  "h6" "h7"]} ;; 2018-10-29, 5 days => sum 17
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
 
 (deftest test-no-traffic-run
-  (testing "Ensure no-traffic starts and ends middle of week and lasts just above threshold, ensure no-traffic is reported"
+  (let [result (->> data-no-traffic-run
+                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 10 8) '(2018 12 31))))
+                    detection/detect-changes-for-all-routes)]
     (is (= {:route-key tu/route-name
-            :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
-                            :end-of-week (tu/to-local-date 2018 10 21)}
             :no-traffic-start-date (tu/to-local-date 2018 10 17)
             :no-traffic-end-date (tu/to-local-date 2018 11 3)}
-           (-> data-no-traffic-run
-               detection/changes-by-week->changes-by-route
-               detection/detect-changes-for-all-routes
-               first
-               (select-keys tu/select-keys-detect-changes-for-all-routes))))))
+           (first result))
+        "Ensure no-traffic starts and ends middle of week and lasts just above threshold")))
 
 ;;;;;;;; Test two separate no traffic runs i.e. pauses in traffic
 
 (def data-no-traffic-run-twice
   (tu/weeks (tu/to-local-date 2018 10 8)
             (concat [{tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}]
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2018-10-15
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2018-10-22
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2018-10-29
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2018-11-5
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2018-11-23
+                     {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ;; 2018-11-29
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2018-11-26
+                     {tu/route-name [nil nil nil nil nil nil nil]};; 2018-12-03
+                     {tu/route-name [nil nil nil nil nil nil nil]}];; 2018-12-10
+                    ;; 2018-12-17
                     (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]))))
 
 (deftest test-no-traffic-run-twice-is-detected
-  (let [test-result (-> data-no-traffic-run-twice
-                        detection/changes-by-week->changes-by-route
-                        detection/detect-changes-for-all-routes)]
-    (testing "Ensure first no-traffic run is reported"
-      (is (= {:no-traffic-start-date (tu/to-local-date 2018 10 15)
-              :no-traffic-end-date (tu/to-local-date 2018 11 5)
-              :route-key tu/route-name
-              :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
-                              :end-of-week (tu/to-local-date 2018 10 21)}}
-             (-> (first test-result)
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))
+  (let [test-result (->> data-no-traffic-run-twice
+                         detection/changes-by-week->changes-by-route
+                         (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 10 8) '(2018 12 31))))
+                         detection/detect-changes-for-all-routes)]
 
-    (testing "Ensure second no-traffic run is reported"
-      (is (= {:no-traffic-start-date (tu/to-local-date 2018 11 26)
-              :no-traffic-end-date (tu/to-local-date 2018 12 17)
-              :route-key tu/route-name
-              :starting-week {:beginning-of-week (tu/to-local-date 2018 11 5)
-                              :end-of-week (tu/to-local-date 2018 11 11)}}
-             (-> (second test-result)
-                 (select-keys tu/select-keys-detect-changes-for-all-routes)))))
+    (is (= {:no-traffic-start-date (tu/to-local-date 2018 10 15)
+            :no-traffic-end-date (tu/to-local-date 2018 11 5)
+            :route-key tu/route-name}
+           (-> (first test-result)
+               (select-keys tu/select-keys-detect-changes-for-all-routes)))
+        "Ensure first no-traffic run is reported")
 
-    (testing "Ensure count of results"
-      (is (= 2 (count test-result))))))
+    (is (= {:no-traffic-start-date (tu/to-local-date 2018 11 26)
+            :no-traffic-end-date (tu/to-local-date 2018 12 17)
+            :route-key tu/route-name}
+           (-> (second test-result)
+               (select-keys tu/select-keys-detect-changes-for-all-routes))) "Ensure second no-traffic run is reported")
+
+    (is (= 2 (count test-result))
+        "Ensure count of results")))
 
 ;;;;;;;; Test traffic change and two patterns of no-traffic which do NOT exceed reporting threshold
 
@@ -206,9 +183,10 @@
                   {tu/route-name ["DD" "DD" "DD" "DD" "DD" nil nil]})))
 
 (deftest test-no-traffic-two-patterns-consecutive
-  (let [result (-> data-no-traffic-two-patterns-consecutive
-                   detection/changes-by-week->changes-by-route
-                   detection/detect-changes-for-all-routes)]
+  (let [result (->> data-no-traffic-two-patterns-consecutive
+                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 5 13) '(2019 12 31))))
+                    detection/detect-changes-for-all-routes)]
     (testing "Ensure first change is reported"
       (is (=
             {:route-key tu/route-name
@@ -259,10 +237,8 @@
   (let [result (->> data-no-traffic-run-weekdays
                    (detection/changes-by-week->changes-by-route)
                    (detection/detect-changes-for-all-routes)
-                   (detection/add-ending-route-change (tu/to-local-date 2018 10 15) data-all-routes-2019))]
+                   #_(detection/add-ending-route-change (tu/to-local-date 2018 10 15) data-all-routes-2018))]
     (is (= {:route-key tu/route-name
-                :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
-                                :end-of-week (tu/to-local-date 2018 10 21)}
                 :no-traffic-start-date (tu/to-local-date 2018 11 13)
                 :no-traffic-end-date (tu/to-local-date 2018 11 30)}
            (-> result
@@ -277,18 +253,23 @@
 
 (def no-traffic-run-full-detection-window
   (tu/weeks (tu/to-local-date 2018 10 8)
-            (concat (tu/generate-traffic-week 5 ["h1" "h2" "h3" "h4" "h5" nil nil] tu/route-name)
+            (concat
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}]
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}]
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}]
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}]
+                    [{tu/route-name ["h1" "h2" "h3" "h4" "h5" nil nil]}]
                     [{tu/route-name ["h1" nil nil nil nil nil nil]}] ;; 12.11, Starting 13.11. 6 day run
                     (tu/generate-traffic-week 12 [nil nil nil nil nil nil nil] tu/route-name))))
 
 (deftest test-no-traffic-run-full-detection-window
-  (let [result (-> no-traffic-run-full-detection-window
-                   detection/changes-by-week->changes-by-route
-                   detection/detect-changes-for-all-routes)]
+  (let [result (->> no-traffic-run-full-detection-window
+                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 10 8) '(2018 12 31))))
+                    detection/detect-changes-for-all-routes
+                    #_(detection/add-ending-route-change (tu/to-local-date 2018 10 15) data-all-routes-2018))]
     (testing "Ensure traffic with normal no-traffic days detects a no-traffic change correctly"
       (is (= {:route-key tu/route-name
-              :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
-                              :end-of-week (tu/to-local-date 2018 10 21)}
               :no-traffic-start-date (tu/to-local-date 2018 11 13)}
              (select-keys
                (first result)
@@ -310,8 +291,9 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
 
 (deftest test-traffic-2-different-weeks
-  (let [result (-> data-traffic-2-different-weeks
+  (let [result (->> data-traffic-2-different-weeks
                    (detection/changes-by-week->changes-by-route)
+                   (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 10 8) '(2018 12 31))))
                    (detection/detect-changes-for-all-routes))
         expect-first {:route-key tu/route-name
                       :starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
@@ -341,9 +323,10 @@
                   {tu/route-name ["h1" "h2" "h3" "h4" "!!" "h6" "!!"]}))) ; New schedule
 
 (deftest test-traffic-1-different-week-and-new-change
-  (let [result (-> data-traffic-1wk-difference-and-manywk-difference
-                   (detection/changes-by-week->changes-by-route)
-                   (detection/detect-changes-for-all-routes))
+  (let [result (->> data-traffic-1wk-difference-and-manywk-difference
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 1 28) '(2019 12 31))))
+                    (detection/detect-changes-for-all-routes))
         expect-first {:route-key tu/route-name
                       :starting-week {:beginning-of-week (tu/to-local-date 2019 2 4)
                                       :end-of-week (tu/to-local-date 2019 2 10)}
@@ -368,9 +351,10 @@
                   {tu/route-name ["h1" "h2" "h3" "!!" "!!" "h6" "h7"]}))) ;; thu and fri different
 
 (deftest test-consecutive-different-traffic-patterns
-  (let [result (-> data-consecutive-different-traffic-patterns
-                   (detection/changes-by-week->changes-by-route)
-                   (detection/detect-changes-for-all-routes))]
+  (let [result (->> data-consecutive-different-traffic-patterns
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 10 8) '(2018 12 31))))
+                    (detection/detect-changes-for-all-routes))]
 
     (is (= {:starting-week {:beginning-of-week (tu/to-local-date 2018 10 15)
                             :end-of-week (tu/to-local-date 2018 10 21)}
@@ -458,9 +442,10 @@
               {tu/route-name ["BB" "BB" "BB" "BB" "BB" "BB" "BB"]})))
 
 (deftest test-traffic-change-middle-of-week
-  (let [result (-> data-traffic-change-middle-of-week
-                   (detection/changes-by-week->changes-by-route)
-                   (detection/detect-changes-for-all-routes))
+  (let [result (->> data-traffic-change-middle-of-week
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 4 15) '(2019 12 31))))
+                    (detection/detect-changes-for-all-routes))
         expect-first {:route-key tu/route-name
                       :starting-week {:beginning-of-week (tu/to-local-date 2019 4 22)
                                       :end-of-week (tu/to-local-date 2019 4 28)}
@@ -520,7 +505,7 @@
                   {tu/route-name ["h1!" "h2!" "h3!" "h4!" "h5!" "h6!" "h7!"]})))
 
 (deftest test-traffic-static-holidays2
-  (let [{:keys [starting-week different-week] :as res}
+  (let [{:keys [different-week] :as res}
         (first (detection/route-weeks-with-first-difference data-traffic-static-holidays))]
 
     (testing "Ensure detection skipped christmas week"
@@ -532,9 +517,10 @@
 ;;;;;;;; Test holiday/keyword day handling for week detection
 
 (deftest test-traffic-static-holidays
-  (let [result (-> data-traffic-static-holidays
-                   (detection/changes-by-week->changes-by-route)
-                   (detection/detect-changes-for-all-routes))
+  (let [result (->> data-traffic-static-holidays
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2018 11 30) '(2019 1 31))))
+                    (detection/detect-changes-for-all-routes))
         expect-first {:route-key tu/route-name
                       :starting-week {:beginning-of-week (tu/to-local-date 2018 12 10)
                                       :end-of-week (tu/to-local-date 2018 12 16)}
@@ -569,13 +555,15 @@
                   {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]} ; 2019-03-04
                   {tu/route-name ["h1" "##" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "##" "h4" "h5" "h6" "h7"]} ; 2019-03-11
                   {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2019-03-18
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}
-                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]})))
+                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]} ; 2019-03-25
+                  {tu/route-name ["h1" "h2" "h3" "h4" "h5" "h6" "h7"] tu/route-name-2 ["h1" "h2" "h3" "h4" "h5" "h6" "h7"]}))) ; 2019-04-01
 
 (deftest test-two-week-two-route-change
-  (let [result (-> data-two-week-two-route-change
-                      (detection/changes-by-week->changes-by-route)
-                      (detection/detect-changes-for-all-routes))]
+  (let [result (->> data-two-week-two-route-change
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 2 4) '(2019 4 7))
+                                                                                 (list '(2019 2 4) '(2019 4 7))))
+                    (detection/detect-changes-for-all-routes))]
     (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 2 18)
                              :end-of-week (tu/to-local-date 2019 2 24)}
             :route-key tu/route-name
@@ -637,9 +625,10 @@
                   {tu/route-name [nil nil nil nil nil "B6" nil]})))
 
 (deftest test-change-to-summer-schedule-nil-weeks-with-midsummer
-  (let [result (-> data-change-to-summer-schedule-nil-weeks-with-midsummer
-                   detection/changes-by-week->changes-by-route
-                   detection/detect-changes-for-all-routes)]
+  (let [result (->> data-change-to-summer-schedule-nil-weeks-with-midsummer
+                    detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks (tu/create-data-all-routes (list '(2019 5 13) '(2019 12 31))))
+                    detection/detect-changes-for-all-routes)]
 
     (is (= {:different-week {:beginning-of-week (tu/to-local-date 2019 5 27) :end-of-week (tu/to-local-date 2019 6 2)}
             :route-key tu/route-name
@@ -657,32 +646,6 @@
 
     (is (= 2 (count result)))))
 
-;;;;;;;;; Data for all routes, needed in tests where have to resolve for how long route has traffic declared
-
-(def route-1-min-date (tu/to-local-date 2019 1 1))
-(def route-1-max-date (tu/to-local-date 2019 7 14))
-(def data-all-routes [[tu/route-name-2
-                       {:route-short-name tu/route-name-2,
-                        :route-long-name tu/route-name-2,
-                        :trip-headsign "",
-                        :min-date nil,
-                        :max-date nil,
-                        :route-hash-id tu/route-name-2}]
-                      [tu/route-name
-                       {:route-short-name "",
-                        :route-long-name tu/route-name,
-                        :trip-headsign "",
-                        :min-date (time/sql-date route-1-min-date),
-                        :max-date (time/sql-date route-1-max-date),
-                        :route-hash-id tu/route-name}]
-                      [tu/route-name-3
-                       {:route-short-name "",
-                        :route-long-name tu/route-name-3,
-                        :trip-headsign "",
-                        :min-date nil,
-                        :max-date nil,
-                        :route-hash-id tu/route-name-3}]])
-
 ;;;;;;;;; Test route END reporting when traffic change to pattern with nils and then only nil. Adapted from production case.
 
 (def data-traffic-winter-to-summer-and-end-traffic
@@ -694,16 +657,17 @@
                      {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 03
                      {tu/route-name [nil nil nil nil nil "h6" nil]} ;; 2019 06 17
                      {tu/route-name [nil nil nil nil nil nil nil]}
+                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019-07-01
                      {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [nil nil nil nil nil nil nil]}])))
+                     {tu/route-name [nil nil nil nil nil nil nil]}]))) ;; 2019-07-15
 
 (deftest test-traffic-winter-to-summer-and-end-traffic
-  (let [result (->> data-traffic-winter-to-summer-and-end-traffic
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 7 22)))
+        result (->> data-traffic-winter-to-summer-and-end-traffic
                     detection/changes-by-week->changes-by-route
+                    (detection/remove-outscoped-weeks data-all-routes)
                     detection/detect-changes-for-all-routes
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
-
     (testing "Expect change to a week with nils"
       (is (= {:route-key tu/route-name
               :different-week {:beginning-of-week (tu/to-local-date 2019 6 3)
@@ -716,9 +680,7 @@
 
     (testing "Expect route end instead of no-traffic, when no-traffic starts within route end threshold"
       (is (= {:route-key tu/route-name
-              :route-end-date (tu/to-local-date 2019 6 23)
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3)
-                              :end-of-week (tu/to-local-date 2019 6 9)}}
+              :route-end-date (tu/to-local-date 2019 6 23)}
              (select-keys
                (second result)
                tu/select-keys-detect-changes-for-all-routes))))
@@ -737,14 +699,15 @@
                     (tu/generate-traffic-week 5 [nil nil nil nil nil nil nil]))))
 
 (deftest test-change-nil-and-ending-route
-  (let [result (->> data-change-nil-and-ending-route        ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 7 22)))
+        result (->> data-change-nil-and-ending-route
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (testing "Ensure route end is reported when no-traffic starts, even if route max-date is later. If that is possible..."
       (is (= {:route-end-date (tu/to-local-date 2019 6 5)
-              :route-key tu/route-name
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
+              :route-key tu/route-name}
              (-> result
                  first
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
@@ -755,16 +718,19 @@
 
 (def data-ending-route-change
   (tu/weeks (tu/to-local-date 2019 5 13)
-            (tu/generate-traffic-week 9)))                  ;; 2019 07 08
+            (concat
+                    (tu/generate-traffic-week 5)            ;; 2019-05-13 + 5 wks = 2019-06-16 last traffic day
+                    (tu/generate-traffic-week 10 [nil nil nil nil nil nil nil]))))
 
 (deftest test-ending-route-change
-  (let [result (->> data-ending-route-change                ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 6 16)))
+        result (->> data-ending-route-change
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
-    (is (= {:route-end-date (tu/to-local-date 2019 7 15)
-            :route-key tu/route-name
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
+    (is (= {:route-end-date (tu/to-local-date 2019 6 17)
+            :route-key tu/route-name}
            (-> result
                first
                (select-keys tu/select-keys-detect-changes-for-all-routes))))
@@ -780,8 +746,10 @@
                     (tu/generate-traffic-week 4 ["h1" "h2" "h3" "h4" "h5" "!!" "!!"]))))
 
 (deftest test-change-and-ending-route
-  (let [result (->> data-change-and-ending-route            ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 7 14)))
+        result (->> data-change-and-ending-route
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
     (testing "Ensure a traffic change and route end within detection window are reported."
@@ -794,8 +762,7 @@
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
 
       (is (= {:route-end-date (tu/to-local-date 2019 7 15)
-              :route-key tu/route-name
-              :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
+              :route-key tu/route-name}
              (-> result
                  second
                  (select-keys tu/select-keys-detect-changes-for-all-routes))))
@@ -821,23 +788,23 @@
                      {tu/route-name [nil nil nil nil nil nil nil]}])))
 
 (deftest test-paused-traffic-with-end
-  (let [result (->> data-paused-traffic-with-end            ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 8 4)))
+        result (->> data-paused-traffic-with-end
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 20) data-all-routes))]
 
     (is (= {:route-key tu/route-name
             :no-traffic-start-date (tu/to-local-date 2019 6 10)
-            :no-traffic-end-date (tu/to-local-date 2019 7 11)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 20) :end-of-week (tu/to-local-date 2019 5 26)}}
+            :no-traffic-end-date (tu/to-local-date 2019 7 11)}
            (-> result
                (first)
                (select-keys tu/select-keys-detect-changes-for-all-routes)))
         "Ensure that the pause is detected properly")
 
     (is (= {:route-key tu/route-name
-            :route-end-date (tu/to-local-date 2019 8 5)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 7 15) :end-of-week (tu/to-local-date 2019 7 21)}}
+            :route-end-date (tu/to-local-date 2019 8 5)}
            (-> result
                (second)
                (select-keys tu/select-keys-detect-changes-for-all-routes)))
@@ -859,36 +826,28 @@
                      {tu/route-name [nil nil nil "A" "A" "A" "A"]} ;; 2019 07 01
                      {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 07 08
                      {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019 07 15
-                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]}
-                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]}
-                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]}])))
+                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019-07-22
+                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019-07-29
+                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]}]))) ;; 2019-08-05
 
 
 (deftest test-paused-traffic-with-keyword
-  (let [result (->> data-paused-traffic-with-keyword            ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 8 11)))
+        result (->> data-paused-traffic-with-keyword
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
     (is (= {:route-key tu/route-name
             :no-traffic-start-date (tu/to-local-date 2019 6 1)
-            :no-traffic-end-date (tu/to-local-date 2019 7 4)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13) :end-of-week (tu/to-local-date 2019 5 19)}}
+            :no-traffic-end-date (tu/to-local-date 2019 7 4)}
            (-> result
                first
                (select-keys tu/select-keys-detect-changes-for-all-routes)))
         "Ensure a traffic change and route end within detection window are reported.")
 
-    (is (= {:route-key tu/route-name
-            :route-end-date (tu/to-local-date 2019 7 15)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
-                            :end-of-week (tu/to-local-date 2019 5 19)}}
-           (-> result
-               second
-               (select-keys tu/select-keys-detect-changes-for-all-routes)))
-        "Ensure a traffic change and route end within detection window are reported.")
-
-    (is (= 2 (count result)))))
+    (is (= 1 (count result)))))
 
 (def data-2-changes-with-nil-days
   (tu/weeks (tu/to-local-date 2019 5 6)
@@ -901,12 +860,13 @@
                      {tu/route-name [nil nil nil nil nil "X" nil]} ;; 2019 06 17
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 06 24
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 07 01
-                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}])))
-
+                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}]))) ;; 2019-07-08, last day 14th
 
 (deftest test-2-changes-with-nil-days-with-route-end
-  (let [result (->> data-2-changes-with-nil-days            ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 13) '(2019 7 14)))
+        result (->> data-2-changes-with-nil-days
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
@@ -931,9 +891,7 @@
         "Ensure a traffic change is reported.")
 
     (is (= {:route-key tu/route-name
-            :route-end-date (tu/to-local-date 2019 7 15)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 6 3)
-                            :end-of-week (tu/to-local-date 2019 6 9)}}
+            :route-end-date (tu/to-local-date 2019 7 15)}
            (-> result
                (nth 2)
                (select-keys tu/select-keys-detect-changes-for-all-routes)))
@@ -941,23 +899,6 @@
 
     (testing "Ensure that a right amount of changes are reported"
       (is (= 3 (count result))))))
-
-;; ;**************************** TODO: remove these notes after merging hybrid-week= function implementation
-;Ernon/Hybridi-week= korjaa: nil wk ja lyhyt muutos
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-;{tu/route-name [nil nil nil nil nil nil nil]}
-;{tu/route-name ["B" "X" "B" "B" "B" "B" "B"]}
-;{tu/route-name ["B" "X" "B" "B" "B" "B" "B"]}
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-
-;"joni"-week= korjaa:
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-;{tu/route-name ["B" "B" "B" "B" "B" "B" nil]}
-;{tu/route-name [nil nil nil nil nil nil nil]}
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-;{tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}
-
 
 (def data-change-after-no-traffic
   (tu/weeks (tu/to-local-date 2019 5 6)
@@ -970,11 +911,13 @@
                      {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019 06 17
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 06 24
                      {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]} ;; 2019 07 01
-                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}])))
+                     {tu/route-name ["B" "B" "B" "B" "B" "B" "B"]}]))) ;; 2019-07-08, last day 14th
 
 (deftest test-change-after-no-traffic-and-route-end
-  (let [result (->> data-change-after-no-traffic            ;; Notice thread-last
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 6) '(2019 7 14)))
+        result (->> data-change-after-no-traffic
                     (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
@@ -997,9 +940,7 @@
         "Ensure a traffic change is reported.")
 
     (is (= {:route-key tu/route-name
-            :route-end-date (tu/to-local-date 2019 7 15)
-            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
-                            :end-of-week (tu/to-local-date 2019 5 19)}}
+            :route-end-date (tu/to-local-date 2019 7 15)}
            (-> result
                (nth 2)
                (select-keys tu/select-keys-detect-changes-for-all-routes)))
