@@ -370,12 +370,11 @@
     route-weeks = sequence of maps each describing traffic for one week of one route
   Output: route-weeks where week traffic hashes are replaced using values from route-hashes in running order"
   [route-hashes route-weeks]
-  (let [hash-weeks (partition 7 route-hashes)]
-    (mapv (fn [route-week hash-week]
-           (assoc route-week :routes {(first (keys (:routes route-week)))
-                                      (vec hash-week)}))
-         route-weeks
-         hash-weeks)))
+  (mapv (fn [route-week hash-week]
+          (assoc route-week :routes {(first (keys (:routes route-week)))
+                                     (vec hash-week)}))
+        route-weeks
+        (partition 7 route-hashes)))
 
 (defn- route-hashes->keyed-notraffic-hashesv
   "Replaces day hashes using a keyword, if the consecutive length of a nil traffic period exceeds a configured
@@ -400,7 +399,7 @@
                 (repeat (- (count group) 2) :nt))
               [:nt-last]))
           group))
-      (partition-by                                         ;; Group nil and keyword hashes to own groups to count lengths
+      (partition-by                                         ;; Group hashes of no traffic to own groups to count lengths
         #(not (string? %))
         route-hashes))))
 
@@ -442,7 +441,7 @@
 (defn- append-no-traffic-end-key
   "Input: route-week = a map describing traffic for one week of one route
      no-traffic-end-position = index of last day of no-traffic period, or nil.
-   Output: `change-maps`, where into last object has :no-traffic-end-date ap`pended if `no-traffic-end-position` exists."
+   Output: `change-maps`, where last object has :no-traffic-end-date appended if `no-traffic-end-position` exists."
   [change-maps {:keys [beginning-of-week] :as route-week} no-traffic-end-position]
   (if (and (number? no-traffic-end-position)
            change-maps
@@ -462,8 +461,6 @@
   (reduce
     (fn [change-maps {:keys [routes] :as route-week}]
       (let [wk-hash (first (vals routes))
-            ;prev-wk-traffic? (some #(and (not= :nt %) (not= :nt-first %))
-            ;                       (first (vals routes-prev-wk)))              ;; Check if previous week has any non-nil i.e. traffic
             no-traffic-start-position  (week-hash-key-ix wk-hash :nt-first)
             no-traffic-end-position (when-let [ixx (week-hash-key-ix wk-hash :nt-last)]
                                       (inc ixx))] ;; inc because no-traffic end is to be reported when traffic continues.
@@ -505,10 +502,12 @@
            :starting-week-hash [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}]
            {...}"
   [route-weeks]
-  ;; First pre-process input data and do no-traffic change detection for a route
-  (let [route-weeks-trafficless (route-wks->keyed-notraffic-wksv route-weeks)]
-    (loop [route-weeks route-weeks-trafficless
-           results (create-no-traffic-change-mapsv route-weeks-trafficless)]
+  ;; First pre-process input data and do "no-traffic" change detection for a route
+  (let [route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
+
+    (loop [route-weeks route-weeks-nt-keyed
+           results (create-no-traffic-change-mapsv route-weeks-nt-keyed)]
+
       ;; Do traffice change detection for a route
       (let [diff-data (route-weeks-with-first-difference route-weeks)
             filtered-diff-data (filterv
@@ -521,6 +520,7 @@
             diff-week-date (first diff-week-beginnings)
             prev-week-date (when (or diff-week-date no-traffic-end)
                              (.minusWeeks (or diff-week-date no-traffic-end) 1))]
+
         (if (and (not-empty diff-data) prev-week-date)      ;; end condition: dates returned by f-w-d had nil different-week beginning
           (recur
             ;; Filter out different weeks before current week, because different week is starting week for next change.
@@ -898,8 +898,7 @@
             route-max-date-local (when route-info
                                    (.toLocalDate (:max-date route-info)))]
 
-        (if (and route-min-date-local
-                 route-max-date-local)
+        (if (and route-min-date-local route-max-date-local)
           (filterv #(and (.isAfter (:end-of-week %) route-min-date-local)
                          (.isBefore (:beginning-of-week %) route-max-date-local))
                    route-wks)
