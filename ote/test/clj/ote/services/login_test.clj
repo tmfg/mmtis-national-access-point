@@ -61,9 +61,9 @@
   (first (ote.test/sql-query "SELECT password FROM \"user\" WHERE name='normaluser'")))
 
 (defn extract-key-and-id []
-  (let [body (:body (first @ote.test/outbox))
+  (let [body (:content (first (:body (first @ote.test/outbox))))
         [_ key id] (when body
-                     (re-matches #"(?is).*reset-password\?key=([^&]+)&id=([^ ]+).*"
+                     (re-matches #"(?is).*reset-password\?key=([^&]+)&amp;id=([^ ]+).*"
                                  body))]
     {:key key
      :id id}))

@@ -1305,10 +1305,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :email-templates
  {:password-reset {:subject "NAP - Återställ ditt lösenord"
-                   :body1 ["Bästa " :name ", "]
-                   :body2 "Du har bett om återställning av ditt lösenord."
-                   :body3 "Var vänlig klicka på länken nedan för att bekräfta."
-                   :body4 "Den här länken löper ut på en timme."
-                   :body5 "P.S Om inte återställningen av ditt lösenord lyckades ta kontakt med NAP-HelpDesk."
+                   :body1 ["Salasanan vaihtopyyntö on vastaanotettu."]
+                   :body2 "Voit siirtyä vaihtamaan salasanan täppäämällä alla olevaa"
+                   :body3 "-painiketta."
+                   :body4 "Tämä linkki vanhenee tunnin kuluttua. "
+                   :body5 "Mikäli salasanan vaihto ei onnistu, olkaa yhteydessä NAP-HelpDeskiin."
+                   :body6 "Jos et yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
+                   :body7 "Tämä viesti on lähetetty järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
                    :link-text "Återställ lösenord"}}
  }

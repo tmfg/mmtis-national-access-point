@@ -299,14 +299,18 @@
 
                   (html-divider-border "100%")
 
-                  [:p (tr [:email-templates :password-reset :body1] {:name (:name user)})]
-                  [:p (tr [:email-templates :password-reset :body2])]
-                  [:p (tr [:email-templates :password-reset :body3])]
+                  [:p (tr [:email-templates :password-reset :body1])]
+                  [:p (tr [:email-templates :password-reset :body2]) [:strong (str " " (tr [:email-templates :password-reset :link-text]))] (tr [:email-templates :password-reset :body3])]
                   [:br]
+
                   (blue-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
                   [:br]
                   [:p (tr [:email-templates :password-reset :body4])]
                   [:p (tr [:email-templates :password-reset :body5])]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body6])]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body7])]
                   [:br]
                   (html-divider-border "100%")]
                  false))
