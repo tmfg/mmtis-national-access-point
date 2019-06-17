@@ -194,7 +194,7 @@
     key-to-find = key to find
   Output: Returns the index of first occurrence of `key-to-find`. Monday = 0, Sunday = 6, nil = not found"
   [weekhash key-to-find]
-  (key-to-find (zipmap weekhash (range 0 8))))
+  (key-to-find (zipmap weekhash (range 8))))
 
 (defn add-current-week-hash [to-key if-key state week]
   (if (and (nil? (get state to-key))
@@ -341,7 +341,7 @@
   (assert (some? (:beginning-of-week rw)) rw)
   (not (local-date-before? (:beginning-of-week rw) date)))
 
-(defn- remove-starting-nt-first
+(defn- replace-starting-nt-first
   "Input: hashes = Sequence of values
   Output: Replaces first value if it marks start of no-traffic period."
   [hashes]
@@ -421,7 +421,7 @@
       route-wks->hashes-flat
       route-hashes->keyed-notraffic-hashesv
       replace-terminating-nt-last                           ;; Don't report :no-traffic-end-date if traffic doesn't continue
-      remove-starting-nt-first                              ;; Don't report no-traffic which is already ongoing
+      replace-starting-nt-first                              ;; Don't report no-traffic which is already ongoing
       (hashes-flat->route-wksv route-weeks)))
 
 (defn- append-no-traffic-start-map
