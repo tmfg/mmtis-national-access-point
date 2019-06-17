@@ -36,3 +36,39 @@
   ([wk-count week route-name]
    (let [basic-week {route-name week}]
      (vec (repeat wk-count basic-week)))))
+
+(defn create-data-all-routes
+
+  ([dates-r1]
+   (create-data-all-routes dates-r1 (list '(2050 1 2) '(2051 12 31))))
+
+  ([[min-dates-r1 max-dates-r1] [min-dates-r2 max-dates-r2]]
+   [[route-name-2
+     {:route-short-name route-name-2
+      :route-long-name route-name-2
+      :trip-headsign ""
+      :min-date (time/sql-date (to-local-date (first min-dates-r2)
+                                              (second min-dates-r2)
+                                              (nth min-dates-r2 1)))
+      :max-date (time/sql-date (to-local-date (first max-dates-r2)
+                                              (second max-dates-r2)
+                                              (nth max-dates-r2 2)))
+      :route-hash-id route-name-2}]
+    [route-name
+     {:route-short-name ""
+      :route-long-name route-name
+      :trip-headsign ""
+      :min-date (time/sql-date (to-local-date (first min-dates-r1)
+                                              (second min-dates-r1)
+                                              (nth min-dates-r1 1)))
+      :max-date (time/sql-date (to-local-date (first max-dates-r1)
+                                              (second max-dates-r1)
+                                              (nth max-dates-r1 2)))
+      :route-hash-id route-name}]
+    [route-name-3
+     {:route-short-name ""
+      :route-long-name route-name-3
+      :trip-headsign ""
+      :min-date nil
+      :max-date nil
+      :route-hash-id route-name-3}]]))

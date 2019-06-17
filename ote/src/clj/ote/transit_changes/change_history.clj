@@ -41,11 +41,12 @@
                             (some #(= (:gtfs/change-key new-change) (:gtfs/change-key %)) service-change-history))
                           service-changes)]
     (doseq [u unsaved-changes]
-      (specql/insert! db :gtfs/detected-change-history
-                      {:gtfs/transport-service-id service-id
-                       :gtfs/change-key (:gtfs/change-key u)
-                       :gtfs/route-hash-id (:gtfs/route-hash-id u)
-                       :gtfs/change-detected (time/sql-date (java.time.LocalDate/now))
-                       :gtfs/different-week-date (:gtfs/different-week-date u)
-                       :gtfs/package-ids package-ids
-                       :gtfs/change-type (:gtfs/change-type u)}))))
+      (when u
+        (specql/insert! db :gtfs/detected-change-history
+                        {:gtfs/transport-service-id service-id
+                         :gtfs/change-key (:gtfs/change-key u)
+                         :gtfs/route-hash-id (:gtfs/route-hash-id u)
+                         :gtfs/change-detected (time/sql-date (java.time.LocalDate/now))
+                         :gtfs/different-week-date (:gtfs/different-week-date u)
+                         :gtfs/package-ids package-ids
+                         :gtfs/change-type (:gtfs/change-type u)})))))
