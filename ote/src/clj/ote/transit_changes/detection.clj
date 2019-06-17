@@ -900,7 +900,7 @@
 
         (if (and route-min-date-local route-max-date-local)
           (filterv #(and (.isAfter (:end-of-week %) route-min-date-local)
-                         (.isBefore (:beginning-of-week %) route-max-date-local))
+                         (.isBefore (.minusDays (:beginning-of-week %) 1) route-max-date-local))
                    route-wks)
           route-wks)))
     routes-weeks))
