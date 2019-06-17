@@ -292,12 +292,11 @@
                      :component (fn [{data :data} form-data]
                                   (let [id (:ote.db.transit/id data)
                                         file-name (:ote.db.transit/attachment-file-name data)]
-                                    [:div {:id (str "att-id")}
-                                     [:span
-                                      (if id
-                                        [:a {:href (str "pre-notice/attachment/" id) :target "_blank"}
-                                         file-name]
-                                        file-name)]]))}
+                                    [:div
+                                     (if id
+                                       [:a {:href (str "pre-notice/attachment/" id) :target "_blank"}
+                                        file-name]
+                                       file-name)]))}
                     {:name :attachment-file
                      :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
