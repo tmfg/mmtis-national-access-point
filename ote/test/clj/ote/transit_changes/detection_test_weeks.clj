@@ -1103,8 +1103,6 @@
                     (detection/detect-changes-for-all-routes)
                     (detection/add-ending-route-change (tu/to-local-date 2019 5 13) data-all-routes))]
 
-    (clojure.pprint/pprint result)
-
     (is (= {:route-key tu/route-name
             :different-week {:beginning-of-week (tu/to-local-date 2019 5 27)
                              :end-of-week (tu/to-local-date 2019 6 2)}
