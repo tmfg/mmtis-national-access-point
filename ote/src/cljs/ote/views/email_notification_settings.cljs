@@ -8,7 +8,8 @@
             [reagent.core :as r]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.email-notification-settings :as email-settings]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (defn select-province [e! regions]
   [(form/group
@@ -51,4 +52,4 @@
 (defn email-notification-settings [e! state]
   (if (not (get-in state [:email-settings :regions-loading]))
     [email-notification-settings-form e! state]
-    [common/loading-spinner]))
+    [circular-progress/circular-progress]))

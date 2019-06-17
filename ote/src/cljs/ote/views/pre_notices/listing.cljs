@@ -15,7 +15,8 @@
             [clojure.string :as str]
             [ote.app.controller.front-page :as fp]
             [ote.ui.common :as common]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (defn pre-notice-type->str
   [types]
@@ -64,7 +65,7 @@
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]
   (if (= :loading pre-notices)
-    [common/loading-spinner]
+    [circular-progress/circular-progress]
     (let [pre-notices (filter #(= (::t-operator/id transport-operator)
                                   (::t-operator/id %))
                               pre-notices)]

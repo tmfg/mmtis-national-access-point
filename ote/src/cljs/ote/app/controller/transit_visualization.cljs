@@ -98,6 +98,17 @@
   [coll]
   (str/join "/" (map :change-type coll)))
 
+(defn- combine-change-values
+  "Combine grouped route changes to the first route row (shown in routes list)"
+  [single-route grouped-routes]
+  (-> single-route
+      (assoc :added-trips (apply + (map :added-trips grouped-routes)))
+      (assoc :removed-trips (apply + (map :removed-trips grouped-routes)))
+      (assoc :trip-stop-sequence-changes-lower (apply + (map :trip-stop-sequence-changes-lower grouped-routes)))
+      (assoc :trip-stop-sequence-changes-upper (apply + (map :trip-stop-sequence-changes-upper grouped-routes)))
+      (assoc :trip-stop-time-changes-lower (apply + (map :trip-stop-time-changes-lower grouped-routes)))
+      (assoc :trip-stop-time-changes-upper (apply + (map :trip-stop-time-changes-upper grouped-routes)))))
+
 (defn sorted-route-changes
   "Sort route changes according to change date and route-long-name: Earliest first and missing date last."
   [show-no-change changes]
@@ -105,7 +116,6 @@
         ;removed-in-past (sort-by (juxt :route-long-name :route-short-name) (filterv #(and (= :removed (:change-type %)) (nil? (:change-date %))) changes))
         no-changes (sort-by (juxt :route-long-name :route-short-name) (filterv #(= :no-change (:change-type %)) changes))
         only-changes (sort-by :different-week-date (filterv :different-week-date changes))
-
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
         group-recent? (map
@@ -122,7 +132,8 @@
         route-changes (map (fn [x]
                              (-> x
                                  (assoc :count (count-changes (:route-hash-id x) grouped-changes))
-                                 (assoc :combined-change-types (combine-change-types (get grouped-changes (:route-hash-id x))))))
+                                 (assoc :combined-change-types (combine-change-types (get grouped-changes (:route-hash-id x))))
+                                 (combine-change-values (get grouped-changes (:route-hash-id x)))))
                            route-changes-with-recent)
         sorted-changes (sort-by (juxt :different-week-date :route-long-name :route-short-name) route-changes)
         all-sorted-changes (if show-no-change

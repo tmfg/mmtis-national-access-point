@@ -21,7 +21,7 @@
 (defn- send-email
   "Send a singular email using Postal."
   [server msg]
-  (if (-> server :host some?)   
+  (if (-> server :host some?)
     (postal/send-message server msg)
     (log/warn "not sending email because configured smtp host is empty")))
 
