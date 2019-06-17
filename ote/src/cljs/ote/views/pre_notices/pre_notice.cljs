@@ -15,7 +15,8 @@
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.ui.common :as common]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -312,6 +313,7 @@
                       :footer-fn (r/partial footer e! sent?)
                       :update! #(e! (pre-notice/->EditForm %))}]
     [:span
+     [common/back-link-with-event :pre-notices (tr [:pre-notice-page :back-to-pre-notices])]
      [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
      [select-operator e! transport-operator operators]
      [form/form

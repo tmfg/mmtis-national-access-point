@@ -917,6 +917,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                 :school-start "Kouluvuoden alku"
                                 :school-end "Kouluvuoden päätös"
                                 :season-schedule-change "Aikataulukauden vaihtuminen"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page

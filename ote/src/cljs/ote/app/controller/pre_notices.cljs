@@ -293,27 +293,6 @@
                                (drop (inc row-index) %))))
       (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 
-;; Download attachment file
-(define-event DownloadResponse [content filename]
-  {}
-  (let [blob (new js/Blob
-                  (clj->js [content])
-                  #_ (clj->js {:type "text/csv"}
-                           ))]
-    (js/saveAs blob filename)
-    app))
-
-(define-event DownloadAttachment [id filename]
-  {}
-  (.log js/console "DownloadAttachment " (pr-str id) (pr-str filename))
-  (comm/get! (str "pre-notice/attachment/" id)
-             {:type :blob
-              :content-type "text/csv"
-              :response-format :text
-              :on-success (tuck/send-async! ->DownloadResponse filename)
-              :on-failure (tuck/send-async! ->ServerError)})
-  app)
-
 (defn load-regions-from-server []
   (comm/get! "pre-notices/regions"
              {:on-success (tuck/send-async! ->RegionsResponse)

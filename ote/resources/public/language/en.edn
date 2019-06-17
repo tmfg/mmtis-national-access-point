@@ -912,6 +912,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                                 :school-start "The beginning of the school year"
                                 :school-end "The end of the school year"
                                 :season-schedule-change "Season schedule change"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page
