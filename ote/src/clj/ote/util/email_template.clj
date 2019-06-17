@@ -113,7 +113,7 @@
    first-effective-date
    (escape-html description)])
 
-(defn html-template [title body]
+(defn html-template [title body authority-email?]
   [:html {:xmlns "http://www.w3.org/1999/xhtml"
           :xmlns:v "urn:schemas-microsoft-com:vml"
           :xmlns:o "urn:schemas-microsoft-com:office:office"}
@@ -181,12 +181,16 @@
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
       [:br]
-      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-       "Haluatko muuttaa sähköpostiasetuksiasi?"
-       [:br]
-       [:a
-        {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-         :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]
+
+      ;; Only authorities should change their notification settings
+      (when authority-email?
+        [:div
+         [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+          "Haluatko muuttaa sähköpostiasetuksiasi?"
+          [:br]
+          [:a
+           {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+            :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]])
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
@@ -237,7 +241,8 @@
                         (detected-change-row detected-changes))
                       [:br]]
                      (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
-                  (html-divider-border nil)]))
+                  (html-divider-border nil)]
+                 true))
 
 (defn notify-user-new-member [new-member requester operator title]
   (html-template title
@@ -259,25 +264,49 @@
                   [:br]
                   (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
-                  (html-divider-border "100%")]))
+                  (html-divider-border "100%")]
+                 false))
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/name operator)]
-     (html-template title
-       [:div {:style "max-width: 800px"}
-        [:br]
-        [:h1 {:class "headerText1"
-              :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
-         (str "Olet saanut kutsun liittyä NAP:iin")]
+    (html-template title
+                   [:div {:style "max-width: 800px"}
+                    [:br]
+                    [:h1 {:class "headerText1"
+                          :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+                     (str "Olet saanut kutsun liittyä NAP:iin")]
 
-        (html-divider-border "100%")
-        [:p
-         [:strong (get-in requester [:user :name])]
-         " on kutsunut sinut NAP-palveluun "
-         [:strong op-name]
-         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
-        [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
-        [:br]
-        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+                    (html-divider-border "100%")
+                    [:p
+                     [:strong (get-in requester [:user :name])]
+                     " on kutsunut sinut NAP-palveluun "
+                     [:strong op-name]
+                     (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+                    [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+                    [:br]
+                    (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
-        (html-divider-border "100%")])))
+                    (html-divider-border "100%")]
+                   false)))
+
+(defn reset-password [title token user]
+  (html-template title
+                 [:div {:style "max-width: 800px"}
+                  [:br]
+                  [:h1 {:class "headerText1"
+                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+                   (tr [:email-templates :password-reset :subject])]
+
+                  (html-divider-border "100%")
+
+                  [:p (tr [:email-templates :password-reset :body1] {:name (:name user)})]
+                  [:p (tr [:email-templates :password-reset :body2])]
+                  [:p (tr [:email-templates :password-reset :body3])]
+                  [:br]
+                  (blue-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body4])]
+                  [:p (tr [:email-templates :password-reset :body5])]
+                  [:br]
+                  (html-divider-border "100%")]
+                 false))
