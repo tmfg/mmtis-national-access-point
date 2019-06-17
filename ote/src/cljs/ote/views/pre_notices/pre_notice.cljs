@@ -6,17 +6,13 @@
             [ote.app.controller.pre-notices :as pre-notice]
             [ote.ui.buttons :as buttons]
             [ote.ui.form-fields :as form-fields]
-    ;; db
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
             [ote.ui.form :as form]
-            [ote.ui.common :as common]
             [cljs-react-material-ui.icons :as ic]
             [ote.style.form :as style-form]
-            [stylefy.core :as stylefy]
             [ote.ui.leaflet :as leaflet]
-            [ote.ui.mui-chip-input :as chip-input]
             [clojure.string :as str]
             [ote.style.dialog :as style-dialog]
             [ote.ui.circular_progress :as circular-progress]))
@@ -290,9 +286,17 @@
      :add-label (tr [:pre-notice-page :add-attachment])
      :add-label-disabled? (constantly sent?)
      :table-fields [{:name ::transit/attachment-file-name
-                     :type :string
-                     :disabled? true}
-
+                     :type :component
+                     :read identity
+                     :component (fn [{data :data} form-data]
+                                  (let [id (:ote.db.transit/id data)
+                                        file-name (:ote.db.transit/attachment-file-name data)]
+                                    [:div {:id (str "att-id")}
+                                     [:span
+                                      (if id
+                                        [:a {:href (str "pre-notice/attachment/" id) :target "_blank"}
+                                         file-name]
+                                        file-name)]]))}
                     {:name :attachment-file
                      :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
