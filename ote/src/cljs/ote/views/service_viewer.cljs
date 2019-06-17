@@ -467,7 +467,7 @@
              (tr [:service-viewer :day-of-week])
              (string/join ", " (map
                                  #(string/lower-case (tr [:enums ::t-service/day :short %]))
-                                 (tsu/reorder-service-days (::t-service/week-days time))))
+                                 (tsu/reorder-week-days (::t-service/week-days time))))
              true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
             [common-ui/information-row-with-option
