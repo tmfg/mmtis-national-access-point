@@ -1305,14 +1305,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :email-templates
  {:password-reset {:subject "NAP - Återställ ditt lösenord"
-                   :body ["Bästa " :name ", \n"
-                          "Du har bett om återställning av ditt lösenord.\n"
-                          "Var vänlig klicka på länken nedan för att bekräfta:\n"
-                          :reset-link
-                          "\nDen här länken löper ut på en timme"
-                          "\nP.S Om inte återställningen av ditt lösenord lyckades ta kontakt med NAP-HelpDesk,\n"
-                          "joukkoliikenne@traficom.fi eller tfn 029 534 5454 (Mån-Fre kl 10-16)."
-                          "\n\n------------\n"
-                          "Detta meddelande är skickat av NAP\n"
-                          "(www.finap.fi)"]}}
+                   :body1 ["Bästa " :name ", "]
+                   :body2 "Du har bett om återställning av ditt lösenord."
+                   :body3 "Var vänlig klicka på länken nedan för att bekräfta."
+                   :body4 "Den här länken löper ut på en timme."
+                   :body5 "P.S Om inte återställningen av ditt lösenord lyckades ta kontakt med NAP-HelpDesk."
+                   :link-text "Återställ lösenord"}}
  }

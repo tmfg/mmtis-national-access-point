@@ -1300,13 +1300,9 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :email-templates
  {:password-reset {:subject "NAP - Reset your password"
-                   :body ["Dear " :name ", \n"
-                          "You have requested your password on NAP to be reset.\n"
-                          "Please click the following link to confirm this request:\n"
-                          :reset-link
-                          "\nThis link expires in one hour."
-                          "\nP.S If you do not manage to reset your password, please contact NAP-HelpDesk,\n"
-                          "email joukkoliikenne@traficom.fi or phone +358 29 534 5454 (Mon-Fri 10am-4pm)."
-                          "\n\n------------\n"
-                          "This message was sent by NAP\n"
-                          "(www.finap.fi)"]}}}
+                   :body1 ["Dear " :name ", "]
+                   :body2 "You have requested your password on NAP to be reset."
+                   :body3 "Please click the following button to confirm this request."
+                   :body4 "This link expires in one hour."
+                   :body5 "P.S If you do not manage to reset your password, please contact NAP-HelpDesk."
+                   :link-text "Reset password"}}}
