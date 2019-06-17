@@ -174,7 +174,7 @@
        "Tämän viestin lähetti NAP."]
       [:br]
       [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-              "NAP-yhteystiedot:"]]
+              "NAP-Helpdesk yhteystiedot:"]]
       [:p
        [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
@@ -312,5 +312,7 @@
                   [:br]
                   [:p (tr [:email-templates :password-reset :body7])]
                   [:br]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body8])]
                   (html-divider-border "100%")]
                  false))

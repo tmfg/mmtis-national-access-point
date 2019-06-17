@@ -1312,11 +1312,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :email-templates
  {:password-reset {:subject "NAP - Salasanan vaihto"
-                   :body1 ["Salasanan vaihtopyyntö on vastaanotettu."]
-                   :body2 "Voit siirtyä vaihtamaan salasanan täppäämällä alla olevaa"
+                   :body1 "Salasanan vaihtopyyntösi on vastaanotettu."
+                   :body2 "Voit siirtyä vaihtamaan salasanan napsauttamalla alla olevaa"
                    :body3 "-painiketta."
-                   :body4 "Tämä linkki vanhenee tunnin kuluttua. "
-                   :body5 "Mikäli salasanan vaihto ei onnistu, olkaa yhteydessä NAP-HelpDeskiin."
-                   :body6 "Jos et yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
-                   :body7 "Tämä viesti on lähetetty järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
+                   :body4 "Huom! Painikkeen takana oleva linkki vanhenee tunnin kuluttua tämän viestin saapumisesta."
+                   :body5 "Voit tilata salasanan vaihdon NAP:sta uudelleen, mikäli tarpeen."
+                   :body6 "Mikäli salasanan vaihto ei onnistu, ota yhteys NAP-Helpdeskiin."
+                   :body7 "Mikäli et ole yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
+                   :body8 "Tämä viesti on lähetetty NAP-järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
                    :link-text "Vaihda salasana"}}}
