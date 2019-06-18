@@ -88,7 +88,7 @@
 (def data-route-starts-no-end
   (tu/weeks (tu/to-local-date 2019 4 15)
             (concat [{tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [:holiday :holiday nil nil nil nil nil]}
+                     {tu/route-name [:holiday-nt :holiday-nt nil nil nil nil nil]}
                      {tu/route-name [nil nil nil nil nil nil nil]}] ;; 29.4.
                     (tu/generate-traffic-week 11 [nil nil nil nil nil "h6" "h6"]))))
 
