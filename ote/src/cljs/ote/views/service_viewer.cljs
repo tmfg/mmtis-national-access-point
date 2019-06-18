@@ -8,6 +8,7 @@
             [reagent.core :as r]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.util.transport-service-util :as tsu]
             [ote.app.controller.service-viewer :as svc]
             [ote.ui.common :as common-ui]
             [ote.style.base :as style-base]
@@ -466,7 +467,8 @@
              (tr [:service-viewer :day-of-week])
              (string/join ", " (map
                                  #(string/lower-case (tr [:enums ::t-service/day :short %]))
-                                 (::t-service/week-days time))) true]]
+                                 (tsu/reorder-week-days (::t-service/week-days time))))
+             true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
             [common-ui/information-row-with-option
              (tr [:common-texts :start-time])
