@@ -88,7 +88,7 @@
 (def data-route-starts-no-end
   (tu/weeks (tu/to-local-date 2019 4 15)
             (concat [{tu/route-name [nil nil nil nil nil nil nil]}
-                     {tu/route-name [:holiday :holiday nil nil nil nil nil]}
+                     {tu/route-name [:holiday-nt :holiday-nt nil nil nil nil nil]}
                      {tu/route-name [nil nil nil nil nil nil nil]}] ;; 29.4.
                     (tu/generate-traffic-week 11 [nil nil nil nil nil "h6" "h6"]))))
 
@@ -1194,3 +1194,34 @@
 
     (testing "Ensure that right number of changes is reported"
       (is (= 3 (count result))))))
+
+(def data-holiday-tr-days-and-holiday-nt-days
+  (tu/weeks (tu/to-local-date 2019 11 18)
+            (concat [{tu/route-name ["A" nil nil nil nil nil nil]} ;; 2019 11 11
+                     {tu/route-name ["A" nil nil nil nil nil nil]} ;; 2019 11 18
+                     {tu/route-name ["A" nil nil nil nil nil nil]} ;; 2019 11 25
+                     {tu/route-name [:holiday-tr nil nil nil nil nil nil]} ;; 2019 12 02
+                     {tu/route-name [:holiday-tr nil nil nil nil nil nil]} ;; 2019 12 09
+                     {tu/route-name [:holiday-nt nil nil nil nil nil nil]} ;; 2019 12 16
+                     {tu/route-name [:holiday-tr nil nil nil nil nil nil]} ;; 2019 12 23
+                     {tu/route-name [:holiday-tr nil nil nil nil nil nil]} ;; 2019 12 30
+                     {tu/route-name [:holiday-nt nil nil nil nil nil]} ;; 2020 01 06
+                     {tu/route-name ["A" nil nil nil nil nil nil]}]))) ;; 2020 01 13, last 19th
+
+(deftest test-holiday-hides-traffic-days
+  (let [data-all-routes (tu/create-data-all-routes (list '(2019 5 25) '(2020 1 13)))
+        result (->> data-holiday-tr-days-and-holiday-nt-days
+                    (detection/changes-by-week->changes-by-route)
+                    (detection/remove-outscoped-weeks data-all-routes)
+                    (detection/detect-changes-for-all-routes))]
+    (testing "Test that holidays hiding route's weekly traffic do not cause no-traffic to be reported"
+      (is (= {:route-key tu/route-name
+              :starting-week {:beginning-of-week (tu/to-local-date 2019 11 25)
+                              :end-of-week (tu/to-local-date 2019 12 1)}}
+             (select-keys
+               (first result)
+               tu/select-keys-detect-changes-for-all-routes))
+          "Ensure a no traffic changes are reported."))
+
+    (testing "Ensure that right number of changes is reported"
+      (is (= 1 (count result))))))

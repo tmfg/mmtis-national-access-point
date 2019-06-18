@@ -376,6 +376,10 @@
         route-weeks
         (partition 7 route-hashes)))
 
+(defn- hash-without-traffic? [hash]
+  (or (nil? hash)                                           ;; Business day without traffic
+      (= :holiday-nt hash)))                                ;; Holiday without traffic
+
 (defn- route-hashes->keyed-notraffic-hashesv
   "Replaces day hashes using a keyword, if the consecutive length of a nil traffic period exceeds a configured
   threshold alue.
@@ -389,7 +393,7 @@
         ;; If a grouped sequence does not have any string values, consider it a group without traffic.
         ;; Evalue if trafficless groups meet reporting criteria and if so, replace values using a specific keyword.
         ;; Replace also holiday keywords for the sake of uniformity.
-        (if (and (some #(not (string? %)) group)            ;; True if there are no string objects
+        (if (and (some hash-without-traffic? group)
                  (> (count group) (:detection-threshold-no-traffic-days settings-tc)))
           (seq
             (concat
@@ -400,7 +404,7 @@
               [:nt-last]))
           group))
       (partition-by                                         ;; Group hashes of no traffic to own groups to count lengths
-        #(not (string? %))
+        hash-without-traffic?
         route-hashes))))
 
 (defn- route-wks->hashes-flat
@@ -843,7 +847,11 @@
                holiday-id (when date
                             (transit-changes/is-holiday? db date))]
            (if holiday-id
-             (assoc row :hash :holiday)
+             (assoc row :hash
+                        ;; Mark holiday using a keyword which no-traffic detection know if day has traffic or not.
+                        (if (string? (:hash row))
+                          :holiday-tr                       ;; holiday with traffic
+                          :holiday-nt))                     ;; holiday without traffic
              row)))
        date-route-hashes))
 
