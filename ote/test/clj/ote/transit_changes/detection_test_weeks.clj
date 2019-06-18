@@ -1213,8 +1213,7 @@
         result (->> data-holiday-tr-days-and-holiday-nt-days
                     (detection/changes-by-week->changes-by-route)
                     (detection/remove-outscoped-weeks data-all-routes)
-                    (detection/detect-changes-for-all-routes)
-                    #_(detection/add-ending-route-change (tu/to-local-date 2019 11 18) data-all-routes))]
+                    (detection/detect-changes-for-all-routes))]
     (testing "Test that holidays hiding route's weekly traffic do not cause no-traffic to be reported"
       (is (= {:route-key tu/route-name
               :starting-week {:beginning-of-week (tu/to-local-date 2019 11 25)
