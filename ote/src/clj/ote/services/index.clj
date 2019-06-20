@@ -45,20 +45,22 @@
 
 (defn matomo-analytics-scripts [config]
   (list
-    (str "<!-- Matomo -->")
+    (str " <!-- Matomo -->")
     (javascript-tag
-      (str "var _paq = window._paq || [];"
-           "/* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */"
-           "_paq.push(['trackPageView']);"
-           "_paq.push(['enableLinkTracking']);\n(function() {"
-           "var u=\"" (:piwik-url config) "\";"
-           "_paq.push(['setTrackerUrl', u+'matomo.php']);"
-           "_paq.push(['setSiteId', '" (:site-id config) "']);"
-           "var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
-           "g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);"
-           "})();"
+      (str " var _paq = window._paq || [];"
+           " /* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */"
+           " _paq.push(['trackPageView']);"
+           " _paq.push(['enableLinkTracking']);"
+           " _paq.push(['enableHeartBeatTimer']);"
+           " (function() {"
+           " var u=\"" (:piwik-url config) "\";"
+           " _paq.push(['setTrackerUrl', u+'matomo.php']);"
+           " _paq.push(['setSiteId', " (:site-id config) "]);"
+           " var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
+           " g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);"
+           " })();"
            ))
-    (str "<!-- End Matomo Code -->")))
+    (str " <!-- End Matomo Code -->")))
 
 (def favicons
   [{:rel "apple-touch-icon" :sizes "180x180" :href "/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
