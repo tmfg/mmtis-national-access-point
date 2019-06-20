@@ -44,10 +44,12 @@
 
     (is (= 1 (count outbox)))
     (testing "Email message"
-      (let [{:keys [to subject body]} (first outbox)]
+      (let [{:keys [to subject body]} (first outbox)
+            body (:content (first body))]
         (is (= to "admin@napoteadmin123.com"))
         (is (= subject "NAP - Reset your password"))
-        (is (str/includes? body "admin"))
+        (is (str/includes? body "Ignore this message, if you have not tried to change your password."))
+        (is (str/includes? body "nap@traficom.fi"))
         (is (str/includes? body "#/reset-password?key="))))))
 
 (deftest password-reset-request-for-unknown-user
