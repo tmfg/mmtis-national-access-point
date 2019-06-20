@@ -118,8 +118,7 @@
              {:id "main-body"
               :onload "ote.main.main();"
               :features flags
-              :data-language localization/*language*
-              :data-ga-tracking-code (:tracking-code ga-conf)}
+              :data-language localization/*language*}
              (when dev-mode?
                {:data-dev-mode? true})
              (when (bound? #'anti-forgery/*anti-forgery-token*)
