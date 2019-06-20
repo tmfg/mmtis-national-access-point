@@ -46,6 +46,8 @@
 
  :log {:level :debug}
  :ga {:tracking-code "UA-5406842-15"}
+ :matomo {:piwik-url "https://matomo.vy.laru.local/"
+          :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
