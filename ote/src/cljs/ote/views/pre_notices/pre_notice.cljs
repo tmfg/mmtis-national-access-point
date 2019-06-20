@@ -294,8 +294,7 @@
                                         file-name (:ote.db.transit/attachment-file-name data)]
                                     [:div
                                      (if id
-                                       [:a {:href (str "pre-notice/attachment/" id) :target "_blank"}
-                                        file-name]
+                                       (common/linkify (str "pre-notice/attachment/" id) file-name {:target "_blank"})
                                        file-name)]))}
                     {:name :attachment-file
                      :button-label (tr [:pre-notice-page :select-attachment])
