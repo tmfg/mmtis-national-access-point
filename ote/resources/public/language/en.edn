@@ -572,7 +572,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :associated-search-hint "Add participation information by writing the name of the service or the name of the service provider in to this field."
                      :edit-business-id ["Edit information for business-id " :business-id]
                      :filling-info "Filling instructions"
-                     :filling-info-content (:md "**Participation information entered  by other companies** \n If there are already listed services under this headline, the service providers in question have entered your company (Business ID) as participating in the provision of their service. If the information is incorrect, please contact the service provider to rectify the information. \n\n**How to add participation information yourself?**\nIf a service, in which you are participating, is missing from the list (e.g. a taxi brokering centre), write the name of the service provider or the name of the service in the search box. After this, select the right service from the alternatives in the list. If you select the wrong service by mistake, you can remove it by clicking the X  symbol after the service name. If you cannot find the mobility service that you are participating in, please contact **NAP Helpdesk**: +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi\n\nIf you also provide your own taxi transport services in addition to those of a brokering centre, or provide other transport services, please create your own service or services in the section **Own services**.")
+                     :filling-info-content (:md "**Participation information entered  by other companies** \n If there are already listed services under this headline, the service providers in question have entered your company (Business ID) as participating in the provision of their service. If the information is incorrect, please contact the service provider to rectify the information. \n\n**How to add participation information yourself?**\nIf a service, in which you are participating, is missing from the list (e.g. a taxi brokering centre), write the name of the service provider or the name of the service in the search box. After this, select the right service from the alternatives in the list. If you select the wrong service by mistake, you can remove it by clicking the X  symbol after the service name. If you cannot find the mobility service that you are participating in, please contact **NAP Helpdesk**: +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or nap@traficom.fi\n\nIf you also provide your own taxi transport services in addition to those of a brokering centre, or provide other transport services, please create your own service or services in the section **Own services**.")
                      :no-associations [:operator-name " has not been entered as participating in any other service provider’s service."]
                      :no-own-associations ["You have not entered the service provider " :operator-name " as participating in the provision of any other service provider´s service."]
                      :open-geojson "Open GeoJson"
@@ -583,7 +583,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :own-services-directions-short "Instructions"
                      :own-services-new-provider1 "Well done! You have now successfully added a service provider "
                      :own-services-new-provider2 (:md " to the NAP service catalog. Please notice that only creating a service provider does not cover the essential information of your transport service/services determined in the legislation (e.g. operating area, pricing and accessibility). \n\nPlease, provide next more detailed information on your transport service or services in section **Own transport services** and/or **Other services in which you are involved in**. If you are a taxi company and you only operate rides through a brokering centre, go directly to the section **Other services in which you are involved in** and give information about the brokering centre. In such a case, you don´t necessarily have to create a transport service of your own in the NAP service catalog.")
-                     :own-services-no-providers (:md "You are not yet a member of any service provider. In order to be able to publish transport service information, you must first **create a new service provider** in the NAP service or **join as a member of an already existing service provider** by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or joukkoliikenne@traficom.fi).\n\nA service provider is a company, community or other organization, which provides its own transport services or participates in the provision of another party’s transport services, A transport operator can be e.g. a taxi company, a bus company, a commercial parking facility operator or a municipality.")
+                     :own-services-no-providers (:md "You are not yet a member of any service provider. In order to be able to publish transport service information, you must first **create a new service provider** in the NAP service or **join as a member of an already existing service provider** by contacting **NAP Helpdesk**, +358 29 534 5454 (Mon-Fri 9 am to 3 pm) or nap@traficom.fi).\n\nA service provider is a company, community or other organization, which provides its own transport services or participates in the provision of another party’s transport services, A transport operator can be e.g. a taxi company, a bus company, a commercial parking facility operator or a municipality.")
                      :missing-service-info "Information about the service is incomplete"
                      :flaws "Missing elements"
                      :missing-schedule "This service is missing the interface for route and timetable data required by law."
@@ -995,8 +995,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-organizations "Transport operator"
   :navigation-dataset "Transport service catalog"
   :navigation-give-feedback "Give feedback"
-  :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
-  :navigation-feedback-email "joukkoliikenne@traficom.fi"
+  :navigation-feedback-link "mailto:nap@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-email "nap@traficom.fi"
   :navigation-login "Login"
   :navigation-register "Register"
   :navigation-admin "Admin panel"
@@ -1071,7 +1071,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :save-user-success "Account info saved"
   :start-time "Starting time"
   :ending-time "Ending time"
-  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, joukkoliikenne@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 9 am to 3 pm)."
+  :business-id-is-not-unique "The BIS number given is already in NAP. Please, contact NAP helpdesk for further information, nap@traficom.fi or tel. +358 29 534 5454 (Mon - Fri 9 am to 3 pm)."
   :day-of-week-1-short "Mon"
   :day-of-week-2-short "Tue"
   :day-of-week-3-short "Wed"
