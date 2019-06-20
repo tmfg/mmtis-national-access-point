@@ -3,12 +3,12 @@
 -- name: fetch-operators-no-services
 SELECT op.name, op.id, op.phone, COALESCE(NULLIF(op.email, ''), u.email) AS "email"
   FROM "transport-operator" op
-         JOIN "user" u ON u.name = (SELECT u.name
+         JOIN "user" u ON u.name = (SELECT usr.name
                                       FROM "transport-operator" t
                                              JOIN member m ON m.group_id = t."ckan-group-id"
-                                             JOIN "user" u ON m.table_id = u.id
+                                             JOIN "user" usr ON m.table_id = usr.id
                                      WHERE t.id = op.id
-                                     ORDER BY u.id
+                                     ORDER BY usr.id
                                      LIMIT 1)
  WHERE (SELECT COUNT(*) FROM "transport-service" ts WHERE ts."transport-operator-id" = op.id) = 0
  ORDER BY op.name ASC;
@@ -135,12 +135,12 @@ SELECT x.*,
                    AND ts.published IS NULL) AS "unpublished-services-count"
 
           FROM "transport-operator" op
-          JOIN "user" u ON u.name = (SELECT u.name
+          JOIN "user" u ON u.name = (SELECT usr.name
                                      FROM "transport-operator" t
                                             JOIN member m ON m.group_id = t."ckan-group-id"
-                                            JOIN "user" u ON m.table_id = u.id
+                                            JOIN "user" usr ON m.table_id = usr.id
                                      WHERE t.id = op.id
-                                     ORDER BY u.id
+                                     ORDER BY usr.id
                                      LIMIT 1)
          ORDER BY op.name ASC) x
  WHERE "unpublished-services-count" > 0;
