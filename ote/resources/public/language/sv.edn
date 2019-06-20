@@ -917,6 +917,7 @@
                                 :school-start "Början av läsåret"
                                 :school-end "Slutet av läsåret"
                                 :season-schedule-change "Tidtabellsperioden ändras"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page
