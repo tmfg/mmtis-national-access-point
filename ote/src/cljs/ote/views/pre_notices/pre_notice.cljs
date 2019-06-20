@@ -18,6 +18,7 @@
             [ote.ui.circular_progress :as circular-progress]
             [ote.ui.common :as common]))
 
+
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
 
@@ -154,13 +155,11 @@
        :layout  :row}
 
       {:name                ::transit/pre-notice-type
-       :should-update-check (juxt ::transit/pre-notice-type ::transit/other-type-description)
        :type                :checkbox-group
        :container-class     "col-md-12"
        :header?             false
        :required?           true
        :options             notice-types
-       :option-addition     {:value :other :addition addition}
        :show-option         (tr-key [:enums ::transit/pre-notice-type])}
 
       {:name ::transit/description
@@ -289,7 +288,7 @@
      :table-fields [{:name ::transit/attachment-file-name
                      :type :component
                      :read identity
-                     :component (fn [{data :data} form-data]
+                     :component (fn [{data :data}]
                                   (let [id (:ote.db.transit/id data)
                                         file-name (:ote.db.transit/attachment-file-name data)]
                                     [:div

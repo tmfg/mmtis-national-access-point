@@ -517,7 +517,7 @@ You can also draw the operating area or point to the map with drawing tools. You
    :new "Increasement of transport or a new traffic route/routes"
    :schedule-change "Timetable change"
    :route-change "Route change/changes"
-   :other "Other change, what?"}
+   :other "Other change"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Draft"
