@@ -1300,12 +1300,12 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :email-templates
  {:password-reset {:subject "NAP - Reset your password"
-                   :body1 "Salasanan vaihtopyyntösi on vastaanotettu."
-                   :body2 "Voit siirtyä vaihtamaan salasanan napsauttamalla alla olevaa"
-                   :body3 "-painiketta."
-                   :body4 "Huom! Painikkeen takana oleva linkki vanhenee tunnin kuluttua tämän viestin saapumisesta."
-                   :body5 "Voit tilata salasanan vaihdon NAP:sta uudelleen, mikäli tarpeen."
-                   :body6 "Mikäli salasanan vaihto ei onnistu, ota yhteys NAP-Helpdeskiin."
-                   :body7 "Mikäli et ole yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
-                   :body8 "Tämä viesti on lähetetty NAP-järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
+                   :body1 "We have received your request to change your password."
+                   :body2 "Click the button"
+                   :body3 "to change your password."
+                   :body4 "NB! The button link expires one hour after you have received this message."
+                   :body5 "If necessary, you can request via NAP that your password is changed again."
+                   :body6 "If you are unable to change your password successfully, contact NAP Helpdesk."
+                   :body7 "Ignore this message, if you have not tried to change your password."
+                   :body8 "This message has been sent automatically from the NAP system. Do not reply to this message, replies are not processed."
                    :link-text "Reset password"}}}
