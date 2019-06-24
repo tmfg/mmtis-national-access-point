@@ -540,9 +540,14 @@
         [change-map-removed])
       change-maps)))
 
+(defn- create-no-change [change-maps route-key]
+  (if (empty? change-maps)
+    [{:change-type :no-change
+      :route-key route-key}]
+    change-maps))
+
 (defn- route-differences
-  " Takes a vector of weeks for ONE ROUTE and outputs vector of weeks where change or no traffic starts
-  (Or if neither is found, returns the starting week of analysis)
+  " Takes a sequence of week maps for ONE ROUTE and outputs a sequence of zero or more change map objects.
   Input: [{:beginning-of-week #object[java.time.LocalDate 0x3f51d3c0 \"2019-02-11\"],
           :end-of-week #object[java.time.LocalDate 0x30b5f64f \"2019-02-17\"],
           :routes {\"routename\" [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}}
@@ -556,47 +561,49 @@
                             :end-of-week #object[java.time.LocalDate \"2019-02-17\"]}
            :starting-week-hash [\"h1\" \"h2\" \"h3\" \"h4\" \"h5\" \"h6\" \"h7\"]}]
            {...}"
+  [change-maps route-weeks]
+
+  ;; Iterate all traffic weeks of one route and create traffic change maps
+  (loop [route-weeks route-weeks
+         ;; Create route added, removed and no-traffic change maps before first loop iteration
+         change-maps change-maps]
+    ;; Create change-map for next traffic change
+    (let [temp-change-map (first (route-weeks-with-first-difference route-weeks))
+          change-map (when (contains? temp-change-map :different-week)
+                       temp-change-map)
+          ;; Filter from previous week date because route-weeks-with-first-difference starts from
+          ;; the second given week (curr): [prev curr next1 next2]
+          week-filter-date (when-let [change-week-date (get-in change-map [:different-week :beginning-of-week])]
+                             (.minusWeeks change-week-date 1))
+          ;; Compose result for this round in one place to avoid forgetting something in different loop exit conditions
+          results-iteration (if change-map
+                              (concat change-maps [change-map])
+                              change-maps)
+          ;; Filter out different weeks before current week, because different week is starting week for next change.
+          weeks-remaining (when week-filter-date
+                            (filter #(route-starting-week-not-before? % week-filter-date)
+                                    route-weeks))]
+      (if (not-empty weeks-remaining)
+        (recur
+          weeks-remaining
+          results-iteration)
+        (sort change-maps-compare results-iteration)))))
+
+(defn- route-change-maps
   [route-weeks all-routes ^LocalDate analysis-date]
-  ;; First pre-process input data and mark "no-traffic" periods
   (let [route-key (first (keys (:routes (first route-weeks))))
         _ (assert
             (some #(= route-key (first (keys (:routes %)))) route-weeks)
             (str "Assuming all route keys in route weeks sequence are identical to route-key '" route-key
                  "', asserting because they are not!"))
+        ;; Pre-process input data and mark "no-traffic" periods
         route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
-
-    ;; Iterate all traffic weeks of one route and create traffic change maps
-    (loop [route-weeks route-weeks-nt-keyed
-           ;; Create route added, removed and no-traffic change maps before first loop iteration
-           change-maps (-> []
-                           (create-change-route-added route-key analysis-date all-routes)
-                           (create-changes-no-traffic route-weeks-nt-keyed)
-                           (remove-no-traffic-append-route-removed-change route-key analysis-date all-routes))]
-
-      ;; Create change-map for next traffic change
-      (let [temp-change-map (first (route-weeks-with-first-difference route-weeks))
-            change-map (when (contains? temp-change-map :different-week)
-                         temp-change-map)
-            ;; Filter from previous week date because route-weeks-with-first-difference starts from
-            ;; the second given week (curr): [prev curr next1 next2]
-            week-filter-date (when-let [change-week-date (get-in change-map [:different-week :beginning-of-week])]
-                               (.minusWeeks change-week-date 1))
-            ;; Compose result for this round in one place to avoid forgetting something in different loop exit conditions
-            results-iteration (if change-map
-                                (concat change-maps [change-map])
-                                change-maps)
-            ;; Filter out different weeks before current week, because different week is starting week for next change.
-            weeks-remaining (when week-filter-date
-                              (filter #(route-starting-week-not-before? % week-filter-date)
-                                      route-weeks))]
-        (if (not-empty weeks-remaining)
-          (recur
-            weeks-remaining
-            results-iteration)
-          (if (empty? results-iteration)
-            [{:change-type :no-change
-              :route-key route-key}]
-            (sort change-maps-compare results-iteration)))))))
+    (-> []
+        (create-change-route-added route-key analysis-date all-routes)
+        (create-changes-no-traffic route-weeks-nt-keyed)
+        (no-traffic-change->route-ending-change route-key analysis-date all-routes)
+        (route-differences route-weeks-nt-keyed)
+        (create-no-change route-key))))
 
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
@@ -957,9 +964,8 @@
   Output: Sequence of change-maps, each describing a traffic change of a route or ongoing traffic without changes."
   [^LocalDate analysis-date all-routes route-list-with-week-hashes]
   (vec (mapcat
-         #(route-differences % all-routes analysis-date)
+         #(route-change-maps % all-routes analysis-date)
          route-list-with-week-hashes)))
-
 
 (defn traffic-week-maps->change-maps
   "Input: analysis-date = date when analysis is run
