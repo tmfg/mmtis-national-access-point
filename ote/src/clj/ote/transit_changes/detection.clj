@@ -506,8 +506,14 @@
        (.isBefore (.toLocalDate max-date) (.plusDays date traffic-threshold-d))
        (.isAfter (.toLocalDate max-date) (.minusDays date 1)))) ; minus 1 day so we are sure the current day is still calculated
 
-(defn remove-no-traffic-append-route-removed-change
-  [change-maps route-key analysis-date all-routes]
+(defn no-traffic-change->route-ending-change
+  "Input: change-maps = sequence of changes for one route
+    route-key = route id string
+    analysis-date = Date for which analysis is run
+    all-routes = sequence of route info maps
+   Output: Sequence of change-maps where `ending` change is appended, r
+   eplacing last no-traffic change-map if it doesn't have an end."
+  [change-maps route-key ^LocalDate analysis-date all-routes]
   (let [route-max-date (fn [route-hash-id all-routes]
                          (:max-date (some
                                       #(when (= route-hash-id (:route-hash-id (second %))) (second %))
@@ -899,7 +905,7 @@
                          service-routes)]
     (sort-by :route-hash-id (map-by :route-hash-id service-routes))))
 
-(defn remove-outscoped-weeks
+(defn remove-out-scope-weeks
   "Input: all-routes = sequence of vectors (template: `[ ['' {}] ['' {}] ]` ). Each vector describes a route.
     routes-weeks = sequence of vectors. A vector contains maps of a route, a map describes a week of traffic.
   Output: Removes from routes-weeks weeks which fall out from route's min and max date of traffic."
@@ -927,11 +933,9 @@
   "Input: Takes collection of maps (weeks), each map contains all routes of the service for the week.
     Input format:
         {:beginning-of-week 1.1 :end-of-week 7.1 :routes { \"route1\" [\"h1\" \"h1\"}
-                                                          \"route2\" [\"h1\" \"h1\"]
-                                                          \"route3\" [\"h1\" \"h1\"]}}
+                                                          \"route2\" [\"h1\" \"h1\"]}
         {:beginning-of-week 8.1 :end-of-week 15.1 :routes { \"route1\" [\"h1\" \"h1\"}
-                                                          \"route2\" [\"h1\" \"h1\"]
-                                                          \"route3\" [\"h1\" \"h1\"]}}
+                                                          \"route2\" [\"h1\" \"h1\"]}
   Function splits the input maps so that routes are not grouped together, instead each route will be in its own collection.
   Output: A vector of 'route-vectors'. Each route-vector contains maps, each representing a week for the specific route.
     Output format:
@@ -939,8 +943,7 @@
         {:beginning-of-week 8.1, :end-of-week 15.1, :route-key \"name\" :routes {\"route1\" [\"h1\" \"h1\"]}}
         {:beginning-of-week 16.1, :end-of-week 23.1, :route-key \"name\" :routes {\"route1\" [\"h1\" \"h1\"]}}]
         [{:beginning-of-week 1.1, :end-of-week 7.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}
-         {:beginning-of-week 8.1, :end-of-week 15.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}
-         {:beginning-of-week 16.1, :end-of-week 23.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}}]]"
+         {:beginning-of-week 8.1, :end-of-week 15.1, :route-key \"name\" :routes {\"route2\" [\"h1\" \"h1\"]}} }]]"
   [weeks-routes]
   (->> weeks-routes
        ;; Take each route object from a week object and duplicate them so route weeks are independent week objects
@@ -974,7 +977,7 @@
   [analysis-date all-routes week-maps]
   (->> week-maps
        (changes-by-week->changes-by-route)
-       (remove-outscoped-weeks all-routes)
+       (remove-out-scope-weeks all-routes)
        (detect-changes-for-all-routes analysis-date all-routes)))
 
 (spec/fdef detect-route-changes-for-service
