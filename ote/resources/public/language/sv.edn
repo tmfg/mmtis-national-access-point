@@ -523,7 +523,7 @@
    :new "Trafiken utökas eller ny rutt"
    :schedule-change "Tidtabellsändring"
    :route-change "Ruttändring"
-   :other "Annan ändring, vilken?"}
+   :other "Annan ändring"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Utkast"
