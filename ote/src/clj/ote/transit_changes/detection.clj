@@ -159,11 +159,6 @@
      :routes (merge-week-hash (map :routes days))}))
 
 
-(defn dcfr-enter-debug
-  [route-key starting-week-hash curr next1 next2]
-  (when (= route-key current-debug-route)
-    (println "doing week: " (map #(when % (subs % 62)) curr))))
-
 (defn- vnot [cond msg]
   #_(when cond (println "debug: not a change because" msg))
   (not cond))
@@ -171,7 +166,6 @@
 (defn detect-change-for-route
   "Reduces [prev curr next1 next2] weeks into a detection state change"
   [{:keys [starting-week-hash] :as state} [prev curr next1 next2] route]
-  ;; (dcfr-enter-debug route starting-week-hash curr next1 next2)
   (cond
     ;; If this is the first call and the current week is "anomalous".
     ;; Then start at the next week.
@@ -311,7 +305,6 @@
   (let [route-names (into #{}
                           (map first)
                           (:routes (first route-weeks)))
-        debug-route-hit? (contains? route-names current-debug-route )
         result (reduce
                  (fn [route-detection-state [_ week-map-current _ _ :as week-maps]]
                    (reduce
@@ -324,9 +317,6 @@
                      route-names))
                  {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
-    (when debug-route-hit?
-      (println "route-weeks-with-first-difference result: " (pr-str result) "count" (count route-weeks)))
-    
     (vals result)))
 
 
@@ -790,18 +780,6 @@
 
        :gtfs/change-key (:gtfs/change-key change-key)}
       change)))
-
-; Development-time utility
-;(defn- debug-print-change-stats [all-routes route-changes type]
-;  (doseq [r all-routes
-;          :let [key (:route-hash-id r)
-;                {:keys [changes no-traffic-start-date no-traffic-end-date]
-;                 :as route} (route-changes key)]]
-;    #_(println key " has traffic " (:min-date r) " - " (:max-date r)
-;               (when no-traffic-end-date
-;                 (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
-;               (when changes
-;                 (str " has changes")))))
 
 (defn- update-route-changes! [db analysis-date service-id route-change-infos]
   {:pre [(some? analysis-date)
