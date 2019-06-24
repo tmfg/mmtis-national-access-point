@@ -420,6 +420,7 @@
         publish-date (or existing-publish-date (java.util.Date.))
         data (cond-> data
                      publish? (assoc ::t-service/published publish-date)
+                     (not publish?) (assoc ::t-service/published nil)
                      true (dissoc ::t-service/published?))]
     data))
 
