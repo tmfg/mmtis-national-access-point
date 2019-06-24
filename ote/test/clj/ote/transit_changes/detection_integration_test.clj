@@ -64,9 +64,7 @@
     (println "rewritten date" input-localdate "->" rewritten-date)
     (is (some? rewritten-date))
 
-    (is (same-localdate-weekday? input-localdate rewritten-date))
-
-    (is (= 1 (localdate-days-between input-localdate rewritten-date)))))
+    (is (same-localdate-weekday? input-localdate rewritten-date))))
 
 
 (use-fixtures :each
