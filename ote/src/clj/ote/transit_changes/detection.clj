@@ -558,8 +558,12 @@
            {...}"
   [route-weeks all-routes ^LocalDate analysis-date]
   ;; First pre-process input data and mark "no-traffic" periods
-  (let [route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)
-        route-key (first (keys (:routes (first route-weeks))))]
+  (let [route-key (first (keys (:routes (first route-weeks))))
+        _ (assert
+            (some #(= route-key (first (keys (:routes %)))) route-weeks)
+            (str "Assuming all route keys in route weeks sequence are identical to route-key '" route-key
+                 "', asserting because they are not!"))
+        route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
 
     ;; Iterate all traffic weeks of one route and create traffic change maps
     (loop [route-weeks route-weeks-nt-keyed
