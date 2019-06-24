@@ -22,7 +22,8 @@
             [ote.ui.common :as ui-common]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -116,7 +117,7 @@
 
 (defn edit-service-by-id [e! {loaded? :transport-service-loaded? service :transport-service :as app}]
   (if (or (nil? service) (not loaded?))
-    [ui-common/loading-spinner]
+    [circular-progress/circular-progress]
     ;; Render transport service page only if given id matches with the loaded id
     ;; This will prevent page render with "wrong" or "empty" transport-service data
     (when (= (get-in app [:params :id]) (str (get-in app [:transport-service ::t-service/id])))

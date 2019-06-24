@@ -33,7 +33,7 @@
 
 (def result-card {:box-shadow "1px 1px 10px 0 hsla(0, 0%, 86%, .5)"
                   :background-color "#fff"
-                  :margin-top "1.5rem"
+                  :margin-top "1.0rem"
                   :border (str "1px solid " colors/gray550)
                   :border-top (str "4px solid " colors/gray750)
                   ::stylefy/sub-styles {:header {:align-items "center"
@@ -107,3 +107,6 @@
 (def contact-icon {:color  "#999999"
                    :height 16
                    :width  16})
+
+(def title-group-description  {:font-size "0.875rem"
+                               :margin-top "-1rem"})

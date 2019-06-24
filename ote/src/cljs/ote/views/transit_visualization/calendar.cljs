@@ -16,7 +16,8 @@
             [ote.style.base :as style-base]
             [ote.views.transit-visualization.change-utilities :as tv-section]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
-            [ote.app.controller.transit-visualization :as tv]))
+            [ote.app.controller.transit-visualization :as tv]
+            [ote.ui.circular_progress :as prog]))
 
 ;; Utility methods
 (defn day-of-week-number->text [dof]
@@ -65,7 +66,8 @@
                                :width "20px"
                                :height "20px"}
                               (style/date1-highlight-style))}]
-    (time/format-date date1)]
+    (when date1
+      (time/format-date date1))]
    [:div
     [:div {:style (merge {:display "inline-block"
                                :position "relative"
@@ -74,7 +76,8 @@
                                :width "20px"
                                :height "20px"}
                               (style/date2-highlight-style))}]
-    (time/format-date date2)]])
+    (when date2
+      (time/format-date date2))]])
 
 (defn comparison-date-changes [{diff :differences :as compare}]
   [:div
@@ -84,11 +87,15 @@
      [tv-change-icons/change-icons diff true])])
 
 ;; Ui
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-changes] :as transit-visualization} routes selected-route]
+(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-dates-selected-from-calendar?]
+                          :as transit-visualization}
+                      routes selected-route]
   (let [current-year (time/year (time/now))
-        changes (filter (fn [x]
-                          (if (= (:route-hash-id x) (:route-hash-id selected-route)) true false)
-                          ) routes)]
+        changes (filter
+                  (fn [x]
+                    (= (:route-hash-id x)
+                       (:route-hash-id selected-route)))
+                  routes)]
     [:div.route-service-calendar
      [tv-section/section {:toggle! #(e! (tv/->ToggleSection :route-service-calendar))
                :open? (get open-sections :route-service-calendar true)}
@@ -110,8 +117,19 @@
                      :show-row-hover? true
                      :on-select #(when (first %)
                                    (e! (tv/->SelectRouteForDisplay (first %))))
-                     :row-selected? #(= (:different-week-date %) (:different-week-date selected-route))}
-        [{:name "Aikaa muutokseen"
+                     :row-selected? #(and
+                                       (= (:different-week-date %) (:different-week-date selected-route))
+                                       (not route-dates-selected-from-calendar?))}
+        [{:name ""
+          :read identity
+          :format (fn [{:keys [recent-change? change-detected]}]
+                    (when recent-change?
+                      [:div (merge (stylefy/use-style style/new-change-container)
+                                   {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui change-detected)) })
+                       [:div (stylefy/use-style style/new-change-indicator)]]))
+          :col-style style-base/table-col-style-wrap
+          :width "2%"}
+         {:name "Aikaa muutokseen"
           :read :different-week-date
           :col-style style-base/table-col-style-wrap
           :format (fn [different-week-date]
@@ -131,7 +149,7 @@
           :col-style style-base/table-col-style-wrap
           :format (fn [change-detected]
                     (time/format-timestamp->date-for-ui change-detected))}
-         {:name "Vertailupäivien väliset muutokset" :width "30%"
+         {:name "Vertailupäivien väliset muutokset" :width "35%"
           :read identity
           :col-style style-base/table-col-style-wrap
           :format (fn [{change-type :change-type :as route}]
@@ -143,12 +161,12 @@
 
                       :added
                       [icon-l/icon-labeled style/transit-changes-icon
-                       [ic/content-add-box {:color style/add-color}]
+                       [ic/content-add-box {:color colors/add-color}]
                        "Uusi reitti"]
 
                       :removed
                       [icon-l/icon-labeled
-                       [ic/content-remove-circle-outline {:color style/remove-color}]
+                       [ic/content-remove-circle-outline {:color colors/remove-color}]
                        "Mahdollisesti päättyvä reitti"]
 
                       :no-change
@@ -174,7 +192,12 @@
                                                                hash-color (hash->color hash)]
                                                            (style/date-highlight-style hash-color
                                                                                        style/date-highlight-color-hover))}]
-       (when (and (:date1 compare) (:date2 compare))
-         [:div
-          [:h3 "Valittujen päivämäärien väliset muutokset"]
-          [comparison-date-changes compare]])]]]]))
+
+       [:h3 "Valittujen päivämäärien väliset muutokset"]
+       ;; :differences used to detect when new route selection or new calendar day selection is being loaded
+       (if (empty? (:differences compare))
+         [prog/circular-progress (tr [:common-texts :loading])]
+         ;; :date2 used to hide difference statistics but not the title, when user selects new diff dates from calendar
+         (when (some? (:date2 compare))
+           [:div
+            [comparison-date-changes compare]]))]]]]))

@@ -23,25 +23,28 @@ SELECT * FROM (
                        (SELECT array_agg(fr.nimi)
                           FROM finnish_regions fr
                          WHERE fr.numero = ANY (p."finnish-regions")) AS regions,
-                      to_char(h."different-week-date", 'dd.mm.yyyy') AS "different-week-date",
+                      h."different-week-date" AS "different-week-date",
                       op.name AS "operator-name",
                       ts.name AS "service-name",
                       ts.id AS "transport-service-id",
-                      h."transport-service-id",
                       to_char(h."change-detected", 'yyyy-mm-dd') AS date,
                       (h."different-week-date" - CURRENT_DATE) AS "days-until-change",
-                      h."change-type"
+                      h."change-type",
+                      h."route-hash-id"
                 FROM "detected-change-history" h
                      JOIN gtfs_package p ON p.id = ANY (h."package-ids")
                      JOIN "detected-route-change" r ON h."change-key" = r."change-key"
                      JOIN "transport-service" ts
-                            ON ts.id = h."transport-service-id" AND ts."sub-type" = 'schedule' AND
-                               ts."commercial-traffic?" = TRUE
+                            ON ts.id = h."transport-service-id"
+                                   AND ts."sub-type" = 'schedule'
+                                   AND ts."commercial-traffic?" = TRUE
+                                   AND ts."transport-type" @> ARRAY['road'::transport_type]
                      JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
                 WHERE h."email-sent" IS NULL
                   AND (p."finnish-regions" IS NULL OR
                        :regions::CHAR(2)[] IS NULL OR
                        :regions::CHAR(2)[] && p."finnish-regions")
+                GROUP BY h.id,p."finnish-regions", op.name, ts.name,ts.id
               ) x
  ORDER BY x."different-week-date" ASC;
 

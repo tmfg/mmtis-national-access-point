@@ -15,25 +15,14 @@ SELECT ts.id AS "transport-service-id",
        ts."commercial-traffic?" AS "commercial?",
        ts.name AS "transport-service-name",
        op.name AS "transport-operator-name",
-
-       -- Resulted record set is grouped by service id, date etc. This part calculates the sum of each distinct value of
-       -- "change-type", which is enum "gtfs-route-change-type". Allows displaying them at front-end summary.
-       COUNT(CASE
-               WHEN drc."change-type" = 'added'::"gtfs-route-change-type" THEN 1
-         END) as "added-routes",
-       COUNT(CASE
-               WHEN "change-type" = 'removed'::"gtfs-route-change-type" THEN 1
-         END)  as "removed-routes",
-       COUNT(CASE
-               WHEN "change-type" = 'no-traffic'::"gtfs-route-change-type" THEN 1
-         END)  as "no-traffic-routes",
-       COUNT(CASE
-               WHEN "change-type" = 'changed'::"gtfs-route-change-type" THEN 1
-         END)  as "changed-routes",
-
+       c."added-routes" as "added-routes",
+       c."removed-routes" as "removed-routes",
+       c."no-traffic-routes" as "no-traffic-routes",
+       c."changed-routes" as "changed-routes",
        CURRENT_DATE as "current-date",
        c."change-date",
        c."date",
+       ("sent-emails"."email-sent" IS NOT NULL) AS "recent-change?",
        MIN(drc."different-week-date") as "different-week-date",
        MIN(drc."different-week-date") - CURRENT_DATE AS "days-until-change",
        (c."different-week-date" IS NOT NULL) AS "changes?",
@@ -62,9 +51,14 @@ SELECT ts.id AS "transport-service-id",
         WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
         ORDER BY p.id DESC limit 1) as "max-date"
 FROM "transport-service" ts
-       JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-       LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id,
-     "detected-route-change" drc
+    JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
+    LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
+    LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
+                FROM "detected-change-history" dch
+                WHERE dch."email-sent" = (SELECT MAX("email-sent") AS max
+                                            FROM "detected-change-history" dc))
+        as "sent-emails" ON ts.id = "sent-emails"."transport-service-id",
+ "detected-route-change" drc
 WHERE 'road' = ANY(ts."transport-type")
   AND drc."transit-change-date" = c.date
   AND drc."transit-service-id" = c."transport-service-id"
@@ -73,7 +67,9 @@ WHERE 'road' = ANY(ts."transport-type")
   AND 'schedule' = ts."sub-type"
   AND ts.published IS NOT NULL
 -- Group so that each group represents a distinct change date, allows summing up changes in SELECT section of this query
-GROUP BY ts.id, c."date", op.name, c."change-date", c."package-ids", c."different-week-date"
+GROUP BY ts.id, c."date", op.name, c."change-date", c."package-ids", c."different-week-date", "sent-emails"."email-sent",
+         c."added-routes", c."removed-routes", c."no-traffic-routes", c."changed-routes"
+
 ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC,
          op.name ASC;
 
@@ -94,3 +90,12 @@ SELECT ts.id as "service-id", ts.name as service, op.name as operator, d."route-
  WHERE d."transport-service-id" = ts.id
    AND op.id = ts."transport-operator-id"
    ORDER BY d."route-hash-id-type" , ts.id;
+
+-- name: valid-detected-route-changes
+-- Changes will expire and to keep statistic up to date return only changes that are not yet exipred
+SELECT c."route-hash-id", c."different-week-date", c."change-type"
+FROM "detected-route-change" c
+       LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key" AND h."different-week-date" >= :date
+WHERE c."transit-change-date" = :date
+  AND c."transit-service-id" = :service-id
+  AND c."different-week-date" >= CURRENT_DATE;

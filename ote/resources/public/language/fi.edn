@@ -573,7 +573,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :associated-search-hint "Lisää osallistumistieto kirjoittamalla palvelun tai palveluntuottajan nimi"
                      :edit-business-id ["Muokkaa tietoja Y-tunnukselle " :business-id]
                      :filling-info "Täyttöohje"
-                     :filling-info-content (:md "**Muiden lisäämät osallistumistiedot** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Osallistumistietojen lisääminen itse**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita hakukenttään joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai joukkoliikenne@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
+                     :filling-info-content (:md "**Muiden lisäämät osallistumistiedot** \nMikäli otsikon alla on jo valmiiksi listattuna joitakin palveluita, ovat kyseisten palveluiden tuottajat ilmoittaneet NAP:ssa yrityksenne (y-tunnuksen) palvelunsa tuottamiseen osallistuvaksi yritykseksi. Mikäli tiedot eivät pidä paikkaansa, ota yhteyttä kyseiseen palveluntuottajaan tiedon poistamiseksi.\n\n**Osallistumistietojen lisääminen itse**\nJos listalta puuttuu jokin oleellinen palvelu, jonka tuottamiseen osallistut (esim. taksien tilausvälityskeskus), kirjoita hakukenttään joko palveluntuottajan nimi tai palvelun nimi. Valitse tämän jälkeen tarjotuista vaihtoehdoista oikea palvelu. Jos valitset listalta vahingossa väärän palvelun, voit poistaa sen napsauttamalla palvelun perässä olevaa rastia. Mikäli et löydä listalta liikkumispalvelua, jonka tuottamisessa olet mukana, ota yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi\n\nMikäli ajat välityskeskuksen kyytien lisäksi myös omia kyytejä tai tarjoat muita liikkumispalveluita, lisää myös oma palvelu tai palveluita NAP:iin kohdassa **Omat palvelut**.")
                      :no-associations [:operator-name " -nimistä palveluntuottajaa ei ole ilmoitettu osallistujaksi minkään muun palveluntuottajan palveluun."]
                      :no-own-associations ["Et ole lisännyt " :operator-name " -nimistä palveluntuottajaa osallistujaksi minkään muun palveluntuottajan palveluun."]
                      :open-geojson "Avaa geojson"
@@ -584,7 +584,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :own-services-directions-short "Ohjeet"
                      :own-services-new-provider1 "Hienoa! Olet nyt lisännyt "
                      :own-services-new-provider2 (:md " -nimisen palveluntuottajan NAP:iin.  Huomioithan, että pelkät palveluntuottajan tiedot eivät sisällä lain vaatimia olennaisia tietoja (esim. toiminta-alue, hintatiedot ja esteettömyystiedot) tarjoamastasi palvelusta/palveluista.\n\nLisää seuraavaksi tarkemmat tiedot tarjoamastasi palvelusta/palveluista kohdassa **Omat palvelut** ja/tai kohdassa **Muiden tuottamat palvelut, joissa olet mukana**.\n\nMikäli omistat taksiyrityksen ja ajat kyytejä vain välityskeskuksen kautta, riittää, että täytät välityskeskuksen tiedot kohtaan **Muiden tuottamat palvelut, joissa olet mukana**.")
-                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 09-15) tai joukkoliikenne@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
+                     :own-services-no-providers (:md "Et ole vielä yhdenkään palveluntuottajan jäsen. Julkaistaksesi liikkumispalveluiden tietoja sinun täytyy ensin **luoda uusi palveluntuottaja** NAP-palveluun, tai **liittyä jäseneksi johonkin olemassa olevaan palveluntuottajaan** ottamalla yhteyttä **NAP-Helpdeskiin**: 029 534 5454 (arkisin klo 09-15) tai nap@traficom.fi\n\nPalveluntuottajalla tarkoitetaan yritystä, yhteisöä tai muuta organisaatiota, joka tuottaa itse tai osallistuu liikkumispalvelun tuottamiseen. Kyseessä voi siis olla esimerkiksi taksiyritys, linja-autoalan yritys, kaupallisen pysäköinnin tarjoaja tai kunta.")
                      :missing-service-info "Palvelun tiedoissa on puutteita"
                      :flaws "Puutteet"
                      :missing-schedule "Palvelulta puuttuu lain vaatima reitti- ja aikataulutietorajapinta."
@@ -596,6 +596,19 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
                      :open-rae "Avaa Traficomin RAE-työkalu"
                      :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
+
+ :transport-users-page {:username "Nimi"
+                        :members "Jäsenet"
+                        :add-member "Lisää jäsen"
+                        :email-placeholder "Kirjoita sähköpostiosoite"
+                        :manage-users "Hallinnoi käyttöoikeuksia"
+                        :something-went-wrong "Jotain meni pieleen."
+                        :already-member "Käyttäjä on jo lisätty."
+                        :already-invited "Käyttäjä on jo kutsuttu"
+                        :invite-pending "Odottaa kutsun vahvistusta"
+                        :invite-sent-success "Kutsu lähetetty onnistuneesti"
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
+                        :confirm-remove "Poista jäsen"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -904,6 +917,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                 :school-start "Kouluvuoden alku"
                                 :school-end "Kouluvuoden päätös"
                                 :season-schedule-change "Aikataulukauden vaihtuminen"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page
@@ -990,7 +1004,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-organizations "Palveluntuottajat"
   :navigation-dataset "Liikkumispalvelukatalogi"
   :navigation-give-feedback "Anna palautetta"
-  :navigation-feedback-link "mailto:joukkoliikenne@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-link "mailto:nap@traficom.fi?subject=Palautetta%20NAP-palvelusta%20"
+  :navigation-feedback-email "nap@traficom.fi"
   :navigation-login "Kirjaudu"
   :navigation-register "Rekisteröidy"
   :navigation-admin "Ylläpitopaneeli"
@@ -1065,7 +1080,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :save-user-success "Käyttäjätiedot tallennettu"
   :start-time "Alkamisaika"
   :ending-time "Päättymisaika"
-  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, joukkoliikenne@traficom.fi tai p. 029 534 5454 (arkisin 9 - 15)."
+  :business-id-is-not-unique "Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@traficom.fi tai p. 029 534 5454 (arkisin 9 - 15)."
   :day-of-week-1-short "Ma"
   :day-of-week-2-short "Ti"
   :day-of-week-3-short "Ke"
@@ -1141,11 +1156,18 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    ["löytyi " :count " palvelua"]) "."]
   :nap-interface ["NAP-palvelussa tallennettujen tietojen koneluettava rajapinta: "]
   :external-interfaces ["Palvelun muut koneluettavat rajapinnat"]
-  :showing-latest-services "Hakuehtoja ei ole valittu. Alla näytetään viimeksi muokatut palvelut."
-  :total-services ["Palvelukatalogissa on yhteensä " :total-service-count " palvelua. Palveluiden tuottamiseen osallistuu yhteensä " :total-company-count " yritystä."]
+  :no-services-found "Hakuehdoilla ei löydy palveluita."
+  :no-search-filters "Hakuehtoja ei ole valittu."
+  :found-x-services ["Hakuehdoilla löytyi " :count " kpl palveluita. "]
+  :operation-area-search-filter-result ["Palvelut, joiden toiminta-alueeksi on ilmoitettu: " :operation-area-filter]
+  :search-order "Palvelut on järjestetty tietojen päivitysajankohdan mukaan uusimmasta vanhimpaan."
+  :other-operation-area-services "Muut valitun toiminta-alueen kattavat palvelut"
+  :no-operation-area-services "Yhdellekään palvelulle ei ole ilmoitettu kyseistä toiminta-aluetta."
+  :service-summary-text "Palvelukatalogissa on yhteensä "
+  :service-count [:count " palvelua"]
+  :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
+  :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
   :fetching-more "Haetaan lisää palveluita..."
-  :operator-services ["Palveluntuottajalla " :name " on " :count " palvelua."]
-  :operator-no-services "Palveluntuottajalla ei ole palveluita."
   :view-routes "Katsele reittejä"
   :view-routes-failure "Reittejä ei voi katsella"
   :load-csv-file "Lataa csv tiedosto"
@@ -1234,7 +1256,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :logged-in ["Olet jo kirjautunut käyttäjänä: " :name]
            :password-not-valid "Pituus vähintään 6 merkkiä. Salasanan tulee sisältää kirjaimia ja vähintään yksi numero."}
   :confirm-changes "Varmista muutokset"
-  :change-password "Vaihda salasana"}
+  :change-password "Vaihda salasana"
+  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
 
  :reset-password
  {:label "Salasanan vaihto"
@@ -1295,7 +1319,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                           :reset-link
                           "\nTämä linkki vanhenee tunnin kuluttua."
                           "\nP.S Mikäli salasanan vaihto ei onnistu, olkaa yhteydessä NAP-HelpDeskiin,\n"
-                          "joukkoliikenne@traficom.fi tai 029 534 5454 (arkisin 10-16)."
+                          "nap@traficom.fi tai 029 534 5454 (arkisin 10-16)."
                           "\n\n------------\n"
                           "Tämän viestin lähetti NAP\n"
                           "(www.finap.fi)"]}}}

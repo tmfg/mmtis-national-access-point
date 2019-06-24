@@ -4,10 +4,6 @@
             [ote.theme.colors :as colors]
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
-(def add-color "rgb(0,170,0)")
-(def remove-color "rgb(221,0,0)")
-(def no-change-color colors/gray700)
-
 (def transit-changes-legend-container
   {:align-items "flex-start"
    :background-color "rgb(235,235,235)"
@@ -140,3 +136,23 @@
                              :flex-wrap "nowrap"
                              :justify-content "space-between"
                              ::stylefy/media {{:max-width (str width-xs "px")} {:flex-direction "column"}}})
+
+(def new-change-indicator
+  {:height "6px"
+   :width "6px"
+   :background-color colors/primary
+   :border-radius "50%"})
+
+(def new-change-container
+  {:height "100%"
+   :width "100%"
+   :display "flex"
+   :justify-content "center"
+   :align-items "center"})
+
+(def new-change-legend-icon
+  {:height "20px"
+   :width "20px"
+   :display "flex"
+   :justify-content "center"
+   :align-items "center"})

@@ -7,10 +7,6 @@
             [compojure.core :refer [routes GET]]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.service-search :as search]
-            [ote.db.common :as common]
-            [ote.db.modification :as modification]
             [specql.op :as op]
             [clojure.set :as set]
             [clojure.string :as str]))
@@ -27,14 +23,14 @@
          (map #(update % :sub-type keyword))
          (sub-type-facet db))})
 
-(defn- ids [key query-result]
+(defn- map->set [key query-result]
   (into #{} (map key) query-result))
 
 (defn- services-operating-in
   "Returns ids of services which operate in the given areas"
   [db operation-area]
   (when (seq operation-area)
-    (ids
+    (map->set
      :id
      (service-ids-by-operation-areas db {:operation-area operation-area}))))
 
@@ -47,7 +43,12 @@ Negative return value is an invalid match"
 (defn- id-to-quality
   "Processes `spatial-diffs` into a mapping of id > match quality"
   [spatial-diffs]
-  (into {} (map (juxt :id #(match-quality (:intersection %) (:difference %))) spatial-diffs)))
+  (mapv
+    (fn [row]
+      {:id (:id row)
+       :difference (match-quality (:intersection row) (:difference row))
+       :modified (:modified row)})
+    spatial-diffs))
 
 (defn- service-search-match-qualities
   "Returns a mapping of service id -> match quality
@@ -55,13 +56,14 @@ Negative return value is an invalid match"
   `service-ids` collection of ids for which qualities are returned
   `operation-area` collection of place names against which match quality is compared"
   [db service-ids operation-area]
-  (id-to-quality
-   (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})))
+  (let  [services (service-match-quality-to-operation-area db {:id service-ids :operation-area operation-area})
+         services (id-to-quality services)]
+    services))
 
 (defn- text-search-ids [db text]
   (when-not (str/blank? text)
     (let [text (str/trim text)]
-      (ids ::t-service/id
+      (map->set ::t-service/id
            (specql/fetch db ::t-service/transport-service
                          #{::t-service/id}
                          {::t-service/published op/not-null?
@@ -72,7 +74,7 @@ Negative return value is an invalid match"
   [db types]
   (let [ids (cond
               (and (> (count types) 1) (contains? types :brokerage)) ;; Get sub types and brokerage
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   (op/and {::t-service/published op/not-null?}
@@ -80,13 +82,13 @@ Negative return value is an invalid match"
                                            {::t-service/sub-type (op/in types)}
                                            {::t-service/brokerage? true}))))
               (and (seq types) (not (contains? types :brokerage))) ;; Only sub types
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   {::t-service/sub-type   (op/in types)
                                    ::t-service/published op/not-null?}))
               (and (= 1 (count types)) (contains? types :brokerage)) ;; Only brokerage
-                (ids ::t-service/id
+                (map->set ::t-service/id
                     (specql/fetch db ::t-service/transport-service
                                   #{::t-service/id}
                                   {::t-service/published op/not-null?
@@ -95,19 +97,19 @@ Negative return value is an invalid match"
 
 (defn- transport-type-ids [db transport-types]
   (when (seq transport-types)
-    (ids
+    (map->set
       :id
       (service-ids-by-transport-type db {:tt (apply list transport-types)}))))
 
 (defn- operator-ids [db operators]
   (when (seq operators)
-    (ids
+    (map->set
       :id
       (service-ids-by-business-id db {:operators (apply list operators)}))))
 
 (defn- data-content-ids [db data-content]
   (when (seq data-content)
-    (ids
+    (map->set
       :id
       (service-ids-by-data-content db {:dc (apply list data-content)}))))
 
@@ -158,8 +160,9 @@ Negative return value is an invalid match"
   [db ids]
   (specql/fetch db ::t-service/transport-service-search-result
                 search-result-columns
-                {::t-service/id (op/in ids)}
-                {}))
+                {::t-service/id (op/in (map :id ids))}
+                {:specql.core/order-by :ote.db.modification/modified
+                 :specql.core/order-direction :desc}))
 
 (defn- transport-services-page
   "Queries database for a page of transport services.
@@ -192,12 +195,20 @@ Negative return value is an invalid match"
   `offset` and `limit` make it possible to use paging instead of fetching all the results"
   [db ids operation-area offset limit]
   (let [match-qualities (service-search-match-qualities db ids operation-area)
-        sorted-ids (sort-by match-qualities (keys match-qualities))
-        page (page-of sorted-ids offset limit)
-        results (transport-services db page)]
-    (sort-by
-     (comp match-qualities ::t-service/id)
-     results)))
+        sorted-ids (sort-by (juxt :difference :modified) match-qualities)
+        paged-result (page-of sorted-ids offset limit)
+        results (transport-services db paged-result)
+        maps-by-id (zipmap (map :id match-qualities) match-qualities)
+        results (map
+                  (fn [result]
+                    (let [service-id (::t-service/id result)
+                          r (maps-by-id service-id)]
+                      (-> result
+                          (assoc :modified (:modified r))
+                          (assoc :difference (:difference r)))))
+                  results)
+        results (sort-by (juxt :difference :modified) results)]
+    results))
 
 (defn- without-import-errors [search-result]
   (update-in search-result
@@ -230,19 +241,19 @@ Negative return value is an invalid match"
 
 (defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
                    :as filters}]
-  (let [result-id-sets [(services-operating-in db operation-area)
+  (let [;; Get service id's using different filters. If filter is not given no results will be returned.
+        result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
                         (transport-type-ids db transport-type)
                         (data-content-ids db data-content)
                         (text-search-ids db text)
                         (operator-ids db operators)]
-        empty-filters? (every? nil? result-id-sets)
+        empty-filters? (every? nil? result-id-sets)         ;; filters are empty if results are nil
         ids (if empty-filters?
               ;; No filters specified, show latest services
               (latest-service-ids db)
               ;; Combine with intersection (AND)
-              (apply set/intersection
-                     (remove nil? result-id-sets)))]
+              (apply set/intersection (remove nil? result-id-sets)))]
     (-> (if operation-area
                   (transport-services-in-operation-area db ids operation-area offset limit)
                   (transport-services-page db ids offset limit))

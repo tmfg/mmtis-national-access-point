@@ -7,6 +7,8 @@
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
 
+(def cyan "#00AABB")
+
 (def gray950 "#191919")
 (def gray900 "#323232")
 (def gray800 "#4b4b4b")
@@ -24,11 +26,18 @@
 (def gray100 "#f5f5f5")
 (def gray50 "#fafafa")
 
+(def green-dark "#008800")
 (def green-basic "#00AA00")
+(def green-light "#66cc66")
 (def red-basic "#DD0000")
 (def red-dark "#CF0000")
+(def red-darker "#DD0000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
+(def yellow-basic "#ddcc00")
+(def yellow-dark "#cfb800")
+
+(def spinner cyan)
 
 (def negative-button red-basic)
 (def negative-text white-basic)
@@ -43,6 +52,10 @@
 (def progress primary)
 (def success green-basic)
 (def warning red-basic)
+(def add-color green-basic)
+(def remove-color red-darker)
+(def icon-disabled gray550)
+(def icon-gray gray900)
 
 (def monitor-taxi-color "rgb(0,170,187)")
 (def monitor-request-color "rgb(102,204,102)")

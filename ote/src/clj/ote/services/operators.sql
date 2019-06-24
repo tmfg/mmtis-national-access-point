@@ -39,7 +39,7 @@ SELECT u.id as "user-id"
  WHERE op."business-id" = :business-id
    AND u.id != :user-id
  GROUP BY "user-id";
- 
+
 -- name: group-id-for-op
 SELECT "ckan-group-id" FROM "transport-operator" op
  WHERE op."id" = :id
@@ -56,3 +56,11 @@ FROM "transport-service" ts
        JOIN LATERAL unnest(ts.companies) tsc ON "business-id" = :business-id
        JOIN "transport-operator" po
          ON ts."transport-operator-id" = po.id;
+
+
+-- name: fetch-operator-users
+SELECT u.id, u.name, u.fullname, u.email
+  FROM "transport-operator" t
+  JOIN member m ON m.group_id = t."ckan-group-id"
+  JOIN "user" u ON m.table_id = u.id
+ WHERE t.id = :operator-id;

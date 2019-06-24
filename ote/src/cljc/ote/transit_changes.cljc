@@ -192,9 +192,7 @@
                 [l r (trip-stop-differences l r)])
               combined-trips)))))
 
-
-;; note: when enabling/testing this version, also change first-different-day to return first-non-nil-in-either index when comparing all-nil week with not-all-nil week
-#_(defn week=
+(defn week=
   "Compare week hashes. Returns true if they represent the same traffic
   (excluding no-traffic days and static-holidays).
   Both `w1` and `w2` are vectors of strings that must be the same length."
@@ -209,28 +207,11 @@
       ;; otherwise, do day-by-day comparison ignoring no-traffic days and holidays
       (every? true?
               (map (fn [h1 h2]
-                     ;; Only compare hashes where both days have traffic (not nil)
-                     (or (nil? h1) ;; h1 is no-traffic day due to nil value
-                         (nil? h2) ;; h2 is no-traffic day due to nil value
-                         (keyword? h1) ;; h1 is static-holiday due to value is keyword
+                     ;; Only compare hashes where both days have traffic or are holidays
+                     (or (keyword? h1) ;; h1 is static-holiday due to value is keyword
                          (keyword? h2) ;; h2 is static-holiday due to value is keyword
                          (= h1 h2)))
                    w1 w2)))))
-
-(defn week=
-  "Compare week hashes. Returns true if they represent the same traffic
-  (excluding no-traffic days and static-holidays).
-  Both `w1` and `w2` are vectors of strings that must be the same length."
-  [w1 w2]
-  (every? true?
-          (map (fn [h1 h2]
-                 ;; Only compare hashes where both days have traffic (not nil)
-                 (or (nil? h1) ;; h1 is no-traffic day due to nil value
-                     (nil? h2) ;; h2 is no-traffic day due to nil value
-                     (keyword? h1) ;; h1 is static-holiday due to value is keyword
-                     (keyword? h2) ;; h2 is static-holiday due to value is keyword
-                     (= h1 h2)))
-               w1 w2)))
 
 (s/fdef week=
   :args (s/cat :w1 ::week-hash :w2 ::week-hash)

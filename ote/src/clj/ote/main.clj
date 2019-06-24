@@ -3,6 +3,7 @@
   Main entrypoint for the backend system."
   (:require [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
+            [ote.services.register :as register-services]
             [ote.components.http :as http]
             [ote.components.db :as db]
             [ote.email :as email]
@@ -16,7 +17,6 @@
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
             [ote.services.admin :as admin-service]
-            [ote.services.operators :as operators-service]
             [ote.services.settings :as settings-service]
             [ote.services.pre-notices :as pre-notices]
             [ote.services.transit-visualization :as transit-visualization]
@@ -58,7 +58,8 @@
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
 
    ;; Services for the frontend
-   :transport (component/using (transport-service/->Transport config) [:http :db])
+   :register (component/using (register-services/->Register config) [:http :db])
+   :transport (component/using (transport-service/->Transport config) [:http :db :email])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
@@ -86,14 +87,14 @@
 
    ;; Integration: Fetch company data from YTJ
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
-   
+
    :login (component/using
            (login-service/->LoginService (get-in config [:http :auth-tkt]))
            [:db :http :email])
 
    :admin (component/using
            (admin-service/->Admin (:nap config))
-           [:db :http])
+           [:db :http :email])
 
    :admin-reports (component/using
                     (admin-service/->CSVAdminReports)

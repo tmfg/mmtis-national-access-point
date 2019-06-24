@@ -7,7 +7,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.ui.form :as form]
             [ote.localization :refer [tr]]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [clojure.string :as str]))
 
 (declare ->LoadPreNoticesResponse ->LoadPreNoticeResponse
           ->RegionsResponse effective-date-description->set
@@ -271,7 +272,7 @@
 
 (define-event UploadAttachment [input]
   {}
-  (let [filename (.-name (first (array-seq (.-files input))))]
+  (let [filename (str/lower-case (.-name (first (array-seq (.-files input)))))]
     (if (re-matches #".*\.(png|jpg|jpeg|pdf)" filename)
       (do
         (comm/upload! "pre-notice/upload" input {:on-success (tuck/send-async! ->UploadResponse)

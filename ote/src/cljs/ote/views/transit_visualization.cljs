@@ -20,7 +20,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
             [ote.views.transit-visualization.change-utilities :as tv-utilities]
-            [ote.views.transit-visualization.change-icons :as tv-change-icons]))
+            [ote.views.transit-visualization.change-icons :as tv-change-icons]
+            [ote.ui.circular_progress :as prog]))
 
 (set! *warn-on-infer* true)
 
@@ -297,33 +298,9 @@
 (def selected-change-keys #{:removed-trips :trip-stop-sequence-changes-lower
                             :trip-stop-sequence-changes-upper :route-hash-id
                             :trip-stop-time-changes-lower :trip-stop-time-changes-upper :change-type :added-trips
-                            :different-week-date})
-
-(defn- list-route-changes-with-same-route-hash-id [all-changes single-change]
-	;; Filter nil values
-	(keep
-		(fn [c]
-			;; Return nil if route-hash-id doesn't match because keep won't work with false values.
-			(when (= (:route-hash-id c) (:route-hash-id single-change))
-				(if (= :removed (:change-type c))
-					;; Remove trip and stop changes from route summary if route has change-type :removed
-					(dissoc c :trip-stop-sequence-changes-lower
-									:trip-stop-time-changes-lower
-									:trip-stop-sequence-changes-upper
-									:trip-stop-time-changes-upper
-									:removed-trips)
-					c)))
-		all-changes))
-
-(defn- route-change-summary
-  "Route list has first change row of that route change. To be able to show summary of changes in all route rows we
-  need to merge-with them together."
-  [single-change all-changes]
-  (let [all-changes (map #(select-keys % selected-change-keys) all-changes)
-        single-change (select-keys single-change selected-change-keys)
-        all-route-changes (list-route-changes-with-same-route-hash-id all-changes single-change)
-        merged-changes (apply merge-with + all-route-changes)]
-    merged-changes))
+                            :different-week-date
+                            :route-short-name :route-long-name
+                            :count})
 
 (defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
   (let [route-count (count route-changes)
@@ -353,7 +330,16 @@
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
-      [{:name "Reitti" :width "20%"
+      [{:name ""
+        :read identity
+        :format (fn [{:keys [recent-change? change-detected]}]
+                  (when recent-change?
+                    [:div (merge (stylefy/use-style style/new-change-container)
+                                 {:title (str "Muutos tunnistettu: " (time/format-timestamp->date-for-ui change-detected))})
+                     [:div (stylefy/use-style style/new-change-indicator)]]))
+        :col-style style-base/table-col-style-wrap
+        :width "2%"}
+       {:name "Reitti" :width "20%"
         :read (juxt :route-short-name :route-long-name)
         :col-style style-base/table-col-style-wrap
         :format (fn [[short long]]
@@ -361,20 +347,20 @@
 
        ;; Show Reitti/Määränpää column only if it does affect on routes.
        (when (service-is-using-headsign route-hash-id-type)
-         {:name "Reitti/määränpää" :width "23%"
+         {:name "Reitti/määränpää" :width "21%"
           :read :trip-headsign
           :col-style style-base/table-col-style-wrap})
 
-       {:name "Muutoksia (kpl)"
-        :width "10%"
+       {:name "Muutoksia"
+        :width "8%"
         :read identity
         :col-style style-base/table-col-style-wrap
         :format (fn [row]
                   (if (= :no-change (:change-type row))
-                    "0"
-                    (:count row)))}
+                    "0 kpl"
+                    (str (:count row) " kpl")))}
        {:name "Aikaa 1. muutokseen"
-        :width "15%"
+        :width "9%"
         :read :different-week-date
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
@@ -382,39 +368,13 @@
                     [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
                     [:span
                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
-                     [:span (stylefy/use-style {:margin-left "5px"
-                                                :color "gray"})
+                     [:div (stylefy/use-style {:color "gray"})
                       (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
-       {:name "Muutosten yhteenveto" :width "32%"
+       {:name "Muutosten yhteenveto" :width "40%"
         :read identity
         :col-style style-base/table-col-style-wrap
-        :format (fn [{change-type :change-type different-week-date :different-week-date :as route-changes}]
-                  (case change-type
-                    :no-traffic
-                    [icon-l/icon-labeled
-                     [ic/av-not-interested {:color style/remove-color}] (tr [:transit-changes :no-traffic])]
-
-                    :added
-                    [icon-l/icon-labeled
-                     [ic/content-add-box {:color style/add-color}]
-                     (tr [:transit-changes :route-new])]
-
-                    :removed
-                    [icon-l/icon-labeled
-                     [ic/content-remove-circle-outline {:color style/remove-color}]
-                     [:span {:title (str "Reitti päättyy mahdollisesti "
-                                         (time/format-timestamp->date-for-ui different-week-date)
-                                         ". "
-                                         "Ota yhteyttä liikennöitsijään saadaksesi tarkempia tietoja.")}
-                      (tr [:transit-changes :trip-end-potential])]]
-
-                    :no-change
-                    [icon-l/icon-labeled
-                     [ic/navigation-check]
-                     (tr [:transit-changes :no-changes])]
-
-                    :changed
-                    [tv-change-icons/change-icons (route-change-summary route-changes changes-all)]))}]
+        :format (fn [grouped-route-data]
+                  [tv-change-icons/route-change-icons grouped-route-data])}]
 
       route-changes] e!
      [:div {:id "route-calendar-anchor"}]]))
@@ -778,10 +738,15 @@
       (when selected-route
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: " route-name]
-
          [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
-         (when (and hash->color date->hash (tv/loaded-from-server? transit-visualization))
-           [:span
-            [selected-route-map-section e! open-sections date->hash hash->color compare]
-            [route-trips e! open-sections compare]
-            [trip-stop-sequence e! open-sections compare]])])]]))
+
+         (if (tv/loading-trips? transit-visualization)
+           [prog/circular-progress (tr [:common-texts :loading])]
+           ;; Selecting a new date1 from calendar clears date2 related keys which are used by selected-route-map-section
+           ;; Also, displaying below data is always in connection with the date1&date2 pair which is outdated after a
+           ;; new selection from calendar.
+           (when (:date2-trips compare)
+             [:span
+              [selected-route-map-section e! open-sections date->hash hash->color compare]
+              [route-trips e! open-sections compare]
+              [trip-stop-sequence e! open-sections compare]]))])]]))

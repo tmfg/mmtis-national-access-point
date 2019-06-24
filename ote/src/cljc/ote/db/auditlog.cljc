@@ -20,4 +20,6 @@
 
 ;; Create order for auditlog_event_type
 (def auditlog-event-types [:delete-service :modify-service :add-service :delete-operator
-                           :modify-operator :add-operator :delete-user :modify-user :add-user])
+                           :modify-operator :add-operator :delete-user :modify-user :add-user
+                           :add-member-to-operator :add-user-to-operator :remove-member-from-operator
+                           :invite-new-user])

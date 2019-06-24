@@ -43,6 +43,25 @@
          "  window['ga-disable-" (:tracking-code ga-conf) "'] = true; "
          "}"))))
 
+(defn matomo-analytics-scripts [config]
+  (list
+    (str " <!-- Matomo -->")
+    (javascript-tag
+      (str " var _paq = window._paq || [];"
+           " /* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */"
+           " _paq.push(['trackPageView']);"
+           " _paq.push(['enableLinkTracking']);"
+           " _paq.push(['enableHeartBeatTimer']);"
+           " (function() {"
+           " var u=\"" (:piwik-url config) "\";"
+           " _paq.push(['setTrackerUrl', u+'matomo.php']);"
+           " _paq.push(['setSiteId', " (:site-id config) "]);"
+           " var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
+           " g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);"
+           " })();"
+           ))
+    (str " <!-- End Matomo Code -->")))
+
 (def favicons
   [{:rel "apple-touch-icon" :sizes "180x180" :href "/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
    {:rel "icon" :type "image/png" :sizes "32x32" :href "/favicon/favicon-32x32.png?v=E6jNQXq6yK"}
@@ -71,7 +90,8 @@
   (let [dev-mode? (:dev-mode? config)
         testing-env? (:testing-env? config)
         ga-conf (:ga config)
-        flags (str/join "," (map name (:enabled-features config)))]
+        flags (str/join "," (map name (:enabled-features config)))
+        matomo-config (:matomo config)]
     [:html
      [:head
       (if testing-env?
@@ -92,6 +112,7 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
+      (matomo-analytics-scripts matomo-config)
       (translations localization/*language*)
       (user-info db user)]
 
@@ -99,8 +120,7 @@
              {:id "main-body"
               :onload "ote.main.main();"
               :features flags
-              :data-language localization/*language*
-              :data-ga-tracking-code (:tracking-code ga-conf)}
+              :data-language localization/*language*}
              (when dev-mode?
                {:data-dev-mode? true})
              (when (bound? #'anti-forgery/*anti-forgery-token*)

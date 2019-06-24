@@ -182,8 +182,9 @@ WHERE c."transport-service-id" = :service-id
 -- Fetch changes for service joinin detected-route-change table and detected-change-history table.
 SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
        c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
-       c."trip-stop-time-changes-lower", c."trip-stop-sequence-changes-upper", c."current-week-date",
-       c."different-week-date", c."change-date", c."created-date"
+       c."trip-stop-time-changes-lower", c."trip-stop-time-changes-upper", c."current-week-date",
+       c."different-week-date", c."change-date", c."created-date",
+       h."email-sent" >= (SELECT MAX("email-sent") FROM "detected-change-history") AS "recent-change?"
   FROM "detected-route-change" c
        LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key" AND h."different-week-date" >= :date
  WHERE c."transit-change-date" = :date

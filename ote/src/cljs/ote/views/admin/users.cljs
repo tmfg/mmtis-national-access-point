@@ -62,7 +62,7 @@
                                       (e! (admin-controller/->ConfirmDeleteUser id)))}]))]}
         [:div
          (if (some false? admin-list)
-           [:p "Ei voida poistaa käyttäjää."]
+           [:p "Ei voi poistaa käyttäjää."]
            [:div
             [:p "Oletko varma, että haluat poistaa käyttäjän?"]
             [:p (str "Käyttäjän id: " id)]

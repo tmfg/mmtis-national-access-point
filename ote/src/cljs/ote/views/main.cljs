@@ -19,9 +19,10 @@
             [ote.views.service-search :as service-search]
             [ote.ui.form :as form]
             [ote.app.controller.flags :as flags]
-            [ote.ui.common :as common]
+            [ote.ui.circular_progress :as spinner]
             [ote.ui.form-fields :as form-fields]
             [ote.views.own-services :as os]
+            [ote.views.operator-users :as ou]
             [ote.views.service-viewer :as sv]
             [ote.views.login :as login]
             [ote.views.user :as user]
@@ -80,14 +81,14 @@
         [:div {:style (stylefy/use-style style-base/body)}
          [theme e! app
           (if (nil? app)
-            [common/loading-spinner]
+            [spinner/circular-progress]
             [:div.ote-sovellus {:style {:display "flex"
                                         :flex-direction "column"}}
              [top-nav e! app is-scrolled? desktop?]
              [:div (merge (stylefy/use-style style-base/sticky-footer)
                      {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
               (if (not loaded?)
-                [common/loading-spinner]
+                [spinner/circular-progress]
                 [(if wide? :div :div.wrapper)
                  (if wide?
                    {}
@@ -99,7 +100,7 @@
                          wide?
                          {}
 
-                         :default
+                         :else
                          {:style {:padding-bottom "20px"}
                           :class "container"})
                   [document-title (:page app)]
@@ -111,13 +112,13 @@
                   (case (:page app)
                     :login [login/login e! (:login app)]
                     :reset-password [login/reset-password e! app]
-                    :register [register/register e! (:register app) (:user app)]
+                    :register [register/register e! (:params app) (:register app) (:user app)]
                     :user [user/user e! (:user app)]
                     :front-page [fp/front-page e! app]
                     :own-services [os/own-services e! app]
                     :transport-service [t-service/select-service-type e! app]
                     :transport-operator [to/operator e! app]
-
+                    :access-management [ou/manage-access e! app]
                     ;; Routes for the service form, one for editing an existing one by id
                     ;; and another when creating a new service
                     :edit-service [t-service/edit-service-by-id e! app]

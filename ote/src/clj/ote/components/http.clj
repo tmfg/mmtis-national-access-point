@@ -15,7 +15,8 @@
             [ring.middleware.session.cookie :as session-cookie]
             [ote.localization :as localization]
             [ring.middleware.cookies :as cookies]
-            [cheshire.core :as cheshire]))
+            [cheshire.core :as cheshire]
+            [ote.util.fn :as ote-fn]))
 
 (defn- serve-request [handlers req]
   (some #(% req) handlers))
@@ -145,11 +146,13 @@
   (update response :headers merge no-cache-headers))
 
 (defn transit-response
-  "Return the given Clojure `data` as a Transit response with status code 200."
-  [data]
-  {:status 200
-   :headers {"Content-Type" "application/json+transit"}
-   :body (transit/clj->transit data)})
+  "Return the given Clojure `data` as a Transit response"
+  ([data]
+   (transit-response data 200))
+  ([data status]
+   {:status status
+    :headers {"Content-Type" "application/json+transit"}
+    :body (transit/clj->transit data)}))
 
 (defn no-cache-transit-response
   "Return the given Clojure `data` as a Transit response with status code 200 and no-cache headers."
@@ -176,11 +179,18 @@
       (json-response data)
       (transit-response data))))
 
-
 (defn transit-request
   "Parse HTTP POST body as Transit data."
   [in]
   (transit/transit->clj in))
+
+;; Input: spec=spec which validates params, params=map to validate against spec
+;; Output: http response if params are not valid, nil if params are valid.
+(defn response-bad-args [spec params]
+  (when-let [error-str (ote-fn/form-validation-error-str spec params)]
+    (transit-response
+      (str "Invalid argument(s): " error-str)
+      400)))
 
 (defrecord SslUpgrade [ip port url]
   component/Lifecycle

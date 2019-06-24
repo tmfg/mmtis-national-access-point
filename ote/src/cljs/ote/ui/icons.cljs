@@ -20,6 +20,12 @@
 (defn outline-add-box []
   [:img {:src "/img/icons/outline-add-box.svg"}])
 
+(defn outline-add-box-gray []
+  [:img {:src "/img/icons/outline-add-box-gray.svg"}])
+
 (defn outline-indeterminate-checkbox []
   [:img {:src "/img/icons/outline-indeterminate-checkbox.svg"}])
+
+(defn outline-indeterminate-checkbox-gray []
+  [:img {:src "/img/icons/outline-indeterminate-checkbox-gray.svg"}])
 
