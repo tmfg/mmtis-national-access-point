@@ -218,7 +218,7 @@
                     (.toByteArray out)))]
       (println "**************************** START test-hsl-gtfs *********************")
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1 1)
+      (save-gtfs-to-db db bytes 1 1 1 nil)
       (println "******************* test-hsl-gtfs end *********************"))))
 
 (defn- load-interface-url [db interface-id url last-import-date saved-etag]
@@ -347,7 +347,7 @@
                 
 
                 ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id)))
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
             (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]

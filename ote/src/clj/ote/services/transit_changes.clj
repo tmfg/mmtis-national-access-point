@@ -87,7 +87,7 @@
                                    :gtfs/transport-service-id              service-id
                                    :gtfs/created                           (time/date-string->inst-date date)
                                    :gtfs/external-interface-description-id interface-id})
-          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id)]
+          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil)]
       "OK")
     (catch Exception e
       (let [msg (.getMessage e)]
