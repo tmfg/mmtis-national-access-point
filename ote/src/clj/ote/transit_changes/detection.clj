@@ -296,11 +296,6 @@
   Returns map from route [short long headsign] to next different week info.
   The route-weeks maps have keys :beginning-of-week, :end-of-week and :routes, under :routes there is a map with route-name -> 7-vector with day hashes of the week"
   [route-weeks]
-  ;(if (= 7  (count route-weeks))
-  ;   (def *r7 route-weeks))
-  ;; (println "spec for route-weeks:")
-  ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs route-weeks ::route-weeks) 'ote.transit-changes.detection 'spec)
-  (println "rwwfdn called with " (mapv #(keys (:routes %)) route-weeks))
   ;; Take routes from the first week (they are the same in all weeks)
   (let [route-names (into #{}
                           (map first)
@@ -1173,6 +1168,6 @@
                             ; where
                             {:gtfs/package-id package-id
                              :gtfs/date (:gtfs/date h)})
-            (println "package-id " package-id "date " (:gtfs/date h))))))))
+            #_(println "package-id " package-id "date " (:gtfs/date h))))))))
 
 
