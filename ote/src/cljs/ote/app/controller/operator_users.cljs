@@ -83,27 +83,29 @@
       (assoc-in [:manage-access :confirmation :open?] false)
       (assoc-in [:manage-access :users] new-users))))
 
+(define-event RemoveMemberError []
+  {}
+  (-> app
+    (assoc :flash-message-error (tr [:transport-users-page :removing-last-user]))
+    (assoc-in [:manage-access :confirmation :open?] false)))
+
 (define-event RemoveMember [member operator-id]
   {}
   (comm/delete!
     (str "transport-operator/" (url-util/encode-url-component operator-id) "/users")
     member
     {:on-success (tuck/send-async! ->RemoveMemberSuccess member)
-     :on-failure (tuck/send-async! ->ServerError)})
+     :on-failure (tuck/send-async! ->RemoveMemberError)})
   app)
 
 (define-event RemoveToken [token operator-id]
   {}
-  (println "operator-id: " operator-id)
-  (println "remove-token: " token)
   (comm/delete!
     (str "transport-operator/" (url-util/encode-url-component operator-id) "/token")
     token
     {:on-success (tuck/send-async! ->RemoveTokenSuccess token)
      :on-failure (tuck/send-async! ->ServerError)})
   app)
-
-
 
 (define-event OpenConfirmationDialog [member operator-id]
   {}

@@ -609,7 +609,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :invite-sent-success "Kutsu lähetetty onnistuneesti"
                         :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-email " palveluntuottajan " :operator-name " jäsenlistalta"]
                         :confirm-remove "Poista jäsen"
-                        :remove-dialog-title "Jäsenen poistamisen varmistus"}
+                        :remove-dialog-title "Jäsenen poistamisen varmistus"
+                        :removing-last-user "Et voi poistaa operaattorin viimeistä käyttäjää"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

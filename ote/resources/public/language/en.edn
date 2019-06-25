@@ -608,7 +608,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                         :invite-sent-success "Invitation sent successfully."
                         :remove-dialog-text ["Are you sure that you want to delete the member " :user-name ", " :user-email " from the service producer´s " :operator-name " list of members?"]
                         :confirm-remove "Delete member"
-                        :remove-dialog-title "Confirm member removal"}
+                        :remove-dialog-title "Confirm member removal"
+                        :removing-last-user "Can't remove final member of operator"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

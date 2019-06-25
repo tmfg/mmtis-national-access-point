@@ -16,7 +16,6 @@
 
 (defn remove-modal
   [e! open? row-info operator-name]
-  (println row-info)
   (let [token? (some? (get-in row-info [:member :token]))
         open? (true? open?)]
     [ui/dialog

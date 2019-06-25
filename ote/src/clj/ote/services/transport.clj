@@ -696,9 +696,14 @@
                    {::auditlog/name "removed-user-id", ::auditlog/value (str (:id form-data))}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}
-        delete-count (specql/delete! db ::user/member
-                       {::user/table_id (:id form-data)
-                        ::user/group_id ckan-group-id})]
+        user-count (count (specql/fetch db ::user/member
+                            (specql/columns ::user/member)
+                            {::user/group_id ckan-group-id}))
+        delete-count (if (= user-count 1)
+                       0
+                       (specql/delete! db ::user/member
+                           {::user/table_id (:id form-data)
+                            ::user/group_id ckan-group-id}))]
 
     (if (= 0 delete-count)
       (do

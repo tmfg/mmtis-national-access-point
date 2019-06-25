@@ -613,7 +613,8 @@
                         :invite-sent-success "Inbjudan har skickats"
                         :remove-dialog-text ["Är du säker på att du vill ta bort medlemmen " :user-name ", " :user-email " från tjänsteproducentens " :operator-name " medlemslista?"]
                         :confirm-remove "Ta bort medlemmen"
-                        :remove-dialog-title "Verifiera medlemshantering"}
+                        :remove-dialog-title "Verifiera medlemshantering"
+                        :removing-last-user "Du kan inte ta bort den senaste användaren av operatören"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
