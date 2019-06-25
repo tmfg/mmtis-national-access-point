@@ -986,7 +986,9 @@
     (is (= 4 (count result)) "Ensure that a right amount of changes are found and there are no extra changes.")))
 
 ;TODO: Current implementation doesn't detect all changes, needs an improvement
-(deftest test-no-traffic-middle-of-week-and-changes-before-and-after
+;; Changes on resuming week cause resuming week with keywords to be set as starting week.
+;; Keywords on "starting week" hide changes for those weekdays ==> prooblem
+(deftest test-no-traffic-middle-of-week-and-changes-before-and-on-resuming-week
   (let [analysis-date (tu/to-local-date 2019 5 13)
         all-routes (tu/create-data-all-routes (list '(2019 5 6) '(2019 7 28)))
         test-data (tu/weeks (tu/to-local-date 2019 5 6)
@@ -1028,6 +1030,61 @@
         "Ensure route end is reported.")
 
     (is (= 3 (count result)) "Ensure that a right amount of changes are found and there are no extra changes.")))
+
+;; No changes on resuming week ==> "starting week" will be some non-anomalous week without keywords
+;; (if there's no holidays like here)
+;; No keywords on starting week ==> no problem, changes detected
+(deftest test-no-traffic-middle-of-week-and-changes-after-resuming-week
+  (let [analysis-date (tu/to-local-date 2019 5 13)
+        all-routes (tu/create-data-all-routes (list '(2019 5 6) '(2019 7 28)))
+        test-data (tu/weeks (tu/to-local-date 2019 5 6)
+                            (concat [{tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019-05-06
+                                     {tu/route-name ["A" "A" "A" "A" "A" "A" "A"]} ;; 2019-05-13
+                                     {tu/route-name ["A" "A" "A" "A" "A" nil nil]} ;; 2019-05-20 
+                                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019-05-27
+                                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019-06-03
+                                     {tu/route-name [nil nil nil nil nil nil nil]} ;; 2019-06-10
+                                     {tu/route-name [nil nil nil nil nil "A" "A"]} ;; 2019-06-17
+                                     {tu/route-name ["A" "A" "B" "A" "A" "A" "A"]} ;; 2019-06-24
+                                     {tu/route-name ["A" "A" "B" "A" "A" "A" "A"]} ;; 2019-07-01
+                                     {tu/route-name ["A" "A" "B" "C" "A" "A" "A"]} ;; 2019-07-08
+                                     {tu/route-name ["A" "A" "B" "C" "A" "A" "A"]} ;; 2019-07-15
+                                     {tu/route-name ["A" "A" "B" "C" "A" "A" "A"]}])) ;;2019-07-22 last day 28th
+        result (detection/traffic-week-maps->change-maps analysis-date all-routes test-data)]
+
+    (is (= {:change-type :no-traffic
+            :change-date (tu/to-local-date 2019 5 25)
+            :route-key tu/route-name
+            :no-traffic-start-date (tu/to-local-date 2019 5 25)
+            :no-traffic-end-date (tu/to-local-date 2019 6 22)}
+           (select-keys (first result) tu/select-keys-detect-changes-for-all-routes))
+        "Ensure a traffic change is reported.")
+
+    (is (= {:change-type :changed
+            :route-key tu/route-name
+            :different-week {:beginning-of-week (tu/to-local-date 2019 6 24)
+                             :end-of-week (tu/to-local-date 2019 6 30)}
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 5 13)
+                            :end-of-week (tu/to-local-date 2019 5 19)}}
+           (select-keys (second result) tu/select-keys-detect-changes-for-all-routes))
+        "Ensure a traffic change is reported.")
+
+    (is (= {:change-type :changed
+            :route-key tu/route-name
+            :different-week {:beginning-of-week (tu/to-local-date 2019 7 8)
+                             :end-of-week (tu/to-local-date 2019 7 14)}
+            :starting-week {:beginning-of-week (tu/to-local-date 2019 6 24)
+                            :end-of-week (tu/to-local-date 2019 6 30)}}
+           (select-keys (nth result 2) tu/select-keys-detect-changes-for-all-routes))
+        "Ensure a traffic change is reported.")
+
+    (is (= {:route-key tu/route-name
+            :change-type :removed
+            :change-date (tu/to-local-date 2019 7 29)}
+           (select-keys (nth result 3) tu/select-keys-detect-changes-for-all-routes))
+        "Ensure route end is reported.")
+
+    (is (= 4 (count result)) "Ensure that a right amount of changes are found and there are no extra changes.")))
 
 (deftest test-holiday-shouldnt-hide-traffic-days
   (let [analysis-date (tu/to-local-date 2019 11 18)
