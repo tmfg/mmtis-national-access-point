@@ -600,11 +600,10 @@
   (if (empty? route-weeks)
     []
     (let [route-key (first (keys (:routes (first route-weeks))))
+          _ (when (some #(not= route-key (first (keys (:routes %)))) route-weeks)
+              (throw (Exception. (str "All route keys in route weeks sequence are not identical to '" route-key "' !"))))
           ;; Pre-process input data and mark "no-traffic" periods to allow change detection to ignore them
           route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
-
-      (when (some #(not= route-key (first (keys (:routes %)))) route-weeks)
-        (throw (Exception. (str "All route keys in route weeks sequence are not identical to '" route-key "' !"))))
       (-> []
           (create-change-route-added route-key analysis-date all-routes)
           (create-changes-no-traffic route-weeks-nt-keyed)
