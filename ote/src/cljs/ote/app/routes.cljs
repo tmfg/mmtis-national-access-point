@@ -23,7 +23,7 @@
     ["/register/:token" :register]
     ["/user" :user]
     ["/own-services" :own-services]
-    ["/transport-operator/:operator-id/users" :access-management]
+    ["/transport-operator/:ckan-group-id/users" :operator-users]
     ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
@@ -67,7 +67,7 @@
 
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:own-services :transport-service :edit-service :new-service
-                     :transport-operator :access-management
+                     :transport-operator :operator-users
                      :routes :new-route :edit-route
                      :new-notice :edit-pre-notice :pre-notices
                      :email-settings})
