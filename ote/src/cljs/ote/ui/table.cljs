@@ -20,7 +20,7 @@
        opts])))
 
 (defn table [{:keys [height name->label key-fn label-style row-style
-                     on-select row-selected? no-rows-message class no-selection?] :as opts} headers rows]
+                     on-select row-selected? no-rows-message class no-outline-on-selection?] :as opts} headers rows]
   (let [random-table-id (str "tid-"(rand-int 999))
         table-row-color "#FFFFFF"
         table-row-color-alt colors/gray200
@@ -34,7 +34,7 @@
                  ;;        For now, leaving this commented out.
                  ;:bodyStyle {:overflow "visible"}
                  }
-                (when no-selection?
+                (when no-outline-on-selection?
                   {:body-style {:padding 0}})
                 (when on-select
                   {:on-row-selection (fn [selected-rows]
