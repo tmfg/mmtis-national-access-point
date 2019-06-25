@@ -570,8 +570,6 @@
         removed-trip-count (if (and (nil? combined-trips) (pos-int? (count date1-trips)))
                              (count date1-trips)
                              0)]
-    #_(when added
-      (def *ad [date1-trips date2-trips starting-week-date different-week-date]))
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
      :added-trips (if combined-trips (count added) added-trip-count)
