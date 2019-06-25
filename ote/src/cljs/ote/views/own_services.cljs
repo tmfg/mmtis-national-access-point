@@ -281,7 +281,7 @@
                                   :margin-right "0.5rem"
                                   :color colors/primary}})
       (tr [:own-services-page :edit-business-id] {:business-id business-id})]
-     [:a (merge {:href (str "#/transport-operator/" id "/users")
+     [:a (merge {:href (str "#/transport-operator/" ckan-group-id "/users")
                  :id "operator-users-link"
                  :on-click #(do
                               (.preventDefault %)
