@@ -27,7 +27,7 @@
                    [:tr {:class (if (even? index) "even-row" "odd-row")}
                     (for [cell row]
                       [:td cell])])
-                 rows)]])
+      rows)]])
 
 (defn- blue-button [link text]
   [:table {:style "background-color: #fff;" :cellpadding "16"}
@@ -89,19 +89,19 @@
 
         [operator-name
          (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
-              transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
+           transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
          (str days-until-change " pv (" (time/format-date different-week-date) ")")
          (str/join ", "
-                   (remove nil?
-                           [(when (and added-routes (> added-routes 0))
-                              (str added-routes " uutta reittiä"))
-                            (when (and removed-routes (> removed-routes 0))
-                              (str removed-routes " päättyvää reittiä"))
-                            (when (and changed-routes (> changed-routes-count 0))
-                              (str changed-routes-count " muuttuvaa reittiä"))
-                            (when (and no-traffic-routes (> no-traffic-routes 0))
-                              (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))]))))
+           (remove nil?
+             [(when (and added-routes (> added-routes 0))
+                (str added-routes " uutta reittiä"))
+              (when (and removed-routes (> removed-routes 0))
+                (str removed-routes " päättyvää reittiä"))
+              (when (and changed-routes (> changed-routes-count 0))
+                (str changed-routes-count " muuttuvaa reittiä"))
+              (when (and no-traffic-routes (> no-traffic-routes 0))
+                (str no-traffic-routes " reitillä tauko liikennöinnissä"))]))]))))
 
 (defn- pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                                first-effective-date description]}]
@@ -109,11 +109,11 @@
    (escape-html operator-name)
    (str/join ",<br />" (db-util/PgArray->seqable regions))
    (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
-                             (db-util/PgArray->seqable pre-notice-type)))
+                         (db-util/PgArray->seqable pre-notice-type)))
    first-effective-date
    (escape-html description)])
 
-(defn html-template [title body]
+(defn html-template [title {:keys [show-email-settings?]} body]
   [:html {:xmlns "http://www.w3.org/1999/xhtml"
           :xmlns:v "urn:schemas-microsoft-com:vml"
           :xmlns:o "urn:schemas-microsoft-com:office:office"}
@@ -135,6 +135,7 @@
      p { margin: 0px; }
      table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
      td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
+     a:visited {color:#fff !important}
      .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
      .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
      .whiteBackground {background-color:#FFFFFF}
@@ -180,104 +181,105 @@
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
-      [:br]
-      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-       "Haluatko muuttaa sähköpostiasetuksiasi?"
-       [:br]
-       [:a
-        {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-         :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]]
+      (when show-email-settings?
+        [:br]
+        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+         "Haluatko muuttaa sähköpostiasetuksiasi?"
+         [:br]
+         [:a
+          {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+           :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]])
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
-  (html-template title
-                 [:div
-                  [:br]
-                  [:h1 {:class "headerText1"
-                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
+  (html-template {:show-email-settings? true} title
+    [:div
+     [:br]
+     [:h1 {:class "headerText1"
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+      "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
 
-                  (when (seq pre-notices)
-                    [:div {:style "background-color:#FFFFFF"}
-                     (html-divider-border nil)
-                     [:p {:style "margin-bottom:  20px;"}
-                      [:h2 {:class "headerText2"
-                            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
-                       "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
+     (when (seq pre-notices)
+       [:div {:style "background-color:#FFFFFF"}
+        (html-divider-border nil)
+        [:p {:style "margin-bottom:  20px;"}
+         [:h2 {:class "headerText2"
+               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+          "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
-                     (html-table
-                       [{:class "tg-lusz" :width "10%" :label "Reitin nimi"}
-                        {:class "tg-lusz" :width "10%" :label "Palveluntuottajan nimi"}
-                        {:class "tg-lusz" :width "20%" :label "Alue"}
-                        {:class "tg-lusz" :width "15%" :label "Muutoksen tyyppi"}
-                        {:class "tg-lusz" :width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
-                        {:class "tg-lusz" :width "30%" :label "Lisätiedot muutoksesta"}]
-                       (for [n pre-notices]
-                         (pre-notice-row n)))
-                     [:br]
-                     (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
+        (html-table
+          [{:class "tg-lusz" :width "10%" :label "Reitin nimi"}
+           {:class "tg-lusz" :width "10%" :label "Palveluntuottajan nimi"}
+           {:class "tg-lusz" :width "20%" :label "Alue"}
+           {:class "tg-lusz" :width "15%" :label "Muutoksen tyyppi"}
+           {:class "tg-lusz" :width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
+           {:class "tg-lusz" :width "30%" :label "Lisätiedot muutoksesta"}]
+          (for [n pre-notices]
+            (pre-notice-row n)))
+        [:br]
+        (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
 
-                  (when (seq detected-changes)
-                    [:div {:style "background-color:#FFFFFF"}
-                     (html-divider-border nil)
-                     [:p
-                      [:h2 {:class "headerText2"
-                            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
-                       "Rajapinnoista tunnistetut muutokset"]
-                      [:h2
-                       {:class "headerText2"
-                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
-                       "Tunnistusajankohta " (time/format-date (time/now))]
-                      (html-table
-                        [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
-                         {:class "tg-lusz" :width "15%" :label "Palvelu"}
-                         {:class "tg-lusz" :width "25%" :label "Alue"}
-                         {:class "tg-lusz" :width "15%" :label "Aikaa 1. muutokseen"}
-                         {:class "tg-lusz" :width "25%" :label "Muutokset"}]
-                        (detected-change-row detected-changes))
-                      [:br]]
-                     (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
-                  (html-divider-border nil)]))
+     (when (seq detected-changes)
+       [:div {:style "background-color:#FFFFFF"}
+        (html-divider-border nil)
+        [:p
+         [:h2 {:class "headerText2"
+               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+          "Rajapinnoista tunnistetut muutokset"]
+         [:h2
+          {:class "headerText2"
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
+          "Tunnistusajankohta " (time/format-date (time/now))]
+         (html-table
+           [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
+            {:class "tg-lusz" :width "15%" :label "Palvelu"}
+            {:class "tg-lusz" :width "25%" :label "Alue"}
+            {:class "tg-lusz" :width "15%" :label "Aikaa 1. muutokseen"}
+            {:class "tg-lusz" :width "25%" :label "Muutokset"}]
+           (detected-change-row detected-changes))
+         [:br]]
+        (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+     (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
-  (html-template title
-                 [:div {:style "max-width 800px"}
-                  [:br]
-                  [:h1 {:class "headerText1"
-                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   (str "Sinut on kutsuttu " (::t-operator/name operator) "-nimisen palveluntuottajan jäseneksi.")]
+  (html-template {:show-email-settings? false} title
+    [:div {:style "max-width 800px"}
+     [:br]
+     [:h1 {:class "headerText1"
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+      (str "Sinut on kutsuttu " (::t-operator/name operator) "-nimisen palveluntuottajan jäseneksi.")]
 
-                  (html-divider-border "100%")
-                  [:p
-                   [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-                    (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
-                   [:strong (::t-operator/name operator)]
-                   (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
-                  [:br]
-                  [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
-                   [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
-                  [:br]
-                  (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
+     (html-divider-border "100%")
+     [:p
+      [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
+      [:strong (::t-operator/name operator)]
+      (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+     [:br]
+     [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+     [:br]
+     (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
-                  (html-divider-border "100%")]))
+     (html-divider-border "100%")]))
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/name operator)]
-     (html-template title
-       [:div {:style "max-width: 800px"}
-        [:br]
-        [:h1 {:class "headerText1"
-              :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
-         (str "Olet saanut kutsun liittyä NAP:iin")]
+    (html-template {:show-email-settings? false} title
+      [:div {:style "max-width: 800px"}
+       [:br]
+       [:h1 {:class "headerText1"
+             :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+        (str "Olet saanut kutsun liittyä NAP:iin")]
 
-        (html-divider-border "100%")
-        [:p
-         [:strong (get-in requester [:user :name])]
-         " on kutsunut sinut NAP-palveluun "
-         [:strong op-name]
-         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
-        [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
-        [:br]
-        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       (html-divider-border "100%")
+       [:p
+        [:strong (get-in requester [:user :name])]
+        " on kutsunut sinut NAP-palveluun "
+        [:strong op-name]
+        (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+       [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+       [:br]
+       (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
-        (html-divider-border "100%")])))
+       (html-divider-border "100%")])))
