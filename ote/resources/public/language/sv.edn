@@ -606,13 +606,13 @@
                         :members "Medlemmar"
                         :email-placeholder "Mata in e-postadress"
                         :manage-users "Hantera användarrättigheter"
-                        :already-invited "Käyttäjä on jo kutsuttu."
+                        :already-invited "Användaren har redan blivit inbjuden"
                         :something-went-wrong "Ett fel uppstod."
                         :already-member "Användaren har redan lagts till"
-                        :invite-pending "Odottaa kutsun vahvistusta"
-                        :invite-sent-success "Kutsu lähetetty onnistuneesti"
-                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
-                        :confirm-remove "Poista jäsen"}
+                        :invite-pending "Väntar på att inbjudan ska accepteras"
+                        :invite-sent-success "Inbjudan har skickats"
+                        :remove-dialog-text ["Är du säker på att du vill ta bort medlemmen " :user-name ", " :user-email " från tjänsteproducentens " :operator-name " medlemslista?"]
+                        :confirm-remove "Ta bort medlemmen"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -1249,8 +1249,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :password-not-valid "Minst 6 tecken krävs. Lösenordet bör innehålla bokstäver och minst en siffra."}
   :confirm-changes "Bekräfta ändringar"
   :change-password "Ändra lösenord"
-  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
-  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
+  :valid-token ["I samband med registreringen får du användarrättigheter till tjänsteproducenten " :operator-name "."]
+  :invalid-token "Din inbjudan har förfallit. Avsluta registreringen och kontakta därefter inbjudans avsändare eller NAP Helpdesk (nap@traficom.fi) för att få en ny inbjudan."}
 
  :reset-password
  {:label "Återställ ditt lösenord"

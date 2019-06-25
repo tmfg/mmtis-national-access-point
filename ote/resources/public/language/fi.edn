@@ -607,8 +607,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :already-invited "Käyttäjä on jo kutsuttu"
                         :invite-pending "Odottaa kutsun vahvistusta"
                         :invite-sent-success "Kutsu lähetetty onnistuneesti"
-                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
-                        :confirm-remove "Poista jäsen"}
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-email " palveluntuottajan " :operator-name " jäsenlistalta"]
+                        :confirm-remove "Poista jäsen"
+                        :remove-dialog-title "Jäsenen poistamisen varmistus"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"

@@ -603,11 +603,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                         :manage-users "Manage access rights"
                         :already-invited "User is already invited."
                         :something-went-wrong "Something went wrong."
-                        :already-member "The user has already been added."
+                        :already-member "The user is already a member."
                         :invite-pending "Waiting for confirmation."
                         :invite-sent-success "Invitation sent successfully."
-                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
-                        :confirm-remove "Poista jäsen"}
+                        :remove-dialog-text ["Are you sure that you want to delete the member " :user-name ", " :user-email " from the service producer´s " :operator-name " list of members?"]
+                        :confirm-remove "Delete member"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -1245,8 +1245,8 @@ You can also draw the operating area or point to the map with drawing tools. You
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
   :confirm-changes "Confirm changes"
   :change-password "Change password"
-  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
-  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
+  :valid-token ["At registration you will get user rights to the service producer " :operator-name "."]
+  :invalid-token "Your invitation has expired. Complete the registration and contact the invitation sender or the NAP Helpdesk (nap@traficom.fi) to get a new invitation."}
 
  :reset-password
  {:label "Reset your password"
