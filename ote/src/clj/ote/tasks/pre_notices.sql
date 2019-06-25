@@ -41,10 +41,11 @@ SELECT * FROM (
                                    AND ts."transport-type" @> ARRAY['road'::transport_type]
                      JOIN "transport-operator" op ON op.id = ts."transport-operator-id"
                 WHERE h."email-sent" IS NULL
+                  AND h."change-type" != 'no-change'
                   AND (p."finnish-regions" IS NULL OR
                        :regions::CHAR(2)[] IS NULL OR
                        :regions::CHAR(2)[] && p."finnish-regions")
-                GROUP BY h.id,p."finnish-regions", op.name, ts.name,ts.id
+                GROUP BY h.id, p."finnish-regions", op.name, ts.name, ts.id
               ) x
  ORDER BY x."different-week-date" ASC;
 
