@@ -82,7 +82,6 @@
            db user
            #(http/transit-response
              (add-comment db user (http/transit-request form-data)))))
-   (GET "/pre-notices/authority-users" req
-        {:status 302
-         :headers {"Location" (str "/organization/member_new/"
-                                   (users/transit-authority-group-id db))}})))
+   (GET "/pre-notices/authority-group-id" {}
+    (http/transit-response
+       {:ckan-group-id (users/transit-authority-group-id db)} 200))))

@@ -146,13 +146,14 @@
        [:p (tr [:pre-notice-list-page :only-for-authorities])]]]
      [:div.row.authority-pre-notice-table
 
-      [table/table {:name->label     (tr-key [:pre-notice-list-page :headers])
-                    :key-fn          ::transit/id
+      [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
+                    :key-fn ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])
-                    :stripedRows    true
+                    :stripedRows true
                     :row-style {:cursor "pointer"}
                     :show-row-hover? true
-                    :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))}
+                    :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))
+                    :no-outline-on-selection? true}
        [{:name ::transit/sent :format (comp str time/format-timestamp-for-ui)}
         {:name ::transit/regions :format region-name}
         {:name ::transit/pre-notice-type
@@ -166,11 +167,7 @@
   [:div.authority-pre-notices
    [ui/flat-button {:label "Kutsu käyttäjiä"
                     :primary true
-                    :on-click #(e! (pre-notice/->TogglePreNoticeUsersDialog))}]
-   (when pre-notice-users-dialog?
-     [common/ckan-iframe-dialog "Kutsu käyttäjiä"
-      "/pre-notices/authority-users"
-      #(e! (pre-notice/->TogglePreNoticeUsersDialog))])
+                    :on-click #(e! (pre-notice/->MoveToAuthorityGroupPage))}]
    [pre-notices-listing e! pre-notices]
    (when pre-notice-dialog
      [pre-notice-view e! pre-notice-dialog])])

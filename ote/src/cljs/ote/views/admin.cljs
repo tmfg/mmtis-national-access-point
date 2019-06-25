@@ -129,11 +129,7 @@
                                           :font-size "8pt"}
                                   :on-click #(do
                                                (.preventDefault %)
-                                               (e! (admin-controller/->ToggleAddMemberDialog id)))}]
-                 (when show-add-member-dialog?
-                   [ui-common/ckan-iframe-dialog (::t-operator/name result)
-                    (str "/organization/member_new/" ckan-group-id)
-                    #(e! (admin-controller/->ToggleAddMemberDialog id))])]
+                                               (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}]]
                 [ui/table-row-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} [ui/icon-button {:href     "#"
                                                                               :on-click #(do
                                                                                            (.preventDefault %)

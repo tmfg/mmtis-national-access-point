@@ -597,19 +597,19 @@
 
 (defn- route-change-maps
   [route-weeks all-routes ^LocalDate analysis-date]
-  (let [route-key (first (keys (:routes (first route-weeks))))
-        _ (assert
-            (some #(= route-key (first (keys (:routes %)))) route-weeks)
-            (str "Assuming all route keys in route weeks sequence are identical to route-key '" route-key
-                 "', asserting because they are not!"))
-        ;; Pre-process input data and mark "no-traffic" periods
-        route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
-    (-> []
-        (create-change-route-added route-key analysis-date all-routes)
-        (create-changes-no-traffic route-weeks-nt-keyed)
-        (no-traffic-change->route-ending-change route-key analysis-date all-routes)
-        (route-differences route-weeks-nt-keyed)
-        (create-no-change route-key))))
+  (if (empty? route-weeks)
+    []
+    (let [route-key (first (keys (:routes (first route-weeks))))
+          _ (when (some #(not= route-key (first (keys (:routes %)))) route-weeks)
+              (throw (Exception. (str "All route keys in route weeks sequence are not identical to '" route-key "' !"))))
+          ;; Pre-process input data and mark "no-traffic" periods to allow change detection to ignore them
+          route-weeks-nt-keyed (route-wks->keyed-notraffic-wksv route-weeks)]
+      (-> []
+          (create-change-route-added route-key analysis-date all-routes)
+          (create-changes-no-traffic route-weeks-nt-keyed)
+          (no-traffic-change->route-ending-change route-key analysis-date all-routes)
+          (route-differences route-weeks-nt-keyed)
+          (create-no-change route-key)))))
 
 (defn route-trips-for-date [db service-id route-hash-id date]
   (vec
