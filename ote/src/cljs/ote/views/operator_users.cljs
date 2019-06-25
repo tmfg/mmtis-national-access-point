@@ -3,12 +3,40 @@
             [ote.ui.table :as table]
             [ote.app.utils :as utils]
             [ote.localization :refer [tr tr-key]]
+            [cljs-react-material-ui.reagent :as ui]
             [ote.ui.form-fields :as form-fields]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.buttons :as buttons]
+            [ote.style.buttons :as style-buttons]
             [ote.theme.colors :as colors]
-            [ote.ui.circular_progress :as prog]))
+            [ote.ui.circular_progress :as prog]
+            [ote.ui.buttons :as buttons]
+            [reagent.core :as r]
+            [ote.style.dialog :as style-dialog]))
+
+(defn remove-modal
+  [e! open? row-info operator-name]
+  (println row-info)
+  (let [token? (some? (get-in row-info [:member :token]))
+        open? (true? open?)]
+    [ui/dialog
+     {:open open?
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:transport-users-page :remove-dialog-title])
+      :actions [(r/as-element
+                  [buttons/cancel
+                   {:on-click #(e! (ou/->CloseConfirmationDialog))}
+                   (tr [:buttons :cancel])])
+                (r/as-element
+                  [buttons/delete
+                   {:icon (ic/action-delete-forever)
+                    :id "confirm-delete"
+                    :on-click #(if token?
+                                 (e! (ou/->RemoveToken (:member row-info) (:operator-id row-info)))
+                                 (e! (ou/->RemoveMember (:member row-info) (:operator-id row-info))))}
+                   (tr [:transport-users-page :confirm-remove])])]}
+     (tr [:transport-users-page :remove-dialog-text]
+       {:user-email (get-in row-info [:member :email]) :operator-name operator-name})]))
 
 (defn access-table
   [e! users operator-id]
@@ -18,7 +46,7 @@
                  :key-fn #(or (:id %) (:token %))
                  :name->label identity
                  :show-row-hover? true
-                 :no-selection? true}
+                 :no-outline-on-selection? true}
     [{:name (tr [:transport-users-page :username])
       :read identity
       :format (fn [row]
@@ -35,9 +63,10 @@
       :read identity
       :format (fn [member]
                 [:div
-                 [:button.remove-member (merge {:on-click #(e! (ou/->RemoveMember member operator-id))}
+                 [:button.remove-member (merge
+                                          {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
                                           (stylefy/use-style
-                                            (merge buttons/svg-button
+                                            (merge style-buttons/svg-button
                                               {:display "flex"
                                                :align-items "center"})))
                   [ic/action-delete]
@@ -45,12 +74,12 @@
     users]])
 
 (defn invite-member
-  [e! {:keys [new-member-email new-member-loading?] :as state} op-id]
+  [e! {:keys [new-member-email new-member-loading?] :as state} ckan-group-id]
   [:div
    [:form {:on-submit (fn [e]
                         (.preventDefault e)
                         (when (re-matches utils/email-regex new-member-email)
-                          (e! (ou/->PostNewUser new-member-email op-id))))}
+                          (e! (ou/->PostNewUser new-member-email ckan-group-id))))}
     [form-fields/field {:element-id "operator-user-email"
                         :type :string
                         :full-width? true
@@ -63,8 +92,8 @@
                    :align-items "center"}}
      [:button
       (if (and new-member-email (re-matches utils/email-regex new-member-email) (not new-member-loading?))
-        (stylefy/use-style buttons/primary-button)
-        (stylefy/use-style buttons/disabled-button))
+        (stylefy/use-style style-buttons/primary-button)
+        (stylefy/use-style style-buttons/disabled-button))
       (tr [:transport-users-page :add-member])]
      (when new-member-loading?
        [:span {:style {:margin-left "1rem"}}
@@ -75,13 +104,15 @@
   (let [loaded? (get-in state [:manage-access :loaded?])
         access-users (get-in state [:manage-access :users])
         access-state (:manage-access state)
-        name (get-in state [:manage-access :operator-name])]
+        operator-name (get-in state [:manage-access :operator-name])
+        confirm (get-in state [:manage-access :confirmation])]
     [:div
      [:h1 (tr [:transport-users-page :manage-users])]
-     [:h2 name]
+     [:h2 operator-name]
      (if loaded?
        [:div
-        [access-table e! access-users (get-in state [:params :operator-id])]
-        [invite-member e! access-state (get-in state [:params :operator-id])]]
-       [prog/circular-progress (tr [:common-texts :loading])])]))
+        [access-table e! access-users (get-in state [:params :ckan-group-id])]
+        [invite-member e! access-state (get-in state [:params :ckan-group-id])]]
+       [prog/circular-progress (tr [:common-texts :loading])])
+     [remove-modal e! (:open? confirm) confirm operator-name]]))
 

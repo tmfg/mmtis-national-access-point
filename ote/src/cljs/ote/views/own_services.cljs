@@ -49,7 +49,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (ts/->DeleteTransportService id)))}
-                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -92,7 +92,7 @@
            [:a (merge {:href (str "/#/edit-service/" id)
                        :on-click #(do (.preventDefault %)
                                       (e! (fp/->ChangePage :edit-service {:id id})))}
-                      (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
+                 (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "}
            (if (service-errors row)
              [:span (stylefy/use-style style-base/icon-with-text)
@@ -117,7 +117,7 @@
            [ui/icon-button (merge {:href "#" :on-click #(do
                                                           (.preventDefault %)
                                                           (e! (fp/->ChangePage :edit-service {:id id})))}
-                                  (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                             (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
             [ic/content-create]]
            [delete-service-action e! row]]])
        services))])
@@ -207,7 +207,7 @@
   (let [operator (:transport-operator state)
         operators (:transport-operators-with-services state)]
     (when (and (not (empty? operators))
-               (not (:new? operator)))
+            (not (:new? operator)))
       [:div.row {:style {:margin-bottom "2rem"
                          :margin-top "3rem"
                          :align-items "center"
@@ -232,7 +232,7 @@
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (to/->CreateTransportOperator)))}
-                   (stylefy/use-style style-buttons/outline-button))
+              (stylefy/use-style style-buttons/outline-button))
          (tr [:buttons :add-new-transport-operator])]]])))
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
@@ -247,7 +247,7 @@
                :on-click #(do
                             (.preventDefault %)
                             (e! (ts/->OpenTransportServiceTypePage)))}
-              (stylefy/use-style style-buttons/primary-button))
+         (stylefy/use-style style-buttons/primary-button))
     (tr [:buttons :add-transport-service])]
    (if (and has-services? (not (empty? operator-services)))
      ;; TRUE -> Table for transport services
@@ -275,25 +275,23 @@
                  :on-click #(do
                               (.preventDefault %)
                               (e! (fp/->ChangePage :transport-operator {:id id})))}
-                (stylefy/use-style style-base/blue-link-with-icon))
+           (stylefy/use-style style-base/blue-link-with-icon))
       (ic/content-create {:style {:width 20
                                   :height 20
                                   :margin-right "0.5rem"
                                   :color colors/primary}})
       (tr [:own-services-page :edit-business-id] {:business-id business-id})]
-     [:button (merge {:on-click #(do
-                                   (.preventDefault %)
-                                   (e! (fp/->ToggleAddMemberDialog)))}
-                     (stylefy/use-style style-base/blue-link-with-icon))
+     [:a (merge {:href (str "#/transport-operator/" id "/users")
+                 :id "operator-users-link"
+                 :on-click #(do
+                              (.preventDefault %)
+                              (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}
+           (stylefy/use-style style-base/blue-link-with-icon))
       (ic/social-person {:style {:width 20
                                  :height 20
                                  :margin-right "0.5rem"
                                  :color colors/primary}})
-      (tr [:buttons :manage-access-rights])]]
-    (when show-add-member-dialog?
-      [ui-common/ckan-iframe-dialog name
-       (str "/organization/member_new/" ckan-group-id)
-       #(e! (fp/->ToggleAddMemberDialog))])]
+      (tr [:buttons :manage-access-rights])]]]
    (let [has-assoc-services? (not
                                (and
                                  (empty? (::t-operator/own-associations operator))
@@ -424,7 +422,7 @@
                :on-click #(do
                             (.preventDefault %)
                             (e! (to/->CreateTransportOperator)))}
-              (stylefy/use-style style-buttons/outline-button))
+         (stylefy/use-style style-buttons/outline-button))
     (tr [:buttons :add-new-transport-operator])]])
 
 (defn- no-operator
@@ -438,7 +436,7 @@
 
   (fn [e! state]
     (if (and (:transport-operator-data-loaded? state)
-             (not (contains? state :transport-operators-with-services)))
+          (not (contains? state :transport-operators-with-services)))
       [no-operator e! state]
 
       ;; Get services by default from first organization
@@ -446,7 +444,7 @@
             has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
             operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
                                        %)
-                                    (:transport-operators-with-services state))
+                                (:transport-operators-with-services state))
             operator-services (if (empty? operator-services)
                                 (:transport-service-vector (first (:transport-operators-with-services state)))
                                 (:transport-service-vector state))]
