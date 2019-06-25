@@ -519,7 +519,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :new "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"
    :route-change "Reittimuutos"
-   :other "Muu muutos, mikä?"}
+   :other "Muu muutos"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Luonnos"

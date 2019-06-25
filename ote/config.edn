@@ -46,7 +46,7 @@
 
  :log {:level :debug}
  :ga {:tracking-code "UA-5406842-15"}
- :matomo {:piwik-url "https://matomo.vy.laru.local/"
+ :matomo {:piwik-url "https://stat.viestintavirasto.fi/"
           :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
