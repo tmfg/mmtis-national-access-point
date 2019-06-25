@@ -697,7 +697,7 @@
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}
         user-count (count (specql/fetch db ::user/member
-                            (specql/columns ::user/member)
+                            #{::user/group_id}
                             {::user/group_id ckan-group-id}))
         delete-count (if (= user-count 1)
                        0
