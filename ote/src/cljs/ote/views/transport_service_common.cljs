@@ -419,9 +419,15 @@
 
         (if published?
           ;; True
-          [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
-                         :disabled (not (form/can-save? data))}
-           (tr [:buttons :save-updated])]
+          [:span
+           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+                          :disabled (not (form/can-save? data))}
+            (tr [:buttons :save-updated])]
+           [buttons/save {:disabled name-missing?
+                          :on-click #(do
+                                       (.preventDefault %)
+                                       (e! (ts/->SaveTransportService schemas false)))}
+            (tr [:buttons :back-to-draft])]]
           ;; False
           [:span
            [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
