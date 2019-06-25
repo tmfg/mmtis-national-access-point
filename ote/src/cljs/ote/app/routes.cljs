@@ -142,7 +142,8 @@
                      event-to (on-navigate-event navigation-data)
                      event-to (if (vector? event-to) event-to [event-to])
                      orig-app app
-                     app (merge app navigation-data)]
+                     app (merge app navigation-data)
+                     win-location (subs (str "/" (.. js/window -location -hash)) 1)]
 
                  (if (or (requires-authentication? app)
                          (requires-transit-authority? app)
@@ -154,11 +155,16 @@
                    (do
                      ;; Send startup events (if any) immediately after returning from this swap
                      (when (or event-leave event-to)
-                       (.setTimeout
-                         js/window
-                         (fn []
-                           (send-startup-events (vec (concat event-leave event-to))))
-                         0))
+                       (do
+                         ;; Due to spa (Single page app) we need to manually push page change to matomo
+                         ;; But first check if _paq exists (may not exist in local machines)
+                         (when (exists? js/_paq)
+                           (.push js/_paq (clj->js ["setCustomUrl" win-location])))
+                         (.setTimeout
+                           js/window
+                           (fn []
+                             (send-startup-events (vec (concat event-leave event-to))))
+                           0)))
                      app)))
                app)))))
 
