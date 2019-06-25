@@ -321,6 +321,14 @@
   {}
   (dissoc app :delete-pre-notice-dialog))
 
-(define-event TogglePreNoticeUsersDialog []
-  {:path [:pre-notice-users-dialog?]}
-  (not app))
+(define-event AuthorityGroupIdFetchSuccess [result]
+  {}
+  (routes/navigate! :operator-users {:ckan-group-id (:ckan-group-id result)})
+  app)
+
+(define-event MoveToAuthorityGroupPage []
+  {}
+  (comm/get! "/pre-notices/authority-group-id"
+    {:on-success (tuck/send-async! ->AuthorityGroupIdFetchSuccess)
+     :on-failure (tuck/send-async! ->ServerError)})
+  app)
