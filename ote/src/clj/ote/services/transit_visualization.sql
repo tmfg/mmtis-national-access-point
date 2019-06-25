@@ -108,19 +108,29 @@ SELECT ST_AsGeoJSON(COALESCE(
 
 -- name: fetch-route-trip-info-by-name-and-date
 -- Fetch listing of all trips by route name and date
-SELECT trip."package-id", (trip.trip)."trip-id", (trip.trip)."trip-headsign" as headsign,
-       array_agg(ROW(stoptime."stop-sequence",
-                     s."stop-name",
-                     stoptime."arrival-time",
-                     stoptime."departure-time",
-                     s."stop-lat", s."stop-lon",s."stop-fuzzy-lat", s."stop-fuzzy-lon")::gtfs_stoptime_display
-                 ORDER BY stoptime."stop-sequence") AS "stoptimes"
- FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER,:date::date), :date::date) rt
- JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
- JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
- JOIN "gtfs-stop" s ON (s."package-id" = trip."package-id" AND s."stop-id" = stoptime."stop-id")
+WITH route_stops as (
+ SELECT trip."package-id" as "package-id", (trip.trip)."trip-id" as "trip-id",
+        (trip.trip)."trip-headsign" as headsign, stoptime."stop-id" as "stop-id",
+        stoptime."arrival-time" as "arrival-time", stoptime."departure-time" as "departure-time",
+        stoptime."stop-sequence" as "stop-sequence"
+  FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::date) rt
+       JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
+       JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
- GROUP BY trip."package-id", (trip.trip)."trip-id", (trip.trip)."trip-headsign";
+)
+SELECT rs."package-id", rs."trip-id", rs."headsign" as headsign,
+       array_agg(ROW(rs."stop-sequence",
+                   s."stop-name",
+                   rs."arrival-time",
+                   rs."departure-time",
+                   s."stop-lat", s."stop-lon",s."stop-fuzzy-lat", s."stop-fuzzy-lon")::gtfs_stoptime_display
+                 ORDER BY rs."stop-sequence") AS "stoptimes"
+  FROM route_stops as rs,
+       "gtfs-stop" s
+ WHERE s."package-id" = rs."package-id"
+   AND s."stop-id" = rs."stop-id"
+ GROUP BY rs."package-id", rs."trip-id", rs.headsign;
+
 
 -- name: fetch-date-hashes-for-route-with-route-hash-id
 -- Fetch the date/hash pairs for a given route using route-hash-id which isn't used for all services
