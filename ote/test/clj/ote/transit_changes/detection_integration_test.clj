@@ -5,8 +5,6 @@
             [specql.core :as specql]
             [ote.integration.import.gtfs :as gtfs-import]
             [clojure.test :as t :refer [deftest testing is use-fixtures]]
-            [clojure.spec.test.alpha :as spec-test]
-            [ote.transit-changes :as transit-changes]
             [ote.transit-changes.detection-test-utilities :as tu]
             [ote.time :as time]
             [com.stuartsierra.component :as component]
