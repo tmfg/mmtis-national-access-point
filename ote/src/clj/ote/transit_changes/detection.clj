@@ -158,6 +158,7 @@
      :end-of-week eow
      :routes (merge-week-hash (map :routes days))}))
 
+
 (defn- vnot [cond msg]
   #_(when cond (println "debug: not a change because" msg))
   (not cond))
@@ -310,7 +311,6 @@
                            route-next-different-week route-name week-maps week-map-current))
                  {}                                         ; initial route detection state is empty
                  (partition 4 1 route-weeks))]
-    ;; (spec-provider.provider/pprint-specs (spec-provider.provider/infer-specs result ::route-differences-pair) 'ote.transit-changes.detection 'spec)
     (vals result)))
 
 (defn local-date-before? [d1 d2]
@@ -723,6 +723,7 @@
 
 (spec/fdef transform-route-change
            :args (spec/cat :all-routes vector? :route-change ::service-route-change-map :route-changes-all ::detected-route-changes-for-services-coll))
+
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
@@ -797,18 +798,6 @@
                                   {:gtfs/change-type :no-change})))]
 
     (change-history/append-change-key route-change-for-db)))
-
-; Development-time utility
-;(defn- debug-print-change-stats [all-routes route-changes type]
-;  (doseq [r all-routes
-;          :let [key (:route-hash-id r)
-;                {:keys [changes no-traffic-start-date no-traffic-end-date]
-;                 :as route} (route-changes key)]]
-;    #_(println key " has traffic " (:min-date r) " - " (:max-date r)
-;               (when no-traffic-end-date
-;                 (str " no traffic between: " no-traffic-start-date " - " no-traffic-end-date))
-;               (when changes
-;                 (str " has changes")))))
 
 (defn- update-route-changes! [db analysis-date service-id route-change-infos]
   {:pre [(some? analysis-date)
@@ -982,7 +971,7 @@
 
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
-(defn detect-route-changes-for-service [db {:keys [service-id] :as route-query-params}]
+(defn detect-route-changes-for-service [db {:keys [service-id ignore-holidays?] :as route-query-params}]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
@@ -999,10 +988,13 @@
                                                (service-route-hashes-for-date-range db query-params)))
                                            all-route-keys)))
         ;; Change hashes that are at static holiday to a keyword
-        route-hashes-with-holidays (override-holidays db route-hashes)
+        route-hashes-with-holidays (if ignore-holidays?
+                                     route-hashes
+                                     (override-holidays db route-hashes))
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys) ;; Format: ({:date routes(=hashes)})
         analysis-date (java.time.LocalDate/now)]
     (try
+      #_(def *rd routes-by-date)
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
@@ -1115,4 +1107,4 @@
                             ; where
                             {:gtfs/package-id package-id
                              :gtfs/date (:gtfs/date h)})
-            (println "package-id " package-id "date " (:gtfs/date h))))))))
+            (log/debug "package-id " package-id "date " (:gtfs/date h))))))))
