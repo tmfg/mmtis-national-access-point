@@ -257,7 +257,7 @@
       (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/ckan-group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
      (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
