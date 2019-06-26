@@ -575,7 +575,7 @@
         updated-member (if (= (:e2e-test-email (email-config/config)) (:user_email new-member))
                (assoc new-member :user_email (:e2e-test-amazon-simulator-email (email-config/config)))
                new-member)
-        title (str "Sinut on kutsuttu " (:name operator) " -nimisen palveluntuottajan jäseneksi")
+        title (str "Sinut on kutsuttu " (::t-operator/name operator) " -nimisen palveluntuottajan jäseneksi")
         auditlog {::auditlog/event-type :add-member-to-operator
                   ::auditlog/event-attributes
                   [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
