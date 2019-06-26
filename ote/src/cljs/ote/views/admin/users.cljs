@@ -155,5 +155,4 @@
                [ui/table-row-column {:style {:padding 0}}
                 [groups-list groups]]
                [ui/table-row-column
-                [delete-user-action e! user]
-                [edit-user-action e! user]]]))]]])]))
+                [delete-user-action e! user]]]))]]])]))
