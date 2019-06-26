@@ -143,7 +143,11 @@
                      event-to (if (vector? event-to) event-to [event-to])
                      orig-app app
                      app (merge app navigation-data)
-                     win-location (subs (str "/" (.. js/window -location -hash)) 1)]
+                     win-location (subs (.. js/window -location -hash) 1)
+                     win-location (if-let [page (#{:register :reset-password}
+                                                 (:page navigation-data))]
+                                    (str "/" (name page))
+                                    win-location)]
 
                  (if (or (requires-authentication? app)
                          (requires-transit-authority? app)
