@@ -144,10 +144,9 @@
                      orig-app app
                      app (merge app navigation-data)
                      win-location (subs (.. js/window -location -hash) 1)
-                     win-location (if (boolean
-                                        (#{:register :reset-password}
-                                         (:page navigation-data)))
-                                    (str "/" (name (:page navigation-data)))
+                     win-location (if-let [page (#{:register :reset-password}
+                                                 (:page navigation-data))]
+                                    (str "/" (name page))
                                     win-location)]
 
                  (if (or (requires-authentication? app)
