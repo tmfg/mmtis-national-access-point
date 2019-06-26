@@ -14,6 +14,7 @@
   [token-info]
   (if (or
         (nil? token-info)
+        (:loading? token-info)
         (= token-info :token-invalid))
     (notification/notification
       {:text (tr [:register :invalid-token])
