@@ -1042,11 +1042,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :footer-livi-logo "Traficom"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/fi/asioi-kanssamme/nap"
-  :footer-ckan-software "CKAN-ohjelmistolla"
   :footer-made-width "Toteutettu"
   :footer-copyright-disclaimer (:md "Finap.fi-sivusto on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
   :footer-funded (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
-  :footer-ckan (:md "Toteutuksessa on hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page "Valittua sivua ei löydy: "
   :time-unit "Aikayksikkö"
   :time-units {:minutes "Minuuttia"
