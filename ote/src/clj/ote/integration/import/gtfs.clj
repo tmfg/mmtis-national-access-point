@@ -163,7 +163,6 @@
                  (def debug-calendar file-data))
                (doseq [fk (process-rows file-type file-data)]
                  (when (and db-table-name (seq fk))
-                   (println "inserting to" db-table-name ":" (pr-str (assoc fk :gtfs/package-id package-id)))
                    (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
 
       ;; Handle stop times
