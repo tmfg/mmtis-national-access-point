@@ -12,13 +12,15 @@
 
 (defn token-check
   [token-info]
-  (if (not (= token-info :token-invalid))
-    (notification/notification
-      {:text (tr [:register :valid-token] {:operator-name (:name token-info)})
-       :type :success})
+  (if (or
+        (nil? token-info)
+        (= token-info :token-invalid))
     (notification/notification
       {:text (tr [:register :invalid-token])
-       :type :warning})))
+       :type :warning})
+    (notification/notification
+      {:text (tr [:register :valid-token] {:operator-name (:name token-info)})
+       :type :success})))
 
 ;; PENDING:
 ;; This form has a new ":show-errors?" flag in the schemas that only
