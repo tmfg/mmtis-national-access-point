@@ -278,7 +278,7 @@
         " on kutsunut sinut NAP-palveluun "
         [:strong op-name]
         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
-       [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinua ei tarvitse tehdä mitään."]
+       [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinun ei tarvitse tehdä mitään."]
        [:br]
        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
