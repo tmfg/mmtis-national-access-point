@@ -1034,11 +1034,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-livi-logo "Finnish Transport and Communications Agency"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/en/services/how-submit-your-transport-service-information-nap-service-catalog"
-  :footer-ckan-software "CKAN-software"
   :footer-made-width "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
   :footer-funded (:md "Financed partly by EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
-  :footer-ckan (:md "NAP utilizes open source code from [CKAN.](https://ckan.org/)")
   :no-such-page "Page not found: "
   :time-unit "Time unit"
   :time-units {:minutes "Minutes"
