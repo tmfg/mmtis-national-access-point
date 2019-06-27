@@ -3,7 +3,7 @@
   (:require [buddy.hashers :as hashers]
             [clojure.string :as str]
             [jeesql.core :refer [defqueries]]
-            [com.stuartsierra.component :as component]
+            [hiccup.core :refer [html]]
             [ote.components.http :as http]
             [compojure.core :refer [routes POST]]
             [ote.nap.cookie :as cookie]
@@ -19,6 +19,7 @@
             [ote.db.modification :as modification]
             [ote.localization :as localization :refer [tr]]
             [ote.email :as email]
+            [ote.util.email-template :as email-template]
             [ote.environment :as env]
             [specql.op :as op]
             [clj-time.core :as t]
@@ -185,15 +186,14 @@
 (defn send-password-reset-email [email {:keys [user password-reset-request]} language]
   (log/debug "Sending password reset email to " user)
   (localization/with-language language
-    (email/send! email
-                 {:to (:email user)
-                  :subject (tr [:email-templates :password-reset :subject])
-                  :body (tr [:email-templates :password-reset :body]
-                            {:name (:name user)
-                             :reset-link (str " " (env/base-url) "#/reset-password?key="
-                                              (::user/reset-key password-reset-request)
-                                              "&id="
-                                              (:id user) " ")})})))
+                              (email/send! email
+                                           {:to (:email user)
+                                            :subject (tr [:email-templates :password-reset :subject])
+                                            :body [{:type "text/html;charset=utf-8" :content (str email-template/html-header
+                                                                                                  (html (email-template/reset-password
+                                                                                                          (tr [:email-templates :password-reset :subject])
+                                                                                                          (::user/reset-key password-reset-request)
+                                                                                                          user)))}]})))
 
 (defn request-password-reset [db email form-data]
   (with-throttle-ms 1000 ; always take 1sec to prevent spamming requests

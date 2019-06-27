@@ -135,7 +135,6 @@
      p { margin: 0px; }
      table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
      td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
-     a:visited {color:#fff !important}
      .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
      .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
      .whiteBackground {background-color:#FFFFFF}
@@ -175,7 +174,7 @@
        "Tämän viestin lähetti NAP."]
       [:br]
       [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-              "NAP-yhteystiedot:"]]
+              "NAP-Helpdesk yhteystiedot:"]]
       [:p
        [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
@@ -283,3 +282,30 @@
        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
        (html-divider-border "100%")])))
+
+(defn reset-password [title token user]
+  (html-template {:show-email-settings? false} title
+                 [:div {:style "max-width: 800px"}
+                  [:br]
+                  [:h1 {:class "headerText1"
+                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+                   (tr [:email-templates :password-reset :subject])]
+
+                  (html-divider-border "100%")
+
+                  [:p (tr [:email-templates :password-reset :body1])]
+                  [:p (tr [:email-templates :password-reset :body2]) [:strong (str " " (tr [:email-templates :password-reset :link-text]))] (tr [:email-templates :password-reset :body3])]
+                  [:br]
+
+                  (blue-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body4])]
+                  [:p (tr [:email-templates :password-reset :body5])]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body6])]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body7])]
+                  [:br]
+                  [:br]
+                  [:p (tr [:email-templates :password-reset :body8])]
+                  (html-divider-border "100%")]))

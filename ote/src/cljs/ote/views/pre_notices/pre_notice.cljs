@@ -142,7 +142,7 @@
         :disabled? true}
        (::t-operator/email operator)]]]]])
 
-(defn transport-type [e! {pre-notice :pre-notice :as app}]
+(defn transport-type [e! {pre-notice :pre-notice}]
   (let [addition [form-fields/field
                   {:label   nil
                    :name    ::transit/other-type-description
@@ -164,6 +164,7 @@
 
       {:name ::transit/description
        :type :text-area
+       :rows 1
        :hint-text (tr [:pre-notice-page :notice-description-hint])
        :full-width? true
        :required? true
@@ -195,7 +196,7 @@
      :delete?      true
      :add-label    (tr [:buttons :add-new-effective-date])}))
 
-(defn- notice-area-map [pre-notice]
+(defn- notice-area-map [_]
   (r/create-class
    {:component-did-update leaflet/update-bounds-from-layers
     :component-did-mount leaflet/update-bounds-from-layers

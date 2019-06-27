@@ -1313,13 +1313,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :email-templates
  {:password-reset {:subject "NAP - Salasanan vaihto"
-                   :body ["Hyvä " :name ", \n"
-                          "Olette pyytänyt NAP-sovelluksen salasananne uudelleenasettamista.\n"
-                          "Voitte vaihtaa salasanan klikkaamalla alla olevaa linkkiä:\n"
-                          :reset-link
-                          "\nTämä linkki vanhenee tunnin kuluttua."
-                          "\nP.S Mikäli salasanan vaihto ei onnistu, olkaa yhteydessä NAP-HelpDeskiin,\n"
-                          "nap@traficom.fi tai 029 534 5454 (arkisin 10-16)."
-                          "\n\n------------\n"
-                          "Tämän viestin lähetti NAP\n"
-                          "(www.finap.fi)"]}}}
+                   :body1 "Salasanan vaihtopyyntösi on vastaanotettu."
+                   :body2 "Voit siirtyä vaihtamaan salasanan napsauttamalla alla olevaa"
+                   :body3 "-painiketta."
+                   :body4 "Huom! Painikkeen takana oleva linkki vanhenee tunnin kuluttua tämän viestin saapumisesta."
+                   :body5 "Voit tilata salasanan vaihdon NAP:sta uudelleen, mikäli tarpeen."
+                   :body6 "Mikäli salasanan vaihto ei onnistu, ota yhteys NAP-Helpdeskiin."
+                   :body7 "Mikäli et ole yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
+                   :body8 "Tämä viesti on lähetetty NAP-järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
+                   :link-text "Vaihda salasana"}}}
