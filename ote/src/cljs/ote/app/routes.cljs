@@ -23,7 +23,7 @@
     ["/register/:token" :register]
     ["/user" :user]
     ["/own-services" :own-services]
-    ["/transport-operator/:operator-id/users" :access-management]
+    ["/transport-operator/:ckan-group-id/users" :operator-users]
     ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]
@@ -67,7 +67,7 @@
 
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:own-services :transport-service :edit-service :new-service
-                     :transport-operator :access-management
+                     :transport-operator :operator-users
                      :routes :new-route :edit-route
                      :new-notice :edit-pre-notice :pre-notices
                      :email-settings})
@@ -142,7 +142,12 @@
                      event-to (on-navigate-event navigation-data)
                      event-to (if (vector? event-to) event-to [event-to])
                      orig-app app
-                     app (merge app navigation-data)]
+                     app (merge app navigation-data)
+                     win-location (subs (.. js/window -location -hash) 1)
+                     win-location (if-let [page (#{:register :reset-password}
+                                                 (:page navigation-data))]
+                                    (str "/" (name page))
+                                    win-location)]
 
                  (if (or (requires-authentication? app)
                          (requires-transit-authority? app)
@@ -154,11 +159,16 @@
                    (do
                      ;; Send startup events (if any) immediately after returning from this swap
                      (when (or event-leave event-to)
-                       (.setTimeout
-                         js/window
-                         (fn []
-                           (send-startup-events (vec (concat event-leave event-to))))
-                         0))
+                       (do
+                         ;; Due to spa (Single page app) we need to manually push page change to matomo
+                         ;; But first check if _paq exists (may not exist in local machines)
+                         (when (exists? js/_paq)
+                           (.push js/_paq (clj->js ["setCustomUrl" win-location])))
+                         (.setTimeout
+                           js/window
+                           (fn []
+                             (send-startup-events (vec (concat event-leave event-to))))
+                           0)))
                      app)))
                app)))))
 

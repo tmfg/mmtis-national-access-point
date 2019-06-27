@@ -25,14 +25,14 @@
 
 (defn GetOperatorUsers [app]
   (comm/get!
-    (str "transport-operator/" (url-util/encode-url-component (get-in app [:params :operator-id])) "/users")
+    (str "transport-operator/" (url-util/encode-url-component (get-in app [:params :ckan-group-id])) "/users")
     {:on-success (tuck/send-async! ->GetUsersSuccess)
      :on-failure (tuck/send-async! #(fp/->ChangePage :front-page nil))})
   (assoc-in app [:manage-access :loaded?] false))
 
 (defn GetTransportOperator [app]
   (comm/get!
-    (str "t-operator/" (url-util/encode-url-component (get-in app [:params :operator-id])))
+    (str "transport-operator/" (url-util/encode-url-component (get-in app [:params :ckan-group-id])))
     {:on-success (tuck/send-async! ->GetOperatorSuccess)
      :on-failure (tuck/send-async! ->ServerError)})
   app)
@@ -54,32 +54,70 @@
       (assoc-in [:manage-access :new-member-email] "")
       (assoc-in [:manage-access :new-member-loading?] false)))
 
-(define-event PostNewUser [email operator-id]
+(define-event PostNewUser [email ckan-group-id]
   {}
   (comm/post!
-    (str "transport-operator/" (url-util/encode-url-component operator-id) "/users")
+    (str "transport-operator/" (url-util/encode-url-component ckan-group-id) "/users")
     {:email email}
     {:on-success (tuck/send-async! ->NewUserSuccess)
      :on-failure (tuck/send-async! ->NewUserFailure)})
   (assoc-in app [:manage-access :new-member-loading?] true))
 
-;; TODO: remove removed user from app-state
-(define-event RemoveMemberSuccess [result]
+(define-event RemoveMemberSuccess [result member]
   {}
-  app)
+  (let [users (get-in app [:manage-access :users])
+        new-users (filterv
+                    #(not= (:id member) (:id %))
+                    users)]
+    (-> app
+      (assoc-in [:manage-access :confirmation :open?] false)
+      (assoc-in [:manage-access :users] new-users))))
+
+(define-event RemoveTokenSuccess [result token]
+  {}
+  (let [users (get-in app [:manage-access :users])
+        new-users (filterv
+                    #(not= (:token token) (:token %))
+                    users)]
+    (-> app
+      (assoc-in [:manage-access :confirmation :open?] false)
+      (assoc-in [:manage-access :users] new-users))))
+
+(define-event RemoveMemberError []
+  {}
+  (-> app
+    (assoc :flash-message-error (tr [:transport-users-page :removing-last-user]))
+    (assoc-in [:manage-access :confirmation :open?] false)))
 
 (define-event RemoveMember [member operator-id]
   {}
   (comm/delete!
-    (str "transport-operator/" (url-util/encode-url-component operator-id) "/users/" (:email member))
-    {}
-    {:on-success (tuck/send-async! ->RemoveMemberSuccess)
+    (str "transport-operator/" (url-util/encode-url-component operator-id) "/users")
+    member
+    {:on-success (tuck/send-async! ->RemoveMemberSuccess member)
+     :on-failure (tuck/send-async! ->RemoveMemberError)})
+  app)
+
+(define-event RemoveToken [token operator-id]
+  {}
+  (comm/delete!
+    (str "transport-operator/" (url-util/encode-url-component operator-id) "/token")
+    token
+    {:on-success (tuck/send-async! ->RemoveTokenSuccess token)
      :on-failure (tuck/send-async! ->ServerError)})
-  app)                                                      ;;TODO: Remove removed user from app-state
+  app)
+
+(define-event OpenConfirmationDialog [member operator-id]
+  {}
+  (assoc-in app [:manage-access :confirmation] {:open? true :member member :operator-id operator-id}))
+
+(define-event CloseConfirmationDialog []
+  {}
+  (assoc-in app [:manage-access :confirmation :open?] false))
 
 (define-event InitTransportUserView []
   {}
   (GetOperatorUsers (GetTransportOperator app)))
 
-(defmethod routes/on-navigate-event :access-management [_]
+(defmethod routes/on-navigate-event :operator-users [_]
   (->InitTransportUserView))

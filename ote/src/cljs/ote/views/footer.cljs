@@ -2,7 +2,7 @@
   "NAP - footer"
   (:require [ote.style.base :as style-base]
             [ote.localization :refer [tr tr-key] :as localization]
-            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
+            [ote.ui.common :refer [linkify]]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.style.front-page :as style-front-page]
@@ -41,5 +41,4 @@
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled
        [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 80 :height 52 :margin-right "20px"} :src "/img/EU-logo.svg"}] (tr [:common-texts :footer-funded])]]
-       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 80 :height 26 :margin-right "20px"} :src "/img/ckan-logo.svg"}] (tr [:common-texts :footer-ckan])]]
        [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 60 :height 60 :margin-right "40px"} :src "/img/icons/cc.svg"}] (tr [:common-texts :footer-copyright-disclaimer])]]]]]]])

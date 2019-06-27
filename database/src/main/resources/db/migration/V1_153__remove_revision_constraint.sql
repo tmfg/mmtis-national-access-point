@@ -1,0 +1,3 @@
+
+ALTER TABLE member_revision
+DROP CONSTRAINT member_revision_continuity_id_fkey;

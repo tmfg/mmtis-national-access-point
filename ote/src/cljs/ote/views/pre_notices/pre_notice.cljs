@@ -10,13 +10,14 @@
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
             [ote.ui.form :as form]
-            [ote.ui.common :as common]
             [cljs-react-material-ui.icons :as ic]
             [ote.style.form :as style-form]
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.ui.common :as common]))
+
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -154,13 +155,11 @@
        :layout  :row}
 
       {:name                ::transit/pre-notice-type
-       :should-update-check (juxt ::transit/pre-notice-type ::transit/other-type-description)
        :type                :checkbox-group
        :container-class     "col-md-12"
        :header?             false
        :required?           true
        :options             notice-types
-       :option-addition     {:value :other :addition addition}
        :show-option         (tr-key [:enums ::transit/pre-notice-type])}
 
       {:name ::transit/description
@@ -288,9 +287,15 @@
      :add-label (tr [:pre-notice-page :add-attachment])
      :add-label-disabled? (constantly sent?)
      :table-fields [{:name ::transit/attachment-file-name
-                     :type :string
-                     :disabled? true}
-
+                     :type :component
+                     :read identity
+                     :component (fn [{data :data}]
+                                  (let [id (:ote.db.transit/id data)
+                                        file-name (:ote.db.transit/attachment-file-name data)]
+                                    [:div
+                                     (if id
+                                       (common/linkify (str "pre-notice/attachment/" id) file-name {:target "_blank"})
+                                       file-name)]))}
                     {:name :attachment-file
                      :button-label (tr [:pre-notice-page :select-attachment])
                      :type :file-and-delete
@@ -306,6 +311,7 @@
                       :footer-fn (r/partial footer e! sent?)
                       :update! #(e! (pre-notice/->EditForm %))}]
     [:span
+     [common/back-link-with-event :pre-notices (tr [:pre-notice-page :back-to-pre-notices])]
      [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
      [select-operator e! transport-operator operators]
      [form/form

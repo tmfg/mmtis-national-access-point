@@ -519,7 +519,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :new "Liikenteen lisääminen tai uusi reitti"
    :schedule-change "Aikataulumuutos"
    :route-change "Reittimuutos"
-   :other "Muu muutos, mikä?"}
+   :other "Muu muutos"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Luonnos"
@@ -607,8 +607,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         :already-invited "Käyttäjä on jo kutsuttu"
                         :invite-pending "Odottaa kutsun vahvistusta"
                         :invite-sent-success "Kutsu lähetetty onnistuneesti"
-                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
-                        :confirm-remove "Poista jäsen"}
+                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-email " palveluntuottajan " :operator-name " jäsenlistalta?"]
+                        :confirm-remove "Poista jäsen"
+                        :remove-dialog-title "Jäsenen poistamisen varmistus"
+                        :removing-last-user "Et voi poistaa operaattorin viimeistä käyttäjää"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -917,6 +919,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                 :school-start "Kouluvuoden alku"
                                 :school-end "Kouluvuoden päätös"
                                 :season-schedule-change "Aikataulukauden vaihtuminen"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page
@@ -1039,11 +1042,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :footer-livi-logo "Traficom"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/fi/asioi-kanssamme/nap"
-  :footer-ckan-software "CKAN-ohjelmistolla"
   :footer-made-width "Toteutettu"
   :footer-copyright-disclaimer (:md "Finap.fi-sivusto on lisensoitu [Creative Commons Nimeä 4.0 Kansainvälinen](http://creativecommons.org/licenses/by/4.0/) -lisenssillä.")
   :footer-funded (:md "Osarahoitettu Euroopan Unioni [Verkkojen Eurooppa -välineellä.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
-  :footer-ckan (:md "Toteutuksessa on hyödynnetty avoimen lähdekoodin [CKAN-ohjelmistoa.](https://ckan.org/)")
   :no-such-page "Valittua sivua ei löydy: "
   :time-unit "Aikayksikkö"
   :time-units {:minutes "Minuuttia"

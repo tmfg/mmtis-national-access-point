@@ -22,9 +22,28 @@
   "Returns set of transport-operators the user belongs to (based on CKAN group membership)."
   [db {groups :groups :as user}]
   (into #{}
-        (map ::t-operator/id)
-        (specql/fetch db ::t-operator/transport-operator #{::t-operator/id}
-                      {::t-operator/ckan-group-id (op/in (map :id groups))})))
+    (map ::t-operator/id)
+    (specql/fetch db ::t-operator/transport-operator #{::t-operator/id}
+      {::t-operator/ckan-group-id (op/in (map :id groups))})))
+
+(defn with-group-check
+  [db user ckan-group-id body-fn]
+  (let [allowed? (some
+                   #(= (:id %) ckan-group-id)
+                   (:groups user))
+        is-admin? (get-in user [:user :admin?])
+        access-denied (do
+                        (log/warn "User " user " tried to access transport-operator-id " ckan-group-id
+                          ", allowed transport operators: " ckan-group-id)
+                        {:status 403 :body "Forbidden"})]
+    (cond
+      (and
+        (not is-admin?)
+        (not allowed?))
+      (access-denied)
+
+      :else
+      (body-fn))))
 
 (defn with-transport-operator-check
   "Check that user has access (belongs to) the given transport operator.
@@ -34,15 +53,15 @@
         is-admin? (get-in user [:user :admin?])
         access-denied #(do
                          (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
-                         ", allowed transport operators: " allowed-operators)
+                           ", allowed transport operators: " allowed-operators)
                          {:status 403 :body "Forbidden"})]
     (cond
       (nil? transport-operator-id)
-        (access-denied)
+      (access-denied)
 
       (and (not is-admin?)
-           (not (contains? allowed-operators transport-operator-id)))
-        (access-denied)
+        (not (contains? allowed-operators transport-operator-id)))
+      (access-denied)
 
       :else
       (body-fn))))

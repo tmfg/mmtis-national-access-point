@@ -517,7 +517,7 @@ You can also draw the operating area or point to the map with drawing tools. You
    :new "Increasement of transport or a new traffic route/routes"
    :schedule-change "Timetable change"
    :route-change "Route change/changes"
-   :other "Other change, what?"}
+   :other "Other change"}
 
   :ote.db.transit/pre-notice-state
   {:draft "Draft"
@@ -603,11 +603,13 @@ You can also draw the operating area or point to the map with drawing tools. You
                         :manage-users "Manage access rights"
                         :already-invited "User is already invited."
                         :something-went-wrong "Something went wrong."
-                        :already-member "The user has already been added."
+                        :already-member "The user is already a member."
                         :invite-pending "Waiting for confirmation."
                         :invite-sent-success "Invitation sent successfully."
-                        :remove-dialog-text ["Haluatko varmasti poistaa jäsenen " :user-name ", " :user-email ". Palveluntuottajan " :operator-name " jäsenlistalta"]
-                        :confirm-remove "Poista jäsen"}
+                        :remove-dialog-text ["Are you sure that you want to delete the member " :user-name ", " :user-email " from the service producer´s " :operator-name " list of members?"]
+                        :confirm-remove "Delete member"
+                        :remove-dialog-title "Confirm member removal"
+                        :removing-last-user "Can't remove final member of operator"}
 
  :front-page
  {:title-NAP "NAP - National Access Point"
@@ -912,6 +914,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                                 :school-start "The beginning of the school year"
                                 :school-end "The end of the school year"
                                 :season-schedule-change "Season schedule change"}
+  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
   }
 
  :email-notification-settings-page
@@ -1031,11 +1034,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :footer-livi-logo "Finnish Transport and Communications Agency"
   :footer-livi-url "Traficom.fi"
   :footer-livi-url-link "https://www.traficom.fi/en/services/how-submit-your-transport-service-information-nap-service-catalog"
-  :footer-ckan-software "CKAN-software"
   :footer-made-width "Made with"
   :footer-copyright-disclaimer (:md "Finap.fi-service is licensed with [Attribution 4.0 International (CC BY 4.0)](http://creativecommons.org/licenses/by/4.0/) -license.")
   :footer-funded (:md "Financed partly by EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
-  :footer-ckan (:md "NAP utilizes open source code from [CKAN.](https://ckan.org/)")
   :no-such-page "Page not found: "
   :time-unit "Time unit"
   :time-units {:minutes "Minutes"
@@ -1244,8 +1245,8 @@ You can also draw the operating area or point to the map with drawing tools. You
            :password-not-valid "Minimum length 6 characters. Password must include letters and at least one number."}
   :confirm-changes "Confirm changes"
   :change-password "Change password"
-  :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
-  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
+  :valid-token ["At registration you will get user rights to the service producer " :operator-name "."]
+  :invalid-token "Your invitation has expired. Complete the registration and contact the invitation sender or the NAP Helpdesk (nap@traficom.fi) to get a new invitation."}
 
  :reset-password
  {:label "Reset your password"

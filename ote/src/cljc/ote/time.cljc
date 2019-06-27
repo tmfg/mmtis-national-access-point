@@ -159,8 +159,14 @@
 (defn date-fields->date-time [{::keys [year date month hours minutes seconds]}]
   (t/date-time year month date hours minutes seconds))
 
+;; note! This returns a different family of data type than date-fields->date-time
+;; (java.time.LocalDate instead of clj-time/JodaTime LocalDate)
 (defn date-fields->date [{::keys [year date month]}]
   #?(:clj (java.time.LocalDate/of year month date)
+     :cljs (goog.date.Date. year (dec month) date)))
+
+(defn date-fields->joda-date [{::keys [year date month]}]
+  #?(:clj (t/local-date year month date)
      :cljs (goog.date.Date. year (dec month) date)))
 
 ;; Change js-date (.js/date) to google datetime
@@ -400,7 +406,6 @@
    (cons start
          (when (t/before? start end)
            (date-range (t/plus start (t/days 1)) end)))))
-
 (def week-days [:monday :tuesday :wednesday :thursday :friday :saturday :sunday])
 (def week-day-order {:monday 0 :tuesday 1 :wednesday 2 :thursday 3 :friday 4 :saturday 5 :sunday 6})
 
@@ -414,6 +419,11 @@
     6 :saturday
     7 :sunday))
 
+(defn joda-datetime->java-localdate [joda-dt]
+  (let [str-dt (format-date-iso-8601 joda-dt)
+        java-ld (java.time.LocalDate/parse str-dt)]
+    java-ld))
+
 (defn native->date-time
   "Convert a platform native Date object to clj(s)-time.
   Takes into account that the JS date objects for timezones added
@@ -424,9 +434,14 @@
   (date-fields->date-time (date-fields native-date)))
 
 (defn native->date
-  "Converts different formats into DateFields and converts result into localdate or goog.date"
+  "Converts different formats into DateFields and converts result into java.time.LocalDate or goog.date"
   [native-date]
   (date-fields->date (date-fields native-date)))
+
+(defn native->joda-local-date
+  "Converts different formats into DateFields and converts result into Joda LocalDate or goog.date"
+  [native-date]
+  (date-fields->joda-date (date-fields native-date)))
 
 (defn date-fields->native
   "Convert date fields ma pto native Date object"
@@ -445,6 +460,13 @@
     (t/in-days (t/interval date1 date2))
     (- (t/in-days (t/interval date2 date1)))))
 
+(defn java-localdate->inst [ld]
+  (date-fields->native
+   (merge {::hours 0 ::minutes 0 ::seconds 0}
+          (date-fields ld))))
+
+(defn java-localdate->joda-date-time [ld]
+  (native->date-time (java-localdate->inst ld)))
 
 (defn date-string->date-time [date-string]
   (let [df (date-fields-only (parse-date-iso-8601 date-string))

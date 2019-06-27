@@ -123,7 +123,7 @@
                                                  (io/reader stop-times-file)))]
       (when p
         (when (zero? (mod i 1000))
-          (log/debug "Trip partitions stored: " i))
+          (log/debug "Trip partitions stored: " i "/" (count ps)))
 
         (let [;; Use specql internal stringify to turn sequence of stop times
               ;; to a string in PostgreSQL composite array format
@@ -140,7 +140,8 @@
           (recur (inc i) ps))))))
 
 
-(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id]
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn]
+  ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
     (try
@@ -153,7 +154,10 @@
              (io/copy input output))
            (when-let [db-table-name (db-table-name name)]
              (let [file-type (gtfs-spec/name->keyword name)
-                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))]
+                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))
+                   file-data (if intercept-fn
+                               (intercept-fn file-type file-data)
+                               file-data)]
                (log/debug file-type " file: " name " PARSED.")
                (when (= file-type :gtfs/calendar-txt)
                  (def debug-calendar file-data))
@@ -213,7 +217,7 @@
                     (.toByteArray out)))]
       (println "**************************** START test-hsl-gtfs *********************")
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1 1)
+      (save-gtfs-to-db db bytes 1 1 1 nil)
       (println "******************* test-hsl-gtfs end *********************"))))
 
 (defn- load-interface-url [db interface-id url last-import-date saved-etag]
@@ -298,7 +302,7 @@
                      ::specql/limit 1}))))
 
 (defn download-and-store-transit-package
-  "Download GTFS (later kalkati files also) file, upload to s3, parse and store to database.
+  "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
   [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3?]
   (let [filename (gtfs-file-name operator-id ts-id)
@@ -318,7 +322,7 @@
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
               old-gtfs-hash (:gtfs/sha256 latest-package)]
 
-          ;; No gtfs import errors catched. Remove old import errors.
+          ;; No gtfs import errors caught. Remove old import errors.
           (specql/update! db ::t-service/external-interface-description
                           {::t-service/gtfs-import-error nil}
                           {::t-service/id interface-id})
@@ -326,8 +330,7 @@
           ;; IF hash doesn't match, save new and upload file to s3
           (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
             (do
-              (let [
-                    package (specql/insert! db :gtfs/package
+              (let [package (specql/insert! db :gtfs/package
                                             {:gtfs/sha256 new-gtfs-hash
                                              :gtfs/first_package (nil? latest-package)
                                              :gtfs/transport-operator-id operator-id
@@ -336,13 +339,15 @@
                                              :gtfs/etag new-etag
                                              :gtfs/license license
                                              :gtfs/external-interface-description-id interface-id})]
+                (log/debug "File: " filename " was stored to db successfully.")
                 (when upload-s3?
-                  (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)}))
-                (log/debug "File: " filename " was uploaded to S3 successfully.")
+                  (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
+                  (log/debug "File: " filename " was uploaded to S3 successfully."))
+                
 
                 ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id)))
-            (log/debug "File " filename " was found from S3, no need to upload. Thank you for trying.")))))))
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
+            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
