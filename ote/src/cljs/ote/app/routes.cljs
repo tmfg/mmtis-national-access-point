@@ -144,9 +144,9 @@
                      orig-app app
                      app (merge app navigation-data)
                      win-location (subs (.. js/window -location -hash) 1)
-                     win-location (if-let [page (#{:register :reset-password}
-                                                 (:page navigation-data))]
-                                    (str "/" (name page))
+                     ;; Remove potentially sensitive arguments from analytics script reporting
+                     win-location (if-let [opt-out-page (#{:register :reset-password} (:page navigation-data))]
+                                    (str "/" (name opt-out-page))
                                     win-location)]
 
                  (if (or (requires-authentication? app)
@@ -156,21 +156,24 @@
                        (assoc orig-app
                          :login {:show? true
                                  :navigate-to navigation-data}))
-                   (do
-                     ;; Send startup events (if any) immediately after returning from this swap
-                     (when (or event-leave event-to)
-                       (do
-                         ;; Due to spa (Single page app) we need to manually push page change to matomo
-                         ;; But first check if _paq exists (may not exist in local machines)
-                         (when (exists? js/_paq)
-                           (.push js/_paq (clj->js ["setCustomUrl" win-location])))
-                         (.setTimeout
-                           js/window
-                           (fn []
-                             (send-startup-events (vec (concat event-leave event-to))))
-                           0)))
-                     app)))
-               app)))))
+
+                   ;; Send startup events (if any) immediately after returning from this swap
+                   (when (or event-leave event-to)
+
+                     ; SPA page changes must be pushed to analytics script because url route might not change.
+                     ;; Check tracker script in case script loading failed. A browser extension or other issue may block it.
+                     (when (exists? js/_paq)
+                       (.push js/_paq (clj->js ["setCustomUrl", win-location]))
+                       ;; trackPageView signals to matomo piwik js api a single page visit.
+                       (.push js/_paq (clj->js ["trackPageView"])))
+
+                     (.setTimeout
+                       js/window
+                       (fn []
+                         (send-startup-events (vec (concat event-leave event-to))))
+                       0)
+                     app))
+                 app))))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
