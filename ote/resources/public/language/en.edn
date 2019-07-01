@@ -1025,6 +1025,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
+  :invalid-foreign-business-id "A foreign business id has to be between 2 to 10 characters logn."
+  :no-finnish-business-id "Yritykselläni ei ole suomalaisesta Y-tunnusta."
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."
