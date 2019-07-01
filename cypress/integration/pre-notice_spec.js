@@ -126,7 +126,7 @@ describe('Authority pre notice tests', () => {
         cy.contains('Ilmoitustyyppi');
     });
 
-    it('should open authority pre notice modal', () => {
+    xit('should open authority pre notice modal', () => {
 
         cy.get('.header-general-menu').click();
 
