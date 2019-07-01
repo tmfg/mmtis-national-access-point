@@ -203,7 +203,7 @@
         (html-divider-border nil)
         [:p {:style "margin-bottom:  20px;"}
          [:h2 {:class "headerText2"
-               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
           "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
         (html-table
@@ -227,7 +227,7 @@
           "Rajapinnoista tunnistetut muutokset"]
          [:h2
           {:class "headerText2"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:20px;"}
           "Tunnistusajankohta " (time/format-date (time/now))]
          (html-table
            [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
