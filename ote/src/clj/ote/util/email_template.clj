@@ -180,9 +180,9 @@
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
+      [:br]
       (when show-email-settings?
-        [:br]
-        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;padding-bottom: 16px;"}
          "Haluatko muuttaa sähköpostiasetuksiasi?"
          [:br]
          [:a
@@ -191,7 +191,7 @@
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
-  (html-template {:show-email-settings? true} title
+  (html-template title {:show-email-settings? true}
     [:div
      [:br]
      [:h1 {:class "headerText1"
@@ -241,7 +241,7 @@
      (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
-  (html-template {:show-email-settings? false} title
+  (html-template title {:show-email-settings? false}
     [:div {:style "max-width 800px"}
      [:br]
      [:h1 {:class "headerText1"
@@ -264,7 +264,7 @@
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/name operator)]
-    (html-template {:show-email-settings? false} title
+    (html-template title {:show-email-settings? false}
       [:div {:style "max-width: 800px"}
        [:br]
        [:h1 {:class "headerText1"
