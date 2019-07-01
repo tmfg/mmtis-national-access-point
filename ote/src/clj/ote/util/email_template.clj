@@ -88,7 +88,7 @@
             no-traffic-routes (count (filter #(= "no-traffic" (:change-type %)) change-list))]
 
         [operator-name
-         (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
+         (str "<a class=\"change-link\" href=\"" (environment/base-url) "#/transit-visualization/"
            transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
          (str days-until-change " pv (" (time/format-date different-week-date) ")")
@@ -144,6 +144,7 @@
      a.mcnButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
+     .change-link:visited {color: #663366;}
      .tg  {border-collapse:collapse;border-spacing:0;}
      .tg td{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
      .tg th{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
