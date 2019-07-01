@@ -39,7 +39,7 @@
 
 (defn access-table
   [e! users operator-id]
-  [:div
+  [:div#user-table-container
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
                  :key-fn #(or (:id %) (:token %))
@@ -61,15 +61,14 @@
      {:name (tr [:front-page :table-header-actions])
       :read identity
       :format (fn [member]
-                [:div
-                 [:button.remove-member (merge
-                                          {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
-                                          (stylefy/use-style
-                                            (merge style-buttons/svg-button
-                                              {:display "flex"
-                                               :align-items "center"})))
-                  [ic/action-delete]
-                  (tr [:buttons :delete])]])}]
+                [:button#remove-member (merge
+                                         {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
+                                         (stylefy/use-style
+                                           (merge style-buttons/svg-button
+                                             {:display "flex"
+                                              :align-items "center"})))
+                 [ic/action-delete]
+                 (tr [:buttons :delete])])}]
     users]])
 
 (defn invite-member
@@ -89,7 +88,7 @@
      new-member-email]
     [:div {:style {:display "flex"
                    :align-items "center"}}
-     [:button
+     [:button#add-member
       (if (and new-member-email (re-matches utils/email-regex new-member-email) (not new-member-loading?))
         (stylefy/use-style style-buttons/primary-button)
         (stylefy/use-style style-buttons/disabled-button))
