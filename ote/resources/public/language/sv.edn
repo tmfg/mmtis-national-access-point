@@ -294,423 +294,424 @@
   :RAE-link-text "RAE-verktyg"
   :SEA-ROUTE-link-text " Rutteditorn för sjötrafik"
   ;; FIXME: Partially Google translated: please improve
-  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**
-\n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**")
-  :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
-  :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
-  :companies-info "Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här."
+  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**"
+                         "\n\n**Uppgifterna publicerasi den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.** "
+                         "\n\n**Du kan bara lägga till företag som har ett finländskt FO-nummer.**")
+  :csv-info " Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https:// www.finap.fi / ote / csv/palveluyritykset.csv) "
+  :csv-file-example " Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen. "
+  :companies-info " Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här. "
 
-  :guaranteed-vehicle-accessibility "Fyll i info om transportmedlens tillgänglighet. Garanterad tillgång = behöver inte beställas separat."
-  :limited-vehicle-accessibility "Fyll i info om transportmedlens tillgänglighet. Begränsad tillgång = finns inte garanterat I alla fordon, skäl att beställa I förväg."
+  :guaranteed-vehicle-accessibility " Fyll i info om transportmedlens tillgänglighet. Garanterad tillgång = behöver inte beställas separat. "
+  :limited-vehicle-accessibility " Fyll i info om transportmedlens tillgänglighet. Begränsad tillgång = finns inte garanterat I alla fordon, skäl att beställa I förväg. "
 
-  :brokerage? (:md "**Fyll inte i denna punkt i formuläret om du tillhör en förmedlingstjänst. Endast själva förmedlingstjänsten fyller i uppgifterna!** \n"
-                "En förmedlingstjänst **förmedlar mot ersättning** andra aktörers enskilda resor. Förmedlingstjänsten kan dessutom också förmedla det egna företagets resor. En beställningscentral för taxiresor är ett exempel på en förmedlingstjänst. Ett företag som förmedlar en beställning till ett annat företag utan ersättning betraktas inte som en förmedlingstjänst.")
-  :brokerage-link "Läs mer om skyldigheterna gällande förmedlingstjänster från och med 1.7.2018."
+  :brokerage? (:md " **Fyll inte i denna punkt i formuläret om du tillhör en förmedlingstjänst. Endast själva förmedlingstjänsten fyller i uppgifterna!** \n "
+                " En förmedlingstjänst **förmedlar mot ersättning** andra aktörers enskilda resor. Förmedlingstjänsten kan dessutom också förmedla det egna företagets resor. En beställningscentral för taxiresor är ett exempel på en förmedlingstjänst. Ett företag som förmedlar en beställning till ett annat företag utan ersättning betraktas inte som en förmedlingstjänst. ")
+  :brokerage-link " Läs mer om skyldigheterna gällande förmedlingstjänster från och med 1.7.2018. "
 
-  :operation-area "Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel). Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård\"."
+  :operation-area " Verksamhetsområdet meddelas genom sökord och val ur lista (kan sökas för tillfället endast på finska: kommun, postnummer, landskap, land, världsdel) . Sökningen av ett område fungerar endast med finska nyckelord. Du kan välja flera områden. Området kan även uppges med kartans ritverktyg (välj ”Rita huvudsakligt/sekundärt verksamhetsområde” under kartan) och därefter namnges området tex \"Åbolands skärgård \". "
 
-  :available-from-and-to "Uppge datum då tjänster startar och upphör.\n\u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast\").\n\u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum\" tomt (\"Tillsvidare\")."
-  :description-why-contact-info "Av kontaktinformationen i tjänsten är det endast webbadressen som publiceras i den offentliga NAP-tjänstekatalogen"
-  :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
+  :available-from-and-to " Uppge datum då tjänster startar och upphör. \n \u2022 För redan redan existerande tjänst lämna fältet \"Startdatum \" tomt (\"Genast \") . \n \u2022 Om tjänsten erbjuds tillsvidare var vänlig lämna \"Slutdatum \" tomt (\"Tillsvidare \") . "
+  :description-why-contact-info " Av kontaktinformationen i tjänsten är det endast webbadressen som publiceras i den offentliga NAP-tjänstekatalogen "
+  :pricing-info " Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt. \nUppge www-adress ifall prissättningen beskrivs på en webbplats. "
 
-  :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
+  :publish-missing-required " Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt. "
 
-  :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
-  :trip-editor-no-calendar "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
-  :trip-editor-no-stop-sequence "Skapa rutten först, därefter avgångarna."
-  :pre-notice-attatchment-info "Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett."
-  :autocomplete-hint "Ange egen eller välj från listan"
-  :allowed-file-types "Godkända filformat är "
+  :advance-reservation-info " Ange här om användning av tjänsten kräver förhandsbokning. "
+  :trip-editor-no-calendar " Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar. "
+  :trip-editor-no-stop-sequence " Skapa rutten först, därefter avgångarna. "
+  :pre-notice-attatchment-info " Meddela de detaljerade rutt- och tidtabellsändringarna i din transporttjänst inom persontrafik. Du kan lägga till en webbadress där uppgifterna framgår. Du kan också bifoga filer som visar ändringarna till denna blankett. "
+  :autocomplete-hint " Ange egen eller välj från listan "
+  :allowed-file-types " Godkända filformat är "
 
-  :real-time-info "Här kan du rapportera realtidstjänster relaterade till din tjänst som \"bilar på kartan\" eller \"fria parkeringsplatser\""
-  :pick-up-locations-url "Ifall det inte är ändamålsenligt att fylla i verksamhetsställen i tabellen ange i stället en web-adress med motsvarande information."
+  :real-time-info " Här kan du rapportera realtidstjänster relaterade till din tjänst som \"bilar på kartan \" eller \"fria parkeringsplatser \" "
+  :pick-up-locations-url " Ifall det inte är ändamålsenligt att fylla i verksamhetsställen i tabellen ange i stället en web-adress med motsvarande information. "
   }
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
- {:external-interfaces ["CC BY 4.0" "CC0 1.0 Universal"]}
+ {:external-interfaces [" CC BY 4.0 " " CC0 1.0 Universal "]}
 
  ;; CSV parsing
  :csv
- {:url-parse-failed "Kontrollera adressen"
-  :csv-parse-failed "Felaktigt format. .csv-filen gick inte att läsa"
-  :parsing-success ["I listan hittades " :count " företag."]}
+ {:url-parse-failed " Kontrollera adressen "
+  :csv-parse-failed " Felaktigt format. .csv-filen gick inte att läsa "
+  :parsing-success [" I listan hittades " :count " företag. "]}
 
  :companies-csv
- {:invalid "CSV-filen är bristfällig eller innehåller fel."}
+ {:invalid " CSV-filen är bristfällig eller innehåller fel. "}
 
  ;; Action buttons
  :buttons
- {:save "Spara"
-  :cancel "Ångra"
-  :delete "Ta bort"
-  :delete-operator "Ta bort tjänsteproducent"
-  :close "Stäng"
-  :publish "Publicera"
-  :edit-service "Redigera tjänstens info"
-  :edit "Redigera"
-  :approve "Godkänn"
-  :manage-access-rights "Hanterar användarrättigheter"
+ {:save " Spara "
+  :cancel " Ångra "
+  :delete " Ta bort "
+  :delete-operator " Ta bort tjänsteproducent "
+  :close " Stäng "
+  :publish " Publicera "
+  :edit-service " Redigera tjänstens info "
+  :edit " Redigera "
+  :approve " Godkänn "
+  :manage-access-rights " Hanterar användarrättigheter "
 
-  :save-and-publish "Spara och publicera"
-  :save-as-draft "Spara utkast"
-  :save-and-send "Spara och skicka"
-  :save-updated "Spara uppdaterad info"
-  :add-new-parking-capacity "Lägg till ny parkeringstyp"
-  :add-new-price-class "Lägg till prisrad"
-  :add-new-service-hour "Lägg till betjäningstid"
-  :add-new-service-exception "Lägg till dag med tjänsteuppehåll"
-  :add-new-company "Lägg till företag"
-  :add-new-route "Lägg till ny sjörutt"
-  :add-new-pre-notice "Nytt ändringsmeddelande"
-  :discard "Ångra"
+  :save-and-publish " Spara och publicera "
+  :save-as-draft " Spara utkast "
+  :save-and-send " Spara och skicka "
+  :save-updated " Spara uppdaterad info "
+  :add-new-parking-capacity " Lägg till ny parkeringstyp "
+  :add-new-price-class " Lägg till prisrad "
+  :add-new-service-hour " Lägg till betjäningstid "
+  :add-new-service-exception " Lägg till dag med tjänsteuppehåll "
+  :add-new-company " Lägg till företag "
+  :add-new-route " Lägg till ny sjörutt "
+  :add-new-pre-notice " Nytt ändringsmeddelande "
+  :discard " Ångra "
 
-  :next "Fortsätt"
-  :add-transport-service "Lägg till ny tjänst"
-  :add-external-interface "Lägg till externt gränssnitt"
-  :add-new-service-link "Lägg till ny tjänst"
-  :add-add-new-row "Lägg till ny rad"
-  :add-new-pick-up-location "Lägg till verksamhetsställe"
-  :add-new-additional-service "Lägg till"
-  :add-new-vehicle "Lägg till"
-  :add-new-transport-operator "Lägg till ny tjänsteproducent"
-  :add-new-member "Lägg till användare"
-  :upload-csv "Lägg till CSV"
-  :update-csv "Uppdatera CSV"
-  :save-as-gtfs "Spara GTFS"
-  :previous-step "Föregående"
-  :next-step "Fortsätt"
-  :route-calendar-back-to-trips "Tillbaka till turlistan"
-  :route-calendar-clear "Töm kalendern"
-  :back-to-draft "Ändra status till utkast"
-  :add-new-effective-date "Lägg till nytt datum"
-  :transport-service-catalog "Tjänstekatalogen"
-  :register-to-service "Registrering"
-  :check-out-the-service "Bekanta dig med informationen"
+  :next " Fortsätt "
+  :add-transport-service " Lägg till ny tjänst "
+  :add-external-interface " Lägg till externt gränssnitt "
+  :add-new-service-link " Lägg till ny tjänst "
+  :add-add-new-row " Lägg till ny rad "
+  :add-new-pick-up-location " Lägg till verksamhetsställe "
+  :add-new-additional-service " Lägg till "
+  :add-new-vehicle " Lägg till "
+  :add-new-transport-operator " Lägg till ny tjänsteproducent "
+  :add-new-member " Lägg till användare "
+  :upload-csv " Lägg till CSV "
+  :update-csv " Uppdatera CSV "
+  :save-as-gtfs " Spara GTFS "
+  :previous-step " Föregående "
+  :next-step " Fortsätt "
+  :route-calendar-back-to-trips " Tillbaka till turlistan "
+  :route-calendar-clear " Töm kalendern "
+  :back-to-draft " Ändra status till utkast "
+  :add-new-effective-date " Lägg till nytt datum "
+  :transport-service-catalog " Tjänstekatalogen "
+  :register-to-service " Registrering "
+  :check-out-the-service " Bekanta dig med informationen "
   }
 
  ;; Database enumeration values
  :enums
  {:ote.db.transport-service/transport-type
-  {:road "Vägtrafik"
-   :rail "Tågtrafik"
-   :sea "Sjötrafik"
-   :aviation "Luftfart"}
+  {:road " Vägtrafik "
+   :rail " Tågtrafik "
+   :sea " Sjötrafik "
+   :aviation " Luftfart "}
 
   :ote.db.transport-service/type
-  {:terminal "Stationer, hamnar och övriga terminaler"
-   :passenger-transportation "Persontransporttjänster"
-   :rentals "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking "Almmänna kommersiella parkeringstjänster"
-   :brokerage "Förmedlingstjänster"}
+  {:terminal " Stationer, hamnar och övriga terminaler "
+   :passenger-transportation " Persontransporttjänster "
+   :rentals " Fordonsuthyrning och kommersiella samanvändningstjänster "
+   :parking " Almmänna kommersiella parkeringstjänster "
+   :brokerage " Förmedlingstjänster "}
 
   :ote.db.transport-service/sub-type
-  {:terminal "Stationer, hamnar och övriga terminaler"
-   :taxi "Taxitjänst (i vägtrafik)"
-   :request "Abbonerad trafik eller annan anropsstyrd trafik"
-   :schedule "Regelbunden ruttbaserad trafik"
-   :rentals "Fordonsuthyrning och kommersiella samanvändningstjänster"
-   :parking "Allmänna kommersiella parkeringstjänster"
-   :brokerage "Förmedlingstjänster"}
+  {:terminal " Stationer, hamnar och övriga terminaler "
+   :taxi " Taxitjänst (i vägtrafik) "
+   :request " Abbonerad trafik eller annan anropsstyrd trafik "
+   :schedule " Regelbunden ruttbaserad trafik "
+   :rentals " Fordonsuthyrning och kommersiella samanvändningstjänster "
+   :parking " Allmänna kommersiella parkeringstjänster "
+   :brokerage " Förmedlingstjänster "}
 
   :ote.db.transport-service/payment-methods
-  {:cash "Kontant"
-   :debit-card "Bankkort"
-   :credit-card "Kreditkort"
-   :mobilepay "Mobilbetalning"
-   :contactless-payment "Närbetalning"
-   :invoice "Faktura"
-   :other "Annat"}
+  {:cash " Kontant "
+   :debit-card " Bankkort "
+   :credit-card " Kreditkort "
+   :mobilepay " Mobilbetalning "
+   :contactless-payment " Närbetalning "
+   :invoice " Faktura "
+   :other " Annat "}
 
   :ote.db.transport-service/additional-services
-  {:child-seat "Barnstol"
-   :animal-transport "Djur tillåtet"
-   :other "Annat"}
+  {:child-seat " Barnstol "
+   :animal-transport " Djur tillåtet "
+   :other " Annat "}
 
 
   :ote.db.transport-service/accessibility-tool
-  {:wheelchair "Rullstol"
-   :walkingstick "Käpp"
-   :audio-navigator "Audioinfo"
-   :visual-navigator "Visuell skyltning"
-   :passenger-cart "Persontransportvagn"
-   :pushchair "Barnvagn"
-   :umbrella "Paraply"
-   :buggy "Barnvagn"
-   :other "Annan"}
+  {:wheelchair " Rullstol "
+   :walkingstick " Käpp "
+   :audio-navigator " Audioinfo "
+   :visual-navigator " Visuell skyltning "
+   :passenger-cart " Persontransportvagn "
+   :pushchair " Barnvagn "
+   :umbrella " Paraply "
+   :buggy " Barnvagn "
+   :other " Annan "}
 
   :ote.db.transport-service/day
-  {:short {:MON "Må" :TUE "Ti" :WED "On" :THU "To" :FRI "Fr" :SAT "Lö" :SUN "Sö"}
-   :full {:ALL "Välj allt" :MON "Måndag" :TUE "Tisdag" :WED "Onsdag" :THU "Torsdag"
-          :FRI "Fredag" :SAT "Lördag" :SUN "Söndag"}}
+  {:short {:MON " Må " :TUE " Ti " :WED " On " :THU " To " :FRI " Fr " :SAT " Lö " :SUN " Sö "}
+   :full {:ALL " Välj allt " :MON " Måndag " :TUE " Tisdag " :WED " Onsdag " :THU " Torsdag "
+          :FRI " Fredag " :SAT " Lördag " :SUN " Söndag "}}
 
   :ote.db.transport-service/information-service-accessibility
-  {:audio-for-hearing-impaired "Ljudförstärkning för hörselskadade"
-   :audio-information "Utrop"
-   :visual-displays "Visuella displays"
-   :displays-for-visually-impaired "Tavlor för synskadade (taktil)"
-   :large-print-timetables "Stora tidtabellsskyltar"}
+  {:audio-for-hearing-impaired " Ljudförstärkning för hörselskadade "
+   :audio-information " Utrop "
+   :visual-displays " Visuella displays "
+   :displays-for-visually-impaired " Tavlor för synskadade (taktil) "
+   :large-print-timetables " Stora tidtabellsskyltar "}
 
   :ote.db.transport-service/accessibility
-  {:lift "Hiss"
-   :escalator "Rulltrappor"
-   :travelator "Rullband"
-   :ramp "Ramp"
-   :stairs "Trappor"
-   :narrow-entrance "Smal ingång"
-   :barrier "Bom"
-   :wheelchair-access-toilet "Inva WC"
-   :step-free-access "Inga trappsteg"
-   :suitable-for-wheelchairs "Lämplig för rullstol"
-   :tactile-platform-edges "Varning vid perrongkanten"
-   :tactile-guiding-strips "Beröringstyrda följlinjer"}
+  {:lift " Hiss "
+   :escalator " Rulltrappor "
+   :travelator " Rullband "
+   :ramp " Ramp "
+   :stairs " Trappor "
+   :narrow-entrance " Smal ingång "
+   :barrier " Bom "
+   :wheelchair-access-toilet " Inva WC "
+   :step-free-access " Inga trappsteg "
+   :suitable-for-wheelchairs " Lämplig för rullstol "
+   :tactile-platform-edges " Varning vid perrongkanten "
+   :tactile-guiding-strips " Beröringstyrda följlinjer "}
 
   :ote.db.transport-service/transportable-aid
-  {:wheelchair "Rullstol"
-   :walking-stick "Gångkäpp"
-   :assistance-dog "Assistanshund"
-   :crutches "Kryckor"
-   :walker "Rollator"}
+  {:wheelchair " Rullstol "
+   :walking-stick " Gångkäpp "
+   :assistance-dog " Assistanshund "
+   :crutches " Kryckor "
+   :walker " Rollator "}
 
   :ote.db.transport-service/pick-up-type
-  {:pick-up "Avhämtning"
-   :return "Returnering"
-   :pick-up-return "Avhämtning och returnering"}
+  {:pick-up " Avhämtning "
+   :return " Returnering "
+   :pick-up-return " Avhämtning och returnering "}
 
   :ote.db.transport-service/vehicle-accessibility
-  {:low-floor "Låggolv"
-   :step-free-access "Inga trappsteg"
-   :accessible-vehicle "Fordon utan hinder"
-   :suitable-for-wheelchairs "Lämplig för rullstol"
-   :suitable-for-stretchers "Bårtransport"
-   :boarding-assistance "Assistans vid ombordstigning"
-   :assistance-dog-space "Plats för assistenshund"
-   :disability-adapted-vehicle "Fordon lämpat för rörelsehindrade"}
+  {:low-floor " Låggolv "
+   :step-free-access " Inga trappsteg "
+   :accessible-vehicle " Fordon utan hinder "
+   :suitable-for-wheelchairs " Lämplig för rullstol "
+   :suitable-for-stretchers " Bårtransport "
+   :boarding-assistance " Assistans vid ombordstigning "
+   :assistance-dog-space " Plats för assistenshund "
+   :disability-adapted-vehicle " Fordon lämpat för rörelsehindrade "}
 
   :ote.db.transport-service/parking-facility
-  {:unknown "Okänd"
-   :car-park "Bilplatser"
-   :park-and-ride-park "Infartsparkering"
-   :motorcycle-park "Motorcyklar"
-   :cycle-park "Cyklar"
-   :rental-car-park "Hyrbilar"
-   :coach-park "Bussar"
-   :disabled-park "Invaplatser"}
+  {:unknown " Okänd "
+   :car-park " Bilplatser "
+   :park-and-ride-park " Infartsparkering "
+   :motorcycle-park " Motorcyklar "
+   :cycle-park " Cyklar "
+   :rental-car-park " Hyrbilar "
+   :coach-park " Bussar "
+   :disabled-park " Invaplatser "}
 
   :ote.db.transport-service/interface-data-content
-  {:route-and-schedule "Rutt- och tidtabellsinformation"
-   :luggage-restrictions "Resgodsbegränsningar"
-   :realtime-interface "Realtidsgränssnitt"
-   :booking-interface "Bokningsgränssnitt"
-   :accessibility-services "Tillgänglighetstjänster"
-   :other-services "Övriga tjänster"
-   :pricing "Prisinformation"
-   :service-hours "Betjäningstider"
-   :on-behalf-errand "Acting on behalf"
-   :customer-account-info "Användarkonto"
-   :disruptions "Störningsinformation"
-   :payment-interface "Biljett- och försäljningsgränssnitt"
-   :other "Övrigt"
-   :map-and-location "Kart- och platsdata"}
+  {:route-and-schedule " Rutt- och tidtabellsinformation "
+   :luggage-restrictions " Resgodsbegränsningar "
+   :realtime-interface " Realtidsgränssnitt "
+   :booking-interface " Bokningsgränssnitt "
+   :accessibility-services " Tillgänglighetstjänster "
+   :other-services " Övriga tjänster "
+   :pricing " Prisinformation "
+   :service-hours " Betjäningstider "
+   :on-behalf-errand " Acting on behalf "
+   :customer-account-info " Användarkonto "
+   :disruptions " Störningsinformation "
+   :payment-interface " Biljett- och försäljningsgränssnitt "
+   :other " Övrigt "
+   :map-and-location " Kart- och platsdata "}
 
   :ote.db.transport-service/advance-reservation
-  {:no "Ingen förhandsbokning krävs."
-   :possible "Förhandsbokning möjlig men inte obligatorisk."
-   :mandatory "Obligatorisk förhandsbokning."}
+  {:no " Ingen förhandsbokning krävs. "
+   :possible " Förhandsbokning möjlig men inte obligatorisk. "
+   :mandatory " Obligatorisk förhandsbokning. "}
 
   :ote.db.transit/pre-notice-type
-  {:termination "Trafiken upphör (delvis eller helt)"
-   :new "Trafiken utökas eller ny rutt"
-   :schedule-change "Tidtabellsändring"
-   :route-change "Ruttändring"
-   :other "Annan ändring"}
+  {:termination " Trafiken upphör (delvis eller helt) "
+   :new " Trafiken utökas eller ny rutt "
+   :schedule-change " Tidtabellsändring "
+   :route-change " Ruttändring "
+   :other " Annan ändring "}
 
   :ote.db.transit/pre-notice-state
-  {:draft "Utkast"
-   :sent "Skickat"
-   :read "Läst"}
+  {:draft " Utkast "
+   :sent " Skickat "
+   :read " Läst "}
   }
  ;; ENUMS end
  :regions
- {"01" "Nyland"
-  "02" "Egentliga Finland"
-  "04" "Satakunta"
-  "05" "Egentliga Tavastland"
-  "06" "Birkaland"
-  "07" "Päijänne-Tavastland"
-  "08" "Kymmenedalen"
-  "09" "Södra Karelen"
-  "10" "Södra Savolax"
-  "11" "Norra Savolax"
-  "12" "Norra Karelen"
-  "13" "Mellersta Finland"
-  "14" "Södra Österbotten"
-  "15" "Österbotten"
-  "16" "Mellersta Österbotten"
-  "17" "Norra Österbotten"
-  "18" "Kajanaland"
-  "19" "Lappland"
-  "21" "Åland"}
+ {" 01 " " Nyland "
+  " 02 " " Egentliga Finland "
+  " 04 " " Satakunta "
+  " 05 " " Egentliga Tavastland "
+  " 06 " " Birkaland "
+  " 07 " " Päijänne-Tavastland "
+  " 08 " " Kymmenedalen "
+  " 09 " " Södra Karelen "
+  " 10 " " Södra Savolax "
+  " 11 " " Norra Savolax "
+  " 12 " " Norra Karelen "
+  " 13 " " Mellersta Finland "
+  " 14 " " Södra Österbotten "
+  " 15 " " Österbotten "
+  " 16 " " Mellersta Österbotten "
+  " 17 " " Norra Österbotten "
+  " 18 " " Kajanaland "
+  " 19 " " Lappland "
+  " 21 " " Åland "}
 
  ;; Per feature/page localization keys
- :place-search {:primary-name "Platsnamn"
-                :secondary-name "Platsnamn"
-                :place-auto-complete-primary "Sök plats"
-                :place-auto-complete-secondary "Sök plats"
-                :rename-place "Ange nytt namn (Enter godkänn)"
-                :primary-header "Huvudsakligt verksamhetsområde"
-                :secondary-header "Sekundärt verksamhetsområde (frivilligt)"
-                :primary-tooltip "Huvudsakligt verksamhetsområde – det område där tjänsten i huvudsak erbjuds under normala verksamhetstide. (Obs: Denna information används vid uppföljningen av tjänsteutbudet.)"
-                :secondary-tooltip "Sekundärt verksamhetsområde – det område där tjänsten erbjuds tex. enligt särskild överenskommelse, på beställning eller med begränsad servicenivå jämfört med huvudsakligt område"
-                :draw-primary "Rita huvudsakligt verksamhetsområde"
-                :draw-secondary "Rita sekundärt verksamhetsområde"
-                :hide-draw-tools "Göm ritverktyget"}
+ :place-search {:primary-name " Platsnamn "
+                :secondary-name " Platsnamn "
+                :place-auto-complete-primary " Sök plats "
+                :place-auto-complete-secondary " Sök plats "
+                :rename-place " Ange nytt namn (Enter godkänn) "
+                :primary-header " Huvudsakligt verksamhetsområde "
+                :secondary-header " Sekundärt verksamhetsområde (frivilligt) "
+                :primary-tooltip " Huvudsakligt verksamhetsområde – det område där tjänsten i huvudsak erbjuds under normala verksamhetstide. (Obs: Denna information används vid uppföljningen av tjänsteutbudet.) "
+                :secondary-tooltip " Sekundärt verksamhetsområde – det område där tjänsten erbjuds tex. enligt särskild överenskommelse, på beställning eller med begränsad servicenivå jämfört med huvudsakligt område "
+                :draw-primary " Rita huvudsakligt verksamhetsområde "
+                :draw-secondary " Rita sekundärt verksamhetsområde "
+                :hide-draw-tools " Göm ritverktyget "}
 
- :titles {:terminal "Stationer, hamnar och övriga terminaler"
-          :passenger-transportation "Persontransporttjänster"
-          :rentals "Fordonsuthyrning och komersiella samanvändningstjänster"
-          :parking "Allmänna kommersiella parkeringstjänster"
-          :brokerage "Förmedlingstjänst"}
+ :titles {:terminal " Stationer, hamnar och övriga terminaler "
+          :passenger-transportation " Persontransporttjänster "
+          :rentals " Fordonsuthyrning och komersiella samanvändningstjänster "
+          :parking " Allmänna kommersiella parkeringstjänster "
+          :brokerage " Förmedlingstjänst "}
 
- :own-services-page {:added-services "Tjänster du själv anmält ditt företag delaktig i"
-                     :add-service "Lägg till en tjänst"
-                     :associated-search-hint "Lägg till information om deltagande genom att skriva namnet på tjänsten eller tjänsteproducenten i det här fältet"
-                     :edit-business-id ["Fyll i uppgifter gällande FO-nummer " :business-id]
-                     :filling-info "Anvisning"
-                     :filling-info-content (:md "**Tjänster du anmälts delaktigt i** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna.\n\n**Lägg till uppgifter om deltagande själv**\nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap@traficom.fi\n\nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänsteuppgifter**.")
-                     :no-associations [:operator-name " har inte anmälts som deltagare i någon annan tjänsteproducents tjänst."]
-                     :no-own-associations ["Du har inte lagt till tjänsteproducenten " :operator-name " som delaktig i någon annan tjänst."]
-                     :other-services-where-involved "Övriga tjänster du deltar i"
-                     :other-service-associations "Tjänster du anmälts delaktig i"
-                     :open-geojson "Öppna geojson"
-                     :own-services "Egna tjänsteuppgifter"
-                     :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **.\n\n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
-                     :own-services-directions-short "Anvisningar"
-                     :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
-                     :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
-                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap@traficom.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")
-                     :missing-service-info "Uppgifterna om tjänsten är bristfälliga"
-                     :flaws "Bristfälliga punkter"
-                     :missing-schedule "Tjänsten saknar det lagstadgade gränssnittet för rutt- och tidtabellsdata."
-                     :guide-to-completion "Anvisningar för att komplettera uppgifterna"
-                     :add-schedule-to-service "Lägg till information om gränssnittet för rutt- och tidtabellsdata för tjänsten i fråga"
-                     :add-schedule-to-service-2 "genom att klicka på tjänstens namn eller pennsymbolen i tabellen"
-                     :add-schedule-to-service-3 "i slutet av raden. Fyll i informationen om gränssnittet i blanketten som öppnas i sektionen"
-                     :schedule-creation "Skapa gränssnitt för rutt- och tidtabellsdata"
-                     :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
-                     :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
-                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"}
+ :own-services-page {:added-services " Tjänster du själv anmält ditt företag delaktig i "
+                     :add-service " Lägg till en tjänst "
+                     :associated-search-hint " Lägg till information om deltagande genom att skriva namnet på tjänsten eller tjänsteproducenten i det här fältet "
+                     :edit-business-id [" Fyll i uppgifter gällande FO-nummer " :business-id]
+                     :filling-info " Anvisning "
+                     :filling-info-content (:md " **Tjänster du anmälts delaktigt i** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna. \n \n**Lägg till uppgifter om deltagande själv** \nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap @traficom.fi \n \nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänsteuppgifter**. ")
+                     :no-associations [:operator-name " har inte anmälts som deltagare i någon annan tjänsteproducents tjänst. "]
+                     :no-own-associations [" Du har inte lagt till tjänsteproducenten " :operator-name " som delaktig i någon annan tjänst. "]
+                     :other-services-where-involved " Övriga tjänster du deltar i "
+                     :other-service-associations " Tjänster du anmälts delaktig i "
+                     :open-geojson " Öppna geojson "
+                     :own-services " Egna tjänsteuppgifter "
+                     :own-services-info-long (:md " Med knappen **Lägg till ny tjänst** kan du lägga till **detaljerade uppgifter om din tjänst **. \n \n Ifall du endast erbjuder tjänster via tex en taxicentral kan du hoppa över denna punkt. Välj i såfall en eller flera tjänster vid **Övriga tjänster du är delaktig i**. ")
+                     :own-services-directions-short " Anvisningar "
+                     :own-services-new-provider1 " Du har nu lagt till tjänsteproducenten "
+                     :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**. ")
+                     :own-services-no-providers (:md " Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap @traficom.fi \n \nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun. ")
+                     :missing-service-info " Uppgifterna om tjänsten är bristfälliga "
+                     :flaws " Bristfälliga punkter "
+                     :missing-schedule " Tjänsten saknar det lagstadgade gränssnittet för rutt- och tidtabellsdata. "
+                     :guide-to-completion " Anvisningar för att komplettera uppgifterna "
+                     :add-schedule-to-service " Lägg till information om gränssnittet för rutt- och tidtabellsdata för tjänsten i fråga "
+                     :add-schedule-to-service-2 " genom att klicka på tjänstens namn eller pennsymbolen i tabellen "
+                     :add-schedule-to-service-3 " i slutet av raden. Fyll i informationen om gränssnittet i blanketten som öppnas i sektionen "
+                     :schedule-creation " Skapa gränssnitt för rutt- och tidtabellsdata "
+                     :if-no-interfaces " Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan "
+                     :open-rae " Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller "
+                     :open-sea-rae " Öppna Kartverktyget för sjötrafik i NAP-tjänsten "}
 
- :transport-users-page {:username "Namn"
-                        :add-member "Lägg till medlem"
-                        :members "Medlemmar"
-                        :email-placeholder "Mata in e-postadress"
-                        :manage-users "Hantera användarrättigheter"
-                        :already-invited "Användaren har redan blivit inbjuden"
-                        :something-went-wrong "Ett fel uppstod."
-                        :already-member "Användaren har redan lagts till"
-                        :invite-pending "Väntar på att inbjudan ska accepteras"
-                        :invite-sent-success "Inbjudan har skickats"
-                        :remove-dialog-text ["Är du säker på att du vill ta bort medlemmen " :user-name ", " :user-email " från tjänsteproducentens " :operator-name " medlemslista?"]
-                        :confirm-remove "Ta bort medlemmen"
-                        :remove-dialog-title "Verifiera medlemshantering"
-                        :removing-last-user "Du kan inte ta bort den senaste användaren av operatören"}
+ :transport-users-page {:username " Namn "
+                        :add-member " Lägg till medlem "
+                        :members " Medlemmar "
+                        :email-placeholder " Mata in e-postadress "
+                        :manage-users " Hantera användarrättigheter "
+                        :already-invited " Användaren har redan blivit inbjuden "
+                        :something-went-wrong " Ett fel uppstod. "
+                        :already-member " Användaren har redan lagts till "
+                        :invite-pending " Väntar på att inbjudan ska accepteras "
+                        :invite-sent-success " Inbjudan har skickats "
+                        :remove-dialog-text [" Är du säker på att du vill ta bort medlemmen " :user-name ", " :user-email " från tjänsteproducentens " :operator-name " medlemslista? "]
+                        :confirm-remove " Ta bort medlemmen "
+                        :remove-dialog-title " Verifiera medlemshantering "
+                        :removing-last-user " Du kan inte ta bort den senaste användaren av operatören "}
 
  :front-page
- {:title-NAP "NAP - National Access Point"
-  :title-transport-services "Mobilitetstjänster"
-  :title-essential-info "Väsentlig information"
-  :title-transport-operator "Tjänsteproducent"
-  :title-developer "Tjänsteutvecklare"
-  :column-NAP (:md "Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken **mobilitetstjänsteproducenter** ska lämna in data om sina digitala maskinläsbara gränssnitt för **väsentlig information**. NAP-tjänsten är en del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.")
-  :column-transport-services "Med mobilitetstjänster avses persontransporttjänster på land, till sjöss eller i luften (t.ex. taxi- och busstrafik), stationer, hamnar och andra terminaler, parkeringsanläggningar, tjänster för uthyrning av färdmedel och kommersiella samanvändningstjänster samt förmedlingstjänster."
-  :column-essential-info "Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. Väsentlig information definieras i statsrådets förordning 643/2017."
-  :column-transport-operator "Alla mobilitetstjänster är skyldiga att uppge information om tjänsten i maskinläsbart format. Registrering och inloggning i NAP krävs för att informationen ska kunna sparas. NAP-tjänsten handleder användaren så att all väsentlig information sparas."
-  :column-developer "NAP är en katalog med gränssnitt och information avsedd för tjänsteutvecklare. Man behöver inte registrera sig och logga in i NAP för att använda informationen."
+ {:title-NAP " NAP - National Access Point "
+  :title-transport-services " Mobilitetstjänster "
+  :title-essential-info " Väsentlig information "
+  :title-transport-operator " Tjänsteproducent "
+  :title-developer " Tjänsteutvecklare "
+  :column-NAP (:md " Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken **mobilitetstjänsteproducenter** ska lämna in data om sina digitala maskinläsbara gränssnitt för **väsentlig information**. NAP-tjänsten är en del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster. ")
+  :column-transport-services " Med mobilitetstjänster avses persontransporttjänster på land, till sjöss eller i luften (t.ex. taxi- och busstrafik), stationer, hamnar och andra terminaler, parkeringsanläggningar, tjänster för uthyrning av färdmedel och kommersiella samanvändningstjänster samt förmedlingstjänster. "
+  :column-essential-info " Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. Väsentlig information definieras i statsrådets förordning 643 /2017. "
+  :column-transport-operator " Alla mobilitetstjänster är skyldiga att uppge information om tjänsten i maskinläsbart format. Registrering och inloggning i NAP krävs för att informationen ska kunna sparas. NAP-tjänsten handleder användaren så att all väsentlig information sparas. "
+  :column-developer " NAP är en katalog med gränssnitt och information avsedd för tjänsteutvecklare. Man behöver inte registrera sig och logga in i NAP för att använda informationen. "
 
   :front-page-content
   (:md
-    "# **Vad är NAP?**
+    " #**Vad är NAP?**
 
- Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
+                         Tjänstekatalogen NAP är en öppen nationell åtkomstpunkt (National Access Point, NAP), till vilken mobilitetstjänsteproducenter ska lämna in data om sina digitala maskinläsbara gränssnitt för väsentlig information. NAP-tjänsten är en väsentlig del av det övergripande målet att få till stånd nya kombinerade mobilitets-och informationstjänster som är så lätta att använda som möjligt.
 
- ## **Vad är mobilitetstjänster?**
+                         ##**Vad är mobilitetstjänster?**
 
- Med mobilitetstjänster avses:
- 1. persontransporttjänster (t.ex. taxi- och busstrafik)
- 2. stationer, hamnar och andra terminaler
- 3. parkeringsanläggningar
- 4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
- 5. förmedlingstjänster
+                         Med mobilitetstjänster avses:
+                         1. persontransporttjänster (t.ex. taxi- och busstrafik)
+                         2. stationer, hamnar och andra terminaler
+                         3. parkeringsanläggningar
+                         4. tjänster för uthyrning av färdmedel och kommersiella samavändningstjänster
+                         5. förmedlingstjänster
 
- ## **Vad avses med väsentlig information?**
+                         ##**Vad avses med väsentlig information?**
 
- Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
+                         Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. NAP är inte en tjänst för slutanvändare eller resenärer, utan den är ämnad för sådana som producerar och utvecklar mobilitetstjänster.
 
- ## **NAP-tjänstens uppbyggnad**
+                         ##**NAP-tjänstens uppbyggnad**
 
- På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
+                         På sidan [Tjänstekatalog] (/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
 
- På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
+                         På sidan [Tjänsteproducenter] (/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
 
- Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
-  :hero-title "Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare."
-  :new-user? "Ny användare?"
-  :table-header-service-name "Tjänstens namn"
-  :table-header-service-url "Tjänstens www-adress"
-  :table-header-NAP-status "NAP status"
-  :table-header-modified "Redigerat"
-  :table-header-created "Skapat"
-  :table-header-actions "Funktioner"
-  :do-you-want-to-publish-service "Du har redan ett eget maskinläsbart gränssnitt (tex GTFS-format), som du vill publicera."
-  :header-explain-more "Nu förstår jag inte riktigt, kan du förklara närmare?"
-  :move-to-services-page "Gå till Egna tjänster"
-  :move-to-organizations-page "Gå till vyn Tjänsteproducent"
-  :hello "Hej "
-  :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
-    päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin."
+                         Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten. ")
+  :hero-title " Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare. "
+  :new-user? " Ny användare? "
+  :table-header-service-name " Tjänstens namn "
+  :table-header-service-url " Tjänstens www-adress "
+  :table-header-NAP-status " NAP status "
+  :table-header-modified " Redigerat "
+  :table-header-created " Skapat "
+  :table-header-actions " Funktioner "
+  :do-you-want-to-publish-service " Du har redan ett eget maskinläsbart gränssnitt (tex GTFS-format), som du vill publicera. "
+  :header-explain-more " Nu förstår jag inte riktigt, kan du förklara närmare? "
+  :move-to-services-page " Gå till Egna tjänster "
+  :move-to-organizations-page " Gå till vyn Tjänsteproducent "
+  :hello " Hej "
+  :NAP-service-short-description " NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
+                         päivittämisen, sekä tietojen julkaisun NAP -palvelukatalogiin. "
   :own-services-short-description " -näkymästä näet mitä palveluita olet tähän mennessä tallentanut ja mitkä tiedoista on
-     julkaistu myös julkisessa NAP -palvelukatalogissa."
-  :right-corner-description "Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
+                         julkaistu myös julkisessa NAP -palvelukatalogissa. "
+  :right-corner-description " Päävalikon oikeassa reunassa olevasta käyttäjävalikosta pääset siirtymään "
   :service-operator-short-description " -näkymään, jossa voit täydentää tilisi perustietoja. Perustiedot kannattaa täyttää ja pitää ajan tasalla,
-     sillä niitä hyödynnetään lomakenäkymissä."
-  :publish-new-service "Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja?"
-  :help-more-explanation1 "Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
-  sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
-   joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis."
-  :help-more-explanation2 "Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
-     Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
-     Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
-     olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis."
-  :header-no-operator "Du har ännu inte skapat en tjänsteproducent"
-  :desc-to-add-new-operator "För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten."
-  :desc-to-add-new-operator-2 "Finns tjänsteproducenten (tex. företag, annan organisation) redan i katalogen?"
-  :desc-to-add-new-operator-3 "Du kan kolla det under fliken Tjänsteproducenter ovan."
-  :desc-to-add-new-operator-4 "Om din tjänsteproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant."
-  :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
-  :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
-  :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Du har nu lagt till en tjänsteleverantör i NAP. Lägg nu till information om de mobilitetstjänster du tillhandahåller. Om du tillhandahåller mer än en typ av mobilitetstjänst, lägg först till en tjänst. Du kan sedan lägga till följande tjänst."}
+                         sillä niitä hyödynnetään lomakenäkymissä. "
+  :publish-new-service " Haluatko julkaista uusia palveluita NAP-palvelukatalogiin tai päivittää aiemmin julkaisemiasi tietoja? "
+  :help-more-explanation1 " Toki. Voit lisätä ensin linkin esimerkiksi liikkumispalvelu olennaisia tietoja
+                         sisältävän GTFS-tieostoon. Lomake, jonka avulla GTFS-tiedoston sijainti ilmoitetaan sisältää kenttiä,
+                         joihin voit täydentää loput olennaiset tiedot liikkumispalvelusta. Tämän jälkeen olet valmis. "
+  :help-more-explanation2 " Toinen vaihtoehto on lisätä liikkumispalvelun olennaiset tiedot lisäämällä useita erillisiä rajapintoja.
+                         Voit esimerksiksi lisätä linkin ensin ylläpitämääsi GTFS-tiedostoon.
+                         Sen jälkeen lisäät linkin ylläpitäämääsi GJSON-tiedostoon, joka sisältää loput
+                         olennaiset tiedot liikkumispalvelustasi. Tämän jälkeen olet valmis. "
+  :header-no-operator " Du har ännu inte skapat en tjänsteproducent "
+  :desc-to-add-new-operator " För att kunna skapa en ny mobilitetstjänst måste du först skapa en ny tjänsteproducent eller be administratören för en existerande tjänst koppla dig till den tjänsten. "
+  :desc-to-add-new-operator-2 " Finns tjänsteproducenten (tex. företag, annan organisation) redan i katalogen? "
+  :desc-to-add-new-operator-3 " Du kan kolla det under fliken Tjänsteproducenter ovan. "
+  :desc-to-add-new-operator-4 " Om din tjänsteproducent redan finns, be då administratören/kollegan lägga till dig som producentens representant. "
+  :desc-to-add-new-operator-5 " Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare? "
+  :to-add-new-operator " Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
+  :to-add-new-operator-tab " välilehdestä. "
+  :operator-dont-have-any-services " Du har nu lagt till en tjänsteleverantör i NAP. Lägg nu till information om de mobilitetstjänster du tillhandahåller. Om du tillhandahåller mer än en typ av mobilitetstjänst, lägg först till en tjänst. Du kan sedan lägga till följande tjänst. "}
 
 
  :organization-page
- {:address-postal "Postadress"
-  :address-postal-street "Gatuadress eller postbox"
-  :business-id-and-aux-names "Företagsnamn och parallellnamn"
-  :business-or-aux-name "Företagsnamn eller extra företagsnamn"
-  :contact-details-plural "Kontaktuppgifter för företagsnamn"
-  :contact-details-other "Andra kontaktuppgifter"
-  :contact-details "Kontaktuppgifter"
-  :fetch-from-ytj "Hämta data från YTJ"
-  :fetch-from-ytj-success "Uppgifterna har hämtats från YTJ."
-  :field-phone-mobile "Mobiltelefon"
-  :field-phone-telephone "Telefon"
-  :no-aux-names-for-business-id "Det fanns inga extra företagsnamn för id."
-  :contact-types "Kontaktalternativ"
-  :organization-form-title "Tjänsteproducentens uppgifter"
-  :organization-new-title "Lägg till tjänsteproducent"
-  :help-desc-1 "Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor."
-  :help-desc-2 (:md "Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
+ {:address-postal " Postadress "
+  :address-postal-street " Gatuadress eller postbox "
+  :business-id-and-aux-names " Företagsnamn och parallellnamn "
+  :business-or-aux-name " Företagsnamn eller extra företagsnamn "
+  :contact-details-plural " Kontaktuppgifter för företagsnamn "
+  :contact-details-other " Andra kontaktuppgifter "
+  :contact-details " Kontaktuppgifter "
+  :fetch-from-ytj " Hämta data från YTJ "
+  :fetch-from-ytj-success " Uppgifterna har hämtats från YTJ. "
+  :field-phone-mobile " Mobiltelefon "
+  :field-phone-telephone " Telefon "
+  :no-aux-names-for-business-id " Det fanns inga extra företagsnamn för id. "
+  :contact-types " Kontaktalternativ "
+  :organization-form-title " Tjänsteproducentens uppgifter "
+  :organization-new-title " Lägg till tjänsteproducent "
+  :help-desc-1 " Uppgifterna som förs in på blanketten på den här sidan kommer att synas på NAP-tjänstekatalogens offentliga sidor. "
+  :help-desc-2 (:md " Med **tjänsteproducenter** avses företag, sammanslutningar och organisationer som tillhandahåller mobilitetstjänster. Med mobilitetstjänster avses 1) persontransporttjänster (t.ex. taxi- och busstrafik), 2) stationer, hamnar och terminaler, 3) parkeringsanläggningar, 4) tjänster för uthyrning av färdmedel och kommersiella samåkningstjänster, samt 5) förmedlingstjänster.")
   :help-merge-company-names "Du har tidigare skapat en eller flera NAP-tjänsteleverantörer vars namn inte stämmer med företagsnamn eller hjälpnamn som registrerats för företags-ID. \nVänligen välja NAP-tjänsteleverantörens namn som du vill ersätta med ett namn hämtade från YTJ-registret"
   :basic-info-tooltip "Här fyller du i uppgifterna för företaget, sammanslutningen eller organisationen som du representerar."
   :contact-types-tooltip "Uppgifterna här är avsedda för dem som använder NAP-gränssnitten, inte för mobilitetstjänsternas slutanvändare."
@@ -1029,8 +1030,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :required-field "Obligatorisk uppgift"
   :required-field-missing "Obligatorisk uppgift"
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
-  :invalid-foreign-business-id "Ulkomaalaisessa Y-tunnuksessa on oltava vähintään kaksi ja enintään 10 merkkiä."
-  :no-finnish-business-id "Yritykselläni ei ole suomalaisesta Y-tunnusta."
+  :invalid-foreign-business-id "Ett utländskt FO-nummer måste ha minst två och högst 10 tecken."
+  :no-finnish-business-id "Mitt företag har inget finländskt FO-nummer"
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
   :save-failure "Går ej att spara."
