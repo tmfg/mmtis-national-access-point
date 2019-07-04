@@ -48,7 +48,7 @@
                               ::user/sysadmin false
                               ::user/apikey (str (UUID/randomUUID))
                               ::user/activity_streams_email_notifications false})]
-              (when (and token group-info)
+              (when (and token group-info)                  ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
                 (transport/create-member! db (::user/id new-user) (:ckan-group-id group-info))
                 (specql/delete! db ::user/user-token
                   {::user/token token})
