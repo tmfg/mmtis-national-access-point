@@ -191,7 +191,7 @@
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
-  (html-template {:show-email-settings? true} title
+  (html-template title {:show-email-settings? true}
     [:div
      [:br]
      [:h1 {:class "headerText1"
@@ -241,7 +241,7 @@
      (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
-  (html-template {:show-email-settings? false} title
+  (html-template title {:show-email-settings? false}
     [:div {:style "max-width 800px"}
      [:br]
      [:h1 {:class "headerText1"
@@ -264,7 +264,7 @@
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/title operator)]
-    (html-template {:show-email-settings? false} title
+    (html-template title {:show-email-settings? false}
       [:div {:style "max-width: 800px"}
        [:br]
        [:h1 {:class "headerText1"
@@ -284,7 +284,7 @@
        (html-divider-border "100%")])))
 
 (defn reset-password [title token user]
-  (html-template {:show-email-settings? false} title
+  (html-template title {:show-email-settings? false}
                  [:div {:style "max-width: 800px"}
                   [:br]
                   [:h1 {:class "headerText1"
