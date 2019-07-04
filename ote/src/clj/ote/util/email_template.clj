@@ -88,7 +88,7 @@
             no-traffic-routes (count (filter #(= "no-traffic" (:change-type %)) change-list))]
 
         [operator-name
-         (str "<a href=\"" (environment/base-url) "#/transit-visualization/"
+         (str "<a class=\"change-link\" href=\"" (environment/base-url) "#/transit-visualization/"
            transport-service-id "/" date "/new\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
          (str days-until-change " pv (" (time/format-date different-week-date) ")")
@@ -144,6 +144,7 @@
      a.mcnButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
+     .change-link:visited {color: #663366;}
      .tg  {border-collapse:collapse;border-spacing:0;}
      .tg td{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
      .tg th{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
@@ -180,9 +181,9 @@
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
+      [:br]
       (when show-email-settings?
-        [:br]
-        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;padding-bottom: 16px;"}
          "Haluatko muuttaa sähköpostiasetuksiasi?"
          [:br]
          [:a
@@ -191,7 +192,7 @@
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
-  (html-template {:show-email-settings? true} title
+  (html-template title {:show-email-settings? true}
     [:div
      [:br]
      [:h1 {:class "headerText1"
@@ -203,7 +204,7 @@
         (html-divider-border nil)
         [:p {:style "margin-bottom:  20px;"}
          [:h2 {:class "headerText2"
-               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
           "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
         (html-table
@@ -227,7 +228,7 @@
           "Rajapinnoista tunnistetut muutokset"]
          [:h2
           {:class "headerText2"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:  20px;"}
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:20px;"}
           "Tunnistusajankohta " (time/format-date (time/now))]
          (html-table
            [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
@@ -241,7 +242,7 @@
      (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
-  (html-template {:show-email-settings? false} title
+  (html-template title {:show-email-settings? false}
     [:div {:style "max-width 800px"}
      [:br]
      [:h1 {:class "headerText1"
@@ -264,7 +265,7 @@
 
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/title operator)]
-    (html-template {:show-email-settings? false} title
+    (html-template title {:show-email-settings? false}
       [:div {:style "max-width: 800px"}
        [:br]
        [:h1 {:class "headerText1"
