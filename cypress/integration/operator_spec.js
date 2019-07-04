@@ -52,7 +52,7 @@ describe('Operator creation basic tests', function () {
         // Save button should be disabled
         cy.get('#btn-operator-save').should('be.disabled');
         cy.visit('/#/');
-        cy.get('#btn-confirm-leave-page').click();
+        cy.get('#btn-confirm-leave-page').click({ force: true });
     });
 
     it('should add new operator', function () {
@@ -111,7 +111,6 @@ describe('Operator creation basic tests', function () {
         cy.server();
         cy.route('POST', '/transport-operator/1/users').as('addMember');
         cy.route('DELETE', '/transport-operator/1/users').as('removeMember');
-
 
 
         // Add user to operator
