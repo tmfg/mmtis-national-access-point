@@ -246,24 +246,24 @@
      [:br]
      [:h1 {:class "headerText1"
            :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-      (str "Sinut on kutsuttu " (::t-operator/name operator) "-nimisen palveluntuottajan jäseneksi.")]
+      (str "Sinut on kutsuttu " (::t-operator/title operator) "-nimisen palveluntuottajan jäseneksi.")]
 
      (html-divider-border "100%")
      [:p
       [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
        (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
-      [:strong (::t-operator/name operator)]
-      (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/name operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
+      [:strong (::t-operator/title operator)]
+      (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/title operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/ckan-group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
      (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
      (html-divider-border "100%")]))
 
 (defn new-user-invite [requester operator title token]
-  (let [op-name (::t-operator/name operator)]
+  (let [op-name (::t-operator/title operator)]
     (html-template {:show-email-settings? false} title
       [:div {:style "max-width: 800px"}
        [:br]

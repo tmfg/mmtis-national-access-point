@@ -570,16 +570,16 @@
     (http/transit-response users&invites 200)))
 
 (defn add-user-to-operator [email db new-member requester operator]
-  (let [member (create-member! db (:user_id new-member) (::t-operator/ckan-group-id operator))
+  (let [member (create-member! db (:user_id new-member) (::t-operator/group-id operator))
         ;; Ensure that we do not send email to test user
         updated-member (if (= (:e2e-test-email (email-config/config)) (:user_email new-member))
                (assoc new-member :user_email (:e2e-test-amazon-simulator-email (email-config/config)))
                new-member)
-        title (str "Sinut on kutsuttu " (::t-operator/name operator) " -nimisen palveluntuottajan jäseneksi")
+        title (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi")
         auditlog {::auditlog/event-type :add-member-to-operator
                   ::auditlog/event-attributes
-                  [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
-                   {::auditlog/name "transport-operator-name", ::auditlog/value (str (::t-operator/name operator))}
+                  [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
+                   {::auditlog/name "transport-group-title", ::auditlog/value (str (::t-operator/title operator))}
                    {::auditlog/name "new-member-id", ::auditlog/value (str (:user_id updated-member))}
                    {::auditlog/name "new-member-email", ::auditlog/value (str (:user_email updated-member))}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
@@ -611,14 +611,14 @@
         inserted-token (specql/insert! db ::user/user-token
                                        {::user/user-email user-email
                                         ::user/token (str token)
-                                        ::user/ckan-group-id (::t-operator/ckan-group-id operator)
+                                        ::user/ckan-group-id (::t-operator/group-id operator)
                                         ::user/expiration expiration-date
                                         ::user/requester-id (get-in requester [:user :id])})
-        title (str "Sinut on kutsuttu " (::t-operator/name operator) " -nimisen palveluntuottajan jäseneksi")
+        title (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi")
         auditlog {::auditlog/event-type :invite-new-user
                   ::auditlog/event-attributes
-                  [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
-                   {::auditlog/name "transport-operator-name", ::auditlog/value (str (::t-operator/name operator))}
+                  [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
+                   {::auditlog/name "transport-group-title", ::auditlog/value (str (::t-operator/title operator))}
                    {::auditlog/name "new-member-email", ::auditlog/value (str user-email)}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in requester [:user :id])}]
@@ -641,7 +641,7 @@
 
 (defn manage-adding-users-to-operator [email db requester operator form-data]
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
-        ckan-group-id (::t-operator/ckan-group-id operator)
+        ckan-group-id (::t-operator/group-id operator)
         operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
         not-invited? (empty?
                        (specql/fetch db ::user/user-token
@@ -682,18 +682,18 @@
                        {::user/token (:token form-data)
                         ::user/ckan-group-id ckan-group-id})]
 
-    (log/info "Token deleted by " (get-in user [:user :email]) ". From operator " (::t-operator/name operator))
+    (log/info "Token deleted by " (get-in user [:user :email]) ". From operator " (::t-operator/title operator))
     (if (= 0 delete-count)
       (http/transit-response "Delete failed" 400)
       (http/transit-response "Deleted successfully" 200))))
 
 (defn remove-member-from-operator
   [db user operator form-data]
-  (let [ckan-group-id (::t-operator/ckan-group-id operator)
+  (let [ckan-group-id (::t-operator/group-id operator)
         auditlog {::auditlog/event-type :remove-member-from-operator
                   ::auditlog/event-attributes
-                  [{::auditlog/name "transport-operator-id", ::auditlog/value (str (::t-operator/id operator))},
-                   {::auditlog/name "transport-operator-name", ::auditlog/value (str (::t-operator/name operator))}
+                  [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
+                   {::auditlog/name "transport-group-title", ::auditlog/value (str (::t-operator/title operator))}
                    {::auditlog/name "removed-user-id", ::auditlog/value (str (:id form-data))}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}
@@ -714,11 +714,11 @@
         (specql/insert! db ::auditlog/auditlog auditlog)
         (http/transit-response "Member removed successfully" 200)))))
 
-(defn ckan-group-id->operator
+(defn ckan-group-id->group
   [db ckan-group-id]
-  (first (specql/fetch db ::t-operator/transport-operator
-           (specql/columns ::t-operator/transport-operator)
-           {::t-operator/ckan-group-id ckan-group-id})))
+  (first (specql/fetch db ::t-operator/group
+           (specql/columns ::t-operator/group)
+           {::t-operator/group-id ckan-group-id})))
 
 (defn- transport-routes-auth
   "Routes that require authentication"
@@ -761,7 +761,7 @@
              :params
              user :user
              form-data :body}
-        (let [operator (ckan-group-id->operator db ckan-group-id)
+        (let [operator (ckan-group-id->group db ckan-group-id)
               form-data (http/transit-request form-data)]
           (authorization/with-group-check
             db user ckan-group-id
@@ -774,7 +774,7 @@
                :params
                user :user
                form-data :body}
-        (let [operator (ckan-group-id->operator db ckan-group-id)
+        (let [operator (ckan-group-id->group db ckan-group-id)
               form-data (http/transit-request form-data)]
           (authorization/with-group-check
             db user ckan-group-id
@@ -785,11 +785,11 @@
              :params
              user :user
              form-data :body}
-        (let [operator (ckan-group-id->operator db ckan-group-id)
+        (let [group (ckan-group-id->group db ckan-group-id)
               form-data (http/transit-request form-data)]
           (authorization/with-group-check
             db user ckan-group-id
-            #(remove-member-from-operator db user operator form-data))))
+            #(remove-member-from-operator db user group form-data))))
 
       (POST "/transport-operator/group" {user :user}
         (http/transit-response
