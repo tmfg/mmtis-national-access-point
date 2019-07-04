@@ -60,7 +60,6 @@ FROM "transport-service" ts
 
 -- name: fetch-operator-users
 SELECT u.id, u.name, u.fullname, u.email
-  FROM "transport-operator" t
-  JOIN member m ON m.group_id = t."ckan-group-id"
-  JOIN "user" u ON m.table_id = u.id
- WHERE t."ckan-group-id" = :ckan-group-id;
+  FROM member m
+      JOIN "user" u ON m.table_id = u.id
+WHERE m.group_id = :ckan-group-id;
