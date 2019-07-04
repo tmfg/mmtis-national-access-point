@@ -180,8 +180,8 @@
             :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         " tai 029 534 5454 (arkisin 09-15)"]]
+      [:br]
       (when show-email-settings?
-        [:br]
         [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
          "Haluatko muuttaa sähköpostiasetuksiasi?"
          [:br]
