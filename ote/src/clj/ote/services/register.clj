@@ -28,7 +28,7 @@
     (with-transaction db
       (let [username-taken? (username-exists? db {:username username})
             email-taken? (email-exists? db {:email email})
-            operator-info (when token
+            group-info (when token
                             (first (fetch-operator-info db {:token token})))]
         (if (or username-taken? email-taken?)
           ;; Username or email taken, return errors to form
@@ -48,11 +48,11 @@
                               ::user/sysadmin false
                               ::user/apikey (str (UUID/randomUUID))
                               ::user/activity_streams_email_notifications false})]
-              (when (and token operator-info)
-                (transport/create-member! db (::user/id new-user) (:ckan-group-id operator-info))
+              (when (and token group-info)
+                (transport/create-member! db (::user/id new-user) (:ckan-group-id group-info))
                 (specql/delete! db ::user/user-token
                   {::user/token token})
-                (log/info "New user (" email ") registered with token from " (:name operator-info))))
+                (log/info "New user (" email ") registered with token from " (:name group-info))))
             {:success? true}))))))
 
 (defn register [db auth-tkt-config form-data]
