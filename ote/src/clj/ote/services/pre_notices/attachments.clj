@@ -15,6 +15,7 @@
             [ote.services.transit-changes :as transit-changes]
             [ote.services.admin :as admin]
             [ote.time :as time]
+            [org.httpkit.client :as htclient]
             [clj-time.core :as t]
             [ote.tasks.gtfs :as gtfs-tasks])
   (:import (java.nio.file Files)
@@ -27,7 +28,6 @@
 
 (defn validate-file [{:keys [tempfile filename]}]
   (let [path (.toPath tempfile)
-
         ;; In Mac os x mime types are not handled very well in java 1.8. So we try to probeContentType and if
         ;; it fails then we try to guessContentTypeFromName
         content-mime (or (Files/probeContentType path)
@@ -36,6 +36,43 @@
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
 
+(defn- laundry-convert-file->file! "java.io/file -> java.io/file | nil" [laundry-url input-file fn-suffix conv-name]
+  {:pre [(some? input-file)]}
+  ;; conv-name is used for the subpath of converter service, eg "checksum/sha256" or "pdf/pdf2pdfa"
+  (try
+    (let [temp-file (java.io.File/createTempFile "laundry-tmp" fn-suffix)
+          request-opts
+          {:as :byte-array
+           :multipart [{:name "file"
+                        :content input-file
+                        :filename (str "input" fn-suffix)
+                        :mime-type "application/octet-stream"}]}
+          resp (deref (htclient/post (str laundry-url conv-name) request-opts))]
+      (if (= 200 (:status resp))
+        (do (io/copy (:body resp) temp-file)
+            (log/info "laundry conversion returning tempfile")
+            temp-file)
+        (do
+          (log/info "Conversion failed, file name was: " (when input-file (.getName input-file)))
+          (log/info "Error response from laundry service: " (pr-str resp))
+          (.delete temp-file)
+          nil)))
+    (catch Exception ex
+      (log/error "Error reading HTTP response from laundry: " ex)
+      nil)))
+
+(defn fn-suffix [fn]
+  (str "." (last (clojure.string/split fn #"\."))))
+
+(defn replace-suffix [fn old new]
+  (let [new-without-dot (clojure.string/replace new "." "")
+        old-without-dot (clojure.string/replace old "." "")
+        dotted-parts (clojure.string/split fn #"\.")]
+    (if (= old-without-dot (last dotted-parts))
+      (clojure.string/join "." (conj (pop dotted-parts) new-without-dot))
+      ;; else return changed
+      fn)))
+
 (defn upload-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (try
     (let [uploaded-file (get-in req [:multipart-params "file"])
@@ -43,14 +80,40 @@
                          (:tempfile uploaded-file))
                     "No uploaded file")
           _ (validate-file uploaded-file)
+          conversions {".pdf" "pdf/pdf2pdfa"
+                       ;; ".docx" "docx/docx2pdf"
+                       ".png" "image/png2png"
+                       ".jpg" "image/jpeg2jpeg"
+                       ".jpeg" "image/jpeg2jpeg"}
+          orig-filename (:filename uploaded-file)
+          orig-suffix (fn-suffix orig-filename)
+          converted-filename (replace-suffix orig-filename orig-suffix ".pdf")
+          converted-file (when (:laundry-url config)
+                           (laundry-convert-file->file! "http://localhost:8080/" (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
+          ;; we save both the original and converted files but return only one id to the client (converted if successful, original otherwise)
           file (specql/insert! db ::transit/pre-notice-attachment
                                (modification/with-modification-timestamp-and-user
-                                 {::transit/attachment-file-name (:filename uploaded-file)}
-                                 ::transit/id user))]
+                                 {::transit/attachment-file-name orig-filename}
+                                 ::transit/id user))
+          file2 (when converted-file
+                  (specql/insert! db ::transit/pre-notice-attachment
+                                  (modification/with-modification-timestamp-and-user
+                                    {::transit/attachment-file-name converted-filename}
+                                    ::transit/id user)))]
+      
 
-      (s3/put-object bucket (generate-file-key (::transit/id file) (:filename uploaded-file))
-                     (:tempfile uploaded-file))
-      (http/transit-response file))
+      (s3/put-object bucket (generate-file-key (::transit/id file) orig-filename)
+                     (:tempfile uploaded-file))      
+      (if (and converted-filename converted-file file2)
+        (do 
+          (s3/put-object bucket (generate-file-key (::transit/id file2) converted-filename)
+                         converted-file)
+          (log/debug "returning converted id to client")
+          (http/transit-response file2))        
+        ;; else
+        (do 
+          (log/error "skipping laundry conversion because of nil filename / file object / conversion result")
+          (http/transit-response file))))
     (catch Exception e
       (let [msg (.getMessage e)]
         (log/error msg)
