@@ -25,6 +25,8 @@
 
   ["user-token" ::user-token]
 
+  ["email-confirmation-token" ::email-confirmation-token]
+
   ["member" ::member])
 
 (defn username-valid? [username]
