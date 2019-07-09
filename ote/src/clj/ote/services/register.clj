@@ -37,7 +37,7 @@
     (let [username-taken? (username-exists? db {:username username})
           email-taken? (email-exists? db {:email email})
           group-info (when token
-                          (first (fetch-operator-info db {:token token})))]
+                       (first (fetch-operator-info db {:token token})))]
       (if (or username-taken? email-taken?)
         ;; Username or email taken, return errors to form
         {:success? false
@@ -57,7 +57,7 @@
                             ::user/email-confirmed? false
                             ::user/apikey (str (UUID/randomUUID))
                             ::user/activity_streams_email_notifications false})]
-            (when (and token group-info)                ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
+            (when (and token group-info)                    ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
               (transport/create-member! db (::user/id new-user) (:ckan-group-id group-info))
               (specql/delete! db ::user/user-token
                 {::user/token token})
@@ -109,21 +109,22 @@
 (defn manage-new-confirmation
   "We always want to send the same response so someone can't get all the user emails by spamming this endpoint"
   [db email-config form-data]
-  (throttle/with-throttle-ms 1000
-    (let [user-email (:email form-data)
-          language (:language form-data)
-          user-confirmed? (::user/email-confirmed?
-                            (first (specql/fetch db ::user/user
-                                     #{::user/email-confirmed?}
-                                     {::user/email user-email})))
-          confirmation-token (str (UUID/randomUUID))]
-      (if user-confirmed?
-        (http/transit-response :success true)
-        (do
-          (delete-users-old-token! db user-email)
-          (create-confirmation-token! db user-email confirmation-token)
-          (send-email-verification email-config user-email language confirmation-token)
-          (http/transit-response :success true))))))
+  (with-transaction db
+    (throttle/with-throttle-ms 1000
+      (let [user-email (:email form-data)
+            language (:language form-data)
+            user-confirmed? (::user/email-confirmed?
+                              (first (specql/fetch db ::user/user
+                                       #{::user/email-confirmed?}
+                                       {::user/email user-email})))
+            confirmation-token (str (UUID/randomUUID))]
+        (if user-confirmed?
+          (http/transit-response :success true)
+          (do
+            (delete-users-old-token! db user-email)
+            (create-confirmation-token! db user-email confirmation-token)
+            (send-email-verification email-config user-email language confirmation-token)
+            (http/transit-response :success true)))))))
 
 (defn mange-confirm-email-address
   [db form-data]
