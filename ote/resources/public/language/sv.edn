@@ -1308,11 +1308,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:password-reset {:subject "NAP - Återställ ditt lösenord"
                    :body1 "Vi har tagit emot din begäran om att byta lösenord."
                    :body2 "Klicka på knappen"
-                   :body3 "för att byta lösenord."
+                   :body3 " för att byta lösenord."
                    :body4 "OBS! Länken som knappen leder till förfaller en timme efter att du fått detta meddelande."
                    :body5 "Du kan begära via NAP att ditt lösenord byts igen, om det behövs."
                    :body6 "Om du inte lyckas byta lösenordet, kontakta NAP Helpdesk."
                    :body7 "Om du inte har försökt byta ditt lösenord, kan du ignorera detta meddelande."
                    :body8 "Detta meddelande har skickats automatiskt från NAP-systemet. Svara inte på det här meddelandet, eftersom svaren inte behandlas."
-                   :link-text "Återställ lösenord"}}
- }
+                   :link-text "Återställ lösenord"}}}
