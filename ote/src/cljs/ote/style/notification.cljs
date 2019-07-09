@@ -15,7 +15,7 @@
      :padding "1rem"
      :border-radius "4px"}
     (= type :error)
-    {:border (str "1px solid " colors/green-light "7d")
-     :background-color (str colors/green-light "1f")
+    {:border (str "1px solid " colors/red-darker "7d")
+     :background-color (str colors/red-darker "1f")
      :padding "1rem"
      :border-radius "4px"}))
