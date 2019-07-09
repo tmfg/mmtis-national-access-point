@@ -3,8 +3,6 @@
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.tx :as tx]
-            [ote.db.lock :as lock]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
             [ote.util.db :as db-util]
@@ -172,18 +170,18 @@
       [:br]
       [:br]
       [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-       "Tämän viestin lähetti NAP."]
+       (tr [:email-templates :footer :email-sender])]
       [:br]
       [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-              "NAP-Helpdesk yhteystiedot:"]]
+              (tr [:email-templates :footer :help-desk])]]
       [:p
        [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-            :href "mailto:nap@traficom.fi"} "nap@traficom.fi"]
+            :href "mailto:nap@traficom.fi"} (tr [:email-templates :footer :help-desk-email])]
        [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
-        " tai 029 534 5454 (arkisin 09-15)"]]
+        (tr [:email-templates :footer :help-desk-phone])]]
       [:br]
       (when show-email-settings?
-        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;padding-bottom: 16px;"}
+        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
          "Haluatko muuttaa sähköpostiasetuksiasi?"
          [:br]
          [:a
@@ -283,6 +281,17 @@
        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
        (html-divider-border "100%")])))
+
+(defn email-confirmation
+  [title token]
+  (html-template title {:show-email-settings? false}
+    [:div {:style "max-width: 800px"}
+     [:p (tr [:email-templates :email-verification :verification-message])]
+     [:br]
+     [:p (tr [:email-templates :email-verification :if-not-registered])]
+     [:br]
+     (blue-button (str (environment/base-url) "#/confirm-email/" token) (tr [:email-templates :email-verification :verify-email]))
+     (html-divider-border "100%")]))
 
 (defn reset-password [title token user]
   (html-template {:show-email-settings? false} title

@@ -12,14 +12,12 @@
             [ote.ui.buttons :as buttons]
             [ote.ui.common :refer [linkify] :as common-ui]
             [ote.db.user :as user]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.ui.notification :as notification]))
 
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.login-form
-   (when failed?
-     [:div (stylefy/use-style style-base/error-element)
-      (tr [:login :error error])])
    [:h1 (tr [:login :label])]
    [form/form {:name->label (tr-key [:field-labels :login])
                :update! #(e! (lc/->UpdateLoginCredentials %))
@@ -27,20 +25,32 @@
                             [:span.login-dialog-footer
                              [buttons/save {:on-click #(e! (lc/->Login))} (tr [:login :login-button])]])}
     [(form/group
-      {:expandable? false :columns 3 :layout :raw :card? false}
-      {:name :email
-       :label (tr [:field-labels :login :email-or-username])
-       :type :string
-       :autocomplete "email"
-       :on-enter #(e! (lc/->Login))
-       :full-width? true}
-      {:name :password
-       :autocomplete "password"
-       :type :string
-       :password? true
-       :on-enter #(e! (lc/->Login))
-       :full-width? true})]
+       {:expandable? false :columns 3 :layout :raw :card? false}
+       {:name :email
+        :label (tr [:field-labels :login :email-or-username])
+        :type :string
+        :autocomplete "email"
+        :on-enter #(e! (lc/->Login))
+        :full-width? true}
+       {:name :password
+        :autocomplete "password"
+        :type :string
+        :password? true
+        :on-enter #(e! (lc/->Login))
+        :full-width? true})]
     credentials]])
+
+(defn login-error
+  [error]
+  [:div {:style {:margin-top "1rem"}}
+   (cond
+     (#{:unconfirmed-email} error) [notification/notification {:type :warning}
+                                    [:div
+                                     [:p {:style {:margin-top 0}}
+                                      (tr [:login :error error])]
+                                     [linkify "#/confirm-email/resend-token" (tr [:common-texts :send-new-message])]]]
+     (#{:login-error} error) [notification/notification {:type :error}
+                              (tr [:login :error error])])])
 
 (defn login-action-cards [e!]
   [:div {:style {:margin "2rem 0 2rem 0"
@@ -60,6 +70,7 @@
 (defn login [e! {:keys [credentials failed? error in-progress?] :as login}]
   [:div.col-xs-12.col-md-6
    [login-form e! login]
+   [login-error error]
    [login-action-cards e!]])
 
 (defn reset-password-form [e! {:keys [new-password confirm] :as form-data}]
@@ -71,21 +82,21 @@
                             [:span.login-dialog-footer
                              [ui/raised-button {:primary true
                                                 :disabled (or (not= new-password confirm)
-                                                              (not (user/password-valid? new-password)))
+                                                            (not (user/password-valid? new-password)))
                                                 :on-click #(e! (lc/->ResetPassword))
                                                 :label (tr [:register :change-password])}]])}
     [(form/group
-      {:expandable? false :columns 3 :layout :raw :card? false}
-      {:name :new-password
-       :autocomplete "password"
-       :type :string
-       :password? true
-       :full-width? true}
-      {:name :confirm
-       :autocomplete "password"
-       :type :string
-       :password? true
-       :full-width? true})]
+       {:expandable? false :columns 3 :layout :raw :card? false}
+       {:name :new-password
+        :autocomplete "password"
+        :type :string
+        :password? true
+        :full-width? true}
+       {:name :confirm
+        :autocomplete "password"
+        :type :string
+        :password? true
+        :full-width? true})]
     form-data]])
 
 (defn reset-password-request-form [e! {:keys [email code-sent-for-email] :as form-data}]
@@ -96,16 +107,16 @@
                             [:span.login-dialog-footer
                              [ui/raised-button {:primary true
                                                 :disabled (or (str/blank? email)
-                                                              (= email code-sent-for-email))
+                                                            (= email code-sent-for-email))
                                                 :on-click #(e! (lc/->RequestPasswordReset))
                                                 :label (tr [:register :change-password])}]])}
     [(form/group
-      {:expandable? false :columns 3 :layout :raw :card? false}
-      {:name :email
-       :label (tr [:field-labels :login :email-or-username])
-       :autocomplete "email"
-       :type :string
-       :full-width? true})]
+       {:expandable? false :columns 3 :layout :raw :card? false}
+       {:name :email
+        :label (tr [:field-labels :login :email-or-username])
+        :autocomplete "email"
+        :type :string
+        :full-width? true})]
     form-data]
 
    (when-not (str/blank? code-sent-for-email)

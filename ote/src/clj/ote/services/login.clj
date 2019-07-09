@@ -13,14 +13,11 @@
             [ote.db.tx :as tx :refer [with-transaction]]
             [specql.core :as specql]
             [ote.db.user :as user]
-            [ote.time :as time]
-            [ote.util.feature :as feature]
             [taoensso.timbre :as log]
             [ote.db.modification :as modification]
             [ote.localization :as localization :refer [tr]]
             [ote.email :as email]
             [ote.util.email-template :as email-template]
-            [ote.environment :as env]
             [specql.op :as op]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
@@ -94,29 +91,30 @@
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
-  (let [login-info (first (fetch-login-info db {:email email}))]
-    (if login-info
-      (if (hashers/check password
-                         (passlib->buddy (:password login-info)))
+  (if-let [login-info (first (fetch-login-info db {:email email}))]
+    (if (hashers/check password
+          (passlib->buddy (:password login-info)))
+      (if (:email-confirmed? login-info)                    ;;If email not confirmed send proper error
         ;; User was found and password is correct, return user info
         (with-auth-tkt
           (http/transit-response
-           {:success? true
-            :session-data
-            (let [user (users/find-user db (:name login-info))]
-              (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))})
+            {:success? true
+             :session-data
+             (let [user (users/find-user db (:name login-info))]
+               (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))})
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
-                          {:digest-algorithm (:digest-algorithm auth-tkt-config)
-                           :timestamp (java.util.Date.)
-                           :user-id (:name login-info)
-                           :user-data ""})
+            {:digest-algorithm (:digest-algorithm auth-tkt-config)
+             :timestamp (java.util.Date.)
+             :user-id (:name login-info)
+             :user-data ""})
           (:domain auth-tkt-config))
 
         ;; No need to hide if the error was in the email or the password
         ;; the registration page can be used to check if an email has an account
         ;; Update 8.4.2019: We decided that in login form we will only indicate error in more general way.
-        (http/transit-response {:error :login-error}))
-      (http/transit-response {:error :login-error}))))
+        (http/transit-response {:error :unconfirmed-email} 401))
+      (http/transit-response {:error :login-error} 400))
+    (http/transit-response {:error :login-error} 400)))
 
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
@@ -151,9 +149,7 @@
           (let [user (specql/update! db ::user/user
                                      (merge
                                       {::user/name (:username form-data)
-                                       ::user/fullname (:name form-data)
-                                       ::user/email (:email form-data)}
-
+                                       ::user/fullname (:name form-data)}
                                       ;; If new password provided, change it
                                       (when-not (str/blank? (:password form-data))
                                         {::user/password (buddy->passlib (encrypt (:password form-data)))}))
