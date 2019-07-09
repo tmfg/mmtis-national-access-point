@@ -88,8 +88,9 @@
           orig-filename (:filename uploaded-file)
           orig-suffix (fn-suffix orig-filename)
           converted-filename (replace-suffix orig-filename orig-suffix ".pdf")
-          converted-file (when (:laundry-url config)
-                           (laundry-convert-file->file! "http://localhost:8080/" (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
+          laundry-url (:laundry-url config)
+          converted-file (when laundry-url
+                           (laundry-convert-file->file! laundry-url (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
           ;; we save both the original and converted files but return only one id to the client (converted if successful, original otherwise)
           file (specql/insert! db ::transit/pre-notice-attachment
                                (modification/with-modification-timestamp-and-user
@@ -104,15 +105,17 @@
 
       (s3/put-object bucket (generate-file-key (::transit/id file) orig-filename)
                      (:tempfile uploaded-file))      
-      (if (and converted-filename converted-file file2)
+      (if (and converted-filename converted-file file2 (> (.length converted-file) 0))
         (do 
           (s3/put-object bucket (generate-file-key (::transit/id file2) converted-filename)
                          converted-file)
           (log/debug "returning converted id to client")
           (http/transit-response file2))        
         ;; else
-        (do 
-          (log/error "skipping laundry conversion because of nil filename / file object / conversion result")
+        (do
+          (if laundry-url
+            (log/error "skipping laundry conversion because of nil filename / file object / conversion result")
+            (log/info "skipping laundry conversion because no laundry-url configured"))
           (http/transit-response file))))
     (catch Exception e
       (let [msg (.getMessage e)]
