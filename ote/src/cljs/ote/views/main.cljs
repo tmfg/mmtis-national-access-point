@@ -24,6 +24,8 @@
             [ote.views.own-services :as os]
             [ote.views.operator-users :as ou]
             [ote.views.service-viewer :as sv]
+            [ote.views.confirm-email :as ce]
+            [ote.views.resend-confirmation :as rc]
             [ote.views.login :as login]
             [ote.views.user :as user]
             [ote.views.admin :as admin]
@@ -137,6 +139,8 @@
                     :admin-exception-days [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-exception-days")]
 
                     :email-settings [email-settings/email-notification-settings e! app]
+                    :confirm-email [ce/confirm-email e! app]
+                    :resend-confirmation [rc/email-confirmation-form e! app]
 
                     :routes [route-list/routes e! app]
                     :new-route [route/new-route e! app]
