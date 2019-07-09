@@ -1,11 +1,7 @@
 (ns ote.views.user
   "User's own info view"
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.icons :as icons]
-            [stylefy.core :as stylefy]
             [ote.ui.form :as form]
-            [ote.ui.form-fields :as form-fields]
             [ote.db.user :as user]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.buttons :as buttons]
@@ -67,7 +63,7 @@
           {:name :name :type :string :required? true :full-width? true
            :placeholder (tr [:register :placeholder :name])
            :should-update-check form/always-update}
-          {:name :email :type :string :autocomplete "email" :required? true
+          {:name :email :type :string :autocomplete "email" :required? true :disabled? true
            :full-width? true :placeholder (tr [:register :placeholder :email])
            :validate [(fn [data _]
                         (when (not (user/email-valid? data))
