@@ -173,7 +173,7 @@
         (recur acc
                (concat (remove nil? (:schemas s)) schemas))
 
-        :default
+        :else
         (recur (conj acc s)
                schemas)))))
 
