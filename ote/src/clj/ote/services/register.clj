@@ -58,10 +58,10 @@
                             ::user/apikey (str (UUID/randomUUID))
                             ::user/activity_streams_email_notifications false})]
             (when (and token group-info)                ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
-              (transport/create-member! db (::user/id new-user) (:ckan-group-id operator-info))
+              (transport/create-member! db (::user/id new-user) (:ckan-group-id group-info))
               (specql/delete! db ::user/user-token
                 {::user/token token})
-              (log/info "New user (" email ") registered with token from " (:name operator-info))))
+              (log/info "New user (" email ") registered with token from " (:name group-info))))
           {:success? true})))))
 
 (defn- send-email-verification
