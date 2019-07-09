@@ -38,6 +38,8 @@
     ["/service/:transport-operator-id/:transport-service-id" :service-view]
 
     ["/email-settings" :email-settings]
+    ["/confirm-email/resend-token" :resend-confirmation]
+    ["/confirm-email/:token" :confirm-email]
 
     ;; Route based traffic
     ["/routes" :routes]
