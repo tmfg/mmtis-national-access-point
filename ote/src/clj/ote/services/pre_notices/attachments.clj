@@ -86,8 +86,8 @@
                        ".jpg" "image/jpeg2jpeg"
                        ".jpeg" "image/jpeg2jpeg"}
           orig-filename (:filename uploaded-file)
+          converted-filename orig-filename ;; we don't convert between formats in our case so keep filename
           orig-suffix (fn-suffix orig-filename)
-          converted-filename (replace-suffix orig-filename orig-suffix ".pdf")
           laundry-url (:laundry-url config)
           converted-file (when laundry-url
                            (laundry-convert-file->file! laundry-url (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
