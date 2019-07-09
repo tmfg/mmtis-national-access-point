@@ -1192,7 +1192,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
           :no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}
+          :incorrect-password "Fel lösenord"
+          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
@@ -1252,7 +1253,6 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :change-password "Ändra lösenord"
   :valid-token ["I samband med registreringen får du användarrättigheter till tjänsteproducenten " :operator-name "."]
   :invalid-token "Din inbjudan har förfallit. Avsluta registreringen och kontakta därefter inbjudans avsändare eller NAP Helpdesk (nap@traficom.fi) för att få en ny inbjudan."
-  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."
   :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
   :confirmation-failed "Sähköpostin vahvistus epäonnistui"
   :confirmation-success "Sähköposti vahvistettu"
