@@ -147,7 +147,7 @@
                      app (merge app navigation-data)
                      win-location (subs (.. js/window -location -hash) 1)
                      ;; Remove potentially sensitive arguments from analytics script reporting
-                     win-location (if-let [opt-out-page (#{:register :reset-password} (:page navigation-data))]
+                     win-location (if-let [opt-out-page (#{:register :reset-password :confirm-email} (:page navigation-data))]
                                     (str "/" (name opt-out-page))
                                     win-location)]
 
