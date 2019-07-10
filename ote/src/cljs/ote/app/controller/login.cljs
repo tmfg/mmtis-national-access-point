@@ -149,32 +149,34 @@
       (update :email (fnil str/trim ""))
       (update :username (fnil str/trim ""))))
 
-(defn- handle-user-save-response [app key response]
-  (let [{:keys [success? username-taken email-taken password-incorrect?]} response]
-    (if success?
-      (-> app
-        (assoc-in [:register :success?] true))
-      (-> app
-          (update-in [key :username-taken]
-                     #(if username-taken
-                        (conj (or % #{}) username-taken)
-                        %))
-          (update-in [key :email-taken]
-                     #(if email-taken
-                        (conj (or % #{}) email-taken)
-                        %))
-          (assoc-in [key :password-incorrect?] password-incorrect?)
-          (assoc :flash-message-error
-                 (if (or username-taken email-taken password-incorrect?)
-                   ;; Expected form errors, don't show snackbar
-                   nil
+(defn- handle-user-save-error [app key response]
+  (let [{:keys [username-taken email-taken password-incorrect?]} response]
+    (-> app
+      (update-in [key :username-taken]
+        #(if username-taken
+           (conj (or % #{}) username-taken)
+           %))
+      (update-in [key :email-taken]
+        #(if email-taken
+           (conj (or % #{}) email-taken)
+           %))
+      (assoc-in [key :password-incorrect?] password-incorrect?)
+      (assoc :flash-message-error
+             (if (or username-taken email-taken password-incorrect?)
+               ;; Expected form errors, don't show snackbar
+               nil
 
-                   ;; Unexpected failure, show server error message
-                   (tr [:common-texts :server-error])))))))
+               ;; Unexpected failure, show server error message
+               (tr [:common-texts :server-error]))))))
 
-(define-event RegisterResponse [response]
+(define-event RegisterSuccess [response]
   {}
-  (handle-user-save-response app :register response))
+  (-> app
+    (assoc-in [:register :success?] true)))
+
+(define-event RegisterError [response]
+  {}
+  (handle-user-save-error app :register (:response response)))
 
 (define-event Register [form-data]
   {}
@@ -183,8 +185,8 @@
                     true (assoc :language @localization/selected-language)
                     (some? token) (assoc :token token))]
     (comm/post! "register" form-data
-                {:on-success (tuck/send-async! ->RegisterResponse)
-                 :on-failure (tuck/send-async! ->ServerError)}))
+                {:on-success (tuck/send-async! ->RegisterSuccess)
+                 :on-failure (tuck/send-async! ->RegisterError)}))
   app)
 
 (define-event UpdateUser [user]
