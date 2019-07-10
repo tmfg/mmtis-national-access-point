@@ -10,6 +10,7 @@
   (:require [reagent.core :refer [atom] :as r]
             [clojure.string :as str]
             [cljs-time.core :as t]
+            [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.format :as fmt]))
 
@@ -109,29 +110,32 @@
     (or message (str "Number must be between " min-value " and " max-value))))
 
 ;; Valid Finnish Business ID (Y-tunnus)
-(defmethod validate-rule :business-id [_ _ data _ _ & [message]]
+(defmethod validate-rule :business-id [_ _ data row _ & [message]]
   (and
     data
-    (let [ ;; Split by separator
+    (let [;; Split by separator
+          data (str/trim data)
           [id check :as split] (str/split data #"-")
           ;; When numbers are removed, it sholud be ["" "-" nil]
           [id-part separator check-part] (str/split data #"\d+")]
-      (when-not (and (= 9 (count data))
-                     (= 2 (count split))
-                     (= 7 (count id))
-                     (= 1 (count check))
-                     (empty? id-part)
-                     (= "-" separator)
-                     (nil? check-part))
-        (or message
-            (tr [:common-texts :invalid-business-id]))))))
+      (if (::t-operator/foreign-business-id? row)
+        (when (or (< (count data) 2) (< 10 (count data)))
+          (tr [:common-texts :invalid-foreign-business-id]))
+        (when-not (and (= 9 (count data))
+                    (= 2 (count split))
+                    (= 7 (count id))
+                    (= 1 (count check))
+                    (empty? id-part)
+                    (= "-" separator)
+                    (nil? check-part))
+          (or message
+            (tr [:common-texts :invalid-business-id])))))))
 
 ;; Valid Finnish postal-code
 (defmethod validate-rule :postal-code [_ _ data _ _ & [message]]
   (when
     (and (not (empty-value? data)) (not (re-matches #"^\d{5}$" data)))
-    (or message (tr [:common-texts :invalid-postal-code]))
-  ))
+    (or message (tr [:common-texts :invalid-postal-code]))))
 
 ;; Validate that checkbox is checked
 (defmethod validate-rule :checked? [_ _ data _ _ ]

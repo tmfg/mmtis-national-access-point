@@ -286,7 +286,8 @@
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
                          "Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
-                         "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
+                         "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**"
+                         "\n\n**Voit lisätä vain yrityksiä joilla on suomalainen Y-tunnus**")
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
@@ -1033,6 +1034,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :required-field "Tieto vaaditaan"
   :required-field-missing "Pakollisia tietoja syöttämättä"
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
+  :invalid-foreign-business-id "Ulkomaalaisessa Y-tunnuksessa on oltava vähintään kaksi ja enintään 10 merkkiä."
+  :no-finnish-business-id "Yritykselläni ei ole suomalaisesta Y-tunnusta."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
   :save-failure "Tallennus ei onnistunut."

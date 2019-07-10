@@ -284,8 +284,9 @@
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
-  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**
-\n\n**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**")
+  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**"
+                         "\n\n**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**"
+                         "\n\n**You can only add companies with a Finnish Business ID.**")
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
@@ -1025,6 +1026,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
+  :invalid-foreign-business-id "A non-Finnish Business ID must be minimum two and maximum ten characters."
+  :no-finnish-business-id "My company does not have a  Finnish Business ID"
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."

@@ -62,7 +62,8 @@
                                                      ::t-operator/phone
                                                      ::t-operator/gsm
                                                      ::t-operator/email
-                                                     ::t-operator/homepage]))
+                                                     ::t-operator/homepage
+                                                     ::t-operator/foreign-business-id?]))
 
 ;; Keys unique to operator when creating a company
 (defn- take-new-op-keys [coll] (select-keys coll [::t-operator/name]))
@@ -504,7 +505,7 @@
 
   EnsureUniqueBusinessId
   (process-event [{business-id :business-id} app]
-    (let [bid-validation-error (validation/validate-rule :business-id nil business-id)
+    (let [bid-validation-error (validation/validate-rule :business-id nil business-id (:transport-operator app))
           resolve-bid-uniqueness-state (fn [state bid-validation-error]
                                          (if (nil? bid-validation-error)
                                            (do
