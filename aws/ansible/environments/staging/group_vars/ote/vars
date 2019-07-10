@@ -17,5 +17,6 @@ allow_robots: "false"
 gtfs_bucket: "napote-gtfs-dev"
 matomo_piwik_url: "https://stat.viestintavirasto.fi/"
 matomo_site_id: "10"
-laundry_url: "http://napote-laundry1-dev.finap.fi:8080/"
+laundry_url: nil
+
 
