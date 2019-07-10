@@ -8,6 +8,7 @@
             [specql.op :as op]
             [ote.services.login :as login]
             [ote.db.tx :as tx :refer [with-transaction]]
+            [ote.localization :as localization :refer [tr]]
             [jeesql.core :refer [defqueries]]
             [ote.util.feature :as feature]
             [clojure.string :as str]
@@ -66,19 +67,18 @@
 
 (defn- send-email-verification
   [email-config user-email language email-confirmation-uuid]
-  (let [title "testi"]
-    (try
-      (localization/with-language
-        language
-        (email/send!
-          email-config
-          {:to user-email
-           :subject title
-           :body [{:type "text/html;charset=utf-8"
-                   :content (str email-template/html-header
-                              (hiccup/html (email-template/email-confirmation title email-confirmation-uuid)))}]}))
-      (catch Exception e
-        (log/warn (str "Error while sending verification to:  " user-email " ") e)))))
+  (try
+    (localization/with-language
+      language
+      (email/send!
+        email-config
+        {:to user-email
+         :subject (tr [:email-templates :email-verification :verify-email])
+         :body [{:type "text/html;charset=utf-8"
+                 :content (str email-template/html-header
+                            (hiccup/html (email-template/email-confirmation (tr [:email-templates :email-verification :verify-email]) email-confirmation-uuid)))}]}))
+    (catch Exception e
+      (log/warn (str "Error while sending verification to:  " user-email " ") e))))
 
 (defn create-confirmation-token!
   [db user-email token]
@@ -97,9 +97,9 @@
           ;; User created, log in immediately with the user info
           (do (create-confirmation-token! db (:email form-data) email-confirmation-token)
               (send-email-verification email user-email language email-confirmation-token)
-              (http/transit-response result 200))
+              (http/transit-response result 201))
           ;; registeration failed send errors
-          (http/transit-response {:message :registeration-failure} 400))))))
+          (http/transit-response result 400))))))
 
 (defn delete-users-old-token!
   [db user-email]
@@ -171,7 +171,8 @@
                          user :user}
         (if user
           ;; Trying to register while logged in
-          (http/transit-response {:success? false})
+          (http/transit-response {:success? false
+                                  :message :already-logged-in} 400)
           (#'register db email auth-tkt-config
             (http/transit-request form-data)))))))
 

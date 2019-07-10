@@ -14,6 +14,15 @@
    [:div {:style {:margin-top "1rem"}}
     [common-ui/linkify "/#/login" (tr [:login :login-button])]]])
 
+(defn confirm-failure
+  []
+  [:div
+   [notification/notification {:type :warning}
+    (tr [:register :confirmation-failed])]
+   [:div {:style {:margin-top "1rem"}}
+    [:p [common-ui/linkify "#/confirm-email/resend-token" (tr [:common-texts :send-new-message])]]
+    [:p [common-ui/linkify "/#/login" (tr [:login :login-button])]]]])
+
 (defn confirm-email
   [e! app]
   (let [loaded? (get-in app [:confirm-email :loaded?])
@@ -23,9 +32,5 @@
      (if loaded?
        (if success?
          [confirm-success]
-         [notification/notification {:type :warning}
-          [:div
-           [:p {:style {:margin 0}}
-            (tr [:register :confirmation-failed])]
-           [common-ui/linkify "#/confirm-email/resend-token" (tr [:common-texts :send-new-message])]]])
+         [confirm-failure])
        [prog/circular-progress])]))
