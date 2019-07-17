@@ -918,8 +918,7 @@
                                 :school-start "Början av läsåret"
                                 :school-end "Slutet av läsåret"
                                 :season-schedule-change "Tidtabellsperioden ändras"}
-  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
-  }
+  :back-to-pre-notices "Tillbaka till sidan Meddelande om ändring i regelbunden persontrafik."}
 
  :email-notification-settings-page
  {:page-title "Inställningar för e-postmeddelanden"
@@ -1034,7 +1033,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-file-type "Ogiltig filtyp"
   :save-failure "Går ej att spara."
   :save-success "Sparat."
-  :send-new-message "Lähetä uusi viesti"
+  :send-new-message "Skicka ett nytt meddelande"
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -1194,7 +1193,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
           :no-such-user "Okänd konto"
           :incorrect-password "Fel lösenord"
-          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
+          :unconfirmed-email "Inloggningen misslyckades eftersom e-postadress inte har verifierats. Om du inte har fått något verifieringsmeddelande i samband med registreringen kan du skicka det på nytt."}
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
@@ -1254,13 +1253,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :change-password "Ändra lösenord"
   :valid-token ["I samband med registreringen får du användarrättigheter till tjänsteproducenten " :operator-name "."]
   :invalid-token "Din inbjudan har förfallit. Avsluta registreringen och kontakta därefter inbjudans avsändare eller NAP Helpdesk (nap@traficom.fi) för att få en ny inbjudan."
-  :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
-  :confirmation-failed "Sähköpostin vahvistus epäonnistui"
-  :confirmation-success "Sähköposti vahvistettu"
-  :confirm-email "Sähköpostin todennus"
-  :email-to-be-confirmed "Todennettava sähköposti"
-  :resend-confirmation "Lähetä sähköpostin todentamisviesti uudelleen"
-  :resend-success ["Todentamisviesti lähetetty osoitteeseen " :email ". Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi viestin ohjeen mukaan. Jos todentamisviesti ei tule perille, ota yhteyttä NAP-Helpdeskiin: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi"]}
+  :verification-email-sent-text ["Tack för att du registrerade dig i NAP-tjänsten! För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress. Verifieringsmeddelandet har skickats till adressen " :email "."]
+  :confirmation-failed "Verifiering av e-postadress misslyckades. Din e-postadress har redan verifierats eller verifieringsmeddelandet har gått ut. Du kan skicka ett nytt verifieringsmeddelande via länken nedan."
+  :confirmation-success "Verifiering av e-postadress lyckades."
+  :confirm-email "Verifiering av e-postadress."
+  :email-to-be-confirmed "E-postadress som verifieras"
+  :resend-confirmation "Skicka verifieringsmeddelandet på nytt"
+  :resend-success ["Verifieringsmeddelandet har skickats till adressen " :email ". För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress enligt instruktionerna i meddelandet. Om du inte får något verifieringsmeddelande, kontakta NAP-Helpdesk: 029 534 5454 (vardagar kl. 9–15) eller nap@traficom.fi."]}
 
  :reset-password
  {:label "Återställ ditt lösenord"
@@ -1325,10 +1324,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    :body7 "Om du inte har försökt byta ditt lösenord, kan du ignorera detta meddelande."
                    :body8 "Detta meddelande har skickats automatiskt från NAP-systemet. Svara inte på det här meddelandet, eftersom svaren inte behandlas."
                    :link-text "Återställ lösenord"}
-  :footer {:email-sender "Tämän viestin lähetti NAP."
-           :help-desk "NAP-Helpdesk yhteystiedot:"
+  :footer {:email-sender "Detta meddelande är skickat av NAP."
+           :help-desk "NAP-HelpDesk:"
            :help-desk-email "nap@traficom.fi"
-           :help-desk-phone " tai 029 534 5454 (arkisin 09-15)"}
-  :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
-                       :verify-email "Todenna sähköpostiosoite"
-                       :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}}
+           :help-desk-phone " eller 029 534 6705 (Mån-Fre kl 9-15)"}
+  :email-verification {:verification-message "Hej. Tack för att du registrerade dig i NAP-tjänsten! För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress. Du kan verifiera adressen genom att klicka nedan."
+                       :verify-email "Verifiera e-postadress"
+                       :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}}}
