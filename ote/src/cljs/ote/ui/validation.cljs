@@ -119,7 +119,7 @@
           ;; When numbers are removed, it sholud be ["" "-" nil]
           [id-part separator check-part] (str/split data #"\d+")]
       (if (::t-operator/foreign-business-id? row)
-        (when (or (< (count data) 2) (< 10 (count data)))
+        (when (or (< (count data) 2) (< 32 (count data)))
           (tr [:common-texts :invalid-foreign-business-id]))
         (when-not (and (= 9 (count data))
                     (= 2 (count split))

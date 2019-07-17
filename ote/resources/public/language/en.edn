@@ -915,8 +915,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                                 :school-start "The beginning of the school year"
                                 :school-end "The end of the school year"
                                 :season-schedule-change "Season schedule change"}
-  :back-to-pre-notices "Takaisin säännöllisen henkilöliikenteen muutosilmoitus -sivulle"
-  }
+  :back-to-pre-notices "Back to the page Report changes in regular scheduled passenger transport."}
 
  :email-notification-settings-page
  {:page-title "Email notification settings"
@@ -1026,13 +1025,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
-  :invalid-foreign-business-id "A non-Finnish Business ID must be minimum two and maximum ten characters."
+  :invalid-foreign-business-id "A non-Finnish Business ID must be minimum 2 and maximum 32 characters."
   :no-finnish-business-id "My company does not have a  Finnish Business ID"
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."
   :save-success "Successfully saved."
-  :send-new-message "Send a new message"
+  :send-new-message "Send new verification email"
   :transport-service-saved "Transport service information has been saved!"
   :transport-operator-saved "Transport operator information has been saved!"
   :footer-livi-logo "Finnish Transport and Communications Agency"
@@ -1192,7 +1191,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :error {:login-error "Invalid credentials, please verify them and retry."
           :no-such-user "Unknown user"
           :incorrect-password "Incorrect password"
-          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
+          :unconfirmed-email "Login failed because the email address has not been verified. If you did not receive a verification email when you registered with the service, you can request a new verification email."}
 
   :check-email-for-link "Your request for changing password has been received. A link for resetting your password has now been sent to your email address."
   :logged-out "You have been logged out."}
@@ -1252,13 +1251,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :change-password "Change password"
   :valid-token ["At registration you will get user rights to the service producer " :operator-name "."]
   :invalid-token "Your invitation has expired. Complete the registration and contact the invitation sender or the NAP Helpdesk (nap@traficom.fi) to get a new invitation."
-  :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
-  :confirmation-failed "Sähköpostin vahvistus epäonnistui"
-  :confirmation-success "Sähköposti vahvistettu"
-  :confirm-email "Sähköpostin todennus"
-  :email-to-be-confirmed "Todennettava sähköposti"
-  :resend-confirmation "Lähetä sähköpostin todentamisviesti uudelleen"
-  :resend-success ["Todentamisviesti lähetetty osoitteeseen " :email ". Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi viestin ohjeen mukaan. Jos todentamisviesti ei tule perille, ota yhteyttä NAP-Helpdeskiin: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi"]}
+  :verification-email-sent-text ["Thank you for registering with the NAP service! Before you can start using the service, please verify your email address. The verification email has been sent to the address " :email "."]
+  :confirmation-failed "Failed to verify email address. Your email address has already been verified or the verification email has expired. To receive a new verification email, please click on the link below."
+  :confirmation-success "Email address successfully verified."
+  :confirm-email "Email address verification"
+  :email-to-be-confirmed "Email address to be verified"
+  :resend-confirmation "Re-send verification email"
+  :resend-success ["A verification email has been sent to the address " :email ". Before you can start using the service, please verify your email address. Follow the instructions in the message you receive. If you do not receive a verification email, please contact the NAP Helpdesk: +358 29 534 5454 (Mon–Fri 9–15) or nap@traficom.fi."]}
 
  :reset-password
  {:label "Reset your password"
@@ -1322,10 +1321,10 @@ You can also draw the operating area or point to the map with drawing tools. You
                    :body7 "Ignore this message, if you have not tried to change your password."
                    :body8 "This message has been sent automatically from the NAP system. Do not reply to this message, replies are not processed."
                    :link-text "Reset password"}
-  :footer {:email-sender "Tämän viestin lähetti NAP."
-           :help-desk "NAP-Helpdesk yhteystiedot:"
+  :footer {:email-sender "This message was sent by NAP."
+           :help-desk "NAP HelpDesk:"
            :help-desk-email "nap@traficom.fi"
-           :help-desk-phone " tai 029 534 5454 (arkisin 09-15)"}
-  :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
-                       :verify-email "Todenna sähköpostiosoite"
-                       :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}}
+           :help-desk-phone " or +358 29 534 5454 (Mon-Fri 9am-3pm)"}
+  :email-verification {:verification-message "Dear recipient, Thank you for registering with the NAP service! Before you can start using the service, please verify your email address by clicking on the button below."
+                       :verify-email "Verify your email address"
+                       :if-not-registered "If you have not recently registered with the NAP service, you can ignore this message."}}}
