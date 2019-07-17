@@ -1315,7 +1315,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:password-reset {:subject "NAP - Reset your password"
                    :body1 "We have received your request to change your password."
                    :body2 "Click the button"
-                   :body3 "to change your password."
+                   :body3 " to change your password."
                    :body4 "NB! The button link expires one hour after you have received this message."
                    :body5 "If necessary, you can request via NAP that your password is changed again."
                    :body6 "If you are unable to change your password successfully, contact NAP Helpdesk."
