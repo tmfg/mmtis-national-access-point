@@ -2,34 +2,26 @@
   "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-
             [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
             [ote.ui.info :as info]
             [ote.ui.select_field :as sf]
             [ote.ui.warning_msg :as msg-warn]
             [ote.ui.success_msg :as msg-succ]
-            [ote.ui.circular_progress :as prog]
-            [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
             [ote.style.form-fields :as style-fields]
             [ote.ui.common :as ui-common]
-            [ote.ui.form-fields :as form-fields]
 
             [ote.app.controller.flags :as flags]
             [ote.app.controller.transport-operator :as to]
-            [ote.app.controller.front-page :as fp]
 
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
             [ote.style.base :as style-base]
             [ote.ui.common :as uicommon]
-            [ote.style.dialog :as style-dialog])
-  )
+            [ote.style.dialog :as style-dialog]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -94,6 +86,7 @@
        :type :string
        :validate [[:business-id]]
        :required? true
+       :margin-bottom "1rem"
        :warning (tr [:common-texts :required-field])
        :should-update-check form/always-update
        :disabled? (ytj-loading? state)
@@ -136,6 +129,11 @@
                            " " (tr [:common-texts :server-error-try-later])
                            " " (tr [:common-texts :optionally-fill-manually])))}))
 
+      {:name ::t-operator/foreign-business-id?
+       :label (tr [:common-texts :no-finnish-business-id])
+       :element-id "foreign-business-id-checkbox"
+       :type :checkbox
+       :required? false}
       ; label composition for existing business-id
       (when (get-in state [:transport-operator :business-id-exists?])
         {:element-id "label-business-id-is-not-unique"
@@ -185,17 +183,16 @@
          :default-state true})
 
       (if ytj-response-ok?                                      ;; Input field if not YTJ results, checkbox-group otherwise
-        {:name                :transport-operators-to-save
-         :type                :checkbox-group-with-delete
-         :show-option         ::t-operator/name
-         :option-enabled?     #(nil? (::t-operator/id %))
-         :options             ytj-company-names
+        {:name :transport-operators-to-save
+         :type :checkbox-group-with-delete
+         :show-option ::t-operator/name
+         :option-enabled? #(nil? (::t-operator/id %))
+         :options ytj-company-names
          :should-update-check form/always-update
-         :required?           true
+         :required? true
          :on-delete (fn [data]
-                      (do
-                        (e! (to/->ToggleListTransportOperatorDeleteDialog data))
-                        (delete-operator e! data (:transport-operators-with-services state))))}
+                      (e! (to/->ToggleListTransportOperatorDeleteDialog data))
+                      (delete-operator e! data (:transport-operators-with-services state)))}
         {:element-id "input-operator-name"
          :name       ::t-operator/name
          :label      ""

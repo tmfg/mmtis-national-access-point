@@ -58,7 +58,7 @@
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
 
    ;; Services for the frontend
-   :register (component/using (register-services/->Register config) [:http :db])
+   :register (component/using (register-services/->Register config) [:http :db :email])
    :transport (component/using (transport-service/->Transport config) [:http :db :email])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])

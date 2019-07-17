@@ -28,7 +28,8 @@
             [ote.time :as time]
             [clj-time.core :as t]
             [clojure.set :refer [rename-keys]]
-            [clj-time.coerce :as tc])
+            [clj-time.coerce :as tc]
+            [clojure.string :as str])
   (:import (java.util UUID)))
 
 ; TODO: split file to transport-service and transport-operator
@@ -801,9 +802,12 @@
 
       (POST "/transport-operator" {form-data :body
                                    user      :user}
-        (http/transit-response
-          (save-transport-operator config db user
-                                   (http/transit-request form-data))))
+        (let [form-data (http/transit-request form-data)
+              form-data (-> form-data
+                          (update ::t-operator/foreign-business-id? true?)
+                          (update ::t-operator/business-id str/trim))]
+          (http/transit-response
+            (save-transport-operator config db user form-data))))
 
       (POST "/transport-service" {form-data :body
                                   user      :user}

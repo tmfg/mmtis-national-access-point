@@ -112,7 +112,8 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
-      (matomo-analytics-scripts matomo-config)
+      (when (not (true? dev-mode?))
+        (matomo-analytics-scripts matomo-config))
       (translations localization/*language*)
       (user-info db user)]
 

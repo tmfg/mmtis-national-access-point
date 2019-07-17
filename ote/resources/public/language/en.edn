@@ -284,8 +284,9 @@
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
-  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**
-\n\n**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**")
+  :companies-main-info (:md "**If you are driving under a taxi dispatch service or another service provider, please do not fill anything in this section!**"
+                         "\n\n**All the information given will be published in the public NAP service catalog and in open machine-readable interfaces. If you do not make an announcement of the companies conducting your service, you have to make sure that those companies will publish information in the NAP catalog about their participation in conducting your service by themselves.**"
+                         "\n\n**You can only add companies with a Finnish Business ID.**")
   :csv-info "If you are mantaining a .csv-file in a WWW-address, that contains all the companies involved for conducting your transport service, fill in the address to the field below (e.g. https://www.finap.fi/ote/csv/servicecompanies.csv)."
   :csv-file-example "Download an example file from here."
   :companies-info "If you do not have a .csv-file from the companies involved, you can fill in company names and business IDs here."
@@ -1025,10 +1026,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :required-field "Required field"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
+  :invalid-foreign-business-id "A non-Finnish Business ID must be minimum two and maximum ten characters."
+  :no-finnish-business-id "My company does not have a  Finnish Business ID"
   :invalid-postal-code "Please, check the postalcode (5 numbers)"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."
   :save-success "Successfully saved."
+  :send-new-message "Send a new message"
   :transport-service-saved "Transport service information has been saved!"
   :transport-operator-saved "Transport operator information has been saved!"
   :footer-livi-logo "Finnish Transport and Communications Agency"
@@ -1187,7 +1191,8 @@ You can also draw the operating area or point to the map with drawing tools. You
 
   :error {:login-error "Invalid credentials, please verify them and retry."
           :no-such-user "Unknown user"
-          :incorrect-password "Incorrect password"}
+          :incorrect-password "Incorrect password"
+          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
 
   :check-email-for-link "Your request for changing password has been received. A link for resetting your password has now been sent to your email address."
   :logged-out "You have been logged out."}
@@ -1246,7 +1251,14 @@ You can also draw the operating area or point to the map with drawing tools. You
   :confirm-changes "Confirm changes"
   :change-password "Change password"
   :valid-token ["At registration you will get user rights to the service producer " :operator-name "."]
-  :invalid-token "Your invitation has expired. Complete the registration and contact the invitation sender or the NAP Helpdesk (nap@traficom.fi) to get a new invitation."}
+  :invalid-token "Your invitation has expired. Complete the registration and contact the invitation sender or the NAP Helpdesk (nap@traficom.fi) to get a new invitation."
+  :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
+  :confirmation-failed "Sähköpostin vahvistus epäonnistui"
+  :confirmation-success "Sähköposti vahvistettu"
+  :confirm-email "Sähköpostin todennus"
+  :email-to-be-confirmed "Todennettava sähköposti"
+  :resend-confirmation "Lähetä sähköpostin todentamisviesti uudelleen"
+  :resend-success ["Todentamisviesti lähetetty osoitteeseen " :email ". Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi viestin ohjeen mukaan. Jos todentamisviesti ei tule perille, ota yhteyttä NAP-Helpdeskiin: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi"]}
 
  :reset-password
  {:label "Reset your password"
@@ -1309,4 +1321,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                    :body6 "If you are unable to change your password successfully, contact NAP Helpdesk."
                    :body7 "Ignore this message, if you have not tried to change your password."
                    :body8 "This message has been sent automatically from the NAP system. Do not reply to this message, replies are not processed."
-                   :link-text "Reset password"}}}
+                   :link-text "Reset password"}
+  :footer {:email-sender "Tämän viestin lähetti NAP."
+           :help-desk "NAP-Helpdesk yhteystiedot:"
+           :help-desk-email "nap@traficom.fi"
+           :help-desk-phone " tai 029 534 5454 (arkisin 09-15)"}
+  :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
+                       :verify-email "Todenna sähköpostiosoite"
+                       :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}}

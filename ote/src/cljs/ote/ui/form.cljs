@@ -173,7 +173,7 @@
         (recur acc
                (concat (remove nil? (:schemas s)) schemas))
 
-        :default
+        :else
         (recur (conj acc s)
                schemas)))))
 
@@ -252,7 +252,7 @@
    modified errors warnings notices update-form hide-error-until-modified?]
   [:div.form-group (stylefy/use-style style)
    (doall
-    (for [{:keys [name editable? read write container-style container-class] :as s} schemas
+    (for [{:keys [name editable? read write container-style container-class margin-bottom] :as s} schemas
           :let [editable? (and can-edit?
                                (or (nil? editable?)
                                    (editable? data)))
@@ -260,9 +260,11 @@
                                  (get modified name))]]
       ^{:key name}
       [:div.form-field {:class container-class :style (merge (if (#{:string :localized-text} (:type s))
-                                                               {:margin-bottom "2rem"}
+                                                               {:margin-bottom (if (some? margin-bottom)
+                                                                                 margin-bottom
+                                                                                 "2rem")}
                                                                {})
-                                                             container-style)}
+                                                        container-style)}
        [field-ui (assoc s
                                         ;:col-class col-class
                         :focus (= name current-focus)

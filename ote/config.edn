@@ -50,7 +50,9 @@
           :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
- :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
+ :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
+               ;; :laundry-url "http://localhost:8080/"
+               }
 
  ;; add features to the set to enable them in in this environment
  :enabled-features #{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}

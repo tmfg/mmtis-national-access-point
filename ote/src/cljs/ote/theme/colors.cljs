@@ -31,7 +31,7 @@
 (def green-light "#66cc66")
 (def red-basic "#DD0000")
 (def red-dark "#CF0000")
-(def red-darker "#DD0000")
+(def red-darker "#C10000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
 (def yellow-basic "#ddcc00")

@@ -286,7 +286,8 @@
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
                          "Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
-                         "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**")
+                         "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**"
+                         "\n\n**Voit lisätä vain yrityksiä joilla on suomalainen Y-tunnus**")
   :csv-info "Mikäli ylläpidät välitettävien yritysten listaa .csv-tiedostossa, syötä alla olevaan osoitekenttään suora osoite tiedostoon. (esim. https://www.finap.fi/ote/csv/palveluyritykset.csv)."
   :csv-file-example "Lataa esimerkki csv-tiedostosta, jonka mukaisesti yritysten tiedot tulisi ilmoittaa"
   :companies-info "Jos sinulla ei ole .csv-tiedostossa listaa välittämistäsi yrityksistä, täytä tähän yritysten nimet ja y-tunnukset."
@@ -1033,10 +1034,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :required-field "Tieto vaaditaan"
   :required-field-missing "Pakollisia tietoja syöttämättä"
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
+  :invalid-foreign-business-id "Ulkomaalaisessa Y-tunnuksessa on oltava vähintään kaksi ja enintään 10 merkkiä."
+  :no-finnish-business-id "Yritykselläni ei ole suomalaisesta Y-tunnusta."
   :invalid-postal-code "Tarkista postinumero (5 numeroa)"
   :invalid-file-type "Virheellinen tiedostotyyppi"
   :save-failure "Tallennus ei onnistunut."
   :save-success "Tallennus onnistui."
+  :send-new-message "Lähetä uusi viesti"
   :transport-service-saved "Liikkumispalvelun tiedot tallennettu!"
   :transport-operator-saved "Palveluntarjoajan tiedot tallennettu!"
   :footer-livi-logo "Traficom"
@@ -1199,7 +1203,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
           :no-such-user "Tuntematon käyttäjä"
-          :incorrect-password "Väärä salasana"}
+          :incorrect-password "Väärä salasana"
+          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
 
   :check-email-for-link "Salasanan vaihtopyyntösi on vastaanotettu. Olemme nyt lähettäneet salasanan vaihtamiseen tarvittavan linkin sähköpostiisi."
   :logged-out "Olet kirjautunut ulos."}
@@ -1258,7 +1263,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :confirm-changes "Varmista muutokset"
   :change-password "Vaihda salasana"
   :valid-token ["Saat rekisteröitymisen yhteydessä käyttöoikeudet palveluntuottajaan " :operator-name "."]
-  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."}
+  :invalid-token "Kutsusi on vanhentunut. Jatka rekisteröityminen loppuun, ja ota tämän jälkeen yhteys kutsun lähettäjään tai NAP-Helpdeskiin (nap@traficom.fi) saadaksesi uuden kutsun."
+  :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
+  :confirmation-failed "Sähköpostin todennus epäonnistui. Sähköpostisi on jo todennettu tai todennusviesti on vanhentunut. Voit lähettää uuden todennusviestin alla olevasta linkistä."
+  :confirmation-success "Sähköposti todennettu."
+  :confirm-email "Sähköpostin todennus"
+  :email-to-be-confirmed "Todennettava sähköposti"
+  :resend-confirmation "Lähetä sähköpostin todentamisviesti uudelleen."
+  :resend-success ["Todentamisviesti lähetetty osoitteeseen " :email ". Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi viestin ohjeen mukaan. Jos todentamisviesti ei tule perille, ota yhteyttä NAP-Helpdeskiin: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi"]}
 
  :reset-password
  {:label "Salasanan vaihto"
@@ -1321,4 +1333,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    :body6 "Mikäli salasanan vaihto ei onnistu, ota yhteys NAP-Helpdeskiin."
                    :body7 "Mikäli et ole yrittänyt vaihtaa salasanaasi, voit jättää tämän viestin huomioimatta."
                    :body8 "Tämä viesti on lähetetty NAP-järjestelmästä automaattisesti. Älä vastaa tähän viestiin, sillä vastauksia ei käsitellä."
-                   :link-text "Vaihda salasana"}}}
+                   :link-text "Vaihda salasana"}
+  :footer {:email-sender "Tämän viestin lähetti NAP."
+           :help-desk "NAP-Helpdesk yhteystiedot:"
+           :help-desk-email "nap@traficom.fi"
+           :help-desk-phone " tai 029 534 5454 (arkisin 09-15)"}
+  :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
+                       :verify-email "Todenna sähköpostiosoite"
+                       :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}}

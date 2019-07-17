@@ -294,8 +294,9 @@
   :RAE-link-text "RAE-verktyg"
   :SEA-ROUTE-link-text " Rutteditorn för sjötrafik"
   ;; FIXME: Partially Google translated: please improve
-  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**
-\n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**")
+  :companies-main-info (:md "**Om du är upptagen med ett leveranscenter eller annan tjänsteleverantör, fyll inte i det här avsnittet!**"
+                          "\n\n**Uppgifterna publiceras i den offentliga NAP-tjänstekatalogen och via öppna maskinläsbara gränssnitt. Om ni inte meddelar vilka företag som deltar i produktionen av er tjänst, bör ni försäkra er om att dessa företag själva anger i NAP-katalogen att de deltar i produktionen av er tjänst.**"
+                          "**Du kan bara lägga till företag som har ett finländskt FO-nummer.**")
   :csv-info "Om du upprätthåller en lista över de tjänsteproducenter som tillhandahåller tjänsten, uppge då här adressen där listan finns (adressexempel: https://www.finap.fi/ote/csv/palveluyritykset.csv)"
   :csv-file-example "Listan med företagen skall uppges i csv-format. Ladda ner denhär exempelfilen."
   :companies-info "Om du inte har en lista i .csv-format, fyll då i de deltagande företagens namn och FO-nummer här."
@@ -323,8 +324,7 @@
   :allowed-file-types "Godkända filformat är "
 
   :real-time-info "Här kan du rapportera realtidstjänster relaterade till din tjänst som \"bilar på kartan\" eller \"fria parkeringsplatser\""
-  :pick-up-locations-url "Ifall det inte är ändamålsenligt att fylla i verksamhetsställen i tabellen ange i stället en web-adress med motsvarande information."
-  }
+  :pick-up-locations-url "Ifall det inte är ändamålsenligt att fylla i verksamhetsställen i tabellen ange i stället en web-adress med motsvarande information."}
 
  ;; License suggestions (TODO: If we will have more of options, it would be better to store these in the database)
  :licenses
@@ -386,8 +386,7 @@
   :add-new-effective-date "Lägg till nytt datum"
   :transport-service-catalog "Tjänstekatalogen"
   :register-to-service "Registrering"
-  :check-out-the-service "Bekanta dig med informationen"
-  }
+  :check-out-the-service "Bekanta dig med informationen"}
 
  ;; Database enumeration values
  :enums
@@ -1029,10 +1028,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :required-field "Obligatorisk uppgift"
   :required-field-missing "Obligatorisk uppgift"
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
+  :invalid-foreign-business-id "Ett utländskt FO-nummer måste ha minst två och högst 10 tecken."
+  :no-finnish-business-id "Mitt företag har inget finländskt FO-nummer"
   :invalid-postal-code "Kolla postnumret (5 siffror)"
   :invalid-file-type "Ogiltig filtyp"
   :save-failure "Går ej att spara."
   :save-success "Sparat."
+  :send-new-message "Lähetä uusi viesti"
   :transport-service-saved "Uppgifterna sparade!"
   :transport-operator-saved "Uppgifterna sparade!"
   :footer-livi-logo "Traficom"
@@ -1191,7 +1193,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
   :error {:login-error "Kirjautumistiedoissa virhe. Tarkista tiedot ja kokeile uudestaan."
           :no-such-user "Okänd konto"
-          :incorrect-password "Fel lösenord"}
+          :incorrect-password "Fel lösenord"
+          :unconfirmed-email "Kirjautuminen epäonnistui, koska sähköpostia ei ole todennettu. Jos et ole saanut todennusviestiä rekisteröinnin yhteydessä, voit lähettää sen uudelleen."}
 
   :check-email-for-link "Din begäran om ändring av lösenord har mottagits. Vi har nu skickat en länk för att ändra ditt lösenord till ditt mail."
   :logged-out "Du har blivit utloggad"}
@@ -1250,7 +1253,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :confirm-changes "Bekräfta ändringar"
   :change-password "Ändra lösenord"
   :valid-token ["I samband med registreringen får du användarrättigheter till tjänsteproducenten " :operator-name "."]
-  :invalid-token "Din inbjudan har förfallit. Avsluta registreringen och kontakta därefter inbjudans avsändare eller NAP Helpdesk (nap@traficom.fi) för att få en ny inbjudan."}
+  :invalid-token "Din inbjudan har förfallit. Avsluta registreringen och kontakta därefter inbjudans avsändare eller NAP Helpdesk (nap@traficom.fi) för att få en ny inbjudan."
+  :verification-email-sent-text ["Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Todennusviesti on lähetetty osoitteseen " :email "."]
+  :confirmation-failed "Sähköpostin vahvistus epäonnistui"
+  :confirmation-success "Sähköposti vahvistettu"
+  :confirm-email "Sähköpostin todennus"
+  :email-to-be-confirmed "Todennettava sähköposti"
+  :resend-confirmation "Lähetä sähköpostin todentamisviesti uudelleen"
+  :resend-success ["Todentamisviesti lähetetty osoitteeseen " :email ". Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi viestin ohjeen mukaan. Jos todentamisviesti ei tule perille, ota yhteyttä NAP-Helpdeskiin: 029 534 5454 (arkisin klo 9-15) tai nap@traficom.fi"]}
 
  :reset-password
  {:label "Återställ ditt lösenord"
@@ -1314,4 +1324,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                    :body6 "Om du inte lyckas byta lösenordet, kontakta NAP Helpdesk."
                    :body7 "Om du inte har försökt byta ditt lösenord, kan du ignorera detta meddelande."
                    :body8 "Detta meddelande har skickats automatiskt från NAP-systemet. Svara inte på det här meddelandet, eftersom svaren inte behandlas."
-                   :link-text "Återställ lösenord"}}}
+                   :link-text "Återställ lösenord"}
+  :footer {:email-sender "Tämän viestin lähetti NAP."
+           :help-desk "NAP-Helpdesk yhteystiedot:"
+           :help-desk-email "nap@traficom.fi"
+           :help-desk-phone " tai 029 534 5454 (arkisin 09-15)"}
+  :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
+                       :verify-email "Todenna sähköpostiosoite"
+                       :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}}

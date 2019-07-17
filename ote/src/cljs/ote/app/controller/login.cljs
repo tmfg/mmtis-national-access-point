@@ -35,12 +35,11 @@
     (if (and (empty? transport-operators)
              (not= :services page))
       ;; If page is :transport-operator and user has no operators, start creating a new one
-      (do
-        (if (= (:page app) :transport-operator)
-          (assoc app
-                 :transport-operator {:new? true}
-                 :services-changed? true)
-          app))
+      (if (= (:page app) :transport-operator)
+        (assoc app
+          :transport-operator {:new? true}
+          :services-changed? true)
+        app)
 
         ;; Get services from response.
         ;; Use selected operator if possible, if not, use the first one from the response.
@@ -70,12 +69,11 @@
                     (not (empty? navigate-to)) (:page navigate-to)
                     (and authority? (= 0 operators-count)) :authority-pre-notices
                     :else :own-services)]
-     (do
-       (routes/navigate! new-page (:params navigate-to))
-       (-> app
-           (dissoc :login)
-           (update-transport-operator-data (:session-data response))
-           (assoc :flash-message flash-message))))))
+     (routes/navigate! new-page (:params navigate-to))
+     (-> app
+       (dissoc :login)
+       (update-transport-operator-data (:session-data response))
+       (assoc :flash-message flash-message)))))
 
 (extend-protocol tuck/Event
 
@@ -111,7 +109,10 @@
   LoginFailed
   (process-event [{response :response} app]
     ;; The login request itself failed
-    (assoc-in app [:login :error] response))
+    (update app :login assoc
+      :failed? true
+      :in-progress? false
+      :error (:error (:response response))))
 
   LoginCancel
   (process-event [_ app]
@@ -148,41 +149,44 @@
       (update :email (fnil str/trim ""))
       (update :username (fnil str/trim ""))))
 
-(defn- handle-user-save-response [app key response]
-  (let [{:keys [success? username-taken email-taken password-incorrect?]} response]
-    (if success?
-      (login-navigate->page app response (tr [:common-texts :save-user-success]))
-      (-> app
-          (update-in [key :username-taken]
-                     #(if username-taken
-                        (conj (or % #{}) username-taken)
-                        %))
-          (update-in [key :email-taken]
-                     #(if email-taken
-                        (conj (or % #{}) email-taken)
-                        %))
-          (assoc-in [key :password-incorrect?] password-incorrect?)
-          (assoc :flash-message-error
-                 (if (or username-taken email-taken password-incorrect?)
-                   ;; Expected form errors, don't show snackbar
-                   nil
+(defn- handle-user-save-error [app key response]
+  (let [{:keys [username-taken email-taken password-incorrect?]} response]
+    (-> app
+      (update-in [key :username-taken]
+        #(if username-taken
+           (conj (or % #{}) username-taken)
+           %))
+      (update-in [key :email-taken]
+        #(if email-taken
+           (conj (or % #{}) email-taken)
+           %))
+      (assoc-in [key :password-incorrect?] password-incorrect?)
+      (assoc :flash-message-error
+             (if (or username-taken email-taken password-incorrect?)
+               ;; Expected form errors, don't show snackbar
+               nil
 
-                   ;; Unexpected failure, show server error message
-                   (tr [:common-texts :server-error])))))))
+               ;; Unexpected failure, show server error message
+               (tr [:common-texts :server-error]))))))
 
-(define-event RegisterResponse [response]
+(define-event RegisterSuccess [response]
   {}
-  (handle-user-save-response app :register response))
+  (-> app
+    (assoc-in [:register :success?] true)))
+
+(define-event RegisterError [response]
+  {}
+  (handle-user-save-error app :register (:response response)))
 
 (define-event Register [form-data]
   {}
   (let [token (get-in app [:params :token])
-        form-data (if (some? token)
-                    (assoc form-data :token token)
-                    form-data)]
+        form-data (cond-> form-data
+                    true (assoc :language @localization/selected-language)
+                    (some? token) (assoc :token token))]
     (comm/post! "register" form-data
-                {:on-success (tuck/send-async! ->RegisterResponse)
-                 :on-failure (tuck/send-async! ->ServerError)}))
+                {:on-success (tuck/send-async! ->RegisterSuccess)
+                 :on-failure (tuck/send-async! ->RegisterError)}))
   app)
 
 (define-event UpdateUser [user]
