@@ -106,7 +106,7 @@
          :on-click #(e! (to/->FetchYtjOperator (::t-operator/business-id operator)))
          :disabled (or
                      (empty? (::t-operator/business-id operator))
-                     (not (nil? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id])))
+                     (some? (get-in state [:transport-operator :ote.ui.form/errors ::t-operator/business-id]))
                      (:business-id-exists? operator)
                      (ytj-loading? state))})
 
