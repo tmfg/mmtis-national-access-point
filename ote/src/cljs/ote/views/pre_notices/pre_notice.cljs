@@ -142,7 +142,7 @@
         :disabled? true}
        (::t-operator/email operator)]]]]])
 
-(defn transport-type [e! {pre-notice :pre-notice}]
+(defn transport-type [e! {pre-notice :pre-notice} sent?]
   (let [addition [form-fields/field
                   {:label   nil
                    :name    ::transit/other-type-description
@@ -154,47 +154,54 @@
        :columns 3
        :layout  :row}
 
-      {:name                ::transit/pre-notice-type
-       :type                :checkbox-group
-       :container-class     "col-md-12"
-       :header?             false
-       :required?           true
-       :options             notice-types
-       :show-option         (tr-key [:enums ::transit/pre-notice-type])}
+      (merge
+        (when sent?
+          {:option-enabled? (constantly false)})
+        {:name ::transit/pre-notice-type
+         :type :checkbox-group
+         :container-class "col-md-12"
+         :header? false
+         :required? true
+         :options notice-types
+         :show-option (tr-key [:enums ::transit/pre-notice-type])})
 
       {:name ::transit/description
        :type :text-area
        :rows 1
+       :disabled? sent?
        :hint-text (tr [:pre-notice-page :notice-description-hint])
        :full-width? true
        :required? true
        :container-class "col-xs-12 col-sm-12 col-md-6"})))
 
-(defn effective-dates []
+(defn effective-dates [sent?]
   (form/group
     {:label   (tr [:pre-notice-page :effective-dates-title])
      :columns 3
      :layout  :row}
 
-    {:name         ::transit/effective-dates
-     :type         :table
-     :id           :effective-dates-table
-     :table-fields [{:name  ::transit/effective-date
-                     :type  :date-picker
-                     :required? true
-                     :label (tr [:pre-notice-page :effective-date-from])}
+    (merge
+      (when-not sent? {:add-label (tr [:buttons :add-new-effective-date])
+                       :delete? true})
+      {:name ::transit/effective-dates
+       :type :table
+       :id :effective-dates-table
+       :table-fields [{:name ::transit/effective-date
+                       :type :date-picker
+                       :required? true
+                       :disabled? sent?
+                       :label (tr [:pre-notice-page :effective-date-from])}
 
-                    {:name  ::transit/effective-date-description
-                     :type  :autocomplete
-                     :hint-text (tr [:form-help :autocomplete-hint])
-                     :label (tr [:pre-notice-page :effective-date-description])
-                     :open-on-focus? true
-                     :auto-select? true
-                     :suggestions (mapv #(tr [:pre-notice-page :effective-date-descriptions %]) effective-date-descriptions)
-                     :write #(assoc-in %1 [::transit/effective-date-description] #{%2})
-                     :read #(first (get-in % [::transit/effective-date-description]))}]
-     :delete?      true
-     :add-label    (tr [:buttons :add-new-effective-date])}))
+                      {:name ::transit/effective-date-description
+                       :type :autocomplete
+                       :hint-text (tr [:form-help :autocomplete-hint])
+                       :disabled? sent?
+                       :label (tr [:pre-notice-page :effective-date-description])
+                       :open-on-focus? true
+                       :auto-select? true
+                       :suggestions (mapv #(tr [:pre-notice-page :effective-date-descriptions %]) effective-date-descriptions)
+                       :write #(assoc-in %1 [::transit/effective-date-description] #{%2})
+                       :read #(first (get-in % [::transit/effective-date-description]))}]})))
 
 (defn- notice-area-map [_]
   (r/create-class
@@ -215,7 +222,8 @@
           [leaflet/GeoJSON {:data  region-geojson
                             :style {:color "green"}}]))])}))
 
-(defn notice-area [e!]
+(defn notice-area [e! sent?]
+  (println "sent?: " sent?)
   (form/group
     {:label   (tr [:pre-notice-page :route-and-area-information-title])
      :columns 3
@@ -225,6 +233,7 @@
      :name :notice-area
      :should-update-check (juxt ::transit/route-description ::transit/regions :regions)
      :read identity
+     :disabled? sent?
      :required? true
      :is-empty? (fn [{regions ::transit/regions description ::transit/route-description}]
                   (or (empty? regions) (str/blank? description)))
@@ -238,6 +247,7 @@
                       :type :text-area
                       :hint-text (tr [:pre-notice-page :route-description-hint])
                       :full-width? true
+                      :disabled? sent?
                       :warning (when (str/blank? (::transit/route-description pre-notice))
                                  (tr [:common-texts :required-field]))
                       :rows 1
@@ -246,7 +256,7 @@
 
                     (let [regions-with-show
                           (mapv #(assoc % :show (str (:id %) " " (:name %)))
-                                (sort-by :id (vals (:regions pre-notice))))
+                            (sort-by :id (vals (:regions pre-notice))))
                           selected-ids (set (::transit/regions pre-notice))]
                       [form-fields/field
                        {:id "regions"
@@ -254,20 +264,21 @@
                         :type :chip-input
                         :update! #(e! (pre-notice/->SelectedRegions %))
                         :full-width? true
+                        :disabled? sent?
                         :suggestions-config {:text :show
                                              :value :id}
-                        :suggestions (clj->js regions-with-show)
+                        :suggestions (when (not sent?) (clj->js regions-with-show))
                         :max-results 25
                         :open-on-focus? true
                         :auto-select? true
                         :filter (fn [query key]
                                   (str/includes? (str/lower-case key)
-                                                 (str/lower-case query)))
+                                    (str/lower-case query)))
                         :warning (when (empty? (::transit/regions pre-notice))
                                    (tr [:common-texts :required-field]))}
                        (into #{}
-                             (keep #(when (selected-ids (:id %)) %))
-                             regions-with-show)])]
+                         (keep #(when (selected-ids (:id %)) %))
+                         regions-with-show)])]
                    [:div.col-md-7
                     [notice-area-map pre-notice]]])}))
 
@@ -281,6 +292,7 @@
     {:name ::transit/url
      :type :string
      :full-width? true
+     :disabled? sent?
      :container-class "col-xs-12 col-sm-12 col-md-6"}
     {:name :attachments
      :type :table
@@ -316,9 +328,9 @@
      [select-operator e! transport-operator operators]
      [form/form
       form-options
-      [(transport-type e! app)
-       (effective-dates)
-       (notice-area e!)
+      [(transport-type e! app sent?)
+       (effective-dates sent?)
+       (notice-area e! sent?)
        (notice-attachments e! sent?)]
       pre-notice]
      [pre-notice-send-modal e! app]]))
