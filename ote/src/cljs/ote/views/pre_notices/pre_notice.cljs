@@ -10,7 +10,6 @@
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
             [ote.ui.form :as form]
-            [cljs-react-material-ui.icons :as ic]
             [ote.style.form :as style-form]
             [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
@@ -59,7 +58,6 @@
                   [ui/raised-button
                    {:id "confirm-send-pre-notice"
                     :label (tr [:buttons :save-and-send])
-                    :icon (ic/action-delete-forever)
                     :secondary true
                     :primary true
                     :on-click #(do
