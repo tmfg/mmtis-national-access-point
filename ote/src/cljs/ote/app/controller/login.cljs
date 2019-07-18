@@ -174,6 +174,10 @@
   (-> app
     (assoc-in [:register :success?] true)))
 
+(define-event SaveUserSuccess [response]
+  {}
+  (login-navigate->page app response (tr [:common-texts :save-user-success])))
+
 (define-event RegisterError [response]
   {}
   (handle-user-save-error app :register (:response response)))
@@ -195,15 +199,15 @@
       (assoc :form-data user)
       (dissoc :password-incorrect?)))
 
-(define-event SaveUserResponse [response]
+(define-event SaveUserError [response]
   {}
-  (handle-user-save-response app :user response))
+  (handle-user-save-error app :user (:response response)))
 
 (define-event SaveUser [form-data]
   {}
   (comm/post! "save-user" form-data
-              {:on-success (tuck/send-async! ->SaveUserResponse)
-               :on-failure (tuck/send-async! ->ServerError)})
+              {:on-success (tuck/send-async! ->SaveUserSuccess)
+               :on-failure (tuck/send-async! ->SaveUserError)})
   app)
 
 (define-event CancelUserEdit [navigate-back?]

@@ -168,7 +168,7 @@
                           (:password form-data))})
 
       ;; Failed, return errors to form
-      (http/transit-response result))))
+      (http/transit-response result 400))))
 
 (defn request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
