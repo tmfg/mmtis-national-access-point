@@ -1112,7 +1112,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
 
   :send-pre-notice
-  {:title "Lähetä muutosilmoitus?"
+  {:title "Muutosilmoituksen lähettäminen"
    :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
 
   :brokering-service

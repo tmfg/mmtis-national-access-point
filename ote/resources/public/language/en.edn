@@ -1102,8 +1102,8 @@ You can also draw the operating area or point to the map with drawing tools. You
    :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
 
   :send-pre-notice
-  {:title "Lähetä muutosilmoitus?"
-   :confirm "Muutosilmoitusta ei voi enää muokata lähettämisen jälkeen. Haluatko varmasti lähettää muutosilmoituksen viranomaisen käsiteltäväksi?"}
+  {:title "Submit change notification"
+   :confirm "The change notification can no longer be edited after submission. Are you sure you want to send the change notification to the authority?"}
 
   :brokering-service
   {:title "Are you sure, that service you are announcing is a brokering service?"
