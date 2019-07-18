@@ -42,7 +42,9 @@
      [buttons/cancel {:on-click #(do
                                    (.preventDefault %)
                                    (e! (pre-notice/->CancelNotice)))}
-      (tr [:buttons :cancel])]]))
+      (if sent?
+        (tr [:buttons :close])
+        (tr [:buttons :cancel]))]]))
 
 (defn- pre-notice-send-modal [e! app]
   (when (:show-pre-notice-send-modal? app)
@@ -223,7 +225,6 @@
                             :style {:color "green"}}]))])}))
 
 (defn notice-area [e! sent?]
-  (println "sent?: " sent?)
   (form/group
     {:label   (tr [:pre-notice-page :route-and-area-information-title])
      :columns 3

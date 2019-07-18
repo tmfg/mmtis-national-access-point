@@ -108,36 +108,22 @@ describe('Authority pre notice tests', () => {
     });
 
     beforeEach(() => {
+        cy.visit('/#/authority-pre-notices');
+        cy.server();
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
     });
 
     it('should render authority pre notice list', () => {
-        cy.get('.header-general-menu').click();
-
-        cy.get('div.container.general-menu').within($el => {
-            // Dropdown menu links
-            cy.contains('Saapuneet muutosilmoitukset').click();
-
-        });
-
         cy.contains('Säännöllisen henkilöliikenteen muutosilmoitukset');
         cy.contains('Oulu - Kajaani');
         cy.contains('Ilmoitustyyppi');
     });
 
-    xit('should open authority pre notice modal', () => {
-
-        cy.get('.header-general-menu').click();
-
-        cy.get('div.container.general-menu').within($el => {
-            // Dropdown menu links
-            cy.contains('Saapuneet muutosilmoitukset').click();
-
-        });
+    it('should open authority pre notice modal', () => {
 
         // Open Modal
-        cy.get('table tbody tr td').contains('Oulu - Kajaani').click();
+        cy.contains('Oulu - Kajaani').click({force: true});
 
         // Check that modal contains something
         cy.contains('Muutosilmoituksen tiedot');
