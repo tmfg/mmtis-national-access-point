@@ -3,7 +3,7 @@ DROP VIEW transport_service_search_result;
 DROP VIEW "all-companies";
 
 -- This is the reason why this migration exists
-ALTER TABLE "transport-operator" ALTER COLUMN "business-id" type text;
+ALTER TABLE "transport-operator" ALTER COLUMN "business-id" type char(32);
 
 -- Create dropped views again
 CREATE VIEW transport_service_search_result AS
