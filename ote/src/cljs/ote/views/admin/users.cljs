@@ -3,38 +3,33 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
-            [ote.app.controller.front-page :as fp-controller]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
-            [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
             [ote.ui.common :as common-ui]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.theme.colors :as colors]
+            [stylefy.core :as stylefy]
+            [ote.app.controller.front-page :as fp]))
 
 (defn- edit-user-action [e! {:keys [id username show-edit-dialog?] :as user}]
-  [:span
-   [ui/icon-button {:id       (str "edit-user-" id)
-                    :href     "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (admin-controller/->OpenEditUserDialog id)))}
-    [ic/content-create]]
-   (when show-edit-dialog?
-     ^{:key "ckan-user-edit"}
-     [common-ui/ckan-iframe-dialog
-      (tr [:common-texts :user-menu-profile])
-      (str "/user/edit/" (:username user))
-      #(e! (admin-controller/->CloseEditUserDialog id))])])
+  [ui/icon-button (merge {:href (str "#/user/" id)
+                          :on-click #(do
+                                       (.preventDefault %)
+                                       (e! (fp/->ChangePage :user-edit {:id id})))}
+                    (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+   [ic/content-create]])
 
 (defn- delete-user-action [e! {:keys [id show-delete-modal? other-members] :as user}]
   [:span
-   [ui/icon-button {:id       (str "delete-user-" id)
-                    :href     "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (admin-controller/->OpenDeleteUserModal id)))}
+   [ui/icon-button (merge {:id (str "delete-user-" id)
+                           :href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (admin-controller/->OpenDeleteUserModal id)))}
+                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      (let [admin-list (mapv #(if (> (count (:members %)) 0) true false) other-members)]
@@ -155,4 +150,5 @@
                [ui/table-row-column {:style {:padding 0}}
                 [groups-list groups]]
                [ui/table-row-column
-                [delete-user-action e! user]]]))]]])]))
+                [delete-user-action e! user]
+                [edit-user-action e! user]]]))]]])]))
