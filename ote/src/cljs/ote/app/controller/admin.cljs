@@ -416,7 +416,7 @@
   (process-event [{response :response} app ]
     (routes/navigate! :transport-operator {:id (::t-operator/id (:transport-operator (first response)))})
     (-> app
-        ;; Clean up admins own services to enable operator deletion. 
+        ;; Clean up admins own services to enable operator deletion.
         (dissoc :transport-service-vector)
         (assoc :admin-transport-operators response)))
 

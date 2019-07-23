@@ -3,6 +3,7 @@
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
+            [ote.app.controller.user-edit :as user-edit]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
@@ -149,26 +150,6 @@
       (update :email (fnil str/trim ""))
       (update :username (fnil str/trim ""))))
 
-(defn- handle-user-save-error [app key response]
-  (let [{:keys [username-taken email-taken password-incorrect?]} response]
-    (-> app
-      (update-in [key :username-taken]
-        #(if username-taken
-           (conj (or % #{}) username-taken)
-           %))
-      (update-in [key :email-taken]
-        #(if email-taken
-           (conj (or % #{}) email-taken)
-           %))
-      (assoc-in [key :password-incorrect?] password-incorrect?)
-      (assoc :flash-message-error
-             (if (or username-taken email-taken password-incorrect?)
-               ;; Expected form errors, don't show snackbar
-               nil
-
-               ;; Unexpected failure, show server error message
-               (tr [:common-texts :server-error]))))))
-
 (define-event RegisterSuccess [response]
   {}
   (-> app
@@ -180,7 +161,7 @@
 
 (define-event RegisterError [response]
   {}
-  (handle-user-save-error app :register (:response response)))
+  (user-edit/handle-user-save-error app :register (:response response)))
 
 (define-event Register [form-data]
   {}
@@ -201,7 +182,7 @@
 
 (define-event SaveUserError [response]
   {}
-  (handle-user-save-error app :user (:response response)))
+  (user-edit/handle-user-save-error app :user (:response response)))
 
 (define-event SaveUser [form-data]
   {}
