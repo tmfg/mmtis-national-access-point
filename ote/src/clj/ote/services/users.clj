@@ -122,6 +122,13 @@
         user (set/rename-keys user {::user/id :id ::user/fullname :name ::user/email :email ::user/name :username})]
     user))
 
+(defn handle-fetch-user-data
+  [db id]
+  (let [user (fetch-user-data db id)]
+    (if (nil? user)
+      (http/transit-response {} 404)
+      (http/transit-response user 200))))
+
 (defn edit-user-info
   [db email requester user-id form-data]
   (tx/with-transaction db
@@ -209,7 +216,7 @@
     (let [form-data (http/transit-request form-data)]
       (#'manage-new-confirmation db email form-data)))
 
-  ^{:unauthenticated FALSE}
+  ^{:unauthenticated false}
   (POST "/save-user" {form-data :body
                       user :user}
     (#'save-user db email auth-tkt-config (:user user)
@@ -239,8 +246,8 @@
   ^{:unauthenticated false}
   (GET "/user/:id" {user :user
                     params :params :as request}
-    (if (:admin? (:user user))
-      (http/transit-response (fetch-user-data db (:id params)) 200)
+    (if (and (:admin? (:user user)) (:id params))
+      (handle-fetch-user-data db (:id params))
       (http/transit-response {} 401)))
 
   ^{:unauthenticated false}
