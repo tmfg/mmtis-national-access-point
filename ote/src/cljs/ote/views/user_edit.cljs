@@ -16,11 +16,10 @@
   "Edit own user info"
   [e! app]
   (r/create-class
-    {:component-will-unmount #(println "cancel unmount")
-     :reagent-render
+    {:reagent-render
      (fn
        [e! {:keys [user user-edit params] :as app}]
-       (let [{:keys [email-taken username-taken form-data]} user-edit]
+       (let [{:keys [email-taken username-taken form-data email-confirmed?]} user-edit]
          [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
           [list-header/header app (tr [:common-texts :user-menu-profile])]
           [form/form
@@ -64,7 +63,9 @@
                             (when (and email-taken (email-taken data))
                               (tr [:register :errors :email-taken])))]
                :should-update-check form/always-update}
-
+              (if email-confirmed?
+                (form/info "Käyttäjä on varmentanut sähköpostiosoitteen.")
+                (form/info "Käyttäjä ei ole varmentanut sähköpostiosoitetta."))
               (form/subtitle :h3 (tr [:register :change-password]) {:margin-top "3rem"})
               {:name :password :type :string :password? true
                :label (tr [:register :fields :new-password])
