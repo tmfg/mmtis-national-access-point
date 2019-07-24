@@ -5,6 +5,7 @@
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
             [clojure.string :as str]
+            [ote.util.encrypt :as encrypt]
             [ote.test :refer [system-fixture http-post]]
             [com.stuartsierra.component :as component])
   (:import (java.util Base64)))
@@ -24,7 +25,7 @@
                              #"\+" ".")]
      (and
       (= base64
-         (sut/hex->base64 (sut/base64->hex base64)))))))
+         (encrypt/hex->base64 (encrypt/base64->hex base64)))))))
 
 (defspec buddy<->passlib
   10
@@ -32,9 +33,9 @@
    [input-password (gen/resize 30 (gen/frequency
                                    [[30 gen/string]
                                     [70 gen/string-alphanumeric]]))]
-   (let [buddy (sut/encrypt input-password)]
+   (let [buddy (encrypt/encrypt input-password)]
      (= buddy
-        (sut/passlib->buddy (sut/buddy->passlib buddy))))))
+        (encrypt/passlib->buddy (encrypt/buddy->passlib buddy))))))
 
 (deftest password-reset-request-sends-email
   (let [response (http-post "request-password-reset" {:email "admin@napoteadmin123.com"
