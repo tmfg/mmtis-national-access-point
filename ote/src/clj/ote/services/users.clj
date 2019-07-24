@@ -28,6 +28,11 @@
 
 (defqueries "ote/services/user_service.sql")
 
+(defn delete-users-old-token!
+  [db user-email]
+  (specql/delete! db ::user/email-confirmation-token
+    {::user/user-email user-email}))
+
 (defn send-email-verification
   [email-config user-email language email-confirmation-uuid]
   (try
@@ -55,17 +60,18 @@
     (string? name)
     (not (str/blank? name))))
 
-(defn save-user! [db email-config user form-data admin?]
+(defn save-user!
+  [db email-config requester form-data admin?]
   (if-not (valid-user-save? form-data)
     {:success? false}
     (with-transaction db
-      (let [username-taken? (and (not= (:username user) (:username form-data))
+      (let [username-taken? (and (not= (:username requester) (:username form-data))
                               (username-exists? db {:username (:username form-data)}))
             language (or (:language form-data) :fi)
-            email-changed? (not= (:email user) (:email form-data))
+            email-changed? (not= (:email requester) (:email form-data))
             email-taken? (and email-changed?
                            (email-exists? db {:email (:email form-data)}))
-            login-info (first (login/fetch-login-info db {:email (:email user)}))
+            login-info (first (login/fetch-login-info db {:email (:email requester)}))
             password-incorrect? (if admin?
                                   false
                                   (or (str/blank? (:current-password form-data))
@@ -87,28 +93,33 @@
                          ;; If new password provided, change it
                          (when-not (str/blank? (:password form-data))
                            {::user/password (encrypt/buddy->passlib (encrypt/encrypt (:password form-data)))})
-                         (when (and email-changed? (not (str/blank? (:email form-data))))
+                         (when email-changed?
                            {::user/email (:email form-data)
                             ::user/email-confirmed? false
                             ::user/confirmation-time nil}))
-                       {::user/id (:id user)})
+                       {::user/id (:id requester)})
                 UUID (str (UUID/randomUUID))]
             ;; When email is changed also send new confirmation email
-            (when (and email-changed? (not (str/blank? (:email form-data))))
-              (create-confirmation-token! db (:email form-data) UUID)
-              (send-email-verification email-config (:email form-data) language UUID))
-            {:success? true}))))))
+            (if email-changed?
+              (do (create-confirmation-token! db (:email form-data) UUID)
+                  (delete-users-old-token! db (:email requester)) ;; If the user changes email multiple times, delete old tokens
+                  (send-email-verification email-config (:email form-data) language UUID)
+                  {:success? true
+                   :email-changed? true})
+              {:success? true})))))))
 
 
 (defn save-user [db email auth-tkt-config user form-data]
   (let [result (save-user! db email user form-data false)]
     (if (:success? result)
       ;; User updated, re-login immediately with updated info
-      (login/login db auth-tkt-config
-        {:email (:email form-data)
-         :password (if (str/blank? (:password form-data))
-                     (:current-password form-data)
-                     (:password form-data))})
+      (if-not (:email-changed? result)
+        (login/login db auth-tkt-config
+          {:email (:email form-data)
+           :password (if (str/blank? (:password form-data))
+                       (:current-password form-data)
+                       (:password form-data))})
+        (http/transit-response result 200))
 
       ;; Failed, return errors to form
       (http/transit-response result 400))))
@@ -117,9 +128,14 @@
   [db id]
   (let [user (first (specql/fetch db
                       ::user/user
-                      #{::user/id ::user/fullname ::user/email ::user/name}
+                      #{::user/id ::user/fullname ::user/email ::user/name ::user/email-confirmed?}
                       {::user/id id}))
-        user (set/rename-keys user {::user/id :id ::user/fullname :name ::user/email :email ::user/name :username})]
+        user (set/rename-keys user
+               {::user/id :id
+                ::user/fullname :name
+                ::user/email :email
+                ::user/name :username
+                ::user/email-confirmed? :email-confirmed?})]
     user))
 
 (defn handle-fetch-user-data
@@ -146,12 +162,6 @@
         (http/transit-response result 200)
         (http/transit-response result 400)))))
 
-
-(defn delete-users-old-token!
-  [db user-email]
-  (specql/delete! db ::user/email-confirmation-token
-    {::user/user-email user-email}))
-
 (defn manage-new-confirmation
   "We always want to send the same response so someone can't get all the user emails by spamming this endpoint"
   [db email-config form-data]
@@ -164,7 +174,7 @@
                                        #{::user/email-confirmed?}
                                        {::user/email user-email})))
             confirmation-token (str (UUID/randomUUID))]
-        (if user-confirmed?
+        (if (or user-confirmed? (nil? user-confirmed?))
           (http/transit-response :success true)
           (do
             (delete-users-old-token! db user-email)
