@@ -50,8 +50,7 @@
 (define-event CancelEdit []
   {}
   (routes/navigate! :admin)
-  (-> app
-    (update-in [:admin :user-listing] dissoc :results)))
+  app)
 
 (define-event UserSaveFailure [response]
   {}
