@@ -61,17 +61,19 @@
     (not (str/blank? name))))
 
 (defn save-user!
-  [db email-config requester form-data admin?]
+  [db email-config user form-data admin?]
   (if-not (valid-user-save? form-data)
     {:success? false}
     (with-transaction db
-      (let [username-taken? (and (not= (:username requester) (:username form-data))
-                              (username-exists? db {:username (:username form-data)}))
+      (let [{new-email :email
+             new-username :username} form-data
+            username-taken? (and (not= (:username user) new-username)
+                              (username-exists? db {:username new-username}))
             language (or (:language form-data) :fi)
-            email-changed? (not= (:email requester) (:email form-data))
+            email-changed? (not= (:email user) new-email)
             email-taken? (and email-changed?
-                           (email-exists? db {:email (:email form-data)}))
-            login-info (first (login/fetch-login-info db {:email (:email requester)}))
+                           (email-exists? db {:email new-email}))
+            login-info (first (login/fetch-login-info db {:email (:email user)}))
             password-incorrect? (if admin?
                                   false
                                   (or (str/blank? (:current-password form-data))
@@ -81,31 +83,33 @@
           ;; Password incorrect, username or email taken => return errors to form
           (or username-taken? email-taken? password-incorrect?)
           {:success? false
-           :username-taken (when username-taken? (:username form-data))
-           :email-taken (when email-taken? (:email form-data))
+           :username-taken (when username-taken? new-username)
+           :email-taken (when email-taken? new-email)
            :password-incorrect? password-incorrect?}
 
           ;; Request is valid, do update
-          (let [user (specql/update! db ::user/user
+          (let [
+                _ (specql/update! db ::user/user
                        (merge
-                         {::user/name (:username form-data)
+                         {::user/name new-username
                           ::user/fullname (:name form-data)}
                          ;; If new password provided, change it
                          (when-not (str/blank? (:password form-data))
                            {::user/password (encrypt/buddy->passlib (encrypt/encrypt (:password form-data)))})
                          (when email-changed?
-                           {::user/email (:email form-data)
+                           {::user/email new-email
                             ::user/email-confirmed? false
                             ::user/confirmation-time nil}))
-                       {::user/id (:id requester)})
+                       {::user/id (:id user)})
                 UUID (str (UUID/randomUUID))]
             ;; When email is changed also send new confirmation email
             (if email-changed?
-              (do (create-confirmation-token! db (:email form-data) UUID)
-                  (delete-users-old-token! db (:email requester)) ;; If the user changes email multiple times, delete old tokens
-                  (send-email-verification email-config (:email form-data) language UUID)
+              (do (create-confirmation-token! db new-email UUID)
+                  (delete-users-old-token! db (:email user)) ;; If the user changes email multiple times, delete old tokens
+                  (send-email-verification email-config new-email language UUID)
                   {:success? true
-                   :email-changed? true})
+                   :email-changed? true
+                   :new-email new-email})
               {:success? true})))))))
 
 
