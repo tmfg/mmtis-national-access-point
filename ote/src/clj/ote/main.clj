@@ -57,7 +57,7 @@
    :index (component/using (index/->Index config)
                            [:http :db])
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
-   :users (component/using (users/->UsersService config)  [:http :db :email])
+   :users (component/using (users/->UsersService (get-in config [:http :auth-tkt]))  [:http :db :email])
    ;; Services for the frontend
    :register (component/using (register-services/->Register config) [:http :db :email])
    :transport (component/using (transport-service/->Transport config) [:http :db :email])
