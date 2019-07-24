@@ -157,7 +157,9 @@
 
 (define-event SaveUserSuccess [response]
   {}
-  (login-navigate->page app response (tr [:common-texts :save-user-success])))
+  (if (:email-changed? response)
+    (assoc-in app [:user :edit-response] response)
+    (login-navigate->page app response (tr [:common-texts :save-user-success]))))
 
 (define-event RegisterError [response]
   {}
