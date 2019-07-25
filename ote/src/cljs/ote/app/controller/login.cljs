@@ -157,8 +157,12 @@
 
 (define-event SaveUserSuccess [response]
   {}
+  ;; If email is changed we can't login the user until the new email address is validated
   (if (:email-changed? response)
-    (assoc-in app [:user :edit-response] response)
+    (-> app
+      (assoc-in [:user :edit-response] response)
+      (assoc-in [:user :email] (:new-email response))
+      (assoc-in [:user :form-data :current-password] ""))
     (login-navigate->page app response (tr [:common-texts :save-user-success]))))
 
 (define-event RegisterError [response]
