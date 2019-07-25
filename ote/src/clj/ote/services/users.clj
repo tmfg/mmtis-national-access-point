@@ -88,8 +88,7 @@
            :password-incorrect? password-incorrect?}
 
           ;; Request is valid, do update
-          (let [
-                _ (specql/update! db ::user/user
+          (let [_ (specql/update! db ::user/user
                        (merge
                          {::user/name new-username
                           ::user/fullname (:name form-data)}
@@ -104,8 +103,8 @@
                 UUID (str (UUID/randomUUID))]
             ;; When email is changed also send new confirmation email
             (if email-changed?
-              (do (create-confirmation-token! db new-email UUID)
-                  (delete-users-old-token! db (:email user)) ;; If the user changes email multiple times, delete old tokens
+              (do (delete-users-old-token! db (:email user)) ;; If the user changes email multiple times, delete old tokens
+                  (create-confirmation-token! db new-email UUID)
                   (send-email-verification email-config new-email language UUID)
                   {:success? true
                    :email-changed? true
