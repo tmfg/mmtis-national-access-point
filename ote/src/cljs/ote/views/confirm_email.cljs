@@ -7,12 +7,13 @@
             [ote.ui.common :as common-ui]))
 
 (defn confirm-success
-  []
+  [app]
   [:div
    [notification/notification {:text (tr [:register :confirmation-success])
                                :type :success}]
-   [:div {:style {:margin-top "1rem"}}
-    [common-ui/linkify "/#/login" (tr [:login :login-button])]]])
+   (when (:user app)
+     [:div {:style {:margin-top "1rem"}}
+        [common-ui/linkify "/#/login" (tr [:login :login-button])]])])
 
 (defn confirm-failure
   []
@@ -31,6 +32,6 @@
      [:h1 (tr [:register :confirm-email])]
      (if loaded?
        (if success?
-         [confirm-success]
+         [confirm-success app]
          [confirm-failure])
        [prog/circular-progress])]))
