@@ -404,7 +404,7 @@
 (defn- remove-date2-keys [coll]
   (-> coll
       (assoc :date2 nil
-             :date2-trips nils
+             :date2-trips nil
              :date2-route-lines nil)))
 
 (define-event SelectDatesForComparison [date]
