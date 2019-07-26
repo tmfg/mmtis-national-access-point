@@ -122,7 +122,6 @@
 (declare navigate!)
 
 (defn on-navigate [go-to-url-event route-name params query]
-  (println "on navigate :" params)
   (swap! state/app
          (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
            (if (and before-unload-message (not navigation-prompt-open?))
