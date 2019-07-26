@@ -702,7 +702,7 @@
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
                                         all-route-changes-display? all-route-changes-checkbox]
-                                 :as transit-visualization} params]
+                                 :as transit-visualization}]
   (let [routes (if all-route-changes-display?
                  changes-route-no-change
                  changes-route-filtered)
