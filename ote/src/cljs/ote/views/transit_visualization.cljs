@@ -16,6 +16,7 @@
             [clojure.string :as str]
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
+            [ote.app.routes :as routes]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
@@ -325,7 +326,10 @@
                    :name->label str
                    :show-row-hover? true
                    :on-select #(when (first %)
-                                 (do
+                                 (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")
+                                       route (str/replace (:route-hash-id (first %)) #"\s" "")]
+                                   (.pushState js/window.history #js {} js/document.title
+                                     (str current-url route))
                                    (e! (tv/->SelectRouteForDisplay (first %)))
                                    (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
                    :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
@@ -426,7 +430,7 @@
           :col-style style-base/table-col-style-wrap}
          {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
           :read #(-> % first :stoptimes first :gtfs/departure-time)
-          :format (partial format-stop-time (style/date1-highlight-style) )
+          :format (partial format-stop-time (style/date1-highlight-style))
           :col-style style-base/table-col-style-wrap}
          ;; name of the last stop of the first trip
          {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
@@ -698,7 +702,7 @@
 (defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
                                         all-route-changes-display? all-route-changes-checkbox]
-                                 :as transit-visualization}]
+                                 :as transit-visualization} params]
   (let [routes (if all-route-changes-display?
                  changes-route-no-change
                  changes-route-filtered)
@@ -707,7 +711,7 @@
                           (:route-long-name selected-route)
                           " (" (:trip-headsign selected-route) ")")
                      (str (:route-short-name selected-route) " "
-                          (:route-long-name selected-route)))]
+                       (:route-long-name selected-route)))]
     [:div
      [:div.transit-visualization
 

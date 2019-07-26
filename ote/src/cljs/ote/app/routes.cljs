@@ -47,6 +47,7 @@
     ["/edit-route/:id" :edit-route]
 
     ["/routes/view-gtfs" :view-gtfs]
+    ["/transit-visualization/:service-id/:date/:scope/:route" :transit-visualization]
     ["/transit-visualization/:service-id/:date/:scope" :transit-visualization]
     ["/transit-changes" :transit-changes]
 
@@ -121,6 +122,7 @@
 (declare navigate!)
 
 (defn on-navigate [go-to-url-event route-name params query]
+  (println "on navigate :" params)
   (swap! state/app
          (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
            (if (and before-unload-message (not navigation-prompt-open?))

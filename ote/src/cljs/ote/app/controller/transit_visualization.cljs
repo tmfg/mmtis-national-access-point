@@ -171,21 +171,6 @@
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
 
-(define-event LoadServiceChangesForDateResponse [response detection-date]
-  {:path [:transit-visualization]}
-  (let [date-filter (if (= "now" (:scope app))
-                      (time/now-iso-date-str)
-                      detection-date)
-        changes (future-changes date-filter (:route-changes response))]
-    (assoc app
-      :service-changes-for-date-loading? false
-      :service-info (:service-info response)
-      :changes-all (sort-by :different-week-date < changes)
-      :changes-route-no-change (sorted-route-changes true changes)
-      :changes-route-filtered (sorted-route-changes false changes)
-      :gtfs-package-info (:gtfs-package-info response)
-      :route-hash-id-type (:route-hash-id-type response))))
-
 (defn- init-view-state [app scope]
   (let [initial-view-state {:all-route-changes-display? false
                             :all-route-changes-chenckbox false
@@ -193,15 +178,6 @@
                             :scope scope
                             :service-changes-for-date-loading? true}]
     (assoc app :transit-visualization initial-view-state)))
-
-(define-event InitTransitVisualization [service-id detection-date scope]
-  {}
-  (comm/get! (str "transit-visualization/" service-id "/" detection-date)
-             {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (init-view-state app scope))
-
-(defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -226,7 +202,7 @@
            (assoc-in [:compare :date2-route-lines] geojson)
            (assoc-in [:compare :date2-show?] true))
 
-       :default
+       :else
        (assoc app :route-lines-for-date-loading? false))
 
      ;; Add all received routes to shown map
@@ -275,7 +251,7 @@
                       ;added - count trips from date2 because date1 is empty
                       {:added-trips (count date2-trips)})))
 
-      :default
+      :else
       transit-visualization)))
 
 ;; Routes trip data
@@ -292,7 +268,7 @@
               (assoc :route-trips-for-date2-loading? false)
               (assoc-in [:compare :date2-trips] trips))
 
-          :default
+          :else
           app)
         app (if (loading-trips? app)
               app
@@ -428,7 +404,7 @@
 (defn- remove-date2-keys [coll]
   (-> coll
       (assoc :date2 nil
-             :date2-trips nil
+             :date2-trips nils
              :date2-route-lines nil)))
 
 (define-event SelectDatesForComparison [date]
@@ -470,14 +446,54 @@
                                                              earlier-date
                                                              later-date)))))))
 
+(define-event LoadServiceChangesForDateResponse [response detection-date]
+  {}
+  (let [date-filter (if (= "now" (:scope app))
+                      (time/now-iso-date-str)
+                      detection-date)
+        route-hash (get-in app [:params :route])
+        changes (future-changes date-filter (:route-changes response))
+        route (some
+                (fn [x]
+                  (when
+                    (= (js/encodeURIComponent (str/replace (:route-hash-id x) #"\s" "")) route-hash)
+                    x))
+                changes)]
+    (when route-hash
+      (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
+        {:params {:route-hash-id (ensure-route-hash-id route)}
+         :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)}))
+    (-> app
+      (assoc :transit-visualization
+             (assoc (:transit-visualization app)
+               :service-changes-for-date-loading? false
+               :service-info (:service-info response)
+               :changes-all (sort-by :different-week-date < changes)
+               :changes-route-no-change (sorted-route-changes true changes)
+               :changes-route-filtered (sorted-route-changes false changes)
+               :gtfs-package-info (:gtfs-package-info response)
+               :route-hash-id-type (:route-hash-id-type response)))
+      (assoc-in [:transit-visualization :selected-route] route))))
+
 (define-event SelectRouteForDisplay [route]
   {}
   (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
              {:params  {:route-hash-id (ensure-route-hash-id route)}
               :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
+  (println "location: " js/window.location.href)
   (-> app
       (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
       (assoc-in [:transit-visualization :compare :differences] nil)))
+
+(define-event InitTransitVisualization [service-id detection-date scope]
+  {}
+  (comm/get! (str "transit-visualization/" service-id "/" detection-date)
+    {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
+  (init-view-state app scope))
+
+(defmethod routes/on-navigate-event :transit-visualization [{params :params}]
+  (println "on-navigate")
+  (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
@@ -488,7 +504,7 @@
     (= date (:date2 app))
     (update app :date2-show? not)
 
-    :default
+    :else
     app))
 
 (define-event ToggleDifferent []
