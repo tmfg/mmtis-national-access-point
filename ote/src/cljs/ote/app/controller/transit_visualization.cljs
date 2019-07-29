@@ -451,15 +451,14 @@
   (let [date-filter (if (= "now" (:scope app))
                       (time/now-iso-date-str)
                       detection-date)
-        route-hash (get-in app [:params :route])
+        route-hash (js/decodeURIComponent (get-in app [:params :route]))
         changes (future-changes date-filter (:route-changes response))
         route (some
-                (fn [x]
-                  (when
-                    (= (js/encodeURIComponent (str/replace (:route-hash-id x) #"\s" "")) route-hash)
-                    x))
+                #(when
+                  (= (str/replace (:route-hash-id %) #"\s" "") route-hash)
+                  %)
                 changes)]
-    (when route-hash
+    (when route-hash                                        ;;route-hash exists when you have a url where route is selected
       (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
         {:params {:route-hash-id (ensure-route-hash-id route)}
          :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)}))
@@ -480,7 +479,6 @@
   (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
              {:params  {:route-hash-id (ensure-route-hash-id route)}
               :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-  (println "location: " js/window.location.href)
   (-> app
       (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
       (assoc-in [:transit-visualization :compare :differences] nil)))
@@ -492,7 +490,6 @@
   (init-view-state app scope))
 
 (defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (println "on-navigate")
   (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
 
 (define-event ToggleRouteDisplayDate [date]
