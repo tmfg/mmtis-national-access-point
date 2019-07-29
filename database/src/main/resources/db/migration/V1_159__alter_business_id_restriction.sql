@@ -2,8 +2,22 @@
 DROP VIEW transport_service_search_result;
 DROP VIEW "all-companies";
 
--- This is the reason why this migration exists
-ALTER TABLE "transport-operator" ALTER COLUMN "business-id" type char(32);
+
+-- These changes are made in between creation and deletion of views.
+ALTER TABLE "transport-operator" ALTER COLUMN "business-id" type text;
+
+ALTER TYPE company RENAME to oldcompany;
+
+CREATE TYPE company AS (
+    name VARCHAR(200),
+    "business-id" text
+);
+
+ALTER TABLE service_company ALTER COLUMN companies TYPE company[] USING companies::text::company[];
+
+ALTER TABLE "transport-service" ALTER COLUMN companies TYPE company[] USING companies::text::company[];
+
+DROP TYPE oldcompany;
 
 -- Create dropped views again
 CREATE VIEW transport_service_search_result AS
