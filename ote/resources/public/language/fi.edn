@@ -1242,6 +1242,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week "Viikonpäivä"
   :exception "Poikkeus"}
 
+ :user
+ {:change-email-warning "Huom! Jos muokkaat sähköpostiosoitetta tulee sinun vahvistaa uusi sähköpostiosoite ennen kuin voit kirjautua uudelleen sisään."}
+
  :register
  {:label "Rekisteröi uusi käyttäjätili"
   :fields {:username "Käyttäjätunnus"

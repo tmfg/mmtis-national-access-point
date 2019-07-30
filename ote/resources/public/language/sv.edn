@@ -1231,6 +1231,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week "Veckodag"
   :exception "Undantag"}
 
+ :user
+ {:change-email-warning "Huom! Jos muokkaat sähköpostiosoitetta tulee sinun vahvistaa uusi sähköpostiosoite ennen kuin voit kirjautua uudelleen sisään."}
+
  :register
  {:label "Skapa ett nytt konto"
   :fields {:username "Användarnamn"
