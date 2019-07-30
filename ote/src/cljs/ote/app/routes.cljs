@@ -76,7 +76,7 @@
                      :email-settings :user-edit})
 
 ;; Add pages that needs :transit-authority? authenticating to this list
-(def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes})
+(def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes :monitor})
 
 (def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-commercial-services :admin-exception-days :user-edit})
 
@@ -150,33 +150,34 @@
                      ;; Remove potentially sensitive arguments from analytics script reporting
                      win-location (if-let [opt-out-page (#{:register :reset-password :confirm-email} (:page navigation-data))]
                                     (str "/" (name opt-out-page))
-                                    win-location)]
-
-                 (if (or (requires-authentication? app)
-                         (requires-transit-authority? app)
-                         (requires-admin? app))
+                                    win-location)
+                     not-authorized? (or (requires-authentication? app)
+                                       (requires-transit-authority? app)
+                                       (requires-admin? app))]
+                 (if not-authorized?
                    (do (navigate! :login)
                        (assoc orig-app
                          :login {:show? true
                                  :navigate-to navigation-data}))
 
                    ;; Send startup events (if any) immediately after returning from this swap
-                   (when (or event-leave event-to)
+                   (if (or event-leave event-to)
+                     (do
+                       ; SPA page changes must be pushed to analytics script because url route might not change.
+                       ;; Check tracker script in case script loading failed. A browser extension or other issue may block it.
+                       (when (exists? js/_paq)
+                         (.push js/_paq (clj->js ["setCustomUrl", win-location]))
+                         ;; trackPageView signals to matomo piwik js api a single page visit.
+                         (.push js/_paq (clj->js ["trackPageView"])))
 
-                     ; SPA page changes must be pushed to analytics script because url route might not change.
-                     ;; Check tracker script in case script loading failed. A browser extension or other issue may block it.
-                     (when (exists? js/_paq)
-                       (.push js/_paq (clj->js ["setCustomUrl", win-location]))
-                       ;; trackPageView signals to matomo piwik js api a single page visit.
-                       (.push js/_paq (clj->js ["trackPageView"])))
-
-                     (.setTimeout
-                       js/window
-                       (fn []
-                         (send-startup-events (vec (concat event-leave event-to))))
-                       0)
-                     app))
-                 app))))))
+                       (.setTimeout
+                         js/window
+                         (fn []
+                           (send-startup-events (vec (concat event-leave event-to))))
+                         0)
+                       app)
+                     app)))
+               app)))))
 
 (defn start! [go-to-url-event]
   (r/start! ote-router {:default :front-page
