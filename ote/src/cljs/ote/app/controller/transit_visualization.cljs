@@ -451,17 +451,20 @@
   (let [date-filter (if (= "now" (:scope app))
                       (time/now-iso-date-str)
                       detection-date)
-        route-hash (js/decodeURIComponent (get-in app [:params :route]))
         changes (future-changes date-filter (:route-changes response))
-        route (some
-                #(when
-                  (= (str/replace (:route-hash-id %) #"\s" "") route-hash)
-                  %)
-                changes)]
-    (when route-hash                                        ;;route-hash exists when you have a url where route is selected
+        route (when-let [route-hash (js/decodeURIComponent (get-in app [:params :route]))]
+                (some
+                  #(when
+                     (= (str/replace (:route-hash-id %) #"\s" "") route-hash)
+                     %)
+                  changes))]
+    (if route                                             ;;route-hash exists when you have a url where route is selected
       (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
         {:params {:route-hash-id (ensure-route-hash-id route)}
-         :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)}))
+         :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
+      (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")]
+        (.pushState js/window.history #js {} js/document.title
+          current-url)))
     (-> app
       (assoc :transit-visualization
              (assoc (:transit-visualization app)
@@ -471,8 +474,8 @@
                :changes-route-no-change (sorted-route-changes true changes)
                :changes-route-filtered (sorted-route-changes false changes)
                :gtfs-package-info (:gtfs-package-info response)
-               :route-hash-id-type (:route-hash-id-type response)))
-      (assoc-in [:transit-visualization :selected-route] route))))
+               :route-hash-id-type (:route-hash-id-type response)
+               :selected-route route)))))
 
 (define-event SelectRouteForDisplay [route]
   {}
