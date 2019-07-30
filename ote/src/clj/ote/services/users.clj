@@ -150,20 +150,19 @@
 
 (defn edit-user-info
   [db email requester user-id form-data]
-  (tx/with-transaction db
-    (let [user (fetch-user-data db user-id)
-          result (save-user! db email user form-data (get-in requester [:user :admin?]))
-          auditlog {::auditlog/event-type :modify-user
-                    ::auditlog/event-attributes
-                    [{::auditlog/name "editing-user", ::auditlog/value (str (get-in requester [:user :id]))}
-                     {::auditlog/name "edited-user", ::auditlog/value (str (:id user))}]
-                    ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
-                    ::auditlog/created-by (get-in requester [:user :id])}
-          _ (specql/insert! db ::auditlog/auditlog auditlog)]
-      (log/info (get-in requester [:user :email]) " requested to edit user: " user-id)
-      (if (:success? result)
-        (http/transit-response result 200)
-        (http/transit-response result 400)))))
+  (let [user (fetch-user-data db user-id)
+        result (save-user! db email user form-data (get-in requester [:user :admin?]))
+        auditlog {::auditlog/event-type :modify-user
+                  ::auditlog/event-attributes
+                  [{::auditlog/name "editing-user", ::auditlog/value (str (get-in requester [:user :id]))}
+                   {::auditlog/name "edited-user", ::auditlog/value (str (:id user))}]
+                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                  ::auditlog/created-by (get-in requester [:user :id])}
+        _ (specql/insert! db ::auditlog/auditlog auditlog)]
+    (log/info (get-in requester [:user :email]) " requested to edit user: " user-id)
+    (if (:success? result)
+      (http/transit-response result 200)
+      (http/transit-response result 400))))
 
 (defn manage-new-confirmation
   "We always want to send the same response so someone can't get all the user emails by spamming this endpoint"
@@ -178,12 +177,12 @@
                                        {::user/email user-email})))
             confirmation-token (str (UUID/randomUUID))]
         (if (or user-confirmed? (nil? user-confirmed?))
-          (http/transit-response :success true)
+          (http/transit-response {:success true} 200)
           (do
             (delete-users-old-token! db user-email)
             (create-confirmation-token! db user-email confirmation-token)
             (send-email-verification email-config user-email language confirmation-token)
-            (http/transit-response :success true)))))))
+            (http/transit-response {:success true} 200)))))))
 
 (defn manage-confirm-email-address
   [db form-data]
@@ -201,8 +200,14 @@
           (specql/delete! db ::user/email-confirmation-token
             {::user/token token})
           (http/transit-response {:message :email-validation-success} 200))
-      (http/transit-response {:message :email-validation-failure} 401))))
+      (do
+        (log/info "Email confirmation failed with token: " token)
+        (http/transit-response {:message :email-validation-failure} 401)))))
 
+(defn clean-old-email-confirmation-tokens
+  [db]
+  (specql/delete! db ::user/email-confirmation-token
+    {::user/expiration (op/>= (tc/to-sql-date (t/now)))}))
 
 (define-service-component UsersService
   {:fields [auth-tkt-config]
@@ -212,11 +217,13 @@
   (POST "/confirm-email" {form-data :body
                           user :user}
     (let [form-data (http/transit-request form-data)]
+      (#'clean-old-email-confirmation-tokens db)
       (#'manage-confirm-email-address db form-data)))
 
   ^:unauthenticated
   (POST "/token/validate" {form-data :body
                            user :user}
+    ;; This ns validates user invite to operator
     (let [token (:token (http/transit-request form-data))
           operator (first (fetch-operator-info db {:token token}))]
       (if (some? operator)
@@ -234,27 +241,6 @@
                       user :user}
     (#'save-user db email auth-tkt-config (:user user)
       (http/transit-request form-data)))
-
-  ^:unauthenticated
-  (POST "/token/validate" {form-data :body
-                           user :user}
-    (let [token (:token (http/transit-request form-data))
-          operator (first (fetch-operator-info db {:token token}))]
-      (if (some? operator)
-        (http/transit-response operator)
-        (http/transit-response "Invalid token" 400))))
-
-  ^:unauthenticated
-  (POST "/confirm-email" {form-data :body
-                          user :user}
-    (let [form-data (http/transit-request form-data)]
-      (#'manage-confirm-email-address db form-data)))
-
-  ^:unauthenticated
-  (POST "/send-email-confirmation" {form-data :body
-                                    user :user}
-    (let [form-data (http/transit-request form-data)]
-      (#'manage-new-confirmation db email form-data)))
 
   ^{:unauthenticated false}
   (GET "/user/:id" {user :user

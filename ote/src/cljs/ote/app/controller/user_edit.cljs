@@ -46,7 +46,6 @@
     (update-in [:admin :user-listing] dissoc :results)
     (assoc :flash-message "Käyttäjän tiedot tallennettu onnistuneesti")))
 
-
 (define-event CancelEdit []
   {}
   (routes/navigate! :admin)
