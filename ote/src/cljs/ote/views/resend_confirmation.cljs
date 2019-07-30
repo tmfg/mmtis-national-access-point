@@ -25,6 +25,7 @@
       [form-fields/field {:element-id "user-email"
                           :type :string
                           :full-width? true
+                          :disabled? submit-success?
                           :name :add-member
                           :update! #(e! (rc-controller/->EmailFieldOnChange %))
                           :label (tr [:register :email-to-be-confirmed])

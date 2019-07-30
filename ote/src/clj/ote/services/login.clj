@@ -1,13 +1,13 @@
 (ns ote.services.login
   "Login related services"
   (:require [buddy.hashers :as hashers]
-            [clojure.string :as str]
-            [jeesql.core :refer [defqueries]]
             [hiccup.core :refer [html]]
             [ote.components.http :as http]
             [compojure.core :refer [routes POST]]
             [ote.nap.cookie :as cookie]
             [ote.nap.users :as users]
+            [jeesql.core :refer [defqueries]]
+            [ote.util.encrypt :as encrypt]
             [ote.services.transport :as transport]
             [ote.components.service :refer [define-service-component]]
             [ote.db.tx :as tx :refer [with-transaction]]
@@ -21,62 +21,9 @@
             [specql.op :as op]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
-            [ote.util.throttle :refer [with-throttle-ms]])
-  (:import (java.util UUID Base64 Base64$Decoder)))
+            [ote.util.throttle :refer [with-throttle-ms]]))
 
 (defqueries "ote/services/login.sql")
-
-(defn base64->hex
-  "Convert base64 encoded string to hex"
-  [base64]
-  (let [bytes (.decode (Base64/getDecoder)
-                       ;; Passlib uses unconventional \. character instead of \+ in base64
-                       (str/replace base64 #"\." "+"))]
-    (str/join (map #(format "%02x" %) bytes))))
-
-(defn hex->base64
-  "Convert hex string to base64 encoded"
-  [hex]
-  (str/replace
-   (->> hex
-        (partition 2)
-        (map #(Integer/parseInt (str/join %) 16))
-        byte-array
-        (.encode (Base64/getEncoder))
-        (String.))
-   #"\+" "."))
-
-(defn passlib->buddy
-  "Convert encrypted password from Python passlib format to buddy format."
-  [hash]
-  ;; Passlib format:
-  ;; $pbkdf2-sha512$iterations$salt$hash
-  ;;
-  ;; buddy format:
-  ;; pbkdf2+sha512$salt$iterations$hash
-  ;;
-  ;; passlib uses base64 encoding and buddy uses hex strings
-  (let [[_ alg iterations salt password] (str/split hash #"\$")]
-    (assert (= alg "pbkdf2-sha512"))
-    (format "pbkdf2+sha512$%s$%s$%s"
-            (base64->hex salt)
-            iterations
-            (base64->hex password))))
-
-(defn buddy->passlib
-  "Reverse of passlib->buddy."
-  [hash]
-  (let [[alg salt iterations password] (str/split hash #"\$")]
-    (assert (= alg "pbkdf2+sha512"))
-    (format "$pbkdf2-sha512$%s$%s$%s"
-            iterations
-            (hex->base64 salt)
-            (hex->base64 password))))
-
-(defn encrypt
-  "Encrypt raw password. Returns buddy formatted password hash."
-  [password]
-  (hashers/derive password {:alg :pbkdf2+sha512}))
 
 (defn with-auth-tkt [response auth-tkt-value domain]
   (update response :headers
@@ -93,7 +40,7 @@
              {:keys [email password] :as credentials}]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
-          (passlib->buddy (:password login-info)))
+          (encrypt/passlib->buddy (:password login-info)))
       (if (:email-confirmed? login-info)                    ;;If email not confirmed send proper error
         ;; User was found and password is correct, return user info
         (with-auth-tkt
@@ -118,57 +65,6 @@
 
 (defn logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
-
-(defn valid-user-save? [{:keys [username name email]}]
-  (and (user/email-valid? email)
-       (user/username-valid? username)
-       (string? name) (not (str/blank? name))))
-
-
-(defn save-user! [db auth-tkt-config user form-data]
-  (if-not (valid-user-save? form-data)
-    {:success? false}
-    (with-transaction db
-      (let [username-taken? (and (not= (:username user) (:username form-data))
-                                 (username-exists? db {:username (:username form-data)}))
-            email-taken? (and (not= (:email user) (:email form-data))
-                              (email-exists? db {:email (:email form-data)}))
-            login-info (first (fetch-login-info db {:email (:email user)}))
-            password-incorrect? (or (str/blank? (:current-password form-data))
-                                    (not (hashers/check (:current-password form-data)
-                                                        (passlib->buddy (:password login-info)))))]
-        (if
-          ;; Password incorrect, username or email taken => return errors to form
-          (or username-taken? email-taken? password-incorrect?)
-          {:success? false
-           :username-taken (when username-taken? (:username form-data))
-           :email-taken (when email-taken? (:email form-data))
-           :password-incorrect? password-incorrect?}
-
-          ;; Request is valid, do update
-          (let [user (specql/update! db ::user/user
-                                     (merge
-                                      {::user/name (:username form-data)
-                                       ::user/fullname (:name form-data)}
-                                      ;; If new password provided, change it
-                                      (when-not (str/blank? (:password form-data))
-                                        {::user/password (buddy->passlib (encrypt (:password form-data)))}))
-                                     {::user/id (:id user)})]
-            {:success? true}))))))
-
-(defn save-user [db auth-tkt-config user form-data]
-
-  (let [result (save-user! db auth-tkt-config user form-data)]
-    (if (:success? result)
-      ;; User updated, re-login immediately with updated info
-      (login db auth-tkt-config
-             {:email (:email form-data)
-              :password (if (str/blank? (:password form-data))
-                          (:current-password form-data)
-                          (:password form-data))})
-
-      ;; Failed, return errors to form
-      (http/transit-response result 400))))
 
 (defn request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
@@ -204,7 +100,7 @@
 (defn reset-password! [db reset-request new-password]
   (log/info "Reset password:" reset-request)
   (specql/update! db ::user/user
-                  {::user/password (buddy->passlib (encrypt new-password))}
+                  {::user/password (encrypt/buddy->passlib (encrypt/encrypt new-password))}
                   {::user/id (::modification/created-by reset-request)})
   (specql/update! db ::user/password-reset-request
                   {::user/used (java.util.Date.)}
@@ -246,11 +142,6 @@
   ^:unauthenticated
   (POST "/logout" []
         (logout auth-tkt-config))
-
-  (POST "/save-user" {form-data :body
-                      user :user}
-        (#'save-user db auth-tkt-config (:user user)
-                     (http/transit-request form-data)))
 
   ^{:unauthenticated true :format :transit}
   (POST "/request-password-reset" {form-data :body}

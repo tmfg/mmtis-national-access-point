@@ -22,6 +22,7 @@
     ["/register" :register]
     ["/register/:token" :register]
     ["/user" :user]
+    ["/user/:id" :user-edit]
     ["/own-services" :own-services]
     ["/transport-operator/:ckan-group-id/users" :operator-users]
     ["/transport-operator" :transport-operator]
@@ -72,12 +73,12 @@
                      :transport-operator :operator-users
                      :routes :new-route :edit-route
                      :new-notice :edit-pre-notice :pre-notices
-                     :email-settings})
+                     :email-settings :user-edit})
 
 ;; Add pages that needs :transit-authority? authenticating to this list
 (def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes})
 
-(def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-commercial-services :admin-exception-days})
+(def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-commercial-services :admin-exception-days :user-edit})
 
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.

@@ -13,6 +13,7 @@
             [ote.services.localization :as localization-service]
             [ote.services.places :as places]
             [ote.services.external :as external]
+            [ote.services.users :as users]
             [ote.services.routes :as routes]
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
@@ -56,7 +57,7 @@
    :index (component/using (index/->Index config)
                            [:http :db])
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
-
+   :users (component/using (users/->UsersService (get-in config [:http :auth-tkt]))  [:http :db :email])
    ;; Services for the frontend
    :register (component/using (register-services/->Register config) [:http :db :email])
    :transport (component/using (transport-service/->Transport config) [:http :db :email])
@@ -65,7 +66,6 @@
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
    :transit-visualization (component/using (transit-visualization/->TransitVisualization) [:http :db])
    :transit-changes (component/using (transit-changes/->TransitChanges config) [:http :db])
-
    ;; Return localization information to frontend
    :localization (component/using
                   (localization-service/->Localization) [:http])
