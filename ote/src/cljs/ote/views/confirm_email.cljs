@@ -6,7 +6,7 @@
             [ote.ui.circular_progress :as prog]
             [ote.ui.common :as common-ui]))
 
-(defn confirm-success
+(defn- confirm-success
   [app]
   [:div
    [notification/notification {:text (tr [:register :confirmation-success])
@@ -15,7 +15,7 @@
      [:div {:style {:margin-top "1rem"}}
         [common-ui/linkify "/#/login" (tr [:login :login-button])]])])
 
-(defn confirm-failure
+(defn- confirm-failure
   []
   [:div
    [notification/notification {:type :warning}
