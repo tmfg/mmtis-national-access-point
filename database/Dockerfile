@@ -1,18 +1,18 @@
-FROM ubuntu:artful
+FROM ubuntu:bionic
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends postgresql-9.6 postgresql-9.6-postgis-2.3 postgresql-9.6-postgis-2.3-scripts postgresql-contrib-9.6 maven
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-recommends tzdata postgresql-10 postgresql-10-postgis-2.4 postgresql-10-postgis-2.4-scripts postgresql-contrib-10 maven
 
 # Configure pg to listen network
-RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/9.6/main/postgresql.conf
-RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/9.6/main/postgresql.conf
-RUN echo "local all all trust" > /etc/postgresql/9.6/main/pg_hba.conf
-RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/9.6/main/pg_hba.conf
+RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/10/main/postgresql.conf
+RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/10/main/postgresql.conf
+RUN echo "local all all trust" > /etc/postgresql/10/main/pg_hba.conf
+RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/10/main/pg_hba.conf
 
 # Configure fsync and full page writes off
-RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/9.6/main/postgresql.conf
-RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/9.6/main/postgresql.conf
+RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/10/main/postgresql.conf
+RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/10/main/postgresql.conf
 
 # Create database
 RUN service postgresql restart && \
@@ -62,4 +62,4 @@ EXPOSE 5432
 
 USER postgres
 
-CMD service postgresql start && tail -F /var/log/postgresql/postgresql-9.6-main.log
+CMD service postgresql start && tail -F /var/log/postgresql/postgresql-10-main.log
