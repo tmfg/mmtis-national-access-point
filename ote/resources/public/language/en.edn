@@ -1228,6 +1228,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :day-of-week "Day of the week"
   :exception "Exception description"}
 
+ :user
+ {:change-email-warning "Huom! Jos muokkaat sähköpostiosoitetta tulee sinun vahvistaa uusi sähköpostiosoite ennen kuin voit kirjautua uudelleen sisään."}
 
  :register
  {:label "Register for an Account"

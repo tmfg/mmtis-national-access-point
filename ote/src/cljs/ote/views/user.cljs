@@ -77,7 +77,7 @@
                           (when (and email-taken (email-taken data))
                             (tr [:register :errors :email-taken])))]
              :should-update-check form/always-update}
-            (form/info "Huom! Jos muokkaat sähköpostiosoitetta tulee sinun vahvistaa uusi sähköpostiosoite ennen kuin voit kirjautua uudelleen sisään.")
+            (form/info (tr [:user :change-email-warning]))
             (form/subtitle :h3 (tr [:register :change-password]) {:margin-top "3rem"})
             {:name :password :type :string :password? true
              :label (tr [:register :fields :new-password])
