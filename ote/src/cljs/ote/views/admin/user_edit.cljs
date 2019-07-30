@@ -1,4 +1,4 @@
-(ns ote.views.user-edit
+(ns ote.views.admin.user-edit
   (:require [ote.ui.form :as form]
             [ote.ui.list-header :as list-header]
             [ote.ui.buttons :as buttons]

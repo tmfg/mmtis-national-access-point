@@ -28,7 +28,7 @@
             [ote.views.resend-confirmation :as rc]
             [ote.views.login :as login]
             [ote.views.user :as user]
-            [ote.views.user-edit :as user-edit]
+            [ote.views.admin.user-edit :as user-edit]
             [ote.views.admin :as admin]
             [ote.views.admin.detected-changes :as admin-detected-changes]
             [ote.views.email-notification-settings :as email-settings]
