@@ -25,7 +25,7 @@
 
 (defqueries "ote/services/login.sql")
 
-(defn with-auth-tkt [response auth-tkt-value domain]
+(defn- with-auth-tkt [response auth-tkt-value domain]
   (update response :headers
           assoc "Set-Cookie" (if (nil? domain)
                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")
@@ -48,7 +48,8 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:name login-info))]
-               (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))})
+               (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+            200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
              :timestamp (java.util.Date.)
@@ -56,17 +57,15 @@
              :user-data ""})
           (:domain auth-tkt-config))
 
-        ;; No need to hide if the error was in the email or the password
-        ;; the registration page can be used to check if an email has an account
-        ;; Update 8.4.2019: We decided that in login form we will only indicate error in more general way.
-        (http/transit-response {:error :unconfirmed-email} 401))
+        (http/transit-response {:error :unconfirmed-email} 401)) ;; This could be 403 instead
+      ;; Login shall indicate error in a general way and not reveal which credential was invalid
       (http/transit-response {:error :login-error} 400))
     (http/transit-response {:error :login-error} 400)))
 
-(defn logout [auth-tkt-config]
+(defn- logout [auth-tkt-config]
   (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
 
-(defn request-password-reset! [db {:keys [email]}]
+(defn- request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
     (when-let [user (first (fetch-login-info db {:email email}))]
       (log/info "User " (:id user) " requested password reset.")
@@ -75,7 +74,7 @@
                                                {::user/reset-key (java.util.UUID/randomUUID)
                                                 ::modification/created-by (:id user)})})))
 
-(defn send-password-reset-email [email {:keys [user password-reset-request]} language]
+(defn- send-password-reset-email [email {:keys [user password-reset-request]} language]
   (log/debug "Sending password reset email to " user)
   (localization/with-language language
                               (email/send! email
@@ -97,7 +96,7 @@
     ;; Always send :ok back, no matter what
     :ok))
 
-(defn reset-password! [db reset-request new-password]
+(defn- reset-password! [db reset-request new-password]
   (log/info "Reset password:" reset-request)
   (specql/update! db ::user/user
                   {::user/password (encrypt/buddy->passlib (encrypt/encrypt new-password))}
@@ -106,7 +105,7 @@
                   {::user/used (java.util.Date.)}
                   {::user/request-id (::user/request-id reset-request)}))
 
-(defn reset-password [db {:keys [id key new-password] :as form-data}]
+(defn- reset-password [db {:keys [id key new-password] :as form-data}]
   (with-throttle-ms 1000
     (if-not (user/password-valid? new-password)
       {:success? false :error :invalid-new-password}
