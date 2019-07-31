@@ -137,7 +137,7 @@
                            :on-enter #(e! (pre-notice/->AddComment))}
         (:new-comment pre-notice)]]]]))
 
-(defn format-effective-dates->ui [list-dates]
+(defn take-first-date-format-for-ui [list-dates]
   (let [sorted-dates (sort list-dates)
         first-date (first sorted-dates)
         formatted-date (time/format-timestamp->date-for-ui first-date)]
@@ -176,7 +176,7 @@
          :format format-notice-types
          :col-style style-base/table-col-style-wrap}
         {:name :first-effective-date
-         :read (comp format-effective-dates->ui :change-dates)
+         :read (comp take-first-date-format-for-ui :change-dates)
          :col-style style-base/table-col-style-wrap
          :width "13%"}]
        pre-notices]]]))
