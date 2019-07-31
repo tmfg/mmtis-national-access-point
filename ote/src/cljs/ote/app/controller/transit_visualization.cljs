@@ -176,7 +176,8 @@
                             :all-route-changes-chenckbox false
                             :open-sections {:gtfs-package-info false}
                             :scope scope
-                            :service-changes-for-date-loading? true}]
+                            :service-changes-for-date-loading? true
+                            :show-next-year? (or (t/after? (goog.date.DateTime. (js/Date.)) (goog.date.DateTime. (js/Date. 2019 8 1))) false)}]
     (assoc app :transit-visualization initial-view-state)))
 
 (define-event HighlightHash [hash day]
@@ -521,6 +522,10 @@
 
 (define-event ToggleShowPreviousYear []
   {:path [:transit-visualization :show-previous-year?]}
+  (not app))
+
+(define-event ToggleShowNextYear []
+  {:path [:transit-visualization :show-next-year?]}
   (not app))
 
 (define-event ToggleSection [section]

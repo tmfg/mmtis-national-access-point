@@ -28,12 +28,7 @@
     (e! (tv/->SelectDatesForComparison day))))
 
 (defn day-style [hash->color date->hash date1 date2 day]
-  (let [prev-week-date (time/format-date-iso-8601 (time/days-from day -7))
-        next-week-date (time/format-date-iso-8601 (time/days-from day 7))
-        prev-week-hash (date->hash prev-week-date)
-        next-week-hash (date->hash next-week-date)
-
-        d (time/format-date-iso-8601 day)
+  (let [d (time/format-date-iso-8601 day)
         hash (date->hash d)
         hash-color (hash->color hash)]
     (merge
@@ -87,7 +82,7 @@
      [tv-change-icons/change-icons diff true])])
 
 ;; Ui
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-dates-selected-from-calendar?]
+(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? show-next-year? compare open-sections route-dates-selected-from-calendar?]
                           :as transit-visualization}
                       routes selected-route]
   (let [current-year (time/year (time/now))
@@ -108,7 +103,10 @@
                                         :margin-bottom "1rem"}))
         [ui/checkbox {:label "Näytä myös edellinen vuosi"
                       :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]]]
+                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
+        [ui/checkbox {:label "Näytä myös seuraava vuosi"
+                      :checked show-next-year?
+                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
       [:div
       [:div.change-list
        [tv-section/route-changes-legend]
@@ -186,7 +184,8 @@
                                            :years (vec (concat (when show-previous-year?
                                                                  [(dec current-year)])
                                                                [current-year]
-                                                               [(inc current-year)]))
+                                                               (when show-next-year?
+                                                                 [(inc current-year)])))
                                            :hover-style #(let [d (time/format-date-iso-8601 %)
                                                                hash (date->hash d)
                                                                hash-color (hash->color hash)]
