@@ -207,7 +207,7 @@
 (defn clean-old-email-confirmation-tokens
   [db]
   (specql/delete! db ::user/email-confirmation-token
-    {::user/expiration (op/>= (tc/to-sql-date (t/now)))}))
+    {::user/expiration (op/< (tc/to-sql-date (t/now)))}))
 
 (define-service-component UsersService
   {:fields [auth-tkt-config]
