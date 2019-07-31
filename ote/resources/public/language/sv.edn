@@ -876,17 +876,24 @@
   :only-for-authorities "Ändringsmeddelanden är endast för officiell användning."
 
   :headers {:ote.db.transit/id "ID"
+            :id "ID"
             :ote.db.transit/regions "Landskap"
+            :regions "Landskap"
             :ote.db.transit/sent "Publicerad"
+            :sent "Publicerad"
             :ote.db.transit/pre-notice-type "Typ av meddelande"
+            :pre-notice-type "Typ av meddelande"
             :ote.db.transit/pre-notice-state "Status"
             :ote.db.modification/created "Skapad"
             :ote.db.modification/modified "Ändrad"
             :ote.db.transit/route-description "Ruttbeskrivning"
+            :route-description "Ruttbeskrivning"
             :actions "Funktioner"
+            :first-effective-date "Muutoksen ensimmäinen voimaantulopäivä"
             :region-names "Landskap"
             :ote.db.transit/attachments "Bifogade filer"
-            :ote.db.transport-operator/transport-operator "Tjänsteproducent"}
+            :ote.db.transport-operator/transport-operator "Tjänsteproducent"
+            :transport-operator "Tjänsteproducent"}
 
   :pre-notice-dialog {:label "Uppgifter i ändringsmeddelandet"
                       :comments-label "Myndighetens kommentarer (visas endast för myndigheter)"

@@ -3,6 +3,7 @@
   (:require [ote.components.http :as http]
             [compojure.core :refer [routes POST GET]]
             [specql.core :as specql]
+            [jeesql.core :refer [defqueries]]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.db.user :as user]
@@ -11,21 +12,20 @@
             [clojure.string :as str]
             [ote.db.places :as places]
             [specql.op :as op]
-            [ote.nap.users :as users]))
+            [ote.nap.users :as users]
+            [ote.util.db :as db-util]))
 
-
-(defn list-published-notices [db user]
-  (specql/fetch db ::transit/pre-notice
-                #{::transit/id
-                  ::transit/sent
-                  ::modification/created
-                  ::transit/regions
-                  ::transit/route-description
-                  ::transit/pre-notice-type
-                  [::t-operator/transport-operator #{::t-operator/name}]}
-                {::transit/pre-notice-state :sent}
-                {:specql.core/order-by ::transit/sent
-                 :specql.core/order-direction :desc}))
+(defqueries "ote/services/pre_notices/pre_notices.sql")
+(defn list-published-notices [db]
+  (let [pre-notices (fetch-authority-pre-notices db)
+        ;; Change PgArray type of arrays to vectors
+        pre-notices (map (fn [x]
+                           (-> x
+                               (update :regions #(db-util/PgArray->vec %))
+                               (update :pre-notice-type #(mapv keyword (db-util/PgArray->vec %)))
+                               (update :change-dates #(db-util/PgArray->vec %))))
+                         pre-notices)]
+    pre-notices))
 
 (def comment-columns  (conj (specql/columns ::transit/pre-notice-comment)
                             [::transit/author #{::user/fullname ::user/email}]))
@@ -76,7 +76,7 @@
    (GET "/pre-notices/authority-list" {user :user :as req}
         (authorization/with-transit-authority-check
           db user
-          #(http/no-cache-transit-response (list-published-notices db user))))
+          #(http/no-cache-transit-response (list-published-notices db))))
    (POST "/pre-notices/comment" {form-data :body user :user}
          (authorization/with-transit-authority-check
            db user
