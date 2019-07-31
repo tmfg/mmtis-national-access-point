@@ -84,7 +84,7 @@
    [comparison-dates compare]
 
    (when (seq diff)
-     [tv-change-icons/change-icons diff true])])
+     [tv-change-icons/change-icons-for-calendar diff true])])
 
 ;; Ui
 (defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? compare open-sections route-dates-selected-from-calendar?]
@@ -175,7 +175,7 @@
                        "Ei muutoksia"]
 
                       :changed
-                      [tv-change-icons/change-icons route]))}]
+                      [tv-change-icons/change-icons-for-calendar route]))}]
         changes]]
 
       [:div.route-service-calendar-content
