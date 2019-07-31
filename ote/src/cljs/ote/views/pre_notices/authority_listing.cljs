@@ -19,7 +19,8 @@
             [ote.ui.circular_progress :as circular-progress]
             [ote.views.service-search :as service-search]
             [ote.style.service-search :as style-service-search]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [ote.style.base :as style-base]))
 
 (defn region-name [region-code]
   (let [region-case #(case %
@@ -43,7 +44,7 @@
                       "19" "Lappi"
                       "21" "Ahvenanmaa"
                       "Maakunta puuttuu")]
-  (str/join ", " (mapv #(region-case %)  region-code))))
+  (str/join ", " (mapv #(region-case %) region-code))))
 
 (defn format-notice-types [types]
   (str/join ", " (map (tr-key [:enums ::transit/pre-notice-type]) types)))
@@ -136,6 +137,12 @@
                            :on-enter #(e! (pre-notice/->AddComment))}
         (:new-comment pre-notice)]]]]))
 
+(defn format-effective-dates->ui [list-dates]
+  (let [sorted-dates (sort list-dates)
+        first-date (first sorted-dates)
+        formatted-date (time/format-timestamp->date-for-ui first-date)]
+    formatted-date))
+
 (defn pre-notices-listing [e! pre-notices]
   (if (= :loading pre-notices)
     [circular-progress/circular-progress]
@@ -145,22 +152,33 @@
        [:h2 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]
        [:p (tr [:pre-notice-list-page :only-for-authorities])]]]
      [:div.row.authority-pre-notice-table
-
       [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
+                    :label-style (merge style-base/table-col-style-wrap {:font-weight "bold"})
                     :key-fn ::transit/id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])
                     :stripedRows true
                     :row-style {:cursor "pointer"}
                     :show-row-hover? true
-                    :on-select #(e! (pre-notice/->ShowPreNotice (::transit/id (first %))))
+                    :on-select #(e! (pre-notice/->ShowPreNotice (:id (first %))))
                     :no-outline-on-selection? true}
-       [{:name ::transit/sent :format (comp str time/format-timestamp-for-ui)}
-        {:name ::transit/regions :format region-name}
-        {:name ::transit/pre-notice-type
-         :format format-notice-types}
-        {:name ::transit/route-description}
-        {:name ::t-operator/transport-operator :read (comp ::t-operator/name ::t-operator/transport-operator)}]
-
+       [{:name :sent
+         :format (comp str time/format-timestamp-for-ui)
+         :width "10%"
+         :col-style style-base/table-col-style-wrap}
+        {:name :route-description
+         :col-style style-base/table-col-style-wrap}
+        {:name :transport-operator
+         :col-style style-base/table-col-style-wrap}
+        {:name :regions
+         :format region-name
+         :col-style style-base/table-col-style-wrap}
+        {:name :pre-notice-type
+         :format format-notice-types
+         :col-style style-base/table-col-style-wrap}
+        {:name :first-effective-date
+         :read (comp format-effective-dates->ui :change-dates)
+         :col-style style-base/table-col-style-wrap
+         :width "13%"}]
        pre-notices]]]))
 
 (defn pre-notices [e! {:keys [pre-notices pre-notice-dialog pre-notice-users-dialog?] :as app}]
