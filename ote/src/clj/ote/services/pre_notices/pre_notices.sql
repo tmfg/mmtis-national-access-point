@@ -4,4 +4,4 @@ SELECT p.id, p.sent, p.created, p.regions, p."route-description", p."pre-notice-
        top.name as "transport-operator"
   FROM "pre_notice" p, "transport-operator" top
  WHERE top.id = p."transport-operator-id"
- ORDER BY p."effective-dates"[1] DESC;
+ ORDER BY p.sent DESC;
