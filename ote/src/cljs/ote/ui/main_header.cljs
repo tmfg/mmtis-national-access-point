@@ -18,7 +18,8 @@
             [ote.app.controller.flags :as flags]
             [clojure.string :as str]
             [ote.localization :as localization]
-            [ote.util.text :as text]))
+            [ote.util.text :as text]
+            [ote.app.controller.common :refer [user-logged-in?]]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
   (let [sensor-node (atom nil)
@@ -54,9 +55,6 @@
        :reagent-render
        (fn [_]
          [:span {:ref "clicksensor"}])})))
-
-(defn logged-in? [app]
-  (not-empty (get-in app [:user])))
 
 (defn- is-user-menu-active [app]
   (when (= true (get-in app [:ote-service-flags :user-menu-open]))
@@ -101,7 +99,7 @@
                (str (str/upper-case lang) " - " flag)]]))]]]]]))
 
 (defn- user-menu [e! app]
-  (when (logged-in? app)
+  (when (user-logged-in? app)
     (let [header-open? (get-in app [:ote-service-flags :user-menu-open])]
       [:div {:style (merge style-topnav/topnav-dropdown
                            (if header-open?
@@ -165,21 +163,21 @@
                      {:href "#/services"
                       :on-click #(e! (fp-controller/->OpenHeader))})
            (tr [:document-title :services])]]
-         (when (logged-in? app)
+         (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/own-services"
                         :on-click #(e! (fp-controller/->OpenHeader))})
              (tr [:document-title :own-services])]])
-         (when (logged-in? app)
+         (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/routes"
                         :on-click #(e! (fp-controller/->OpenHeader))})
              (tr [:common-texts :navigation-route])]])
-         (when (logged-in? app)
+         (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
@@ -230,7 +228,7 @@
                   {:target "_blank"})]]]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
-         (if (not (logged-in? app))
+         (if (not (user-logged-in? app))
            [:ul (stylefy/use-style style-topnav/ul)
             [:li
              (if (flags/enabled? :ote-login)
@@ -294,7 +292,7 @@
         (for [{:keys [page label url]}
               (filter some? [{:page  :services
                               :label [:common-texts :navigation-dataset]}
-                             (when (logged-in? app)
+                             (when (user-logged-in? app)
                                {:page  :own-services
                                 :label [:common-texts :navigation-own-service-list]})])]
           ^{:key page}
@@ -347,7 +345,7 @@
           [ic/navigation-menu {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
         [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-general-menu])]]]
 
-      (when (logged-in? app)
+      (when (user-logged-in? app)
         [:li (stylefy/use-style style-topnav/li-right)
          [:div.header-user-menu (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :user-menu-open])
                                                                    style-topnav/li-right-div-blue
@@ -364,7 +362,7 @@
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
           [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])
 
-      (when (not (logged-in? app))
+      (when (not (user-logged-in? app))
         [:li (stylefy/use-style style-topnav/li-right)
          [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
                                                 (when @is-scrolled?
@@ -376,7 +374,7 @@
                                  {:margin-top "0px"}))}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-register])]]]])
 
-      (when (and (not (logged-in? app)) (flags/enabled? :ote-login))
+      (when (and (not (user-logged-in? app)) (flags/enabled? :ote-login))
         [:li (stylefy/use-style style-topnav/li-right)
          [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
                                                 (when @is-scrolled?
