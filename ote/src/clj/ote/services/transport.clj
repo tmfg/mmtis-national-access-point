@@ -650,7 +650,6 @@
 
 (defn manage-adding-users-to-operator [email db requester operator form-data authority?]
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
-        _ (println "New member " new-member)
         ckan-group-id (::t-operator/group-id operator)
         operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
         not-invited? (empty?
