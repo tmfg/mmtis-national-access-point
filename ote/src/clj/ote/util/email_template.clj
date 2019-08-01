@@ -207,8 +207,8 @@
 
         (html-table
           [{:class "tg-lusz" :width "10%" :label "Reitin nimi"}
-           {:class "tg-lusz" :width "10%" :label "Palveluntuottajan nimi"}
-           {:class "tg-lusz" :width "20%" :label "Alue"}
+           {:class "tg-lusz" :width "10%" :label "Palveluntuottaja"}
+           {:class "tg-lusz" :width "20%" :label "Maakunta"}
            {:class "tg-lusz" :width "15%" :label "Muutoksen tyyppi"}
            {:class "tg-lusz" :width "15%" :label "Muutoksen ensimmäinen voimaantulopäivä"}
            {:class "tg-lusz" :width "30%" :label "Lisätiedot muutoksesta"}]

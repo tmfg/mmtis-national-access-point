@@ -873,17 +873,24 @@ You can also draw the operating area or point to the map with drawing tools. You
   :only-for-authorities "Change notifications are for official use only."
 
   :headers {:ote.db.transit/id "ID"
+            :id "ID"
             :ote.db.transit/regions "Regions"
+            :regions "Regions"
             :ote.db.transit/sent "Published"
+            :sent "Published"
             :ote.db.transit/pre-notice-type "Notice type"
+            :pre-notice-type "Notice type"
             :ote.db.transit/pre-notice-state "State"
             :ote.db.modification/created "Created"
             :ote.db.modification/modified "Modified"
             :ote.db.transit/route-description "Route description"
+            :route-description "Route description"
             :actions "Functions"
+            :first-effective-date "First effective date"
             :region-names "Regions"
             :ote.db.transit/attachments "Attached files"
-            :ote.db.transport-operator/transport-operator "Transport operator"}
+            :ote.db.transport-operator/transport-operator "Transport operator"
+            :transport-operator "Transport operator"}
 
   :pre-notice-dialog {:label "Info of report of change"
                       :comments-label "Comments from officials (visible only for the officials)"
