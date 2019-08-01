@@ -21,7 +21,7 @@
     {:component-will-unmount #(e! (lc/->CancelUserEdit false))
      :reagent-render
      (fn
-       [e! {:keys [form-data email-taken username-taken password-incorrect? edit-response] :as user}]
+       [e! {:keys [form-data email-taken password-incorrect? edit-response] :as user}]
 
        [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
         [list-header/header app (tr [:common-texts :user-menu-profile])]

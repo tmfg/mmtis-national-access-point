@@ -31,10 +31,10 @@
 ;; component if it is needed in other components, but it needs too many changes
 ;; to be worth it for this form alone.
 
-(defn register [e! {:keys [token] :as params} {:keys [form-data email-taken username-taken token-info success?] :as register} user]
+(defn register [e! {:keys [token] :as params} {:keys [form-data email-taken token-info success?] :as register} user]
   (let [edited (r/atom #{})                                 ; keep track of blurred fields
         edit! #(swap! edited conj %)]
-    (fn [e! {:keys [token] :as params} {:keys [form-data email-taken username-taken token-info success?] :as register} user]
+    (fn [e! {:keys [token] :as params} {:keys [form-data email-taken token-info success?] :as register} user]
       (let [email (:email form-data)]
         [:div
          [:div.col-xs-12.col-md-6
