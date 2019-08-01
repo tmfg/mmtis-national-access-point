@@ -570,13 +570,15 @@
         _ (delete-old-tokens db ckan-group-id)]
     (http/transit-response users&invites 200)))
 
-(defn add-user-to-operator [email db new-member requester operator]
+(defn add-user-to-operator [email db new-member requester operator authority?]
   (let [member (create-member! db (:user_id new-member) (::t-operator/group-id operator))
         ;; Ensure that we do not send email to test user
         updated-member (if (= (:e2e-test-email (email-config/config)) (:user_email new-member))
                (assoc new-member :user_email (:e2e-test-amazon-simulator-email (email-config/config)))
                new-member)
-        title (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi")
+        title (if authority?
+                (str "Olet saanut kutsun liittyä tarkastelemaan markkinaehtoisen henkilöliikenteen muutosilmoituksia NAP:ssa")
+                (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi"))
         auditlog {::auditlog/event-type :add-member-to-operator
                   ::auditlog/event-attributes
                   [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
@@ -593,7 +595,9 @@
          :subject title
          :body [{:type "text/html;charset=utf-8"
                  :content (str email-template/html-header
-                            (html (email-template/notify-user-new-member updated-member requester operator title)))}]})
+                               (html (if authority?
+                                       (email-template/notify-authority-new-member updated-member requester operator title)
+                                       (email-template/notify-user-new-member updated-member requester operator title))))}]})
       (catch Exception e
         (log/warn "Error while sending a email to new member" e)))
 
@@ -606,7 +610,7 @@
      :fullname (:user_name new-member)
      :email (:user_email new-member)}))
 
-(defn invite-new-user [email-config db requester operator user-email]
+(defn invite-new-user [email-config db requester operator user-email authority?]
   (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 1))
         token (UUID/randomUUID)
         inserted-token (specql/insert! db ::user/user-token
@@ -615,7 +619,9 @@
                                         ::user/ckan-group-id (::t-operator/group-id operator)
                                         ::user/expiration expiration-date
                                         ::user/requester-id (get-in requester [:user :id])})
-        title (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi")
+        title (if authority?
+                (str "Olet saanut kutsun liittyä NAP:iin")
+                (str "Sinut on kutsuttu " (::t-operator/title operator) " -nimisen palveluntuottajan jäseneksi"))
         auditlog {::auditlog/event-type :invite-new-user
                   ::auditlog/event-attributes
                   [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
@@ -630,7 +636,9 @@
          :subject title
          :body [{:type "text/html;charset=utf-8"
                  :content (str email-template/html-header
-                            (html (email-template/new-user-invite requester operator title (::user/token inserted-token))))}]})
+                               (html (if authority?
+                                       (email-template/new-authority-invite requester operator title (::user/token inserted-token))
+                                       (email-template/new-user-invite requester operator title (::user/token inserted-token)))))}]})
 
       (specql/insert! db ::auditlog/auditlog auditlog)
 
@@ -640,8 +648,9 @@
       (catch Exception e
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
-(defn manage-adding-users-to-operator [email db requester operator form-data]
+(defn manage-adding-users-to-operator [email db requester operator form-data authority?]
   (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
+        _ (println "New member " new-member)
         ckan-group-id (::t-operator/group-id operator)
         operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
         not-invited? (empty?
@@ -656,11 +665,11 @@
         response (cond
                    ;; Existing new-member, existing operator
                    (and (not new-member-is-operator-member) (not (empty? new-member)) (not (empty? operator)))
-                   (add-user-to-operator email db new-member requester operator)
+                   (add-user-to-operator email db new-member requester operator authority?)
 
                    ;; new new-member, existing operator -> invite new-member
                    (and (empty? new-member) (not (empty? operator)) not-invited?)
-                   (invite-new-user email db requester operator (:email form-data))
+                   (invite-new-user email db requester operator (:email form-data) authority?)
 
                    ;; new-member is already a member
                    (and (not (empty? new-member)) new-member-is-operator-member)
@@ -757,8 +766,8 @@
         (authorization/with-group-check db user ckan-group-id
           #(operator-users-response db ckan-group-id)))
 
-      (POST "/transport-operator/:ckan-group-id/users"
-            {{:keys [ckan-group-id]}
+      (POST "/transport-operator/:ckan-group-id/:authority/users"
+            {{:keys [ckan-group-id authority]}
              :params
              user :user
              form-data :body}
@@ -766,8 +775,7 @@
               form-data (http/transit-request form-data)]
           (authorization/with-group-check
             db user ckan-group-id
-            #(manage-adding-users-to-operator email db user operator
-               form-data))))
+            #(manage-adding-users-to-operator email db user operator form-data (boolean (Boolean/valueOf authority))))))
 
       ;; This is not ready, only implemented to help add-member implementation
       (DELETE "/transport-operator/:ckan-group-id/token"
