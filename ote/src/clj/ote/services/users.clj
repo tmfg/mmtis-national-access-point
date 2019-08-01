@@ -76,7 +76,7 @@
                                     (not (hashers/check (:current-password form-data)
                                            (encrypt/passlib->buddy (:password login-info))))))]
         (if
-          ;; Password incorrect, username or email taken => return errors to form
+          ;; Password incorrect or email taken => return errors to form
           (or email-taken? password-incorrect?)
           {:success? false
            :email-taken (when email-taken? new-email)
@@ -85,7 +85,7 @@
           ;; Request is valid, do update
           (let [_ (specql/update! db ::user/user
                        (merge
-                         {;; :user/name intentionally not set because it shall not be modified, previously it was possible all the way from UI
+                         {;; username intentionally not set because it shall not be modified, previously it was possible all the way from UI
                           ::user/fullname (:name form-data)}
                          ;; If new password provided, change it
                          (when-not (str/blank? (:password form-data))
@@ -126,13 +126,13 @@
   [db id]
   (let [user (first (specql/fetch db
                       ::user/user
-                      #{::user/id ::user/fullname ::user/email ::user/name ::user/email-confirmed?}
+                      #{::user/id ::user/fullname ::user/email
+                        ::user/email-confirmed?}
                       {::user/id id}))
         user (set/rename-keys user
                {::user/id :id
                 ::user/fullname :name
                 ::user/email :email
-                ::user/name :username
                 ::user/email-confirmed? :email-confirmed?})]
     user))
 
