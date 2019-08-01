@@ -38,9 +38,10 @@
          :email-taken (when email-taken? email)}
         ;; Registration data is valid and username/email is not taken
         (do
-          (let [new-user (specql/insert! db ::user/user
-                           {::user/id (str (UUID/randomUUID))
-                            ::user/name username
+          (let [user-id (str (UUID/randomUUID))
+                new-user (specql/insert! db ::user/user
+                           {::user/id user-id
+                            ::user/name user-id ;; Username not used anymore, use internally row id
                             ::user/fullname name
                             ::user/email email
                             ::user/password (encrypt/buddy->passlib (encrypt/encrypt password))
