@@ -37,9 +37,6 @@
        :color "rgb (0, 255, 255)"
        :transition "box-shadow 0.25s"
        :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-      #_ (when (and prev-week-hash hash (not= hash prev-week-hash) (> day (time/now)))
-        {:box-shadow "inset 0 0 0 1px black,
-                     inset 0 0 0 2px transparent"})
       (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))
             (style/date1-highlight-style hash-color)
 
