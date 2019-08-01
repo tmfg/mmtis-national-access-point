@@ -878,17 +878,24 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :only-for-authorities "Muutosilmoitukset ovat vain viranomaiskäyttöön."
 
   :headers {:ote.db.transit/id "ID"
+            :id "ID"
             :ote.db.transit/regions "Maakunta"
+            :regions "Maakunta"
             :ote.db.transit/sent "Julkaistu"
-            :ote.db.transit/pre-notice-type "Ilmoitustyyppi"
+            :sent "Julkaistu"
+            :ote.db.transit/pre-notice-type "Muutoksentyyppi"
+            :pre-notice-type "Muutoksentyyppi"
             :ote.db.transit/pre-notice-state "Tila"
             :ote.db.modification/created "Luotu"
             :ote.db.modification/modified "Muokattu"
             :ote.db.transit/route-description "Reitin kuvaus"
+            :route-description "Reitin kuvaus"
             :actions "Toiminnot"
+            :first-effective-date "Muutoksen ensimmäinen voimaantulopäivä"
             :region-names "Maakunta"
             :ote.db.transit/attachments "Liitetiedostot"
-            :ote.db.transport-operator/transport-operator "Palveluntuottaja"}
+            :ote.db.transport-operator/transport-operator "Palveluntuottaja"
+            :transport-operator "Palveluntuottaja"}
 
   :pre-notice-dialog {:label "Muutosilmoituksen tiedot"
                       :comments-label "Viranomaisen kommentit (näkyvät vain viranomaisille)"
