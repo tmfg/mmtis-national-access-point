@@ -172,11 +172,17 @@
   (days-to-first-diff start-date date->hash))
 
 (defn- init-view-state [app scope]
-  (let [initial-view-state {:all-route-changes-display? false
+  (let [current-year (.getFullYear (js/Date.))
+        initial-view-state {:all-route-changes-display? false
                             :all-route-changes-chenckbox false
                             :open-sections {:gtfs-package-info false}
                             :scope scope
-                            :service-changes-for-date-loading? true}]
+                            :service-changes-for-date-loading? true
+                            :show-next-year? (or
+                                               (t/after?
+                                                 (goog.date.DateTime. (js/Date.))
+                                                 (goog.date.DateTime. (js/Date. current-year 8 1))) ;; next years calendar will be shown by default if date is past 1.9.<current-year>
+                                               false)}]
     (assoc app :transit-visualization initial-view-state)))
 
 (define-event HighlightHash [hash day]
@@ -521,6 +527,10 @@
 
 (define-event ToggleShowPreviousYear []
   {:path [:transit-visualization :show-previous-year?]}
+  (not app))
+
+(define-event ToggleShowNextYear []
+  {:path [:transit-visualization :show-next-year?]}
   (not app))
 
 (define-event ToggleSection [section]

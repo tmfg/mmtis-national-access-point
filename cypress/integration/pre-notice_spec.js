@@ -117,7 +117,7 @@ describe('Authority pre notice tests', () => {
     it('should render authority pre notice list', () => {
         cy.contains('Säännöllisen henkilöliikenteen muutosilmoitukset');
         cy.contains('Oulu - Kajaani');
-        cy.contains('Ilmoitustyyppi');
+        cy.contains('Muutoksentyyppi');
     });
 
     it('should open authority pre notice modal', () => {
