@@ -54,9 +54,8 @@
     (specql/insert! db ::user/email-confirmation-token
       {::user/user-email user-email ::user/token token ::user/expiration expiration-date})))
 
-(defn valid-user-save? [{:keys [username name email]}]
+(defn- valid-user-save? [{:keys [name email]}]
   (and (user/email-valid? email)
-    (user/username-valid? username)
     (string? name)
     (not (str/blank? name))))
 
@@ -65,10 +64,7 @@
   (if-not (valid-user-save? form-data)
     {:success? false}
     (with-transaction db
-      (let [{new-email :email
-             new-username :username} form-data
-            username-taken? (and (not= (:username user) new-username)
-                              (username-exists? db {:username new-username}))
+      (let [{new-email :email} form-data
             language (or (:language form-data) :fi)
             email-changed? (not= (:email user) new-email)
             email-taken? (and email-changed?
@@ -81,16 +77,15 @@
                                            (encrypt/passlib->buddy (:password login-info))))))]
         (if
           ;; Password incorrect, username or email taken => return errors to form
-          (or username-taken? email-taken? password-incorrect?)
+          (or email-taken? password-incorrect?)
           {:success? false
-           :username-taken (when username-taken? new-username)
            :email-taken (when email-taken? new-email)
            :password-incorrect? password-incorrect?}
 
           ;; Request is valid, do update
           (let [_ (specql/update! db ::user/user
                        (merge
-                         {::user/name new-username
+                         {;; :user/name intentionally not set because it shall not be modified, previously it was possible all the way from UI
                           ::user/fullname (:name form-data)}
                          ;; If new password provided, change it
                          (when-not (str/blank? (:password form-data))
