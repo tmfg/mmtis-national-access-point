@@ -9,7 +9,7 @@
             [clojure.string :as str]))
 
 (defn merge-user-data [user form-data]
-  (merge (select-keys user #{:name :username :email})
+  (merge (select-keys user #{:name :email})
     form-data))
 
 (defn edit-user
@@ -19,7 +19,7 @@
     {:reagent-render
      (fn
        [e! {:keys [user user-edit params] :as app}]
-       (let [{:keys [email-taken username-taken form-data email-confirmed?]} user-edit]
+       (let [{:keys [email-taken form-data email-confirmed?]} user-edit]
          [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
           [list-header/header app (tr [:common-texts :user-menu-profile])]
           (when user-edit
@@ -39,18 +39,6 @@
                              (tr [:buttons :cancel])]])}
              [(form/group
                 {:expandable? false :columns 3 :layout :raw :card? false}
-
-                {:name :username :type :string :required? true :full-width? true
-                 :placeholder (tr [:register :placeholder :username])
-                 :validate [(fn [data _]
-                              (if (< (count data) 3)
-                                (tr [:common-texts :required-field])
-                                (when (not (user/username-valid? data))
-                                  (tr [:register :errors :username-invalid]))))
-                            (fn [data _]
-                              (when (and username-taken (username-taken data))
-                                (tr [:register :errors :username-taken])))]
-                 :should-update-check form/always-update}
 
                 {:name :name :type :string :required? true :full-width? true
                  :placeholder (tr [:register :placeholder :name])
