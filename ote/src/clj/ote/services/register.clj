@@ -30,15 +30,15 @@
           group-info (when token
                        (first (fetch-operator-info db {:token token})))]
       (if email-taken?
-        ;; Username or email taken, return errors to form
+        ;; email taken, return errors to form
         {:success? false
          :email-taken (when email-taken? email)}
-        ;; Registration data is valid and username/email is not taken
+        ;; Registration data is valid and email is not taken
         (do
           (let [user-id (str (UUID/randomUUID))
                 new-user (specql/insert! db ::user/user
                            {::user/id user-id
-                            ::user/name user-id ;; Username not used anymore, use internally row id
+                            ::user/name user-id ;; Username not used anymore, use internal row id as placeholder just in case
                             ::user/fullname name
                             ::user/email email
                             ::user/password (encrypt/buddy->passlib (encrypt/encrypt password))
