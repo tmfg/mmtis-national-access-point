@@ -129,7 +129,7 @@
                                           :font-size "8pt"}
                                   :on-click #(do
                                                (.preventDefault %)
-                                               (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}]]
+                                               (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id :authority "false"})))}]]
                 [ui/table-row-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} [ui/icon-button {:href     "#"
                                                                               :on-click #(do
                                                                                            (.preventDefault %)

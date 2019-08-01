@@ -24,7 +24,7 @@
     ["/user" :user]
     ["/user/:id" :user-edit]
     ["/own-services" :own-services]
-    ["/transport-operator/:ckan-group-id/users" :operator-users]
+    ["/transport-operator/:ckan-group-id/:authority/users" :operator-users]
     ["/transport-operator" :transport-operator]
     ["/transport-operator/:id" :transport-operator]
     ["/passenger-transportation" :passenger-transportation]

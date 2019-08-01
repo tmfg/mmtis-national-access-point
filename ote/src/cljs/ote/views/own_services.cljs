@@ -281,11 +281,11 @@
                                   :margin-right "0.5rem"
                                   :color colors/primary}})
       (tr [:own-services-page :edit-business-id] {:business-id business-id})]
-     [:a (merge {:href (str "#/transport-operator/" ckan-group-id "/users")
+     [:a (merge {:href (str "#/transport-operator/" ckan-group-id "/false/users")
                  :id "operator-users-link"
                  :on-click #(do
                               (.preventDefault %)
-                              (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}
+                              (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id :authority "false"})))}
            (stylefy/use-style style-base/blue-link-with-icon))
       (ic/social-person {:style {:width 20
                                  :height 20
