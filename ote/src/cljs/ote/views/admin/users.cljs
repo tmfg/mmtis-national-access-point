@@ -132,21 +132,21 @@
          [ui/table-header {:adjust-for-checkbox false
                            :display-select-all  false}
           [ui/table-row
-           [ui/table-header-column "Käyttäjätunnus"]
-           [ui/table-header-column "Nimi"]
            [ui/table-header-column "Sähköposti"]
+           [ui/table-header-column "Nimi"]
+           [ui/table-header-column "Sisäinen id"]
            [ui/table-header-column "Palveluntuottajat"]
            [ui/table-header-column "Toiminnot"]]]
 
          [ui/table-body {:display-row-checkbox false}
           (doall
             (for [{:keys [id username name email groups] :as user} results]
-              ^{:key (str "user-" username)}
+              ^{:key (str "user-" id)}
               [ui/table-row {:style      {:border-bottom "3px solid rgb(224, 224, 224)"}
                              :selectable false}
-               [ui/table-row-column username]
-               [ui/table-row-column name]
                [ui/table-row-column email]
+               [ui/table-row-column name]
+               [ui/table-row-column id]
                [ui/table-row-column {:style {:padding 0}}
                 [groups-list groups]]
                [ui/table-row-column
