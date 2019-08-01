@@ -207,7 +207,6 @@
           :email-taken
           :password-incorrect?))
 
-
 (define-event UpdateResetPasswordForm [form-data]
   {:path [:reset-password]}
   form-data)
@@ -271,3 +270,10 @@
 
 (defmethod routes/on-navigate-event :register [_]
   (->CheckTokenValidity))
+
+(define-event LeaveUserRegister []
+  {}
+  (dissoc app :register))
+
+(defmethod routes/on-leave-event :register [_]
+  (->LeaveUserRegister))
