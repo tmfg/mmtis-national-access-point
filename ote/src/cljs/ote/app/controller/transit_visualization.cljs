@@ -181,7 +181,7 @@
                             :show-next-year? (or
                                                (t/after?
                                                  (goog.date.DateTime. (js/Date.))
-                                                 (goog.date.DateTime. (js/Date. current-year 8 1)))
+                                                 (goog.date.DateTime. (js/Date. current-year 8 1))) ;; next years calendar will be shown by default if date is past 1.9.<current-year>
                                                false)}]
     (assoc app :transit-visualization initial-view-state)))
 
