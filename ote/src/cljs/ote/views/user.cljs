@@ -53,18 +53,6 @@
          [(form/group
             {:expandable? false :columns 3 :layout :raw :card? false}
 
-            {:name :username :type :string :required? true :full-width? true
-             :placeholder (tr [:register :placeholder :username])
-             :validate [(fn [data _]
-                          (if (< (count data) 3)
-                            (tr [:common-texts :required-field])
-                            (when (not (user/username-valid? data))
-                              (tr [:register :errors :username-invalid]))))
-                        (fn [data _]
-                          (when (and username-taken (username-taken data))
-                            (tr [:register :errors :username-taken])))]
-             :should-update-check form/always-update}
-
             {:name :name :type :string :required? true :full-width? true
              :placeholder (tr [:register :placeholder :name])
              :should-update-check form/always-update}
