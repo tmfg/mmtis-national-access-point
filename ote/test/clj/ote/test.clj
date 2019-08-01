@@ -16,7 +16,9 @@
              [clojure.string :as str]
              [clojure.java.io :as io]
              [ote.email :as email]
-             [ote.db.lock :as lock])
+             [ote.db.lock :as lock]
+             [ote.db.user :as user]
+             [specql.core :as specql])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)
            (java.io File)))
@@ -214,3 +216,8 @@
 (defn sql-execute! [& sql-string-parts]
   (jdbc/execute! (:db *ote*)
                  [(str/join sql-string-parts)]))
+
+(defn fetch-id-for-username [db username]
+  (::user/id (first (specql/fetch db ::user/user
+                                  #{::user/id}
+                                  {::user/name username}))))
