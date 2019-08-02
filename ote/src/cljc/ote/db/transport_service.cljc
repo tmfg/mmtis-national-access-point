@@ -37,6 +37,7 @@
   ["interface_data_content" ::interface-data-content (specql.transform/transform (specql.transform/to-keyword))]
   ["company_sources" ::company_sources (specql.transform/transform (specql.transform/to-keyword))]
   ["advance_reservation" ::advance_reservation (specql.transform/transform (specql.transform/to-keyword))]
+  ["interface_download_status" ::interface-download-status (specql.transform/transform (specql.transform/to-keyword))]
 
   ;; UDT tyypit
   ["localized_text" ::localized_text]
@@ -60,6 +61,8 @@
 
   ;; Tables
   ["external-interface-description" ::external-interface-description]
+  ["interface-download" ::interface-download
+   {"id" ::interface-download-id}]
   ["transport-service" ::transport-service
    ote.db.modification/modification-fields
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)
