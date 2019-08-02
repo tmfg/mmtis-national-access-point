@@ -18,7 +18,8 @@
             [ote.util.functor :refer [fmap]]
             [ote.util.collections :refer [map-by]]
             [ote.transit-changes.detection :as detection]
-            [ote.config.transit-changes-config :as config-tc])
+            [ote.config.transit-changes-config :as config-tc]
+            [ote.components.http :as http])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -32,7 +33,12 @@
     "GTFS" :gtfs
     "Kalkati.net" :kalkati))
 
-(defn fetch-and-mark-gtfs-interface! [config db]
+(defn mark-gtfs-package-imported! [db gtfs-data]
+  (specql/update! db ::t-service/external-interface-description
+                  {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
+                  {::t-service/id (:id gtfs-data)})) ;; external-interface-description.id, not service id.
+
+(defn fetch-next-gtfs-interface! [config db]
   (tx/with-transaction
     db
     (let [blacklisted-operators {:blacklist (if (empty? (:no-gtfs-update-for-operators config))
@@ -40,26 +46,42 @@
                                               (:no-gtfs-update-for-operators config))}
           gtfs-data (first (select-gtfs-urls-update db blacklisted-operators))]
       (when gtfs-data
-        (specql/update! db ::t-service/external-interface-description
-                        {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
-                        {::t-service/id (:id gtfs-data)}))
+       (mark-gtfs-package-imported! db gtfs-data))
       gtfs-data)))
 
-(defn update-one-gtfs! [config db upload-s3?]
+(defn fetch-given-gtfs-interface!
+  "Get gtfs package data from database for given service."
+  [db service-id]
+  (let [gtfs-data (first (select-gtfs-url-for-service db {:service-id service-id}))]
+    (when gtfs-data
+      (mark-gtfs-package-imported! db gtfs-data))
+    gtfs-data))
+
+(defn update-one-gtfs!
+  ([config db upload-s3?]
+   (update-one-gtfs! config db upload-s3? nil))
+  ([config db upload-s3? service-id]
   ;; Ensure that gtfs-import flag is enabled
   ;; upload-s3? should be false when using local environment
   (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
-        (fetch-and-mark-gtfs-interface! config db)]
+        ;; Load next gtfs package or package that is related to given service-id
+        (if (nil? service-id)
+          (fetch-next-gtfs-interface! config db)
+          (fetch-given-gtfs-interface! db service-id))
+        force-download? (integer? service-id)]
     (if (nil? gtfs-data)
-      (log/debug "No gtfs files to upload.")
+      (do
+        (log/debug "No gtfs files to upload.")
+        (http/transit-response "No gtfs files to upload." 400))
       (try
         (log/debug "GTFS File url found. " (pr-str gtfs-data))
         (import-gtfs/download-and-store-transit-package
-          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3?)
+          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3? force-download?)
+        (http/transit-response "GTFS file imported and uploaded successfully!" 200)
         (catch Exception e
           (log/warn e "Error when importing, uploading or saving gtfs package to db!"))
         (finally
-          (log/debug "GTFS file imported and uploaded successfully!"))))))
+          (log/debug "GTFS file imported and uploaded successfully!")))))))
 
 (def night-hours #{0 1 2 3 4})
 

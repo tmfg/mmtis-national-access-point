@@ -97,16 +97,24 @@
     [:div (stylefy/use-style style-admin/detection-button-container)
      [:div (stylefy/use-style style-admin/detection-info-text)
       [:span "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
-      Tätä nappia painamalla voidaan pakottaa lataus."]]
+      Tätä nappia painamalla voidaan pakottaa lataus annetulle palvelulle."]]
      [:div {:style {:flex 2}}
+      [ui/text-field
+       {:id                  "download-gtfs-service-id"
+        :name                "download-gtfs-service-name"
+        :floating-label-text "Palvelun id"
+        :value               (get-in app-state [:admin :transit-changes :single-download-gtfs-service-id])
+        :on-change           #(do
+                                (.preventDefault %)
+                                (e! (admin-transit-changes/->SetSingleDownloadGtfsServiceId %2)))}]
       [:a (merge (stylefy/use-style button-styles/primary-button)
                  {:id "force-import"
                   :href "#"
                   :on-click #(do
                                (.preventDefault %)
-                               (e! (admin-transit-changes/->ForceInterfaceImport)))
+                               (e! (admin-transit-changes/->ForceInterfaceImportForGivenService)))
                   :icon (ic/content-filter-list)})
-       [:span "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"]]]]
+       [:span "Lataa palveluun liitetty gtfs paketti"]]]]
 
     [:h2 "Muutostunnistuksen käynnistys"]
     [:div

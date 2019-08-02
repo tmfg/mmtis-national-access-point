@@ -84,6 +84,10 @@
   {}
   (assoc-in app [:admin :transit-changes :single-detection-service-id] service-id))
 
+(define-event SetSingleDownloadGtfsServiceId [service-id]
+  {}
+  (assoc-in app [:admin :transit-changes :single-download-gtfs-service-id] service-id))
+
 (define-event DetectChangesForGivenService []
   {}
   (let [service-id (get-in app [:admin :transit-changes :single-detection-service-id])]
@@ -93,12 +97,23 @@
                  {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))
 
-
-(define-event ForceInterfaceImport []
+(define-event ForceInterfaceImportForGivenServiceSuccess [response]
   {}
-  (comm/post! "/transit-changes/force-interface-import" nil
-              {:on-success #(.log js/console %)})
-  app)
+  (.log js/console "success response " (pr-str response))
+  (assoc app :flash-message "GTFS paketti ladattu onnistuneesti"))
+
+(define-event ForceInterfaceImportForGivenServiceFailure [response]
+  {}
+  (.log js/console "response " (pr-str response))
+  (assoc app :flash-message-error (:response response)))
+
+(define-event ForceInterfaceImportForGivenService []
+  {}
+  (let [service-id (get-in app [:admin :transit-changes :single-download-gtfs-service-id])]
+    (comm/post! (str "/transit-changes/force-interface-import/" service-id) nil
+                {:on-success (tuck/send-async! ->ForceInterfaceImportForGivenServiceSuccess)
+                 :on-failure (tuck/send-async! ->ForceInterfaceImportForGivenServiceFailure)})
+    app))
 
 (define-event ForceHashCalculationForService []
   {}
@@ -205,6 +220,3 @@
 
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))
-
-(defn ^:export force-interface-import []
-  (->ForceInterfaceImport))
