@@ -3,7 +3,7 @@
             [clojure.test :as t :refer [use-fixtures deftest is testing]]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
-            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! fetch-id-for-username]]
+            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute!]]
             [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.db.service-generators :as service-generators]
@@ -36,7 +36,7 @@
   ;; Make it public so that GeoJSON export can return it
   (sql-execute! "UPDATE \"transport-service\" SET published = to_timestamp(0) where id = " id)
   (let [geojson-url (str "export/geojson/" transport-operator-id "/" id)
-        json-response (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+        json-response (http-get (:user-id-admin @ote.test/user-db-ids-atom)
                                 geojson-url)]
     (is (= 200 (:status json-response)))
     (is (:json json-response))
@@ -50,7 +50,7 @@
 (deftest export-geojson-with-interval
   (let [service (assoc (gen/generate (service-generators/service-type-generator :parking))
                        ::t-service/operation-area test-operation-area)
-        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+        response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                             "transport-service"
                             service)
         id (get-in response [:transit ::t-service/id])]
@@ -73,7 +73,7 @@
                          [:parking [::t-service/parking ::t-service/service-hours]]]
             :let [service (assoc (gen/generate (service-generators/service-type-generator type))
                                  ::t-service/operation-area test-operation-area)
-                  saved-service (:transit (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                  saved-service (:transit (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                                      "transport-service"
                                                      service))
                   geojson (export-geojson saved-service)]]
@@ -131,7 +131,7 @@
   (prop/for-all
    [generated-service service-generators/gen-transport-service]
    (let [service (assoc generated-service ::t-service/operation-area test-operation-area)
-         response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+         response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                              "transport-service"
                              service)
          id (get-in response [:transit ::t-service/id])]

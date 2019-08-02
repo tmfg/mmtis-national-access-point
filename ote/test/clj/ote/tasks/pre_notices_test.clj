@@ -65,14 +65,14 @@
                          {::transit/regions ["01"]}))
 
   (testing "Nothing is sent if the regions don't match"
-    (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+    (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                "settings/email-notifications"
                {::user-notifications/finnish-regions ["02"]})
     (send!)
     (is (empty? @outbox)))
 
   (testing "Email is sent when regions match"
-    (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+    (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                "settings/email-notifications"
                {::user-notifications/finnish-regions ["01" "02"]})
     (send!)
