@@ -99,12 +99,10 @@
 
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
   {}
-  (.log js/console "success response " (pr-str response))
   (assoc app :flash-message "GTFS paketti ladattu onnistuneesti"))
 
 (define-event ForceInterfaceImportForGivenServiceFailure [response]
   {}
-  (.log js/console "response " (pr-str response))
   (assoc app :flash-message-error (:response response)))
 
 (define-event ForceInterfaceImportForGivenService []
