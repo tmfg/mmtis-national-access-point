@@ -15,9 +15,9 @@
 
 (defqueries "ote/nap/users.sql")
 
-(defn find-user [db username]
+(defn find-user [db user-id]
   (let [rows (map db-utils/underscore->structure
-                  (fetch-user-by-username db {:username username}))
+                  (fetch-user-by-id db {:user-id user-id}))
         user (first rows)]
     (when user
       (-> user
@@ -27,11 +27,11 @@
 
 
 (defn wrap-user-info
-  "Ring middleware to fetch user info based on :user-id (username)."
+  "Ring middleware to fetch user info based on :user-id."
   [{:keys [db allow-unauthenticated?]} handler]
-  (fn [{username :user-id :as req}]
-    (if-let [user (when username
-                    (find-user db username))]
+  (fn [{user-id :user-id :as req}]
+    (if-let [user (when user-id
+                    (find-user db user-id))]
       (handler (assoc req :user user))
       (if allow-unauthenticated?
         (handler req)

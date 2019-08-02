@@ -28,7 +28,8 @@
             [ote.ui.common :as ui-common]
             [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.app.controller.common :refer [user-logged-in?]]))
 
 
 (let [host (.-host (.-location js/document))]
@@ -110,7 +111,7 @@
         (tr [:front-page :column-transport-operator])]
 
        [:div {:style {:padding-top "20px"}}
-        (if (not (get-in app [:user :username]))
+        (if (not (user-logged-in? app))
           [:a {:style    {:text-decoration "none"}
                :on-click #(do
                             (.preventDefault %)

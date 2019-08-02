@@ -10,14 +10,6 @@
             [ote.ui.list-header :as list-header]
             [ote.ui.notification :as notification]))
 
-(defn require-current-password? [user form-data]
-  (or (and (not (str/blank? (:username form-data)))
-           (not= (:username user) (:username form-data)))
-      (and (not (str/blank? (:email form-data)))
-           (not= (:email user) (:email form-data)))
-      (not (str/blank? (:password form-data)))))
-
-
 (defn merge-user-data [user form-data]
   (merge (select-keys user #{:username :name :email})
          form-data))
@@ -29,7 +21,7 @@
     {:component-will-unmount #(e! (lc/->CancelUserEdit false))
      :reagent-render
      (fn
-       [e! {:keys [form-data email-taken username-taken password-incorrect? edit-response] :as user}]
+       [e! {:keys [form-data email-taken password-incorrect? edit-response] :as user}]
 
        [:div.user-edit.col-xs-12.col-sm-8.col-md-8.col-lg-6
         [list-header/header app (tr [:common-texts :user-menu-profile])]
@@ -52,18 +44,6 @@
                          (tr [:buttons :cancel])]])}
          [(form/group
             {:expandable? false :columns 3 :layout :raw :card? false}
-
-            {:name :username :type :string :required? true :full-width? true
-             :placeholder (tr [:register :placeholder :username])
-             :validate [(fn [data _]
-                          (if (< (count data) 3)
-                            (tr [:common-texts :required-field])
-                            (when (not (user/username-valid? data))
-                              (tr [:register :errors :username-invalid]))))
-                        (fn [data _]
-                          (when (and username-taken (username-taken data))
-                            (tr [:register :errors :username-taken])))]
-             :should-update-check form/always-update}
 
             {:name :name :type :string :required? true :full-width? true
              :placeholder (tr [:register :placeholder :name])

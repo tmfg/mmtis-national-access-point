@@ -1,7 +1,13 @@
 (ns ote.services.service-search-test
   (:require [ote.services.service-search :as sut]
             [clojure.test :as t :refer [deftest is testing use-fixtures]]
-            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! sql-query]]
+            [ote.test :refer [system-fixture 
+                              *ote* 
+                              http-post 
+                              http-get 
+                              sql-execute! 
+                              sql-query
+                              fetch-id-for-username]]
             [com.stuartsierra.component :as component]
             [clojure.test.check.generators :as gen]
             [ote.db.generators :as otegen]
@@ -37,7 +43,8 @@
 
   (let [services (generate-services)
         saved-services (mapv (comp :transit
-                                   (partial http-post "admin" "transport-service"))
+                                   (partial http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                            "transport-service"))
                              services)]
     (publish-services! (map ::t-service/id saved-services))
 
@@ -106,10 +113,13 @@
                                                                      :namefin "Hyrynsalmi",
                                                                      :type "finnish-municipality",
                                                                      :primary? true}])
-          saved-service (http-post "admin" "transport-service" service)]
+          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "transport-service"
+                                   service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area] (get-in
+                                     (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                                     [:json :results]))]
         ;; Matches with itself
         (is (= 1 (count (services-in "Hyrynsalmi"))))
         ;; Doesn't match with neighbouring areas
@@ -131,10 +141,14 @@
                                                                      :namefin "90900 Kiiminki Keskus",
                                                                      :type "finnish-postal",
                                                                      :primary? true}])
-          saved-service (http-post "admin" "transport-service" service)]
+          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "transport-service"
+                                   service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area]
+                          (get-in
+                            (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                            [:json :results]))]
         ;; Matches with itself
         (is (= 1 (count (services-in "90900 Kiiminki Keskus"))))
         ;; Doesn't match with neighbouring areas
@@ -162,10 +176,14 @@
                                                                      :namefin "Keuruu",
                                                                      :type "finnish-municipality",
                                                                      :primary? true}])
-          saved-service (http-post "admin" "transport-service" service)]
+          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "transport-service"
+                                   service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area]
+                          (get-in
+                            (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                            [:json :results]))]
         ;; Matches with itself
         (is (= 1 (count (services-in "Keuruu"))))
         ;; Doesn't match with neighbouring areas
@@ -195,10 +213,14 @@
                                                                      :namefin "33200 Tampere Keskus Läntinen",
                                                                      :type "finnish-postal",
                                                                      :primary? true}])
-          saved-service (http-post "admin" "transport-service" service)]
+          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "transport-service"
+                                   service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area]
+                          (get-in
+                            (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                            [:json :results]))]
         ;; Matches with itself
         (is (= 1 (count (services-in "33200 Tampere Keskus Läntinen"))))
         ;; Doesn't match with neighbouring areas
@@ -222,10 +244,14 @@
                                                       :ote.db.places/namefin "Kannus rautatieasema"
                                                       :ote.db.places/primary? true
                                                       :geojson "{\"type\":\"Point\",\"coordinates\":[23.914974,63.898401]}"}])
-          saved-service (http-post "admin" "transport-service" service)]
+          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "transport-service"
+                                   service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area]
+                          (get-in
+                            (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                            [:json :results]))]
         ;; Doesn't match with neighbouring areas
         (is (zero? (count (services-in "Petäjävesi"))))
         (is (zero? (count (services-in "Virrat"))))
@@ -258,10 +284,15 @@
                                                                                              :namefin "33200 Tampere Keskus Läntinen",
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
-          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
+          saved-services (map (partial
+                                http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                "transport-service")
+                              (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
-      (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json"))
-                                           [:json :results]))]
+      (let [services-in (fn [area]
+                          (get-in
+                            (http-get (str "service-search?operation_area=" area "&response_format=json"))
+                            [:json :results]))]
         ;; All services are in Tampere
         (is (= 31 (count (services-in "Tampere"))))
         ;; Services are found with postal code as well as it intersects with Tampere 
@@ -287,7 +318,10 @@
                                                                                              :namefin "33200 Tampere Keskus Läntinen",
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
-          saved-services (map (partial http-post "admin" "transport-service") (shuffle services))]
+          saved-services (map (partial
+                                http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                "transport-service")
+                              (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
       (let [services-in (fn [area] (get-in (http-get (str "service-search?operation_area=" area "&response_format=json&limit=25&offset=0"))
                                            [:json :results]))]

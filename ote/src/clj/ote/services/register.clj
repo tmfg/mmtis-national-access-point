@@ -17,30 +17,28 @@
 (defqueries "ote/services/register.sql")
 (defqueries "ote/services/user_service.sql")
 
-(defn valid-registration? [{:keys [username name email password]}]
+(defn- valid-registration? [{:keys [name email password]}]
   (and (user/password-valid? password)
     (user/email-valid? email)
-    (user/username-valid? username)
     (string? name) (not (str/blank? name))))
 
-(defn- register-user! [db auth-tkt-config {:keys [username name email password token] :as form-data}]
+(defn- register-user! [db auth-tkt-config {:keys [name email password token] :as form-data}]
   (if-not (valid-registration? form-data)
     ;; Check errors that should have been checked on the form
     {:success? false}
-    (let [username-taken? (username-exists? db {:username username})
-          email-taken? (email-exists? db {:email email})
+    (let [email-taken? (email-exists? db {:email email})
           group-info (when token
                        (first (fetch-operator-info db {:token token})))]
-      (if (or username-taken? email-taken?)
-        ;; Username or email taken, return errors to form
+      (if email-taken?
+        ;; email taken, return errors to form
         {:success? false
-         :username-taken (when username-taken? username)
          :email-taken (when email-taken? email)}
-        ;; Registration data is valid and username/email is not taken
+        ;; Registration data is valid and email is not taken
         (do
-          (let [new-user (specql/insert! db ::user/user
-                           {::user/id (str (UUID/randomUUID))
-                            ::user/name username
+          (let [user-id (str (UUID/randomUUID))
+                new-user (specql/insert! db ::user/user
+                           {::user/id user-id
+                            ::user/name user-id ;; Username not used anymore, use internal row id as placeholder just in case
                             ::user/fullname name
                             ::user/email email
                             ::user/password (encrypt/buddy->passlib (encrypt/encrypt password))
@@ -57,7 +55,7 @@
               (log/info "New user (" email ") registered with token from " (:name group-info))))
           {:success? true})))))
 
-(defn register [db email auth-tkt-config form-data]
+(defn- register-response [db email auth-tkt-config form-data]
   (with-transaction db
     (feature/when-enabled :ote-register
       (let [result (register-user! db auth-tkt-config form-data)
@@ -84,7 +82,7 @@
           ;; Trying to register while logged in
           (http/transit-response {:success? false
                                   :message :already-logged-in} 400)
-          (#'register db email auth-tkt-config
+          (#'register-response db email auth-tkt-config
             (http/transit-request form-data)))))))
 
 (defrecord Register [config]

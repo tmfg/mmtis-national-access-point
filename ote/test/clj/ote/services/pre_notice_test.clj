@@ -1,6 +1,6 @@
 (ns ote.services.pre-notice-test
   (:require [clojure.test :as t :refer [deftest testing is]]
-            [ote.test :refer [system-fixture http-get http-post]]
+            [ote.test :refer [system-fixture http-get http-post fetch-id-for-username]]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.clojure-test :refer [defspec]]
             [com.stuartsierra.component :as component]
@@ -19,7 +19,9 @@
 
 (deftest save-pre-notice
   (let [generated-notice (gen/generate s-generators/gen-pre-notice)
-        response (http-post "admin" "pre-notice" generated-notice)
+        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                            "pre-notice"
+                            generated-notice)
         notice (:transit response)
         id (get notice :ote.db.transit/id)]
     ;; Saved ok
@@ -49,7 +51,9 @@
 
 (deftest edit-pre-notice
   (let [generated-notice (gen/generate s-generators/gen-pre-notice)
-        response (http-post "admin" "pre-notice" generated-notice)
+        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                            "pre-notice"
+                            generated-notice)
         notice (:transit response)
         id (get notice :ote.db.transit/id)]
 
@@ -59,29 +63,38 @@
     ;; Edit data
     (let [generated-url (gen/generate generators/gen-url)
           modified-notice (assoc notice :ote.db.transit/url generated-url)
-          edit-response (http-post "admin" "pre-notice" modified-notice)
+          edit-response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                   "pre-notice"
+                                   modified-notice)
           edited-notice (:transit edit-response)]
       (is (= generated-url (:ote.db.transit/url edited-notice))))))
 
 (deftest operator-pre-notice-list-draft
   (let [generated-notice (gen/generate s-generators/gen-pre-notice)
-        response (http-post "admin" "pre-notice" generated-notice)
-        list (:transit (http-get "admin" "pre-notices/list"))]
+        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                            "pre-notice"
+                            generated-notice)
+        list (:transit (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                 "pre-notices/list"))]
 
     ;; One draft
     (is (= 1 (notice-count list :draft)))
     (is (= 0 (notice-count list :sent)))
 
     ;; Save as sent
-    (http-post "admin" "pre-notice" (assoc generated-notice :ote.db.transit/pre-notice-state :sent))
+    (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin") "pre-notice" (assoc generated-notice :ote.db.transit/pre-notice-state :sent))
     ;; 1 sent
-    (is (= 1 (notice-count (:transit (http-get "admin" "pre-notices/list")) :sent)))))
+    (is (= 1 (notice-count (:transit (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                               "pre-notices/list")) :sent)))))
 
 (deftest operator-pre-notice-list-sent
   (let [generated-notice (gen/generate s-generators/gen-pre-notice)
         sent-notice (assoc generated-notice :ote.db.transit/pre-notice-state :sent)
-        response (http-post "admin" "pre-notice" sent-notice)
-        list (:transit (http-get "admin" "pre-notices/list"))]
+        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                            "pre-notice"
+                            sent-notice)
+        list (:transit (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                 "pre-notices/list"))]
 
     ;; 0 draft
     (is (= 0 (notice-count list :draft)))
@@ -91,8 +104,11 @@
 (deftest authority-pre-notice-list
   (let [generated-notice (gen/generate s-generators/gen-pre-notice)
         sent-notice (assoc generated-notice :ote.db.transit/pre-notice-state :sent)
-        response (http-post "admin" "pre-notice" sent-notice)
-        list (:transit (http-get "admin" "pre-notices/authority-list"))]
+        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                            "pre-notice"
+                            sent-notice)
+        list (:transit (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                 "pre-notices/authority-list"))]
 
     ;; 1 sent notice
     (is (= 1 (count list)))))
