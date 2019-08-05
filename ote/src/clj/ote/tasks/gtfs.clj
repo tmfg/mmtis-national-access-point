@@ -53,6 +53,7 @@
   "Get gtfs package data from database for given service."
   [db service-id]
   (let [gtfs-data (first (select-gtfs-url-for-service db {:service-id service-id}))]
+    (println "fetch-given-gtfs-interface! service-id" service-id (pr-str gtfs-data))
     (when gtfs-data
       (mark-gtfs-package-imported! db gtfs-data))
     gtfs-data))
@@ -71,17 +72,22 @@
         force-download? (integer? service-id)]
     (if (nil? gtfs-data)
       (do
-        (log/debug "No gtfs files to upload.")
-        (http/transit-response "No gtfs files to upload." 400))
+        (log/debug "ERROR: No gtfs files to upload.")
+        (str "ERROR: No gtfs files to upload."))
       (try
         (log/debug "GTFS File url found. " (pr-str gtfs-data))
-        (import-gtfs/download-and-store-transit-package
-          (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3? force-download?)
-        (http/transit-response "GTFS file imported and uploaded successfully!" 200)
+        (if (not (nil? (import-gtfs/download-and-store-transit-package
+                         (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3? force-download?)))
+          (do
+            (log/debug "GTFS file imported and uploaded successfully!")
+            (str "GTFS file imported and uploaded successfully!"))
+          (do
+            (log/debug "ERROR: Could not import GTFS file")
+            (str "ERROR: Could not import GTFS file")))
         (catch Exception e
-          (log/warn e "Error when importing, uploading or saving gtfs package to db!"))
-        (finally
-          (log/debug "GTFS file imported and uploaded successfully!")))))))
+          (do
+            (log/warn e "Error when importing, uploading or saving gtfs package to db!")
+            (str "ERROR: Error when importing, uploading or saving gtfs package to db!"))))))))
 
 (def night-hours #{0 1 2 3 4})
 
