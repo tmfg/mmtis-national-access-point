@@ -27,9 +27,10 @@
 (defn pre-notices-table [e! pre-notices state]
   (let [notices (filter #(= state (::transit/pre-notice-state %)) pre-notices)]
     [:div.row
-     [table/table {:class (name state)
+     [table/table {:table-name "tbl-pre-notices"
+                   :class (name state)
                    :name->label (tr-key [:pre-notice-list-page :headers])
-                   :key-fn ::transit/id
+                   :key-fn :id
                    :no-rows-message (case state
                                       :draft (tr [:pre-notice-list-page :no-pre-notices-for-operator])
                                       :sent (tr [:pre-notice-list-page :no-pre-notices-sent]))}
