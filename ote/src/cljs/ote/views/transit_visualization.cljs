@@ -6,6 +6,7 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
+            [ote.theme.colors :as color]
             [ote.app.controller.transit-visualization :as tv]
             [ote.time :as time]
             [cljs-react-material-ui.reagent :as ui]
@@ -402,120 +403,136 @@
                                       :height "5px"}))]
      (time/format-interval-as-time interval)]))
 
-(defn route-trips [e! open-sections {:keys [trips date1 date2 date1-trips date2-trips combined-trips
-                                            selected-trip-pair]}]
-  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
-   "Vuorot"
-   "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
-   [:div.route-trips
+(defn route-trips [e! open-sections {:keys [combined-trips selected-trip-pair] :as compare}]
+  (let [date1-label (str " (" (count (:date1-trips compare)) " vuoroa)")
+        date2-label (str " (" (count (:date2-trips compare)) " vuoroa)")]
+    [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
+     "Vuorot"
+     "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
 
-    ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
-    (for [[_ trips] (group-by (juxt (comp :gtfs/stop-name first :stoptimes first)
-                                    (comp :gtfs/stop-name last :stoptimes first)
-                                    (comp :gtfs/stop-name first :stoptimes second)
-                                    (comp :gtfs/stop-name last :stoptimes second))
-                              combined-trips)]
-      ^{:key (str "trip-table" (rand-int 9999999))}
-      [:div.trips-table {:style {:margin-top "1em"}}
-       [table/table {:name->label str
-                     :row-selected? #(= % selected-trip-pair)
-                     :label-style style-base/table-col-style-wrap
-                     :on-select #(e! (tv/->SelectTripPair (first %)))}
+     [:div
+      [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label false]
+      [:div.route-trips
 
-        [;; name of the first stop of the first trip (FIXME: should be first common?)
-         {:name (if (-> trips first first :stoptimes first :gtfs/stop-name)
-                  "Reittitunnus"
-                  "")
-          :read #(:headsign (first %))
-          :col-style style-base/table-col-style-wrap}
-         {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
-          :read #(-> % first :stoptimes first :gtfs/departure-time)
-          :format (partial format-stop-time (style/date1-highlight-style))
-          :col-style style-base/table-col-style-wrap}
-         ;; name of the last stop of the first trip
-         {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
-          :read #(-> % first :stoptimes last :gtfs/departure-time)
-          :format (partial format-stop-time (style/date1-highlight-style))
-          :col-style style-base/table-col-style-wrap}
+       ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
+       (for [[_ trips] (group-by (juxt (comp :gtfs/stop-name first :stoptimes first)
+                                       (comp :gtfs/stop-name last :stoptimes first)
+                                       (comp :gtfs/stop-name first :stoptimes second)
+                                       (comp :gtfs/stop-name last :stoptimes second))
+                                 combined-trips)]
+         ^{:key (str "trip-table" (rand-int 9999999))}
+         [:div.trips-table {:style {:margin-top "1em"}}
+          [table/table {:name->label str
+                        :row-selected? #(= % selected-trip-pair)
+                        :label-style style-base/table-col-style-wrap
+                        :on-select #(e! (tv/->SelectTripPair (first %)))}
 
-         {:name (if (-> trips first second :stoptimes first :gtfs/stop-name)
-                    "Reittitunnus"
-                    "")
-          :read #(:headsign (second %))
-          :col-style style-base/table-col-style-wrap}
-         {:name (-> trips first second :stoptimes first :gtfs/stop-name)
-          :read (comp :gtfs/departure-time first :stoptimes second)
-          :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style style-base/table-col-style-wrap}
-         {:name (-> trips first second :stoptimes last :gtfs/stop-name)
-          :read (comp :gtfs/departure-time last :stoptimes second)
-          :format (partial format-stop-time (style/date2-highlight-style))
-          :col-style style-base/table-col-style-wrap}
+           [;; name of the first stop of the first trip (FIXME: should be first common?)
+            {:name (if (-> trips first first :stoptimes first :gtfs/stop-name)
+                     "Reittitunnus"
+                     "")
+             :read #(:headsign (first %))
+             :col-style style-base/table-col-style-wrap}
+            {:name (some-> trips first first :stoptimes first :gtfs/stop-name)
+             :read #(-> % first :stoptimes first :gtfs/departure-time)
+             :format (partial format-stop-time (style/date1-highlight-style))
+             :col-style style-base/table-col-style-wrap}
+            ;; name of the last stop of the first trip
+            {:name (some-> trips first first :stoptimes last :gtfs/stop-name)
+             :read #(-> % first :stoptimes last :gtfs/departure-time)
+             :format (partial format-stop-time (style/date1-highlight-style))
+             :col-style style-base/table-col-style-wrap}
 
-         {:name "Muutokset" :read identity
-          :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
-                    (cond
-                      (and left (nil? right))
-                      [icon-l/icon-labeled [ic/content-remove] "Poistuva vuoro"]
+            {:name (if (-> trips first second :stoptimes first :gtfs/stop-name)
+                     "Reittitunnus"
+                     "")
+             :read #(:headsign (second %))
+             :col-style style-base/table-col-style-wrap}
+            {:name (-> trips first second :stoptimes first :gtfs/stop-name)
+             :read (comp :gtfs/departure-time first :stoptimes second)
+             :format (partial format-stop-time (style/date2-highlight-style))
+             :col-style style-base/table-col-style-wrap}
+            {:name (-> trips first second :stoptimes last :gtfs/stop-name)
+             :read (comp :gtfs/departure-time last :stoptimes second)
+             :format (partial format-stop-time (style/date2-highlight-style))
+             :col-style style-base/table-col-style-wrap}
 
-                      (and (nil? left) right)
-                      [icon-l/icon-labeled [ic/content-add] "Lisätty vuoro"]
+            {:name "Muutokset" :read identity
+             :format (fn [[left right {:keys [stop-time-changes stop-seq-changes]}]]
+                       (cond
+                         (and left (nil? right))
+                         [icon-l/icon-labeled [ic/content-remove] "Poistuva vuoro"]
 
-                      (= 0 stop-time-changes stop-seq-changes)
-                      [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
+                         (and (nil? left) right)
+                         [icon-l/icon-labeled [ic/content-add] "Lisätty vuoro"]
 
-                      :default
-                      [:div (stylefy/use-style style/transit-changes-icon-row-container)
-                       [:div (stylefy/use-style {:width "50%"})
-                        [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
-                       [:div (stylefy/use-style {:width "50%"})
-                        [tv-change-icons/stop-time-changes-icon stop-time-changes]]]))
-          :col-style style-base/table-col-style-wrap}]
-        trips]])]])
+                         (= 0 stop-time-changes stop-seq-changes)
+                         [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
 
-(defn trip-stop-sequence [e! open-sections {:keys [date1 date2 selected-trip-pair
-                                                   combined-stop-sequence selected-trip-pair] :as compare}]
-  [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
-            :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
-   "Pysäkit"
-   "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
-   (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
-     [:div.trip-stop-sequence {:style {:margin-top "1em"}}
-      [table/table {:name->label str
-                    :label-style style-base/table-col-style-wrap}
-       [{:name "Pysäkki"
-         :read :gtfs/stop-name
-         :col-style style-base/table-col-style-wrap
-         :format (partial format-stop-name)}
-        {:name "Lähtöaika"
-         :read :gtfs/departure-time-date1
-         :col-style style-base/table-col-style-wrap
-         :format (partial format-stop-time (style/date1-highlight-style))}
-        {:name "Lähtöaika"
-         :read :gtfs/departure-time-date2
-         :col-style style-base/table-col-style-wrap
-         :format (partial format-stop-time (style/date2-highlight-style))}
-        {:name "Muutokset"
-         :read identity
-         :col-style style-base/table-col-style-wrap
-         :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
-                   (cond
-                     (and departure-time-date1 (nil? departure-time-date2))
-                     (if second-stops-empty? "Poistuva vuoro" "Pysäkki ei kuulu reitille")
+                         :default
+                         [:div (stylefy/use-style style/transit-changes-icon-row-container)
+                          [:div (stylefy/use-style {:width "50%"})
+                           [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
+                          [:div (stylefy/use-style {:width "50%"})
+                           [tv-change-icons/stop-time-changes-icon stop-time-changes]]]))
+             :col-style style-base/table-col-style-wrap}]
+           trips]])]]]))
 
-                     (and (nil? departure-time-date1) departure-time-date2)
-                     "Uusi pysäkki reitillä"
+(defn trip-stop-sequence [e! open-sections {:keys [combined-stop-sequence selected-trip-pair] :as compare}]
+  (let [date1-first-stop (first (:stoptimes (first (:selected-trip-pair compare))))
+        date1-last-stop (last (:stoptimes (first (:selected-trip-pair compare))))
+        date2-first-stop (first (:stoptimes (second (:selected-trip-pair compare))))
+        date2-last-stop (last (:stoptimes (second (:selected-trip-pair compare))))
+        date1-label (if (and date1-first-stop date1-last-stop)
+                      (str ", " (time/format-interval-as-time (:gtfs/departure-time date1-first-stop)) " " (:gtfs/stop-name date1-first-stop) " - "
+                           (time/format-interval-as-time (:gtfs/departure-time date1-last-stop)) " " (:gtfs/stop-name date1-last-stop))
+                      "")
+        date2-label (if (and date2-first-stop date2-last-stop)
+                      (str ", " (time/format-interval-as-time (:gtfs/departure-time date2-first-stop)) " " (:gtfs/stop-name date2-first-stop) " - "
+                           (time/format-interval-as-time (:gtfs/departure-time date2-last-stop)) " " (:gtfs/stop-name date2-last-stop))
+                      "")]
+    [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
+                           :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
+     "Pysäkit"
+     "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
+     (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
+       [:div
+        [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label true]
+        [:div.trip-stop-sequence {:style {:margin-top "1em"}}
+         [table/table {:name->label str
+                       :label-style style-base/table-col-style-wrap}
+          [{:name "Pysäkki"
+            :read :gtfs/stop-name
+            :col-style style-base/table-col-style-wrap
+            :format (partial format-stop-name)}
+           {:name "Lähtöaika"
+            :read :gtfs/departure-time-date1
+            :col-style style-base/table-col-style-wrap
+            :format (partial format-stop-time (style/date1-highlight-style))}
+           {:name "Lähtöaika"
+            :read :gtfs/departure-time-date2
+            :col-style style-base/table-col-style-wrap
+            :format (partial format-stop-time (style/date2-highlight-style))}
+           {:name "Muutokset"
+            :read identity
+            :col-style style-base/table-col-style-wrap
+            :format (fn [{:gtfs/keys [departure-time-date1 departure-time-date2]}]
+                      (cond
+                        (and departure-time-date1 (nil? departure-time-date2))
+                        (if second-stops-empty? "Poistuva vuoro" "Pysäkki ei kuulu reitille")
 
-                     (not= departure-time-date1 departure-time-date2)
-                     [icon-l/icon-labeled [ic/action-query-builder]
-                      (time/format-minutes-elapsed
-                        (time/minutes-elapsed departure-time-date1 departure-time-date2))]
+                        (and (nil? departure-time-date1) departure-time-date2)
+                        "Uusi pysäkki reitillä"
 
-                     :default
-                     [icon-l/icon-labeled {:style {:color "lightgray"}}
-                      [ic/action-query-builder {:color "lightgray"}]
-                      "00:00"]))}]
-       combined-stop-sequence]])])
+                        (not= departure-time-date1 departure-time-date2)
+                        [icon-l/icon-labeled [ic/action-query-builder]
+                         (time/format-minutes-elapsed
+                           (time/minutes-elapsed departure-time-date1 departure-time-date2))]
+
+                        :default
+                        [icon-l/icon-labeled {:style color/icon-disabled}
+                         [ic/action-query-builder color/icon-disabled] nil]))}]
+          combined-stop-sequence]]])]))
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?
                                   show-route-lines :show-route-lines}]
@@ -609,45 +626,32 @@
                                          :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
-  (let [date-differences (:differences compare)]
-    [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
-                           :open? (get open-sections :route-map true)}
-     "Kartta"
-     [:div
-      [:span
-       "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."]
-      [:div (stylefy/use-style style/map-checkbox-container)
+  [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-map))
+                         :open? (get open-sections :route-map true)}
+   "Kartta"
+   [:div
+    [:span
+     "Valitse kartalla näytettävät pysäkkiketjut. Alla olevaan listaan on koostettu kaikki erilaiset pysäkkiketjut valitsemasi reitin ja kalenterin päivien vuorojen perusteella."]
+    [:div (stylefy/use-style style/map-checkbox-container)
 
-       [:div {:style {:flex 1}}
-        [ui/checkbox {:label "Näytä pysäkit"
-                      :checked (boolean (:show-stops? compare))
-                      :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
-       [:div {:style {:flex 4}}
-        (when (pos-int? (count (:show-route-lines compare)))
-          ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
-          (doall
-            (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
-              ^{:key (str "selected-route-map-section-" routename)}
-              [ui/checkbox {:label (first (str/split routename #"\|\|"))
-                            :checked show?
-                            :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]]
+     [:div {:style {:flex 1}}
+      [ui/checkbox {:label "Näytä pysäkit"
+                    :checked (boolean (:show-stops? compare))
+                    :on-check #(e! (tv/->ToggleRouteDisplayStops))}]]
+     [:div {:style {:flex 4}}
+      (when (pos-int? (count (:show-route-lines compare)))
+        ;; There is more than one distinct route (stop-sequence), show checkboxes for displaying
+        (doall
+          (for [[routename show?] (sort-by first (seq (:show-route-lines compare)))]
+            ^{:key (str "selected-route-map-section-" routename)}
+            [ui/checkbox {:label (first (str/split routename #"\|\|"))
+                          :checked show?
+                          :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]]
 
-     [:div
-      (when (seq date-differences)
-        [:div {:style {:padding-top "0.5rem"}}
-         [:div {:style {:display "inline-block"}}
-          [:div {:style {:display "inline-block"
-                         :padding-right "2em"}}
-           [:div (stylefy/use-style style/map-different-date1)]
-           (time/format-date (:date1 compare))]
-          [:div {:style {:display "inline-block"}}
-           [:div (stylefy/use-style style/map-different-date2)]
-           (time/format-date (:date2 compare))]]
-
-         [tv-change-icons/change-icons date-differences true]])
-
-      [:div
-       [selected-route-map e! date->hash hash->color compare]]]]))
+   [:div
+    [tv-utilities/date-comparison-icons compare]
+    [:div
+     [selected-route-map e! date->hash hash->color compare]]]])
 
 (defn gtfs-package-info [e! open-sections packages service-id]
   (let [grouped-packages (group-by :interface-url packages)
