@@ -120,9 +120,7 @@
      [:div
       (when (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])
         [notification/notification {:type (:status (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))}
-         (:msg (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))]
-        )
-      ]]
+         (:msg (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))])]]
 
     [:h2 "Muutostunnistuksen käynnistys"]
     [:div
