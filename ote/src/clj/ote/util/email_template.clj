@@ -261,6 +261,26 @@
 
      (html-divider-border "100%")]))
 
+(defn notify-authority-new-member [new-member requester operator title]
+  (html-template
+    title {:show-email-settings? true}
+    [:div {:style "max-width 800px"}
+     [:br]
+     [:h1 {:class "headerText1"
+           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+      (str "Olet saanut kutsun liittyä tarkastelemaan markkinaehtoisen henkilöliikenteen muutosilmoituksia NAP:ssa.")]
+
+     (html-divider-border "100%")
+     [:p "Alat myös jatkossa saamaan herätesähköposteja markkinaehtoisen liikenteen muutoksista."]
+     [:p "Voit muokata herätesähköpostien asetuksia viestin lopussa olevasta linkistä."]
+     [:br]
+     [:p "Mikäli olet saanut kutsun vahingossa, tai et halua alkaa tarkastelemaan muutosilmoituksia, "
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+     [:br]
+     (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
+     [:br]
+     [:br]]))
+
 (defn new-user-invite [requester operator title token]
   (let [op-name (::t-operator/title operator)]
     (html-template title {:show-email-settings? false}
@@ -281,6 +301,26 @@
        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
        (html-divider-border "100%")])))
+
+(defn new-authority-invite [requester operator title token]
+  (let [op-name (::t-operator/title operator)]
+    (html-template
+      title {:show-email-settings? false}
+      [:div {:style "max-width: 800px"}
+       [:br]
+       [:h1 {:class "headerText1"
+             :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+        (str "Olet saanut kutsun liittyä NAP:iin")]
+
+       (html-divider-border "100%")
+       [:p " Sinut on kutsuttu tarkastelemaan markkinaehtoisen henkilöliikenteen muutosilmoituksia NAP:ssa. "]
+       [:p " Alat myös jatkossa saamaan herätesähköposteja markkinaehtoisen liikenteen muutoksista. "]
+
+       [:p "Mikäli olet saanut kutsun vahingossa, sinun ei tarvitse tehdä mitään."]
+       [:br]
+       (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       [:br]
+       [:br]])))
 
 (defn email-confirmation
   [title token]

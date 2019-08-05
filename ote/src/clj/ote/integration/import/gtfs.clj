@@ -312,7 +312,7 @@
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
-    (when-not (nil? response)
+    (if (not (nil? response))
       (if (nil? gtfs-file)
         (do
           (log/warn "Got empty body as response when loading gtfs from: " url)
@@ -348,7 +348,10 @@
 
                 ;; Parse gtfs package and save it to database.
                 (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
-            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
+            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying."))))
+      ;; in case of error, return nil
+      nil
+      )))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
