@@ -172,9 +172,9 @@
           (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
           "OK"))
 
-  ;; Delete row from gtfs_package to make this work. Don't know why, but it must be done.
-  ;; Also change external-interface-description.gtfs-imported to past to make import work because we only import new packages.
-  (POST "/transit-changes/force-interface-import" req
-    (when (authorization/admin? (:user req))
-      (gtfs-tasks/update-one-gtfs! config db false)
-      "OK")))
+  ;; Force gtfs package download for given service
+  (POST "/transit-changes/force-interface-import/:service-id" {{:keys [service-id]} :params
+                                                               user :user}
+    (when (authorization/admin? user)
+      (let [upload-response (gtfs-tasks/update-one-gtfs! config db false (Long/parseLong service-id))]
+        (http/transit-response upload-response 200)))))
