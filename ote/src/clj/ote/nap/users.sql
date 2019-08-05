@@ -1,4 +1,4 @@
--- name: fetch-user-by-username
+-- name: fetch-user-by-id
     SELECT u.id as user_id,
            u.name as user_username,
            u.fullname as user_name,
@@ -11,7 +11,7 @@
       FROM "user" u
  LEFT JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
  LEFT JOIN "group" g ON g.id = m.group_id
-     WHERE u.name = :username;
+     WHERE u.id = :user-id;
 
 -- name: fetch-user-by-email
 SELECT u.id as user_id,

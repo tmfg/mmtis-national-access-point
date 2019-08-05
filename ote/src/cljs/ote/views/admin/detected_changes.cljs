@@ -18,7 +18,8 @@
             [ote.ui.common :as common]
             [ote.ui.info :as info]
             [ote.time :as time]
-            [ote.theme.colors :as colors]))
+            [ote.theme.colors :as colors]
+            [ote.ui.notification :as notification]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -94,19 +95,32 @@
 
     [:h2 "Rajapintoihin kohdistuvat toimenpiteet"]
 
-    [:div (stylefy/use-style style-admin/detection-button-container)
-     [:div (stylefy/use-style style-admin/detection-info-text)
-      [:span "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
-      Tätä nappia painamalla voidaan pakottaa lataus."]]
-     [:div {:style {:flex 2}}
-      [:a (merge (stylefy/use-style button-styles/primary-button)
-                 {:id "force-import"
-                  :href "#"
-                  :on-click #(do
-                               (.preventDefault %)
-                               (e! (admin-transit-changes/->ForceInterfaceImport)))
-                  :icon (ic/content-filter-list)})
-       [:span "Pakota yhden lataamattoman pakettin lataus ulkoisesta osoitteesta"]]]]
+    [:div
+     [:div (stylefy/use-style style-admin/detection-button-container)
+      [:div (stylefy/use-style style-admin/detection-info-text)
+       [:span "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
+      Tätä nappia painamalla voidaan pakottaa lataus annetulle palvelulle."]]
+      [:div {:style {:flex 2}}
+       [ui/text-field
+        {:id "download-gtfs-service-id"
+         :name "download-gtfs-service-name"
+         :floating-label-text "Palvelun id"
+         :value (get-in app-state [:admin :transit-changes :single-download-gtfs-service-id])
+         :on-change #(do
+                       (.preventDefault %)
+                       (e! (admin-transit-changes/->SetSingleDownloadGtfsServiceId %2)))}]
+       [:a (merge (stylefy/use-style button-styles/primary-button)
+                  {:id "force-import"
+                   :href "#"
+                   :on-click #(do
+                                (.preventDefault %)
+                                (e! (admin-transit-changes/->ForceInterfaceImportForGivenService)))
+                   :icon (ic/content-filter-list)})
+        [:span "Lataa palveluun liitetty gtfs paketti"]]]]
+     [:div
+      (when (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])
+        [notification/notification {:type (:status (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))}
+         (:msg (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))])]]
 
     [:h2 "Muutostunnistuksen käynnistys"]
     [:div

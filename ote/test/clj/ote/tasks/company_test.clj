@@ -1,8 +1,7 @@
 (ns ote.tasks.company-test
   (:require [clojure.test :refer [deftest is testing use-fixtures]]
             [ote.tasks.company :refer [update-one-csv! store-daily-company-stats]]
-            [ote.test :refer [system-fixture with-http-resource http-post
-                              sql-query sql-execute! *ote*]]
+            [ote.test :refer [system-fixture with-http-resource http-post sql-query sql-execute! *ote*]]
             [ote.services.transport :as transport-service]
             [com.stuartsierra.component :as component]
             [ote.services.external :as external]
@@ -46,7 +45,9 @@
                     (dissoc ::t-service/companies)
                     (assoc ::t-service/companies-csv-url url
                            ::t-service/company-source :csv-url))
-            response (http-post "admin" "transport-service" ts)
+            response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+                                "transport-service"
+                                ts)
             id (get-in response [:transit ::t-service/id])]
         (is (= 200 (:status response)))
 

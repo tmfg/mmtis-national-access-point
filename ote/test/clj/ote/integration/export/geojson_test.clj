@@ -36,7 +36,8 @@
   ;; Make it public so that GeoJSON export can return it
   (sql-execute! "UPDATE \"transport-service\" SET published = to_timestamp(0) where id = " id)
   (let [geojson-url (str "export/geojson/" transport-operator-id "/" id)
-        json-response (http-get "admin" geojson-url)]
+        json-response (http-get (:user-id-admin @ote.test/user-db-ids-atom)
+                                geojson-url)]
     (is (= 200 (:status json-response)))
     (is (:json json-response))
     (:json json-response)))
@@ -49,20 +50,22 @@
 (deftest export-geojson-with-interval
   (let [service (assoc (gen/generate (service-generators/service-type-generator :parking))
                        ::t-service/operation-area test-operation-area)
-        response (http-post "admin" "transport-service" service)
+        response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+                            "transport-service"
+                            service)
         id (get-in response [:transit ::t-service/id])]
 
     ;; Check that save is ok
     (is (pos? id))
 
     ;; Fetch exported GeoJSON
-    (let [geojson (export-geojson (:transit response))]
+    (let [geojson (export-geojson (:transit response))
+          maximum-stay (get-in geojson [:features 0 :properties :transport-service
+                                        :parking :maximum-stay])
+          interval-fields (juxt :years :months :days :hours :minutes :seconds)]
       ;; Check that maximum stay interval has the same fields in JSON and Clojure interval type
-      (let [maximum-stay (get-in geojson [:features 0 :properties :transport-service
-                                          :parking :maximum-stay])
-            interval-fields (juxt :years :months :days :hours :minutes :seconds)]
-        (is (= (interval-value (time/iso-8601-period->interval maximum-stay))
-               (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay]))))))))
+      (is (= (interval-value (time/iso-8601-period->interval maximum-stay))
+             (interval-value (get-in service [::t-service/parking ::t-service/maximum-stay])))))))
 
 (deftest service-hours-export
   (testing "Service hours are exported properly and weekdays are sorted"
@@ -70,7 +73,9 @@
                          [:parking [::t-service/parking ::t-service/service-hours]]]
             :let [service (assoc (gen/generate (service-generators/service-type-generator type))
                                  ::t-service/operation-area test-operation-area)
-                  saved-service (:transit (http-post "admin" "transport-service" service))
+                  saved-service (:transit (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+                                                     "transport-service"
+                                                     service))
                   geojson (export-geojson saved-service)]]
 
       (let [generated-values (get-in service path)
@@ -126,7 +131,9 @@
   (prop/for-all
    [generated-service service-generators/gen-transport-service]
    (let [service (assoc generated-service ::t-service/operation-area test-operation-area)
-         response (http-post "admin" "transport-service" service)
+         response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+                             "transport-service"
+                             service)
          id (get-in response [:transit ::t-service/id])]
 
      (and (pos? id)

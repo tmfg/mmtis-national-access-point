@@ -2,9 +2,8 @@
   (:require  [clojure.test :as t]
              [ote.integration.import.ytj :as ytj]
              [com.stuartsierra.component :as component]
-             [ote.test :as ote-test]
-             [cheshire.core :refer [encode]]
-             [clj-http.client :as http-client]))
+             [ote.test :as ote-test :refer [http-get user-db-ids-atom]]
+             [cheshire.core :refer [encode]]))
 
 (t/use-fixtures :each
   (ote-test/system-fixture
@@ -30,7 +29,8 @@
                                        :results [{:name "Acme"
                                                   :addresses {:endDate "2012-12-12"}
                                                   :auxiliaryNames [{:endDate "2012-12-12"}]}]}})]
-    (let [result (ote-test/http-get "normaluser" "fetch/ytj?company-id=123132-12")]
+    (let [result (http-get (:user-id-normal @ote.test/user-db-ids-atom)
+                                    "fetch/ytj?company-id=123132-12")]
       (t/is (= "Acme" (-> result :transit :name)))
       (t/is (not-empty (-> result :transit :addresses)))
       (t/is (empty? (-> result :transit :auxiliaryNames))))))

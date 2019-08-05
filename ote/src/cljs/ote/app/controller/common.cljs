@@ -8,3 +8,6 @@
   (if (= 403 (:status response))
     (assoc app :flash-message-error (tr [:common-texts :forbidden]))
     (assoc app :flash-message-error (tr [:common-texts :server-error]))))
+
+(defn user-logged-in? [app]
+  (not-empty (get-in app [:user])))

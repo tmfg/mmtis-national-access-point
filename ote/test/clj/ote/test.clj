@@ -16,7 +16,9 @@
              [clojure.string :as str]
              [clojure.java.io :as io]
              [ote.email :as email]
-             [ote.db.lock :as lock])
+             [ote.db.lock :as lock]
+             [ote.db.user :as user]
+             [specql.core :as specql])
   (:import (org.apache.http.client CookieStore)
            (org.apache.http.cookie Cookie)
            (java.io File)))
@@ -30,7 +32,6 @@
 
 ;; Current OTE system
 (defonce ^:dynamic *ote* nil)
-
 
 (def db-url {:user "napote"
              :dbtype "postgresql"
@@ -78,6 +79,9 @@
 
 (def outbox (atom nil))
 
+(def user-db-ids-atom
+  (atom nil))
+
 (defn- fake-email [outbox-atom]
   (reify
     component/Lifecycle
@@ -89,6 +93,11 @@
       (swap! outbox-atom
              (fn [outbox]
                (conj (or outbox []) message))))))
+
+(defn- fetch-id-for-username [db username]
+  (::user/id (first (specql/fetch db ::user/user
+                                  #{::user/id}
+                                  {::user/name username}))))
 
 (defn system-fixture [& system-map-entries]
   (fn [tests]
@@ -107,6 +116,11 @@
                 ;; When testing, we don't need to wait for other nodes
                 lock/*exclusive-task-wait-ms* 0]
         (reset! outbox [])
+        (when (nil? @user-db-ids-atom)
+          ;; user-ids fetched from db for convenience to allow http-posts where user is expected to be authenticated.
+          ;; Relying on that ote uses it as user-id for session and cookie. If that changes then test cases may break.
+          (reset! user-db-ids-atom {:user-id-normal (fetch-id-for-username (:db *ote*) "normaluser")
+                                    :user-id-admin (fetch-id-for-username (:db *ote*) "admin")}))
         (tests)
         (component/stop *ote*)))))
 

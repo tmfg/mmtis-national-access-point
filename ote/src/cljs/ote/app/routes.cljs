@@ -2,7 +2,8 @@
   "Routes for the frontend app."
   (:require [bide.core :as r]
             [ote.app.state :as state]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck]
+            [ote.app.controller.common :refer [user-logged-in?]]))
 
 (def ga-tracking-code
   (.getAttribute js/document.body "data-ga-tracking-code"))
@@ -107,7 +108,7 @@
 
 (defn requires-authentication? [app]
   (and
-       (nil? (get-in app [:user :username]))
+       (not (user-logged-in? app))
        (contains? auth-required (:page app))))
 
 (defn- send-startup-events [event]

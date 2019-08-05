@@ -14,7 +14,6 @@
             [ote.time :as time]
             [clj-time.coerce :as tc]))
 
-
 (t/use-fixtures :each (system-fixture
                        :settings (component/using (settings/->Settings) [:db :http])))
 
@@ -66,13 +65,15 @@
                          {::transit/regions ["01"]}))
 
   (testing "Nothing is sent if the regions don't match"
-    (http-post "admin" "settings/email-notifications"
+    (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+               "settings/email-notifications"
                {::user-notifications/finnish-regions ["02"]})
     (send!)
     (is (empty? @outbox)))
 
   (testing "Email is sent when regions match"
-    (http-post "admin" "settings/email-notifications"
+    (http-post (:user-id-admin @ote.test/user-db-ids-atom)
+               "settings/email-notifications"
                {::user-notifications/finnish-regions ["01" "02"]})
     (send!)
     (is (= 1 (count @outbox)))))

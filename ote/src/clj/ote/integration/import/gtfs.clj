@@ -32,12 +32,13 @@
   (with-open [in (:body (http-client/get url {:as :stream}))]
     (read-zip in)))
 
-(defn load-file-from-url [db interface-id url last-import-date etag]
-  (let [query-headers {:headers (merge
-                                 (if (not (nil? etag))
-                                   {"If-None-Match" etag}
-                                   (when-not (nil? last-import-date)
-                                     {"If-Modified-Since" last-import-date})))
+(defn load-file-from-url [db interface-id url last-import-date etag force-download?]
+  (let [query-headers {:headers (when (not force-download?)
+                                  (merge
+                                    (if (not (nil? etag))
+                                      {"If-None-Match" etag}
+                                      (when-not (nil? last-import-date)
+                                        {"If-Modified-Since" last-import-date}))))
                        :as :byte-array}
         response (http-client/get url query-headers)]
     (log/info "Fetching transit interface" interface-id  ", URL:" url ", etag:" etag ", last-import-date:" last-import-date "=> status" (:status response))
@@ -220,9 +221,9 @@
       (save-gtfs-to-db db bytes 1 1 1 nil)
       (println "******************* test-hsl-gtfs end *********************"))))
 
-(defn- load-interface-url [db interface-id url last-import-date saved-etag]
+(defn- load-interface-url [db interface-id url last-import-date saved-etag force-download?]
   (try
-    (load-file-from-url db interface-id url last-import-date saved-etag)
+    (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
       (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
       (specql/update! db ::t-service/external-interface-description
@@ -266,10 +267,10 @@
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
           Returns a response map or nil if it has not been modified."
-          (fn [type db interface-id url last-import-date saved-etag] type))
+          (fn [type db interface-id url last-import-date saved-etag force-download?] type))
 
-(defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag]
-  (let [response (load-interface-url db interface-id url last-import-date saved-etag)]
+(defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
     (when response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
@@ -279,8 +280,8 @@
         (catch Exception e
           nil)))))
 
-(defmethod load-transit-interface-url :kalkati [type db interface-id url last-import-date saved-etag]
-  (let [response (load-interface-url db interface-id url last-import-date saved-etag)]
+(defmethod load-transit-interface-url :kalkati [type db interface-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
     (when response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
@@ -304,14 +305,14 @@
 (defn download-and-store-transit-package
   "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
   Requires s3 bucket config, database settings, operator-id and transport-service-id."
-  [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3?]
+  [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3? force-download?]
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db interface-id)
-        response (load-transit-interface-url interface-type db interface-id url last-import-date (:gtfs/etag latest-package))
+        response (load-transit-interface-url interface-type db interface-id url last-import-date (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
-    (when-not (nil? response)
+    (if (not (nil? response))
       (if (nil? gtfs-file)
         (do
           (log/warn "Got empty body as response when loading gtfs from: " url)
@@ -328,7 +329,7 @@
                           {::t-service/id interface-id})
 
           ;; IF hash doesn't match, save new and upload file to s3
-          (if (or (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
+          (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
             (do
               (let [package (specql/insert! db :gtfs/package
                                             {:gtfs/sha256 new-gtfs-hash
@@ -347,7 +348,10 @@
 
                 ;; Parse gtfs package and save it to database.
                 (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
-            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying.")))))))
+            (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying."))))
+      ;; in case of error, return nil
+      nil
+      )))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
