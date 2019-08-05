@@ -37,7 +37,7 @@
       (merge
         {:font-size "0.75rem"
          :background-color hash-color
-         :color "rgb (0, 255, 255)"
+         :color colors/calendar-day-font
          :transition "box-shadow 0.25s"
          :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
         (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))

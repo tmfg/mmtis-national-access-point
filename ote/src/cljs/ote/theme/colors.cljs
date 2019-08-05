@@ -52,6 +52,8 @@
 (def success green-basic)
 (def warning red-basic)
 
+(def calendar-day-font gray950)
+
 (def monitor-taxi-color "rgb(0,170,187)")
 (def monitor-request-color "rgb(102,204,102)")
 (def monitor-schedule-color "rgb(153,204,0)")
