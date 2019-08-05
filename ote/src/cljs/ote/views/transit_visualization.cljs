@@ -6,6 +6,7 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
+            [ote.theme.colors :as color]
             [ote.app.controller.transit-visualization :as tv]
             [ote.time :as time]
             [cljs-react-material-ui.reagent :as ui]
@@ -482,10 +483,14 @@
         date1-last-stop (last (:stoptimes (first (:selected-trip-pair compare))))
         date2-first-stop (first (:stoptimes (second (:selected-trip-pair compare))))
         date2-last-stop (last (:stoptimes (second (:selected-trip-pair compare))))
-        date1-label (str ", " (time/format-interval-as-time (:gtfs/departure-time date1-first-stop)) " " (:gtfs/stop-name date1-first-stop) " - "
-                         (time/format-interval-as-time (:gtfs/departure-time date1-last-stop)) " " (:gtfs/stop-name date1-last-stop))
-        date2-label (str ", " (time/format-interval-as-time (:gtfs/departure-time date2-first-stop))" " (:gtfs/stop-name date2-first-stop) " - "
-             (time/format-interval-as-time (:gtfs/departure-time date2-last-stop)) " " (:gtfs/stop-name date2-last-stop))]
+        date1-label (if (and date1-first-stop date1-last-stop)
+                      (str ", " (time/format-interval-as-time (:gtfs/departure-time date1-first-stop)) " " (:gtfs/stop-name date1-first-stop) " - "
+                           (time/format-interval-as-time (:gtfs/departure-time date1-last-stop)) " " (:gtfs/stop-name date1-last-stop))
+                      "")
+        date2-label (if (and date2-first-stop date2-last-stop)
+                      (str ", " (time/format-interval-as-time (:gtfs/departure-time date2-first-stop)) " " (:gtfs/stop-name date2-first-stop) " - "
+                           (time/format-interval-as-time (:gtfs/departure-time date2-last-stop)) " " (:gtfs/stop-name date2-last-stop))
+                      "")]
     [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
                            :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
      "Pysäkit"
@@ -525,8 +530,8 @@
                            (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
                         :default
-                        [icon-l/icon-labeled {:style {:color "lightgray"}}
-                         [ic/action-query-builder {:color "lightgray"}] nil]))}]
+                        [icon-l/icon-labeled {:style color/icon-disabled}
+                         [ic/action-query-builder color/icon-disabled] nil]))}]
           combined-stop-sequence]]])]))
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?

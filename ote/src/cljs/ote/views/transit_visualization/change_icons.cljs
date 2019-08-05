@@ -3,7 +3,6 @@
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
@@ -109,7 +108,7 @@
 (defn- show-added-trips [diff with-labels?]
   [:div {:style {:flex "1"}}
    [icon-l/icon-labeled
-    [ote-icons/outline-add-box {:color (if (= 0 (:added-trips diff))
+    [ote-icons/outline-add-box {:color (if (= zero? (:added-trips diff))
                                          colors/icon-disabled
                                          colors/add-color)}]
     [:span (or (:added-trips diff)
@@ -119,7 +118,7 @@
 (defn- show-removed-trips [diff with-labels?]
   [:div {:style {:flex "1"}}
    [icon-l/icon-labeled
-    [ote-icons/outline-indeterminate-checkbox {:color (if (= 0 (:removed-trips diff))
+    [ote-icons/outline-indeterminate-checkbox {:color (if (= zero? (:removed-trips diff))
                                                         colors/icon-disabled
                                                         colors/remove-color)}]
     [:span (or (:removed-trips diff)
