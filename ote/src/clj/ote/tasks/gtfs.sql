@@ -1,9 +1,9 @@
 -- name: select-gtfs-urls-update
 SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
        ts."transport-operator-id" as "operator-id", ts.id as "ts-id", eid."gtfs-imported" as "last-import-date"
-  FROM "external-interface-description"  eid
+  FROM "external-interface-description" eid
   JOIN "transport-service" ts ON eid."transport-service-id" = ts.id
-  JOIN "transport-operator" top ON  top.id = ts."transport-operator-id"
+  JOIN "transport-operator" top ON top.id = ts."transport-operator-id"
  WHERE ts.published IS NOT NULL
    AND top.id NOT IN (:blacklist)
    AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
@@ -14,9 +14,9 @@ SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
 -- name: select-gtfs-url-for-service
 SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
        ts."transport-operator-id" as "operator-id", ts.id as "ts-id", eid."gtfs-imported" as "last-import-date"
-  FROM "external-interface-description"  eid
+  FROM "external-interface-description" eid
   JOIN "transport-service" ts ON eid."transport-service-id" = ts.id
-  JOIN "transport-operator" top ON  top.id = ts."transport-operator-id"
+  JOIN "transport-operator" top ON top.id = ts."transport-operator-id"
  WHERE ts.published IS NOT NULL
    AND ts.id = :service-id
    AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format));
