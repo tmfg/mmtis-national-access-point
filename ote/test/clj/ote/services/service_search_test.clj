@@ -1,13 +1,7 @@
 (ns ote.services.service-search-test
   (:require [ote.services.service-search :as sut]
             [clojure.test :as t :refer [deftest is testing use-fixtures]]
-            [ote.test :refer [system-fixture 
-                              *ote* 
-                              http-post 
-                              http-get 
-                              sql-execute! 
-                              sql-query
-                              fetch-id-for-username]]
+            [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! sql-query]]
             [com.stuartsierra.component :as component]
             [clojure.test.check.generators :as gen]
             [ote.db.generators :as otegen]
@@ -43,8 +37,7 @@
 
   (let [services (generate-services)
         saved-services (mapv (comp :transit
-                                   (partial http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
-                                            "transport-service"))
+                                   (partial http-post (:user-id-admin @ote.test/user-db-ids-atom) "transport-service"))
                              services)]
     (publish-services! (map ::t-service/id saved-services))
 
@@ -113,7 +106,7 @@
                                                                      :namefin "Hyrynsalmi",
                                                                      :type "finnish-municipality",
                                                                      :primary? true}])
-          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+          saved-service (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                    "transport-service"
                                    service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
@@ -141,7 +134,7 @@
                                                                      :namefin "90900 Kiiminki Keskus",
                                                                      :type "finnish-postal",
                                                                      :primary? true}])
-          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+          saved-service (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                    "transport-service"
                                    service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
@@ -176,7 +169,7 @@
                                                                      :namefin "Keuruu",
                                                                      :type "finnish-municipality",
                                                                      :primary? true}])
-          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+          saved-service (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                    "transport-service"
                                    service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
@@ -213,7 +206,7 @@
                                                                      :namefin "33200 Tampere Keskus Läntinen",
                                                                      :type "finnish-postal",
                                                                      :primary? true}])
-          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+          saved-service (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                    "transport-service"
                                    service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
@@ -244,7 +237,7 @@
                                                       :ote.db.places/namefin "Kannus rautatieasema"
                                                       :ote.db.places/primary? true
                                                       :geojson "{\"type\":\"Point\",\"coordinates\":[23.914974,63.898401]}"}])
-          saved-service (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+          saved-service (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                    "transport-service"
                                    service)]
       (publish-services! [(::t-service/id (:transit saved-service))])
@@ -285,7 +278,7 @@
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
           saved-services (map (partial
-                                http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                 "transport-service")
                               (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))
@@ -319,7 +312,7 @@
                                                                                              :type "finnish-postal",
                                                                                              :primary? true}]))))
           saved-services (map (partial
-                                http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+                                http-post (:user-id-admin @ote.test/user-db-ids-atom)
                                 "transport-service")
                               (shuffle services))]
       (publish-services! (map #(::t-service/id (:transit %1)) saved-services))

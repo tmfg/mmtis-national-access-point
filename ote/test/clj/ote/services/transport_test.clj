@@ -1,6 +1,6 @@
 (ns ote.services.transport-test
   (:require  [clojure.test :as t :refer [deftest testing is]]
-             [ote.test :refer [system-fixture http-get http-post fetch-id-for-username]]
+             [ote.test :refer [system-fixture http-get http-post]]
              [clojure.java.jdbc :as jdbc]
              [clojure.test.check :as tc]
              [clojure.test.check.generators :as gen]
@@ -29,11 +29,10 @@
                   (:nap nil))
                 [:http :db])))
 
-
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
 (deftest fetch-test-data-transport-service
-  (let [ts (http-get (fetch-id-for-username (:db ote.test/*ote*) "admin")
+  (let [ts (http-get (:user-id-admin @ote.test/user-db-ids-atom)
                      "transport-service/1")
         service (:transit ts)
         ps (::t-service/passenger-transportation service)]
@@ -150,7 +149,7 @@
      (compare-values comparison v1 v2))))
 
 (defn- save-and-fetch-compare [transport-service compare-key]
-  (let [response (http-post (fetch-id-for-username (:db ote.test/*ote*) "admin")
+  (let [response (http-post (:user-id-admin @ote.test/user-db-ids-atom)
                             "transport-service"
                             transport-service)
         service (:transit response)
@@ -184,7 +183,7 @@
 (deftest save-terminal-service-to-wrong-operator
   (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)
         modified-terminal-service (assoc generated-terminal-service ::t-service/transport-operator-id 2)
-        response (http-post (fetch-id-for-username (:db ote.test/*ote*) "normaluser")
+        response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
                             "transport-service"
                             modified-terminal-service)
         service (:transit response)
@@ -197,14 +196,14 @@
     ;; Gives error, because user doesn't have access rights to operator 1
     (is (thrown-with-msg?
           clojure.lang.ExceptionInfo #"status 403"
-          (http-post (fetch-id-for-username (:db ote.test/*ote*) "normaluser")
+          (http-post (:user-id-normal @ote.test/user-db-ids-atom)
                      "transport-service"
                      problematic-terminal-service)))))
 
 (deftest delete-transport-service
   (let [service (assoc (gen/generate s-generators/gen-transport-service)
                        ::t-service/transport-operator-id 2)
-        save-response (http-post (fetch-id-for-username (:db ote.test/*ote*) "normaluser")
+        save-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
                                  "transport-service"
                                  service)
         id (get-in save-response [:transit ::t-service/id])]
@@ -217,9 +216,7 @@
       (is (= id (get-in fetch-response [:transit ::t-service/id]))))
 
     ;; Delete
-    (let [delete-response (http-post (fetch-id-for-username
-                                       (:db ote.test/*ote*)
-                                       "normaluser")
+    (let [delete-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
                                      "transport-service/delete"
                                      {:id id})]
       (is (= (:transit delete-response) id)))
