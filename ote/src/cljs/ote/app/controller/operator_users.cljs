@@ -56,12 +56,11 @@
 
 (define-event PostNewUser [email ckan-group-id]
   {}
-  (let [authority (or (get-in app [:params :authority]) "false")]
-    (comm/post!
-      (str "transport-operator/" (url-util/encode-url-component ckan-group-id) "/" authority "/users")
-      {:email email}
-      {:on-success (tuck/send-async! ->NewUserSuccess)
-       :on-failure (tuck/send-async! ->NewUserFailure)}))
+  (comm/post!
+    (str "transport-operator/" (url-util/encode-url-component ckan-group-id) "/users")
+    {:email email}
+    {:on-success (tuck/send-async! ->NewUserSuccess)
+     :on-failure (tuck/send-async! ->NewUserFailure)})
   (assoc-in app [:manage-access :new-member-loading?] true))
 
 (define-event RemoveMemberSuccess [result member]

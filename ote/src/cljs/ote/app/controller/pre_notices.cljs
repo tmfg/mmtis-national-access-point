@@ -323,8 +323,7 @@
 
 (define-event AuthorityGroupIdFetchSuccess [result]
   {}
-  (routes/navigate! :operator-users {:ckan-group-id (:ckan-group-id result)
-                                     :authority "true"})
+  (routes/navigate! :operator-users {:ckan-group-id (:ckan-group-id result)})
   app)
 
 (define-event MoveToAuthorityGroupPage []

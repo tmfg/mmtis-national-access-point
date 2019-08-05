@@ -11,7 +11,6 @@
             [ote.util.db :as util]
             [ote.util.email-template :as email-template]
             [ote.config.email-config :as email-config]
-            [ote.db.user :as user]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
@@ -648,8 +647,9 @@
       (catch Exception e
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
-(defn manage-adding-users-to-operator [email db requester operator form-data authority?]
-  (let [new-member (first (fetch-user-by-email db {:email (:email form-data)}))
+(defn manage-adding-users-to-operator [email db requester operator form-data ]
+  (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
+        new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id (::t-operator/group-id operator)
         operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
         not-invited? (empty?
@@ -765,8 +765,8 @@
         (authorization/with-group-check db user ckan-group-id
           #(operator-users-response db ckan-group-id)))
 
-      (POST "/transport-operator/:ckan-group-id/:authority/users"
-            {{:keys [ckan-group-id authority]}
+      (POST "/transport-operator/:ckan-group-id/users"
+            {{:keys [ckan-group-id]}
              :params
              user :user
              form-data :body}
@@ -774,7 +774,8 @@
               form-data (http/transit-request form-data)]
           (authorization/with-group-check
             db user ckan-group-id
-            #(manage-adding-users-to-operator email db user operator form-data (boolean (Boolean/valueOf authority))))))
+            #(manage-adding-users-to-operator email db user operator
+               form-data))))
 
       ;; This is not ready, only implemented to help add-member implementation
       (DELETE "/transport-operator/:ckan-group-id/token"

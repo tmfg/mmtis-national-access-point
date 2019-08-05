@@ -255,7 +255,7 @@
       (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/title operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/false/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
      (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
@@ -275,7 +275,7 @@
      [:p "Voit muokata herätesähköpostien asetuksia viestin lopussa olevasta linkistä."]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua alkaa tarkastelemaan muutosilmoituksia, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/true/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
      (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
      [:br]
