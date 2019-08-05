@@ -28,23 +28,26 @@
     (e! (tv/->SelectDatesForComparison day))))
 
 (defn day-style [hash->color date->hash date1 date2 day]
-  (let [d (time/format-date-iso-8601 day)
-        hash (date->hash d)
-        hash-color (hash->color hash)]
-    (merge
-      {:font-size "0.75rem"
-       :background-color hash-color
-       :color "rgb (0, 255, 255)"
-       :transition "box-shadow 0.25s"
-       :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
-      (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))
-            (style/date1-highlight-style hash-color)
+  ;; `when` check because date->hash is nil until RouteCalendarDatesResponse completes.
+  ;; That happens a bit late if route is already selected by url element on first navigation to view.
+  (when date->hash
+    (let [d (time/format-date-iso-8601 day)
+          hash (date->hash d)
+          hash-color (hash->color hash)]
+      (merge
+        {:font-size "0.75rem"
+         :background-color hash-color
+         :color "rgb (0, 255, 255)"
+         :transition "box-shadow 0.25s"
+         :box-shadow "inset 0 0 0 2px transparent, inset 0 0 0 3px transparent, inset 0 0 0 100px transparent"}
+        (cond (and (= (time/format-date-iso-8601 date1) d) (some? date2))
+              (style/date1-highlight-style hash-color)
 
-            (= (and (some? date2) (time/format-date-iso-8601 date2)) d)
-            (style/date2-highlight-style hash-color)
+              (= (and (some? date2) (time/format-date-iso-8601 date2)) d)
+              (style/date2-highlight-style hash-color)
 
-            (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
-            (style/date-highlight-style hash-color colors/gray800)))))
+              (and (= (time/format-date-iso-8601 date1) d) (nil? date2))
+              (style/date-highlight-style hash-color colors/gray800))))))
 
 (defn comparison-dates [{:keys [date1 date2]}]
   [:div (stylefy/use-style (merge (style-base/flex-container "row")
