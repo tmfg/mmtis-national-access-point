@@ -166,7 +166,8 @@
       (when trip-headsign
         [:span " otsatunnuksella " [:b trip-headsign]])
       " valittuina päivinä:"]
-     [table/table {:height 300 :name->label str
+     [table/table {:table-name "tbl-date-trips"
+                   :height 300 :name->label str
                    :on-select #(e! (tv/->SelectTripDescription (first %)))
                    :row-selected? (comp boolean #{selected-trip-description})}
       [{:name "Lähtö" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
@@ -321,7 +322,8 @@
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
      [tv-utilities/route-changes-legend]
-     [table/table {:no-rows-message no-rows-message
+     [table/table {:table-name "tbl-route-changes"
+                   :no-rows-message no-rows-message
                    :height table-height
                    :label-style style-base/table-col-style-wrap
                    :name->label str
@@ -419,10 +421,12 @@
                                        (comp :gtfs/stop-name last :stoptimes first)
                                        (comp :gtfs/stop-name first :stoptimes second)
                                        (comp :gtfs/stop-name last :stoptimes second))
-                                 combined-trips)]
-         ^{:key (str "trip-table" (rand-int 9999999))}
+                                 combined-trips)
+             :let [table-key (rand-int 9999999)]]
+         ^{:key (str "section-route-trips-" table-key)}
          [:div.trips-table {:style {:margin-top "1em"}}
-          [table/table {:name->label str
+          [table/table {:table-name (str "tbl-route-trips" table-key)
+                        :name->label str
                         :row-selected? #(= % selected-trip-pair)
                         :label-style style-base/table-col-style-wrap
                         :on-select #(e! (tv/->SelectTripPair (first %)))}
@@ -499,7 +503,8 @@
        [:div
         [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label true]
         [:div.trip-stop-sequence {:style {:margin-top "1em"}}
-         [table/table {:name->label str
+         [table/table {:table-name "tbl-trip-stop-sequence"
+                       :name->label str
                        :label-style style-base/table-col-style-wrap}
           [{:name "Pysäkki"
             :read :gtfs/stop-name
