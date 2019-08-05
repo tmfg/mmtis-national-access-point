@@ -68,16 +68,19 @@
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
 (defn- service-errors
-  [{::t-service/keys [transport-type interface-types sub-type name] :as service}]
+  [{::t-service/keys [transport-type interface-types sub-type name]
+    ::modification/keys [created] :as service}]
   (when (and (= sub-type :schedule) (not ((set interface-types) :route-and-schedule)))
     (let [tr-types (set transport-type)]
       (cond
         (tr-types :road)
         {:service-name name
-         :error :no-schedule-road}
+         :error :no-schedule-road
+         :created created}
         (tr-types :sea)
         {:service-name name
-         :error :no-schedule-sea}))))
+         :error :no-schedule-sea
+         :created created}))))
 
 (defn transport-services-table-rows [e! services transport-operator-id]
   [ui/table-body {:class "table-body"
@@ -135,7 +138,7 @@
       [:h5 {:style {:margin-top 0}} (tr [:own-services-page :flaws])]
       (doall
         (for [error errors]
-          ^{:key (:service-name error)}
+          ^{:key (str error)}
           [:p {:style {:margin 0}}
            [:strong
             [ic/alert-warning {:style {:color colors/negative-button
