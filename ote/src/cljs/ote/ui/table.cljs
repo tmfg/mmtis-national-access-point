@@ -19,9 +19,9 @@
                         :color "gray"}}
        opts])))
 
-(defn table [{:keys [height name->label key-fn label-style row-style
+(defn table [{:keys [table-name height name->label key-fn label-style row-style
                      on-select row-selected? no-rows-message class no-outline-on-selection?] :as opts} headers rows]
-  (let [random-table-id (str "tid-"(rand-int 999))
+  (let [table-id (or table-name (str (rand-int 9999)))
         table-row-color "#FFFFFF"
         table-row-color-alt colors/gray200
         table-row-hover-color colors/gray400]
@@ -46,17 +46,18 @@
                    :fixed-header true})
                 (when class
                   {:class class}))
-     [ui/table-header {:key (str random-table-id "-header")
+     [ui/table-header {:key (str table-id "-hdr")
                        :style {:overflow "visible" :background-color (color :grey300)}
                        :adjust-for-checkbox false
                        :display-select-all false}
-      [ui/table-row {:key (str random-table-id "-header-row")
+      [ui/table-row {:key (str table-id "-hdr-row")         ;; When adding more rows remember to add their id to key
                      :style {:overflow "visible"}
                      :selectable false}
        (doall
          (map-indexed
            (fn [i {:keys [name width tooltip tooltip-pos tooltip-len]}]
-             ^{:key (str i "-" name "-header-column")}
+             ;; Note, add i to key if name is not enough, for now avoiding index because it's not optimal for react rendering
+             ^{:key (str table-id "-hdr-col-" name )}
              [ui/table-header-column {:style
                                       (merge
                                         (when width
@@ -78,9 +79,9 @@
         (doall
           (map-indexed
             (fn [i row]
-              ^{:key (if key-fn
-                       (key-fn row)
-                       (str i "-" random-table-id "-body-row"))}
+              ^{:key (str table-id "-b-row-" (if (and key-fn (key-fn row))
+                                               (key-fn row)
+                                               row))}
               [ui/table-row (merge
                               (stylefy/use-style (merge {:background-color (if (even? i)
                                                                              table-row-color
@@ -101,7 +102,9 @@
                  (map-indexed
                    (fn [i {:keys [name width col-style format read]}]
                      (let [value ((or format identity) (if read (read row) (get row name)))]
-                       ^{:key (str i "-" random-table-id "-row-col-" name)}
+                       ;; Note: index i not added to key, because assuming one row won't have duplicate value-name pairs
+                       ;; Assumption ok when each row is in a separate key namespace
+                       ^{:key (str table-id "-b-row-col-" value "-" name)}
                        [ui/table-row-column {:style (merge
                                                       {:white-space "pre-line"
                                                        :overflow "visible"}
