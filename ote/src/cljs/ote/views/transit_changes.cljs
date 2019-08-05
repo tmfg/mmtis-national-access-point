@@ -221,7 +221,8 @@
     [:div.transit-changes
      [detected-transit-changes-page-controls e! transit-changes]
      [transit-changes-legend]
-     [table/table {:no-rows-message (if loading?
+     [table/table {:table-name "tbl-transit-changes"
+                   :no-rows-message (if loading?
                                       "Ladataan muutoksia, odota hetki..."
                                       "Ei löydettyjä muutoksia")
                    :name->label str
