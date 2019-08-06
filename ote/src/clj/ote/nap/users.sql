@@ -121,4 +121,4 @@ AND m.state = 'active';
 
 -- name: delete-user!
 -- "Delete" user from the database - only changes user data to null to preserve foreign key links
-UPDATE "user" SET name = :name, fullname = NULL, email = NULL, state = 'deleted' WHERE id = :id;
+UPDATE "user" SET name = :name, fullname = NULL, email = :id, state = 'deleted' WHERE id = :id;
