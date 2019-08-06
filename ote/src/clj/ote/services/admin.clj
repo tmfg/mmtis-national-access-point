@@ -37,7 +37,8 @@
             [ote.email :as email]
             [clojure.spec.alpha :as spec]
             [ote.util.collections :as ote-coll]
-            [ote.util.email-template :as email-template]))
+            [ote.util.email-template :as email-template]
+            [ote.services.users :as srv-users]))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -107,14 +108,18 @@
   Input: db=database instance, id=id of record to delete
   Output: id of the removed record."
   [db ^String id]
-  (let [affected-records (nap-users/delete-user! db {:id (str id)
+  (let [email (:user_email                                  ;; Delete user clears email field, so get it before deleting
+                (first
+                  (ote.nap.users/fetch-user-by-id db {:user-id id})))
+        affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
-    (http/transit-response
-      id
-      (if (= affected-records 1)
-        200
-        404))))
+    (if (= affected-records 1)
+      (do
+        (when (not (clojure.string/blank? email))
+          (srv-users/delete-users-old-token! db email))
+        (http/transit-response id 200))
+      (http/transit-response id 404))))
 
 (spec/def :user-memberships/userid (spec/and string? some?))
 (spec/def ::user-memberships-params-map
