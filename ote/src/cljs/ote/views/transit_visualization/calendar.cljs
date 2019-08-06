@@ -110,7 +110,8 @@
       [:div
       [:div.change-list
        [tv-section/route-changes-legend]
-       [table/table {:name->label str
+       [table/table {:table-name "tbl-route-calendar"
+                     :name->label str
                      :label-style style-base/table-col-style-wrap
                      :show-row-hover? true
                      :on-select #(when (first %)

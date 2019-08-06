@@ -152,9 +152,10 @@
        [:h2 (tr [:pre-notice-list-page :header-authority-pre-notice-list])]
        [:p (tr [:pre-notice-list-page :only-for-authorities])]]]
      [:div.row.authority-pre-notice-table
-      [table/table {:name->label (tr-key [:pre-notice-list-page :headers])
+      [table/table {:table-name "tbl-pre-notices-auth"
+                    :name->label (tr-key [:pre-notice-list-page :headers])
                     :label-style (merge style-base/table-col-style-wrap {:font-weight "bold"})
-                    :key-fn ::transit/id
+                    :key-fn :id
                     :no-rows-message (tr [:pre-notice-list-page :no-pre-notices-for-operator])
                     :stripedRows true
                     :row-style {:cursor "pointer"}
