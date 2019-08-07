@@ -160,7 +160,7 @@
 
                       :added
                       [icon-l/icon-labeled style/transit-changes-icon
-                       [ic/content-add-box {:color colors/add-color}]
+                       [ic/content-add-circle-outline {:color colors/add-color}]
                        "Uusi reitti"]
 
                       :removed
