@@ -9,7 +9,8 @@
             [clojure.string :as str]
             [ote.theme.colors :as colors]
             [ote.localization :refer [tr]]
-            [ote.time :as time]))
+            [ote.time :as time]
+            [ote.style.transit-changes :as style]))
 
 ;; Utility methods
 
@@ -173,3 +174,21 @@
    [:div (stylefy/use-style (style-base/flex-container "row"))
     [show-trip-sequences diff with-labels?]
     [show-stop-times diff with-labels?]]))
+
+(defn change-icons-for-dates
+  ([compare-data]
+   (change-icons-for-dates compare-data nil nil))
+  ([compare-data date1-label date2-label]
+   [:div (stylefy/use-style (style-base/flex-container "row"))
+    [:div {:style {:flex "1"}}
+     [:div (stylefy/use-style style/map-different-date1)]
+     (time/format-date (:date1 compare-data)) date1-label]
+    [:div {:style {:flex "1"}}
+     [:div (stylefy/use-style style/map-different-date2)]
+     (time/format-date (:date2 compare-data)) date2-label]]))
+
+(defn date-comparison-icons [compare-data]
+  (when (seq (:differences compare-data))
+    [:div {:style {:padding "0.5rem 0rem 1rem 0rem"}}
+     [change-icons-for-trips (:differences compare-data) true]
+     (change-icons-for-dates compare-data)]))
