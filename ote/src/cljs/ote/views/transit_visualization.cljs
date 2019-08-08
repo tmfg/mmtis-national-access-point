@@ -411,11 +411,12 @@
     [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
      "Vuorot"
      "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
-
      [:div
-      [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label false]
+      (when (seq (:differences compare))
+        [:div {:style {:padding-top "0.5rem"}}
+         [tv-change-icons/change-icons-for-trips compare true]
+         [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
       [:div.route-trips
-
        ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
        (for [[_ trips] (group-by (juxt (comp :gtfs/stop-name first :stoptimes first)
                                        (comp :gtfs/stop-name last :stoptimes first)
@@ -501,7 +502,11 @@
      "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
      (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
        [:div
-        [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label true]
+        (when (seq (:differences compare))
+          [:div {:style {:padding-top "0.5rem"}}
+           [tv-change-icons/change-icons-for-stops compare true]
+           [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
+
         [:div.trip-stop-sequence {:style {:margin-top "1em"}}
          [table/table {:table-name "tbl-trip-stop-sequence"
                        :name->label str
@@ -654,7 +659,7 @@
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]]
 
    [:div
-    [tv-utilities/date-comparison-icons compare]
+    [tv-change-icons/date-comparison-icons compare]
     [:div
      [selected-route-map e! date->hash hash->color compare]]]])
 
