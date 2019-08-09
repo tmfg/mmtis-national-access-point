@@ -70,8 +70,11 @@
              (:ensured-id user)]])]]))])
 
 
-(def groups-header-style {:height "10px" :padding "5px 0 5px 0"})
-(def groups-row-style {:height "20px" :padding 0})
+(def groups-header-style {:height "1em" :padding "5px 0 5px 0"})
+(def groups-row-style {:height "2em"
+                       :padding 0
+                       :word-break "break-all"
+                       :white-space "normal"})
 
 (defn groups-list [groups]
   [:div {:style {:border-left "1px solid rgb(224, 224, 224)"}}
@@ -93,10 +96,15 @@
         (doall
           (for [{:keys [title name]} groups]
             ^{:key (str "group-" name)}
-            [ui/table-row {:selectable false
-                           :style      groups-row-style}
-             [ui/table-row-column {:style groups-row-style} title]
-             [ui/table-row-column {:style groups-row-style} name]]))]]]
+            [ui/table-row
+             {:selectable false
+              :style groups-row-style}
+             [ui/table-row-column
+              {:style groups-row-style}
+              title]
+             [ui/table-row-column
+              {:style groups-row-style}
+              name]]))]]]
      [:div {:style {:padding-left "10px"
                     :line-height  "48px"}}
       "Ei palveluntuottajia."])])
@@ -123,9 +131,9 @@
 
      (when (seq results)
        [:span
-        [ui/table {:selectable    false
-                   :fixed-header  false
-                   :style         {:width "auto" :table-layout "auto"}
+        [ui/table {:selectable false
+                   :fixed-header false
+                   :style {:width "100%" :table-layout "fixed"}
                    :wrapper-style {:border-style "solid"
                                    :border-color "rgb(224, 224, 224)"
                                    :border-width "1px 1px 0 1px"}}
@@ -134,7 +142,6 @@
           [ui/table-row
            [ui/table-header-column "Sähköposti"]
            [ui/table-header-column "Nimi"]
-           [ui/table-header-column "Sisäinen id"]
            [ui/table-header-column "Palveluntuottajat"]
            [ui/table-header-column "Toiminnot"]]]
 
@@ -142,12 +149,18 @@
           (doall
             (for [{:keys [id username name email groups] :as user} results]
               ^{:key (str "user-" id)}
-              [ui/table-row {:style      {:border-bottom "3px solid rgb(224, 224, 224)"}
+              [ui/table-row {:style {:border-bottom "3px solid rgb(224, 224, 224)"}
                              :selectable false}
-               [ui/table-row-column email]
-               [ui/table-row-column name]
-               [ui/table-row-column id]
-               [ui/table-row-column {:style {:padding 0}}
+               [ui/table-row-column
+                {:style {:word-break "break-all"            ;; inline because otherwise style does not take effect
+                         :white-space "normal"}}
+                email]
+               [ui/table-row-column
+                {:style {:word-break "break-all"            ;; inline because otherwise style does not take effect
+                         :white-space "normal"}}
+                name ]
+               [ui/table-row-column
+                {:style {:padding 0}}
                 [groups-list groups]]
                [ui/table-row-column
                 [delete-user-action e! user]
