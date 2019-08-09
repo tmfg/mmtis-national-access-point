@@ -266,7 +266,7 @@
           [:span (stylefy/use-style style-topnav/gray-info-text)
            (tr [:common-texts :navigation-feedback-email])]]]]]]]))
 
-(defn- top-nav-links [e! app is-scrolled?]
+(defn- top-nav-links [e! {:keys [user] :as app} is-scrolled?]
   (let [current-language @localization/selected-language]
     [:div.navbar (stylefy/use-style style-topnav/clear)
      [:ul (stylefy/use-style style-topnav/ul)
@@ -360,7 +360,11 @@
            (if (get-in app [:ote-service-flags :user-menu-open])
             [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
-          [:span.hidden-xs {:style {:color "#fff"}} (text/maybe-shorten-text-to 30 (get-in app [:user :name]))]]])
+          [:span.hidden-xs {:style {:color "#fff"}}
+           (text/maybe-shorten-text-to 30
+                                       (if (clojure.string/blank? (:name user))
+                                         (:email user)
+                                         (:name user)))]]])
 
       (when (not (user-logged-in? app))
         [:li (stylefy/use-style style-topnav/li-right)
