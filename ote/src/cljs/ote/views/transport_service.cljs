@@ -23,7 +23,8 @@
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
             [reagent.core :as r]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.ui.info :as info]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -43,14 +44,16 @@
     [:div
      [:h1 (tr [:select-service-type-page :title-required-data])]]
     [:div.row
-     [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]
-     [:br]
-     [:p (tr [:select-service-type-page :transport-service-type-brokerage-help-text])]]
+     [info/info-toggle
+      (tr [:common-texts :instructions])
+      [:span
+       [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]
+       [:p (tr [:select-service-type-page :transport-service-type-brokerage-help-text])]
+       [:p {:style {:font-style "italic"}}
+        (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
+      {:default-open? false}]]
 
-    [:div.row {:style {:padding-top "20px"}}
-     [:p {:style {:font-style "italic"}}
-      (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
-    [:div.row {:style {:padding-top "20px"}}
+    [:div.row
 
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
