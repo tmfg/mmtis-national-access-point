@@ -943,7 +943,7 @@ You can also draw the operating area or point to the map with drawing tools. You
 
 
  :select-service-type-page
- {:title-required-data "Start creating a new transport service by choosing the mode of the transport service"
+ {:title-required-data "Adding a new service"
   :transport-service-type-selection-help-text "You can save the essential data of your transport service by first choosing the mode of the transport service and the transport operator, and after that by filling the form that opens up to your screen. If you provide many types of transport services, fill up an own form from each service."
   :transport-service-type-selection-help-example "Example: There is a transpor operator \"Example Bus Ltd.\", which provides two different transport services, \"Example Bus Charter Traffic\" in Tampere and \"Example Bus Taxi Service\" in Helsinki. The company has to fill up a separate form from each of the services.
 
