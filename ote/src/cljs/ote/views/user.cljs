@@ -82,7 +82,7 @@
             (form/subtitle :h3 (tr [:register :confirm-changes]) {:margin-top "3rem"})
             {:name :current-password :type :string :password? true
              :full-width? true
-             :required? true
+             :required? (seq (::form/modified form-data))
              :validate [(fn [_ _]
                           (when password-incorrect?
                             (tr [:login :error :incorrect-password])))]})]
