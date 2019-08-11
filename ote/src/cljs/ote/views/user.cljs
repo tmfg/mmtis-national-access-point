@@ -57,14 +57,18 @@
                           (when (and email-taken (email-taken data))
                             (tr [:register :errors :email-taken])))]
              :should-update-check form/always-update}
-            (form/info (tr [:user :change-email-warning]))
+
+            (when (and (not (clojure.string/blank? (:email form-data)))
+                       (not= (:email form-data) (:email app)))
+              (form/info (tr [:user :change-email-warning])))
+
             (form/subtitle :h3 (tr [:register :change-password]) {:margin-top "3rem"})
             {:name :password :type :string :password? true
              :label (tr [:register :fields :new-password])
              :full-width? true
              :validate [(fn [data _]
                           (when (and (not (str/blank? data))
-                                  (not (user/password-valid? data)))
+                                     (not (user/password-valid? data)))
                             (tr [:register :errors :password-not-valid])))]
              :should-update-check form/always-update}
             {:name :confirm :type :string :password? true
