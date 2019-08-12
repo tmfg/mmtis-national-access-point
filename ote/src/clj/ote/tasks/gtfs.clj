@@ -53,7 +53,6 @@
   "Get gtfs package data from database for given service."
   [db service-id]
   (let [gtfs-data (first (select-gtfs-url-for-service db {:service-id service-id}))]
-    (println "fetch-given-gtfs-interface! service-id" service-id (pr-str gtfs-data))
     (when gtfs-data
       (mark-gtfs-package-imported! db gtfs-data))
     gtfs-data))

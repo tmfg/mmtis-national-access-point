@@ -349,7 +349,10 @@
   (doseq [{id ::t-service/id} removed-resources]
     ;; Mark possible gtfs_packages to removed and then remove interface
     (mark-package-as-deleted db id)
-
+    ;; Delete from interface-download
+    (specql/delete! db ::t-service/interface-download
+                    {::t-service/external-interface-description-id id})
+    ;; Delete from external-interface-description
     (specql/delete! db ::t-service/external-interface-description
                     {::t-service/id id}))
 
