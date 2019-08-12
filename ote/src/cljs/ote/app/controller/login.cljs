@@ -197,7 +197,7 @@
                :on-failure (tuck/send-async! ->SaveUserError)})
   app)
 
-(define-event CancelUserEdit [navigate-back?]
+(define-event UserSettingsInit [navigate-back?]
   {:path [:user]}
   (when navigate-back?
     (.back js/history))
@@ -205,7 +205,8 @@
           :form-data
           :username-taken
           :email-taken
-          :password-incorrect?))
+          :password-incorrect?
+          :edit-response))
 
 (define-event UpdateResetPasswordForm [form-data]
   {:path [:reset-password]}
