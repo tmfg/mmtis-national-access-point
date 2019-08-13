@@ -5,20 +5,14 @@
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]))
 
 (def transit-changes-legend-container
-  {:align-items "flex-start"
-   :background-color "rgb(235,235,235)"
-   :display "flex"
-   :flex-direction "column"
-   :justify-content "flex-start"
+  {:background-color colors/gray300
    :margin-top "1rem"
    :padding "1rem"})
 
 (def transit-changes-icon-legend-row-container
-  {:align-items "center"
-   :display "flex"
-   :flex-direction "row"
-   :flex-wrap "wrap"
-   :justify-content "flex-start"})
+  {:display "flex"
+   :min-width "100%"
+   :flex-wrap "wrap"})
 
 (def transit-changes-icon-row-container
   {:align-items "center"
