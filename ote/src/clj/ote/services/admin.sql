@@ -67,7 +67,7 @@ SELECT eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
    AND ts."sub-type" = 'schedule'
    AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
  GROUP BY id.created, eid.id, id."download-error", id."db-error", ts.id, op.id
- ORDER BY "format" ASC, "import-error" DESC;
+ ORDER BY eid.id ASC, id.created DESC;
 
 -- name: search-services-wihtout-interface
 select ts.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
