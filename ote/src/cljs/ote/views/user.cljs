@@ -35,7 +35,7 @@
           [:div
            (when (:email-changed? edit-response)
              [:div {:style {:margin-bottom "2rem"}}
-              [notification/notification {:text (str "Sähköpostiosoitteeseen " (:new-email edit-response) " on lähetetty vahvistusviesti")
+              [notification/notification {:text (str (tr [:user :change-email-confirmation-sent]) " " (:new-email edit-response))
                                           :type :success}]])
            [:a (merge {:href (str "#/own-services")
                        :on-click #(do (.preventDefault %)
