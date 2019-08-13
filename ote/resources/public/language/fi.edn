@@ -1250,7 +1250,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :exception "Poikkeus"}
 
  :user
- {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."}
+ {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."
+  :change-email-confirmation-sent "Vahvistusviesti lähetetty sähköpostiosoitteeseen"}
 
  :register
  {:label "Rekisteröi uusi käyttäjätili"
