@@ -7,7 +7,7 @@ CREATE TYPE interface_download_status AS ENUM ('success','failure');
 -- And create the table
 CREATE TABLE "interface-download" (
   id SERIAL PRIMARY KEY,
-  "external-interface-description-id"  INTEGER REFERENCES "external-interface-description" (id) NOT NULL,
+  "external-interface-description-id" INTEGER REFERENCES "external-interface-description" (id) NOT NULL,
   "download-error" text,
   "db-error" text,
   "download-status" interface_download_status,
