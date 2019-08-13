@@ -8,7 +8,10 @@
             [ote.app.controller.login :as lc]
             [clojure.string :as str]
             [ote.ui.list-header :as list-header]
-            [ote.ui.notification :as notification]))
+            [ote.ui.notification :as notification]
+            [ote.app.controller.front-page :as fp]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]))
 
 (defn merge-user-data [user form-data]
   (merge (select-keys user #{:username :name :email})
@@ -34,8 +37,11 @@
              [:div {:style {:margin-bottom "2rem"}}
               [notification/notification {:text (str "Sähköpostiosoitteeseen " (:new-email edit-response) " on lähetetty vahvistusviesti")
                                           :type :success}]])
-           [buttons/cancel {:on-click #(e! (lc/->UserSettingsInit true))}
-            (tr [:buttons :cancel])]]
+           [:a (merge {:href (str "#/own-services")
+                       :on-click #(do (.preventDefault %)
+                                      (e! (fp/->ChangePage :own-services nil)))}
+                      (stylefy/use-style style-base/blue-link-with-icon))
+            (tr [:front-page :move-to-services-page])]]
           ;; When arriving to view or after a failed form submission: display form.
           [form/form
            {:update! #(e! (lc/->UpdateUser %))
