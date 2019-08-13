@@ -687,7 +687,7 @@
                     (str (time/format-timestamp-for-ui created)))] ". "
                  "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
                  (case download-status
-                   "success" [:div  {:style {:flex "1"}} " "]
+                   "success" [:div {:style {:flex "1"}} " "]
                    "failure" [:div {:title error
                                     :style {:flex "1"}} 
                                     [ic/alert-warning {:style style/gtfs-package-info-icons}]]
