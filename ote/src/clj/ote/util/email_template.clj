@@ -315,7 +315,7 @@
        (html-divider-border "100%")
        [:p " Sinut on kutsuttu tarkastelemaan markkinaehtoisen henkilöliikenteen muutosilmoituksia NAP:ssa. "]
        [:p " Alat myös jatkossa saamaan herätesähköposteja markkinaehtoisen liikenteen muutoksista. "]
-
+       [:br]
        [:p "Mikäli olet saanut kutsun vahingossa, sinun ei tarvitse tehdä mitään."]
        [:br]
        (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")

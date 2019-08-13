@@ -8,8 +8,7 @@
             [ote.localization :refer [tr]]
             [ote.style.base :as style-base]
             [ote.theme.colors :as colors]
-            [ote.time :as time]
-            [ote.views.transit-visualization.change-icons :as tv-change-icons]))
+            [ote.time :as time]))
 
 (defn section [{:keys [open? toggle!]} title help-content body-content]
   [:div.transit-visualization-section (stylefy/use-style (if open?
@@ -52,34 +51,3 @@
      [:div (stylefy/use-style style/new-change-legend-icon)
       [:div (stylefy/use-style style/new-change-indicator)]]
      [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])
-
-
-(defn date-comparison-icons [compare-data]
-  [:div
-   (when (seq (:differences compare-data))
-     [:div {:style {:padding-top "0.5rem"}}
-      [:div (stylefy/use-style (style-base/flex-container "row"))
-       [:div {:style {:flex "1"}}
-        [:div (stylefy/use-style style/map-different-date1)]
-        (time/format-date (:date1 compare-data))]
-       [:div {:style {:flex "1"}}
-        [:div (stylefy/use-style style/map-different-date2)]
-        (time/format-date (:date2 compare-data))]]
-
-      [tv-change-icons/change-icons-for-trips (:differences compare-data) true]])])
-
-(defn date-comparison-icons-with-date-labels [compare-data date1-label date2-label hide-trips?]
-  [:div
-   (when (seq (:differences compare-data))
-     [:div {:style {:padding-top "0.5rem"}}
-      [:div (stylefy/use-style (style-base/flex-container "row"))
-       [:div {:style {:flex "1"}}
-        [:div (stylefy/use-style style/map-different-date1)]
-        (time/format-date (:date1 compare-data)) date1-label]
-       [:div {:style {:flex "1"}}
-        [:div (stylefy/use-style style/map-different-date2)]
-        (time/format-date (:date2 compare-data)) date2-label]]
-
-      (if hide-trips?
-        [tv-change-icons/change-icons-for-stops (:differences compare-data) true]
-        [tv-change-icons/change-icons-for-trips (:differences compare-data) true])])])

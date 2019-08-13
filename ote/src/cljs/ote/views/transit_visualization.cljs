@@ -166,7 +166,8 @@
       (when trip-headsign
         [:span " otsatunnuksella " [:b trip-headsign]])
       " valittuina päivinä:"]
-     [table/table {:height 300 :name->label str
+     [table/table {:table-name "tbl-date-trips"
+                   :height 300 :name->label str
                    :on-select #(e! (tv/->SelectTripDescription (first %)))
                    :row-selected? (comp boolean #{selected-trip-description})}
       [{:name "Lähtö" :width "35%" :format #(str (:time %) " " (:stop-name %)) :read :departure}
@@ -321,7 +322,8 @@
                           (tr [:transit-visualization-page :loading-routes]))]
     [:div.route-changes
      [tv-utilities/route-changes-legend]
-     [table/table {:no-rows-message no-rows-message
+     [table/table {:table-name "tbl-route-changes"
+                   :no-rows-message no-rows-message
                    :height table-height
                    :label-style style-base/table-col-style-wrap
                    :name->label str
@@ -409,20 +411,23 @@
     [tv-utilities/section {:toggle! #(e! (tv/->ToggleSection :route-trips)) :open? (get open-sections :route-trips true)}
      "Vuorot"
      "Vuorolistalla näytetään valitsemasi reitin ja päivämäärien mukaiset vuorot. Sarakkeissa näytetään reitin lähtö- ja päätepysäkkien lähtö- ja saapumisajankohdat. Muutokset-sarakkeessa näytetään reitillä tapahtuvat muutokset vuorokohtaisesti. Napsauta haluttu vuoro listalta nähdäksesi pysäkkikohtaiset aikataulut ja mahdolliset muutokset Pysäkit-osiossa."
-
      [:div
-      [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label false]
+      (when (seq (:differences compare))
+        [:div {:style {:padding-top "0.5rem"}}
+         [tv-change-icons/change-icons-for-trips compare true]
+         [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
       [:div.route-trips
-
        ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
        (for [[_ trips] (group-by (juxt (comp :gtfs/stop-name first :stoptimes first)
                                        (comp :gtfs/stop-name last :stoptimes first)
                                        (comp :gtfs/stop-name first :stoptimes second)
                                        (comp :gtfs/stop-name last :stoptimes second))
-                                 combined-trips)]
-         ^{:key (str "trip-table" (rand-int 9999999))}
+                                 combined-trips)
+             :let [table-key (rand-int 9999999)]]
+         ^{:key (str "section-route-trips-" table-key)}
          [:div.trips-table {:style {:margin-top "1em"}}
-          [table/table {:name->label str
+          [table/table {:table-name (str "tbl-route-trips" table-key)
+                        :name->label str
                         :row-selected? #(= % selected-trip-pair)
                         :label-style style-base/table-col-style-wrap
                         :on-select #(e! (tv/->SelectTripPair (first %)))}
@@ -497,9 +502,14 @@
      "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
      (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
        [:div
-        [tv-utilities/date-comparison-icons-with-date-labels compare date1-label date2-label true]
+        (when (seq (:differences compare))
+          [:div {:style {:padding-top "0.5rem"}}
+           [tv-change-icons/change-icons-for-stops compare true]
+           [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
+
         [:div.trip-stop-sequence {:style {:margin-top "1em"}}
-         [table/table {:name->label str
+         [table/table {:table-name "tbl-trip-stop-sequence"
+                       :name->label str
                        :label-style style-base/table-col-style-wrap}
           [{:name "Pysäkki"
             :read :gtfs/stop-name
@@ -649,7 +659,7 @@
                           :on-check #(e! (tv/->ToggleShowRouteLine routename))}])))]]]
 
    [:div
-    [tv-utilities/date-comparison-icons compare]
+    [tv-change-icons/date-comparison-icons compare]
     [:div
      [selected-route-map e! date->hash hash->color compare]]]])
 

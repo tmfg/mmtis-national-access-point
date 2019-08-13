@@ -14,7 +14,6 @@
             [taoensso.timbre :as log])
   (:import (java.util UUID)))
 
-(defqueries "ote/services/register.sql")
 (defqueries "ote/services/user_service.sql")
 
 (defn- valid-registration? [{:keys [name email password]}]

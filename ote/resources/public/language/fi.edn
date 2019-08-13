@@ -949,7 +949,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :select-service-type-page
- {:title-required-data "Aloita liikkumispalvelun lisääminen valitsemalla liikkumispalvelun tyyppi"
+ {:title-required-data "Uuden palvelun lisääminen"
   :transport-service-type-selection-help-text "Voit tallentaa liikkumispalvelusi olennaiset tiedot valitsemalla
                 ensin liikkumispalvelutyypin sekä palveluntuottajan ja täyttämällä sen jälkeen näytölle avautuneen lomakkeen.
                 Jos tarjoat useita liikkumispalveluita, voit täyttää jokaisesta oman lomakkeen."
@@ -1250,7 +1250,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :exception "Poikkeus"}
 
  :user
- {:change-email-warning "Huom! Jos muokkaat sähköpostiosoitetta tulee sinun vahvistaa uusi sähköpostiosoite ennen kuin voit kirjautua uudelleen sisään."}
+ {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."}
 
  :register
  {:label "Rekisteröi uusi käyttäjätili"

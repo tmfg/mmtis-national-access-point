@@ -1,13 +1,10 @@
 (ns ote.theme.colors)
 
-
 (def blue-lighter "#66a3e0")
 (def blue-light "#3385d6")
 (def blue "#0066cc")
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
-
-(def cyan "#00AABB")
 
 (def gray950 "#191919")
 (def gray900 "#323232")
@@ -37,8 +34,9 @@
 (def yellow-basic "#ddcc00")
 (def yellow-dark "#cfb800")
 
-(def spinner cyan)
-
+(def add-color green-basic)
+(def icon-disabled gray550)
+(def icon-gray gray900)
 (def negative-button red-basic)
 (def negative-text white-basic)
 (def negative-button-hover red-dark)
@@ -50,12 +48,11 @@
 (def primary-light blue-light)
 (def secondary gray900)
 (def progress primary)
+(def remove-color red-darker)
 (def success green-basic)
 (def warning red-basic)
-(def add-color green-basic)
-(def remove-color red-darker)
-(def icon-disabled gray550)
-(def icon-gray gray900)
+
+(def calendar-day-font gray950)
 
 (def monitor-taxi-color "rgb(0,170,187)")
 (def monitor-request-color "rgb(102,204,102)")
