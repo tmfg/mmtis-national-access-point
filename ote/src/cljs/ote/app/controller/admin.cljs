@@ -61,10 +61,12 @@
 (defrecord UpdateInterfaceFilters [filter])
 (defrecord SearchInterfaces [])
 (defrecord SearchInterfacesResponse [response])
-(defrecord OpenInterfaceErrorModal [id])
-(defrecord CloseInterfaceErrorModal [id])
-(defrecord OpenOperatorModal [id])
-(defrecord CloseOperatorModal [id])
+(defrecord OpenInterfaceErrorModal [interface])
+(defrecord CloseInterfaceErrorModal [])
+(defrecord OpenOperatorModal [interface])
+(defrecord CloseOperatorModal [])
+(defrecord OpenInterfaceList [interface-id])
+(defrecord CloseInterfaceList [])
 
 ;; Sea route tab
 (defrecord UpdateSeaRouteFilters [filter])
@@ -88,14 +90,6 @@
   (update-in app [:admin :operator-list :results]
              (fn [operators]
                (map #(if (= (::t-operator/id %) id)
-                       (apply update-fn % args)
-                       %)
-                    operators))))
-
-(defn- update-interface-by-id [app id update-fn & args]
-  (update-in app [:admin :interface-list :results]
-             (fn [operators]
-               (map #(if (= (:interface-id %) id)
                        (apply update-fn % args)
                        %)
                     operators))))
@@ -286,29 +280,29 @@
                :loading? false
                :results response))
 
+  OpenInterfaceList
+  (process-event [{interface-id :interface-id} app]
+    (assoc-in app [:admin :interface-list :selected-interface-id] interface-id))
+
+  CloseInterfaceList
+  (process-event [_ app]
+    (assoc-in app [:admin :interface-list :selected-interface-id] nil))
+
   OpenInterfaceErrorModal
-  (process-event [{id :id} app]
-    (update-interface-by-id
-      app id
-      assoc :show-error-modal? true))
+  (process-event [{interface :interface} app]
+    (assoc-in app [:admin :interface-list :error-modal] interface))
 
   CloseInterfaceErrorModal
-  (process-event [{id :id} app]
-    (update-interface-by-id
-      app id
-      dissoc :show-error-modal?))
+  (process-event [_ app]
+    (assoc-in app [:admin :interface-list :error-modal] nil))
 
   OpenOperatorModal
-  (process-event [{id :id} app]
-    (update-interface-by-id
-      app id
-      assoc :show-operator-modal? true))
+  (process-event [{interface :interface} app]
+    (assoc-in app [:admin :interface-list :operator-modal] interface))
 
   CloseOperatorModal
-  (process-event [{id :id} app]
-    (update-interface-by-id
-      app id
-      dissoc :show-operator-modal?))
+  (process-event [_ app]
+    (assoc-in app [:admin :interface-list :operator-modal] nil))
 
   UpdateSeaRouteFilters
   (process-event [{filter :filter} app]

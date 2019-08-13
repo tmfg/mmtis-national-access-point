@@ -13,96 +13,97 @@
             [reagent.core :as r]
             [ote.ui.common :as ui-common]
             [ote.ui.common :as common-ui]
+            [ote.theme.colors :as colors]
             [stylefy.core :as stylefy]
             [ote.style.admin :as style-admin]
             [ote.app.controller.front-page :as fp]
             [ote.ui.form :as form]
             [ote.style.dialog :as style-dialog]))
 
-(defn error-modal [e! interface]
-  (let [title (if (:db-error interface)
+(defn error-modal [e! app]
+  (let [interface (get-in app [:admin :interface-list :error-modal])
+        title (if (:db-error interface)
                 "Rajapinnan käsittelyssä tapahtunut virhe"
                 "Rajapinnan lataamisessa tapahtunut virhe")]
-  (when (:show-error-modal? interface)
-    [ui/dialog
-     {:open true
-      :actionsContainerStyle style-dialog/dialog-action-container
-      :modal false
-      :auto-scroll-body-content true
-      :on-request-close #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))
-      :title title
-      :actions [(r/as-element
-                  [ui/flat-button
-                   {:label (tr [:buttons :close])
-                    :secondary true
-                    :primary true
-                    :on-click #(e! (admin-controller/->CloseInterfaceErrorModal (:interface-id interface)))}])]}
-     [:div.col-md-8
-      [:div.row
-       [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
-       [:div.col-md-6 [linkify (:url interface) (:url interface) {:target "_blank"}]]]
-      [:div.row
-       [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
-       [:div.col-md-6 (str/join ", " (:format interface))]]
-      [:div.row
-       [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Virhe: "]
-       [:div.col-md-6
-        (when (:import-error interface)
-          [:p (:import-error interface)])
-        (when (:db-error interface)
-          [:p (:db-error interface)])]]]])))
+    (when interface
+      [ui/dialog
+       {:open true
+        :actionsContainerStyle style-dialog/dialog-action-container
+        :modal false
+        :auto-scroll-body-content true
+        :on-request-close #(e! (admin-controller/->CloseInterfaceErrorModal))
+        :title title
+        :actions [(r/as-element
+                    [ui/flat-button
+                     {:label (tr [:buttons :close])
+                      :secondary true
+                      :primary true
+                      :on-click #(e! (admin-controller/->CloseInterfaceErrorModal))}])]}
+       [:div.col-md-8
+        [:div.row
+         [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
+         [:div.col-md-6 [linkify (:url interface) (:url interface) {:target "_blank"}]]]
+        [:div.row
+         [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
+         [:div.col-md-6 (str/join ", " (:format interface))]]
+        [:div.row
+         [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Virhe: "]
+         [:div.col-md-6
+          (when (:import-error interface)
+            [:p (:import-error interface)])
+          (when (:db-error interface)
+            [:p (:db-error interface)])]]]])))
 
-(defn operator-modal [e! interface]
-  (when (:show-operator-modal? interface)
-    [ui/dialog
-     {:open                     true
-      :actionsContainerStyle style-dialog/dialog-action-container
-      :modal                    false
-      :auto-scroll-body-content true
-      :on-request-close         #(e! (admin-controller/->CloseOperatorModal (:interface-id interface)))
-      :title                    "Palvelun ja palveluntuottajan tiedot"
-      :actions                  [(r/as-element
-                                   [ui/flat-button
-                                    {:label     (tr [:buttons :close])
-                                     :secondary true
-                                     :primary   true
-                                     :on-click  #(e! (admin-controller/->CloseOperatorModal (:interface-id interface)))}])]}
-     [:div.col-md-6 {:style {:border-right "1px solid gray"}}
-      [:div.row [:h2 "Rajapinnan tuottaa"]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
-       [:div.col-md-6 [:a {:href     "#"
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (fp/->ChangePage :transport-operator {:id (:operator-id interface)})))}
-                       (:operator-name interface)]]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
-       [:div.col-md-6 (:operator-phone interface)]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "GSM: "]
-       [:div.col-md-6 (:operator-gsm interface)]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
-       [:div.col-md-6 (:operator-email interface)]]]
+(defn operator-modal [e! app]
+  (let [interface (get-in app [:admin :interface-list :operator-modal])]
+    (when interface
+      [ui/dialog
+       {:open true
+        :actionsContainerStyle style-dialog/dialog-action-container
+        :modal false
+        :auto-scroll-body-content true
+        :on-request-close #(e! (admin-controller/->CloseOperatorModal))
+        :title "Palvelun ja palveluntuottajan tiedot"
+        :actions [(r/as-element
+                    [ui/flat-button
+                     {:label (tr [:buttons :close])
+                      :secondary true
+                      :primary true
+                      :on-click #(e! (admin-controller/->CloseOperatorModal))}])]}
+       [:div.col-md-6 {:style {:border-right "1px solid gray"}}
+        [:div.row [:h2 "Rajapinnan tuottaa"]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
+         [:div.col-md-6 [:a {:href "#"
+                             :on-click #(do
+                                          (.preventDefault %)
+                                          (e! (fp/->ChangePage :transport-operator {:id (:operator-id interface)})))}
+                         (:operator-name interface)]]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
+         [:div.col-md-6 (:operator-phone interface)]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "GSM: "]
+         [:div.col-md-6 (:operator-gsm interface)]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
+         [:div.col-md-6 (:operator-email interface)]]]
 
-     [:div.col-md-6 {:style {:padding-left "20px"}}
-      [:div.row [:h2 "Rajapinta kuuluu palveluun:"]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
-       [:div.col-md-6 [:a {:href     "#"
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (fp/->ChangePage :edit-service {:id (:service-id interface)})))}
-                       (:service-name interface)]]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
-       [:div.col-md-6 (:service-phone interface)]]
-      [:div.row
-       [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
-       [:div.col-md-6 (:service-email interface)]]]]))
-
-
+       [:div.col-md-6 {:style {:padding-left "20px"}}
+        [:div.row [:h2 "Rajapinta kuuluu palveluun:"]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
+         [:div.col-md-6 [:a {:href "#"
+                             :on-click #(do
+                                          (.preventDefault %)
+                                          (e! (fp/->ChangePage :edit-service {:id (:service-id interface)})))}
+                         (:service-name interface)]]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Puhelin: "]
+         [:div.col-md-6 (:service-phone interface)]]
+        [:div.row
+         [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Sähköposti: "]
+         [:div.col-md-6 (:service-email interface)]]]])))
 
 (defn- gtfs-viewer-link [url format]
   (when format
@@ -117,10 +118,84 @@
 
 (def interface-formats [:GTFS :Kalkati.net :ALL])
 
+(defn interface-table-row [e! interface-id data-content operator-name format import-error url date-0 imported db-error interface first? selected-interface-id]
+  ^{:key (str interface)}
+  [ui/table-row {:key (str interface)
+                 :selectable false :style (merge
+                                            (when first?
+                                              {:background-color colors/gray100})
+                                            {})}
+
+   (cond
+     (and first? (= selected-interface-id interface-id))
+     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}} [:a {:style {:text-decoration "none" :font-size 20}
+                                                                   :href "#"
+                                                                   :on-click #(do (.preventDefault %)
+                                                                                  (e! (admin-controller/->CloseInterfaceList)))}
+                                                               [:div {:dangerouslySetInnerHTML {:__html "&#8743;" }}]]]
+     (and first? (not= selected-interface-id interface-id))
+     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}} [:a {:style {:text-decoration "none" :font-size 20}
+                                                                   :href "#"
+                                                                   :on-click #(do (.preventDefault %)
+                                                                                  (e! (admin-controller/->OpenInterfaceList interface-id)))}
+                                                               [:div {:dangerouslySetInnerHTML {:__html "&or;"}}]]]
+     :else
+     [ui/table-row-column {:style {:width "2%" :padding "0"}} " "])
+   [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} [:a {:href "#"
+                                                                                :on-click #(do (.preventDefault %)
+                                                                                               (e! (admin-controller/->OpenOperatorModal interface)))}
+                                                                            operator-name]]
+   [ui/table-row-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} (admin-controller/format-interface-content-values data-content)]
+   [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
+   [ui/table-row-column {:style {:width "35%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
+                                                                             url
+                                                                             [linkify url url {:target "_blank"}])]
+   [ui/table-row-column {:style {:width "14%" :padding "0px 5px 0px 5px"}}
+    (if (= date-0 imported)
+      ""
+      (time/format-timestamp-for-ui imported))]
+   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}}
+    (when (and import-error (not= "Rajapinta puuttuu" import-error))
+      [:a {:style {:color "red"}
+           :href "#"
+           :on-click #(do (.preventDefault %)
+                          (e! (admin-controller/->OpenInterfaceErrorModal interface)))}
+       " Latausvirhe "])
+    (when (and db-error (not= "no-db" db-error))
+      [:a {:style {:color "red"}
+           :href "#"
+           :on-click #(do (.preventDefault %)
+                          (e! (admin-controller/->OpenInterfaceErrorModal interface)))}
+       " Käsittelyvirhe "])
+
+    (when (and import-error (= "Rajapinta puuttuu" import-error))
+      [:span " Rajapinta puuttuu kokonaan "])
+
+    (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]])
+
 (defn interface-list [e! app]
   (let [{:keys [loading? results filters]}
         (get-in app [:admin :interface-list])
-        date-0 (js/Date. 0)]
+        date-0 (js/Date. 0)
+        grouped-results (group-by :interface-id results)
+        ;; Take first from every vector
+        first-from-grouped-results (map
+                                     (fn [x]
+                                       (merge {:first? true} x))
+                                     (map #(first (second %)) grouped-results))
+        selected-interface-id (get-in app [:admin :interface-list :selected-interface-id])
+        selected-interfaces (filter
+                             (fn [x]
+                               (= selected-interface-id (:interface-id x)))
+                             results)
+        rows (doall
+                (mapcat (fn [{:keys [interface-id operator-name format data-content url imported import-error db-error created first?]
+                              :as interface}]
+                          [^{:key (str interface created)}
+                          (interface-table-row e! interface-id data-content operator-name format import-error url
+                                                date-0 imported db-error interface first? selected-interface-id)])
+                        (sort-by :interface-id (concat
+                                                              first-from-grouped-results selected-interfaces))))]
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
@@ -170,7 +245,7 @@
 
       (when results
         [:div
-         [:div "Hakuehdoilla löytyi " (count results) " rajapintaa. "
+         [:div "Hakuehdoilla löytyi " (count first-from-grouped-results) " rajapintaa. "
           [ui/raised-button {:secondary true
                              :on-click #(e! (admin-controller/->DownloadInterfacesCSV))
                              :label "Lataa CSV"}]]
@@ -178,48 +253,16 @@
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all  false}
            [ui/table-row
+            [ui/table-header-column {:style {:width "2%" :padding "0px 5px 0px 5px"}} "#"]
             [ui/table-header-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} "Palveluntuottaja"]
-            [ui/table-header-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} "Sisältö"]
+            [ui/table-header-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} "Sisältö"]
             [ui/table-header-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} "Tyyppi"]
-            [ui/table-header-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} "Rajapinta"]
-            [ui/table-header-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} "Viimeisin käsittely"]
-            [ui/table-header-column {:style {:width "20%" :padding "0px 5px 0px 5px"}} "Katso"]]]
+            [ui/table-header-column {:style {:width "35%" :padding "0px 5px 0px 5px"}} "Rajapinta"]
+            [ui/table-header-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} "Viimeisin käsittely"]
+            [ui/table-header-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} "Katso"]]]
           [ui/table-body {:display-row-checkbox false}
-           (doall
-             (for [{:keys [interface-id service-id operator-name format data-content url imported import-error db-error]
-                    :as interface} results]
-               ^{:key (str "link_" (str interface-id "_" service-id))}
-               [ui/table-row {:selectable false}
-                [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} [:a {:href "#"
-                                                                                             :on-click #(do (.preventDefault %)
-                                                                                                            (e! (admin-controller/->OpenOperatorModal interface-id)))}
-                                                                                         operator-name]]
-                [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} (admin-controller/format-interface-content-values data-content)]
-                [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
-                [ui/table-row-column {:style {:width "25%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
-                                                                                          url
-                                                                                          [linkify url url {:target "_blank"}])]
-                [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}}
-                 (if (= date-0 imported)
-                   ""
-                   (time/format-timestamp-for-ui imported))]
-                [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
-                 (when (and import-error (not= "Rajapinta puuttuu" import-error))
-                   [:a {:style {:color "red"}
-                        :href "#"
-                        :on-click #(do (.preventDefault %)
-                                       (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
-                    " Latausvirhe "])
-                 (when (and db-error (not= "no-db" db-error))
-                   [:a {:style {:color "red"}
-                        :href "#"
-                        :on-click #(do (.preventDefault %)
-                                       (e! (admin-controller/->OpenInterfaceErrorModal interface-id)))}
-                    " Käsittelyvirhe "])
+           rows]]])
 
-                 (when (and import-error (= "Rajapinta puuttuu" import-error))
-                   [:span " Rajapinta puuttuu kokonaan "])
-
-                 (when (and (nil? import-error) (nil? db-error)) [gtfs-viewer-link url (first format)])]
-                (error-modal e! interface)
-                (operator-modal e! interface)]))]]])]]))
+      (error-modal e! app)
+      (operator-modal e! app)
+      ]]))
