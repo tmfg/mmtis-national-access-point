@@ -689,7 +689,8 @@
                  (case download-status
                    "success" [:div  {:style {:flex "1"}} " "]
                    "failure" [:div {:title error
-                                    :style {:flex "1"}} [ic/alert-warning {:style style/gtfs-package-info-icons}]]
+                                    :style {:flex "1"}} 
+                                    [ic/alert-warning {:style style/gtfs-package-info-icons}]]
                    nil " "
                    :default " ")]))]
     [:div (stylefy/use-style style/infobox)
