@@ -64,8 +64,11 @@
                                   (.preventDefault %)
                                   (e! (admin-controller/->ConfirmDeleteOperator id)))}])]}
 
-      [:div [:p "Oletko varma, että haluat poistaa palveluntuottajan?
-      Samalla poistetaan kaikki palvelut ja tiedot mitä tuottajalle on syötetty."]
+      [:div [:p "Oletko varma, että haluat poistaa palveluntuottajan?"
+             [:br]
+             (str "\"" name "\", id: " id)
+             [:br]
+             " Samalla poistetaan kaikki palvelut ja tiedot mitä tuottajalle on syötetty."]
 
        [form-fields/field {:name :ensured-id
                            :type :string
