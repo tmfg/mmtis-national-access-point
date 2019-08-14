@@ -676,17 +676,23 @@
                                            (rest (get grouped-packages k))))
                                        group-keys))
         open? (get open-sections :gtfs-package-info false)
-        pkg (fn [{:keys [created min-date max-date interface-url]} show-link?]
+        pkg (fn [{:keys [created min-date max-date interface-url download-status error]} show-link?]
               (when created
-                [:div.gtfs-package
-                 interface-url
-                 " Ladattu NAPiin "
-                 (if show-link?
-                   (common/linkify
-                     (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all")
-                     (time/format-timestamp-for-ui created))
-                   (time/format-timestamp-for-ui created)) ". "
-                 "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."]))]
+                [:div.gtfs-package (stylefy/use-style (style-base/flex-container "row"))
+                 [:span interface-url " Ladattu NAPiin "
+                  (if show-link?
+                    (common/linkify
+                      (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all")
+                      (str (time/format-timestamp-for-ui created)))
+                    (str (time/format-timestamp-for-ui created)))] ". "
+                 "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
+                 (case download-status
+                   "success" [:div {:style {:flex "1"}} " "]
+                   "failure" [:div {:title error
+                                    :style {:flex "1"}} 
+                                    [ic/alert-warning {:style style/gtfs-package-info-icons}]]
+                   nil " "
+                   :default " ")]))]
     [:div (stylefy/use-style style/infobox)
      [:div (stylefy/use-style style/infobox-text)
       [:b "Viimeisin aineisto"]

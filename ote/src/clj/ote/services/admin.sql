@@ -42,30 +42,32 @@ SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
 
 -- name: search-services-with-interfaces
 -- Find published interfaces using operator name, service name
-SELECT i.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+SELECT eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
        op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
        op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
-       ts."contact-email" as "service-email", i."data-content" as "data-content", (i."external-interface").url as url,
-       i.format as format, i."gtfs-imported" as imported, i."gtfs-import-error" as "import-error",
-       i."gtfs-db-error" as "db-error"
+       ts."contact-email" as "service-email", eid."data-content" as "data-content", (eid."external-interface").url as url,
+       eid.format as format, id."created" as imported, id."download-error" as "import-error",
+       id."db-error" as "db-error"
   FROM
        "transport-operator" as op,
        "transport-service" as ts,
-       "external-interface-description" as i
+       "external-interface-description" as eid,
+       "external-interface-download-status" as id
  WHERE
        (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
    AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
-   AND (:interface-url::TEXT IS NULL OR (i."external-interface").url ilike :interface-url)
-   AND (:import-error::BOOLEAN IS NULL OR i."gtfs-import-error" IS NOT NULL)
-   AND (:db-error::BOOLEAN IS NULL OR i."gtfs-db-error" IS NOT NULL)
-   AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(i.format::text)::text[]))
+   AND (:interface-url::TEXT IS NULL OR (eid."external-interface").url ilike :interface-url)
+   AND (:import-error::BOOLEAN IS NULL OR id."download-error" IS NOT NULL)
+   AND (:db-error::BOOLEAN IS NULL OR id."db-error" IS NOT NULL)
+   AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(eid.format::text)::text[]))
    AND ts.published IS NOT NULL
    AND ts."transport-operator-id" = op.id
-   AND i."transport-service-id" = ts.id
+   AND eid."transport-service-id" = ts.id
+   AND id."external-interface-description-id" = eid.id
    AND ts."sub-type" = 'schedule'
-   AND ('gtfs' = ANY(lower(i.format::text)::text[]) OR 'kalkati.net' = ANY(lower(i.format::text)::text[]))
- GROUP BY ts.id, op.id, i.id
- ORDER BY "format" ASC, "import-error" DESC;
+   AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+ GROUP BY id.created, eid.id, id."download-error", id."db-error", ts.id, op.id
+ ORDER BY eid.id ASC, id.created DESC;
 
 -- name: search-services-wihtout-interface
 select ts.id as "interface-id", ts.id as "service-id", op.id as "operator-id",

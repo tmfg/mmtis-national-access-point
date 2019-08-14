@@ -174,10 +174,13 @@ SELECT ts.name AS "transport-service-name",
 SELECT p.id, p.created,
        to_char(lower(dr.daterange), 'dd.mm.yyyy') as "min-date",
        to_char(upper(dr.daterange), 'dd.mm.yyyy') as "max-date",
-       (eid."external-interface").url as "interface-url"
+       (eid."external-interface").url as "interface-url",
+       id."download-status",
+       concat(id."db-error", id."download-error") as error
   FROM gtfs_package p
   JOIN LATERAL gtfs_package_date_range(p.id) as dr (daterange) ON TRUE
   JOIN "external-interface-description" eid ON p."external-interface-description-id" = eid.id
+  LEFT JOIN "external-interface-download-status" id ON id."external-interface-description-id" = eid.id AND id."package-id" = p.id
  WHERE p."transport-service-id" = :service-id AND p."deleted?" = FALSE
  ORDER BY p.created DESC;
 

@@ -95,11 +95,6 @@
     (let [new-gtfs-hash (gtfs-import/gtfs-hash gtfs-bytes)
           old-gtfs-hash (:gtfs/sha256 latest-package)]
 
-      ;; No gtfs import errors caught. Remove old import errors.
-      (specql/update! db ::t-service/external-interface-description
-                      {::t-service/gtfs-import-error nil}
-                      {::t-service/id interface-id})
-
       (let [package (specql/insert! db :gtfs/package
                                     {:gtfs/sha256 new-gtfs-hash
                                      :gtfs/first_package true ;; (nil? latest-package) ;; true -> will load past weeks

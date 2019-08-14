@@ -146,11 +146,11 @@ Negative return value is an invalid match"
     ::t-service/business-id})
 
 (defn- hide-import-errors [ei-link]
-  (if (or (::t-service/gtfs-import-error ei-link) (::t-service/gtfs-db-error ei-link))
+  (if (or (::t-service/download-error ei-link) (::t-service/db-error ei-link))
     (-> ei-link
         (assoc :has-errors? true)
-        (dissoc ::t-service/gtfs-import-error
-                ::t-service/gtfs-db-error))
+        (dissoc ::t-service/download-error
+                ::t-service/db-error))
     ei-link))
 
 (defn- transport-services

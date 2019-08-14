@@ -26,12 +26,16 @@ SELECT ts.id AS "transport-service-id",
        MIN(drc."different-week-date") as "different-week-date",
        MIN(drc."different-week-date") - CURRENT_DATE AS "days-until-change",
        (c."different-week-date" IS NOT NULL) AS "changes?",
-       EXISTS(SELECT id
+       EXISTS(SELECT eid.id
               FROM "external-interface-description" eid
+                    LEFT JOIN (SELECT eids.id, eids."external-interface-description-id", eids."db-error",  eids."download-error"
+                                 FROM "external-interface-download-status" eids
+                                ORDER BY eids.id DESC
+                                LIMIT 1) eids ON eid.id = eids."external-interface-description-id"
               WHERE eid."transport-service-id" = ts.id
                 AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
                 AND 'route-and-schedule' = ANY(eid."data-content")
-                AND ("gtfs-db-error" IS NOT NULL OR "gtfs-import-error" IS NOT NULL)) AS "interfaces-has-errors?",
+                AND (eids."db-error" IS NOT NULL OR eids."download-error" IS NOT NULL)) AS "interfaces-has-errors?",
        NOT EXISTS(SELECT id
                   FROM "external-interface-description" eid
                   WHERE eid."transport-service-id" = ts.id
@@ -60,7 +64,6 @@ FROM "transport-service" ts
         as "sent-emails" ON ts.id = "sent-emails"."transport-service-id",
  "detected-route-change" drc
 WHERE 'road' = ANY(ts."transport-type")
-  AND drc."transit-change-date" = c.date
   AND drc."transit-service-id" = c."transport-service-id"
   -- Get new changes or changes that can't be found because of invalid gtfs package which makes different-week-date as null
   AND (drc."different-week-date" >= CURRENT_DATE OR drc."different-week-date" IS NULL)

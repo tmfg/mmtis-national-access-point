@@ -43,13 +43,8 @@
         response (http-client/get url query-headers)]
     (log/info "Fetching transit interface" interface-id  ", URL:" url ", etag:" etag ", last-import-date:" last-import-date "=> status" (:status response))
     (if (= 304 (:status response))
-      ;; Not modified
-      (do
-        ;; Remove old import errors, because the package can be loaded, but we already have the newest version.
-        (specql/update! db ::t-service/external-interface-description
-                        {::t-service/gtfs-import-error nil}
-                        {::t-service/id interface-id})
-        nil)
+      ;; Not modified - return nil
+      nil
       response)))
 
 (defn load-gtfs [url-or-response]
@@ -183,18 +178,15 @@
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})
 
-      ;; IF handling was ok, remove all errors from the interface table
-      (specql/update! db ::t-service/external-interface-description
-                      {::t-service/gtfs-db-error nil ::t-service/gtfs-import-error nil}
-                      {::t-service/id interface-id})
-
       (catch Exception e
-        (.printStackTrace e)
-        (specql/update! db ::t-service/external-interface-description
-                        {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                         ::t-service/gtfs-db-error (str (.getName (class e)) ": " (.getMessage e))}
-                        {::t-service/id interface-id})
-        (log/warn "Error in save-gtfs-to-db" e))
+        (log/warn "Error in save-gtfs-to-db" e)
+        (specql/insert! db ::t-service/external-interface-download-status
+                        {::t-service/external-interface-description-id interface-id
+                         ::t-service/download-status :failure
+                         ::t-service/package-id package-id
+                         ::t-service/db-error (str (.getName (class e)) ": " (.getMessage e))
+                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+        (.printStackTrace e))
 
       (finally
         (.delete stop-times-file)))))
@@ -226,11 +218,13 @@
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
       (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
-      (specql/update! db ::t-service/external-interface-description
-                      ;; Note that the gtfs-imported field tells us when the interface was last checked.
-                      {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                       ::t-service/gtfs-import-error (.getMessage e)}
-                      {::t-service/id interface-id})
+      (specql/insert! db ::t-service/external-interface-download-status
+                      {::t-service/external-interface-description-id interface-id
+                       ::t-service/download-status :failure
+                       ::t-service/download-error (str "Error when loading gtfs package from url "
+                                                       url ": "
+                                                       (.getMessage e))
+                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
       nil)))
 
 (defmulti validate-interface-zip-package
@@ -258,10 +252,11 @@
 
     (catch Exception e
       (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
-      (specql/update! db ::t-service/external-interface-description
-                      {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                       ::t-service/gtfs-import-error (str "Invalid interface package: " (.getMessage e))}
-                      {::t-service/id interface-id})
+      (specql/insert! db ::t-service/external-interface-download-status
+                      {::t-service/external-interface-description-id interface-id
+                       ::t-service/download-status :failure
+                       ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
+                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
       (throw (ex-info (str "Invalid interface package: " (.getMessage e)) {})))))
 
 (defmulti load-transit-interface-url
@@ -271,25 +266,31 @@
 
 (defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
-    (when response
+    (if response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
         response
 
         ;; Return nil response in case of error
         (catch Exception e
-          nil)))))
+          (log/warn "Error while loading package from url url " url ": " (.getMessage e))
+          nil))
+      ;; Return nil response in case of error
+      nil)))
 
 (defmethod load-transit-interface-url :kalkati [type db interface-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
-    (when response
+    (if response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
         (update response :body kalkati-to-gtfs/convert-bytes)
 
         ;; Return nil response in case of error
         (catch Exception e
-          nil)))))
+          (log/warn "Error while loading package from url url " url ": " (.getMessage e))
+          nil))
+      ;; Return nil response in case of error
+      nil)))
 
 (defn interface-latest-package [db interface-id]
   (when interface-id
@@ -316,17 +317,13 @@
       (if (nil? gtfs-file)
         (do
           (log/warn "Got empty body as response when loading gtfs from: " url)
-          (specql/update! db ::t-service/external-interface-description
-                          {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))
-                           ::t-service/gtfs-import-error (str "Virhe ladatatessa pakettia: " (pr-str response))}
-                          {::t-service/id interface-id}))
+          (specql/insert! db ::t-service/external-interface-download-status
+                          {::t-service/external-interface-description-id interface-id
+                           ::t-service/download-status :failure
+                           ::t-service/download-error (str "Virhe ladatatessa pakettia: " (pr-str response))
+                           ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))}))
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
               old-gtfs-hash (:gtfs/sha256 latest-package)]
-
-          ;; No gtfs import errors caught. Remove old import errors.
-          (specql/update! db ::t-service/external-interface-description
-                          {::t-service/gtfs-import-error nil}
-                          {::t-service/id interface-id})
 
           ;; IF hash doesn't match, save new and upload file to s3
           (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
@@ -347,11 +344,17 @@
                 
 
                 ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)))
+                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)
+                ;; Mark interface download a success
+                (specql/insert! db ::t-service/external-interface-download-status
+                                {::t-service/external-interface-description-id interface-id
+                                 ::t-service/download-status :success
+                                 ::t-service/package-id (:gtfs/id package)
+                                 ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})))
+
             (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying."))))
-      ;; in case of error, return nil
-      nil
-      )))
+      ;; Return nil in case of error
+      nil)))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
