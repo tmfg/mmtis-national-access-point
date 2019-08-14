@@ -663,7 +663,7 @@
   :table-header-actions "Funktioner"
   :do-you-want-to-publish-service "Du har redan ett eget maskinläsbart gränssnitt (tex GTFS-format), som du vill publicera."
   :header-explain-more "Nu förstår jag inte riktigt, kan du förklara närmare?"
-  :move-to-services-page "Gå till Egna tjänster"
+  :move-to-services-page "Gå till Egna tjänsteuppgifter"
   :move-to-organizations-page "Gå till vyn Tjänsteproducent"
   :hello "Hej "
   :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
