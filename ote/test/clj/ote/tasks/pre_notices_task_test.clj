@@ -1,4 +1,4 @@
-(ns ote.tasks.pre-notices-test
+(ns ote.tasks.pre-notices-task-test
   (:require [ote.tasks.pre-notices :as sut]
             [clojure.test :as t :refer [deftest testing is]]
             [ote.test :refer :all]
@@ -6,6 +6,7 @@
             [specql.core :as specql]
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [clojure.string :as str]
             [ote.db.user-notifications :as user-notifications]
             [ote.services.settings :as settings]
@@ -37,7 +38,9 @@
 (defn- clean-up-db [db]
   ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
   (specql/delete! db :gtfs/detection-route
-                  {:gtfs/package-id 1})                 ;; Clean detection-route to prevent foreign key problems
+                  {:gtfs/package-id 1})                 ;; Clean up detection-route to prevent foreign key problems
+  (specql/delete! db ::t-service/external-interface-download-status
+                  {::t-service/package-id 1})                 ;; Clean up external-interface-download-status to prevent foreign key problems
   (specql/delete! db :gtfs/package
                   {:gtfs/id 1})
   (specql/delete! db :gtfs/transit-changes
