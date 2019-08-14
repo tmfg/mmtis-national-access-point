@@ -197,12 +197,12 @@
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation)
               (ts-common/external-interfaces e! (get service ::t-service/type) (get service ::t-service/sub-type) (get-in service [::t-service/passenger-transportation ::t-service/transport-type]))
               (luggage-restrictions-group)
-              (ts-common/service-url
+              (ts-common/service-url "real-time-information-url"
                (tr [:field-labels :passenger-transportation ::t-service/real-time-information])
                ::t-service/real-time-information
                (tr [:form-help :real-time-info]))
               (ts-common/advance-reservation-group)
-              (ts-common/service-url
+              (ts-common/service-url "booking-service-url"
                (tr [:field-labels :transport-service-common ::t-service/booking-service])
                ::t-service/booking-service)
               (accessibility-group)

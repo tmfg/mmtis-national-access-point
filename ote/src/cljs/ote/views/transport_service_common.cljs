@@ -45,8 +45,8 @@
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
-  ([label service-url-field] (service-url label service-url-field nil))
-  ([label service-url-field info-message]
+  ([element-id label service-url-field] (service-url element-id label service-url-field nil))
+  ([element-id label service-url-field info-message]
    (apply
     form/group
     {:label label
@@ -58,6 +58,7 @@
        [(form/info info-message)])
 
      [{:class "set-bottom"
+       :element-id element-id
        :name   ::t-service/url
        :type   :string
        :read   (comp ::t-service/url service-url-field)
@@ -510,10 +511,12 @@
                       :type :localized-text}
                      {:name ::t-service/from-date
                       :type :date-picker
-                      :label (tr* :from-date)}
+                      :label (tr* :from-date)
+                      :element-id "service-exception-from-date"}
                      {:name ::t-service/to-date
                       :type :date-picker
-                      :label (tr* :to-date)}]
+                      :label (tr* :to-date)
+                      :element-id "service-exception-to-date"}]
       :delete? true
       :add-label (tr [:buttons :add-new-service-exception])}
 

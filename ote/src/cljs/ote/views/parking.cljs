@@ -230,11 +230,11 @@
                        (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/parking)
                        (ts-common/external-interfaces e!)
                        (ts-common/advance-reservation-group)
-                       (ts-common/service-url
+                       (ts-common/service-url "real-time-information-url"
                         (tr [:field-labels :parking ::t-service/real-time-information])
                         ::t-service/real-time-information
                         (tr [:form-help :real-time-info]))
-                       (ts-common/service-url
+                       (ts-common/service-url "booking-service-url"
                          (tr [:field-labels :parking ::t-service/booking-service])
                          ::t-service/booking-service)
                        (ts-common/service-urls
