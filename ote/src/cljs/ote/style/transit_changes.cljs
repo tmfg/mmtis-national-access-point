@@ -11,7 +11,7 @@
 
 (def transit-changes-icon-legend-row-container
   {:display "flex"
-   :min-width "100%"
+   :width "100%"
    :flex-wrap "wrap"})
 
 (def transit-changes-icon-row-container
