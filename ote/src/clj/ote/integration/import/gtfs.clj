@@ -179,14 +179,14 @@
       (gtfs-set-package-geometry db {:package-id package-id})
 
       (catch Exception e
-        (.printStackTrace e)
-        (specql/insert! db ::t-service/interface-download
+        (log/warn "Error in save-gtfs-to-db" e)
+        (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/download-status :failure
                          ::t-service/package-id package-id
                          ::t-service/db-error (str (.getName (class e)) ": " (.getMessage e))
                          ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-        (log/warn "Error in save-gtfs-to-db" e))
+        (.printStackTrace e))
 
       (finally
         (.delete stop-times-file)))))
@@ -218,7 +218,7 @@
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
       (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
-      (specql/insert! db ::t-service/interface-download
+      (specql/insert! db ::t-service/external-interface-download-status
                       {::t-service/external-interface-description-id interface-id
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Error when loading gtfs package from url "
@@ -252,7 +252,7 @@
 
     (catch Exception e
       (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
-      (specql/insert! db ::t-service/interface-download
+      (specql/insert! db ::t-service/external-interface-download-status
                       {::t-service/external-interface-description-id interface-id
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
@@ -273,6 +273,7 @@
 
         ;; Return nil response in case of error
         (catch Exception e
+          (log/warn "Error while loading package from url url " url ": " (.getMessage e))
           nil))
       ;; Return nil response in case of error
       nil)))
@@ -286,6 +287,7 @@
 
         ;; Return nil response in case of error
         (catch Exception e
+          (log/warn "Error while loading package from url url " url ": " (.getMessage e))
           nil))
       ;; Return nil response in case of error
       nil)))
@@ -315,7 +317,7 @@
       (if (nil? gtfs-file)
         (do
           (log/warn "Got empty body as response when loading gtfs from: " url)
-          (specql/insert! db ::t-service/interface-download
+          (specql/insert! db ::t-service/external-interface-download-status
                           {::t-service/external-interface-description-id interface-id
                            ::t-service/download-status :failure
                            ::t-service/download-error (str "Virhe ladatatessa pakettia: " (pr-str response))
@@ -344,7 +346,7 @@
                 ;; Parse gtfs package and save it to database.
                 (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)
                 ;; Mark interface download a success
-                (specql/insert! db ::t-service/interface-download
+                (specql/insert! db ::t-service/external-interface-download-status
                                 {::t-service/external-interface-description-id interface-id
                                  ::t-service/download-status :success
                                  ::t-service/package-id (:gtfs/id package)
