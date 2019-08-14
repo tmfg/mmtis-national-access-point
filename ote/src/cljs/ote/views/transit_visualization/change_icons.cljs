@@ -170,10 +170,13 @@
 (defn change-icons-for-stops
   ([diff]
    [change-icons-for-stops diff false])
-  ([diff with-labels?]
+  ([{:keys [trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper] :as diff} with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    [show-trip-sequences diff with-labels?]
-    [show-stop-times diff with-labels?]]))
+    ;; show-trip-sequences not used here because of needed custom layout
+    [:div {:style {:flex 1}}
+     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
+    [:div {:style {:flex 3}}
+     [show-stop-times diff with-labels?]]]))
 
 (defn change-icons-for-dates
   ([compare-data]
