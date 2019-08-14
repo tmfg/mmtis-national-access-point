@@ -119,7 +119,6 @@
 (def interface-formats [:GTFS :Kalkati.net :ALL])
 
 (defn interface-table-row [e! interface-id data-content operator-name format import-error url date-0 imported db-error interface first? selected-interface-id]
-  ^{:key (str interface)}
   [ui/table-row {:key (str interface)
                  :selectable false :style (merge
                                             (when first?
@@ -128,23 +127,26 @@
 
    (cond
      (and first? (= selected-interface-id interface-id))
-     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}} [:a {:style {:text-decoration "none" :font-size 20}
-                                                                   :href "#"
-                                                                   :on-click #(do (.preventDefault %)
-                                                                                  (e! (admin-controller/->CloseInterfaceList)))}
-                                                               [:div {:dangerouslySetInnerHTML {:__html "&#8743;" }}]]]
+     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}}
+      [:a {:style {:text-decoration "none" :font-size 20}
+           :href "#"
+           :on-click #(do (.preventDefault %)
+                          (e! (admin-controller/->CloseInterfaceList)))}
+       [:div {:dangerouslySetInnerHTML {:__html "&#8743;"}}]]]
      (and first? (not= selected-interface-id interface-id))
-     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}} [:a {:style {:text-decoration "none" :font-size 20}
-                                                                   :href "#"
-                                                                   :on-click #(do (.preventDefault %)
-                                                                                  (e! (admin-controller/->OpenInterfaceList interface-id)))}
-                                                               [:div {:dangerouslySetInnerHTML {:__html "&or;"}}]]]
+     [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}}
+      [:a {:style {:text-decoration "none" :font-size 20}
+           :href "#"
+           :on-click #(do (.preventDefault %)
+                          (e! (admin-controller/->OpenInterfaceList interface-id)))}
+       [:div {:dangerouslySetInnerHTML {:__html "&or;"}}]]]
      :else
      [ui/table-row-column {:style {:width "2%" :padding "0"}} " "])
-   [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} [:a {:href "#"
-                                                                                :on-click #(do (.preventDefault %)
-                                                                                               (e! (admin-controller/->OpenOperatorModal interface)))}
-                                                                            operator-name]]
+   [ui/table-row-column {:style {:width "17%" :padding "0px 5px 0px 5px"}}
+    [:a {:href "#"
+         :on-click #(do (.preventDefault %)
+                        (e! (admin-controller/->OpenOperatorModal interface)))}
+     operator-name]]
    [ui/table-row-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} (admin-controller/format-interface-content-values data-content)]
    [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
    [ui/table-row-column {:style {:width "35%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
@@ -185,59 +187,59 @@
                                      (map #(first (second %)) grouped-results))
         selected-interface-id (get-in app [:admin :interface-list :selected-interface-id])
         selected-interfaces (filter
-                             (fn [x]
-                               (= selected-interface-id (:interface-id x)))
-                             results)
+                              (fn [x]
+                                (= selected-interface-id (:interface-id x)))
+                              results)
         rows (doall
-                (mapcat (fn [{:keys [interface-id operator-name format data-content url imported import-error db-error created first?]
-                              :as interface}]
-                          [^{:key (str interface created)}
+               (mapcat (fn [{:keys [interface-id operator-name format data-content url imported import-error db-error created first?]
+                             :as interface}]
+                         [^{:key (str "tbl-row-" interface created)}
                           (interface-table-row e! interface-id data-content operator-name format import-error url
-                                                date-0 imported db-error interface first? selected-interface-id)])
-                        (sort-by :interface-id (concat
-                                                              first-from-grouped-results selected-interfaces))))]
+                                               date-0 imported db-error interface first? selected-interface-id)])
+                       (sort-by :interface-id (concat
+                                                first-from-grouped-results selected-interfaces))))]
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
        [(apply
-         form/group
-         {:label   "Etsi rajapintoja"
-          :columns 3
-          :layout  :row}
+          form/group
+          {:label "Etsi rajapintoja"
+           :columns 3
+           :layout :row}
 
-         (map #(merge {:type :string
-                       :container-class "col-xs-12 col-sm-4 col-md-4"
-                       :full-width? true} %)
-              [{:name            :operator-name
-                :label "Palveluntuottaja"
-                :hint-text       "Palveluntuottajan nimi tai sen osa"}
-               {:name            :service-name
-                :label "Palvelu"
-                :hint-text       "Palvelun nimi tai sen osa"}
-               {:name            :interface-format
-                :type            :selection
-                :options         interface-formats
-                :label           "Tyyppi"
-                :hint-text       "Palvelun nimi tai sen osa"
-                :show-option     (tr-key [:admin-page :interface-formats])
-                :update!         #(e! (admin-controller/->UpdatePublishedFilter %))}
-               {:name            :interface-url
-                :label           "Rajapinnan osoite"}
-               {:name            :import-error
-                :type            :checkbox
-                :label           "Latausvirheet"}
-               {:name            :db-error
-                :type            :checkbox
-                :label           "Käsittelyvirhe"}
-               {:name            :no-interface
-                :type            :checkbox
-                :label           "Rajapinnattomat"}]))]
+          (map #(merge {:type :string
+                        :container-class "col-xs-12 col-sm-4 col-md-4"
+                        :full-width? true} %)
+               [{:name :operator-name
+                 :label "Palveluntuottaja"
+                 :hint-text "Palveluntuottajan nimi tai sen osa"}
+                {:name :service-name
+                 :label "Palvelu"
+                 :hint-text "Palvelun nimi tai sen osa"}
+                {:name :interface-format
+                 :type :selection
+                 :options interface-formats
+                 :label "Tyyppi"
+                 :hint-text "Palvelun nimi tai sen osa"
+                 :show-option (tr-key [:admin-page :interface-formats])
+                 :update! #(e! (admin-controller/->UpdatePublishedFilter %))}
+                {:name :interface-url
+                 :label "Rajapinnan osoite"}
+                {:name :import-error
+                 :type :checkbox
+                 :label "Latausvirheet"}
+                {:name :db-error
+                 :type :checkbox
+                 :label "Käsittelyvirhe"}
+                {:name :no-interface
+                 :type :checkbox
+                 :label "Rajapinnattomat"}]))]
        filters]
 
-      [ui/raised-button {:primary  true
+      [ui/raised-button {:primary true
                          :disabled (str/blank? filter)
                          :on-click #(e! (admin-controller/->SearchInterfaces))
-                         :label    "Hae rajapintoja"}]]
+                         :label "Hae rajapintoja"}]]
 
      [:div.row {:style {:padding-top "40px"}}
       (when loading?
@@ -251,7 +253,7 @@
                              :label "Lataa CSV"}]]
          [ui/table {:selectable false}
           [ui/table-header {:adjust-for-checkbox false
-                            :display-select-all  false}
+                            :display-select-all false}
            [ui/table-row
             [ui/table-header-column {:style {:width "2%" :padding "0px 5px 0px 5px"}} "#"]
             [ui/table-header-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} "Palveluntuottaja"]
@@ -264,5 +266,4 @@
            rows]]])
 
       (error-modal e! app)
-      (operator-modal e! app)
-      ]]))
+      (operator-modal e! app)]]))

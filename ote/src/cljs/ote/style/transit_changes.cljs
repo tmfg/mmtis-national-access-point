@@ -158,4 +158,4 @@
    :align-items "center"})
 
 (def gtfs-package-info-icons {:height 18
-                              :color "black"})
+                              :color colors/gray950})
