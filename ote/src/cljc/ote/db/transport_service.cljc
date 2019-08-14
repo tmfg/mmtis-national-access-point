@@ -61,8 +61,8 @@
 
   ;; Tables
   ["external-interface-description" ::external-interface-description]
-  ["interface-download" ::interface-download
-   {"id" ::interface-download-id}]
+  ["external-interface-download-status" ::external-interface-download-status
+   {"id" ::external-interface-download-status-id}]
   ["transport-service" ::transport-service
    ote.db.modification/modification-fields
    {::provider (specql.rel/has-one ::transport-operator-id ::transport-operator ::id)

@@ -52,7 +52,7 @@ SELECT eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
        "transport-operator" as op,
        "transport-service" as ts,
        "external-interface-description" as eid,
-       "interface-download" as id
+       "external-interface-download-status" as id
  WHERE
        (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
    AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
