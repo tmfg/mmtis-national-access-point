@@ -10,7 +10,11 @@
                        :padding-right "20px"})
 
 (def detection-button-container {:display "flex"
-                       :flex-wrap "nowrap"
-                       :justify-content "space-between"})
+                                 :flex-wrap "wrap"
+                                 :justify-content "flex-end"})
 
-(def detection-info-text {:flex 2 :padding-right "1.5rem"})
+(def detection-info-text {:margin "0 0 0.5em 0"})
+
+(def detection-button-with-input {:margin "0 0 0 2em"})
+
+
