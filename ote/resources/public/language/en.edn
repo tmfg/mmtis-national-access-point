@@ -656,7 +656,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :table-header-actions "Functions"
   :do-you-want-to-publish-service "You already have an own, self mantained interface (e.g. in GTFS-form), which you want to publish."
   :header-explain-more "Now I don´t understand, can you be more specific?"
-  :move-to-services-page "Move to own transport services - page"
+  :move-to-services-page "Go to Own transport services page"
   :move-to-organizations-page "Move to transport operators page"
   :hello "Hey"
   :NAP-service-short-description "In the NAP-service, you register and mantain essential data about your transport service,
