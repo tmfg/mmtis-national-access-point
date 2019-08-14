@@ -21,7 +21,7 @@ VALUES
       NULL, NULL, E'{road}');
 
 INSERT INTO "transport-operator" (name, "business-id", homepage, "visiting-address", "ckan-group-id")
-VALUES ('Terminaali Oy', '1234567-8', 'http://www.example.com',
+VALUES ('Terminaali Oy', '1234567-9', 'http://www.example.com',
 ROW('Terminaalitie 1','90100','Terminaalikaupunki')::address, 'ff5ca54d-2ff5-476d-9ad4-e903b6d1eeb4');
 
 INSERT INTO "public"."finnish_ports"("code","name","location","created")
