@@ -1240,7 +1240,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :user
  {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."
-  :change-email-confirmation-sent "Vahvistusviesti lähetetty sähköpostiosoitteeseen"}
+  :change-email-confirmation-sent "Ett bekräftelsemeddelande har skickats till e-postadressen"}
 
  :register
  {:label "Skapa ett nytt konto"
