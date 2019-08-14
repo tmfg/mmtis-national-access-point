@@ -663,7 +663,7 @@
   :table-header-actions "Funktioner"
   :do-you-want-to-publish-service "Du har redan ett eget maskinläsbart gränssnitt (tex GTFS-format), som du vill publicera."
   :header-explain-more "Nu förstår jag inte riktigt, kan du förklara närmare?"
-  :move-to-services-page "Gå till Egna tjänster"
+  :move-to-services-page "Gå till Egna tjänsteuppgifter"
   :move-to-organizations-page "Gå till vyn Tjänsteproducent"
   :hello "Hej "
   :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
@@ -1239,7 +1239,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :exception "Undantag"}
 
  :user
- {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."
+ {:change-email-warning "Den nya e-postadressen måste bekräftas innan du kan logga in på nytt. Efter att du sparat dina uppgifter, får du ett separat meddelande per e-post med anvisningar om hur du bekräftar e-postadressen."
   :change-email-confirmation-sent "Ett bekräftelsemeddelande har skickats till e-postadressen"}
 
  :register

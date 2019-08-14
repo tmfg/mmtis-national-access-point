@@ -656,7 +656,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :table-header-actions "Functions"
   :do-you-want-to-publish-service "You already have an own, self mantained interface (e.g. in GTFS-form), which you want to publish."
   :header-explain-more "Now I don´t understand, can you be more specific?"
-  :move-to-services-page "Move to own transport services - page"
+  :move-to-services-page "Go to Own transport services page"
   :move-to-organizations-page "Move to transport operators page"
   :hello "Hey"
   :NAP-service-short-description "In the NAP-service, you register and mantain essential data about your transport service,
@@ -1236,7 +1236,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :exception "Exception description"}
 
  :user
- {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."
+ {:change-email-warning "You must confirm your new email address before you can login again. You will receive separate confirmation instructions by email once you have saved your information."
   :change-email-confirmation-sent "We have sent a confirmation email to the address"}
 
  :register
