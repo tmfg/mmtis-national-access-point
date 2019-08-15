@@ -245,26 +245,22 @@
                                             :label "Kaikki rajapinnat"
                                             :id "radio-interface-all"
                                             :value :all
-                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :all))
-                                            }]
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :all))}]
                           [ui/radio-button {:style {:width "200px"}
                                             :label "Käsittelyvirhe"
                                             :id "radio-interface-db-error"
                                             :value :db-error
-                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :db-error))
-                                            }]
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :db-error))}]
                           [ui/radio-button {:style {:width "200px"}
                                             :label "Latausvirhe"
                                             :id "radio-interface-download-error"
                                             :value :import-error
-                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :import-error))
-                                            }]
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :import-error))}]
                           [ui/radio-button {:style {:width "200px"}
                                             :label "Palvelut, joilla ei rajapintaa"
                                             :id "radio-no-interface"
                                             :value :no-interface
-                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :no-interface))
-                                            }]]])})]
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :no-interface))}]]])})]
        filters]
 
       [ui/raised-button {:primary true
