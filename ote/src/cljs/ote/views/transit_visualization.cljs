@@ -688,7 +688,7 @@
                  "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
                  (case download-status
                    "success" [:div {:style {:flex "1"}} " "]
-                   "failure" [:div {:title error
+                   "failure" [:div {:title "Aineiston tiedoissa virheitä. Aineistoa ei voitu ladata NAP:iin."
                                     :style {:flex "1"}} 
                                     [ic/alert-warning {:style style/gtfs-package-info-icons}]]
                    nil " "
