@@ -59,6 +59,7 @@
 
 ;; Interface tab
 (defrecord UpdateInterfaceFilters [filter])
+(defrecord UpdateInterfaceRadioFilter [radio-filter])
 (defrecord SearchInterfaces [])
 (defrecord SearchInterfacesResponse [response])
 (defrecord OpenInterfaceErrorModal [interface])
@@ -279,6 +280,35 @@
     (update-in app [:admin :interface-list] assoc
                :loading? false
                :results response))
+
+  UpdateInterfaceRadioFilter
+  (process-event [{f :radio-filter} app]
+    (let [app (cond (= f :all)
+                      (-> app
+                          (assoc-in [:admin :interface-list :filters :import-error] false)
+                          (assoc-in [:admin :interface-list :filters :db-error] false)
+                          (assoc-in [:admin :interface-list :filters :no-interface] false))
+                    (= f :no-interface)
+                    (-> app
+                        (assoc-in [:admin :interface-list :filters :import-error] false)
+                        (assoc-in [:admin :interface-list :filters :db-error] false)
+                        (assoc-in [:admin :interface-list :filters :no-interface] true))
+                    (= f :db-error)
+                    (-> app
+                        (assoc-in [:admin :interface-list :filters :import-error] false)
+                        (assoc-in [:admin :interface-list :filters :db-error] true)
+                        (assoc-in [:admin :interface-list :filters :no-interface] false))
+                    (= f :import-error)
+                    (-> app
+                        (assoc-in [:admin :interface-list :filters :import-error] true)
+                        (assoc-in [:admin :interface-list :filters :db-error] false)
+                        (assoc-in [:admin :interface-list :filters :no-interface] false))
+                    :else
+                    (-> app
+                        (assoc-in [:admin :interface-list :filters :import-error] false)
+                        (assoc-in [:admin :interface-list :filters :db-error] false)
+                        (assoc-in [:admin :interface-list :filters :no-interface] false)))]
+      app))
 
   OpenInterfaceList
   (process-event [{interface-id :interface-id} app]
