@@ -31,12 +31,8 @@
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
 
-(defn datetime-string [dt timezone]
-  (when dt
-    (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
-
 (def notification-html-subject
-  (str "Uudet 60 päivän muutosilmoitukset NAP:ssa " (datetime-string (t/now) timezone)))
+  (str "Uudet 60 päivän muutosilmoitukset NAP:ssa " (time/format-date (time/now))))
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
