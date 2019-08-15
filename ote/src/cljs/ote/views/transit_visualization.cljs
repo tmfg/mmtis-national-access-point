@@ -415,6 +415,7 @@
       (when (seq (:differences compare))
         [:div {:style {:padding-top "0.5rem"}}
          [tv-change-icons/change-icons-for-trips compare true]
+         [:div {:style {:padding-bottom "1rem"}}]
          [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
       [:div.route-trips
        ;; Group by different (d1 start, d1 stop, d2 start, d2 stop) stops
@@ -505,6 +506,7 @@
         (when (seq (:differences compare))
           [:div {:style {:padding-top "0.5rem"}}
            [tv-change-icons/change-icons-for-stops compare true]
+           [:div {:style {:padding-bottom "1rem"}}]
            [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
 
         [:div.trip-stop-sequence {:style {:margin-top "1em"}}

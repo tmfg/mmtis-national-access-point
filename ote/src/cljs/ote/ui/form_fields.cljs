@@ -120,18 +120,15 @@
                            :as   field} data]
   [text-field
    (merge
-     (when element-id
-       {:id element-id})
+     (if element-id
+       {:id element-id}
+       {:id (str label "-" name)})
      {:name name
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
       :on-blur on-blur
       :hint-text (or hint-text (placeholder field data) "")
       :value (or data "")
-      :error-text (or error warning "") ;; Show error text or warning text or empty string
-      :error-style (if error ;; Error is more critical than required - showing it first
-                     style-base/error-element
-                     style-base/required-element)
       :hint-style (merge style-base/placeholder
                          hint-style)}
     (if on-change
@@ -150,7 +147,12 @@
                        (when (re-matches regex v)
                          (update! v))
                        (update! v)))})
-    (when max-length
+    (when (or error (string? warning))
+      {:error-text (or error warning) ;; Show error text or warning text
+       :error-style (if error ;; Error is more critical than required - showing it first
+                      style-base/error-element
+                      style-base/required-element)})
+     (when max-length
       {:max-length max-length})
     (when full-width?
       {:full-width true})
@@ -207,7 +209,7 @@
             :title " "}
            (when disabled?
              {:disabled true}))]
-   (when (or error warning)
+   (when (or error (string? warning))
      [:div (stylefy/use-style style-base/required-element)
       (if error error warning)])])
 
@@ -235,13 +237,14 @@
                            hint-style)
         :value (or data "")
         :multi-line true
-        :rows rows
-        ;; Show error text or warning text or empty string
-        :error-text (or error warning "")
-        ;; Error is more critical than required - showing it first
-        :error-style (if error
-                       style-base/error-element
-                       style-base/required-element)}
+        :rows rows}
+       (when (or error (string? warning))
+         ;; Show error text or warning text
+         :error-text (or error warning)
+         ;; Error is more critical than required - showing it first
+         :error-style (if error
+                        style-base/error-element
+                        style-base/required-element))
        (when max-length
          {:max-length max-length})
        (when full-width?
@@ -290,8 +293,9 @@
            :value (or (:ote.db.transport-service/text language-data) "")
            :multi-line true
            :rows rows
-           :rows-max (or rows-max 200)
-           :error-text (or error "")}
+           :rows-max (or rows-max 200)}
+          (when error
+            {:error-text (or error "")})
           (when full-width?
             {:full-width true}))]
        [:div (stylefy/use-style style-form-fields/localized-text-language-container)
@@ -306,7 +310,7 @@
                   {:href "#" :on-click #(do (.preventDefault %)
                                             (reset! selected-language lang))})
              lang]))]
-       (when (or error warning)
+       (when (or error (string? warning))
          [:div (stylefy/use-style style-base/required-element)
           (if error error warning)])
        (when (and (not error) (not warning) is-empty? (is-empty? data))
@@ -340,16 +344,18 @@
         :full-width full-width?
 
 
-        ;; Show error text or warning text or empty string
-        :error-text (or error warning "")
-        ;; Error is more critical than required - showing it first
-        :error-style (if error
-                       style-base/error-element
-                       style-base/required-element)
+
         :hint-style (merge style-base/placeholder
                            hint-style)
         :on-update-input handle-change!
         :on-new-request handle-change!}
+       (when (or error (string? warning))
+         {;; Show error text or warning text
+          :error-text (or error warning)
+          ;; Error is more critical than required - showing it first
+          :error-style (if error
+                         style-base/error-element
+                         style-base/required-element)})
        (when on-blur
          {:on-blur on-blur})
        (when max-length
@@ -395,9 +401,6 @@
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
         :new-chip-key-codes (or new-chip-key-codes [13])
 
-        ;; Show error text or warning text or empty string
-        :error-text (or error warning "")
-
         ;; == Styling ==
         :full-width full-width?
         :full-width-input full-width-input?
@@ -425,6 +428,9 @@
        ;;   ((:value dataSourceConfig) {:key 2}) -> 2
        (when suggestions-config
          {:dataSourceConfig suggestions-config})
+       (when error
+         ;; Show error text or warning text
+         {:error-text (or error warning)})
        (when max-length
          {:max-length max-length})
        (when style
@@ -451,7 +457,7 @@
                 :value (option-idx option)
                 :key (str "radio-" (option-idx option))}])
             options))]
-     (when (or error warning)
+     (when (or error (string? warning))
        [:div
         (stylefy/use-sub-style style-form-fields/radio-selection :required)
         (if error error warning)])]))
@@ -471,11 +477,12 @@
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
         :value (option-idx data)
-        :on-change #(update! (option-value (nth options %2)))
-        :error-text (or error warning "") ;; Show error text or warning text or empty string
-        :error-style (if error             ;; Error is more critical than required - showing it first
-                       style-base/error-element
-                       style-base/required-element)}
+        :on-change #(update! (option-value (nth options %2)))}
+       (when (or error (string? warning))
+         {:error-text (or error warning) ;; Show error text or warning text
+          :error-style (if error             ;; Error is more critical than required - showing it first
+                         style-base/error-element
+                         style-base/required-element)})
       (when class-name {:className class-name})
       (when disabled?
         {:disabled true}))
@@ -539,7 +546,7 @@
                           :inset-children true
                           :checked (boolean (selected-set option))}])
          options))]
-    (when (or error warning)
+    (when (or error (string? warning))
       [:div (stylefy/use-style style-base/required-element)
        (if error error warning)])]))
 
@@ -597,46 +604,47 @@
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
-           {:id element-id
-            :type :string
-            :name "hours"
-            :regex (if unrestricted-hours?
-                     unrestricted-hour-regex
-                     hour-regex)
-            :warning (when
-                       (and required? (empty? data))
-                       true)
-            :style {:width 30}
-            :input-style {:text-align "right"}
-            :hint-style {:position "absolute" :right "0"}
-            :update! (fn [hour]
-                       (let [h (if (str/blank? hour)
-                                 nil
-                                 (js/parseInt hour))]
-                         (update! (assoc (time/->Time h minutes nil)
-                                         :hours-text hour))))}
-           (when (not hours)
-             {:hint-text (tr [:common-texts :hours-placeholder])}))
+            {:id (str "hours-" element-id)
+             :type :string
+             :name "hours"
+             :regex (if unrestricted-hours?
+                      unrestricted-hour-regex
+                      hour-regex)
+             :style {:width 30}
+             :error-text false
+             :input-style {:text-align "right"}
+             :hint-style {:position "absolute" :right "0"}
+             :update! (fn [hour]
+                        (let [h (if (str/blank? hour)
+                                  nil
+                                  (js/parseInt hour))]
+                          (update! (assoc (time/->Time h minutes nil)
+                                     :hours-text hour))))}
+            (when (and required? (empty? data))
+              {:warning true})
+            (when (not hours)
+              {:hint-text (tr [:common-texts :hours-placeholder])}))
     (if (not hours)
       ""
       (or hours-text (str hours)))]
    "."
    [field (merge
-           {:type :string
-            :name "minutes"
-            :regex minute-regex
-            :warning (when
-                       (and required? (empty? data))
-                       true)
-            :style {:width 30}
-            :update! (fn [minute]
-                       (let [m (if (str/blank? minute)
-                                 nil
-                                 (js/parseInt minute))]
-                         (update! (assoc (time/->Time hours m nil)
-                                         :minutes-text minute))))}
-           (when (not minutes)
-             {:hint-text (tr [:common-texts :minutes-placeholder])}))
+            {:id (str "minutes-" element-id)
+             :type :string
+             :name "minutes"
+             :regex minute-regex
+             :style {:width 30}
+             :error-text false
+             :update! (fn [minute]
+                        (let [m (if (str/blank? minute)
+                                  nil
+                                  (js/parseInt minute))]
+                          (update! (assoc (time/->Time hours m nil)
+                                     :minutes-text minute))))}
+            (when (and required? (empty? data))
+              {:warning true})
+            (when (not minutes)
+              {:hint-text (tr [:common-texts :minutes-placeholder])}))
     (if (not minutes)
       ""
       (or minutes-text (gstr/format "%02d" minutes)))]
@@ -707,19 +715,17 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
-                                       show-clear? hint-text id date-fields? disabled?] :as opts} data]
+                                       show-clear? hint-text id date-fields? disabled? element-id] :as opts} data]
   (let [warning (when (and required? (not data))
                   (tr [:common-texts :required-field]))]
     [:div (stylefy/use-style style-base/inline-block)
-     [ui/date-picker (merge {:style {:display "inline-block"}
+     [ui/date-picker (merge {:id (if element-id element-id (str label))
+                             :style {:display "inline-block"}
                              :text-field-style {:width "150px"}
                              :hint-text (or hint-text "")
                              :floating-label-text (when-not table? label)
                              :floating-label-fixed true
 
-                             ;; Show warning text or empty string
-                             :error-text (or warning "")
-                             :error-style style-base/required-element
                              :auto-ok true
                              :value (if date-fields?
                                       (when (time/valid-date? data)
@@ -739,6 +745,10 @@
                                        :en "en-UK"
                                        "fi-FI")
                              :Date-time-format js/Intl.DateTimeFormat}
+                            (when warning
+                              ;; Show warning text
+                              {:error-text (or warning)
+                               :error-style style-base/required-element})
                             (when (not (nil? id))
                               {:id (str "date-picker-" id)}))]
      (when show-clear?
@@ -901,7 +911,7 @@
               (when is-addition-valid
                 [:span {:style {:padding-left "20px"}} addition])]))
          options))
-     (when (or error warning)
+     (when (or error (string? warning))
        [:div
         (stylefy/use-sub-style style-form-fields/radio-selection :required)
         (if error error warning)])]))
@@ -949,7 +959,7 @@
                                                (on-delete option))}
                   [ic/action-delete]]])]))
          options))
-     (when (or error warning)
+     (when (or error (string? warning))
        [:div
         (stylefy/use-sub-style style-form-fields/radio-selection :required)
         (if error error warning)])]))

@@ -26,7 +26,7 @@
                   [ts-common/footer e! data schemas app])})
 
 (defn- indoor-map-group []
-  (ts-common/service-url
+  (ts-common/service-url "indoor-map-url"
    (tr [:field-labels :terminal ::t-service/indoor-map])
    ::t-service/indoor-map))
 

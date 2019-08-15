@@ -194,4 +194,5 @@
   (when (seq (:differences compare-data))
     [:div {:style {:padding "0.5rem 0rem 1rem 0rem"}}
      [change-icons-for-trips (:differences compare-data) true]
+     [:div {:style {:padding-bottom "1rem"}}]
      (change-icons-for-dates compare-data)]))

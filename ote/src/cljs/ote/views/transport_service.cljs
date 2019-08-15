@@ -82,7 +82,8 @@
               transport-operator]]]]
     [:div.row
      [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-      [ui/raised-button {:style {:margin-top "20px"}
+      [ui/raised-button {:id "own-service-next-btn"
+                         :style {:margin-top "20px"}
                          :label    (tr [:buttons :next])
                          :on-click #(e! (ts/->NavigateToNewService))
                          :primary  true
