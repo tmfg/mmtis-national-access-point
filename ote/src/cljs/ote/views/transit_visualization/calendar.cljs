@@ -101,12 +101,15 @@
        [:div (stylefy/use-style (merge (style-base/flex-container "row")
                                        {:margin-top "1rem"
                                         :margin-bottom "1rem"}))
-        [ui/checkbox {:label "Näytä myös edellinen vuosi"
-                      :checked show-previous-year?
-                      :on-check #(e! (tv/->ToggleShowPreviousYear))}]
-        [ui/checkbox {:label "Näytä myös seuraava vuosi"
-                      :checked show-next-year?
-                      :on-check #(e! (tv/->ToggleShowNextYear))}]]]
+        [:div {:style {:flex 1}}
+         [ui/checkbox {:label "Näytä myös edellinen vuosi"
+                       :checked show-previous-year?
+                       :on-check #(e! (tv/->ToggleShowPreviousYear))}]]
+        [:div {:style {:flex 1}}
+         [ui/checkbox {:style {:flex 1}
+                       :label "Näytä myös seuraava vuosi"
+                       :checked show-next-year?
+                       :on-check #(e! (tv/->ToggleShowNextYear))}]]]]
       [:div
       [:div.change-list
        [tv-section/route-changes-legend]
