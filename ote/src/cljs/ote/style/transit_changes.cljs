@@ -152,4 +152,4 @@
    :align-items "center"})
 
 (def gtfs-package-info-icons {:height 18
-                              :color colors/gray950})
+                              :color colors/negative-button})
