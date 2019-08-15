@@ -118,7 +118,8 @@
 
 (def interface-formats [:GTFS :Kalkati.net :ALL])
 
-(defn interface-table-row [e! interface-id data-content operator-name format import-error url date-0 imported db-error interface first? selected-interface-id]
+(defn interface-table-row [e! interface-id data-content operator-name format
+                           import-error url date-0 imported db-error interface first? list-count selected-interface-id]
   [ui/table-row {:key (str interface)
                  :selectable false :style (merge
                                             (when first?
@@ -133,7 +134,7 @@
            :on-click #(do (.preventDefault %)
                           (e! (admin-controller/->CloseInterfaceList)))}
        [:div {:dangerouslySetInnerHTML {:__html "&#8743;"}}]]]
-     (and first? (not= selected-interface-id interface-id))
+     (and first? (not= selected-interface-id interface-id) (> list-count 1))
      [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}}
       [:a {:style {:text-decoration "none" :font-size 20}
            :href "#"
@@ -182,58 +183,88 @@
         grouped-results (group-by :interface-id results)
         ;; Take first from every vector
         first-from-grouped-results (map
-                                     (fn [x]
-                                       (merge {:first? true} x))
-                                     (map #(first (second %)) grouped-results))
+                                     (fn [list]
+                                       (merge {:first? true :list-count (count list)} (first list)))
+                                     (map #(second %) grouped-results))
         selected-interface-id (get-in app [:admin :interface-list :selected-interface-id])
-        selected-interfaces (filter
-                              (fn [x]
-                                (= selected-interface-id (:interface-id x)))
-                              results)
+        selected-interfaces (rest                           ;; First is already in first-from-grouped-results array
+                              (filter
+                                (fn [x]
+                                  (= selected-interface-id (:interface-id x)))
+                                results))
         rows (doall
-               (mapcat (fn [{:keys [interface-id operator-name format data-content url imported import-error db-error created first?]
+               (mapcat (fn [{:keys [interface-id operator-name format data-content url imported import-error db-error created first? list-count]
                              :as interface}]
                          [^{:key (str "tbl-row-" interface created)}
                           (interface-table-row e! interface-id data-content operator-name format import-error url
-                                               date-0 imported db-error interface first? selected-interface-id)])
+                                               date-0 imported db-error interface first? list-count selected-interface-id)])
                        (sort-by :interface-id (concat
                                                 first-from-grouped-results selected-interfaces))))]
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
-       [(apply
-          form/group
+       [(form/group
           {:label "Etsi rajapintoja"
            :columns 3
            :layout :row}
-
-          (map #(merge {:type :string
-                        :container-class "col-xs-12 col-sm-4 col-md-4"
-                        :full-width? true} %)
-               [{:name :operator-name
-                 :label "Palveluntuottaja"
-                 :hint-text "Palveluntuottajan nimi tai sen osa"}
-                {:name :service-name
-                 :label "Palvelu"
-                 :hint-text "Palvelun nimi tai sen osa"}
-                {:name :interface-format
-                 :type :selection
-                 :options interface-formats
-                 :label "Tyyppi"
-                 :hint-text "Palvelun nimi tai sen osa"
-                 :show-option (tr-key [:admin-page :interface-formats])
-                 :update! #(e! (admin-controller/->UpdatePublishedFilter %))}
-                {:name :interface-url
-                 :label "Rajapinnan osoite"}
-                {:name :import-error
-                 :type :checkbox
-                 :label "Latausvirheet"}
-                {:name :db-error
-                 :type :checkbox
-                 :label "Käsittelyvirhe"}
-                {:name :no-interface
-                 :type :checkbox
-                 :label "Rajapinnattomat"}]))]
+          {:type :string
+           :name :operator-name
+           :label "Palveluntuottaja"
+           :hint-text "Palveluntuottajan nimi tai sen osa"
+           :container-class "col-xs-12 col-sm-6 col-md-4"}
+          {:type :string
+           :name :service-name
+           :label "Palvelu"
+           :hint-text "Palvelun nimi tai sen osa"
+           :container-class "col-xs-12 col-sm-6 col-md-4"}
+          {:type :string
+           :name :interface-url
+           :label "Rajapinnan osoite"
+           :container-class "col-xs-12 col-sm-6 col-md-4"}
+          {:name :interface-format
+           :type :selection
+           :options interface-formats
+           :label "Tyyppi"
+           :hint-text "Palvelun nimi tai sen osa"
+           :show-option (tr-key [:admin-page :interface-formats])
+           :update! #(e! (admin-controller/->UpdatePublishedFilter %))}
+          {:name :radio-group
+           :type :component
+           :width "100%"
+           :container-class "col-xs-12 col-sm-10 col-md-10"
+           :full-width? true
+           :component (fn [data]
+                        [:div {:style {:display "flex"
+                                       :flex-direction "row"}}
+                         (.log js/console "data " (pr-str data))
+                         [ui/radio-button-group {:name (str "admin-interface-type-selection")
+                                                 :value-selected :all
+                                                 :style {:display "flex"
+                                                         :flex-direction "row"}}
+                          [ui/radio-button {:style {:width "200px"}
+                                            :label "Kaikki rajapinnat"
+                                            :id "radio-interface-all"
+                                            :value :all
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :all))
+                                            }]
+                          [ui/radio-button {:style {:width "200px"}
+                                            :label "Käsittelyvirhe"
+                                            :id "radio-interface-db-error"
+                                            :value :db-error
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :db-error))
+                                            }]
+                          [ui/radio-button {:style {:width "200px"}
+                                            :label "Latausvirhe"
+                                            :id "radio-interface-download-error"
+                                            :value :import-error
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :import-error))
+                                            }]
+                          [ui/radio-button {:style {:width "200px"}
+                                            :label "Palvelut, joilla ei rajapintaa"
+                                            :id "radio-no-interface"
+                                            :value :no-interface
+                                            :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :no-interface))
+                                            }]]])})]
        filters]
 
       [ui/raised-button {:primary true
