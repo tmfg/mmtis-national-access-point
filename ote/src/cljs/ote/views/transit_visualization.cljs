@@ -542,8 +542,7 @@
                            (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
                         :default
-                        [icon-l/icon-labeled {:style color/icon-disabled}
-                         [ic/action-query-builder color/icon-disabled] nil]))}]
+                        ""))}]                              ;; Empty string just to ensure nil/null are never displayed
           combined-stop-sequence]]])]))
 
 (defn- selected-route-map [_ _ _ {show-stops? :show-stops?
