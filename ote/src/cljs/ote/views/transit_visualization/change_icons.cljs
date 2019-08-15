@@ -126,17 +126,12 @@
                0)
      (when with-labels? " poistettua vuoroa")]]])
 
-(defn- show-trip-sequences [diff with-labels? use-flex?]
-  [:div (when use-flex? {:style {:flex 1}})
+(defn- show-trip-sequences [diff with-labels?]
+  [:div {:style {:flex "1"}}
    [stop-seq-changes-icon (:trip-stop-sequence-changes-lower diff) (:trip-stop-sequence-changes-upper diff) with-labels?]])
 
-(defn- show-stop-times
-  "This element should be rendered differently every time it is used. Which is really nice. So we need to know how many other elements
-  there are in the same row when this is used. This is designed for four elements. When only two elements are in the same row, this element
-  can't be as far as it is when there is four."
-  [diff with-labels? use-flex?]
-  [:div
-   (when use-flex? {:style {:flex 1}})
+(defn- show-stop-times [diff with-labels?]
+  [:div {:style {:flex "1"}}
    [stop-time-changes-icon (:trip-stop-time-changes-lower diff) (:trip-stop-time-changes-upper diff) with-labels?]])
 
 (defn change-icons-for-calendar
@@ -147,8 +142,8 @@
    [:div (stylefy/use-style (style-base/flex-container "row"))
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
-    [show-trip-sequences diff with-labels? true]
-    [show-stop-times diff with-labels? true]
+    [show-trip-sequences diff with-labels?]
+    [show-stop-times diff with-labels?]
 
     (if (str/includes? (str change-type) "no-traffic")
       [:div {:style {:flex "0.5"} :title (tr [:transit-changes :no-traffic])}
@@ -169,16 +164,19 @@
    [:div (stylefy/use-style (style-base/flex-container "row"))
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
-    [show-trip-sequences diff with-labels? true]
-    [show-stop-times diff with-labels? true]]))
+    [show-trip-sequences diff with-labels?]
+    [show-stop-times diff with-labels?]]))
 
 (defn change-icons-for-stops
   ([diff]
    [change-icons-for-stops diff false])
-  ([diff with-labels?]
+  ([{:keys [trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper] :as diff} with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    [show-trip-sequences diff with-labels? false]
-    [show-stop-times diff with-labels? false]]))
+    ;; show-trip-sequences not used here because of needed custom layout
+    [:div {:style {:flex 1}}
+     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
+    [:div {:style {:flex 3}}
+     [show-stop-times diff with-labels?]]]))
 
 (defn change-icons-for-dates
   ([compare-data]
