@@ -599,8 +599,8 @@
       (toggle-commercial-service db (http/transit-request form-data))
       (http/transit-response "OK"))
 
-    (GET "/admin/datetime-issues" req
-      (require-admin-user "route" (:user (:user req)))
+    (GET "/admin/general-troubleshooting-log" req
+      (require-admin-user "general-troubleshooting-log" (:user (:user req)))
       (log-different-date-formations (:user (:user req))))
 
     ;; For development purposes only - remove/hide before pr

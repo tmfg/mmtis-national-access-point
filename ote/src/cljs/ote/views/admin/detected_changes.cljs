@@ -196,7 +196,7 @@
    [day-hash-button-element e!
     "Selvitä tuotannon päiväyksiin liittyvää formatointiongelmaa"
     "Logita päiväykset"
-    #(e! (admin-transit-changes/->FormatDate))]])
+    #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]])
 
 (defn route-id [e! app-state recalc?]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]

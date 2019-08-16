@@ -227,9 +227,9 @@
               :on-failure (tuck/send-async! ->CSVLoadFailure)})
   app)
 
-(define-event FormatDate []
+(define-event GeneralTroubleshootingLog []
   {}
-  (comm/get! "admin/datetime-issues"
+  (comm/get! "admin/general-troubleshooting-log"
              {:on-success #(.log js/console "response " %)
               :on-failure #(.log js/console "response " %)})
   app)
