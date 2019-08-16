@@ -59,6 +59,7 @@
 
 ;; Interface tab
 (defrecord UpdateInterfaceFilters [filter])
+(defrecord UpdateInterfaceRadioFilter [radio-filter])
 (defrecord SearchInterfaces [])
 (defrecord SearchInterfacesResponse [response])
 (defrecord OpenInterfaceErrorModal [interface])
@@ -279,6 +280,28 @@
     (update-in app [:admin :interface-list] assoc
                :loading? false
                :results response))
+
+  UpdateInterfaceRadioFilter
+  (process-event [{f :radio-filter} app]
+    (case f
+      :all (update-in app [:admin :interface-list :filters] assoc
+                      :import-error false
+                      :db-error false
+                      :no-interface false)
+      :no-interface (update-in app [:admin :interface-list :filters] assoc
+                               :import-error false
+                               :db-error false
+                               :no-interface true)
+      :db-error (update-in app [:admin :interface-list :filters] assoc
+                           :import-error false
+                           :db-error true
+                           :no-interface false)
+      :import-error (update-in app [:admin :interface-list :filters] assoc
+                               :import-error true
+                               :db-error false
+                               :no-interface false)
+      ;; default
+      app))
 
   OpenInterfaceList
   (process-event [{interface-id :interface-id} app]
