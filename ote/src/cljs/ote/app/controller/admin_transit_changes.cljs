@@ -227,5 +227,12 @@
               :on-failure (tuck/send-async! ->CSVLoadFailure)})
   app)
 
+(define-event FormatDate []
+  {}
+  (comm/get! "admin/datetime-issues"
+             {:on-success #(.log js/console "response " %)
+              :on-failure #(.log js/console "response " %)})
+  app)
+
 (defn ^:export force-detect-transit-changes []
   (->ForceDetectTransitChanges))

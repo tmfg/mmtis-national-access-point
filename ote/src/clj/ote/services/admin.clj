@@ -38,7 +38,9 @@
             [clojure.spec.alpha :as spec]
             [ote.util.collections :as ote-coll]
             [ote.util.email-template :as email-template]
-            [ote.services.users :as srv-users]))
+            [ote.services.users :as srv-users]
+            [clj-time.format :as format])
+  (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
@@ -66,7 +68,7 @@
 
 (defn- authorization-fail-response [user]
   (when-not (:admin? user)
-    (log/info  "Not authorized. Bad role. authorization-fail-response: id=" (:id user))
+    (log/info "Not authorized. Bad role. authorization-fail-response: id=" (:id user))
     (http/transit-response "Not authorized. Bad role." 403)))
 
 (defn- admin-service [route {user :user
@@ -509,6 +511,39 @@
             (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
+;; Ensure that defonce was the reason for the wrong date
+(defonce cached-timezone (DateTimeZone/forID "Europe/Helsinki"))
+
+(defn- log-different-date-formations
+  "We have issues with date times in production. It seems that same code functions differently in different machines.
+  It is odd and this will help investigate the issue"
+  [user]
+  (let [_ (println "log-different-dates: cached-timezone = " cached-timezone)
+        different-timezone (t/time-zone-for-id "Europe/Helsinki")
+        _ (println "log-different-dates: different-timezone = " different-timezone)
+        current-t-now (t/now)
+        _ (println "log-different-dates: current-t-now = " current-t-now)
+        timezone-now (t/to-time-zone (t/now) different-timezone)
+        _ (println "log-different-dates: timezone-now = " timezone-now)
+        problematic-formation (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") cached-timezone)
+        _ (println "log-different-dates: problematic-formation = " problematic-formation)
+        working-formation (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") different-timezone)
+        _ (println "log-different-dates: working-formation = " problematic-formation)
+        problematic-subject (format/unparse problematic-formation current-t-now)
+        _ (println "log-different-dates: problematic-subject = " problematic-subject)
+        maybe-working-subject (format/unparse working-formation current-t-now)
+        _ (println "log-different-dates: maybe-working-subject = " maybe-working-subject)
+        date-str (str "cached-timezone " cached-timezone " /n "
+                      "current-t-now " current-t-now " /n "
+                      "timezone-now " timezone-now " /n "
+                      "problematic-formation " problematic-formation " /n "
+                      "working-formation " working-formation " /n "
+                      "problematic-subject " problematic-subject " /n "
+                      "maybe-working-subject " maybe-working-subject " /n ")]
+
+    (log/warn "Logging different date formations")
+    (http/transit-response date-str 200)))
+
 (defn- admin-routes [db http nap-config email-config]
   (routes
 
@@ -563,6 +598,10 @@
       (require-admin-user "/admin/toggle-commercial-services" (:user user))
       (toggle-commercial-service db (http/transit-request form-data))
       (http/transit-response "OK"))
+
+    (GET "/admin/datetime-issues" req
+      (require-admin-user "route" (:user (:user req)))
+      (log-different-date-formations (:user (:user req))))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req
