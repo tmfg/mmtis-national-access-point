@@ -71,7 +71,7 @@
                       :primary true
                       :on-click #(e! (admin-controller/->CloseOperatorModal))}])]}
        [:div.col-md-6 {:style {:border-right "1px solid gray"}}
-        [:div.row [:h2 "Rajapinnan tuottaa"]]
+        [:div.row [:h3 "Rajapinnan tuottaa"]]
         [:div.row
          [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
          [:div.col-md-6 [:a {:href "#"
@@ -90,7 +90,7 @@
          [:div.col-md-6 (:operator-email interface)]]]
 
        [:div.col-md-6 {:style {:padding-left "20px"}}
-        [:div.row [:h2 "Rajapinta kuuluu palveluun:"]]
+        [:div.row [:h3 "Rajapinta kuuluu palveluun:"]]
         [:div.row
          [:div.col-md-4 (stylefy/use-style style-admin/modal-data-label) "Nimi: "]
          [:div.col-md-6 [:a {:href "#"
@@ -236,7 +236,6 @@
            :component (fn [data]
                         [:div {:style {:display "flex"
                                        :flex-direction "row"}}
-                         (.log js/console "data " (pr-str data))
                          [ui/radio-button-group {:name (str "admin-interface-type-selection")
                                                  :value-selected :all
                                                  :style {:display "flex"

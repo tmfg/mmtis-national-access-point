@@ -283,31 +283,24 @@
 
   UpdateInterfaceRadioFilter
   (process-event [{f :radio-filter} app]
-    (let [app (cond (= f :all)
-                      (-> app
-                          (assoc-in [:admin :interface-list :filters :import-error] false)
-                          (assoc-in [:admin :interface-list :filters :db-error] false)
-                          (assoc-in [:admin :interface-list :filters :no-interface] false))
-                    (= f :no-interface)
-                    (-> app
-                        (assoc-in [:admin :interface-list :filters :import-error] false)
-                        (assoc-in [:admin :interface-list :filters :db-error] false)
-                        (assoc-in [:admin :interface-list :filters :no-interface] true))
-                    (= f :db-error)
-                    (-> app
-                        (assoc-in [:admin :interface-list :filters :import-error] false)
-                        (assoc-in [:admin :interface-list :filters :db-error] true)
-                        (assoc-in [:admin :interface-list :filters :no-interface] false))
-                    (= f :import-error)
-                    (-> app
-                        (assoc-in [:admin :interface-list :filters :import-error] true)
-                        (assoc-in [:admin :interface-list :filters :db-error] false)
-                        (assoc-in [:admin :interface-list :filters :no-interface] false))
-                    :else
-                    (-> app
-                        (assoc-in [:admin :interface-list :filters :import-error] false)
-                        (assoc-in [:admin :interface-list :filters :db-error] false)
-                        (assoc-in [:admin :interface-list :filters :no-interface] false)))]
+    (case f
+      :all (update-in app [:admin :interface-list :filters] assoc
+                      :import-error false
+                      :db-error false
+                      :no-interface false)
+      :no-interface (update-in app [:admin :interface-list :filters] assoc
+                               :import-error false
+                               :db-error false
+                               :no-interface true)
+      :db-error (update-in app [:admin :interface-list :filters] assoc
+                           :import-error false
+                           :db-error true
+                           :no-interface false)
+      :import-error (update-in app [:admin :interface-list :filters] assoc
+                               :import-error true
+                               :db-error false
+                               :no-interface false)
+      ;; default
       app))
 
   OpenInterfaceList
