@@ -190,7 +190,13 @@
    [day-hash-button-element e!
     "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
     "Laske sopimusliikenteelle päivätiivisteet"
-    #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]])
+    #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]
+
+   [:br]
+   [day-hash-button-element e!
+    "Selvitä tuotannon päiväyksiin liittyvää formatointiongelmaa"
+    "Logita päiväykset"
+    #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]])
 
 (defn route-id [e! app-state recalc?]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]
