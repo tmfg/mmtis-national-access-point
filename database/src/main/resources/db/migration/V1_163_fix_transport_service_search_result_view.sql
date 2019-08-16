@@ -25,7 +25,10 @@ SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
 
        -- Changed section
        FROM "external-interface-description" ei
-             JOIN "external-interface-download-status" eids ON eids."external-interface-description-id" = ei.id
+                LEFT JOIN (SELECT eids.id, eids."external-interface-description-id", eids."db-error",  eids."download-error"
+                           FROM "external-interface-download-status" eids
+                           ORDER BY eids.id DESC
+                           LIMIT 1) eids ON ei.id = eids."external-interface-description-id"
        -- Changed section ends
 
         WHERE ei."transport-service-id" = t.id)::external_interface_search_result[] AS "external-interface-links"
