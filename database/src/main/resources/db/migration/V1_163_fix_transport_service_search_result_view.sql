@@ -23,13 +23,13 @@ SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
            eids."download-error",
            eids."db-error")::external_interface_search_result)
 
-       -- Changed section
-       FROM "external-interface-description" ei
-                LEFT JOIN (SELECT eids.id, eids."external-interface-description-id", eids."db-error",  eids."download-error"
-                           FROM "external-interface-download-status" eids
-                           ORDER BY eids.id DESC
-                           LIMIT 1) eids ON ei.id = eids."external-interface-description-id"
-       -- Changed section ends
+               -- Changed section
+        FROM "external-interface-description" ei
+                 LEFT JOIN (SELECT distinct on (eids.id) eids.id, eids."external-interface-description-id",
+                                                         eids."db-error",  eids."download-error"
+                            FROM "external-interface-download-status" eids
+                            ORDER BY eids.id DESC) eids ON ei.id = eids."external-interface-description-id"
+             -- Changed section ends
 
         WHERE ei."transport-service-id" = t.id)::external_interface_search_result[] AS "external-interface-links"
 FROM "transport-service" t
