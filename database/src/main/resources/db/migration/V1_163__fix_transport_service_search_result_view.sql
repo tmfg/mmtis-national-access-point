@@ -25,7 +25,7 @@ SELECT t.*, op.name as "operator-name", op."business-id" as "business-id",
 
                -- Changed section
         FROM "external-interface-description" ei
-                 LEFT JOIN (SELECT distinct on (eids.id) eids.id, eids."external-interface-description-id",
+                 LEFT JOIN (SELECT DISTINCT ON (eids.id) eids.id, eids."external-interface-description-id",
                                                          eids."db-error",  eids."download-error"
                             FROM "external-interface-download-status" eids
                             ORDER BY eids.id DESC) eids ON ei.id = eids."external-interface-description-id"
