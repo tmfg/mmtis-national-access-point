@@ -65,7 +65,7 @@ FROM latest_transit_changes c
      LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
                   FROM "detected-change-history" dch
                  WHERE dch."email-sent" = (SELECT MAX("email-sent") AS max
-                                             FROM "detected-change-history" dc)) as "sent-emails" ON ts.id = "sent-emails"."transport-service-id"
+                                             FROM "detected-change-history" dc)) AS "sent-emails" ON ts.id = "sent-emails"."transport-service-id"
 WHERE 'road' = ANY(ts."transport-type")
   AND 'schedule' = ts."sub-type"
   -- Get new changes or changes that can't be found because of invalid gtfs package which makes different-week-date as null
