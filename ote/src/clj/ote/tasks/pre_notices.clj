@@ -34,12 +34,12 @@
     (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
 
 (defn- log-java-time-objs []                                ; This shall be removed once implementation is verified
-  (log/info (str "log-different-date-formations: java.time.LocalDateTime/now = " (java.time.LocalDateTime/now)))
-  (log/info (str "log-different-date-formations: java.time.ZoneId/of \"Europe/Helsinki\" = " (java.time.ZoneId/of "Europe/Helsinki")))
-  (log/info (str "log-different-date-formations: java.time.ZonedDateTime/of = " (java.time.ZonedDateTime/of
+  (log/warn (str "log-different-date-formations: java.time.LocalDateTime/now = " (java.time.LocalDateTime/now)))
+  (log/warn (str "log-different-date-formations: java.time.ZoneId/of \"Europe/Helsinki\" = " (java.time.ZoneId/of "Europe/Helsinki")))
+  (log/warn (str "log-different-date-formations: java.time.ZonedDateTime/of = " (java.time.ZonedDateTime/of
                                                                                   (java.time.LocalDateTime/now)
                                                                                   (java.time.ZoneId/of "Europe/Helsinki"))))
-  (log/info (str "log-different-date-formations:  java format DateTimeFormatter = "
+  (log/warn (str "log-different-date-formations:  java format DateTimeFormatter = "
                  (.format
                    (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
                    (java.time.ZonedDateTime/of
@@ -47,17 +47,19 @@
                      (java.time.ZoneId/of "Europe/Helsinki"))))))
 
 (defn notification-html-subject [] ; These logs shall be removed once implementation is verified
-  (log/info
+  (log/warn
     (str "notification-html-subject: old subject = "
-         "Uudet 60 päivän muutosilmoitukset NAP:ssa ") (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki")))
+         "Uudet 60 päivän muutosilmoitukset NAP:ssa ")
+    (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki")))
 
-  (let [res (.format
-              (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
-              (java.time.ZonedDateTime/of
-                (java.time.LocalDateTime/now)
-                (java.time.ZoneId/of "Europe/Helsinki")))]
+  (let [res (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                 (.format
+                   (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
+                   (java.time.ZonedDateTime/of
+                     (java.time.LocalDateTime/now)
+                     (java.time.ZoneId/of "Europe/Helsinki"))))]
     (log-java-time-objs)
-    (log/info "notification-html-subject: subject = " res)
+    (log/warn "notification-html-subject: subject = " res)
     res))
 
 (defn user-notification-html
