@@ -59,7 +59,7 @@ FROM latest_transit_changes c
      LEFT JOIN (SELECT distinct drc."transit-service-id", drc."transit-change-date", drc."different-week-date"
                   FROM "detected-route-change" drc
                  WHERE drc."different-week-date" >= CURRENT_DATE
-                 ORDER BY drc."different-week-date" ASC ) drc ON drc."transit-service-id" = c."transport-service-id" AND drc."transit-change-date" = c.date
+                 ORDER BY drc."different-week-date" ASC) drc ON drc."transit-service-id" = c."transport-service-id" AND drc."transit-change-date" = c.date
      JOIN "transport-service" ts ON ts.id = c."transport-service-id"
      JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
      LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
