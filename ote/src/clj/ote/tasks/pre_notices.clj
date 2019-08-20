@@ -33,8 +33,34 @@
   (when dt
     (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
 
-(def notification-html-subject
-  (str "Uudet 60 päivän muutosilmoitukset NAP:ssa " (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki"))))
+(defn- log-java-time-objs []                                ; This shall be removed once implementation is verified
+  (log/warn (str "log-different-date-formations: java.time.LocalDateTime/now = " (java.time.LocalDateTime/now)))
+  (log/warn (str "log-different-date-formations: java.time.ZoneId/of \"Europe/Helsinki\" = " (java.time.ZoneId/of "Europe/Helsinki")))
+  (log/warn (str "log-different-date-formations: java.time.ZonedDateTime/of = " (java.time.ZonedDateTime/of
+                                                                                  (java.time.LocalDateTime/now)
+                                                                                  (java.time.ZoneId/of "Europe/Helsinki"))))
+  (log/warn (str "log-different-date-formations:  java format DateTimeFormatter = "
+                 (.format
+                   (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
+                   (java.time.ZonedDateTime/of
+                     (java.time.LocalDateTime/now)
+                     (java.time.ZoneId/of "Europe/Helsinki"))))))
+
+(defn notification-html-subject [] ; These logs shall be removed once implementation is verified
+  (log/warn
+    (str "notification-html-subject: old subject = "
+         "Uudet 60 päivän muutosilmoitukset NAP:ssa ")
+    (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki")))
+
+  (let [res (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
+                 (.format
+                   (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
+                   (java.time.ZonedDateTime/of
+                     (java.time.LocalDateTime/now)
+                     (java.time.ZoneId/of "Europe/Helsinki"))))]
+    (log-java-time-objs)
+    (log/warn "notification-html-subject: subject = " res)
+    res))
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -67,7 +93,8 @@
     (localization/with-language
       "fi"
       (tx/with-transaction db
-                           (let [authority-users (nap-users/list-authority-users db) ;; Authority users
+                           (let [_ (notification-html-subject)
+                                 authority-users (nap-users/list-authority-users db) ;; Authority users
                                  unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
                              (log/info "Authority users: " (pr-str (map :email authority-users)))
                              (doseq [u authority-users]
