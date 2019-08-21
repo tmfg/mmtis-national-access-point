@@ -10,6 +10,7 @@
             [ote.db.transport-service :as t-service]
             [ote.util.transport-service-util :as tsu]
             [ote.app.controller.service-viewer :as svc]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.ui.common :as common-ui]
             [ote.style.base :as style-base]
             [ote.localization :refer [tr supported-languages tr-key selected-language]]
@@ -19,10 +20,16 @@
             [ote.style.service-viewer :as service-viewer]
             [ote.app.controller.place-search :as place-search]
             [ote.ui.form-fields :as form-fields]
-            [ote.style.base :as base]))
+            [ote.style.base :as base]
+            [clojure.string :as str]))
 
 (defonce shown-language
          (r/atom (string/upper-case (name @selected-language))))
+
+(defn format-time-key->str [time-map first-key second-key]
+  (if (= (count (str (get-in time-map [first-key second-key]))) 1)
+    (str "0" (get-in time-map [first-key second-key]))
+    (get-in time-map [first-key second-key])))
 
 (defn change-lang-fn
   [new-val]
@@ -88,7 +95,6 @@
     [:div.info-block (stylefy/use-style service-viewer/info-container)
      [:div (stylefy/use-sub-style service-viewer/info-container :left-block)
       sv]]]))
-
 
 (defn info-sections-2-cols
   ([title lv rv]
@@ -210,7 +216,6 @@
           [common-ui/linkify url url {:target "_blank"}]) false]]]
      [spacer]]))
 
-
 (defn- leaflet-map
   [e! areas]
   (r/create-class
@@ -253,7 +258,6 @@
      [leaflet-map e! areas]
      [spacer]]))
 
-
 (defn- published-interfaces
   [title data]
   [:div
@@ -293,7 +297,6 @@
                                 :font-style "italic"}))
       (tr [:service-viewer :not-disclosed])])
    [spacer]])
-
 
 (defn- luggage-warnings
   [title data]
@@ -342,7 +345,7 @@
        [information-row-with-selection (tr [:common-texts :description]) descriptions false]]]
      [spacer]]))
 
-(defn- accessibility-and-other-services
+(defn- passenger-accessibility-and-other-services
   [title data]
   (let [url (:url data)
         guaranteed-descriptions (format-descriptions (get-in data [:descriptions :guaranteed]))
@@ -402,6 +405,50 @@
         true]]]
      [spacer]]))
 
+(defn- rental-accessibility-and-other-services
+  [title data]
+  (let [url (:url data)
+        guaranteed-vehicle-accessibility (map #(tr [:enums ::t-service/vehicle-accessibility %]) (get data ::t-service/guaranteed-vehicle-accessibility))
+        limited-vehicle-accessibility (map #(tr [:enums ::t-service/vehicle-accessibility %]) (get data ::t-service/limited-vehicle-accessibility))
+        guaranteed-aid (map #(tr [:enums ::t-service/transportable-aid %]) (get data ::t-service/guaranteed-transportable-aid))
+        limited-aid (map #(tr [:enums ::t-service/transportable-aid %]) (get data ::t-service/limited-transportable-aid))
+        guaranteed-description (format-descriptions (get data ::t-service/guaranteed-accessibility-description))
+        limited-description (format-descriptions (get data ::t-service/limited-accessibility-description))
+        accessibility-url (get data ::t-service/accessibility-info-url)]
+    [:section
+     [:h4 title]
+     [info-sections-1-col (string/upper-case (tr [:service-viewer :transport-vehicles]))
+      [:div
+       [common-ui/information-row-with-option (tr [:service-viewer :guaranteed-accessibility])
+        (when (not-empty guaranteed-vehicle-accessibility)
+          (string/capitalize
+            (string/join ", " guaranteed-vehicle-accessibility)))
+        true]
+       [common-ui/information-row-with-option (tr [:service-viewer :limited-accessibility])
+        (when (not-empty limited-vehicle-accessibility)
+          (string/capitalize
+            (string/join ", " limited-vehicle-accessibility)))
+        true]]]
+     [info-sections-1-col (string/upper-case (tr [:field-labels :transport-service-common :ote.db.transport-service/transportable-aid]))
+      [:div
+       [common-ui/information-row-with-option (tr [:service-viewer :guaranteed-accessibility])
+        (when (not-empty guaranteed-vehicle-accessibility)
+          (string/capitalize
+            (string/join ", " guaranteed-aid)))
+        true]
+
+       [common-ui/information-row-with-option (tr [:service-viewer :limited-accessibility])
+        (when (not-empty limited-vehicle-accessibility)
+          (string/capitalize
+            (string/join ", " limited-aid)))
+        true]]]
+     [info-sections-1-col (string/upper-case (tr [:service-viewer :other-accessibility-descriptions]))
+      [:div
+       [common-ui/information-row-with-option (tr [:service-viewer :accessibility-website]) accessibility-url true]
+       [information-row-with-selection (tr [:service-viewer :guaranteed-accessibility-description]) guaranteed-description true]
+       [information-row-with-selection (tr [:service-viewer :limited-accessibility-description]) limited-description true]]]
+     [spacer]]))
+
 (defn- price-information
   [title data]
   [:section
@@ -453,13 +500,7 @@
          info (:service-hours-info data)]
      [:div
       (doall
-        (for [time service-times
-              :let [start-minutes (if (= (get-in time [::t-service/from :minutes]) 0)
-                                    "00"
-                                    (get-in time [::t-service/from :minutes]))
-                    end-minutes (if (= (get-in time [::t-service/to :minutes]) 0)
-                                  "00"
-                                  (get-in time [::t-service/to :minutes]))]]
+        (for [time service-times]
           ^{:key (str (::t-service/week-days time))}
           [:div (stylefy/use-style service-viewer/info-row)
            [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
@@ -472,11 +513,11 @@
            [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
             [common-ui/information-row-with-option
              (tr [:common-texts :start-time])
-             (str (get-in time [::t-service/from :hours]) ":" start-minutes) true]]
+             (str (format-time-key->str time ::t-service/from :hours) ":" (format-time-key->str time ::t-service/from :minutes)) true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
             [common-ui/information-row-with-option
              (tr [:common-texts :ending-time])
-             (str (get-in time [::t-service/to :hours]) ":" end-minutes) true]]]))
+             (str (format-time-key->str time ::t-service/to :hours) ":" (format-time-key->str time ::t-service/to :minutes)) true]]]))
       [:div {:style {:margin-bottom "0.5rem"}}
        (doall
          (for [exception exceptions
@@ -496,29 +537,201 @@
        (format-descriptions info) true]])
    [spacer]])
 
+(defn- vehicle-and-price [title vehicle-classes vehicle-price-url]
+  [:section
+   [:h4 title]
+   (let [vehicle-classes vehicle-classes]
+     [:div
+      [common-ui/information-row-with-option (tr [:service-viewer :vehicle-price-url]) vehicle-price-url true]
+      (doall
+        (for [vc vehicle-classes
+              :let [license-required (get vc ::t-service/license-required)
+                    vehicle-type (get vc ::t-service/vehicle-type)
+                    minimum-age (get vc ::t-service/minimum-age)]]
+          ^{:key (str vc)}
+          [info-sections-2-cols vehicle-type
+           [:div
+            [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/license-required]) license-required false]
+            (doall
+              (for [price-row (::t-service/price-classes vc)
+                    :let [price (::t-service/price-per-unit price-row)]]
+                ^{:key (str vehicle-type "-" license-required "-" price)}
+                [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/price-classes]) (str price " €") false]))]
+           [:div
+            [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/minimum-age]) minimum-age false]
+            (doall
+              (for [price-row (::t-service/price-classes vc)
+                    :let [unit (::t-service/unit price-row)]]
+                ^{:key (str vehicle-type "-" minimum-age "-" unit)}
+                [common-ui/information-row-with-option (tr [:service-viewer :pricing-basis]) unit false]))]]))])
+   [spacer]])
+
+(defn- restrictions-and-payment-methods
+  [title luggage-restrictions payment-methods]
+  (let [luggage-restrictions (format-descriptions luggage-restrictions)
+        payment-methods (string/join ", "
+                                     (map #(tr [:enums ::t-service/payment-methods %]) payment-methods))]
+    [:section
+     [info-sections-2-cols title
+      [:div
+       [common-ui/information-row-with-option (tr [:service-viewer :payment-methods]) payment-methods false]]
+      [:div
+       [information-row-with-selection (tr [:service-viewer :luggage-warnings]) luggage-restrictions false]]]
+     [spacer]]))
+
+(defn- additional-services [title data]
+  [:section
+   [info-sections-3-cols title
+    [:div
+     (doall
+       (for [services-row data
+             :let [translated-service (tr [:enums ::t-service/additional-services (get services-row ::t-service/additional-service-type)])]]
+         ^{:key (str services-row)}
+
+         [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/additional-service-type]) translated-service false]))]
+    [:div
+     (doall
+       (for [services-row data]
+         ^{:key (str services-row)}
+
+         [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/price-classes]) (get-in services-row [::t-service/additional-service-price ::t-service/price-per-unit]) false]))]
+    [:div
+     (doall
+       (for [services-row data]
+         ^{:key (str services-row)}
+
+         [common-ui/information-row-with-option (tr [:service-viewer :pricing-basis]) (get-in services-row [::t-service/additional-service-price ::t-service/unit]) false]))]]
+   [spacer]])
+
+(defn- usage-area
+  [title data]
+  (let [desc (format-descriptions data)]
+    [:section
+     [info-sections-1-col title
+      [:div
+       [information-row-with-selection (tr [:common-texts :description]) desc true]]]
+     [spacer]]))
+
+(defn- pick-up-locations [title data url]
+  [:section
+   [:h4 title]
+   [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/pick-up-locations-url]) url true]
+   (doall
+     (for [row data
+           :let [service-hours-info (get-in row [::t-service/service-hours-info])
+                 service-exceptions (get-in row [::t-service/service-exceptions])
+                 street  (get-in row [::t-service/pick-up-address :ote.db.common/street])
+                 post-office (get-in row [::t-service/pick-up-address :ote.db.common/post_office])
+                 post-code (get-in row [::t-service/pick-up-address :ote.db.common/postal_code])]]
+       ^{:key (str row)}
+       [:div
+        [:h4 (string/upper-case (::t-service/pick-up-name row))]
+        ; Address
+        [:div (stylefy/use-style service-viewer/info-row)
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/street]) street true]]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/postal_code]) post-code true]]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/post_office]) post-office true]]]
+
+        ; Service hours
+        (doall
+          (for [she (::t-service/service-hours row)
+                :let [week-days (string/join ", " (map
+                                                    #(string/lower-case (tr [:enums ::t-service/day :short %]))
+                                                    (tsu/reorder-week-days (::t-service/week-days she))))
+                      start-time (str (format-time-key->str she ::t-service/from :hours) ":" (format-time-key->str she ::t-service/from :minutes))
+                      end-time (str (format-time-key->str she ::t-service/to :hours) ":" (format-time-key->str she ::t-service/to :minutes))]]
+            ^{:key (str she week-days)}
+            [:div (stylefy/use-style service-viewer/info-row)
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+              [common-ui/information-row-with-option (tr [:service-viewer :day-of-week]) week-days true]]
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+              [common-ui/information-row-with-option (tr [:common-texts :start-time])  start-time true]]
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+              [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-time true]]]))
+
+        ; Exceptions
+        (doall
+          (for [se service-exceptions
+                :let [desc (format-descriptions (::t-service/description se))
+                      start-date (time/format-timestamp->date-for-ui (::t-service/from-date se))
+                      end-date (time/format-timestamp->date-for-ui (::t-service/to-date se))]]
+            ^{:key (str desc start-date end-date)}
+            [:div (stylefy/use-style service-viewer/info-row)
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+              [information-row-with-selection (tr [:service-viewer :exception]) desc true]]
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+              [common-ui/information-row-with-option (tr [:service-viewer :starting-date]) start-date true]]
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+              [common-ui/information-row-with-option (tr [:service-viewer :ending-date]) end-date true]]]))
+
+        (when service-hours-info
+          [:div (stylefy/use-style service-viewer/info-row)
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+            [information-row-with-selection (tr [:field-labels :transport-service-common :ote.db.transport-service/service-hours-info]) (format-descriptions service-hours-info) true]]])]))])
+
+(defn- create-sub-type-key [sub-type]
+  (let [sub-type (name (ts-controller/service-type-from-sub-type sub-type))
+        sub-type-keyword (keyword (str "ote.db.transport-service" "/" sub-type))]
+    sub-type-keyword))
+
 (defn service-view
   [e! {{to :transport-operator ts :transport-service} :service-view}]
-  (let [interfaces (::t-service/external-interfaces ts)
-        warnings (get-in ts [::t-service/passenger-transportation ::t-service/luggage-restrictions])
+  (let [service-sub-type (get ts ::t-service/sub-type)
+        sub-type-key (create-sub-type-key service-sub-type)
+        interfaces (::t-service/external-interfaces ts)
+        luggage-restrictions (get-in ts [sub-type-key ::t-service/luggage-restrictions])
         real-time-info-data (get-in ts [::t-service/passenger-transportation ::t-service/real-time-information])
         pre-booking-data (get-in ts [::t-service/passenger-transportation ::t-service/advance-reservation])
         booking-data (get-in ts [::t-service/passenger-transportation ::t-service/booking-service])
         accessibility-data (:accessibility ts)
         pricing-data (:pricing-info ts)
-        service-hours-data (:service-hours-info ts)]
+        rental-payment-methods (get-in ts [::t-service/rentals ::t-service/payment-methods])
+        rentals (sub-type-key ts)
+        service-hours-data (:service-hours-info ts)
+        vehicle-classes (get-in ts [::t-service/rentals ::t-service/vehicle-classes])
+        vehicle-price-url (get-in ts [::t-service/rentals ::t-service/vehicle-price-url])
+        rental-additional-services (get-in ts [::t-service/rentals ::t-service/rental-additional-services])
+        rental-usage-area (get-in ts [::t-service/rentals ::t-service/usage-area])
+        rental-pick-up-locations (get-in ts [::t-service/rentals ::t-service/pick-up-locations])
+        pick-up-locations-url (get-in ts [::t-service/rentals ::t-service/pick-up-locations-url])]
     (if (or (= (:error to) 404)
             (= (:error ts) 404))
       [:h2 (tr [:common-texts :data-not-found])]
-      [:div
-       [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-       [operator-info (tr [:service-viewer :operator-info]) to]
-       [service-info (tr [:service-viewer :transport-service-info]) ts]
-       [service-area e! (tr [:service-viewer :service-area]) ts]
-       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-       [luggage-warnings (tr [:service-viewer :luggage-warnings]) warnings]
-       [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
-       [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-       [booking-service (tr [:service-viewer :reservation-service]) booking-data]
-       [accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
-       [price-information (tr [:service-viewer :price-information]) pricing-data]
-       [service-hours (tr [:service-viewer :service-hours]) service-hours-data]])))
+      (if (not (= :rentals service-sub-type))
+
+        [:div
+         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
+         [operator-info (tr [:service-viewer :operator-info]) to]
+         [service-info (tr [:service-viewer :transport-service-info]) ts]
+         [service-area e! (tr [:service-viewer :service-area]) ts]
+         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
+         [luggage-warnings (tr [:service-viewer :luggage-warnings]) luggage-restrictions]
+         [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+         [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+         [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+         [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
+         [price-information (tr [:service-viewer :price-information]) pricing-data]
+         [service-hours (tr [:service-viewer :service-hours]) service-hours-data]]
+
+        ; Rentals
+        [:div
+         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
+         [operator-info (tr [:service-viewer :operator-info]) to]
+         [service-info (tr [:service-viewer :transport-service-info]) ts]
+         [service-area e! (tr [:service-viewer :service-area]) ts]
+         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
+         [vehicle-and-price (tr [:service-viewer :vehicles-and-pricing-information]) vehicle-classes vehicle-price-url]
+         [restrictions-and-payment-methods (tr [:service-viewer :restrictions-and-payment-methods]) luggage-restrictions rental-payment-methods]
+
+         [rental-accessibility-and-other-services (tr [:service-viewer :accessibility-info]) rentals]
+         [additional-services (tr [:service-viewer :additional-services]) rental-additional-services]
+         [usage-area (tr [:service-viewer :usage-area]) rental-usage-area]
+
+         [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+         [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+         [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+
+         [pick-up-locations (tr [:service-viewer :pick-up-locations]) rental-pick-up-locations pick-up-locations-url]]))))
