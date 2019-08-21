@@ -48,7 +48,7 @@
   app)
 
 (defmethod routes/on-navigate-event :admin-detected-changes [{params :params}]
-  (->LoadHashRecalculations ))
+  (->LoadHashRecalculations))
 
 (defmethod routes/on-navigate-event :admin-commercial-services [_]
   (->LoadCommercialServices))
@@ -94,7 +94,7 @@
     ;; When service-id is not given, do not try to start detection
     (when service-id
       (comm/post! (str "transit-changes/force-detect/" service-id) nil
-                 {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+                  {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))
 
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
@@ -202,7 +202,7 @@
 (define-event ResetHashRecalculations []
   {}
   (comm/delete! (str "transit-changes/hash-calculation") {}
-             {:on-success (tuck/send-async! ->LoadHashRecalculations)})
+                {:on-success (tuck/send-async! ->LoadHashRecalculations)})
   app)
 
 
