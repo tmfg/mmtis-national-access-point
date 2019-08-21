@@ -46,21 +46,8 @@
                      (java.time.LocalDateTime/now)
                      (java.time.ZoneId/of "Europe/Helsinki"))))))
 
-(defn notification-html-subject [] ; These logs shall be removed once implementation is verified
-  (log/warn
-    (str "notification-html-subject: old subject = "
-         "Uudet 60 päivän muutosilmoitukset NAP:ssa ")
-    (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki")))
-
-  (let [res (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                 (.format
-                   (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
-                   (java.time.ZonedDateTime/of
-                     (java.time.LocalDateTime/now)
-                     (java.time.ZoneId/of "Europe/Helsinki"))))]
-    (log-java-time-objs)
-    (log/warn "notification-html-subject: subject = " res)
-    res))
+(defn notification-html-subject []
+  (str "Uudet 60 päivän muutosilmoitukset NAP:ssa " (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki"))))
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -79,22 +66,20 @@
 
           ;; Add doctype which can't be added using hiccup template
           (str email-template/html-header
-               (html (email-template/notification-html notices detected-changes notification-html-subject))))
+               (html (email-template/notification-html notices detected-changes (notification-html-subject)))))
         (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e))))
 
-(defn send-notification! [db email detected-changes-recipients]
-  (log/info "Starting pre-notices notification task...")
-
+(defn send-pre-notice-email! [db email detected-changes-recipients]
+  (log/info "Starting pre-notices notification composition and email sending...")
   (lock/with-exclusive-lock
     db "pre-notice-email" 300
     (localization/with-language
       "fi"
       (tx/with-transaction db
-                           (let [_ (notification-html-subject)
-                                 authority-users (nap-users/list-authority-users db) ;; Authority users
+                           (let [authority-users (nap-users/list-authority-users db) ;; Authority users
                                  unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
                              (log/info "Authority users: " (pr-str (map :email authority-users)))
                              (doseq [u authority-users]
@@ -109,7 +94,7 @@
                                                          (email/send!
                                                            email
                                                            {:to (:email u)
-                                                            :subject notification-html-subject
+                                                            :subject (notification-html-subject)
                                                             :body [{:type "text/html;charset=utf-8" :content notification}]})
                                                          (catch Exception e
                                                            (log/warn "Error while sending a notification" e)))))
@@ -120,22 +105,24 @@
                                              {:gtfs/email-sent (java.util.Date.)}
                                              {:gtfs/id (op/in (into #{} (map :history-id unsent-detected-changes)))}))))))
 
+(defn pre-notice-recipient-emails [config]
+  (or (some-> config :detected-changes-recipients
+              (string/split #",")
+              set)
+      identity))
 
 (defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
+    (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
     (assoc this
       ::stop-tasks [(chime-at (daily-at 8 15)
                               (fn [_]
-                                (#'send-notification! db email detected-changes-recipients)))]))
+                                (#'send-pre-notice-email! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
     (dissoc this ::stop-tasks)))
 
 (defn pre-notices-tasks [config]
-  (let [detected-changes-recipients (or (some-> config :detected-changes-recipients
-                                                (string/split #",")
-                                                set)
-                                        identity)]
-    (->PreNoticesTasks detected-changes-recipients)))
+  (->PreNoticesTasks (pre-notice-recipient-emails config)))

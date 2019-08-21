@@ -89,7 +89,7 @@
                                           500))})
      [:span btn-text]]]])
 
-(defn detect-changes [e! app-state]
+(defn detect-changes [e! {:keys [admin] :as app-state}]
   [:div (stylefy/use-style (style-base/flex-container "column"))
 
    [:h3 "Rajapintoihin kohdistuvat toimenpiteet"]
@@ -191,6 +191,20 @@
     "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
     "Laske sopimusliikenteelle päivätiivisteet"
     #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]
+
+   [:br]
+   [day-hash-button-element e!
+    "Käynnistä uusi muutosilmoitusten sähköposti-ilmoituksen lähetys. Operaatio ei lähetä edellistä sähköpostia uudestaan,
+    vaan koostaa uudet ilmoitukset, lähettää ne, sekä päivittää lähetyshistorian.
+    Lähetettyjä ilmoituksia ei siis lähetetä uudestaan seuraavalla ajastetulla tai käsin käynnistetyllä ajolla."
+    "Käynnistä muutosilmoitusten lähetys"
+    #(e! (admin-transit-changes/->SendPreNotices))]
+   [:div (stylefy/use-style style-admin/detection-info-text)
+    (when-let [resp (get-in admin [:responses :pre-notice-notify])]
+      [notification/notification
+       (if (= :success resp)
+         {:type :success :text (str "Mahdolliset muutosilmoitusten sähköpostit lähetetty")}
+         {:type :error :text (str "Mahdollisten muutosilmoitusten sähköpostien lähettäminen ei onnistunut. Virhetietoja: " resp)})])]
 
    [:br]
    [day-hash-button-element e!

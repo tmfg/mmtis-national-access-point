@@ -511,6 +511,11 @@
             (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
+(defn- send-pre-notice-email-response [db config-email config-nap]
+  (log/debug "send-pre-notice-email-response")
+  (pn/send-pre-notice-email! db config-email (pn/pre-notice-recipient-emails config-nap))
+  (http/transit-response nil 200))
+
 ;; Ensure that defonce was the reason for the wrong date
 (defonce cached-timezone (DateTimeZone/forID "Europe/Helsinki"))
 
@@ -618,6 +623,10 @@
     (GET "/admin/general-troubleshooting-log" req
       (require-admin-user "general-troubleshooting-log" (:user (:user req)))
       (log-different-date-formations (:user (:user req))))
+
+    (GET "/admin/pre-notices/notify" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (send-pre-notice-email-response db nap-config email-config)))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req
