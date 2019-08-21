@@ -46,21 +46,8 @@
                      (java.time.LocalDateTime/now)
                      (java.time.ZoneId/of "Europe/Helsinki"))))))
 
-(defn notification-html-subject [] ; These logs shall be removed once implementation is verified
-  (log/warn
-    (str "notification-html-subject: old subject = "
-         "Uudet 60 päivän muutosilmoitukset NAP:ssa ")
-    (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki")))
-
-  (let [res (str "Uudet 60 päivän muutosilmoitukset NAP:ssa "
-                 (.format
-                   (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
-                   (java.time.ZonedDateTime/of
-                     (java.time.LocalDateTime/now)
-                     (java.time.ZoneId/of "Europe/Helsinki"))))]
-    (log-java-time-objs)
-    (log/warn "notification-html-subject: subject = " res)
-    res))
+(defn notification-html-subject []
+  (str "Uudet 60 päivän muutosilmoitukset NAP:ssa " (datetime-string (t/now) (DateTimeZone/forID "Europe/Helsinki"))))
 
 (defn user-notification-html
   "Every user can have their own set of notifications. Return notification html based on regions."
@@ -79,7 +66,7 @@
 
           ;; Add doctype which can't be added using hiccup template
           (str email-template/html-header
-               (html (email-template/notification-html notices detected-changes notification-html-subject))))
+               (html (email-template/notification-html notices detected-changes (notification-html-subject)))))
         (log/info "No new pre-notices or detected changes found.")))
 
     (catch Exception e
@@ -93,7 +80,8 @@
     (localization/with-language
       "fi"
       (tx/with-transaction db
-                           (let [_ (notification-html-subject)
+                           (let [_ (log/warn (notification-html-subject))
+                                 _ (log/warn (log-java-time-objs))
                                  authority-users (nap-users/list-authority-users db) ;; Authority users
                                  unsent-detected-changes (fetch-unsent-changes-by-regions db {:regions nil})]
                              (log/info "Authority users: " (pr-str (map :email authority-users)))
@@ -109,7 +97,7 @@
                                                          (email/send!
                                                            email
                                                            {:to (:email u)
-                                                            :subject notification-html-subject
+                                                            :subject (notification-html-subject)
                                                             :body [{:type "text/html;charset=utf-8" :content notification}]})
                                                          (catch Exception e
                                                            (log/warn "Error while sending a notification" e)))))
