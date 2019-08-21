@@ -511,7 +511,7 @@
             (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
-(defn- send-pre-notice-email-response [db config-email config-nap]
+(defn- send-pre-notice-email-response [db config-nap config-email]
   (log/debug "send-pre-notice-email-response")
   (pn/send-pre-notice-email! db config-email (pn/pre-notice-recipient-emails config-nap))
   (http/transit-response nil 200))
