@@ -227,11 +227,29 @@
               :on-failure (tuck/send-async! ->CSVLoadFailure)})
   app)
 
+(define-event SendPreNoticeSuccess [response]
+  {}
+  (.log js/console "SendPreNoticeSuccess = " response)
+  (assoc-in app [:admin :responses :pre-notice-notify] :success))
+
+(define-event SendPreNoticeFailure [response]
+  {}
+  (.log js/console "SendPreNoticeFailure = " response)
+  (assoc-in app [:admin :responses :pre-notice-notify] response))
+
+(define-event SendPreNotices []
+  {}
+  (comm/get! "/admin/pre-notices/notify"
+             {
+              :on-success (tuck/send-async! ->SendPreNoticeSuccess)
+              :on-failure (tuck/send-async! ->SendPreNoticeFailure)})
+  app)
+
 (define-event GeneralTroubleshootingLog []
   {}
   (comm/get! "admin/general-troubleshooting-log"
-             {:on-success #(.log js/console "response " %)
-              :on-failure #(.log js/console "response " %)})
+             {:on-success #(.log js/console "response = " %)
+              :on-failure #(.log js/console "response = " %)})
   app)
 
 (defn ^:export force-detect-transit-changes []
