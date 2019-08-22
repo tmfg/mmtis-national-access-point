@@ -69,9 +69,7 @@
           {:history-ids history-ids
            :email-to-send (str email-template/html-header
                                (html (email-template/notification-html notices detected-changes (notification-html-subject))))})
-        (do
-          (log/info "No new pre-notices or detected changes found for " (:email user))
-          {:history-ids history-ids})))
+        {:history-ids history-ids}))                        ; Return empty set of ids because no notification for user
 
     (catch Exception e
       (log/warn "Error while generating notification html for regions: " (:finnish-regions user) " ERROR: " e))))
@@ -80,8 +78,6 @@
   (let [res (user-notification-html db u detected-changes-recipients)
         notification (:email-to-send res)
         history-ids (:history-ids res)]
-    (println "compose-and-send-pre-notice-to-user!: ")
-    (clojure.pprint/pprint res)
     (if notification
       (do
         (log/info "Trying to send a pre-notice email to: " (pr-str (:email u)))
@@ -108,31 +104,32 @@
     db "pre-notice-email" 300
     (localization/with-language
       "fi"
-      (tx/with-transaction db
-                           (let [authority-users (nap-users/list-authority-users db) ;; Authority users
-                                 ;; history-sent-ids contains those detected-change-history ids, which were notified
-                                 ;; to some user(s). Does not containt those, which no user was interested about.
-                                 history-sent-ids (loop [auth-users authority-users
-                                                         u (first auth-users)
-                                                         history-id-sent #{}]
-                                                    (if (seq auth-users)
-                                                      (recur (rest auth-users)
-                                                             (first auth-users)
-                                                             (into history-id-sent
-                                                                   (compose-and-send-pre-notice-to-user!
-                                                                     db u email detected-changes-recipients)))
-                                                      (set (remove nil? history-id-sent))))]
-                             (log/info "Authority users: " (pr-str (map :email authority-users)))
+      (tx/with-transaction
+        db
+        (let [authority-users (nap-users/list-authority-users db)
+              ;; history-sent-ids contains those detected-change-history ids, which were notified
+              ;; to some user(s). Does not containt those, which no user was interested about.
+              history-ids-sent (loop [auth-users (rest authority-users)
+                                      u (first authority-users)
+                                      history-id-sent #{}]
+                                 (if u
+                                   (recur (rest auth-users)
+                                          (first auth-users)
+                                          (into history-id-sent
+                                                (compose-and-send-pre-notice-to-user!
+                                                  db u email detected-changes-recipients)))
+                                   (set (remove nil? history-id-sent))))]
+          (log/info "Authority users: " (pr-str (map :email authority-users)))
 
-                             ;; Mark all detected-change-history records as sent, because for now it does not make sense to
-                             ;; include them again in next email if sending some failed.
-                             ;; In future failed ids could be returned by compose-and-send-pre-notice-to-user!
-                             (specql/update! db :gtfs/detected-change-history
-                                             {:gtfs/email-sent (java.util.Date.)}
-                                             {:gtfs/id (op/in
-                                                         (into #{}
-                                                               (map :history-id
-                                                                    (fetch-unsent-changes-by-regions db {:regions nil}))))}))))))
+          ;; Mark all detected-change-history records as sent, because for now it does not make sense to
+          ;; include them again in next email if sending some failed.
+          ;; In future failed ids could be returned by compose-and-send-pre-notice-to-user!
+          (specql/update! db :gtfs/detected-change-history
+                          {:gtfs/email-sent (java.util.Date.)}
+                          {:gtfs/id (op/in
+                                      (into #{}
+                                            (map :history-id
+                                                 (fetch-unsent-changes-by-regions db {:regions nil}))))}))))))
 
 (defn pre-notice-recipient-emails [config]
   (or (some-> config :detected-changes-recipients
