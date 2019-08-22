@@ -513,7 +513,7 @@
 
 (defn- send-pre-notice-email-response [db config-nap config-email]
   (log/debug "send-pre-notice-email-response")
-  (pn/send-pre-notice-email! db config-email (pn/pre-notice-recipient-emails config-nap))
+  (pn/send-pre-notice-emails! db config-email (pn/pre-notice-recipient-emails config-nap))
   (http/transit-response nil 200))
 
 ;; Ensure that defonce was the reason for the wrong date
