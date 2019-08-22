@@ -14,6 +14,13 @@
             cljsjs.filesaverjs
             [ote.app.routes :as routes]))
 
+(define-event InitAdminDetectedChanges []
+  {}
+  (update-in app
+             [:admin :pre-notice]
+             dissoc
+             :pre-notice-notify-send))
+
 (define-event HashRecalculationsResponse [response]
   {}
   (assoc-in app [:admin :transit-changes :hash-recalculations] response))
@@ -229,13 +236,11 @@
 
 (define-event SendPreNoticeSuccess [response]
   {}
-  (.log js/console "SendPreNoticeSuccess = " response)
-  (assoc-in app [:admin :responses :pre-notice-notify] :success))
+  (assoc-in app [:admin :pre-notice :pre-notice-notify-send] :success))
 
 (define-event SendPreNoticeFailure [response]
   {}
-  (.log js/console "SendPreNoticeFailure = " response)
-  (assoc-in app [:admin :responses :pre-notice-notify] response))
+  (assoc-in app [:admin :pre-notice  :pre-notice-notify-send] response))
 
 (define-event SendPreNotices []
   {}
