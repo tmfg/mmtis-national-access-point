@@ -106,20 +106,13 @@
       "fi"
       (tx/with-transaction
         db
-        (let [authority-users (nap-users/list-authority-users db)
-              ;; history-sent-ids contains those detected-change-history ids, which were notified
-              ;; to some user(s). Does not containt those, which no user was interested about.
-              history-ids-sent (loop [auth-users (rest authority-users)
-                                      u (first authority-users)
-                                      history-id-sent #{}]
-                                 (if u
-                                   (recur (rest auth-users)
-                                          (first auth-users)
-                                          (into history-id-sent
-                                                (compose-and-send-pre-notice-to-user!
-                                                  db u email detected-changes-recipients)))
-                                   (set (remove nil? history-id-sent))))]
-          (log/info "Authority users: " (pr-str (map :email authority-users)))
+        ;; history-sent-ids contains those detected-change-history ids, which were notified
+        ;; to some user(s). Does not contain those, which no user was interested about.
+        (let [history-ids-sent (set
+                                 (remove nil?
+                                         (mapcat #(compose-and-send-pre-notice-to-user!
+                                                    db % email detected-changes-recipients)
+                                                 (nap-users/list-authority-users db))))]
 
           ;; Mark all detected-change-history records as sent, because for now it does not make sense to
           ;; include them again in next email if sending some failed.
