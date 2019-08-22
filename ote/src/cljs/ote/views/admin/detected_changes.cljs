@@ -115,10 +115,9 @@
                  :icon (ic/content-filter-list)})
       [:span "Lataa palveluun liitetty gtfs paketti"]]]]
 
-   (when (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])
+   (when-let [response (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])]
      [:div (stylefy/use-style style-admin/detection-info-text)
-      [notification/notification {:type (:status (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))}
-       (:msg (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))]])
+      [notification/notification {:type (:status response)} (:msg response)]])
 
    [:h3 "Muutostunnistuksen käynnistys"]
    [:div
