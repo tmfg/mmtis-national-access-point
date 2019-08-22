@@ -48,7 +48,7 @@
   app)
 
 (defmethod routes/on-navigate-event :admin-detected-changes [{params :params}]
-  (->LoadHashRecalculations ))
+  (->LoadHashRecalculations))
 
 (defmethod routes/on-navigate-event :admin-commercial-services [_]
   (->LoadCommercialServices))
@@ -94,7 +94,7 @@
     ;; When service-id is not given, do not try to start detection
     (when service-id
       (comm/post! (str "transit-changes/force-detect/" service-id) nil
-                 {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+                  {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))
 
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
@@ -202,7 +202,7 @@
 (define-event ResetHashRecalculations []
   {}
   (comm/delete! (str "transit-changes/hash-calculation") {}
-             {:on-success (tuck/send-async! ->LoadHashRecalculations)})
+                {:on-success (tuck/send-async! ->LoadHashRecalculations)})
   app)
 
 
@@ -227,11 +227,29 @@
               :on-failure (tuck/send-async! ->CSVLoadFailure)})
   app)
 
+(define-event SendPreNoticeSuccess [response]
+  {}
+  (.log js/console "SendPreNoticeSuccess = " response)
+  (assoc-in app [:admin :responses :pre-notice-notify] :success))
+
+(define-event SendPreNoticeFailure [response]
+  {}
+  (.log js/console "SendPreNoticeFailure = " response)
+  (assoc-in app [:admin :responses :pre-notice-notify] response))
+
+(define-event SendPreNotices []
+  {}
+  (comm/get! "/admin/pre-notices/notify"
+             {
+              :on-success (tuck/send-async! ->SendPreNoticeSuccess)
+              :on-failure (tuck/send-async! ->SendPreNoticeFailure)})
+  app)
+
 (define-event GeneralTroubleshootingLog []
   {}
   (comm/get! "admin/general-troubleshooting-log"
-             {:on-success #(.log js/console "response " %)
-              :on-failure #(.log js/console "response " %)})
+             {:on-success #(.log js/console "response = " %)
+              :on-failure #(.log js/console "response = " %)})
   app)
 
 (defn ^:export force-detect-transit-changes []

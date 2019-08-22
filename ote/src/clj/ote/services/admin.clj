@@ -511,13 +511,34 @@
             (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
+(defn- send-pre-notice-email-response [db config-nap config-email]
+  (log/debug "send-pre-notice-email-response")
+  (pn/send-pre-notice-emails! db config-email (pn/pre-notice-recipient-emails config-nap))
+  (http/transit-response nil 200))
+
 ;; Ensure that defonce was the reason for the wrong date
 (defonce cached-timezone (DateTimeZone/forID "Europe/Helsinki"))
+
+(defn- log-java-time-objs []
+  (println "log-different-date-formations: java.time.LocalDateTime/now = " (java.time.LocalDateTime/now))
+  (println "log-different-date-formations: java.time.ZoneId/of \"Europe/Helsinki\" = " (java.time.ZoneId/of "Europe/Helsinki"))
+  (println "log-different-date-formations: java.time.ZonedDateTime/of = " (java.time.ZonedDateTime/of
+                                                  (java.time.LocalDateTime/now)
+                                                  (java.time.ZoneId/of "Europe/Helsinki")))
+  (println "log-different-date-formations:  java.time.format.DateTimeFormatter/ofPattern= " )
+  (println "log-different-date-formations:  java format DateTimeFormatter = "
+           (.format
+             (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
+             (java.time.ZonedDateTime/of
+               (java.time.LocalDateTime/now)
+               (java.time.ZoneId/of "Europe/Helsinki")))))
 
 (defn- log-different-date-formations
   "We have issues with date times in production. It seems that same code functions differently in different machines.
   It is odd and this will help investigate the issue"
   [user]
+  (log/warn "Logging different date formations")
+  (println "log-different-dates: getAvailableIDs = " (DateTimeZone/getAvailableIDs))
   (let [_ (println "log-different-dates: cached-timezone = " cached-timezone)
         different-timezone (t/time-zone-for-id "Europe/Helsinki")
         _ (println "log-different-dates: different-timezone = " different-timezone)
@@ -541,7 +562,7 @@
                       "problematic-subject " problematic-subject " /n "
                       "maybe-working-subject " maybe-working-subject " /n ")]
 
-    (log/warn "Logging different date formations")
+    (log-java-time-objs)
     (http/transit-response date-str 200)))
 
 (defn- admin-routes [db http nap-config email-config]
@@ -602,6 +623,10 @@
     (GET "/admin/general-troubleshooting-log" req
       (require-admin-user "general-troubleshooting-log" (:user (:user req)))
       (log-different-date-formations (:user (:user req))))
+
+    (GET "/admin/pre-notices/notify" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (send-pre-notice-email-response db nap-config email-config)))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req

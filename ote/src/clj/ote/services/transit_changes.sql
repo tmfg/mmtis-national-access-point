@@ -26,16 +26,17 @@ SELECT ts.id AS "transport-service-id",
        MIN(drc."different-week-date") as "different-week-date",
        MIN(drc."different-week-date") - CURRENT_DATE AS "days-until-change",
        (c."different-week-date" IS NOT NULL) AS "changes?",
-       EXISTS(SELECT eid.id
-              FROM "external-interface-description" eid
-                    LEFT JOIN (SELECT eids.id, eids."external-interface-description-id", eids."db-error",  eids."download-error"
-                                 FROM "external-interface-download-status" eids
-                                ORDER BY eids.id DESC
-                                LIMIT 1) eids ON eid.id = eids."external-interface-description-id"
-              WHERE eid."transport-service-id" = ts.id
-                AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
-                AND 'route-and-schedule' = ANY(eid."data-content")
-                AND (eids."db-error" IS NOT NULL OR eids."download-error" IS NOT NULL)) AS "interfaces-has-errors?",
+
+       -- IF max-date is given, then there cannot be any errors
+       CASE
+           WHEN (SELECT (upper(gtfs_package_date_range(p.id)))::date
+                  FROM gtfs_package p
+                 WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
+                 ORDER BY p.id DESC limit 1) > '1900-01-01'::date THEN false
+           ELSE true
+           END
+           AS "interfaces-has-errors?",
+
        NOT EXISTS(SELECT id
                   FROM "external-interface-description" eid
                   WHERE eid."transport-service-id" = ts.id
@@ -50,24 +51,25 @@ SELECT ts.id AS "transport-service-id",
         FROM gtfs_package p
                JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
         WHERE id = ANY(c."package-ids")) AS "finnish-regions",
-       (SELECT (upper(gtfs_package_date_range(p.id)) - '1 day'::interval)::date
-        FROM gtfs_package p
-        WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
-        ORDER BY p.id DESC limit 1) as "max-date"
-FROM "transport-service" ts
-    JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
-    LEFT JOIN latest_transit_changes c ON c."transport-service-id" = ts.id
-    LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
-                FROM "detected-change-history" dch
-                WHERE dch."email-sent" = (SELECT MAX("email-sent") AS max
-                                            FROM "detected-change-history" dc))
-        as "sent-emails" ON ts.id = "sent-emails"."transport-service-id",
- "detected-route-change" drc
+       (SELECT (upper(gtfs_package_date_range(p.id)))::date
+          FROM gtfs_package p
+         WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
+         ORDER BY p.id DESC limit 1) as "max-date"
+FROM latest_transit_changes c
+     LEFT JOIN (SELECT distinct drc."transit-service-id", drc."transit-change-date", drc."different-week-date"
+                  FROM "detected-route-change" drc
+                 WHERE drc."different-week-date" >= CURRENT_DATE
+                 ORDER BY drc."different-week-date" ASC) drc ON drc."transit-service-id" = c."transport-service-id" AND drc."transit-change-date" = c.date
+     JOIN "transport-service" ts ON ts.id = c."transport-service-id"
+     JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
+     LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
+                  FROM "detected-change-history" dch
+                 WHERE dch."email-sent" = (SELECT MAX("email-sent") AS max
+                                             FROM "detected-change-history" dc)) AS "sent-emails" ON ts.id = "sent-emails"."transport-service-id"
 WHERE 'road' = ANY(ts."transport-type")
-  AND drc."transit-service-id" = c."transport-service-id"
+  AND 'schedule' = ts."sub-type"
   -- Get new changes or changes that can't be found because of invalid gtfs package which makes different-week-date as null
   AND (drc."different-week-date" >= CURRENT_DATE OR drc."different-week-date" IS NULL)
-  AND 'schedule' = ts."sub-type"
   AND ts.published IS NOT NULL
 -- Group so that each group represents a distinct change date, allows summing up changes in SELECT section of this query
 GROUP BY ts.id, c."date", op.name, c."change-date", c."package-ids", c."different-week-date", "sent-emails"."email-sent",

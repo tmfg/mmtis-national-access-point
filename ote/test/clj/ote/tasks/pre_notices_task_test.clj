@@ -19,7 +19,7 @@
                        :settings (component/using (settings/->Settings) [:db :http])))
 
 (defn send! []
-  (sut/send-notification! (:db *ote*) (:email *ote*) constantly))
+  (sut/send-pre-notice-emails! (:db *ote*) (:email *ote*) constantly))
 
 (def test-pre-notice {::t-operator/id 1
                       ::transit/sent (java.util.Date.)
