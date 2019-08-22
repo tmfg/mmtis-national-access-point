@@ -106,23 +106,23 @@
       "fi"
       (tx/with-transaction
         db
-        ;; history-sent-ids contains those detected-change-history ids, which were notified
-        ;; to some user(s). Does not contain those, which no user was interested about.
-        (let [history-ids-sent (set
-                                 (remove nil?
-                                         (mapcat #(compose-and-send-pre-notice-to-user!
-                                                    db % email detected-changes-recipients)
-                                                 (nap-users/list-authority-users db))))]
+        ;; Returned collection contains those detected-change-history ids, which were included in sent notifications.
+        ;; Does not contain those, which no user was interested about.
+        ;; Not used at the moment. If used, put into set and remove nil to get unique ids.
+        (doall
+          (mapcat #(compose-and-send-pre-notice-to-user!
+                     db % email detected-changes-recipients)
+                  (nap-users/list-authority-users db)))
 
-          ;; Mark all detected-change-history records as sent, because for now it does not make sense to
-          ;; include them again in next email if sending some failed.
-          ;; In future failed ids could be returned by compose-and-send-pre-notice-to-user!
-          (specql/update! db :gtfs/detected-change-history
-                          {:gtfs/email-sent (java.util.Date.)}
-                          {:gtfs/id (op/in
-                                      (into #{}
-                                            (map :history-id
-                                                 (fetch-unsent-changes-by-regions db {:regions nil}))))}))))))
+        ;; Mark all detected-change-history records as sent, because for now it does not make sense to
+        ;; include them again in next email if sending some failed.
+        ;; In future failed ids could be returned by compose-and-send-pre-notice-to-user!
+        (specql/update! db :gtfs/detected-change-history
+                        {:gtfs/email-sent (java.util.Date.)}
+                        {:gtfs/id (op/in
+                                    (into #{}
+                                          (map :history-id
+                                               (fetch-unsent-changes-by-regions db {:regions nil}))))})))))
 
 (defn pre-notice-recipient-emails [config]
   (or (some-> config :detected-changes-recipients
