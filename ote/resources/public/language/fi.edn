@@ -1249,17 +1249,31 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week "Viikonpäivä"
   :exception "Poikkeus"
   :vehicles-and-pricing-information "Ajoneuvot ja hintatiedot"
-  :vehicle-price-url "Verkkosivun osoite"
+  :url "Verkkosivun osoite"
   :restrictions-and-payment-methods "Rajoitukset ja maksutavat"
   :other-accessibility-descriptions "Muut estettömyystiedot"
   :starting-date "Alkamispäivä"
   :ending-date "Päättymispäivä"
   :accessibility-info "Esteettömyystiedot"
+  :accessibility "Esteettömyys"
   :additional-services "Lisäpalvelut"
   :usage-area "Maarajoitukset"
   :pick-up-locations "Toimipisteet"
   :payment-methods "Maksutavat"
-  :transport-vehicles "Liikennevälineet"}
+  :transport-vehicles "Liikennevälineet"
+  :assistance-info "Avustuspalveluiden tiedot"
+  :assistance-description "Avustuspalveluiden kuvaus"
+  :assistance-place-description "Avustuspalveluiden sijaintien kuvaus"
+  :reservation-only {true "Kyllä"
+                     false "Ei"}
+  :assistance-www "Avustuspalvelun verkko-osoite"
+  :assistance-phone "Avustuspalvelun puhelinnumero"
+  :assistance-email "Avustuspalvelun sähköpostiosoite"
+  :parking-restrictions "Rajoitukset pysäköintiajassa"
+  :parking-restricted-text "Pysäköintiaika rajoitettu?"
+  :parking-restricted? {true "Kyllä"
+                        false "Ei"}
+  }
 
  :user
  {:change-email-warning "Uusi sähköpostiosoite täytyy vahvistaa, ennen kuin voit kirjautua uudelleen sisään. Saat vahvistuksesta erillisen ohjeviestin sähköpostiisi tietojen tallentamisen jälkeen."

@@ -1238,17 +1238,31 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week "Veckodag"
   :exception "Undantag"
   :vehicles-and-pricing-information "Ajoneuvot ja hintatiedot"
-  :vehicle-price-url "Verkkosivun osoite"
+  :url "Verkkosivun osoite"
   :restrictions-and-payment-methods "Rajoitukset ja maksutavat"
   :other-accessibility-descriptions "Muut estettömyystiedot"
   :starting-date "Startdatum"
   :ending-date "Slutdatum"
   :accessibility-info "Esteettömyystiedot"
-  :additional-services "Lisäpalvelut"
+  :accessibility "Esteettömyys"
+  :additional-services "Övriga tjänster"
   :usage-area "Landbegränsning"
   :pick-up-locations "Verksamhetsställen"
   :payment-methods "Välj betalsätt"
-  :transport-vehicles "Liikennevälineet"}
+  :transport-vehicles "Liikennevälineet"
+  :assistance-info "Information on assistanstjänst"
+  :assistance-description "Beskriving av assistenstjänster"
+  :assistance-place-description "Avustuspalveluiden sijaintien kuvaus"
+  :reservation-only {true "Ja"
+                     false "Nej"}
+  :assistance-www "Avustuspalvelun verkko-osoite"
+  :assistance-phone "Avustuspalvelun puhelinnumero"
+  :assistance-email "Avustuspalvelun sähköpostiosoite"
+  :parking-restrictions "Rajoitukset pysäköintiajassa"
+  :parking-restricted-text "Pysäköintiaika rajoitettu?"
+  :parking-restricted? {true "Ja"
+                        false "Nej"}
+  }
 
  :user
  {:change-email-warning "Den nya e-postadressen måste bekräftas innan du kan logga in på nytt. Efter att du sparat dina uppgifter, får du ett separat meddelande per e-post med anvisningar om hur du bekräftar e-postadressen."

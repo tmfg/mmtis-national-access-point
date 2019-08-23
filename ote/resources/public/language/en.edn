@@ -1235,17 +1235,31 @@ You can also draw the operating area or point to the map with drawing tools. You
   :day-of-week "Day of the week"
   :exception "Exception description"
   :vehicles-and-pricing-information "Ajoneuvot ja hintatiedot"
-  :vehicle-price-url "Web address"
+  :url "Web address"
   :restrictions-and-payment-methods "Rajoitukset ja maksutavat"
   :other-accessibility-descriptions "Muut estettömyystiedot"
   :starting-date "From date"
   :ending-date "To date"
   :accessibility-info "Esteettömyystiedot"
-  :additional-services "Lisäpalvelut"
+  :accessibility "Accessibility"
+  :additional-services "Additional services"
   :usage-area "Maarajoitukset"
-  :pick-up-locations "Toimipisteet"
+  :pick-up-locations "Service point name"
   :payment-methods "Accepted payment methods"
-  :transport-vehicles "Liikennevälineet"}
+  :transport-vehicles "Liikennevälineet"
+  :assistance-info "Assistance service information"
+  :assistance-description "Assistance service description"
+  :assistance-place-description "Avustuspalveluiden sijaintien kuvaus"
+  :reservation-only {true "Yes"
+                     false "No"}
+  :assistance-www "Avustuspalvelun verkko-osoite"
+  :assistance-phone "Avustuspalvelun puhelinnumero"
+  :assistance-email "Avustuspalvelun sähköpostiosoite"
+  :parking-restrictions "Rajoitukset pysäköintiajassa"
+  :parking-restricted-text "Pysäköintiaika rajoitettu?"
+  :parking-restricted? {true "Yes"
+                        false "No"}
+  }
 
  :user
  {:change-email-warning "You must confirm your new email address before you can login again. You will receive separate confirmation instructions by email once you have saved your information."
