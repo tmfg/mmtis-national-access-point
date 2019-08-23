@@ -115,10 +115,9 @@
                  :icon (ic/content-filter-list)})
       [:span "Lataa palveluun liitetty gtfs paketti"]]]]
 
-   (when (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])
+   (when-let [response (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])]
      [:div (stylefy/use-style style-admin/detection-info-text)
-      [notification/notification {:type (:status (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))}
-       (:msg (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response]))]])
+      [notification/notification {:type (:status response)} (:msg response)]])
 
    [:h3 "Muutostunnistuksen käynnistys"]
    [:div
@@ -200,7 +199,7 @@
     "Käynnistä muutosilmoitusten lähetys"
     #(e! (admin-transit-changes/->SendPreNotices))]
    [:div (stylefy/use-style style-admin/detection-info-text)
-    (when-let [resp (get-in admin [:responses :pre-notice-notify])]
+    (when-let [resp (get-in admin [:pre-notice :pre-notice-notify-send])]
       [notification/notification
        (if (= :success resp)
          {:type :success :text (str "Mahdolliset muutosilmoitusten sähköpostit lähetetty")}
@@ -385,27 +384,31 @@
      (get-in app-state [:admin :transit-changes :upload-gtfs])]])
 
 (defn configure-detected-changes [e! app-state]
-  (let [tabs [{:label "Tunnista muutokset" :value "admin-detected-changes"}
-              {:label "Reitin tunnistus" :value "admin-route-id"}
-              {:label "Lataa gtfs" :value "admin-upload-gtfs"}
-              {:label "Sopimusliikenne" :value "admin-commercial-services"}
-              {:label "Poikkeuspäivät" :value "admin-exception-days"}]
-        selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
-        recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
-    [:div
-     [common/back-link-with-event :admin "Takaisin ylläpitopaneelin etusivulle"]
-     [:h2 "Muutostunnistukseen liittyviä työkaluja"]
+  (r/create-class
+    {:component-will-mount #(e! (admin-transit-changes/->InitAdminDetectedChanges))
+     :reagent-render
+     (fn [e! app-state]
+       (let [tabs [{:label "Tunnista muutokset" :value "admin-detected-changes"}
+                   {:label "Reitin tunnistus" :value "admin-route-id"}
+                   {:label "Lataa gtfs" :value "admin-upload-gtfs"}
+                   {:label "Sopimusliikenne" :value "admin-commercial-services"}
+                   {:label "Poikkeuspäivät" :value "admin-exception-days"}]
+             selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
+             recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
+         [:div
+          [common/back-link-with-event :admin "Takaisin ylläpitopaneelin etusivulle"]
+          [:h2 "Muutostunnistukseen liittyviä työkaluja"]
 
-     ;; If hash recalculations are ongoing disable some of the tabs
-     [:div
-      [tabs/tabs tabs {:update-fn #(e! (admin-transit-changes/->ChangeDetectionTab %))
-                       :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
-      [:div.container {:style {:margin-top "20px"}}
-       (case selected-tab
-         "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
-         "admin-route-id" [route-id e! app-state recalc?]
-         "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
-         "admin-commercial-services" [contract-traffic e! app-state]
-         "admin-exception-days" [admin-exception-days e! app-state]
-         ;;default
-         [detect-changes e! app-state])]]]))
+          ;; If hash recalculations are ongoing disable some of the tabs
+          [:div
+           [tabs/tabs tabs {:update-fn #(e! (admin-transit-changes/->ChangeDetectionTab %))
+                            :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
+           [:div.container {:style {:margin-top "20px"}}
+            (case selected-tab
+              "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
+              "admin-route-id" [route-id e! app-state recalc?]
+              "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
+              "admin-commercial-services" [contract-traffic e! app-state]
+              "admin-exception-days" [admin-exception-days e! app-state]
+              ;;default
+              [detect-changes e! app-state])]]]))}))
