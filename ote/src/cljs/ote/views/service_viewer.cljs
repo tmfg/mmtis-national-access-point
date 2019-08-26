@@ -667,9 +667,9 @@
              [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
               [common-ui/information-row-with-option (tr [:service-viewer :day-of-week]) week-days true]]
              [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-              [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-time true]]
+              [common-ui/information-row-with-option (tr [:field-labels :transport-service :ote.db.transport-service/from]) start-time true]]
              [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-              [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-time true]]]))
+              [common-ui/information-row-with-option (tr [:field-labels :transport-service :ote.db.transport-service/to]) end-time true]]]))
 
         ; Exceptions
         (doall
