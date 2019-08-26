@@ -27,9 +27,10 @@
          (r/atom (string/upper-case (name @selected-language))))
 
 (defn format-time-key->str [time-map first-key second-key]
-  (if (= (count (str (get-in time-map [first-key second-key]))) 1)
-    (str "0" (get-in time-map [first-key second-key]))
-    (get-in time-map [first-key second-key])))
+  (let [v (str (get-in time-map [first-key second-key]))]
+    (if (= (count v) 1)
+      (str "0" v)
+      v)))
 
 (defn change-lang-fn
   [new-val]
@@ -823,70 +824,56 @@
     (if (or (= (:error to) 404)
             (= (:error ts) 404))
       [:h2 (tr [:common-texts :data-not-found])]
-      (case service-sub-type
-        :rentals
-        [:div
-         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-         [operator-info (tr [:service-viewer :operator-info]) to]
-         [service-info (tr [:service-viewer :transport-service-info]) ts]
-         [service-area e! (tr [:service-viewer :service-area]) ts]
-         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-         [vehicle-and-price (tr [:service-viewer :vehicles-and-pricing-information]) vehicle-classes vehicle-price-url]
-         [restrictions-and-payment-methods (tr [:service-viewer :restrictions-and-payment-methods]) luggage-restrictions rental-payment-methods]
-         [rental-accessibility-and-other-services (tr [:service-viewer :accessibility-info]) rentals]
-         [additional-services (tr [:service-viewer :additional-services]) rental-additional-services]
-         [usage-area (tr [:service-viewer :usage-area]) rental-usage-area]
-         [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
-         [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-         [booking-service (tr [:service-viewer :reservation-service]) booking-data]
-         [pick-up-locations (tr [:service-viewer :pick-up-locations]) rental-pick-up-locations pick-up-locations-url]]
+      [:div
+       [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
+       [operator-info (tr [:service-viewer :operator-info]) to]
+       [service-info (tr [:service-viewer :transport-service-info]) ts]
+       [service-area e! (tr [:service-viewer :service-area]) ts]
+       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
+       (case service-sub-type
+         :rentals
+         [:div
+          [vehicle-and-price (tr [:service-viewer :vehicles-and-pricing-information]) vehicle-classes vehicle-price-url]
+          [restrictions-and-payment-methods (tr [:service-viewer :restrictions-and-payment-methods]) luggage-restrictions rental-payment-methods]
+          [rental-accessibility-and-other-services (tr [:service-viewer :accessibility-info]) rentals]
+          [additional-services (tr [:service-viewer :additional-services]) rental-additional-services]
+          [usage-area (tr [:service-viewer :usage-area]) rental-usage-area]
+          [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+          [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+          [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+          [pick-up-locations (tr [:service-viewer :pick-up-locations]) rental-pick-up-locations pick-up-locations-url]]
 
-        :terminal
-        [:div
-         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-         [operator-info (tr [:service-viewer :operator-info]) to]
-         [service-info (tr [:service-viewer :transport-service-info]) ts]
-         [service-area e! (tr [:service-viewer :service-area]) ts]
-         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-         [service-hours (tr [:service-viewer :service-hours]) service-hours-info]
-         [indoor-map (tr [:field-labels :terminal ::t-service/indoor-map]) (get-in ts [sub-type-key ::t-service/indoor-map])]
-         [assistance-info (tr [:service-viewer :assistance-info]) (get-in ts [sub-type-key ::t-service/assistance])]
-         [accessibility-info (tr [:service-viewer :accessibility-info])
-          (get-in ts [sub-type-key ::t-service/accessibility]) (get-in ts [sub-type-key ::t-service/accessibility-description])
-          (get-in ts [sub-type-key ::t-service/accessibility-info-url]) (get-in ts [sub-type-key ::t-service/information-service-accessibility])]]
+         :terminal
+         [:div
+          [service-hours (tr [:service-viewer :service-hours]) service-hours-info]
+          [indoor-map (tr [:field-labels :terminal ::t-service/indoor-map]) (get-in ts [sub-type-key ::t-service/indoor-map])]
+          [assistance-info (tr [:service-viewer :assistance-info]) (get-in ts [sub-type-key ::t-service/assistance])]
+          [accessibility-info (tr [:service-viewer :accessibility-info])
+           (get-in ts [sub-type-key ::t-service/accessibility]) (get-in ts [sub-type-key ::t-service/accessibility-description])
+           (get-in ts [sub-type-key ::t-service/accessibility-info-url]) (get-in ts [sub-type-key ::t-service/information-service-accessibility])]]
 
-        :parking
-        [:div
-         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-         [operator-info (tr [:service-viewer :operator-info]) to]
-         [service-info (tr [:service-viewer :transport-service-info]) ts]
-         [service-area e! (tr [:service-viewer :service-area]) ts]
-         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-         [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
-         [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-         [booking-service (tr [:service-viewer :reservation-service]) booking-data]
-         [additional-service-links (tr [:field-labels :parking :ote.db.transport-service/additional-service-links])
-          (get-in ts [sub-type-key ::t-service/additional-service-links])]
-         [parking-facilities (tr [:parking-page :header-facilities-and-capacities]) (get-in ts [sub-type-key ::t-service/parking-capacities])]
-         [charging-points (tr [:parking-page :header-charging-points]) (get-in ts [sub-type-key ::t-service/charging-points])]
-         [price-information (tr [:service-viewer :price-information]) pricing-data]
-         [accessibility-info (tr [:service-viewer :accessibility-info])
-          (get-in ts [sub-type-key ::t-service/accessibility]) (get-in ts [sub-type-key ::t-service/accessibility-description])
-          (get-in ts [sub-type-key ::t-service/accessibility-info-url]) (get-in ts [sub-type-key ::t-service/information-service-accessibility])]
-         [service-hours (tr [:service-viewer :service-hours]) service-hours-info]
-         [parking-restrictions (tr [:service-viewer :parking-restrictions]) (get-in ts [sub-type-key ::t-service/maximum-stay])]]
+         :parking
+         [:div
+          [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+          [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+          [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+          [additional-service-links (tr [:field-labels :parking :ote.db.transport-service/additional-service-links])
+           (get-in ts [sub-type-key ::t-service/additional-service-links])]
+          [parking-facilities (tr [:parking-page :header-facilities-and-capacities]) (get-in ts [sub-type-key ::t-service/parking-capacities])]
+          [charging-points (tr [:parking-page :header-charging-points]) (get-in ts [sub-type-key ::t-service/charging-points])]
+          [price-information (tr [:service-viewer :price-information]) pricing-data]
+          [accessibility-info (tr [:service-viewer :accessibility-info])
+           (get-in ts [sub-type-key ::t-service/accessibility]) (get-in ts [sub-type-key ::t-service/accessibility-description])
+           (get-in ts [sub-type-key ::t-service/accessibility-info-url]) (get-in ts [sub-type-key ::t-service/information-service-accessibility])]
+          [service-hours (tr [:service-viewer :service-hours]) service-hours-info]
+          [parking-restrictions (tr [:service-viewer :parking-restrictions]) (get-in ts [sub-type-key ::t-service/maximum-stay])]]
 
-        ; Default = passenger-transportation
-        [:div
-         [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
-         [operator-info (tr [:service-viewer :operator-info]) to]
-         [service-info (tr [:service-viewer :transport-service-info]) ts]
-         [service-area e! (tr [:service-viewer :service-area]) ts]
-         [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-         [luggage-warnings (tr [:service-viewer :luggage-warnings]) luggage-restrictions]
-         [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
-         [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-         [booking-service (tr [:service-viewer :reservation-service]) booking-data]
-         [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
-         [price-information (tr [:service-viewer :price-information]) pricing-data]
-         [service-hours (tr [:service-viewer :service-hours]) service-hours-info]]))))
+         ; Default = passenger-transportation
+         [:div
+          [luggage-warnings (tr [:service-viewer :luggage-warnings]) luggage-restrictions]
+          [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
+          [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
+          [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+          [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
+          [price-information (tr [:service-viewer :price-information]) pricing-data]
+          [service-hours (tr [:service-viewer :service-hours]) service-hours-info]])])))
