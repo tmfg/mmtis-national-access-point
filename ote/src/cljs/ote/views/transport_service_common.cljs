@@ -51,7 +51,7 @@
     form/group
     {:label label
      :layout :row
-     :columns 3}
+     :columns 2}
 
     (concat
      (when info-message
@@ -65,7 +65,7 @@
        :write  (fn [data url]
                  (assoc-in data [service-url-field ::t-service/url] url))
        :full-width? true
-       :container-class "col-xs-12 col-sm-6 col-md-6"
+       :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
        :max-length 200}
 
       {:name ::t-service/description
@@ -74,7 +74,7 @@
        :read  (comp ::t-service/description service-url-field)
        :write (fn [data desc]
                 (assoc-in data [service-url-field ::t-service/description] desc))
-       :container-class "col-xs-12 col-sm-6 col-md-6"
+       :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
        :full-width?  true}]))))
 
 
