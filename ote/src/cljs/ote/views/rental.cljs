@@ -254,12 +254,10 @@
       :type :table
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/pick-up-name
-                      ;:width "20%"
                       :full-width? true
                       :type :string
                       :required? true}
                      {:name ::t-service/pick-up-type
-                      ;:width "17%"
                       :type :selection
                       :full-width? true
                       :auto-width? true
@@ -268,26 +266,22 @@
                       :show-option (tr-key [:enums ::t-service/pick-up-type])
                       :required? true}
                      {:name ::common/street
-                      ;:width "20%"
                       :full-width? true
                       :type :string
                       :read (comp ::common/street ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
                      {:name ::common/postal_code
                       :type :string
-                      ;:width "10%"
                       :full-width? true
                       :regex #"\d{0,5}"
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
                      {:name ::common/post_office
-                      ;:width "13%"
                       :full-width? true
                       :type :string
                       :read (comp ::common/post_office ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
                      {:name ::t-service/service-hours-and-exceptions
-                      ;:width "10%"
                       :full-width? true
                       :type :component
                       :component (fn [{:keys [update-form! data]}]
