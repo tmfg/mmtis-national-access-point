@@ -33,10 +33,8 @@
    :top "-0.5rem"
    :left "0.2rem"})
 
-(def date1-highlight-color "rgba(53,140,217,1)")
-(def date1-highlight-color-hover "rgba(53,140,217,0.5)")
-(def date2-highlight-color "rgba(219,25,169,1)")
-(def date2-highlight-color-hover "rgba(219,25,169,0.5)")
+(def date1-highlight-color "rgba(219,25,169,1)")
+(def date2-highlight-color "rgba(53,140,217,1)")
 (def date-highlight-color-hover colors/gray650)
 
 
