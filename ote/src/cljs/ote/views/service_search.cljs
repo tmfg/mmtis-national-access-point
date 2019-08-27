@@ -19,7 +19,6 @@
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
-            [ote.views.ckan-service-viewer :as ckan-service-viewer]
             [ote.app.controller.admin :as admin]
             [tuck.core :as tuck]
             [ote.ui.validation :as validation]
@@ -417,22 +416,6 @@
             :suggestions-config {:text :text :value :value}
             :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
-
-
-(defn service-geojson [e! {:keys [resource geojson loading-geojson?]}]
-  [:div.service-geojson
-   [common-ui/linkify "/#/services" [:span [icons/arrow-back {:position "relative"
-                                                              :top "6px"
-                                                              :padding-right "5px"
-                                                              :color style-base/link-color}]
-                                     (tr [:service-search :back-link])]]
-   [:span
-    [:h1 (str (get-in resource ["features" 0 "properties" "transport-service" "name"])
-              " GeoJSON")]
-
-    (when (false? loading-geojson?)
-      [ckan-service-viewer/viewer e! {:resource resource
-                                      :geojson geojson}])]])
 
 (defn service-search [e! _]
   (r/create-class
