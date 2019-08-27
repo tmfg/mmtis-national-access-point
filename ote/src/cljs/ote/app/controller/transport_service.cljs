@@ -34,7 +34,8 @@
     :schedule :passenger-transportation
     :terminal :terminal
     :rentals :rentals
-    :parking :parking))
+    :parking :parking
+    :passenger-transportation))
 
 (define-event CreateServiceNavigate [operator-id sub-type]
   {}

@@ -78,7 +78,8 @@
 (defn vehicle-group []
   (form/group
    {:label (tr [:rentals-page :header-vehicles])
-    :columns 3}
+    :columns 1
+    :layout :row}
 
    {:name ::t-service/vehicle-classes
     :type :table
@@ -95,13 +96,15 @@
     :delete? true
     :add-label (tr [:buttons :add-new-vehicle])}
    {:name ::t-service/vehicle-price-url
-    :type :string})
+    :type :string
+    :full-width? true
+    :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"})
   )
 
 (defn accessibility-group []
   (form/group
     {:label (tr [:rentals-page :header-accessibility])
-    :columns 3
+    :columns 2
     :layout :row}
 
     {:name        ::t-service/guaranteed-vehicle-accessibility
@@ -110,7 +113,7 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"}
 
     {:name        ::t-service/limited-vehicle-accessibility
     :help (tr [:form-help :limited-vehicle-accessibility])
@@ -118,37 +121,37 @@
     :show-option (tr-key [:enums ::t-service/vehicle-accessibility])
     :options     t-service/rental-vehicle-accessibility
     :full-width? true
-    :container-class "col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"}
 
     {:name ::t-service/guaranteed-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
-    :container-class "col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"}
 
     {:name ::t-service/limited-transportable-aid
     :type :checkbox-group
     :show-option (tr-key [:enums ::t-service/transportable-aid])
     :options t-service/rental-transportable-aid
     :full-width? true
-    :container-class "col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"}
 
     {:name            ::t-service/guaranteed-accessibility-description
      :type            :localized-text
      :rows            1
      :full-width?     true
-     :container-class "col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"}
 
     {:name ::t-service/limited-accessibility-description
      :type :localized-text
      :rows 1
-     :container-class "col-md-6"
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
      :full-width? true}
 
     {:name ::t-service/accessibility-info-url
     :type :string
-    :container-class "col-md-6"
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
     :full-width? true
     :max-length 200}))
 
@@ -185,31 +188,33 @@
 (defn luggage-restrictions-groups []
   (form/group
    {:label (tr [:rentals-page :header-restrictions-payments])
-    :columns 3
+    :columns 2
     :layout :row}
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
     :rows 1
-    :container-class "col-md-6"
+    :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
     :full-width?  true}
 
    {:name        ::t-service/payment-methods
     :type        :multiselect-selection
     :show-option (tr-key [:enums ::t-service/payment-methods])
-    :options     t-service/payment-methods})
+    :options     t-service/payment-methods
+    :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+    :full-width?  true})
   )
 
 (defn usage-area []
   (form/group
    {:label (tr [:rentals-page :header-usage-area])
-    :columns 3
+    :columns 1
     :layout :row}
 
    {:name ::t-service/usage-area
     :type :string
     :full-width? true
-    :container-class "col-md-12"
+    :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
     :rows 1}))
 
 (defn service-hours-for-location [update-form! data]
@@ -243,18 +248,16 @@
                     (assoc data key time))))]
     (form/group
      {:label (tr [:passenger-transportation-page :header-pick-up-locations])
-      :columns 3}
+      :columns 1}
 
      {:name ::t-service/pick-up-locations
       :type :table
       :prepare-for-save values/without-empty-rows
       :table-fields [{:name ::t-service/pick-up-name
-                      :width "20%"
                       :full-width? true
                       :type :string
                       :required? true}
                      {:name ::t-service/pick-up-type
-                      :width "17%"
                       :type :selection
                       :full-width? true
                       :auto-width? true
@@ -263,31 +266,26 @@
                       :show-option (tr-key [:enums ::t-service/pick-up-type])
                       :required? true}
                      {:name ::common/street
-                      :width "20%"
                       :full-width? true
                       :type :string
                       :read (comp ::common/street ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
                      {:name ::common/postal_code
                       :type :string
-                      :width "10%"
                       :full-width? true
                       :regex #"\d{0,5}"
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
                      {:name ::common/post_office
-                      :width "13%"
                       :full-width? true
                       :type :string
                       :read (comp ::common/post_office ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
                      {:name ::t-service/service-hours-and-exceptions
-                      :width "10%"
                       :full-width? true
                       :type :component
                       :component (fn [{:keys [update-form! data]}]
-                                   [service-hours-for-location update-form! data])}
-                     ]
+                                   [service-hours-for-location update-form! data])}]
       :delete? true
       :add-label (tr [:buttons :add-new-pick-up-location])}
 
@@ -295,7 +293,7 @@
 
      {:name ::t-service/pick-up-locations-url
       :type :string
-      :container-class "col-xs-12 col-sm-6 col-md-6"
+      :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
       :full-width? true})))
 
 (defn rental [e! service app]

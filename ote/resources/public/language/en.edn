@@ -1233,7 +1233,33 @@ You can also draw the operating area or point to the map with drawing tools. You
   :price/unit "Price/unit"
   :pricing-basis "Unit"
   :day-of-week "Day of the week"
-  :exception "Exception description"}
+  :exception "Exception description"
+  :vehicles-and-pricing-information "Vehichle and price information"
+  :url "Web address"
+  :restrictions-and-payment-methods "Restrictions and payment methods"
+  :other-accessibility-descriptions "Other accessibility information"
+  :starting-date "From date"
+  :ending-date "To date"
+  :accessibility-info "Accessibility information"
+  :accessibility "Accessibility"
+  :additional-services "Additional services"
+  :usage-area "Usage area restrictions"
+  :pick-up-locations "Service points"
+  :payment-methods "Payment methods"
+  :transport-vehicles "Means of transport"
+  :assistance-info "Assistance service information"
+  :assistance-description "Assistance service description"
+  :assistance-place-description "Assistance service location"
+  :reservation-only {true "Yes"
+                     false "No"}
+  :assistance-www "Website of the assistance service"
+  :assistance-phone "Phone number to assistance service"
+  :assistance-email "Email address to assistance service"
+  :parking-restrictions "Parking time limits"
+  :parking-restricted-text "Limited parking time?"
+  :parking-restricted? {true "Yes"
+                        false "No"}
+  }
 
  :user
  {:change-email-warning "You must confirm your new email address before you can login again. You will receive separate confirmation instructions by email once you have saved your information."

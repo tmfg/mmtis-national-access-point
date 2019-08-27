@@ -132,6 +132,7 @@
                     :services [service-search/service-search e! app]
                     ;; show single service GeoJSON
                     :service [service-search/service-geojson e! (:service-search app)]
+                    :service-view [sv/service-view e! app]
 
                     :admin [admin/admin-panel e! app]
                     :admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
@@ -156,7 +157,6 @@
                     :pre-notices [pre-notices-listing/pre-notices e! app]
 
                     :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                    :service-view [sv/service-view e! app]
                     :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
 
                     (:transit-changes :authority-pre-notices)
