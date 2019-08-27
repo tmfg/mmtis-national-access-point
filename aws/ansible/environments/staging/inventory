@@ -1,11 +1,3 @@
-[ckan]
-napote-ckan1-dev.finap.fi
-napote-ckan2-dev.finap.fi
-
-[solr]
-napote-solr1-dev.finap.fi
-napote-solr2-dev.finap.fi
-
 [ote]
 napote-ote1-dev.finap.fi
 napote-ote2-dev.finap.fi
