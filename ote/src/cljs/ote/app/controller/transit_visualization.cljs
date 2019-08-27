@@ -214,7 +214,10 @@
      ;; Add all received routes to shown map
      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
-(defn compare-stop-differences [transit-visualization date1-trips date2-trips]
+(defn combined-trips-and-stop-differences
+  "Combine trips from date1 and date2 vectors. When trips are combined calculate stop difference counts between those
+  two vectors."
+  [transit-visualization date1-trips date2-trips]
   (if-let [first-common-stop (tcu/first-common-stop (concat date1-trips date2-trips))]
           (let [first-common-stop
                 #(assoc %
@@ -222,10 +225,11 @@
                    :first-common-stop-time (tcu/time-for-stop % first-common-stop))
                 date1-trips (mapv first-common-stop date1-trips)
                 date2-trips (mapv first-common-stop date2-trips)
-                combined-trips (tcu/merge-by-closest-time
+                combined-trips (tcu/merge-trips-by-closest-time
                                  :first-common-stop-time
                                  date1-trips date2-trips)]
 
+            ;; Calculate stop differences => {:stop-time-changes :stop-seq-changes}
             (assoc-in transit-visualization [:compare :combined-trips]
                       (mapv (fn [[l r]]
                               [l r (tcu/trip-stop-differences l r)])
@@ -233,7 +237,6 @@
 
           ;; Can't find common stop
           (assoc-in transit-visualization [:compare :combined-trips] nil)))
-
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
@@ -244,12 +247,12 @@
       (and (not loading)
            (not-empty date1-trips)
            (not-empty date2-trips))
-      (compare-stop-differences transit-visualization date1-trips date2-trips)
+      (combined-trips-and-stop-differences transit-visualization date1-trips date2-trips)
 
       (not loading)
       ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
       (-> transit-visualization
-          (compare-stop-differences date1-trips date2-trips)
+          (combined-trips-and-stop-differences date1-trips date2-trips)
           (assoc-in [:compare :differences]
                     (if (and date1-trips (empty? date2-trips))
                       ;ending - count trips from date1, because date2 is empty
