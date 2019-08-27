@@ -129,10 +129,10 @@
 (defn earliest-departure-time [stop]
   (let [minutes-from-midnight1 (some-> stop :gtfs/departure-time-date1 (time/minutes-from-midnight))
         minutes-from-midnight2 (some-> stop :gtfs/departure-time-date2 (time/minutes-from-midnight))]
-    (cond
-      (nil? minutes-from-midnight1) minutes-from-midnight2
-      (nil? minutes-from-midnight2) minutes-from-midnight1
-      :default (max minutes-from-midnight1 minutes-from-midnight2))))
+    ; Use date2 departure time as master when sorting results
+    (if (some? minutes-from-midnight2)
+      minutes-from-midnight2
+      (max minutes-from-midnight1 minutes-from-midnight2))))
 
 (defn format-stop-info
   "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
