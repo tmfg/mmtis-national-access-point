@@ -73,7 +73,10 @@
   [data]
   (reduce
     (fn [new-collection item]
-      (let [lang (keyword (string/lower-case (::t-service/lang item)))
+      (let [raw-lang (::t-service/lang item)
+            lang (if raw-lang
+                   (keyword (string/lower-case (::t-service/lang item)))
+                   (keyword "fi"))
             val (::t-service/text item)]
         (assoc new-collection lang val)))
     {}
