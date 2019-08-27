@@ -12,30 +12,6 @@ networks:
   napote:
 
 services:
-  napote-ckan:
-    container_name: napote-ckan
-    image: solita/napote-ckan:latest
-    build:
-      context: ./ckan
-      args:
-      - CKAN_SITE_URL=${CKAN_SITE_URL}
-      - CKAN_PORT=${CKAN_PORT}
-    networks:
-      - napote
-    links:
-      - napotedb
-      - napote-solr
-      - napote-redis
-    ports:
-      - "127.0.0.1:${CKAN_PORT}:5000"
-    environment:
-      - CKAN_SQLALCHEMY_URL=postgresql://ckan:@napotedb:5432/napote
-      - CKAN_SOLR_URL=http://napote-solr:8983/solr/ckan
-      - CKAN_REDIS_URL=redis://napote-redis:6379/1
-      - CKAN_SITE_ID=${CKAN_SITE_ID}
-      - CKAN_SITE_URL=${CKAN_SITE_URL}
-    volumes:
-      - ./ckan/ckan-plugins:/ckan-plugins
 
   napotedb:
     restart: always
@@ -52,24 +28,6 @@ services:
       timeout: 30s
       retries: 3
 
-  napote-solr:
-    container_name: napote-solr
-    image: solita/napote-solr:latest
-    build: ./solr
-    networks:
-      - napote
-    ports:
-      - "127.0.0.1:8983:8983"
-
-  napote-redis:
-    container_name: napote-redis
-    image: solita/napote-redis:latest
-    build: ./redis
-    networks:
-      - napote
-    ports:
-      - "127.0.0.1:6379:6379"
-
   napote-nginx:
     restart: always
     container_name: napote-nginx
@@ -77,8 +35,6 @@ services:
     build: ./nginx
     networks:
       - napote
-    links:
-      - napote-ckan
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
     ports:
