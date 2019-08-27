@@ -1,7 +1,0 @@
----
-
-- name: Install CKAN plugin
-  hosts: ckan
-  become: true
-  tasks:
-    - include: tasks/ckan_plugin.yml
