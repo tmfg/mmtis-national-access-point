@@ -460,7 +460,7 @@
    [:h4 title]
    (let [price-classes (:price-classes data)
          payment-methods (map #(tr [:enums ::t-service/payment-methods %]) (:payment-methods data))
-         description (format-descriptions (:payment-method-description data))
+         payment-method-desc (format-descriptions (:payment-method-description data))
          pricing-description (format-descriptions (get-in data [:pricing ::t-service/description]))
          pricing-url (get-in data [:pricing ::t-service/url])]
      [:div
@@ -485,7 +485,7 @@
        (tr [:parking-page :header-payment-methods])
        (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))
        true]
-      [information-row-with-selection (tr [:common-texts :description]) description true]
+      [information-row-with-selection (tr [:common-texts :description]) payment-method-desc true]
       [information-row-with-selection
        (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
        pricing-description

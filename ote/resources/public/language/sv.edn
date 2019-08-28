@@ -1262,6 +1262,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :parking-restricted-text "Begränsad parkeringstid?"
   :parking-restricted? {true "Ja"
                         false "Nej"}
+  :payment-method-description "Betalsätt beskrivning"
   }
 
  :user
