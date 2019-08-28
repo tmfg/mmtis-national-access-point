@@ -269,12 +269,15 @@
    (if data
      (doall
        (for [interface data
-             :let [title (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))])
+             :let [title (string/join ", "
+                                       (map
+                                         #(tr [:enums ::t-service/interface-data-content %])
+                                         (::t-service/data-content interface)))
                    url (::t-service/url (::t-service/external-interface interface))
                    license (::t-service/license interface)
                    format (first (::t-service/format interface))
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
-         ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
+         ^{:key (str (::t-service/id interface) title)}
          [info-sections-2-cols (string/upper-case title)
           [:div
            [common-ui/information-row-with-option
