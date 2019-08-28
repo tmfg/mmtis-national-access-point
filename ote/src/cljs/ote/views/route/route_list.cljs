@@ -5,7 +5,6 @@
     [cljs-react-material-ui.reagent :as ui]
     [ote.app.controller.route.route-list :as route-list]
     [cljs-react-material-ui.icons :as ic]
-    [ote.views.transport-operator-selection :as t-operator-sel]
     [ote.app.controller.transport-operator :as to]
     [ote.db.transport-operator :as t-operator]
     [ote.ui.form-fields :as form-fields]
@@ -17,24 +16,25 @@
     [ote.db.transport-service :as t-service]
     [ote.localization :refer [selected-language]]
     [reagent.core :as r]
-    [ote.ui.list-header :as list-header]
-    [ote.style.base :as style-base]
     [ote.ui.buttons :as buttons]
-    [ote.style.dialog :as style-dialog]))
+    [ote.style.dialog :as style-dialog]
+    [ote.ui.page :as page]
+    [ote.style.buttons :as style-buttons]
+    [stylefy.core :as stylefy]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
-                                  :keys [show-delete-modal?]
-                                  :as route}]
+                                :keys [show-delete-modal?]
+                                :as route}]
   [:span
-   [ui/icon-button {:id       (str "delete-route-" id)
-                    :href     "#"
+   [ui/icon-button {:id (str "delete-route-" id)
+                    :href "#"
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (route-list/->OpenDeleteRouteModal id)))}
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
-      {:open  true
+      {:open true
        :actionsContainerStyle style-dialog/dialog-action-container
        :title (tr [:route-list-page :delete-dialog-header])
        :actions [(r/as-element
@@ -45,9 +45,9 @@
                     (tr [:buttons :cancel])])
                  (r/as-element
                    [buttons/delete
-                    {:on-click  #(do
-                                   (.preventDefault %)
-                                   (e! (route-list/->ConfirmDeleteRoute id)))}
+                    {:on-click #(do
+                                  (.preventDefault %)
+                                  (e! (route-list/->ConfirmDeleteRoute id)))}
                     (tr [:buttons :delete])])]}
 
       (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-with-fallback @selected-language name))])])
@@ -57,10 +57,10 @@
   [:div {:style {:padding-top "20px"}}
    [ui/table
     [ui/table-header {:adjust-for-checkbox false
-                      :display-select-all  false}
+                      :display-select-all false}
      [ui/table-row {:selectable false}
       [ui/table-header-column {:style {:width "18%"}} (tr [:route-list-page :route-list-table-name])]
-      [ui/table-header-column {:class "hidden-xs hidden-sm ":style {:width "10%"}} (tr [:route-list-page :route-list-published?])]
+      [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "10%"}} (tr [:route-list-page :route-list-published?])]
       [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-starting-point])]
       [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-destination-point])]
       [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-from])]
@@ -70,13 +70,13 @@
     [ui/table-body {:display-row-checkbox false}
      (doall
        (map-indexed
-         (fn [i {::transit/keys      [id name published? available-from available-to
-                                      departure-point-name destination-point-name]
+         (fn [i {::transit/keys [id name published? available-from available-to
+                                 departure-point-name destination-point-name]
                  ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
             [ui/table-row-column {:style {:width "18%"}}
-             [:a {:href     "#"
+             [:a {:href "#"
                   :on-click #(do
                                (.preventDefault %)
                                (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-with-fallback @selected-language name)]]
@@ -87,7 +87,7 @@
             [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
             [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "13%"}}
-             [ui/icon-button {:href     "#"
+             [ui/icon-button {:href "#"
                               :on-click #(do
                                            (.preventDefault %)
                                            (e! (fp/->ChangePage :edit-route {:id id})))}
@@ -99,37 +99,42 @@
   (e! (route-list/->LoadRoutes))
   (fn [e! {routes :routes-vector operator :transport-operator :as app}]
     [:div
-     [list-header/header
-      app
-      (tr [:route-list-page :header-route-list])
-      [common/tooltip
-       {:text (if (empty? operators)
-                (tr [:route-list-page :create-new-route-disabled])
-                (tr [:buttons :add-new-route]))}
-       [ui/raised-button {:label    (tr [:buttons :add-new-route])
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (route-list/->CreateNewRoute)))
-                          :primary  true
-                          :disabled (empty? operators)
-                          :icon     (ic/content-add)}]]
-      [t-operator-sel/transport-operator-selection e! app]
-      [buttons/open-link
-       (tr [:route-list-page :link-to-help-pdf-url])
-       (tr [:route-list-page :link-to-help-pdf])]]
+     [page/page-controls "" (tr [:route-list-page :header-route-list])
+      [:div
+       [:h4 {:style {:margin "0"}}
+        (tr [:field-labels :select-transport-operator])]
+       [form-fields/field
+        {:element-id "select-operator-at-own-services"
+         :name :select-transport-operator
+         :type :selection
+         :show-option #(::t-operator/name %)
+         :update! #(e! (to/->SelectOperator %))
+         :options (mapv to/take-operator-api-keys (mapv :transport-operator operators))
+         :auto-width? true
+         :class-name "mui-select-button"}
+        (to/take-operator-api-keys operator)]]]
 
-     (when routes
-       [list-routes e! routes])
-     (when routes
-       (let [loc (.-location js/document)
-             url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                      "export/gtfs/" (::t-operator/id operator))]
-         [:span
-          [:br]
-          [common/help
-           [:span
-            [:div (tr [:route-list-page :route-list-active-routes])
-             [common/linkify url (tr [:route-list-page :route-list-gtfs-zip-file])]]
-            [:div {:style {:width "100%"}}
-             (tr [:route-list-page :route-list-copy-link])
-             [common/copy-to-clipboard url]]]]]))]))
+     [:div.container
+      [:h2 (get-in app [:transport-operator :ote.db.transport-operator/name])]
+      [:a (merge {:href (str "#/new-route/")
+                  :id "new-route-button"
+                  :on-click #(do
+                               (.preventDefault %)
+                               (e! (route-list/->CreateNewRoute)))}
+                 (stylefy/use-style style-buttons/primary-button))
+       (tr [:buttons :add-new-route])]
+      (when routes
+        [list-routes e! routes])
+      (when routes
+        (let [loc (.-location js/document)
+              url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
+                       "export/gtfs/" (::t-operator/id operator))]
+          [:span
+           [:br]
+           [common/help
+            [:span
+             [:div (tr [:route-list-page :route-list-active-routes])
+              [common/linkify url (tr [:route-list-page :route-list-gtfs-zip-file])]]
+             [:div {:style {:width "100%"}}
+              (tr [:route-list-page :route-list-copy-link])
+              [common/copy-to-clipboard url]]]]]))]]))
