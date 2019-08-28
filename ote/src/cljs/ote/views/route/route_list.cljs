@@ -20,7 +20,8 @@
     [ote.style.dialog :as style-dialog]
     [ote.ui.page :as page]
     [ote.style.buttons :as style-buttons]
-    [stylefy.core :as stylefy]))
+    [stylefy.core :as stylefy]
+    [ote.style.base :as style-base]))
 
 (defn- delete-route-action [e! {::transit/keys [id name]
                                 :keys [show-delete-modal?]
@@ -53,47 +54,60 @@
       (str (tr [:route-list-page :delete-dialog-remove-route]) (t-service/localized-text-with-fallback @selected-language name))])])
 
 
+(defn- route-table [e! routes]
+  (.log js/console "route-table routes " (pr-str routes))
+  [ui/table (stylefy/use-style style-base/basic-table)
+   [ui/table-header {:adjust-for-checkbox false
+                     :display-select-all false}
+    [ui/table-row {:selectable false}
+     [ui/table-header-column {:class "table-header" :style {:width "18%"}} (tr [:route-list-page :route-list-table-name])]
+     [ui/table-header-column {:class "table-header" :style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-from])]
+     [ui/table-header-column {:class "table-header" :style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-to])]
+     [ui/table-header-column {:class "table-header hidden-xs hidden-sm " :style {:width "15%"}} (tr [:route-list-page :route-list-table-created-modified])]
+     [ui/table-header-column {:class "table-header hidden-xs hidden-sm " :style {:width "11%"}} (tr [:route-list-page :route-list-table-actions])]]]
+   [ui/table-body {:display-row-checkbox false}
+    (doall
+      (map-indexed
+        (fn [i {::transit/keys [id name published? available-from available-to
+                                departure-point-name destination-point-name]
+                ::modification/keys [created modified] :as row}]
+          ^{:key (str "route-" i)}
+          [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
+           [ui/table-row-column {:style {:width "18%"}}
+            [:a {:href "#"
+                 :on-click #(do
+                              (.preventDefault %)
+                              (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-with-fallback @selected-language name)]]
+           [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
+           [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
+           [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
+           [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "13%"}}
+            [ui/icon-button {:href "#"
+                             :on-click #(do
+                                          (.preventDefault %)
+                                          (e! (fp/->ChangePage :edit-route {:id id})))}
+             [ic/content-create]]
+            [delete-route-action e! row]]])
+        routes))]])
+
 (defn list-routes [e! routes]
+  (let [public-routes (filter (fn [r]
+                                (true? (::transit/published? r))) routes)
+        draft-routes (filter (fn [r]
+                               (false? (::transit/published? r))) routes)
+        _ (.log js/console "public-routes " (pr-str public-routes))
+        _ (.log js/console "routes " (pr-str routes))]
   [:div {:style {:padding-top "20px"}}
-   [ui/table
-    [ui/table-header {:adjust-for-checkbox false
-                      :display-select-all false}
-     [ui/table-row {:selectable false}
-      [ui/table-header-column {:style {:width "18%"}} (tr [:route-list-page :route-list-table-name])]
-      [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "10%"}} (tr [:route-list-page :route-list-published?])]
-      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-starting-point])]
-      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-destination-point])]
-      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-from])]
-      [ui/table-header-column {:style {:width "10%"}} (tr [:route-list-page :route-list-table-valid-to])]
-      [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (tr [:route-list-page :route-list-table-created-modified])]
-      [ui/table-header-column {:class "hidden-xs hidden-sm " :style {:width "11%"}} (tr [:route-list-page :route-list-table-actions])]]]
-    [ui/table-body {:display-row-checkbox false}
-     (doall
-       (map-indexed
-         (fn [i {::transit/keys [id name published? available-from available-to
-                                 departure-point-name destination-point-name]
-                 ::modification/keys [created modified] :as row}]
-           ^{:key (str "route-" i)}
-           [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
-            [ui/table-row-column {:style {:width "18%"}}
-             [:a {:href "#"
-                  :on-click #(do
-                               (.preventDefault %)
-                               (e! (fp/->ChangePage :edit-route {:id id})))} (t-service/localized-text-with-fallback @selected-language name)]]
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "10%"}} (tr [:route-list-page :route-list-published?-values published?])]
-            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-with-fallback @selected-language departure-point-name)]
-            [ui/table-row-column {:style {:width "10%"}} (t-service/localized-text-with-fallback @selected-language destination-point-name)]
-            [ui/table-row-column {:style {:width "10%"}} (when available-from (time/format-date available-from))]
-            [ui/table-row-column {:style {:width "10%"}} (when available-to (time/format-date available-to))]
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "15%"}} (time/format-timestamp-for-ui (or modified created))]
-            [ui/table-row-column {:class "hidden-xs hidden-sm " :style {:width "13%"}}
-             [ui/icon-button {:href "#"
-                              :on-click #(do
-                                           (.preventDefault %)
-                                           (e! (fp/->ChangePage :edit-route {:id id})))}
-              [ic/content-create]]
-             [delete-route-action e! row]]])
-         routes))]]])
+   [:h4 "Reittiluonnokset"]
+   [:p "Taulukossa on listattuna "
+    [:strong "luonnostilassa"]
+    " olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan."]
+   [route-table e! draft-routes]
+   [:h4 "Valmiit reitit"]
+   [:p "Taulukossa on listattuna "
+    [:strong "valmiit"]
+    " olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan."]
+   [route-table e! public-routes]]))
 
 (defn routes [e! {operators :transport-operators-with-services :as app}]
   (e! (route-list/->LoadRoutes))
