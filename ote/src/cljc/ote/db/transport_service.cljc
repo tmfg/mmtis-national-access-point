@@ -130,7 +130,8 @@
     :terminal ::terminal
     :rentals ::rentals
     :parking ::parking
-    :brokerage ::brokerage))
+    :brokerage ::brokerage
+    ::passenger-transportation))
 
 (defn localized-text-for [language localized-text]
   (some #(when (= (::lang %) (str/upper-case (name language))) (::text %)) localized-text))
