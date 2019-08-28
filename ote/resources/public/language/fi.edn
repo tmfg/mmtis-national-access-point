@@ -355,7 +355,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-new-service-hour "Lisää rivi"
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
-  :add-new-route "Lisää uusi laivareitti"
+  :add-new-route "Lisää uusi merireitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
