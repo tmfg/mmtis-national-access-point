@@ -628,12 +628,11 @@
 
 (defn- usage-area
   [title data]
-  (let [desc (format-descriptions data)]
-    [:section
-     [info-sections-1-col title
-      [:div
-       [information-row-with-selection (tr [:common-texts :description]) desc true]]]
-     [spacer]]))
+  [:section
+   [info-sections-1-col title
+    [:div
+     [common-ui/information-row-with-option (tr [:common-texts :description]) data true]]]
+   [spacer]])
 
 (defn- pick-up-locations [title data url]
   [:section
@@ -822,7 +821,7 @@
         vehicle-classes (get-in ts [::t-service/rentals ::t-service/vehicle-classes])
         vehicle-price-url (get-in ts [::t-service/rentals ::t-service/vehicle-price-url])
         rental-additional-services (get-in ts [::t-service/rentals ::t-service/rental-additional-services])
-        rental-usage-area (get-in ts [::t-service/rentals ::t-service/usage-area])
+        usage-area-description (get-in ts [sub-type-key ::t-service/usage-area])
         rental-pick-up-locations (get-in ts [::t-service/rentals ::t-service/pick-up-locations])
         pick-up-locations-url (get-in ts [::t-service/rentals ::t-service/pick-up-locations-url])]
     (if (or (= (:error to) 404)
@@ -831,7 +830,7 @@
       [:div
        [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
        [operator-info (tr [:service-viewer :operator-info]) to]
-       [service-info (tr [:service-viewer :transport-service-info]) ts]
+       [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
        (case service-sub-type
@@ -841,7 +840,7 @@
           [restrictions-and-payment-methods (tr [:service-viewer :restrictions-and-payment-methods]) luggage-restrictions rental-payment-methods]
           [rental-accessibility-and-other-services (tr [:service-viewer :accessibility-info]) rentals]
           [additional-services (tr [:service-viewer :additional-services]) rental-additional-services]
-          [usage-area (tr [:service-viewer :usage-area]) rental-usage-area]
+          [usage-area (tr [:service-viewer :usage-area]) usage-area-description]
           [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
           [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
           [booking-service (tr [:service-viewer :reservation-service]) booking-data]
