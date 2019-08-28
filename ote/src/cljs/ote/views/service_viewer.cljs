@@ -533,10 +533,7 @@
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
              [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]
-      [information-row-with-selection
-       (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
-       (format-descriptions info) true]]
+             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]]
      [spacer]]))
 
 (defn- vehicle-and-price [title vehicle-classes vehicle-price-url]
