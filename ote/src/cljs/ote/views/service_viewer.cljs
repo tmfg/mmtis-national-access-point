@@ -173,7 +173,7 @@
      [spacer]]))
 
 (defn- service-info
-  [title service]
+  [title service sub-type-key]
   (let [brokerage?-text (tr [:service-viewer :brokerage (::t-service/brokerage? service)])
         sub-type-text (tr [:enums ::t-service/sub-type (::t-service/sub-type service)])
         transport-type-texts (map
@@ -203,7 +203,8 @@
         (tr [:service-search :transport-type])
         (when (not-empty transport-type-texts) (string/join ", " transport-type-texts)) false]
        [information-row-with-selection (tr [:common-texts :description]) descriptions false]
-       [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false]
+       (when (= sub-type-key ::passenger-transportation)
+         [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false])
        #_[common-ui/information-row-with-option
           (tr [:field-labels :transport-service-common ::t-service/contact-email])
           nil false]                                        ;(::t-service/contact-email service)
