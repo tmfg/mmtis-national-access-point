@@ -500,7 +500,8 @@
     [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
                            :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
      "Pysäkit"
-     "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
+     (str "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut. Pysäkit on järjestetty jälkimmäisen vertailupäivän mukaan ( "
+          (time/format-date (:date2 compare)) " ).")
      (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
        [:div
         (when (seq (:differences compare))

@@ -26,10 +26,10 @@
 (defn- flip-vec [[l r]]
   [r l])
 
-(defn merge-by-closest-time [time-fn left-items right-items]
-  (let [left-items-with-closest (mapv #(item-with-closest-time time-fn % right-items) left-items)
-        right-items-with-closest (mapv (comp flip-vec #(item-with-closest-time time-fn % left-items)) right-items)
-        time-diff (fn [[l r]] (time/time-difference (time-fn l) (time-fn r)))
+(defn merge-trips-by-closest-time [first-common-stop-keyword left-items right-items]
+  (let [left-items-with-closest (mapv #(item-with-closest-time first-common-stop-keyword % right-items) left-items)
+        right-items-with-closest (mapv (comp flip-vec #(item-with-closest-time first-common-stop-keyword % left-items)) right-items)
+        time-diff (fn [[l r]] (time/time-difference (first-common-stop-keyword l) (first-common-stop-keyword r)))
         sorted-pairs (remove
                       ;; Remove pairs whose time-difference is over 30 minutes
                       #(> (time-diff %) 30)
@@ -40,21 +40,21 @@
     (loop [left-items-set (into #{} left-items)
            right-items-set (into #{} right-items)
            [p & pairs] sorted-pairs
-           acc []]
+           result []]
       (if (not (and (seq left-items-set)
                     (seq right-items-set)
                     p))
         ;; No more items or or pairs: add any orphans (unpaired times)
         (sort-by
-         ;; Sort by starting time
+         ;; Sort by :first-common-stop-time (time-fn is :first-common-stop keyword)
          (fn [[left right]]
-           (time/minutes-from-midnight (time-fn (or left right))))
+           (time/minutes-from-midnight (first-common-stop-keyword (or left right))))
 
-         (concat acc
+         (concat result
                  (mapv (fn [left] [left nil]) left-items-set)
                  (mapv (fn [right] [nil right]) right-items-set)))
 
-        ;; Take left and right items (if available) and add to acc
+        ;; Take left and right items (if available) and add to result
         (let [[left right] p]
           (if (and (contains? left-items-set left)
                    (contains? right-items-set right))
@@ -62,10 +62,10 @@
             (recur (disj left-items-set left)
                    (disj right-items-set right)
                    pairs
-                   (conj acc p))
+                   (conj result p))
 
             ;; One or both items not available, ignore this pair
-            (recur left-items-set right-items-set pairs acc)))))))
+            (recur left-items-set right-items-set pairs result)))))))
 
 (defn stop-key
   "Use lat and lon values as stop-key. Stop-key is used to determine is the stop remain the same in different gtfs packages.
@@ -129,10 +129,11 @@
 (defn earliest-departure-time [stop]
   (let [minutes-from-midnight1 (some-> stop :gtfs/departure-time-date1 (time/minutes-from-midnight))
         minutes-from-midnight2 (some-> stop :gtfs/departure-time-date2 (time/minutes-from-midnight))]
+    ; Use date2 departure time as master when sorting results. If both are nil set time to zero
     (cond
-      (nil? minutes-from-midnight1) minutes-from-midnight2
-      (nil? minutes-from-midnight2) minutes-from-midnight1
-      :default (max minutes-from-midnight1 minutes-from-midnight2))))
+      (some? minutes-from-midnight2) minutes-from-midnight2
+      (some? minutes-from-midnight1) minutes-from-midnight1
+      :default 0)))
 
 (defn format-stop-info
   "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
@@ -187,7 +188,7 @@
                     :first-common-stop-time (time-for-stop % first-common-stop))
             date1-trips (mapv first-common-stop date1-trips)
             date2-trips (mapv first-common-stop date2-trips)
-            combined-trips (merge-by-closest-time :first-common-stop-time date1-trips date2-trips)]
+            combined-trips (merge-trips-by-closest-time :first-common-stop-time date1-trips date2-trips)]
         (mapv (fn [[l r]]
                 [l r (trip-stop-differences l r)])
               combined-trips)))))
