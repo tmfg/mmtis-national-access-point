@@ -46,8 +46,48 @@
 
   LoadRoutesResponse
   (process-event [{response :response} app]
-    (assoc app :route-list response
-               :routes-vector (get-routes-for-operator app response)))
+    (-> app
+        (handle-routes-response response)))
+
+  LinkInterfaceResponse
+  (process-event [{is-linked? :is-linked?
+                   response :response} app]
+    (let [current-operator (get app :transport-operator)
+          services (:services response)
+          routes (:routes response)]
+      (if services
+        (-> app
+            (show-success-flash-message is-linked?)
+            (handle-routes-response routes)
+            ; Replace operators services with services from backend
+            (update :transport-operators-with-services
+                    (fn [operator-list]
+                      (map (fn [operator-with-services]
+                             (if (=
+                                   (::t-operator/id current-operator)
+                                   (get-in operator-with-services [:transport-operator ::t-operator/id]))
+                               (assoc operator-with-services :transport-service-vector services)
+                               operator-with-services))
+                           operator-list)))
+            ; Replace transport-service-vector with services from backend
+            (assoc :transport-service-vector services))
+        app)))
+
+  LinkInterfaceFailedResponse
+  (process-event [{is-linked? :is-linked?
+                   response :response} app]
+    (show-error-flash-message app is-linked?))
+
+  ToggleLinkInterfaceToService
+  (process-event [{service-id :service-id is-linked? :is-linked?} app]
+    (let [on-success (tuck/send-async! ->LinkInterfaceResponse is-linked?)
+          on-failure (tuck/send-async! ->LinkInterfaceFailedResponse is-linked?)]
+      (comm/post! "routes/link-interface" {:is-linked? is-linked?
+                                           :service-id service-id
+                                           :operator-id (get-in app [:transport-operator ::t-operator/id])} ; Currently selected operator
+                  {:on-success on-success
+                   :on-failure on-failure})
+      app))
 
   CreateNewRoute
   (process-event [_ app]
