@@ -6,6 +6,8 @@
     [ote.localization :refer [selected-language]]
     [cljs-react-material-ui.reagent :as ui]
     [cljs-react-material-ui.icons :as ic]
+    [stylefy.core :as stylefy]
+
     [ote.time :as time]
     [ote.db.transport-operator :as t-operator]
     [ote.db.transit :as transit]
@@ -21,7 +23,6 @@
     [ote.ui.buttons :as buttons]
     [ote.ui.page :as page]
 
-    [stylefy.core :as stylefy]
     [ote.style.dialog :as style-dialog]
     [ote.style.buttons :as style-buttons]
     [ote.style.base :as style-base]
@@ -73,8 +74,7 @@
          [ui/table-row-column {:style {:width "100%"}} empty-row-text]
          [ui/table-row-column ""]
          [ui/table-row-column ""]
-         [ui/table-row-column ""]]
-        )
+         [ui/table-row-column ""]])
       (doall
         (map-indexed
           (fn [i {::transit/keys [id name published? available-from available-to
@@ -109,8 +109,8 @@
 (defn- link-services-to-routes [e! services services-with-route has-public-routes]
   (if has-public-routes
     [:div
-     [:h4 "Valmiiden reittien liittäminen palveluun"]
-     [:p "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."]
+     [:h4 (tr [:route-list-page :header-link-public-routes-to-service])]
+     [:p (tr [:route-list-page :select-services-to-link-interfaces])]
 
      (when (empty? services-with-route)
        [:div
@@ -118,11 +118,11 @@
          [ic/alert-warning {:style {:color colors/negative-button
                                     :margin-right "0.5rem"
                                     :margin-bottom "5px"}}]
-         [:p "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."]]])
+         [:p (tr [:route-list-page :unlinked-routes])]]])
 
      (doall
        (for [{::t-service/keys [id name] :as s} services]
-         ^{:key (str "link-service-id " id)}
+         ^{:key (str "link-service-id" id)}
          [:div
           [ui/checkbox {:label name
                         :id (str "checkbox " id)
@@ -131,23 +131,17 @@
                                          id
                                          (service-linked-to-route s services-with-route)))}]]))]
     [:div
-     [:h4 "Rajapinnan liittäminen palveluun"]
-     [:p "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."]]))
+     [:h4 (tr [:route-list-page :header-link-interface-to-service])]
+     [:p (tr [:route-list-page :desc-link-interface-to-service])]]))
 
 (defn list-routes [e! public-routes draft-routes]
   [:div {:style {:padding-top "20px"}}
-   [:h4 "Reittiluonnokset"]
-   [:p "Taulukossa on listattuna "
-    [:strong "luonnostilassa"]
-    " olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan."]
-   [route-table e! draft-routes (if (not (empty? draft-routes)) nil "Ei reittiluonnoksia.")]
-   [:h4 "Valmiit reitit"]
-   [:p "Taulukossa on listattuna "
-    [:strong "valmiit"]
-    " olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan."]
-   [route-table e! public-routes (if (not (empty? public-routes)) nil "Ei valmiita reittejä.")]])
-
-
+   [:h4 (tr [:route-list-page :header-route-drafts])]
+   [:p (tr [:route-list-page :desc-route-drafts])]
+   [route-table e! draft-routes (if (not (empty? draft-routes)) nil (tr [:route-list-page :no-draft-routes]))]
+   [:h4 (tr [:route-list-page :header-public-routes])]
+   [:p (tr [:route-list-page :desc-public-routes])]
+   [route-table e! public-routes (if (not (empty? public-routes)) nil (tr [:route-list-page :no-public-routes]))]])
 
 (defn routes [e! {operator :transport-operator
                   operators :transport-operators-with-services
@@ -198,12 +192,9 @@
               url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
                        "export/gtfs/" (::t-operator/id operator))]
           [:div
-           [:h4 "Merenkulun reitti- ja aikataulurajapinta"]
-           [:p "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää "
-            [:strong "valmiit reitit"]
-            " -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin
-            NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä."]
+           [:h4 (tr [:route-list-page :header-sea-route-interface])]
+           [:p (tr [:route-list-page :desc-sea-route-interface])]
            [common/linkify url (op-util/gtfs-file-name operator)]])
         [:div
-         [:h4 "Rajapinnan lataaminen"]
-         [:p "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."]])]]))
+         [:h4 (tr [:route-list-page :header-download-gtfs])]
+         [:p (tr [:route-list-page :desc-download-gtfs])]])]]))
