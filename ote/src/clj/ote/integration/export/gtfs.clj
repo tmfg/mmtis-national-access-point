@@ -2,18 +2,19 @@
   "GTFS export of routes"
   (:require [specql.core :refer [fetch]]
             [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
-            [compojure.core :refer [GET]]
-            [ote.db.transit :as transit]
             [specql.op :as op]
-            [ote.time :as time]
+            [compojure.core :refer [GET]]
             [ring.util.io :as ring-io]
-            [ote.util.zip :refer [write-zip]]
-            [ote.db.transport-operator :as t-operator]
-            [ote.gtfs.transform :as gtfs-transform]
             [taoensso.timbre :as log]
-            [ote.util.fn :refer [flip]]
+            [ote.components.http :as http]
+            [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.time :as time]
+            [ote.gtfs.transform :as gtfs-transform]
+            [ote.util.zip :refer [write-zip]]
+            [ote.util.fn :refer [flip]]
+            [ote.util.transport-operator-util :as op-util]
             [ote.localization :refer [*language*]]))
 
 (declare export-gtfs)
@@ -23,10 +24,10 @@
   (start [{http :http
            db :db :as this}]
     (assoc this
-           ::stop (http/publish! http {:authenticated? false}
-                                 (GET "/export/gtfs/:transport-operator-id{[0-9]+}"
-                                      [transport-operator-id]
-                                      (export-gtfs db (Long/parseLong transport-operator-id))))))
+      ::stop (http/publish! http {:authenticated? false}
+                            (GET "/export/gtfs/:transport-operator-id{[0-9]+}"
+                                 [transport-operator-id]
+                              (export-gtfs db (Long/parseLong transport-operator-id))))))
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
@@ -58,11 +59,11 @@
                                          transport-operator-columns
                                          {::t-operator/id transport-operator-id}))
         routes (map #(-> %
-                       (update ::transit/name (flip t-service/localized-text-with-fallback) *language*)
-                       (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))
+                         (update ::transit/name (flip t-service/localized-text-with-fallback) *language*)
+                         (update ::transit/trips (flip mapv) transit/trip-stop-times-from-24h))
                     (current-routes db transport-operator-id))]
     {:status 200
      :headers {"Content-Type" "application/zip"
-               "Content-Disposition" "attachment; filename=gtfs.zip"}
+               "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
      :body (ring-io/piped-input-stream
-            (partial routes-gtfs-zip transport-operator routes))}))
+             (partial routes-gtfs-zip transport-operator routes))}))
