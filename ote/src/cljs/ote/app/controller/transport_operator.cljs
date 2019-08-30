@@ -12,6 +12,17 @@
             [ote.db.common :as common]
             [ote.ui.validation :as validation]))
 
+(defn current-operator-services
+  "Return services from :transport-operators-with-services that belongs to selected operator"
+  [{operator :transport-operator
+    operators :transport-operators-with-services
+    :as app-state}]
+  (some #(when (=
+                 (::t-operator/id operator)
+                 (get-in % [:transport-operator ::t-operator/id]))
+           (:transport-service-vector %))
+        operators))
+
 (defrecord SelectOperator [data])
 (defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperator [id])
