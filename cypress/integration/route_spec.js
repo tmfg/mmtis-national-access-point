@@ -6,6 +6,7 @@ describe('Sea route tests', function () {
     beforeEach(function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
+        cy.fixture('services/schedule.json').as('service');
     });
 
 
@@ -80,13 +81,93 @@ describe('Sea route tests', function () {
     });
 
     it('Save template', function () {
-        cy.contains('Tallenna luonnoksena').click();
+        cy.contains('Tallenna ja julkaise').click();
         cy.contains('Reitin tallennus onnistui');
     });
 
-    it('Delete template', function () {
-        cy.get('div.drafts').get('[id*="delete-route"]').last().click();
+    it('Link route to service - create new service', function () {
+        const service = this.service;
+        cy.visit('/#/own-services');
+
+        // Add new schedule type service
+        cy.server();
+        cy.route('POST', '/transport-service').as('addService');
+
+
+        cy.get('a[id*="new-service-button"]').click({force: true});
+
+        cy.get('[id*="Valitseliikkumispalveluntyyppi"]').click();
+
+        cy.server();
+        cy.route('/place-completions/*').as('placeCompletion');
+
+        cy.contains(/^Säännöllinen*/).click();
+        cy.contains('Jatka').click();
+
+        // Fill mandatory fields
+        cy.get('input[id*=":road"]').click();
+        cy.get('input[id*="Palvelun nimi-"]').type("Liitä merireitti tähän");
+        cy.get('input[name="place-auto-complete-primary"]').as('areaInput');
+
+        cy.wrap(service.areas).each(area => {
+            cy.get('@areaInput').type(area);
+
+            return cy.wait('@placeCompletion')
+                .then(() => {
+                    cy.contains(area).click();
+                    return cy.wait(2000);
+                });
+        });
+
+        cy.get("input[name=':ote.db.transport-service/advance-reservation']").first().click();
+        cy.contains('Tallenna ja julkaise').click({force: true});
+        cy.wait('@addService');
+        cy.wait(1000);
+
+    });
+
+    it('Link route to new service', function () {
+        // Link route to schedule service
+        cy.visit('/#/routes/');
+        cy.wait(200)
+        cy.contains('Valmiiden reittien liittäminen palveluun');
+        cy.contains('Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit.');
+        cy.contains('Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun.');
+        cy.contains('Liitä merireitti tähän');
+
+        // Select service using checbox
+        cy.server();
+        cy.route('POST','/routes/link-interface').as('linkInterface');
+        cy.get('input[id*=checkbox-Liitä]').first().click();
+        cy.wait('@linkInterface');
+        cy.contains('Rajapinta liitettiin palveluun onnistuneesti.');
+
+        //Unlink route
+        cy.get('input[id*=checkbox-Liitä]').first().click();
+        cy.wait('@linkInterface');
+        cy.contains('Rajapinta poistettiin palvelulta onnistuneesti.');
+    });
+
+    it('Delete public route', function () {
+        cy.visit('/#/routes/');
+        cy.get('div.public').get('[id*="delete-route"]').last().click();
         cy.contains('button', 'Poista').click();
         cy.contains('Test route').should('not.exist');
     });
+
+    it('Delete schedule service', function () {
+        cy.visit('/#/own-services');
+        cy.server();
+        cy.route('POST', '/transport-service/delete').as('deleteService');
+
+        cy.contains('tr', 'Liitä merireitti tähän')
+            .within($tr => {
+                cy.get('a').last().click();
+            });
+
+        cy.contains('button', 'Poista').click();
+
+        cy.wait('@deleteService');
+    });
+
 });

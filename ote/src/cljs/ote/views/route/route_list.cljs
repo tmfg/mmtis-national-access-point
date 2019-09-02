@@ -122,10 +122,10 @@
 
      (doall
        (for [{::t-service/keys [id name] :as s} services]
-         ^{:key (str "link-service-id" id)}
+         ^{:key (str "link-service-id-" name "-" id)}
          [:div
           [ui/checkbox {:label name
-                        :id (str "checkbox " id)
+                        :id (str "checkbox-" name "-" id)
                         :checked (service-linked-to-route s services-with-route)
                         :on-click #(e! (route-list/->ToggleLinkInterfaceToService
                                          id

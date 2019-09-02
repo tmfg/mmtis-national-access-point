@@ -795,8 +795,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :header-public-routes "Valmiit reitit"
   :desc-public-routes (:md "Taulukossa on listattuna **valmiit** olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
   :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
-  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin
-                              NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
+  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
   :header-download-gtfs "Rajapinnan lataaminen"
   :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
   :delete-dialog-header "Haluatko poistaa laivareitin?"
