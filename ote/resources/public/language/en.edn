@@ -922,6 +922,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :delete-pre-notice-dialog {:label "Delete draft pre notice?"
                              :content "Permanently delete this pre notice?"
                              :success-message "Pre notice deleted"}
+  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
   }
 
  :pre-notice-page

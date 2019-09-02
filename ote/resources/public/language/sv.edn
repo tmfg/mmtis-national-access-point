@@ -925,6 +925,7 @@
   :delete-pre-notice-dialog {:label "Ta bort ett ändringsmeddelande med utkast-status?"
                              :content "Vill du ta bort det här ändringsmeddelandet för gott?"
                              :success-message "Ändringsmeddelandet har tagits bort"}
+  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
   }
 
  :pre-notice-page

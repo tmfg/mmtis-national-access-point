@@ -926,6 +926,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-pre-notice-dialog {:label "Poista luonnostilassa oleva muutosilmoitus?"
                              :content "Haluatko poistaa tämän muutosilmoituksen pysyvästi?"
                              :success-message "Muutosilmoitus poistettu"}
+  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
   }
 
  :pre-notice-page
