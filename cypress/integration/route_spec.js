@@ -12,9 +12,9 @@ describe('Sea route tests', function () {
     it('Create new route', function () {
         cy.visit('/#/routes/');
 
-        cy.get('tr').should('have.length', 1);
+        //cy.get('tr').should('have.length', 1);
 
-        cy.contains('Lisää uusi laivareitti').click();
+        cy.contains('Lisää uusi merireitti').click();
     });
 
     it('Add basic information', function () {
@@ -30,10 +30,10 @@ describe('Sea route tests', function () {
         cy.get('.leaflet-control-zoom-out').click().wait(400);
         cy.get('.leaflet-control-zoom-out').click().wait(400);
         cy.get('.leaflet-control-zoom-out').click();
-        cy.get('img[title="Puerto Mont"]').click();
-        cy.get('img[title="Panama"]').click();
-        cy.get('img[title="Los Angeles"]').click();
-        cy.get('img[title="Middleton Island"]').click();
+        cy.get('img[title="Puerto Mont"]').last().click();
+        cy.get('img[title="Panama"]').last().click();
+        cy.get('img[title="Los Angeles"]').last().click();
+        cy.get('img[title="Middleton Island"]').last().click();
     });
 
     it('Add calendar', function () {
@@ -64,14 +64,14 @@ describe('Sea route tests', function () {
 
         cy.get('.route-times')
             .within($route => {
-                cy.get('input[id*="hours-tt-nul"]').each(el => {
+                cy.get('input[id*="-hours"]').each(el => {
                     cy.wrap(el).type(hour++);
                 });
             });
 
         cy.get('.route-times')
             .within($route => {
-                cy.get('input[id*="minutes-mm-nul"]').each(el => {
+                cy.get('input[id*="-minutes"]').each(el => {
                     cy.wrap(el).type('00');
                 });
             });
@@ -81,12 +81,12 @@ describe('Sea route tests', function () {
 
     it('Save template', function () {
         cy.contains('Tallenna luonnoksena').click();
-        cy.get('tr').should('have.length', 2);
+        cy.contains('Reitin tallennus onnistui');
     });
 
     it('Delete template', function () {
-        cy.get('[id*="delete-route"]').click();
+        cy.get('div.drafts').get('[id*="delete-route"]').last().click();
         cy.contains('button', 'Poista').click();
-        cy.get('tr').should('have.length', 1);
+        cy.contains('Test route').should('not.exist');
     });
 });
