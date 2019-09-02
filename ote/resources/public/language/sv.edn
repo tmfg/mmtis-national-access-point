@@ -785,6 +785,18 @@
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
+  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
+  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
+  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
+  :header-route-drafts "Reittiluonnokset"
+  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-public-routes "Valmiit reitit"
+  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
+  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin
+                              NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
+  :header-download-gtfs "Rajapinnan lataaminen"
+  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
@@ -795,7 +807,8 @@
   :route-list-table-destination-point "Destination"
   :route-list-table-valid-from "Gäller från och med"
   :route-list-table-valid-to "Gäller till"
-  :route-list-table-created-modified "Skapad / Ändrad"
+  :route-list-table-modified "Ändrad"
+  :route-list-table-created "Skapad"
   :route-list-table-actions "Funktioner"
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
@@ -803,6 +816,14 @@
   :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
+  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
+  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
+  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
+  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
+  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
+  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
+  :no-draft-routes "Ei reittiluonnoksia."
+  :no-public-routes "Ei valmiita reittejä."
   }
 
  :route-wizard-page
@@ -864,6 +885,7 @@
   :show-draw-tools "Ändra anlöpshamnar"
   :hide-draw-tools "Avsluta editeringen"
   :data-missing "Uppgifter saknas"
+  :back-to-routes "Takaisin Merenkulun reitti- ja aikataulueditorin etusivulle"
   }
 
  :pre-notice-list-page
