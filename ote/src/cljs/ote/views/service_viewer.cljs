@@ -488,7 +488,7 @@
        (tr [:parking-page :header-payment-methods])
        (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))
        true]
-      [information-row-with-selection (tr [:common-texts :description]) payment-method-desc true]
+      [information-row-with-selection (tr [:service-viewer :payment-method-description]) payment-method-desc true]
       [information-row-with-selection
        (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
        pricing-description
