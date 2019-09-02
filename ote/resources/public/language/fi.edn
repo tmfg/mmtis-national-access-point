@@ -1294,6 +1294,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :parking-restricted-text "Pysäköintiaika rajoitettu?"
   :parking-restricted? {true "Kyllä"
                         false "Ei"}
+  :payment-method-description "Maksutapojen kuvaus"
   }
 
  :user

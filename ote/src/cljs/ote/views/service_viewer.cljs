@@ -173,7 +173,7 @@
      [spacer]]))
 
 (defn- service-info
-  [title service]
+  [title service sub-type-key]
   (let [brokerage?-text (tr [:service-viewer :brokerage (::t-service/brokerage? service)])
         sub-type-text (tr [:enums ::t-service/sub-type (::t-service/sub-type service)])
         transport-type-texts (map
@@ -203,7 +203,8 @@
         (tr [:service-search :transport-type])
         (when (not-empty transport-type-texts) (string/join ", " transport-type-texts)) false]
        [information-row-with-selection (tr [:common-texts :description]) descriptions false]
-       [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false]
+       (when (= sub-type-key ::passenger-transportation)
+         [common-ui/information-row-with-option (tr [:common-texts :brokerage]) brokerage?-text false])
        #_[common-ui/information-row-with-option
           (tr [:field-labels :transport-service-common ::t-service/contact-email])
           nil false]                                        ;(::t-service/contact-email service)
@@ -269,12 +270,15 @@
    (if data
      (doall
        (for [interface data
-             :let [title (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))])
+             :let [title (string/join ", "
+                                       (map
+                                         #(tr [:enums ::t-service/interface-data-content %])
+                                         (::t-service/data-content interface)))
                    url (::t-service/url (::t-service/external-interface interface))
                    license (::t-service/license interface)
                    format (first (::t-service/format interface))
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
-         ^{:key (str (::t-service/id interface) (tr [:enums ::t-service/interface-data-content (first (::t-service/data-content interface))]))}
+         ^{:key (str (::t-service/id interface) title)}
          [info-sections-2-cols (string/upper-case title)
           [:div
            [common-ui/information-row-with-option
@@ -459,7 +463,7 @@
    [:h4 title]
    (let [price-classes (:price-classes data)
          payment-methods (map #(tr [:enums ::t-service/payment-methods %]) (:payment-methods data))
-         description (format-descriptions (:payment-method-description data))
+         payment-method-desc (format-descriptions (:payment-method-description data))
          pricing-description (format-descriptions (get-in data [:pricing ::t-service/description]))
          pricing-url (get-in data [:pricing ::t-service/url])]
      [:div
@@ -484,7 +488,7 @@
        (tr [:parking-page :header-payment-methods])
        (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))
        true]
-      [information-row-with-selection (tr [:common-texts :description]) description true]
+      [information-row-with-selection (tr [:service-viewer :payment-method-description]) payment-method-desc true]
       [information-row-with-selection
        (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
        pricing-description
@@ -532,10 +536,7 @@
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
              [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]
-      [information-row-with-selection
-       (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
-       (format-descriptions info) true]]
+             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]]
      [spacer]]))
 
 (defn- vehicle-and-price [title vehicle-classes vehicle-price-url]
@@ -627,12 +628,11 @@
 
 (defn- usage-area
   [title data]
-  (let [desc (format-descriptions data)]
-    [:section
-     [info-sections-1-col title
-      [:div
-       [information-row-with-selection (tr [:common-texts :description]) desc true]]]
-     [spacer]]))
+  [:section
+   [info-sections-1-col title
+    [:div
+     [common-ui/information-row-with-option (tr [:common-texts :description]) data true]]]
+   [spacer]])
 
 (defn- pick-up-locations [title data url]
   [:section
@@ -821,7 +821,7 @@
         vehicle-classes (get-in ts [::t-service/rentals ::t-service/vehicle-classes])
         vehicle-price-url (get-in ts [::t-service/rentals ::t-service/vehicle-price-url])
         rental-additional-services (get-in ts [::t-service/rentals ::t-service/rental-additional-services])
-        rental-usage-area (get-in ts [::t-service/rentals ::t-service/usage-area])
+        usage-area-description (get-in ts [sub-type-key ::t-service/usage-area])
         rental-pick-up-locations (get-in ts [::t-service/rentals ::t-service/pick-up-locations])
         pick-up-locations-url (get-in ts [::t-service/rentals ::t-service/pick-up-locations-url])]
     (if (or (= (:error to) 404)
@@ -830,7 +830,7 @@
       [:div
        [service-header (::t-operator/name to) (::t-operator/id to) (::t-service/id ts)]
        [operator-info (tr [:service-viewer :operator-info]) to]
-       [service-info (tr [:service-viewer :transport-service-info]) ts]
+       [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
        (case service-sub-type
@@ -840,7 +840,7 @@
           [restrictions-and-payment-methods (tr [:service-viewer :restrictions-and-payment-methods]) luggage-restrictions rental-payment-methods]
           [rental-accessibility-and-other-services (tr [:service-viewer :accessibility-info]) rentals]
           [additional-services (tr [:service-viewer :additional-services]) rental-additional-services]
-          [usage-area (tr [:service-viewer :usage-area]) rental-usage-area]
+          [usage-area (tr [:service-viewer :usage-area]) usage-area-description]
           [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
           [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
           [booking-service (tr [:service-viewer :reservation-service]) booking-data]

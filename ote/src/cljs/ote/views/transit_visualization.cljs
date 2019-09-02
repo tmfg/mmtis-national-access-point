@@ -500,7 +500,8 @@
     [tv-utilities/section {:open? (get open-sections :trip-stop-sequence true)
                            :toggle! #(e! (tv/->ToggleSection :trip-stop-sequence))}
      "Pysäkit"
-     "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut."
+     (str "Pysäkkilistalla näytetään valitun vuoron pysäkkikohtaiset aikataulut. Pysäkit on järjestetty jälkimmäisen vertailupäivän mukaan ( "
+          (time/format-date (:date2 compare)) " ).")
      (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
        [:div
         (when (seq (:differences compare))
@@ -625,7 +626,7 @@
                                  :onEachFeature (initialize-route-features (- offset) icon-size)
                                  :style {:lineJoin "miter"
                                          :lineCap "miter"
-                                         :color style/date1-highlight-color
+                                         :color style/date2-highlight-color
                                          :weight line-weight}}])
              (when show-date2?
                ^{:key (str date2 "_" route-short-name "_" route-long-name "_" zoom)}
@@ -633,7 +634,7 @@
                                  :onEachFeature (initialize-route-features (+ 2 offset) icon-size)
                                  :style {:lineJoin "miter"
                                          :lineCap "miter"
-                                         :color style/date2-highlight-color
+                                         :color style/date1-highlight-color
                                          :weight line-weight}}])]]))})))
 
 (defn selected-route-map-section [e! open-sections date->hash hash->color compare]
