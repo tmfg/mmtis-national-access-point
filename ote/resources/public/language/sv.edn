@@ -824,6 +824,7 @@
   :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
   }
 
  :route-wizard-page
@@ -1113,7 +1114,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-4-short "To"
   :day-of-week-5-short "Fr"
   :day-of-week-6-short "Lö"
-  :day-of-week-7-short "Sö"}
+  :day-of-week-7-short "Sö"
+  :no-operators "Ei palveluntuottajia"
+  }
 
 
  :dialog

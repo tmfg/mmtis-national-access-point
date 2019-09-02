@@ -820,6 +820,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
   }
 
  :route-wizard-page
@@ -1111,7 +1112,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :day-of-week-4-short "Thu"
   :day-of-week-5-short "Fri"
   :day-of-week-6-short "Sat"
-  :day-of-week-7-short "Sun"}
+  :day-of-week-7-short "Sun"
+  :no-operators "No transport operators"}
 
 
  :dialog
