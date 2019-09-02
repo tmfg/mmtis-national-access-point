@@ -1,8 +1,7 @@
 # FINAP service catalog API
 
-FINAP backend exposes the same query interface as the application uses to outside developers.
-It can be used without authentication.
-
+FINAP backend exposes to 3rd party developers the same query interface as the application uses.
+The interface can be used without authentication.
 
 ## Service search
 
@@ -95,11 +94,11 @@ service-search API response `result` objects.
 The format is:
 > `https://finap.fi/ote/export/geojson/<transport-operator-id>/<id>`
 
-Substitute `<transport-operator-id>` and `<id>` with the values from the JSON result.
+Substitute `<transport-operator-id>` and `<id>` using values from the JSON result.
 
 Please note that "external-interface" links obtained from exported NAP GeoJSON service descriptions do not always lead directly to the actual machine-readable data or API. Sometimes the link can lead to a human-readable web page containing information about how to access the data or API. When assuming that the external-interface link is a direct link to the external data or API, errors can occur in your application.
 
-The Finnish Transport Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API.  If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
+The Finnish Transport and Communications Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API.  If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
 
 ### GeoJSON schema
 
