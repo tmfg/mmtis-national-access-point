@@ -154,6 +154,7 @@
            [:td style
             [:div.col-md-11
              [form-fields/field {:type    :time
+                                 :element-id stop-idx
                                  :required? true
                                  :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/arrival-time %})}
@@ -167,6 +168,7 @@
            [:td style
             [:div.col-md-11
              [form-fields/field {:type    :time
+                                 :element-id stop-idx
                                  :required? true
                                  :unrestricted-hours? (> stop-idx 0)
                                  :update! #(update! {::transit/departure-time %})}

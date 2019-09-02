@@ -138,10 +138,12 @@
   [:div {:style {:padding-top "20px"}}
    [:h4 (tr [:route-list-page :header-route-drafts])]
    [:p (tr [:route-list-page :desc-route-drafts])]
-   [route-table e! draft-routes (if (not (empty? draft-routes)) nil (tr [:route-list-page :no-draft-routes]))]
+   [:div.drafts
+    [route-table e! draft-routes (if (not (empty? draft-routes)) nil (tr [:route-list-page :no-draft-routes]))]]
    [:h4 (tr [:route-list-page :header-public-routes])]
    [:p (tr [:route-list-page :desc-public-routes])]
-   [route-table e! public-routes (if (not (empty? public-routes)) nil (tr [:route-list-page :no-public-routes]))]])
+   [:div.public
+    [route-table e! public-routes (if (not (empty? public-routes)) nil (tr [:route-list-page :no-public-routes]))]]])
 
 (defn routes [e! {operator :transport-operator
                   operators :transport-operators-with-services
