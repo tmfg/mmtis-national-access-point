@@ -24,24 +24,27 @@
       [(form/group
          {:label   (tr [:route-wizard-page :basic-info-header])
           :columns 3
-          :layout  :row}
+          :layout  :row
+          :card? false}
+
          {:name      ::transit/name
           :type      :localized-text
           :label     (tr [:route-wizard-page :basic-info-route-name])
           :is-empty? validation/empty-localized-text?
-          :required? true}
-         {:name         ::transit/transport-operator-id
-          :option-value ::t-operator/id
-          :type         :selection
-          :label        (tr [:route-wizard-page :basic-info-transport-operator])
-          :options      (mapv :transport-operator (:transport-operators-with-services app))
-          :show-option  ::t-operator/name}
+          :required? true
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-4 col-lg-4"}
 
          ;; Departure and destination
          {:name  ::transit/departure-point-name
           :type  :localized-text
-          :label (tr [:route-wizard-page :basic-info-departure-point-name])}
+          :label (tr [:route-wizard-page :basic-info-departure-point-name])
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-4 col-lg-4"}
+
          {:name  ::transit/destination-point-name
           :type  :localized-text
-          :label (tr [:route-wizard-page :basic-info-destination-point-name])})]
+          :label (tr [:route-wizard-page :basic-info-destination-point-name])
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-4 col-lg-4"})]
       route]]))

@@ -4,26 +4,61 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.app.controller.route.route-wizard :as rw]
             [ote.ui.buttons :as buttons]
+            [ote.theme.colors :as colors]
             [ote.localization :refer [tr tr-key]]
             [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
 
     ;; Subviews for wizard
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]
             [ote.views.route.trips :as route-trips]
-            [ote.style.base :as style-base]
-            [ote.app.controller.front-page :as fp-controller]
 
-            [ote.ui.common :as common]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.ui.form-fields :as form-fields]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
                      :on-click #(e! (rw/->SaveAsGTFS))}
    (tr [:buttons :save-as-gtfs])])
 
+(defn- operator-data [e! app]
+  [:div {:style {:background-color colors/gray200
+                 :padding "0rem 1rem 2rem 1rem"
+                 :margin-bottom "1rem"}}
+
+   [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "nowrap"}}
+    [:h3 {:style {:line-height "1rem"}} "Palveluntuottajan tiedot"]]
+
+   [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+     [form-fields/field
+      {:label     (tr [:field-labels ::t-operator/name])
+       :name      ::t-operator/name
+       :type      :string
+       :update!   nil
+       :disabled? true}
+      (::t-operator/name (:transport-operator app))]]
+    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+     [form-fields/field
+      {:label     (tr [:field-labels ::t-operator/business-id])
+       :name      ::t-operator/business-id
+       :type      :string
+       :update!   nil
+       :disabled? true}
+      (::t-operator/business-id (:transport-operator app))]]
+    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+     [form-fields/field
+      {:label     (tr [:field-labels ::t-operator/homepage])
+       :name      ::t-operator/homepage
+       :type      :string
+       :update!   nil}
+      (::t-operator/homepage (:transport-operator app))]]]])
+
 (defn- route-components [e! app]
   [:div
+   [operator-data e! app]
+   [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]
    [route-basic-info/basic-info e! app]
    [route-stop-sequence/stop-sequence e! app]
    [route-trips/trips e! app]])
@@ -31,11 +66,10 @@
 (defn form-container [e! app]
   [:div
    [ote.ui.list-header/header app (tr [:common-texts :navigation-route])]
-   [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]
    [route-components e! app]
    (when (not (rw/valid-route? (:route app)))
-     [ui/card {:style {:margin "1em 0em 1em 0em"}}
-      [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])])
+     [:div {:style {:margin "1em 0em 1em 0em"}}
+      [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]])])
 
 (defn new-route [e! app]
   (when-not (nil? (:route app))

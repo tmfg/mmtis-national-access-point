@@ -220,9 +220,9 @@
 (defn trips [e! {route :route :as app}]
   (fn [e! {route :route :as app}]
     [:div {:style {:padding-top "20px"}}
-     [:div (stylefy/use-style style-form/form-card)
-      [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-times])]
-      [:div (merge (stylefy/use-style style-form/form-card-body))
+     [:div
+      [:h3 (tr [:route-wizard-page :wizard-step-times])]
+      [:div
        (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
          [trips-list e! route]
          [:div
