@@ -229,8 +229,7 @@
                                         :on-click #(e! (admin-transit-changes/->ForceRouteHashCalculationForService))}
                           "Päivitä"]])}
           [(form/group
-             {:label "Route hash id:n hashien uudelleen laskenta"
-              :columns 3
+             {:columns 3
               :layout :raw
               :card? false}
              {:name :service-id
@@ -265,8 +264,7 @@
                                                                   500))}
                           "Laske"]])}
           [(form/group
-             {:label "Päivä hashien uudelleen laskenta"
-              :columns 3
+             {:columns 3
               :layout :raw
               :card? false}
              {:name :service-id
