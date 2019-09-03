@@ -82,6 +82,9 @@
                        :font-size 14
                        :font-weight "600"})                 ;; currently same as error
 
+(def required-input-element (merge required-element
+                                   {:margin-bottom "-1.3rem"}))
+
 (def error-element {:color "#B71C1C"
                     :font-weight "600"})
 
