@@ -184,42 +184,56 @@
                         :first-common-stop-time #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 15, :seconds 0}})
 
 (def combined-stop-sequence-result
-  '(#:gtfs{:stop-name "Joensuu",
+  '(#:gtfs{:stop-sequence 0
+           :stop-name "Joensuu",
           :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 15, :seconds 0},
           :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 15, :seconds 0}}
-    #:gtfs{:stop-name "Kauppatori L",
+    #:gtfs{:stop-sequence 1
+           :stop-name "Kauppatori L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 17, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 17, :seconds 0}}
-    #:gtfs{:stop-name "Lyseo L",
+    #:gtfs{:stop-sequence 2
+           :stop-name "Lyseo L",
            :departure-time-date1 nil,
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 18, :seconds 0}}
-    #:gtfs{:stop-name "Ystävyydenpuisto L",
+    #:gtfs{:stop-sequence 3
+           :stop-name "Ystävyydenpuisto L",
            :departure-time-date1 nil,
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 18, :seconds 0}}
-    #:gtfs{:stop-name "Yliopisto P",
+    #:gtfs{:stop-sequence 2
+           :stop-name "Yliopisto P",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 19, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 19, :seconds 0}}
-    #:gtfs{:stop-name "Kaislakatu P",
+    #:gtfs{:stop-sequence 3
+           :stop-name "Kaislakatu P",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 20, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 20, :seconds 0}}
-    #:gtfs{:stop-name "Siilainen L",
+    #:gtfs{:stop-sequence 4
+           :stop-name "Siilainen L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 21, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 21, :seconds 0}}
-    #:gtfs{:stop-name "Noljakka S->Noljakka L",
+    #:gtfs{:stop-sequence 5
+           :stop-name "Noljakka S->Noljakka L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0}}
-    #:gtfs{:stop-name "Kuusela L",
-           :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
-           :departure-time-date2 nil}
-    #:gtfs{:stop-name "Marjalantie L",
+
+    #:gtfs{:stop-sequence 6
+           :stop-name "Marjalantie L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0}}
-    #:gtfs{:stop-name "Marjala L",
+    #:gtfs{:stop-sequence 7
+            :stop-name "Kuusela L",
+            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
+            :departure-time-date2 nil}
+    #:gtfs{:stop-sequence 8
+           :stop-name "Marjala L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 25, :seconds 0},
            :departure-time-date2 nil}
-    #:gtfs{:stop-name "Lepikkoranta L",
+    #:gtfs{:stop-sequence 9
+           :stop-name "Lepikkoranta L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 26, :seconds 0},
            :departure-time-date2 nil}
-    #:gtfs{:stop-name "Joensuu",
+    #:gtfs{:stop-sequence 10
+           :stop-name "Joensuu",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 30, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 30, :seconds 0}}))
