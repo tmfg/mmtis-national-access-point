@@ -386,7 +386,12 @@
                                                               {::stylefy/with-classes classes})
                                            {:style container-style})
           (if-not card?
-            group-component
+            [:div
+             (when label
+               [:div [:h3 label]
+                (when tooltip
+                  [balloon-header-tooltip {:text tooltip :len tooltip-length}])])
+             group-component]
             [:div (merge (stylefy/use-style style-form/form-card)
                          {:style card-style})
              (when label

@@ -151,7 +151,7 @@
       {:error-text (or error warning) ;; Show error text or warning text
        :error-style (if error ;; Error is more critical than required - showing it first
                       style-base/error-element
-                      style-base/required-element)})
+                      style-base/required-input-element)})
      (when max-length
       {:max-length max-length})
     (when full-width?
@@ -244,7 +244,7 @@
          ;; Error is more critical than required - showing it first
          :error-style (if error
                         style-base/error-element
-                        style-base/required-element))
+                        style-base/required-input-element))
        (when max-length
          {:max-length max-length})
        (when full-width?
@@ -311,10 +311,10 @@
                                             (reset! selected-language lang))})
              lang]))]
        (when (or error (string? warning))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (if error error warning)])
        (when (and (not error) (not warning) is-empty? (is-empty? data))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
