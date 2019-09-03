@@ -11,7 +11,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.transit :as transit]))
+            [ote.db.transit :as transit]
+            [ote.time :as time]))
 
 (defn sea-routes-page-controls [e! app]
   [:div.row {:style {:padding-top "20px"}}
@@ -44,25 +45,28 @@
           [ui/table-header {:adjust-for-checkbox false
                             :display-select-all  false}
            [ui/table-row
-            [ui/table-header-column {:style {:width "30%"}} "Palveluntuottaja"]
-            [ui/table-header-column {:style {:width "40%"}} "Merireitti"]
+            [ui/table-header-column {:style {:width "25%"}} "Palveluntuottaja"]
+            [ui/table-header-column {:style {:width "25%"}} "Merireitti"]
             [ui/table-header-column {:style {:width "10%"}} "Julkaistu?"]
-            [ui/table-header-column {:style {:width "20%"}} "GTFS paketti"]
-            ]]
+            [ui/table-header-column {:style {:width "15%"}} "Luotu"]
+            [ui/table-header-column {:style {:width "15%"}} "Viim. Ajopäivä"]
+            [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{::transit/keys [id name operator published?] :as sea-route} results]
+             (for [{::transit/keys [id name operator-name operator-id published? created to-date] :as sea-route} results]
                ^{:key (str "link_" id)}
                [ui/table-row {:selectable false}
-                [ui/table-row-column {:style {:width "30%"}} (::t-operator/name operator)]
-                [ui/table-row-column {:style {:width "40%"}} [:a {:href "#"
+                [ui/table-row-column {:style {:width "25%"}} operator-name]
+                [ui/table-row-column {:style {:width "25%"}} [:a {:href (str "/#/edit-route/" id)
                                                                   :on-click #(do
                                                                                (.preventDefault %)
                                                                                (e! (admin-controller/->ChangeRedirectTo :admin))
                                                                                (e! (fp/->ChangePage :edit-route {:id id})))}
                                                               (t-service/localized-text-with-fallback @selected-language name)]]
                 [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei") ]
-                [ui/table-row-column {:style {:width "20%"}}
+                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui created) ]
+                [ui/table-row-column {:style {:width "15%"}} (time/format-date to-date)]
+                [ui/table-row-column {:style {:width "10%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                     "export/gtfs/" (::t-operator/id operator))}
+                     "export/gtfs/" operator-id)}
                   "Lataa gtfs"]]]))]]])]))
