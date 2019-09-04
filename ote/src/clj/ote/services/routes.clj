@@ -213,7 +213,7 @@
         db
         (let [r (-> route
                     (save-custom-stops db user)
-                    (modification/with-modification-fields ::transit/id user)
+                    (modification/with-modification-fields ::transit/route-id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
                     (update ::transit/service-calendars #(mapv service-calendar-dates->db %)))
               route-saved (upsert! db ::transit/route (dissoc r ::transit/trips))
