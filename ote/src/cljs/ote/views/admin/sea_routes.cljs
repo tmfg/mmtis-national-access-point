@@ -67,5 +67,5 @@
                 [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei") ]
                 [ui/table-row-column {:style {:width "20%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                     "export/gtfs/" (::t-operator/id operator))}
+                     "export/gtfs-sea/" (::t-operator/id operator))}
                   "Lataa gtfs"]]]))]]])]))

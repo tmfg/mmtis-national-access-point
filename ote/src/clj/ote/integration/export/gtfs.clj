@@ -25,7 +25,7 @@
            db :db :as this}]
     (assoc this
            ::stop (http/publish! http {:authenticated? false}
-                                 (GET "/export/gtfs/:transport-operator-id{[0-9]+}"
+                                 (GET "/export/gtfs-sea/:transport-operator-id{[0-9]+}"
                                       [transport-operator-id]
                                       (export-sea-gtfs db (Long/parseLong transport-operator-id))))))
   (stop [{stop ::stop :as this}]

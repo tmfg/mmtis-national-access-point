@@ -123,7 +123,7 @@
      (when routes
        (let [loc (.-location js/document)
              url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                      "export/gtfs/" (::t-operator/id operator))]
+                      "export/gtfs-sea/" (::t-operator/id operator))]
          [:span
           [:br]
           [common/help
