@@ -96,10 +96,28 @@
           (some? (::transit/departure-time stop-time)) (update ::transit/departure-time #(ote.time/->PGInterval %))
           (some? (::transit/arrival-time stop-time)) (update ::transit/arrival-time #(ote.time/->PGInterval %))))
 
+(defn- sort-tripsv [trips]
+  (vec (sort-by
+         (juxt
+           (comp ote.time/minutes-from-midnight ote.time/pginterval->interval ::transit/departure-time first ::transit/stop-times)
+           (comp ote.time/minutes-from-midnight ote.time/pginterval->interval ::transit/arrival-time last ::transit/stop-times))
+         trips)))
+
 (defn sort-stop-times-of-tripsv [trips]
   (mapv (fn [trip]
           (update trip ::transit/stop-times #(vec (sort-by ::transit/stop-idx %))))
         trips))
+
+(defn fetch-sea-trips [db route-id]
+  (-> (fetch db
+             ::transit/trip
+             (conj (specql/columns ::transit/trip)
+                   [::transit/stop-times  ; Nests linked stop-time table records under each trip record
+                    (specql/columns ::transit/stop-time)])
+             {:transit-trip/route-id route-id})
+      ; Trips must be in same order as stops because of front-end design so sorted just in case.
+      sort-stop-times-of-tripsv
+      sort-tripsv))
 
 (defn get-route
   "Get single route by id"
@@ -113,14 +131,7 @@
     (fn []
       (tx/with-transaction
         db
-        (let [trips (-> (fetch db
-                               ::transit/trip
-                               (conj (specql/columns ::transit/trip)
-                                     [::transit/stop-times  ; Nests linked stop-time table records under each trip record
-                                      (specql/columns ::transit/stop-time)])
-                               {:transit-trip/route-id route-id})
-                        ; Trips must be in same order as stops because of front-end design so sorted just in case.
-                        sort-stop-times-of-tripsv)
+        (let [trips (fetch-sea-trips db route-id)
               route (->
                       ;(fetch db ::transit/route TODO: make this work or remove
                       ;   (conj (specql/columns ::transit/route)
