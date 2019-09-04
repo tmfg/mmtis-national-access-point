@@ -197,8 +197,6 @@
                                       ::transit/trip
                                       (op/and {:transit-trip/route-id route-id}
                                               {:transit-trip/trip-id (op/not (op/in trip-ids-saved))}))]
-    (log/debug "Updating trip model: trip ids saved =" trip-ids-saved
-               ", count of trip records deleted = " trip-records-deleted)
     ;; ::transit/stop-time records referencing the deleted ::transit/trip records are not deleted explicitly here,
     ;; because design relies to implicit deletion as a result of the ON DELETE CASCADE constraint
     trips-saved))
@@ -218,9 +216,6 @@
                     (modification/with-modification-fields ::transit/id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))
                     (update ::transit/service-calendars #(mapv service-calendar-dates->db %)))
-              _ (log/debug "Saving route: route-id =" (::transit/route-id r)
-                           ", trip count = " (count (::transit/trips r))
-                           ", object =" r)
               route-saved (upsert! db ::transit/route (dissoc r ::transit/trips))
               route-id (::transit/route-id route-saved)]
           (update-trip-model! db
