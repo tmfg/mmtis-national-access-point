@@ -55,7 +55,15 @@
    :operator-name ::transit/operator-name
    :published? ::transit/published?
    :created ::transit/created
-   :to-date ::transit/to-date})
+   :to-date ::transit/to-date
+   :weekday ::transit/weekday
+   :monday ::transit/monday
+   :tuesday ::transit/tuesday
+   :wednesday ::transit/wednesday
+   :thursday ::transit/thursday
+   :friday ::transit/friday
+   :saturday ::transit/saturday
+   :sunday ::transit/sunday})
 
 (def service-search-result-columns
   #{::t-service/contact-email

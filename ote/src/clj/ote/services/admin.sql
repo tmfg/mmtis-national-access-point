@@ -110,8 +110,10 @@ SELECT p.code as code, (p.name[1]::localized_text).text as name, ST_X(p.location
 
 -- name: fetch-sea-routes-for-admin
 SELECT
-       r.id AS id,
+       DISTINCT ON (r.id) r.id,
        MAX(ru."to-date") AS "to-date",
+       EXTRACT(DOW FROM DATE (MAX(ru."to-date")::DATE)) weekday, --(0 sunday, 6, saturday)
+       ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday,
        top.id AS "operator-id",
        top.name AS "operator-name",
        r.name AS "route-name",
@@ -124,4 +126,5 @@ SELECT
        (:operator::TEXT IS NULL OR top.name ilike :operator)
    AND top.id = r."transport-operator-id"
  GROUP BY
-          r.id, top.id;
+          r.id, top.id, ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday
+ ORDER BY r.id, "to-date" DESC;
