@@ -103,42 +103,6 @@
   [time]
   (update time :hours mod 24))
 
-(defn trip-stop-times-to-24h
-  "Convert all stop times to be within 24h hours. Trips that span multiple days
-  may have stop times greater than 24h but they must be stored in the database
-  in 24h format."
-  [trip]
-  (update trip ::stop-times (flip mapv)
-          (fn [st]
-            (-> st
-                (update ::arrival-time #(when % (time-to-24h %)))
-                (update ::departure-time #(when % (time-to-24h %)))))))
-
-(defn trip-stop-times-from-24h
-  "Convert trip stop times from 24h to continuous hours.
-  A trip that spans multiple days will have stop times greater than 24h."
-  [trip]
-  (update trip ::stop-times
-          (fn [stop-times]
-            (loop [hours-to-add 0
-                   acc []
-                   previous-departure nil
-                   [st & stop-times] stop-times]
-              (if (nil? st)
-                acc
-                (let [hours-to-add (if (and previous-departure
-                                            (< (time/minutes-from-midnight (::arrival-time st))
-                                               (time/minutes-from-midnight previous-departure)))
-                                     (+ hours-to-add 24)
-                                     0)]
-                  (recur hours-to-add
-                         (conj acc (-> st
-                                       (update ::arrival-time #(when % (update % :hours + hours-to-add)))
-                                       (update ::departure-time #(when % (update % :hours + hours-to-add)))))
-                         (::departure-time st)
-                         stop-times)))))))
-
-
 (defn service-calendar-date-fields
   "Convert service calendar dates from database (with time part) to date fields."
   [service-calendar]
