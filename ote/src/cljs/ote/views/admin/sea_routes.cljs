@@ -53,9 +53,11 @@
                                (if (true? ((weekday-index-to-keyword last-weekday-index) route))
                                  (* -1 index)
                                  (recur (inc index) (dec last-weekday-index)))
-                               -7))
-        new-date (t/plus (time/native->date-time to-date) (t/days last-weekday-count))]
-    (time/native->date new-date)))
+                               nil))]
+    (if (not (nil? last-weekday-count))
+      (time/native->date
+        (t/plus (time/native->date-time to-date) (t/days last-weekday-count)))
+      nil)))
 
 (defn sea-routes [e! app]
   (let [{:keys [loading? results filters]}
@@ -80,7 +82,8 @@
            [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{::transit/keys [id name operator-name operator-id published? created] :as sea-route} results]
+            (for [{::transit/keys [id name operator-name operator-id published? created] :as sea-route} results
+                  :let [last-active-date (last-date-in-use sea-route)]]
               ^{:key (str "link_" sea-route)}
               [ui/table-row {:selectable false}
                [ui/table-row-column {:style {:width "25%"}} operator-name]
@@ -92,7 +95,9 @@
                                                              (t-service/localized-text-with-fallback @selected-language name)]]
                [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei")]
                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui created)]
-               [ui/table-row-column {:style {:width "15%"}} (time/format-date (last-date-in-use sea-route))]
+               [ui/table-row-column {:style {:width "15%"}} (if (not (nil? last-active-date))
+                                                              (time/format-date last-active-date)
+                                                              "Ajopäivissä virhe")]
                [ui/table-row-column {:style {:width "10%"}}
                 [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
                                 "export/gtfs/" operator-id)}
