@@ -171,7 +171,7 @@
                                                                         stop-times-saved)))}))
     stop-times-saved))
 
-(defn- update-trips!
+(defn- update-trips-and-stops!
   "Takes `trips` and updates them to db as well as stop-time records which refer to them.
   Returns a collection of saved trips with updated primary key."
   [db trips]
@@ -191,7 +191,7 @@
   "Takes a collection of `trips` for `route-id` and saves the trips and deletes trips not part of route anymore"
   [db trips route-id]
   {:pre [(clojure.test/is (not (neg-int? route-id)))]}            ; `is` used to print the value of a failed precondition
-  (let [trips-saved (update-trips! db trips)
+  (let [trips-saved (update-trips-and-stops! db trips)
         trip-ids-saved (set-for-keys :transit-trip/trip-id trips-saved)
         trip-records-deleted (delete! db                    ; Orphaned trips must be removed
                                       ::transit/trip
