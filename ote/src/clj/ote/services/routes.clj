@@ -137,6 +137,15 @@
            (delete! db ::transit/route {::transit/id id})
            id))))
 
+(defn- update-operator-homepage! [db user {:keys [operator-id homepage] :as form-data}]
+  (authorization/with-transport-operator-check
+    db user operator-id
+    #(do
+       (update! db ::t-operator/transport-operator
+                {::t-operator/homepage homepage}
+                {::t-operator/id operator-id})
+       homepage)))
+
 (defn- routes-auth
   "Routes that require authentication"
   [db nap-config]
@@ -149,6 +158,11 @@
                          user      :user}
       (http/transit-response
         (save-route nap-config db user (http/transit-request form-data))))
+
+    (POST "/routes/update-operator-homepage" {form-data :body
+                                              user :user}
+      (http/transit-response
+        (update-operator-homepage! db user (http/transit-request form-data))))
 
     (GET "/routes/:id" [id :as {user :user}]
       (let [route (get-route db user (Long/parseLong id))]
