@@ -866,6 +866,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :show-draw-tools "Muokkaa pysähtymispaikkoja"
   :hide-draw-tools "Lopeta muokkaus"
   :data-missing "Tietoja täyttämättä"
+  :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
+  :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
+  :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
   }
 
  :pre-notice-list-page
