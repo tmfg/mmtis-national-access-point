@@ -17,7 +17,8 @@
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]
     [ote.db.transport-service :as t-service]
-    [ote.style.base :as style-base]))
+    [ote.style.base :as style-base]
+    [ote.theme.colors :as colors]))
 
 (defn badge-content [trip-calendar]
   (if (rw/valid-calendar? trip-calendar)
@@ -220,7 +221,7 @@
 (defn trips [e! {route :route :as app}]
   (fn [e! {route :route :as app}]
     [:div {:style {:padding-top "20px"}}
-     [:div
+     [:div {:style {:border-top (str "2px solid" colors/gray950)}}
       [:h3 (tr [:route-wizard-page :wizard-step-times])]
       [:div
        (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))

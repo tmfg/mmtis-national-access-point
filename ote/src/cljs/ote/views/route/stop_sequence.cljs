@@ -16,7 +16,8 @@
             [ote.db.transport-service :as t-service]
             [ote.style.base :as style-base]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.theme.colors :as colors]))
 
 
 (def stop-marker-style
@@ -180,7 +181,7 @@
   (fn [e! {route :route :as app}]
     (if (nil? (get route :stops))
       [circular-progress/circular-progress]
-      [:div
+      [:div {:style {:border-top (str "2px solid" colors/gray950)}}
        [:h3 (tr [:route-wizard-page :wizard-step-stop-sequence])]
        [:div
         [:div {:style {:display "flex" :flex-direction "row"}}

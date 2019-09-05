@@ -25,7 +25,8 @@
          {:label   (tr [:route-wizard-page :basic-info-header])
           :columns 3
           :layout  :row
-          :card? false}
+          :card? false
+          :top-border true}
 
          {:name      ::transit/name
           :type      :localized-text
