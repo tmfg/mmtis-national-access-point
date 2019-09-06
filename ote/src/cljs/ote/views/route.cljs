@@ -102,7 +102,7 @@
 (defn new-route [e! app]
   (when-not (nil? (:route app))
     [:div
-     [:div.container {:style {:margin-top "40px" :padding-top "2rem"}}
+     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
      [form-container e! app]]
      [:div (stylefy/use-style style-base/form-footer)
       [:div.container
@@ -127,7 +127,7 @@
   (if (or (nil? route) (:loading? route))
     [circular-progress/circular-progress]
     [:div
-     [:div.container {:style {:margin-top "40px" :padding-top "2rem"}}
+     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
       [form-container e! app]]
      [:div (stylefy/use-style style-base/form-footer)
       [:div.container
