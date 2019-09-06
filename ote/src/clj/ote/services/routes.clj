@@ -18,10 +18,16 @@
             [ote.authorization :as authorization]
             [cheshire.core :as cheshire]
             [ote.db.tx :as tx]
-            [jeesql.core :refer [defqueries]])
+            [jeesql.core :refer [defqueries]]
+            [ote.environment :as environment])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defqueries "ote/services/routes.sql")
+
+(defn- interface-url
+  "Create interface url for route."
+  [operator-id]
+  (str (environment/base-url) "export/gtfs-sea/" operator-id))
 
 (def route-list-columns  #{::transit/route-id
                            ::transit/transport-operator-id
@@ -31,6 +37,10 @@
                            ::transit/departure-point-name ::transit/destination-point-name
                            ::modification/created ::modification/modified})
 
+(defn- route-used-in-services [db operator-id]
+  (fetch-services-with-route db {:operator-id operator-id
+                                  :url (interface-url operator-id)}))
+
 (defn get-user-routes [db groups user]
   (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         routes (fetch db
@@ -38,11 +48,13 @@
                       route-list-columns
                       {::transit/transport-operator-id (op/in (map ::t-operator/id operators))})]
 
-    (map (fn [{id ::t-operator/id :as operator}]
-           {:transport-operator operator
-            :routes             (into []
-                                      (filter #(= id (::transit/transport-operator-id %)))
-                                      routes)})
+    (map (fn [{operator-id ::t-operator/id :as operator}]
+           (let [routes (into []
+                              (filter #(= operator-id (::transit/transport-operator-id %)))
+                              routes)]
+             {:transport-operator operator
+              :routes routes
+              :route-used-in-services (route-used-in-services db operator-id)}))
          operators)))
 
 (defn- service-date->inst [date]
@@ -239,11 +251,37 @@
            (delete! db ::transit/route {::transit/route-id route-id})
            route-id))))
 
+(defn link-interface
+  "This is a helper function for users. Links created route to given service.
+  Users can add interface by hand but this is much more convenient for them."
+  [db user  {is-linked? :is-linked?
+             service-id :service-id
+             operator-id :operator-id :as form-data}]
+  (let [interface-url (interface-url operator-id)]
+    (authorization/with-transport-operator-check
+      db user operator-id
+      #(do
+         (if (boolean is-linked?)
+           ;delete
+           (specql/delete! db ::t-service/external-interface-description
+                           {::t-service/transport-service-id service-id
+                            ::t-service/external-interface {::t-service/url interface-url}})
+           (specql/insert! db ::t-service/external-interface-description
+                           {::t-service/external-interface {::t-service/description {}
+                                                            ::t-service/url interface-url}
+                            ::t-service/data-content #{:route-and-schedule}
+                            ::t-service/format #{"GTFS"}
+                            ::t-service/license "CC BY 4.0"
+                            ::t-service/transport-service-id service-id}))
+         ;; return all services with operator to update front end app-state
+         {:services (transport/get-transport-services db #{operator-id})
+          :routes (get-user-routes db (:groups user) (:user user))}))))
+
 (defn- routes-auth
   "Routes that require authentication"
   [db nap-config]
   (routes
-    (POST "/routes/routes" {user :user}
+    (GET "/routes/routes" {user :user}
       (http/transit-response
         (get-user-routes db (:groups user) (:user user))))
 
@@ -263,7 +301,12 @@
                             user      :user}
       (http/transit-response
         (delete-route! db user
-                       (:id (http/transit-request form-data)))))))
+                       (:id (http/transit-request form-data)))))
+
+    (POST "/routes/link-interface" {form-data :body
+                                    user :user}
+      (http/transit-response
+        (link-interface db user (http/transit-request form-data))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode

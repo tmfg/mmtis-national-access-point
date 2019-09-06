@@ -69,7 +69,7 @@ describe('Add a new service', function () {
             cy.contains('Jatka').click();
 
             // Fill mandatory fields
-            cy.get('input[id*="name--Palvelunnimi"]').type(this.serviceName);
+            cy.get('input[id*="Palvelun nimi-"]').type(this.serviceName);
             cy.get('input[name="street"]').typeRaw(genNaughtyString(20));
             cy.get('input[name="postal_code"]').type(service.contact.postal_code);
             cy.get('input[name="post_office"]').typeRaw(genNaughtyString(20));
@@ -88,14 +88,15 @@ describe('Add a new service', function () {
             // ## Add some data for non-mandatory fields
 
             cy.get('#radio-company-csv-url').click();
-            cy.get('input[id*="companies-csv-url-"').typeRaw(genNaughtyString(100));
+            cy.get('input[id*="companies-csv-url"').typeRaw(genNaughtyString(100));
+
             cy.get('textarea[id*="luggage-restrictions--Matkatavaroitakoskevatrajoitukset-"')
                 .typeRaw(genNaughtyString(100));
 
             // Get parent el form-group-container that contains the following text
             cy.contains('.form-group-container', 'Reaaliaikapalvelun verkko-osoitetiedot')
                 .within(() => {
-                    cy.get('input[id*="url--Palvelunverkko-osoite"]').typeRaw(genNaughtyString(100));
+                    cy.get('input[id*="real-time-information-url"]').typeRaw(genNaughtyString(100));
 
                     cy.get('textarea[id*="description--Palvelunkuvaus"]').typeRaw(genNaughtyString(100));
                 });
@@ -103,7 +104,7 @@ describe('Add a new service', function () {
             // Get parent el form-group-container that contains the following text
             cy.contains('.form-group-container', 'Varauspalvelun osoitetiedot')
                 .within($el => {
-                    cy.get('input[id*="url--Palvelunverkko-osoite"]').typeRaw(genNaughtyString(100));
+                    cy.get('input[id*="booking-service-url"]').typeRaw(genNaughtyString(100));
 
                     cy.get('textarea[id*="description--Palvelunkuvaus"]').typeRaw(genNaughtyString(100));
                 });

@@ -154,6 +154,7 @@
            [:td style
             [:div.col-md-11
              [form-fields/field {:type :time
+                                 :element-id stop-idx
                                  :required? true
                                  ;; Restricted because first departure cannot be before 24 hours.
                                  :unrestricted-hours? (> stop-idx 0)
@@ -168,6 +169,7 @@
            [:td style
             [:div.col-md-11
              [form-fields/field {:type :time
+                                 :element-id stop-idx
                                  :required? true
                                  ;; All arrival hours allowed because time between two stops could be 24h or more
                                  :unrestricted-hours? true

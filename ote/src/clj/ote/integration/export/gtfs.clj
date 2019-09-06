@@ -6,14 +6,17 @@
             [compojure.core :refer [GET]]
             [ote.db.transit :as transit]
             [specql.op :as op]
-            [ote.time :as time]
             [ring.util.io :as ring-io]
-            [ote.util.zip :refer [write-zip]]
-            [ote.db.transport-operator :as t-operator]
-            [ote.gtfs.transform :as gtfs-transform]
             [taoensso.timbre :as log]
-            [ote.util.fn :refer [flip]]
+            [ote.components.http :as http]
+            [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.time :as time]
+            [ote.gtfs.transform :as gtfs-transform]
+            [ote.util.zip :refer [write-zip]]
+            [ote.util.fn :refer [flip]]
+            [ote.util.transport-operator-util :as op-util]
             [ote.localization :refer [*language*]]
             [ote.services.routes :refer [fetch-sea-trips]]))
 
@@ -65,6 +68,6 @@
                     (fetch-sea-routes-published db transport-operator-id))]
     {:status 200
      :headers {"Content-Type" "application/zip"
-               "Content-Disposition" "attachment; filename=gtfs.zip"}
+               "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
      :body (ring-io/piped-input-stream
             (partial sea-routes-gtfs-zip transport-operator routes))}))
