@@ -19,7 +19,8 @@
             [ote.ui.circular_progress :as circular-progress]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.info :as info]
-            [ote.app.controller.route.route-wizard :as rw]))
+            [ote.app.controller.route.route-wizard :as rw]
+            [ote.ui.common :as common]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
@@ -71,6 +72,8 @@
     [:div
      [:p (tr [:route-wizard-page :instructions-description])]
      [:a (merge {:href  "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
+                 :rel "noopener noreferrer"
+                 :target "_blank"
                  :style {:margin-right "2rem"}
                  :id "edit-transport-operator-btn"}
                 (stylefy/use-style style-base/gray-link-with-icon))

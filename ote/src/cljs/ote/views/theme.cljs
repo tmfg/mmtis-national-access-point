@@ -122,6 +122,9 @@
 
                        ;; Main text color
                        :text-color     (color :grey900)
+
+                       ;; input border color
+                       :borderColor (color :grey900)
                        }
 
            :button    {:labelColor "#fff"}

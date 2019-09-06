@@ -270,8 +270,8 @@
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
       [:div {:style (merge
-                      ;; Push localized text field down for table-row-column top padding amount when in table column.
-                      (when table? {:margin-top "15px"})
+                      ;; Push localized text field down to match regular text input field.
+                      {:padding-top "16px"}
                       (when full-width? style-form/full-width)
                       style)}
        [text-field
