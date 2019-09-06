@@ -31,9 +31,9 @@
      :gtfs/stop-lat (.-y (.getGeometry location))
      :gtfs/stop-lon (.-x (.getGeometry location))}))
 
-(defn- routes-txt [transport-operator-id routes]
-  (for [{::transit/keys [id name route-type]} routes]
-    {:gtfs/route-id id
+(defn- sea-routes-txt [transport-operator-id routes]
+  (for [{::transit/keys [route-id name route-type]} routes]
+    {:gtfs/route-id route-id
      :gtfs/route-short-name ""
      :gtfs/route-long-name name
      :gtfs/route-type (case route-type
@@ -85,7 +85,7 @@
 (defn route-services
   "Generate GTFS services from service calendars. One service calendar can be
   expanded to multiple services."
-  [{::transit/keys [service-calendars id]}]
+  [{::transit/keys [service-calendars route-id]}]
 
   (for [{::transit/keys [service-rules service-added-dates service-removed-dates]
          service-calendar-id :service-calendar-id}
@@ -96,7 +96,7 @@
     (-> (for [{::transit/keys [monday tuesday wednesday thursday
                                friday saturday sunday]
                :as service} (index-key :gtfs/service-id
-                                       #(str id "_" service-calendar-id "_" %)
+                                       #(str route-id "_" service-calendar-id "_" %)
                                        service-rules)]
 
           {:rule-dates (into #{} (transit/rule-dates service))
@@ -114,16 +114,16 @@
         (services-with-removed-dates service-removed-dates)
         (services-with-added-dates service-added-dates))))
 
-(defn- trips-txt [routes]
+(defn- sea-trips-txt [routes]
   (mapcat
-   (fn [{::transit/keys [id trips]
+   (fn [{::transit/keys [route-id trips]
          services :services :as route}]
      (reduce concat
              (map-indexed
               (fn [i {::transit/keys [service-calendar-idx]}]
                 (for [{service-id :gtfs/service-id} (nth services service-calendar-idx)]
-                  {:gtfs/route-id id
-                   :gtfs/trip-id (str id "_" i)
+                  {:gtfs/route-id route-id
+                   :gtfs/trip-id (str route-id "_" i)
                    :gtfs/service-id (or service-id 0)}))
               trips)))
    routes))
@@ -168,9 +168,9 @@
     "0"))
 
 #?(:clj
-   (defn- stop-times-txt [routes]
+   (defn- sea-stop-times-txt [routes]
      (mapcat
-       (fn [{::transit/keys [id trips stops]}]
+       (fn [{::transit/keys [route-id trips stops]}]
          (reduce
            concat
            (map-indexed
@@ -178,10 +178,10 @@
                (for [{::transit/keys [arrival-time departure-time
                                       pickup-type drop-off-type]
                       idx            :idx} (index-key :idx identity stop-times)]
-                 {:gtfs/trip-id (str id "_" i)
-                  :gtfs/stop-id        (::transit/code (nth stops idx))
-                  :gtfs/arrival-time (time/format-interval-as-time (time/time->pginterval (or arrival-time departure-time)))
-                  :gtfs/departure-time (time/format-interval-as-time (time/time->pginterval (or departure-time arrival-time)))
+                 {:gtfs/trip-id (str route-id "_" i)
+                  :gtfs/stop-id (::transit/code (nth stops idx))
+                  :gtfs/arrival-time (time/format-interval-as-time (or arrival-time departure-time))
+                  :gtfs/departure-time (time/format-interval-as-time (or departure-time arrival-time))
                   :gtfs/pickup-type (stopping-type pickup-type)
                   :gtfs/drop-off-type (stopping-type drop-off-type)
                   :gtfs/stop-sequence idx}))
@@ -189,7 +189,7 @@
        routes)))
 
 #?(:clj
-   (defn routes-gtfs
+   (defn sea-routes-gtfs
      "Generate all supported GTFS files form given transport operator and route list"
      [transport-operator routes]
      (let [routes (mapv #(assoc % :services (route-services %)) routes)
@@ -204,15 +204,15 @@
            :data (gtfs-parse/unparse-gtfs-file :gtfs/stops-txt (stops-txt stops-by-code))}
           {:name "stop_times.txt"
            :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt
-                                               (stop-times-txt routes))}
+                                               (sea-stop-times-txt routes))}
           {:name "routes.txt"
            :data (gtfs-parse/unparse-gtfs-file
                    :gtfs/routes-txt
-                   (routes-txt (::t-operator/id transport-operator) routes))}
+                   (sea-routes-txt (::t-operator/id transport-operator) routes))}
           {:name "trips.txt"
            :data (gtfs-parse/unparse-gtfs-file
                    :gtfs/trips-txt
-                   (trips-txt routes))}
+                   (sea-trips-txt routes))}
           {:name "calendar.txt"
            :data (gtfs-parse/unparse-gtfs-file
                    :gtfs/calendar-txt

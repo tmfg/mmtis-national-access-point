@@ -10,7 +10,9 @@
             [ote.app.controller.front-page :as fp]
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transit :as transit]
+            [ote.ui.circular_progress :as circular]
             [ote.time :as time]
             [cljs-time.core :as t]))
 
@@ -63,9 +65,10 @@
   (let [{:keys [loading? results filters]}
         (get-in app [:admin :sea-routes])
         loc (.-location js/document)]
-    [:div.row {:style {:padding-top "40px"}}
-     (when loading?
-       [:span "Ladataan merireittejä..."])
+     [:div.row {:style {:padding-top "40px"}}
+      (when loading?
+        [circular/circular-progress
+         [:span "Ladataan merireittejä..."]])
 
      (when results
        [:div
@@ -82,16 +85,16 @@
            [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{::transit/keys [id name operator-name operator-id published? created] :as sea-route} results
+            (for [{::transit/keys [route-id name operator-name operator-id published? created] :as sea-route} results
                   :let [last-active-date (last-date-in-use sea-route)]]
               ^{:key (str "link_" sea-route)}
               [ui/table-row {:selectable false}
                [ui/table-row-column {:style {:width "25%"}} operator-name]
-               [ui/table-row-column {:style {:width "25%"}} [:a {:href (str "/#/edit-route/" id)
+               [ui/table-row-column {:style {:width "25%"}} [:a {:href (str "/#/edit-route/" route-id)
                                                                  :on-click #(do
                                                                               (.preventDefault %)
                                                                               (e! (admin-controller/->ChangeRedirectTo :admin))
-                                                                              (e! (fp/->ChangePage :edit-route {:id id})))}
+                                                                              (e! (fp/->ChangePage :edit-route {:id route-id})))}
                                                              (t-service/localized-text-with-fallback @selected-language name)]]
                [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei")]
                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui created)]
@@ -100,5 +103,5 @@
                                                               "Ajopäivissä virhe")]
                [ui/table-row-column {:style {:width "10%"}}
                 [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                                "export/gtfs/" operator-id)}
+                                "export/gtfs-sea/" operator-id)}
                  "Lataa gtfs"]]]))]]])]))

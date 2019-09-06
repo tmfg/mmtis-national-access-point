@@ -30,6 +30,7 @@
 
 (defn form-container [e! app]
   [:div
+   [common/back-link-with-event :routes (tr [:route-wizard-page :back-to-routes])]
    [ote.ui.list-header/header app (tr [:common-texts :navigation-route])]
    [buttons/open-link "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf" (tr [:route-list-page :link-to-help-pdf])]
    [route-components e! app]

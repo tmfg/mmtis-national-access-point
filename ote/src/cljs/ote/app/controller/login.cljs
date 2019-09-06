@@ -134,8 +134,7 @@
                 :transport-operator
                 :transport-operators-with-services
                 :transport-service-vector
-                :route-list
-                :routes-vector)
+                :routes)
         (assoc :flash-message (tr [:login :logged-out]))))
 
   LogoutFailed
