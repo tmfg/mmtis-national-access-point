@@ -16,6 +16,14 @@
             [ote.time :as time]
             [cljs-time.core :as t]))
 
+(defn- edit-sea-route-link [e! route-id route-name]
+  [:a {:href (str "/#/edit-route/" route-id)
+       :on-click #(do
+                    (.preventDefault %)
+                    (e! (admin-controller/->ChangeRedirectTo :admin))
+                    (e! (fp/->ChangePage :edit-route {:id route-id})))}
+   (t-service/localized-text-with-fallback @selected-language route-name)])
+
 (defn sea-routes-page-controls [e! app]
   [:div.row {:style {:padding-top "20px"}}
    [form-fields/field {:update! #(e! (admin-controller/->UpdateSeaRouteFilters %))
@@ -80,24 +88,20 @@
            [ui/table-header-column {:style {:width "25%"}} "Palveluntuottaja"]
            [ui/table-header-column {:style {:width "25%"}} "Merireitti"]
            [ui/table-header-column {:style {:width "10%"}} "Julkaistu?"]
-           [ui/table-header-column {:style {:width "15%"}} "Luotu"]
+           [ui/table-header-column {:style {:width "15%"}} "Viim. Muokkaus"]
            [ui/table-header-column {:style {:width "15%"}} "Viim. Ajopäivä"]
            [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{::transit/keys [route-id name operator-name operator-id published? created] :as sea-route} results
-                  :let [last-active-date (last-date-in-use sea-route)]]
+            (for [{::transit/keys [route-id name operator-name operator-id published? modified created] :as sea-route} results
+                  :let [last-active-date (last-date-in-use sea-route)
+                        last-modification (max created modified)]]
               ^{:key (str "link_" sea-route)}
               [ui/table-row {:selectable false}
                [ui/table-row-column {:style {:width "25%"}} operator-name]
-               [ui/table-row-column {:style {:width "25%"}} [:a {:href (str "/#/edit-route/" route-id)
-                                                                 :on-click #(do
-                                                                              (.preventDefault %)
-                                                                              (e! (admin-controller/->ChangeRedirectTo :admin))
-                                                                              (e! (fp/->ChangePage :edit-route {:id route-id})))}
-                                                             (t-service/localized-text-with-fallback @selected-language name)]]
+               [ui/table-row-column {:style {:width "25%"}} [edit-sea-route-link e! route-id name]]
                [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei")]
-               [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui created)]
+               [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui last-modification)]
                [ui/table-row-column {:style {:width "15%"}} (if (not (nil? last-active-date))
                                                               (time/format-date last-active-date)
                                                               "Ajopäivissä virhe")]

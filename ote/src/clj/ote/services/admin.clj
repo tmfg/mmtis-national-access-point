@@ -55,6 +55,7 @@
    :operator-name ::transit/operator-name
    :published? ::transit/published?
    :created ::transit/created
+   :modified ::transit/modified
    :to-date ::transit/to-date
    :weekday ::transit/weekday
    :monday ::transit/monday

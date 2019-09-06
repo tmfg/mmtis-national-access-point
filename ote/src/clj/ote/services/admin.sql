@@ -118,6 +118,7 @@ SELECT
        top.name AS "operator-name",
        r.name AS "route-name",
        r."published?" AS "published?",
+       r.modified AS "modified",
        r.created AS "created"
   FROM
        "transit_route" r, unnest(r."service-calendars") c, unnest(c."service-rules") ru,
