@@ -355,7 +355,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-new-service-hour "Lisää rivi"
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
-  :add-new-route "Lisää uusi laivareitti"
+  :add-new-route "Lisää uusi merireitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
@@ -787,6 +787,17 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
+  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
+  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
+  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
+  :header-route-drafts "Reittiluonnokset"
+  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-public-routes "Valmiit reitit"
+  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
+  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
+  :header-download-gtfs "Rajapinnan lataaminen"
+  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
   :delete-dialog-header "Haluatko poistaa laivareitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
@@ -797,7 +808,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-list-table-destination-point "Määränpää"
   :route-list-table-valid-from "Voimassa lähtien"
   :route-list-table-valid-to "Voimassa asti"
-  :route-list-table-created-modified "Luotu / Muokattu"
+  :route-list-table-modified "Muokattu"
+  :route-list-table-created "Luotu"
   :route-list-table-actions "Toiminnot"
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
@@ -805,6 +817,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :link-to-help-pdf "Merenkulun reittityökalun käyttöohje"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
   :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
+  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
+  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
+  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
+  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
+  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
+  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
+  :no-draft-routes "Ei reittiluonnoksia."
+  :no-public-routes "Ei valmiita reittejä."
   }
 
  :route-wizard-page
@@ -869,6 +889,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
   :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
   :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
+  :back-to-routes "Takaisin Merenkulun reitti- ja aikataulueditorin etusivulle"
   }
 
  :pre-notice-list-page

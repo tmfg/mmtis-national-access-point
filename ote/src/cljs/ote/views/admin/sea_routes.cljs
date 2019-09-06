@@ -1,4 +1,5 @@
-(ns ote.views.admin.sea-routes
+(ns
+  ote.views.admin.sea-routes
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
@@ -11,7 +12,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.transit :as transit]))
+            [ote.db.transit :as transit]
+            [ote.ui.circular_progress :as circular]))
 
 (defn sea-routes-page-controls [e! app]
   [:div.row {:style {:padding-top "20px"}}
@@ -35,7 +37,8 @@
         loc (.-location js/document)]
      [:div.row {:style {:padding-top "40px"}}
       (when loading?
-        [:span "Ladataan merireittejä..."])
+        [circular/circular-progress
+         [:span "Ladataan merireittejä..."]])
 
       (when results
         [:div
@@ -51,18 +54,18 @@
             ]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{::transit/keys [id name operator published?] :as sea-route} results]
-               ^{:key (str "link_" id)}
+             (for [{::transit/keys [route-id name operator published?] :as sea-route} results]
+               ^{:key (str "link_" route-id)}
                [ui/table-row {:selectable false}
                 [ui/table-row-column {:style {:width "30%"}} (::t-operator/name operator)]
                 [ui/table-row-column {:style {:width "40%"}} [:a {:href "#"
                                                                   :on-click #(do
                                                                                (.preventDefault %)
                                                                                (e! (admin-controller/->ChangeRedirectTo :admin))
-                                                                               (e! (fp/->ChangePage :edit-route {:id id})))}
+                                                                               (e! (fp/->ChangePage :edit-route {:id route-id})))}
                                                               (t-service/localized-text-with-fallback @selected-language name)]]
                 [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei") ]
                 [ui/table-row-column {:style {:width "20%"}}
                  [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                     "export/gtfs/" (::t-operator/id operator))}
+                     "export/gtfs-sea/" (::t-operator/id operator))}
                   "Lataa gtfs"]]]))]]])]))

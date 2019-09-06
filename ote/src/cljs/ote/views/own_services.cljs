@@ -95,7 +95,7 @@
            [:a (merge {:href (str "/#/edit-service/" id)
                        :on-click #(do (.preventDefault %)
                                       (e! (fp/->ChangePage :edit-service {:id id})))}
-                 (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
+                      (stylefy/use-sub-style style-base/basic-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "}
            (if (service-errors row)
              [:span (stylefy/use-style style-base/icon-with-text)
@@ -178,7 +178,7 @@
       [:div.row (stylefy/use-style style-base/section-margin)
        [:div {:class "col-xs-12 col-md-12"}
         [:h4 section-label]
-        [ui/table (stylefy/use-style style-base/front-page-service-table)
+        [ui/table (stylefy/use-style style-base/basic-table)
          [ui/table-header {:adjust-for-checkbox false
                            :display-select-all false}
           [ui/table-row {:selectable false}

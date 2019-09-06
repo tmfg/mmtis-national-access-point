@@ -87,6 +87,7 @@
 
 (defn form-container [e! app]
   [:div
+   [common/back-link-with-event :routes (tr [:route-wizard-page :back-to-routes])]
    [ote.ui.list-header/header app (tr [:common-texts :navigation-route])]
    [route-components e! app]])
 

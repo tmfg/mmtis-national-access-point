@@ -30,13 +30,13 @@ describe('OTE login dialog', () => {
     const login = (username, password, activate) => {
         cy.contains('Valikko').click();
         cy.contains('Kirjaudu').click();
-        cy.get('input[id*="email--Shkpostiosoite"]').typeRaw(username);
-        cy.get('input[id*="password--Salasana"]').typeRaw(password);
+        cy.get('input[id*="-:email"]').typeRaw(username);
+        cy.get('input[id*="Salasana-:password"]').typeRaw(password);
 
         if (activate === 'click') {
             cy.get('.login-dialog-footer button').click();
         } else if (activate === 'enter') {
-            cy.get('input[id*="password--Salasana"]').type('{enter}');
+            cy.get('input[id*="Salasana-:password"]').type('{enter}');
         }
         cy.wait('@login');
     };

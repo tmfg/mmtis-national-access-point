@@ -96,8 +96,8 @@
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})
-(def front-page-service-table (merge {:border (str "1px solid " colors/gray650)}
-                                     {::stylefy/sub-styles {:link {:text-decoration "none"
+(def basic-table (merge {:border (str "1px solid " colors/gray650)}
+                        {::stylefy/sub-styles {:link {:text-decoration "none"
                                                                    ::stylefy/mode {:visited {:text-decoration "none"}
                                                                                    :hover {:text-decoration "underline"}}}}}))
 

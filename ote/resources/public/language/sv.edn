@@ -785,6 +785,17 @@
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
+  :header-link-public-routes-to-service "Lägga till färdiga rutter i tjänsten"
+  :header-link-interface-to-service "Lägga till ett gränssnitt i tjänsten"
+  :desc-link-interface-to-service "Ett gränssnitt kan läggas till i en eller flera tjänster först när du har skapat en färdig rutt."
+  :header-route-drafts "Utkast till rutter"
+  :desc-route-drafts (:md "I tabellen finns en lista över **rutter i utkastformat**. Dessa rutter ingår inte i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-public-routes "Färdiga rutter"
+  :desc-public-routes (:md "I tabellen finns en lista över **färdiga rutter**. Dessa rutter ingår i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-sea-route-interface "Gränssnitt för rutter och tidtabeller för sjötrafik"
+  :desc-sea-route-interface (:md "NAP-tjänsten skapar och uppdaterar gränssnittet för rutter och tidtabeller för sjötrafik automatiskt. Gränssnittet innehåller uppgifter om rutterna som listats i tabellen **Färdiga rutter**. Om du vill använda gränssnittet för sjötrafik också i andra tjänster än i NAP-tjänsten, kan du ladda ner en uppdaterad gränssnittsfil via länken nedan.")
+  :header-download-gtfs "Ladda ner ett gränssnitt"
+  :desc-download-gtfs "Gränssnittet skapas och kan laddas ner först när du har skapat en färdig rutt."
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
@@ -795,7 +806,8 @@
   :route-list-table-destination-point "Destination"
   :route-list-table-valid-from "Gäller från och med"
   :route-list-table-valid-to "Gäller till"
-  :route-list-table-created-modified "Skapad / Ändrad"
+  :route-list-table-modified "Ändrad"
+  :route-list-table-created "Skapad"
   :route-list-table-actions "Funktioner"
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
@@ -803,6 +815,14 @@
   :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
+  :link-interface-to-service-succeed "Gränssnittet lades till i tjänsten."
+  :delete-link-interface-to-service-succeed "Gränssnittet togs bort från tjänsten."
+  :link-interface-to-service-failed "Det gick inte att lägga till gränssnittet i tjänsten"
+  :delete-link-interface-to-service-failed "Det gick inte att ta bort gränssnittet från tjänsten"
+  :select-services-to-link-interfaces "Välj de tjänster i listan nedan i vilka du vill lägga till färdiga sjörutter."
+  :unlinked-routes "Du har ännu inte lagt till några färdiga sjörutter i någon tjänst."
+  :no-draft-routes "Inga utkast till rutter."
+  :no-public-routes "Inga färdiga rutter."
   }
 
  :route-wizard-page
@@ -867,6 +887,7 @@
   :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
   :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
   :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
+  :back-to-routes "Tillbaka till ingångssidan för kartverktyget för sjötrafik"
   }
 
  :pre-notice-list-page
