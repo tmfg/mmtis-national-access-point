@@ -69,12 +69,11 @@
      [ui/table-header-column {:class "table-header" :style {:width "11%"}} (tr [:route-list-page :route-list-table-actions])]]]
    [ui/table-body {:display-row-checkbox false}
     (if empty-row-text
-      (doall
-        [ui/table-row {:key (str empty-row-text) :selectable false :display-border false}
-         [ui/table-row-column {:style {:width "100%"}} empty-row-text]
-         [ui/table-row-column ""]
-         [ui/table-row-column ""]
-         [ui/table-row-column ""]])
+      [ui/table-row {:key (str empty-row-text) :selectable false :display-border false}
+       [ui/table-row-column {:style {:width "100%"}} empty-row-text]
+       [ui/table-row-column ""]
+       [ui/table-row-column ""]
+       [ui/table-row-column ""]]
      (doall
        (map-indexed
          (fn [i {::transit/keys [route-id name]
@@ -116,7 +115,7 @@
         [:span (stylefy/use-style style-base/icon-with-text)
          [ic/alert-warning {:style {:color colors/negative-button
                                     :margin-right "0.5rem"
-                                    :margin-bottom "5px"}}]
+                                    :margin-bottom "0.25rem"}}]
          [:p (tr [:route-list-page :unlinked-routes])]]])
 
      (doall
@@ -138,11 +137,13 @@
    [:h4 (tr [:route-list-page :header-route-drafts])]
    [:p (tr [:route-list-page :desc-route-drafts])]
    [:div.drafts
-    [route-table e! draft-routes (if (not (empty? draft-routes)) nil (tr [:route-list-page :no-draft-routes]))]]
+    [route-table e! draft-routes (when (empty? draft-routes)
+                                   (tr [:route-list-page :no-draft-routes]))]]
    [:h4 (tr [:route-list-page :header-public-routes])]
    [:p (tr [:route-list-page :desc-public-routes])]
    [:div.public
-    [route-table e! public-routes (if (not (empty? public-routes)) nil (tr [:route-list-page :no-public-routes]))]]])
+    [route-table e! public-routes (when (empty? public-routes)
+                                    (tr [:route-list-page :no-public-routes]))]]])
 
 (defn routes [e! {operator :transport-operator
                   operators :transport-operators-with-services
@@ -190,7 +191,7 @@
 
      (if operator
       [:div.container
-       [:h2 (get-in app [:transport-operator :ote.db.transport-operator/name])]
+       [:h2 (:ote.db.transport-operator/name operator)]
        [:a (merge {:href (str "#/new-route/")
                    :id "new-route-button"
                    :on-click #(do
