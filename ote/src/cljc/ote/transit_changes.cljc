@@ -135,17 +135,26 @@
       (some? minutes-from-midnight1) minutes-from-midnight1
       :default 0)))
 
+(defn earliest-stop-sequence [stop]
+  (:gtfs/stop-sequence stop))
+
 (defn format-stop-info
   "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
   [[_ stop-times]]
-  {:gtfs/stop-name (str/join "->"
+  (let [min-stop-sequence (min
+                            (or (:gtfs/stop-sequence
+                                  (first (filter #(= 1 (:trip %)) stop-times))) 999999)
+                            (or (:gtfs/stop-sequence
+                                  (first (filter #(= 2 (:trip %)) stop-times))) 999999))]
+  {:gtfs/stop-sequence min-stop-sequence
+   :gtfs/stop-name (str/join "->"
                              (into #{} (map
                                          #(:gtfs/stop-name %)
                                          stop-times)))
    :gtfs/departure-time-date1 (:gtfs/departure-time
                                 (first (filter #(= 1 (:trip %)) stop-times)))
    :gtfs/departure-time-date2 (:gtfs/departure-time
-                                (first (filter #(= 2 (:trip %)) stop-times)))})
+                                (first (filter #(= 2 (:trip %)) stop-times)))}))
 
 
 (defn normalize-trip-with-instance
@@ -173,7 +182,7 @@
         trip2-normalized (normalize-trip-with-instance trip2 stop-seq-of-fcs-trip2 2)]
     ;; Combine the same stops!
     (sort-by
-      earliest-departure-time
+      (juxt earliest-departure-time earliest-stop-sequence)
       (sort-by :gtfs/stop-name
                (mapv format-stop-info (group-by stop-key-for-stop-list
                                (sort-by :gtfs/stop-sequence (concat trip1-normalized trip2-normalized))))))))

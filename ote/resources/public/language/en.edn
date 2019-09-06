@@ -781,20 +781,20 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
-  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
-  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
-  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
-  :header-route-drafts "Reittiluonnokset"
-  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-public-routes "Valmiit reitit"
-  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
-  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin
-                              NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
-  :header-download-gtfs "Rajapinnan lataaminen"
-  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
+  :header-link-public-routes-to-service "Adding finalised routes to a service"
+  :header-link-interface-to-service "Adding an interface to a service"
+  :desc-link-interface-to-service "You can add an interface to one or more services once you have created one finalised route."
+  :header-route-drafts "Draft routes"
+  :desc-route-drafts
+  (:md " The table below lists all **draft routes**. These routes are not included in the machine-readable sea traffic route and timetable interface.")
+  :header-public-routes "Finalised routes"
+  :desc-public-routes (:md "The table below lists all **finalised routes**. These routes are included in the machine-readable sea traffic route and timetable interface.")
+  :header-sea-route-interface "Sea traffic route and timetable interface"
+  :desc-sea-route-interface (:md "The NAP service automatically creates and updates the sea traffic route and timetable interface. The interface includes data on the routes listed in the table **Finalised routes**. If you wish to use the sea traffic interface outside the NAP service, you can download an up-to-date interface file from the link below. ")
+  :header-download-gtfs "Downloading an interface"
+  :desc-download-gtfs "The interface is created and can be downloaded once you have created one finalised route."
   :delete-dialog-header "Want to remove traffic route?"
-  :delete-dialog-remove-route "Removing route "
+  :delete-dialog-remove-route "Removing route"
   :route-list-table-name "Name"
   :route-list-published? "Route status"
   :route-list-published?-values {true "Published"
@@ -810,16 +810,16 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
   :link-to-help-pdf "Sea traffic route and timetable editor user guide"
-  :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
-  :create-new-route-disabled "Create new transport operator in \"Own services\" page first"
-  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
-  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
-  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
-  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
-  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
-  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
-  :no-draft-routes "Ei reittiluonnoksia."
-  :no-public-routes "Ei valmiita reittejä."
+  :link-to-help-pdf-url "https:// s3.eu-central-1.amazonaws.com / ote-assets/sea-route-user-guide.pdf"
+  :create-new-route-disabled "Create new transport operator in \"Own services \" page first"
+  :link-interface-to-service-succeed "The interface was successfully added to the service."
+  :delete-link-interface-to-service-succeed "The interface was successfully removed from the service."
+  :link-interface-to-service-failed "Failed to add the interface to the service."
+  :delete-link-interface-to-service-failed "Failed to remove the interface from the service."
+  :select-services-to-link-interfaces "Select from the list below the services to which you wish to add the finalised sea traffic routes."
+  :unlinked-routes "You have not added finalised sea traffic routes to any services."
+  :no-draft-routes "No draft routes."
+  :no-public-routes "No finalised routes."
   }
 
  :route-wizard-page
