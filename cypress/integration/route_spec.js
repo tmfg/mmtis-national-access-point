@@ -12,15 +12,11 @@ describe('Sea route tests', function () {
 
     it('Create new route', function () {
         cy.visit('/#/routes/');
-
-        //cy.get('tr').should('have.length', 1);
-
         cy.contains('Lisää uusi merireitti').click();
     });
 
     it('Add basic information', function () {
         cy.get('[id*="Reitinnimi"]').type('Test route').should('have.value', 'Test route');
-
         cy.get('[id*="departure-point-name"]').type('Oulu').should('have.value', 'Oulu');
         cy.get('[id*="destination-point-name"]').type('Vaasa').should('have.value', 'Vaasa');
     });
@@ -39,15 +35,11 @@ describe('Sea route tests', function () {
 
     it('Add calendar', function () {
         cy.get('#add-route-button').should('be.disabled');
-
         cy.get('#button_0').first().click();
-
         cy.get('[id*="date-picker-from-date"]').click();
         cy.document().its('body').type('{enter}');
-
         cy.get('[id*="date-picker-to-date"]').click();
         cy.document().its('body').type('{downarrow}{enter}');
-
         cy.get('#row_0 > :nth-child(3)').click();
         cy.get('#row_0 > :nth-child(4)').click();
         cy.get('#row_0 > :nth-child(5)').click();
@@ -93,9 +85,7 @@ describe('Sea route tests', function () {
         cy.server();
         cy.route('POST', '/transport-service').as('addService');
 
-
         cy.get('a[id*="new-service-button"]').click({force: true});
-
         cy.get('[id*="Valitseliikkumispalveluntyyppi"]').click();
 
         cy.server();
@@ -123,7 +113,6 @@ describe('Sea route tests', function () {
         cy.contains('Tallenna ja julkaise').click({force: true});
         cy.wait('@addService');
         cy.wait(1000);
-
     });
 
     it('Link route to new service', function () {
@@ -166,8 +155,6 @@ describe('Sea route tests', function () {
             });
 
         cy.contains('button', 'Poista').click();
-
         cy.wait('@deleteService');
     });
-
 });

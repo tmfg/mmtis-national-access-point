@@ -116,7 +116,7 @@
   :repositories [["osgeo" "https://download.osgeo.org/webdav/geotools/"]
                  ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
   :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-figwheel "0.5.13"]
+            [lein-figwheel "0.5.19"]
             [lein-kibit "0.1.6"]]
 
   ;; Backend lähdekoodit: clj ja frontin kanssa jaettu cljc

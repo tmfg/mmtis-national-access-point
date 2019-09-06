@@ -785,18 +785,17 @@
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
-  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
-  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
-  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
-  :header-route-drafts "Reittiluonnokset"
-  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-public-routes "Valmiit reitit"
-  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** olevat reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
-  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin
-                              NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
-  :header-download-gtfs "Rajapinnan lataaminen"
-  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
+  :header-link-public-routes-to-service "Lägga till färdiga rutter i tjänsten"
+  :header-link-interface-to-service "Lägga till ett gränssnitt i tjänsten"
+  :desc-link-interface-to-service "Ett gränssnitt kan läggas till i en eller flera tjänster först när du har skapat en färdig rutt."
+  :header-route-drafts "Utkast till rutter"
+  :desc-route-drafts (:md "I tabellen finns en lista över **rutter i utkastformat**. Dessa rutter ingår inte i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-public-routes "Färdiga rutter"
+  :desc-public-routes (:md "I tabellen finns en lista över **färdiga rutter**. Dessa rutter ingår i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-sea-route-interface "Gränssnitt för rutter och tidtabeller för sjötrafik"
+  :desc-sea-route-interface (:md "NAP-tjänsten skapar och uppdaterar gränssnittet för rutter och tidtabeller för sjötrafik automatiskt. Gränssnittet innehåller uppgifter om rutterna som listats i tabellen **Färdiga rutter**. Om du vill använda gränssnittet för sjötrafik också i andra tjänster än i NAP-tjänsten, kan du ladda ner en uppdaterad gränssnittsfil via länken nedan.")
+  :header-download-gtfs "Ladda ner ett gränssnitt"
+  :desc-download-gtfs "Gränssnittet skapas och kan laddas ner först när du har skapat en färdig rutt."
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
@@ -816,15 +815,15 @@
   :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
-  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
-  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
-  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
-  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
-  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
-  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
-  :no-draft-routes "Ei reittiluonnoksia."
-  :no-public-routes "Ei valmiita reittejä."
-  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
+  :link-interface-to-service-succeed "Gränssnittet lades till i tjänsten."
+  :delete-link-interface-to-service-succeed "Gränssnittet togs bort från tjänsten."
+  :link-interface-to-service-failed "Det gick inte att lägga till gränssnittet i tjänsten"
+  :delete-link-interface-to-service-failed "Det gick inte att ta bort gränssnittet från tjänsten"
+  :select-services-to-link-interfaces "Välj de tjänster i listan nedan i vilka du vill lägga till färdiga sjörutter."
+  :unlinked-routes "Du har ännu inte lagt till några färdiga sjörutter i någon tjänst."
+  :no-draft-routes "Inga utkast till rutter."
+  :no-public-routes "Inga färdiga rutter."
+  :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du är medlem av någon tjänsteproducent och om du har sparat åtminstone en tjänst i NAP-tjänsten."
   }
 
  :route-wizard-page
@@ -886,7 +885,7 @@
   :show-draw-tools "Ändra anlöpshamnar"
   :hide-draw-tools "Avsluta editeringen"
   :data-missing "Uppgifter saknas"
-  :back-to-routes "Takaisin Merenkulun reitti- ja aikataulueditorin etusivulle"
+  :back-to-routes "Tillbaka till ingångssidan för kartverktyget för sjötrafik"
   }
 
  :pre-notice-list-page
@@ -925,7 +924,7 @@
   :delete-pre-notice-dialog {:label "Ta bort ett ändringsmeddelande med utkast-status?"
                              :content "Vill du ta bort det här ändringsmeddelandet för gott?"
                              :success-message "Ändringsmeddelandet har tagits bort"}
-  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
+  :add-operator-and-service "Du kan bara göra en ändringsanmälan om du är medlem av någon tjänsteproducent."
   }
 
  :pre-notice-page
@@ -1116,7 +1115,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-5-short "Fr"
   :day-of-week-6-short "Lö"
   :day-of-week-7-short "Sö"
-  :no-operators "Ei palveluntuottajia"
+  :no-operators "Inga tjänsteproducenter"
   }
 
 

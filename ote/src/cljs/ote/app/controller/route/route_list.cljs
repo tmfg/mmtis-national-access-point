@@ -29,11 +29,11 @@
 
 (defn- update-route-by-id [app id update-fn & args]
   (update-in app [:routes :routes-vector]
-             (fn [services]
-               (map #(if (= (::transit/id %) id)
-                       (apply update-fn % args)
-                       %)
-                    services))))
+          (fn [services]
+            (map #(if (= (::transit/route-id %) id)
+                    (apply update-fn % args)
+                    %)
+                 services))))
 
 (defn- get-routes-for-operator
   [operator-id response]
@@ -142,9 +142,8 @@
   DeleteRouteResponse
   (process-event [{response :response} app]
     (let [routes (get-in app [:routes :routes-vector])
-          filtered-routes (filter
-                            #(not= (::transit/id %) (int response))
-                            routes)]
+          filtered-routes (filter #(not= (::transit/route-id %) (int response))
+                               routes)]
       (-> app
           (assoc-in [:routes :routes-vector] filtered-routes)
           (assoc :flash-message (tr [:common-texts :delete-route-success]))
