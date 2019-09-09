@@ -22,7 +22,8 @@
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
             [goog.string :as gstr]
-            [ote.ui.validation :as validation]))
+            [ote.ui.validation :as validation]
+            [ote.theme.colors :as colors]))
 
 
 
@@ -151,7 +152,7 @@
       {:error-text (or error warning) ;; Show error text or warning text
        :error-style (if error ;; Error is more critical than required - showing it first
                       style-base/error-element
-                      style-base/required-element)})
+                      style-base/required-input-element)})
      (when max-length
       {:max-length max-length})
     (when full-width?
@@ -184,9 +185,7 @@
                           {:disabled true}))
        [ic/action-delete]])))
 
-(defmethod field :file [{:keys [label button-label name disabled? on-change
-                                error warning]
-                         :as field} data]
+(defmethod field :file [{:keys [label button-label name disabled? on-change error warning] :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
    [:button (merge
               (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
@@ -239,12 +238,12 @@
         :multi-line true
         :rows rows}
        (when (or error (string? warning))
-         ;; Show error text or warning text
-         :error-text (or error warning)
-         ;; Error is more critical than required - showing it first
-         :error-style (if error
-                        style-base/error-element
-                        style-base/required-element))
+         {;; Show error text or warning text
+          :errorText (or error warning)
+          ;; Error is more critical than required - showing it first
+          :error-style (if error
+                         style-base/error-element
+                         style-base/required-input-element)})
        (when max-length
          {:max-length max-length})
        (when full-width?
@@ -270,8 +269,8 @@
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
       [:div {:style (merge
-                      ;; Push localized text field down for table-row-column top padding amount when in table column.
-                      (when table? {:margin-top "15px"})
+                      ;; Push localized text field down to match regular text input field.
+                      {:padding-top "16px"}
                       (when full-width? style-form/full-width)
                       style)}
        [text-field
@@ -311,10 +310,10 @@
                                             (reset! selected-language lang))})
              lang]))]
        (when (or error (string? warning))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (if error error warning)])
        (when (and (not error) (not warning) is-empty? (is-empty? data))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
@@ -766,7 +765,7 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-style table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -775,8 +774,10 @@
      [:div.table-wrapper {:style table-wrapper-style
                           :id id}
       ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
-      [ui/table {:wrapperStyle {:overflow "visible"}
-                 :bodyStyle {:overflow "visible"}}
+      [ui/table (merge {:wrapperStyle {:overflow "visible"}
+                        :bodyStyle {:overflow "visible"}}
+                        (when table-style
+                          {:style table-style}))
        [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                                {:style style-form-fields/table-header})
         [ui/table-row (merge {:selectable false}

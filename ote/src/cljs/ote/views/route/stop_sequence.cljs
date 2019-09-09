@@ -16,7 +16,8 @@
             [ote.db.transport-service :as t-service]
             [ote.style.base :as style-base]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [ote.theme.colors :as colors]))
 
 
 (def stop-marker-style
@@ -142,35 +143,37 @@
                         :on-click #(e! (rw/->SetDrawControl true))}]])]])
 
 (defn- route-stops [e! {stop-sequence ::transit/stops :as route}]
-  [:div {:style {:width "30%" :margin "1em"}}
+  [:div {:style {:width "30%" :margin "0 1rem 1rem 1rem"}}
    (if (not (get-in route [:map-controls :show?]))
-     [:table {:style {:width "100%"}}
-      [:thead {:style {:text-align "left"}}
-       [:tr
-        [:th {:style {:width "50%"}} (tr [:route-wizard-page :stop-sequence-port-header])]
+     [:div
+      [:span {:style {:font-size "1.25rem" :font-weight "600"}} (tr [:route-wizard-page :stop-sequence-port-header])]
+      [:table {:style {:width "100%"}}
+       [:thead {:style {:text-align "left"}}
+        [:tr
+         [:th {:style {:width "50%"}}]
 
-        [:th {:style {:width "10%"}} ""]]]
-      [:tbody {:style {:text-align "left"}}
+         [:th {:style {:width "10%"}} ""]]]
+       [:tbody {:style {:text-align "left"}}
 
-       (doall
-         (map-indexed
-           (fn [i {::transit/keys [code name arrival-time departure-time]}]
-             ^{:key (str code "_" i)}
-             [:tr {:style {:border-bottom "solid 1px black"}}
-              [:td (t-service/localized-text-with-fallback @selected-language name)]
-              [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])
-                                    :pos  "left"}
-                    [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
-                     [ic/action-delete]]]]])
-           stop-sequence))]
-      (when (empty? stop-sequence)
-        [:tbody
-         [:tr
-          [:td {:colSpan 4}
-           [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]
-         [:tr
-          [:td {:colSpan 4}
-           [:span (stylefy/use-style style-base/required-element) (tr [:route-wizard-page :data-missing])]]]])]
+        (doall
+          (map-indexed
+            (fn [i {::transit/keys [code name arrival-time departure-time]}]
+              ^{:key (str code "_" i)}
+              [:tr {:style {:border-bottom "solid 1px black"}}
+               [:td (t-service/localized-text-with-fallback @selected-language name)]
+               [:td [common/tooltip {:text (tr [:route-wizard-page :stop-sequence-delete])
+                                     :pos "left"}
+                     [ui/icon-button {:on-click #(e! (rw/->DeleteStop i))}
+                      [ic/action-delete]]]]])
+            stop-sequence))]
+       (when (empty? stop-sequence)
+         [:tbody
+          [:tr
+           [:td {:colSpan 4}
+            [common/help (tr [:route-wizard-page :stop-sequence-map-help])]]]
+          [:tr
+           [:td {:colSpan 4}
+            [:span (stylefy/use-style style-base/required-element) (tr [:route-wizard-page :data-missing])]]]])]]
      [:div [common/help (tr [:route-wizard-page :stop-sequence-edit-map-help])]])])
 
 (defn stop-sequence [e! {route :route :as app}]
@@ -178,9 +181,9 @@
   (fn [e! {route :route :as app}]
     (if (nil? (get route :stops))
       [circular-progress/circular-progress]
-      [:div (stylefy/use-style style-form/form-card)
-       [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-stop-sequence])]
-       [:div (stylefy/use-style style-form/form-card-body)
+      [:div {:style {:border-top (str "2px solid" colors/gray950)}}
+       [:h3 (tr [:route-wizard-page :wizard-step-stop-sequence])]
+       [:div
         [:div {:style {:display "flex" :flex-direction "row"}}
          [map-container e! route]
          [route-stops e! route]]]])))

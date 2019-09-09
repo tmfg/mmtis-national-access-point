@@ -62,6 +62,10 @@
 
 ;; Edit route basic info
 (defrecord EditBasicInfo [form-data])
+(defrecord UpdateOperatorHomepage [new-homepage])
+(defrecord SaveOperatorHomepage [new-homepage])
+(defrecord UpdateOperatorHomepageResponse [response])
+(defrecord UpdateOperatorHomepageFailure [response])
 
 ;; Events to edit the route's stop sequence
 (defrecord AddStop [feature])
@@ -292,6 +296,26 @@
     (-> app
         (route-updated)
         (update :route merge form-data)))
+
+  UpdateOperatorHomepageResponse
+  (process-event [{response :response} app]
+    (assoc app :flash-message (tr [:route-wizard-page :homepage-update-success])))
+
+  UpdateOperatorHomepageFailure
+  (process-event [{response :response} app]
+    (assoc app :flash-message (tr [:route-wizard-page :homepage-update-failure])))
+
+  SaveOperatorHomepage
+  (process-event [{new-homepage :new-homepage} app]
+    (comm/post! "routes/update-operator-homepage" {:homepage new-homepage
+                                                   :operator-id (get-in app [:transport-operator ::t-operator/id])}
+                {:on-success (tuck/send-async! ->UpdateOperatorHomepageResponse)
+                 :on-failure (tuck/send-async! ->UpdateOperatorHomepageFailure)})
+    app)
+
+  UpdateOperatorHomepage
+  (process-event [{new-homepage :new-homepage} app]
+    (assoc-in app [:transport-operator ::t-operator/homepage] new-homepage))
 
   AddStop
   (process-event [{feature :feature} app]

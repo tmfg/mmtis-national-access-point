@@ -884,6 +884,9 @@
   :show-draw-tools "Ändra anlöpshamnar"
   :hide-draw-tools "Avsluta editeringen"
   :data-missing "Uppgifter saknas"
+  :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
+  :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
+  :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
   :back-to-routes "Tillbaka till ingångssidan för kartverktyget för sjötrafik"
   }
 

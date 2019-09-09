@@ -12,7 +12,8 @@
             [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
-            [cljs-react-material-ui.icons :as ic]))
+            [cljs-react-material-ui.icons :as ic]
+            [ote.theme.colors :as colors]))
 
 (defonce keyword-counter (atom 0))
 
@@ -361,6 +362,7 @@
              classes (get col-classes columns)
              schemas (with-automatic-labels name->label schemas)
              layout (:layout options)
+             top-border (or (:top-border options) false)
              style (case layout
                      :row style-form/form-group-row
                      :raw {} ; no styling
@@ -384,9 +386,16 @@
              card? (get options :card? true)]
          [:div.form-group-container (merge (stylefy/use-style style-form/form-group-container
                                                               {::stylefy/with-classes classes})
-                                           {:style container-style})
+                                           {:style container-style}
+                                           (when top-border
+                                             {:style {:border-top (str "solid 2px" colors/gray950)}}))
           (if-not card?
-            group-component
+            [:div
+             (when label
+               [:div [:h3 label]
+                (when tooltip
+                  [balloon-header-tooltip {:text tooltip :len tooltip-length}])])
+             group-component]
             [:div (merge (stylefy/use-style style-form/form-card)
                          {:style card-style})
              (when label
