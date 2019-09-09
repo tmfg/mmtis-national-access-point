@@ -149,8 +149,7 @@
         ytj-company-names (:ytj-company-names state)
         ytj-company-names-found? (pos-int? (count ytj-company-names))]
     (form/group
-      {:label (tr [:common-texts :title-operator-basic-details])
-       :columns 1
+      {:columns 1
        :tooltip (tr [:organization-page :basic-info-tooltip])
        :tooltip-length "large"
        :card? false}

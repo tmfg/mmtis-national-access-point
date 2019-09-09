@@ -47,6 +47,11 @@
                                                   :margin-bottom "-1px"
                                                   :color colors/primary-dark}}})
 
+(def gray-link-with-icon (merge blue-link-with-icon {:color colors/gray950
+                                                     ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/gray950)
+                                                                             :margin-bottom "-1px"
+                                                                             :color colors/gray950}}}))
+
 (def base-link {:color colors/primary
                 :text-decoration "none"
                 ::stylefy/mode {:hover {:text-decoration "underline"
@@ -81,6 +86,9 @@
 (def required-element {:color "#B71C1C"
                        :font-size 14
                        :font-weight "600"})                 ;; currently same as error
+
+(def required-input-element (merge required-element
+                                   {:margin-bottom "-1.3rem"}))
 
 (def error-element {:color "#B71C1C"
                     :font-weight "600"})
@@ -277,8 +285,13 @@
                       ::stylefy/media {{:max-width (str width-xs "px")}
                                        {:flex-basis "50%"}}})
 
-
-
 (def capital-bold
   {:text-transform "uppercase"
    :font-weight "bold"})
+
+(def form-footer {:background-color colors/gray200
+                  :width "100%"
+                  :margin-bottom "-40px"
+                  :margin-top "1rem"
+                  :padding-bottom "2.5rem"
+                  :padding-top "1rem"})

@@ -475,7 +475,7 @@
             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
              [common-ui/information-row-with-option
               (tr [:field-labels :parking ::t-service/price-class-name])
-              (::t-service/name class) true]]
+              (::t-service/name class) false]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
              [common-ui/information-row-with-option
               (tr [:service-viewer :price/unit])

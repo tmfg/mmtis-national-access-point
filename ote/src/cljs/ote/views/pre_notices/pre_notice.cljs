@@ -15,21 +15,39 @@
             [clojure.string :as str]
             [ote.style.dialog :as style-dialog]
             [ote.ui.circular_progress :as circular-progress]
-            [ote.ui.common :as common]))
-
+            [ote.ui.common :as common]
+            [ote.theme.colors :as colors]
+            [cljs-react-material-ui.icons :as ic]
+            [ote.style.base :as style-base]
+            [stylefy.core :as stylefy]
+            [ote.ui.info :as info]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
 
-(defn footer [e! sent? pre-notice]
-  (let [valid-notice? (form/valid? pre-notice)]
+(defn- valid-notice? [pre-notice]
+  (and
+    (form/valid? pre-notice)
+    (not (empty? (::transit/pre-notice-type pre-notice)))
+    (not (str/blank? (::transit/route-description pre-notice)))
+    (not (str/blank? (::transit/description pre-notice)))
+    (not (empty? (::transit/effective-dates pre-notice)))))
+
+(defn- valid-pre-notice-container [pre-notice]
+  (let [valid-notice? (valid-notice? pre-notice)]
+    (when (not valid-notice?)
+      [:div {:style {:margin "1em 0em 1em 0em"}}
+       [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])))
+
+(defn footer [e! pre-notice sent?]
+  (let [valid-notice? (valid-notice? pre-notice)]
     (when (not valid-notice?)
       [ui/card {:style {:margin "1em 0em 1em 0em"}}
        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
     [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
      (when-not sent?
        [:span
-        [buttons/save {:disabled (not (form/valid? pre-notice))
+        [buttons/save {:disabled (not valid-notice?)
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (pre-notice/->OpenSendModal)))}
@@ -142,43 +160,41 @@
         :disabled? true}
        (::t-operator/email operator)]]]]])
 
-(defn transport-type [e! {pre-notice :pre-notice} sent?]
-  (let [addition [form-fields/field
-                  {:label   nil
-                   :name    ::transit/other-type-description
-                   :type    :string
-                   :update! #(e! (pre-notice/->EditSingleFormElement ::transit/other-type-description %))}
-                  (::transit/other-type-description pre-notice)]]
-    (form/group
-      {:label   (tr [:pre-notice-page :notice-type-title])
-       :columns 3
-       :layout  :row}
-
-      (merge
-        (when sent?
-          {:option-enabled? (constantly false)})
-        {:name ::transit/pre-notice-type
-         :type :checkbox-group
-         :container-class "col-md-12"
-         :header? false
-         :required? true
-         :options notice-types
-         :show-option (tr-key [:enums ::transit/pre-notice-type])})
-
-      {:name ::transit/description
-       :type :text-area
-       :rows 1
-       :disabled? sent?
-       :hint-text (tr [:pre-notice-page :notice-description-hint])
-       :full-width? true
-       :required? true
-       :container-class "col-xs-12 col-sm-12 col-md-6"})))
-
-(defn effective-dates [sent?]
+(defn transport-type [e! sent?]
   (form/group
-    {:label   (tr [:pre-notice-page :effective-dates-title])
+    {:label (tr [:pre-notice-page :notice-type-title])
      :columns 3
-     :layout  :row}
+     :layout :row
+     :card? false
+     :top-border true}
+
+    (merge
+      (when sent?
+        {:option-enabled? (constantly false)})
+      {:name ::transit/pre-notice-type
+       :type :checkbox-group
+       :container-class "col-md-12"
+       :header? false
+       :required? true
+       :options notice-types
+       :show-option (tr-key [:enums ::transit/pre-notice-type])})
+
+    {:name ::transit/description
+     :type :text-area
+     :rows 1
+     :disabled? sent?
+     :hint-text (tr [:pre-notice-page :notice-description-hint])
+     :full-width? true
+     :required? true
+     :container-class "col-xs-12 col-sm-12 col-md-6"}))
+
+(defn effective-dates [e! sent?]
+  (form/group
+    {:label (tr [:pre-notice-page :effective-dates-title])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
     (merge
       (when-not sent? {:add-label (tr [:buttons :add-new-effective-date])
@@ -186,6 +202,7 @@
       {:name ::transit/effective-dates
        :type :table
        :id :effective-dates-table
+       :table-style {:background-color colors/gray50}
        :table-fields [{:name ::transit/effective-date
                        :type :date-picker
                        :required? true
@@ -224,22 +241,27 @@
 
 (defn notice-area [e! sent?]
   (form/group
-    {:label   (tr [:pre-notice-page :route-and-area-information-title])
+    {:label (tr [:pre-notice-page :route-and-area-information-title])
      :columns 3
-     :layout  :row}
+     :layout :row
+     :card? false
+     :top-border true}
 
     {:type :component
-     :name :notice-area
+     :name ::transit/notice-area
      :should-update-check (juxt ::transit/route-description ::transit/regions :regions)
      :read identity
      :disabled? sent?
-     :required? true
+     ;:required? true
      :is-empty? (fn [{regions ::transit/regions description ::transit/route-description}]
                   (or (empty? regions) (str/blank? description)))
      :container-style style-form/full-width
      :component (fn [{pre-notice :data}]
                   [:div
                    [:div.col-md-5
+                    #_(when (empty-regions? pre-notice)
+                        [:div (stylefy/use-style style-base/required-element)
+                         (tr [:common-texts :required-field])])
                     [form-fields/field
                      {:id "route-description"
                       :label (tr [:field-labels :pre-notice ::transit/route-description])
@@ -247,15 +269,17 @@
                       :hint-text (tr [:pre-notice-page :route-description-hint])
                       :full-width? true
                       :disabled? sent?
+                      :required? true
                       :warning (when (str/blank? (::transit/route-description pre-notice))
                                  (tr [:common-texts :required-field]))
                       :rows 1
-                      :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
+                      :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))
+                      }
                      (::transit/route-description pre-notice)]
 
                     (let [regions-with-show
                           (mapv #(assoc % :show (str (:id %) " " (:name %)))
-                            (sort-by :id (vals (:regions pre-notice))))
+                                (sort-by :id (vals (:regions pre-notice))))
                           selected-ids (set (::transit/regions pre-notice))]
                       [form-fields/field
                        {:id "regions"
@@ -272,31 +296,43 @@
                         :auto-select? true
                         :filter (fn [query key]
                                   (str/includes? (str/lower-case key)
-                                    (str/lower-case query)))
+                                                 (str/lower-case query)))
                         :warning (when (empty? (::transit/regions pre-notice))
                                    (tr [:common-texts :required-field]))}
                        (into #{}
-                         (keep #(when (selected-ids (:id %)) %))
-                         regions-with-show)])]
+                             (keep #(when (selected-ids (:id %)) %))
+                             regions-with-show)])]
                    [:div.col-md-7
                     [notice-area-map pre-notice]]])}))
 
 (defn notice-attachments [e! sent?]
   (form/group
     {:label (tr [:pre-notice-page :attachment-section-title])
-     :columns 3
-     :layout :row}
-    (form/info (tr [:form-help :pre-notice-attatchment-info]) {:type :generic})
+     :columns 1
+     :layout :raw
+     :card? false
+     :top-border true}
+
+    {:name :attachment-instructions
+     :type :component
+     :full-width? true
+     :component (fn [_]
+                  [info/info-toggle
+                   (tr [:common-texts :instructions])
+                   [:div [:p (tr [:form-help :pre-notice-attatchment-info])]]
+                   {:default-open? false}])}
 
     {:name ::transit/url
      :type :string
      :full-width? true
      :disabled? sent?
-     :container-class "col-xs-12 col-sm-12 col-md-6"}
+     :container-class "col-xs-12 col-sm-12 col-md-6"
+     :update! #(e! (pre-notice/->EditForm %))}
     {:name :attachments
      :type :table
      :add-label (tr [:pre-notice-page :add-attachment])
      :add-label-disabled? (constantly sent?)
+     :table-style {:background-color colors/gray50}
      :table-fields [{:name ::transit/attachment-file-name
                      :type :component
                      :read identity
@@ -315,29 +351,49 @@
                      :on-change #(e! (pre-notice/->UploadAttachment (.-target %)))
                      :on-delete #(e! (pre-notice/->DeleteAttachment %))}]}))
 
+
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
         sent? (= :sent (::transit/pre-notice-state pre-notice))
         form-options {:name->label (tr-key [:field-labels :pre-notice])
                       :footer-fn (r/partial footer e! sent?)
                       :update! #(e! (pre-notice/->EditForm %))}]
-    [:span
+    [:div
      [common/back-link-with-event :pre-notices (tr [:pre-notice-page :back-to-pre-notices])]
      [:h1 (tr [:pre-notice-page :pre-notice-form-title])]
      [select-operator e! transport-operator operators]
      [form/form
-      form-options
-      [(transport-type e! app sent?)
-       (effective-dates sent?)
+      {:update! #(e! (pre-notice/->EditForm %))
+       :name->label (tr-key [:field-labels :pre-notice])}
+      [(transport-type e! sent?)
+       (effective-dates e! sent?)
        (notice-area e! sent?)
        (notice-attachments e! sent?)]
       pre-notice]
      [pre-notice-send-modal e! app]]))
 
 (defn new-pre-notice [e! app]
-  [pre-notice-form e! app])
+  (let [pre-notice (:pre-notice app)
+        sent? (= :sent (::transit/pre-notice-state pre-notice))]
+    [:div
+     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+      [pre-notice-form e! app]]
+     [:div (stylefy/use-style style-base/form-footer)
+      [:div.container
+       [:div.col-xs-12.col-sm-12.col-md-12
+        [valid-pre-notice-container pre-notice]
+        [footer e! pre-notice sent?]]]]]))
 
-(defn edit-pre-notice-by-id [e! {:keys [pre-notice] :as app}]
-  (if (or (nil? pre-notice) (:loading pre-notice))
-    [circular-progress/circular-progress]
-    [pre-notice-form e! app]))
+(defn edit-pre-notice-by-id [e! app]
+  (let [pre-notice (:pre-notice app)
+        sent? (= :sent (::transit/pre-notice-state pre-notice))]
+    (if (or (nil? pre-notice) (:loading pre-notice))
+      [circular-progress/circular-progress]
+      [:div
+       [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+        [pre-notice-form e! app]]
+       [:div (stylefy/use-style style-base/form-footer)
+        [:div.container
+         [:div.col-xs-12.col-sm-12.col-md-12
+          [valid-pre-notice-container pre-notice]
+          [footer e! pre-notice sent?]]]]])))
