@@ -99,8 +99,14 @@
     [:div {:style {:margin "1em 0em 1em 0em"}}
      [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:route-wizard-page :publish-missing-required])]]))
 
-(defn new-route [e! app]
-  (when-not (nil? (:route app))
+(defn- disable-save-draft? [{::transit/keys [trips] :as route}]
+  (or (not (rw/valid-route-name? (::transit/name route)))
+      (not (every?
+             #(rw/stop-times-valid? (::transit/stop-times %))
+             trips))))
+
+(defn new-route [e! {:keys [route] :as app}]
+  (when-not (nil? route)
     [:div
      [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
      [form-container e! app]]
@@ -108,12 +114,12 @@
       [:div.container
        [:div.col-xs-12.col-sm-12.col-md-12
         [valid-route-container app]
-        [buttons/save {:disabled (not (rw/valid-route? (:route app)))
+        [buttons/save {:disabled (not (rw/valid-route? route))
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->SaveToDb true)))}
          (tr [:buttons :save-and-publish])]
-        [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
+        [buttons/save {:disabled (disable-save-draft? route)
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->SaveToDb false)))}
@@ -123,7 +129,7 @@
                                       (e! (rw/->CancelRoute)))}
          (tr [:buttons :cancel])]]]]]))
 
-(defn edit-route-by-id [e! {route :route :as app}]
+(defn edit-route-by-id [e! {:keys [route] :as app}]
   (if (or (nil? route) (:loading? route))
     [circular-progress/circular-progress]
     [:div
@@ -135,23 +141,23 @@
         [valid-route-container app]
         (if (get-in app [:route ::transit/published?])
           [:span
-           [buttons/save {:disabled (not (rw/valid-route? (:route app)))
+           [buttons/save {:disabled (not (rw/valid-route? route))
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (rw/->SaveToDb true)))}
             (tr [:buttons :save])]
-           [buttons/save {:disabled (not (rw/valid-route-name? (get-in app [:route ::transit/name])))
+           [buttons/save {:disabled (disable-save-draft? route)
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (rw/->SaveToDb false)))}
             (tr [:buttons :back-to-draft])]]
           [:span
-           [buttons/save {:disabled (not (rw/valid-route? (:route app)))
+           [buttons/save {:disabled (not (rw/valid-route? route))
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (rw/->SaveToDb true)))}
             (tr [:buttons :save-and-publish])]
-           [buttons/save {:disabled (not (rw/valid-name (:route app)))
+           [buttons/save {:disabled (disable-save-draft? route)
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (rw/->SaveToDb false)))}
