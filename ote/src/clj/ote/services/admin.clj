@@ -39,11 +39,32 @@
             [ote.util.collections :as ote-coll]
             [ote.util.email-template :as email-template]
             [ote.services.users :as srv-users]
-            [clj-time.format :as format])
+            [clj-time.format :as format]
+            [clojure.set :as set]
+            [specql.impl.registry :as specql-registry]
+            [specql.impl.composite :as composite])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
+
+(def routes-column-keys
+  {:id ::transit/id
+   :operator-id ::transit/operator-id
+   :route-name ::transit/name
+   :operator-name ::transit/operator-name
+   :published? ::transit/published?
+   :created ::transit/created
+   :modified ::transit/modified
+   :to-date ::transit/to-date
+   :weekday ::transit/weekday
+   :monday ::transit/monday
+   :tuesday ::transit/tuesday
+   :wednesday ::transit/wednesday
+   :thursday ::transit/thursday
+   :friday ::transit/friday
+   :saturday ::transit/saturday
+   :sunday ::transit/sunday})
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -206,10 +227,18 @@
     (concat services-with-interface services-without-interface)))
 
 (defn- list-sea-routes [db user query]
-  (specql/fetch db ::transit/route
-                #{::transit/route-id ::transit/transport-operator-id ::transit/name ::transit/published?
-                  [::transit/operator #{::t-operator/name ::t-operator/id}]}
-                {::transit/operator {::t-operator/name (op/ilike (str "%" query "%"))}}))
+  (let [routes (fetch-sea-routes-for-admin db {:operator (if query
+                                                           (str "%" query "%")
+                                                           nil)})
+        ;; Add namespace for non namespaced keywords because sql query returns values without namespace
+        routes-with-namespace (mapv (fn [x] (set/rename-keys x routes-column-keys)) routes)
+        routes-with-name (mapv (fn [route]
+                                (update route ::transit/name #(composite/parse @specql-registry/table-info-registry
+                                                                         {:category "A"
+                                                                          :element-type ::t-service/localized_text}
+                                                                         (str %))))
+                              routes-with-namespace)]
+    routes-with-name))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
