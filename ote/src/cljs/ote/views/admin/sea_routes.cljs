@@ -93,13 +93,13 @@
            [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{::transit/keys [route-id name operator-name operator-id published? modified created] :as sea-route} results
+            (for [{::transit/keys [id name operator-name operator-id published? modified created] :as sea-route} results
                   :let [last-active-date (last-date-in-use sea-route)
                         last-modification (max created modified)]]
               ^{:key (str "link_" sea-route)}
               [ui/table-row {:selectable false}
                [ui/table-row-column {:style {:width "25%"}} operator-name]
-               [ui/table-row-column {:style {:width "25%"}} [edit-sea-route-link e! route-id name]]
+               [ui/table-row-column {:style {:width "25%"}} [edit-sea-route-link e! id name]]
                [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei")]
                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui last-modification)]
                [ui/table-row-column {:style {:width "15%"}} (if (not (nil? last-active-date))
