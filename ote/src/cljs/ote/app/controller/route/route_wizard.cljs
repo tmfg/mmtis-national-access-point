@@ -436,10 +436,21 @@
     (-> app
         (route-updated)
         (update-in [:route ::transit/stops] collections/remove-by-index idx)
+        ;; ::transit/stop-times must always be ordered by stop-idx so removal here trusts that.
+        ;; ::transit/stop-idx refers to a ::transit/stop so removing a stop requires updating stop-idx for all
+        ;; stop-times after the removed stop. If necessary, refactor stop-times later to use id instead of an idx reference.
         (update-in [:route ::transit/trips] (flip mapv)
                    (fn [trip]
-                     (update trip ::transit/stop-times collections/remove-by-index idx)))))
-
+                     (update trip
+                             ::transit/stop-times
+                             (fn [stop-times]
+                               (into []
+                                     (concat
+                                       (take idx stop-times)
+                                       (map
+                                         (fn [stop-time]
+                                           (update stop-time ::transit/stop-idx dec))
+                                         (drop (inc idx) stop-times))))))))))
 
   EditServiceCalendar
   (process-event [{trip-idx :trip-idx} app]
