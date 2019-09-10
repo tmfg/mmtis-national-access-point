@@ -138,25 +138,13 @@
 (defn earliest-stop-sequence [stop]
   (:gtfs/stop-sequence stop))
 
-(defn interval->seconds
-  "Converts interval to seconds. Uses hard coded days of year and days of month because it is accurate enough. Interval
-  doesn't know which year is currently and it doesn't care."
-  [{:keys [years months days hours minutes seconds] :as i}]
-  (+
-    (* (or years 0) 365 24 60 60)
-    (* (or months 0) 31 24 60 60)
-    (* (or days 0) 24 60 60)
-    (* (or hours 0) 60 60)
-    (* (or minutes 0) 60)
-    (or seconds 0)))
-
 (defn smaller-sequence-for-stop [stop stops]
   (let [date1-departure-time (:gtfs/departure-time-date1 stop)
         reversed-stops (reverse stops)
         first-smaller-sequence (keep
                                  (fn [s]
                                    (let [sequence (:gtfs/stop-sequence s)]
-                                     (if (> (interval->seconds (:gtfs/departure-time-date1 s)) (interval->seconds date1-departure-time))
+                                     (if (> (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
                                        (assoc stop :gtfs/stop-sequence (- sequence 0.1))
                                        nil)))
                                  reversed-stops)]
