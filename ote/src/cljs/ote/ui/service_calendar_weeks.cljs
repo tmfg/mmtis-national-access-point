@@ -10,8 +10,8 @@
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]))
 
-(def base-day-style {:width 96
-                     :height 34
+(def base-day-style {:width "96px"
+                     :height "34px"
                      :line-height "34px"
                      :text-align "center"
                      :vertical-align "middle"
@@ -24,11 +24,11 @@
                           :color "gray"
                           :background-color "lightGray"}))
 
-(def week-header-item-style {:width 96
-                             :height 34
+(def week-header-item-style {:width "96px"
+                             :height "34px"
                              :text-align "center"})
-(def week-count-style {:width 60
-                       :height 34
+(def week-count-style {:width "60px"
+                       :height "34px"
                        :text-align "center"})
 
 (def selected-day-style (merge base-day-style
@@ -154,6 +154,6 @@
                           (str (t/day day) "." (t/month day))
                           (when (some #(t/equal? % day) holidays)
                             [ic/toggle-star {:style {:position "relative"
-                                                     :top 3 :width 20 :height 20}}])])
+                                                     :top "3px" :width "20px" :height "20px"}}])])
                        week))]]))
              weeks))])]]))

@@ -336,8 +336,8 @@
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :lang-menu-open])
-          [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
-          [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
+          [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
+          [ic/action-language {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
         [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
       [:li (stylefy/use-style style-topnav/li-right)
@@ -350,8 +350,8 @@
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :header-open])
-          [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
-          [ic/navigation-menu {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
+          [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
+          [ic/navigation-menu {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
         [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-general-menu])]]]
 
       (when (user-logged-in? app)
@@ -365,8 +365,8 @@
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                {:margin-top "7px"})}
            (if (get-in app [:ote-service-flags :user-menu-open])
-            [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
-            [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
+            [ic/navigation-close {:style {:color "#fff" :height "24px" :width "3px0" :top "5px"}}]
+            [ic/social-person {:style {:color "#fff" :height "2px4" :width "30px" :top "5px"}}])]
           [:span.hidden-xs {:style {:color "#fff"}}
            (text/maybe-shorten-text-to 30
                                        (if (clojure.string/blank? (:name user))

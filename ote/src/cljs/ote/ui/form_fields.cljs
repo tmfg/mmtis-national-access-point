@@ -102,11 +102,12 @@
 
 (def tooltip-icon
   "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left "8px"}})]
     (fn [opts]
-      [wrapped {:style {:width          16 :height 16
+      [wrapped {:style {:width "16px"
+                        :height "16px"
                         :vertical-align "middle"
-                        :color          "gray"}}
+                        :color "gray"}}
        opts])))
 
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
@@ -610,7 +611,7 @@
              :regex (if unrestricted-hours?
                       unrestricted-hour-regex
                       hour-regex)
-             :style {:width 30}
+             :style {:width "30px"}
              :error-text false
              :input-style {:text-align "right"}
              :hint-style {:position "absolute" :right "0"}
@@ -633,7 +634,7 @@
              :type :string
              :name "minutes"
              :regex minute-regex
-             :style {:width 30}
+             :style {:width "30px"}
              :error-text false
              :update! (fn [minute]
                         (let [m (if (str/blank? minute)
@@ -698,9 +699,9 @@
                       :type :selection
                       :show-option (tr-key [:common-texts :time-units])
                       :options [:minutes :hours :days]
-                      :style {:width 150
+                      :style {:width "150px"
                               :position "relative"
-                              :top 15})
+                              :top "15px"})
          (or (::preferred-unit data) unit)]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
@@ -754,13 +755,15 @@
      (when show-clear?
        [ui/icon-button {:on-click #(update! nil)
                         :disabled (not data)
-                        :style {:width 16 :height 16
+                        :style {:width "16px"
+                                :height "16px"
                                 :position "relative"
                                 :padding 0
-                                :left -15
+                                :left "-15px"
                                 :top "5px"}
-                        :icon-style {:width 16 :height 16}}
-        [ic/content-clear {:style {:width 16 :height 16}}]])]))
+                        :icon-style {:width "16px"
+                                     :height "16px"}}
+        [ic/content-clear {:style {:width "16px" :height "16px"}}]])]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
@@ -809,7 +812,7 @@
                                    ;; If there are errors or missing fields, make the
                                    ;; row taller to show error messages
                                    (when (or errors missing-required-fields)
-                                     {:style {:height 65}}))
+                                     {:style {:height "65px"}}))
                (doall
                 (for [{:keys [name read write width type component] :as tf} table-fields
                       :let [field-error (get errors name)

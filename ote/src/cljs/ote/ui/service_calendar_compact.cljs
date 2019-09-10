@@ -10,8 +10,8 @@
             [ote.time :as time]
             [taoensso.timbre :as log]))
 
-(def base-day-style {:width 30
-                     :height 30
+(def base-day-style {:width "30px"
+                     :height "30px"
                      :text-align "center"
                      :border "solid 1px lightgray" ;; "solid 1px black"
                      :cursor "pointer"

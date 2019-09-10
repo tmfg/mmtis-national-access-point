@@ -12,9 +12,10 @@
 
 (def tooltip-icon
   "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left "8px"}})]
     (fn [opts]
-      [wrapped {:style {:width 16 :height 16
+      [wrapped {:style {:width "16px"
+                        :height "16px"
                         :vertical-align "middle"
                         :color "gray"}}
        opts])))
