@@ -251,10 +251,6 @@
        (every? valid-calendar-rule?
                (::transit/service-rules calendar))))
 
-(defn- interval< [a b]
-  (when (and a b)
-    (< (time/minutes-from-midnight a) (time/minutes-from-midnight b))))
-
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -596,10 +592,10 @@
                                      (let [stop-prev (last v)
                                            chronology-problem (cond
                                                                 (nil? stop-prev) nil ; First stop cannot be non-chronological
-                                                                (interval< (::transit/arrival-time curr)
-                                                                           (::transit/departure-time stop-prev)) ::transit/arrival-time
-                                                                (interval< (::transit/departure-time curr)
-                                                                           (::transit/arrival-time curr)) ::transit/departure-time
+                                                                (time/interval< (::transit/arrival-time curr)
+                                                                                (::transit/departure-time stop-prev)) ::transit/arrival-time
+                                                                (time/interval< (::transit/departure-time curr)
+                                                                                (::transit/arrival-time curr)) ::transit/departure-time
                                                                 :else nil)]
                                        (conj v
                                              (if chronology-problem
