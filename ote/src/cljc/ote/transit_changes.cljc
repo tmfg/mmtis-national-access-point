@@ -138,18 +138,18 @@
 (defn earliest-stop-sequence [stop]
   (:gtfs/stop-sequence stop))
 
-(defn smaller-sequence-for-stop [stop stops]
+(defn sequence-for-stop [stop stops]
   (let [date1-departure-time (:gtfs/departure-time-date1 stop)
         reversed-stops (reverse stops)
-        first-smaller-sequence (keep
+        modified-stop (some
                                  (fn [s]
                                    (let [sequence (:gtfs/stop-sequence s)]
-                                     (when (> (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
-                                       (assoc stop :gtfs/stop-sequence (- sequence 0.1)))))
+                                     (when (< (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
+                                       (assoc stop :gtfs/stop-sequence (* sequence 1.01))))) ; create new sequence nro for removed stop
                                  reversed-stops)]
-    (if (or (empty? first-smaller-sequence) (nil? first-smaller-sequence))
+    (if (or (empty? modified-stop) (nil? modified-stop))
       stop
-      (last first-smaller-sequence))))
+      modified-stop)))
 
 (defn reorder-removed-stops
   "Receives vector of stops in trip2 departure time order. Update stop-sequence number based on this order"
@@ -158,13 +158,17 @@
                         (fn [index stop]
                           (assoc stop :gtfs/stop-sequence index))
                         stops)
-        ordered-removed-stops (mapv
-                                (fn [stop]
-                                  (if (nil? (:gtfs/departure-time-date2 stop))
-                                    (smaller-sequence-for-stop stop (take (:gtfs/stop-sequence stop) indexed-stops))
-                                    stop))
-                                indexed-stops)
-        ordered-removed-stops (sort-by :gtfs/stop-sequence ordered-removed-stops)]
+        removed-stops (filterv #(nil? (:gtfs/departure-time-date2 %)) indexed-stops)
+        other-stops (filterv #(not (nil? (:gtfs/departure-time-date2 %))) indexed-stops)
+        ors (reduce (fn [result stop]
+                      (let [new-stop-vec (sort-by :gtfs/stop-sequence (if (not (empty? result))
+                                                                        (concat other-stops result)
+                                                                        other-stops))
+                            modified-removed-stop (sequence-for-stop stop new-stop-vec)]
+                        (conj result modified-removed-stop)))
+                    []
+                    removed-stops)
+        ordered-removed-stops (sort-by :gtfs/stop-sequence (concat ors other-stops))]
     ordered-removed-stops))
 
 (defn format-stop-info

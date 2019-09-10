@@ -416,19 +416,19 @@
     #:gtfs{:departure-time-date1 #ote.time.Interval{:days 0 :hours 15 :minutes 5 :months 0 :seconds 0 :years 0}
            :departure-time-date2 nil
            :stop-name "Tieva I"
-           :stop-sequence 3}
+           :stop-sequence 2.02}
     #:gtfs{:departure-time-date1 #ote.time.Interval{:days 0 :hours 15 :minutes 5 :months 0 :seconds 0 :years 0}
            :departure-time-date2 nil
            :stop-name "Muotkan maja th I"
-           :stop-sequence 4}
+           :stop-sequence 2.02}
     #:gtfs{:departure-time-date1 #ote.time.Interval{:days 0 :hours 15 :minutes 6 :months 0 :seconds 0 :years 0}
            :departure-time-date2 nil
            :stop-name "Kopararova I"
-           :stop-sequence 4.9 }
+           :stop-sequence 2.0402}
     #:gtfs{:departure-time-date1 #ote.time.Interval{:days 0 :hours 15 :minutes 7 :months 0 :seconds 0 :years 0}
            :departure-time-date2 nil
            :stop-name "Tunturikeskus Kiilopää"
-           :stop-sequence 4.9}
+           :stop-sequence 2.060602}
     #:gtfs{:departure-time-date1 #ote.time.Interval{:days 0 :hours 15 :minutes 8 :months 0 :seconds 0 :years 0}
            :departure-time-date2 #ote.time.Interval{:days 0 :hours 15 :minutes 6 :months 0 :seconds 0 :years 0}
            :stop-name "Kutturan th P"
