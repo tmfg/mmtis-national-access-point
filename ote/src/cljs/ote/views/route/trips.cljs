@@ -139,7 +139,8 @@
                                          (e! (rw/->EditServiceCalendar row-idx)))}
             [ic/action-today]]]]]]
    (map-indexed
-    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
+    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop
+                   :keys [:time-invalid]}]
       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
             style {:style {:padding-left     "5px"
                            :padding-right    "5px"
