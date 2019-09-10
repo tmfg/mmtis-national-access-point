@@ -144,9 +144,8 @@
         first-smaller-sequence (keep
                                  (fn [s]
                                    (let [sequence (:gtfs/stop-sequence s)]
-                                     (if (> (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
-                                       (assoc stop :gtfs/stop-sequence (- sequence 0.1))
-                                       nil)))
+                                     (when (> (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
+                                       (assoc stop :gtfs/stop-sequence (- sequence 0.1)))))
                                  reversed-stops)]
     (if (or (empty? first-smaller-sequence) (nil? first-smaller-sequence))
       stop
