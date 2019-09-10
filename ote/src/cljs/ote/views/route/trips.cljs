@@ -138,52 +138,55 @@
                                          (.preventDefault %)
                                          (e! (rw/->EditServiceCalendar row-idx)))}
             [ic/action-today]]]]]]
-   (map-indexed
-    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop
-                   :keys [:time-invalid]}]
-      (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
-            style {:style {:padding-left     "5px"
-                           :padding-right    "5px"
-                           :width            "125px"
-                           :background-color (if (even? stop-idx)
-                                               "#f4f4f4"
-                                               "#fafafa")}}]
-        (list
-         (if (zero? stop-idx)
-           ^{:key (str stop-idx "-first")}
-           [:td style " - "]
-           ^{:key (str stop-idx "-arr")}
-           [:td style
-            [:div.col-md-11
-             [form-fields/field {:type :time
-                                 :element-id stop-idx
-                                 :required? true
-                                 ;; Restricted because first departure cannot be before 24 hours.
-                                 :unrestricted-hours? (> stop-idx 0)
-                                 :update! #(update! {::transit/arrival-time (time/time->interval %)})
-                                 :warning (when (= time-invalid ::transit/arrival-time)
-                                            (tr [:common-texts :check-your-input]))}
-              arrival-time]]
-            [:div.col-md-1 {:style {:margin-left "-10px"}}
-             [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
-         (if (= stop-idx (dec stop-count))
-           ^{:key (str stop-idx "-last")}
-           [:td style " - "]
-           ^{:key (str stop-idx "-dep")}
-           [:td style
-            [:div.col-md-11
-             [form-fields/field {:type :time
-                                 :element-id stop-idx
-                                 :required? true
-                                 ;; All arrival hours allowed because time between two stops could be 24h or more
-                                 :unrestricted-hours? true
-                                 :update! #(update! {::transit/departure-time (time/time->interval %)})
-                                 :warning (when (= time-invalid ::transit/departure-time)
-                                            (tr [:common-texts :check-your-input]))}
-              departure-time]]
-            [:div.col-md-1 {:style {:margin-left "-10px"}}
-             [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
-    stops)
+   (doall                                                   ; doall avoids react run-time warning about lazy seq deref
+     (map-indexed
+       (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop
+                      :keys [:time-invalid]}]
+         (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
+               style {:style {:padding-left "5px"
+                              :padding-right "5px"
+                              :width "125px"
+                              :background-color (if (even? stop-idx)
+                                                  "#f4f4f4"
+                                                  "#fafafa")}}]
+           (list
+             (if (zero? stop-idx)
+               ^{:key (str stop-idx "-first")}
+               [:td style " - "]
+               ^{:key (str stop-idx "-arr")}
+               [:td style
+                [:div.col-md-11
+                 [form-fields/field {:type :time
+                                     :element-id stop-idx
+                                     :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
+                                     :required? true
+                                     ;; Restricted because first departure cannot be before 24 hours.
+                                     :unrestricted-hours? (> stop-idx 0)
+                                     :update! #(update! {::transit/arrival-time (time/time->interval %)})
+                                     :warning (when (= time-invalid ::transit/arrival-time)
+                                                (tr [:common-texts :check-your-input]))}
+                  arrival-time]]
+                [:div.col-md-1 {:style {:margin-left "-10px"}}
+                 [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
+             (if (= stop-idx (dec stop-count))
+               ^{:key (str stop-idx "-last")}
+               [:td style " - "]
+               ^{:key (str stop-idx "-dep")}
+               [:td style
+                [:div.col-md-11
+                 [form-fields/field {:type :time
+                                     :element-id stop-idx
+                                     :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
+                                     :required? true
+                                     ;; All arrival hours allowed because time between two stops could be 24h or more
+                                     :unrestricted-hours? true
+                                     :update! #(update! {::transit/departure-time (time/time->interval %)})
+                                     :warning (when (= time-invalid ::transit/departure-time)
+                                                (tr [:common-texts :check-your-input]))}
+                  departure-time]]
+                [:div.col-md-1 {:style {:margin-left "-10px"}}
+                 [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
+       stops))
    (when can-delete?
      [:td
       [common/tooltip {:text (tr [:route-wizard-page :trip-delete])
