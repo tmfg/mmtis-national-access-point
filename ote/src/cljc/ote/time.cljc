@@ -261,6 +261,22 @@
   (map->Interval (merge empty-interval
                         {unit amount})))
 
+(defn interval->seconds
+  "Takes interval `i` and converts and returns interval in seconds for comparing intervals.
+  Note: caution, not a calendar representation of interval because a fixed length of month is used."
+  [{:keys [years months days hours minutes seconds] :as i}]
+  (+
+    (* (or years 0) 365 24 60 60)
+    (* (or months 0) 31 24 60 60)
+    (* (or days 0) 24 60 60)
+    (* (or hours 0) 60 60)
+    (* (or minutes 0) 60)
+    (or seconds 0)))
+
+(defn interval< [a b]
+  (when (and a b)
+    (< (interval->seconds a) (interval->seconds b))))
+
 #?(:clj
    (defn ->PGInterval [interval]
      (if (instance? org.postgresql.util.PGInterval interval)

@@ -825,6 +825,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
   }
 
  :route-wizard-page
@@ -928,6 +929,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-pre-notice-dialog {:label "Poista luonnostilassa oleva muutosilmoitus?"
                              :content "Haluatko poistaa tämän muutosilmoituksen pysyvästi?"
                              :success-message "Muutosilmoitus poistettu"}
+  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
   }
 
  :pre-notice-page
@@ -1122,7 +1124,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week-4-short "To"
   :day-of-week-5-short "Pe"
   :day-of-week-6-short "La"
-  :day-of-week-7-short "Su"}
+  :day-of-week-7-short "Su"
+  :no-operators "Ei palveluntuottajia"
+  }
 
 
  :dialog

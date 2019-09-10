@@ -475,8 +475,9 @@
         :style style
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
-        :value (option-idx data)
-        :on-change #(update! (option-value (nth options %2)))}
+        :value (option-idx data)}
+       (when update!
+         {:on-change #(update! (option-value (nth options %2)))})
        (when (or error (string? warning))
          {:error-text (or error warning) ;; Show error text or warning text
           :error-style (if error             ;; Error is more critical than required - showing it first
