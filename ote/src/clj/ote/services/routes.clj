@@ -291,7 +291,7 @@
   [db nap-config]
   (routes
     (GET "/routes/routes" {user :user}
-      (http/transit-response
+      (http/no-cache-transit-response
         (get-user-routes db (:groups user) (:user user))))
 
     (POST "/routes/new" {form-data :body
