@@ -19,7 +19,8 @@
             [clojure.string :as str]
             [ote.localization :as localization]
             [ote.util.text :as text]
-            [ote.app.controller.common :refer [user-logged-in?]]))
+            [ote.app.controller.common :refer [user-logged-in?]]
+            [ote.app.routes :as routes]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
   (let [sensor-node (atom nil)
@@ -155,55 +156,71 @@
           [:a (merge (stylefy/use-style
                        style-topnav/topnav-dropdown-link)
                      {:href "#/"
-                      :on-click #(e! (fp-controller/->OpenHeader))})
+                      :on-click #(do
+                                   (routes/navigate! :front-page)
+                                   (e! (fp-controller/->OpenHeader)))})
            (tr [:common-texts :navigation-front-page])]]
          [:li
           [:a (merge (stylefy/use-style
                        style-topnav/topnav-dropdown-link)
                      {:href "#/services"
-                      :on-click #(e! (fp-controller/->OpenHeader))})
+                      :on-click #(do
+                                   (routes/navigate! :services)
+                                   (e! (fp-controller/->OpenHeader)))})
            (tr [:document-title :services])]]
          (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/own-services"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                        :on-click #(do
+                                     (routes/navigate! :own-services)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:document-title :own-services])]])
          (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/routes"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                        :on-click #(do
+                                     (routes/navigate! :routes)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:common-texts :navigation-route])]])
          (when (user-logged-in? app)
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/pre-notices"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                        :on-click #(do
+                                     (routes/navigate! :pre-notices)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:common-texts :navigation-pre-notice])]])
          (when (and (flags/enabled? :pre-notice) (get-in app [:user :transit-authority?]))
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
-                       {:href     "#/authority-pre-notices"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                       {:href "#/authority-pre-notices"
+                        :on-click #(do
+                                     (routes/navigate! :authority-pre-notices)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:common-texts :navigation-authority-pre-notices])]])
          (when (:admin? (:user app))
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/admin"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                        :on-click #(do
+                                     (routes/navigate! :admin)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:document-title :admin])]])
          (when (:admin? (:user app))
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
                        {:href "#/monitor"
-                        :on-click #(e! (fp-controller/->OpenHeader))})
+                        :on-click #(do
+                                     (routes/navigate! :monitor)
+                                     (e! (fp-controller/->OpenHeader)))})
              (tr [:document-title :monitor])]])]]
        [:div.col-sm-4.col-md-4
         [:ul (stylefy/use-style style-topnav/ul)
@@ -272,16 +289,15 @@
      [:ul (stylefy/use-style style-topnav/ul)
       [:li
        [:a
-        {:style    (merge
-                     style-topnav/desktop-link
-                     (if @is-scrolled?
-                       {:padding-top "0px"}
-                       {:padding-top "11px"}))
-         :href     "#"
+        {:style (merge
+                  style-topnav/desktop-link
+                  (if @is-scrolled?
+                    {:padding-top "0px"}
+                    {:padding-top "11px"}))
+         :href "#"
          :on-click #(do
-                      (.preventDefault %)
                       (e! (fp-controller/->CloseHeaderMenus))
-                      (e! (fp-controller/->ChangePage :front-page nil)))}
+                      (routes/navigate! :front-page))}
         [:img {:style (merge
                         style-topnav/logo
                         (when @is-scrolled?
@@ -303,13 +319,10 @@
                 (merge style-topnav/desktop-link
                        (when @is-scrolled?
                          {:height "56px"})))
-              {:href     "#"
+              {:href (str "#/" (name page))
                :on-click #(do
-                            (.preventDefault %)
                             (e! (fp-controller/->CloseHeaderMenus))
-                            (if url
-                              (e! (fp-controller/->GoToUrl url))
-                              (e! (fp-controller/->ChangePage page nil))))})
+                            (routes/navigate! page))})
             [:div
              (tr label)]]]))
 
@@ -321,9 +334,7 @@
                                                 {:height "56px"})))
                     {:on-click #(e! (fp-controller/->OpenLangMenu))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
-                             (if @is-scrolled?
-                               {:margin-top "15px"}
-                               {:margin-top "28px"}))}
+                             {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :lang-menu-open])
           [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
           [ic/action-language {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
@@ -337,9 +348,7 @@
                                                                     {:height "56px"})))
                                         {:on-click #(e! (fp-controller/->OpenHeader))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
-                             (if @is-scrolled?
-                               {:margin-top "15px"}
-                               {:margin-top "28px"}))}
+                             {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :header-open])
           [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
           [ic/navigation-menu {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
@@ -354,9 +363,7 @@
                                                                    {:height "56px"})))
                                        {:on-click #(e! (fp-controller/->OpenUserMenu))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
-                               (if @is-scrolled?
-                                 {:margin-top "15px"}
-                                 {:margin-top "28px"}))}
+                               {:margin-top "7px"})}
            (if (get-in app [:ote-service-flags :user-menu-open])
             [ic/navigation-close {:style {:color "#fff" :height 24 :width 30 :top 5}}]
             [ic/social-person {:style {:color "#fff" :height 24 :width 30 :top 5}}])]
