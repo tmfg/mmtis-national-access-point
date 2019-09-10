@@ -216,19 +216,19 @@
            :stop-name "Noljakka S->Noljakka L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0},
            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 23, :seconds 0}}
-    #:gtfs{:stop-sequence 8
-           :stop-name "Marjalantie L",
-           :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
-           :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0}}
-    #:gtfs{:stop-sequence 9
+    #:gtfs{:stop-sequence 7.07
             :stop-name "Kuusela L",
             :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
             :departure-time-date2 nil}
-    #:gtfs{:stop-sequence 10
+    #:gtfs{:stop-sequence 8
+            :stop-name "Marjalantie L",
+            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0},
+            :departure-time-date2 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 24, :seconds 0}}
+    #:gtfs{:stop-sequence 8.08
            :stop-name "Marjala L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 25, :seconds 0},
            :departure-time-date2 nil}
-    #:gtfs{:stop-sequence 11
+    #:gtfs{:stop-sequence 8.1608
            :stop-name "Lepikkoranta L",
            :departure-time-date1 #ote.time.Interval{:years 0, :months 0, :days 0, :hours 18, :minutes 26, :seconds 0},
            :departure-time-date2 nil}
