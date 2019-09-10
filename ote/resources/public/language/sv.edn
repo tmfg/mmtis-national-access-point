@@ -823,6 +823,7 @@
   :unlinked-routes "Du har ännu inte lagt till några färdiga sjörutter i någon tjänst."
   :no-draft-routes "Inga utkast till rutter."
   :no-public-routes "Inga färdiga rutter."
+  :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du är medlem av någon tjänsteproducent och om du har sparat åtminstone en tjänst i NAP-tjänsten."
   }
 
  :route-wizard-page
@@ -926,6 +927,7 @@
   :delete-pre-notice-dialog {:label "Ta bort ett ändringsmeddelande med utkast-status?"
                              :content "Vill du ta bort det här ändringsmeddelandet för gott?"
                              :success-message "Ändringsmeddelandet har tagits bort"}
+  :add-operator-and-service "Du kan bara göra en ändringsanmälan om du är medlem av någon tjänsteproducent."
   }
 
  :pre-notice-page
@@ -1115,7 +1117,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-4-short "To"
   :day-of-week-5-short "Fr"
   :day-of-week-6-short "Lö"
-  :day-of-week-7-short "Sö"}
+  :day-of-week-7-short "Sö"
+  :no-operators "Inga tjänsteproducenter"
+  }
 
 
  :dialog

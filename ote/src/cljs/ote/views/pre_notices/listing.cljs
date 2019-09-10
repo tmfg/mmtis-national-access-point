@@ -70,38 +70,45 @@
     (let [pre-notices (filter #(= (::t-operator/id transport-operator)
                                   (::t-operator/id %))
                               pre-notices)]
-      [:div
-       [:div {:style {:margin-bottom "20px"}}
-        [list-header/header
-         app
-         (tr [:pre-notice-list-page :header-pre-notice-list])
-         [ui/raised-button {:id "add-new-pre-notice"
-                            :label (tr [:buttons :add-new-pre-notice])
-                            :on-click #(do
-                                         (.preventDefault %)
-                                         (e! (pre-notice/->CreateNewPreNotice)))
+      (if (:transport-operator app)
+        [:div
+         [:div {:style {:margin-bottom "20px"}}
+          [list-header/header
+           app
+           (tr [:pre-notice-list-page :header-pre-notice-list])
+           [ui/raised-button {:id "add-new-pre-notice"
+                              :label (tr [:buttons :add-new-pre-notice])
+                              :on-click #(do
+                                           (.preventDefault %)
+                                           (e! (pre-notice/->CreateNewPreNotice)))
+                              :primary true
+                              :icon (ic/content-add)}]
+           [t-operator-sel/transport-operator-selection e! app]]]
+         [:div {:style {:margin-bottom "40px"}}
+          [pre-notices-table e! pre-notices :draft]
+          (when delete-pre-notice-dialog
+            [ui/dialog
+             {:open true
+              :actionsContainerStyle style-dialog/dialog-action-container
+              :title (tr [:pre-notice-list-page :delete-pre-notice-dialog :label])
+              :actions [(r/as-element
+                          [ui/flat-button
+                           {:label (tr [:buttons :cancel])
                             :primary true
-                            :icon (ic/content-add)}]
-         [t-operator-sel/transport-operator-selection e! app]]]
-       [:div {:style {:margin-bottom "40px"}}
-        [pre-notices-table e! pre-notices :draft]
-        (when delete-pre-notice-dialog
-          [ui/dialog
-           {:open true
-            :actionsContainerStyle style-dialog/dialog-action-container
-            :title (tr [:pre-notice-list-page :delete-pre-notice-dialog :label])
-            :actions [(r/as-element
-                        [ui/flat-button
-                         {:label (tr [:buttons :cancel])
-                          :primary true
-                          :on-click #(e! (pre-notice/->DeletePreNoticeCancel))}])
-                      (r/as-element
-                        [ui/raised-button
-                         {:label (tr [:buttons :delete])
-                          :icon (ic/action-delete-forever)
-                          :secondary true
-                          :primary true
-                          :on-click #(e! (pre-notice/->DeletePreNoticeConfirm))}])]}
-           (tr [:pre-notice-list-page :delete-pre-notice-dialog :content])])]
-       [:h3 (tr [:pre-notice-list-page :sent-pre-notices])]
-       [pre-notices-table e! pre-notices :sent]])))
+                            :on-click #(e! (pre-notice/->DeletePreNoticeCancel))}])
+                        (r/as-element
+                          [ui/raised-button
+                           {:label (tr [:buttons :delete])
+                            :icon (ic/action-delete-forever)
+                            :secondary true
+                            :primary true
+                            :on-click #(e! (pre-notice/->DeletePreNoticeConfirm))}])]}
+             (tr [:pre-notice-list-page :delete-pre-notice-dialog :content])])]
+         [:h3 (tr [:pre-notice-list-page :sent-pre-notices])]
+         [pre-notices-table e! pre-notices :sent]]
+        [:div
+         [list-header/header
+          app
+          (tr [:pre-notice-list-page :header-pre-notice-list])]
+         [:p (tr [:pre-notice-list-page :add-operator-and-service])]
+         [common/back-link-with-event :own-services (tr [:front-page :move-to-services-page])]]))))

@@ -214,5 +214,5 @@
           [:h4 (tr [:route-list-page :header-download-gtfs])]
           [:p (tr [:route-list-page :desc-download-gtfs])]])]
       [:div.container
-       [:p (tr [:route-list-page :add-operator-and-service])
-        [common/back-link-with-event :own-services (tr [:front-page :move-to-services-page])]]])]))
+       [:p (tr [:route-list-page :add-operator-and-service])]
+       [common/back-link-with-event :own-services (tr [:front-page :move-to-services-page])]])]))
