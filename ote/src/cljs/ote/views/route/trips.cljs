@@ -139,7 +139,8 @@
                                          (e! (rw/->EditServiceCalendar row-idx)))}
             [ic/action-today]]]]]]
    (map-indexed
-    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
+    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop
+                   :keys [:time-invalid]}]
       (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
             style {:style {:padding-left     "5px"
                            :padding-right    "5px"
@@ -159,7 +160,9 @@
                                  :required? true
                                  ;; Restricted because first departure cannot be before 24 hours.
                                  :unrestricted-hours? (> stop-idx 0)
-                                 :update! #(update! {::transit/arrival-time (time/time->interval %)})}
+                                 :update! #(update! {::transit/arrival-time (time/time->interval %)})
+                                 :warning (when (= time-invalid ::transit/arrival-time)
+                                            (tr [:common-texts :check-your-input]))}
               arrival-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
              [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
@@ -174,7 +177,9 @@
                                  :required? true
                                  ;; All arrival hours allowed because time between two stops could be 24h or more
                                  :unrestricted-hours? true
-                                 :update! #(update! {::transit/departure-time (time/time->interval %)})}
+                                 :update! #(update! {::transit/departure-time (time/time->interval %)})
+                                 :warning (when (= time-invalid ::transit/departure-time)
+                                            (tr [:common-texts :check-your-input]))}
               departure-time]]
             [:div.col-md-1 {:style {:margin-left "-10px"}}
              [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))

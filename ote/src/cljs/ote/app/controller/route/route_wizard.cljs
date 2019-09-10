@@ -584,9 +584,29 @@
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
-    (-> app
-        (route-updated)
-        (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)))
+    (let [stop-times-validated (fn [stop-times]
+                                 ;; Marks arrival/departure time which is too early compared to previous, so view may
+                                 ;; display warning and disable saving
+                                 (reduce
+                                   (fn [v curr]
+                                     (let [stop-prev (last v)
+                                           chronology-problem (cond
+                                                                (nil? stop-prev) nil ; First stop cannot be non-chronological
+                                                                (time/interval< (::transit/arrival-time curr)
+                                                                                (::transit/departure-time stop-prev)) ::transit/arrival-time
+                                                                (time/interval< (::transit/departure-time curr)
+                                                                                (::transit/arrival-time curr)) ::transit/departure-time
+                                                                :else nil)]
+                                       (conj v
+                                             (if chronology-problem
+                                               (assoc curr :time-invalid chronology-problem)
+                                               (dissoc curr :time-invalid)))))
+                                   []
+                                   stop-times))]
+      (-> app
+          (route-updated)
+          (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)
+          (update-in [:route ::transit/trips trip-idx ::transit/stop-times] stop-times-validated))))
 
   ShowStopException
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]
@@ -681,11 +701,19 @@
                                     time/minutes-from-midnight->time)))]
     (calc-from-new-start (get-in app [:route ::transit/stops stop-idx key]))))
 
-(defn validate-stop-times [first-stop last-stop other-stops]
-  (and (time/valid-time? (::transit/departure-time first-stop))
-       (time/valid-time? (::transit/arrival-time last-stop))
+(defn stop-times-input-valid? [stop-times]
+  (not
+    (some (fn [stop-time]
+            (:time-invalid stop-time))
+          stop-times)))
+
+(defn stop-times-valid? [stop-times]
+  (and (time/valid-time? (::transit/departure-time (first stop-times)))
+       (time/valid-time? (::transit/arrival-time (last stop-times)))
        (every? #(and (time/valid-time? (::transit/departure-time %))
-                     (time/valid-time? (::transit/arrival-time %))) other-stops)))
+                     (time/valid-time? (::transit/arrival-time %)))
+               (rest (butlast stop-times)))
+       (stop-times-input-valid? stop-times)))
 
 (defn valid-stop-sequence?
   "Check that a stop sequence has at least 2 stops."
@@ -720,11 +748,9 @@
       (fn [trip]
         (let [stops (::transit/stop-times trip)
               service-calendar-idx (::transit/service-calendar-idx trip)
-              first-stop (first stops)
-              last-stop (last stops)
-              other-stops (rest (butlast stops))
               calendar? (valid-calendar? (get-in route [::transit/service-calendars service-calendar-idx]))]
-          (and calendar? (validate-stop-times first-stop last-stop other-stops))))
+          (and calendar?
+               (stop-times-valid? stops))))
       trips)))
 
 (defn valid-route? [route]
@@ -735,8 +761,6 @@
 
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
-
-
 
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or
