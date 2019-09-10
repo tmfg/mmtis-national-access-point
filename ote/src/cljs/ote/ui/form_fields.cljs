@@ -600,7 +600,7 @@
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required? unrestricted-hours? element-id] :as opts}
+(defmethod field :time [{:keys [update! error warning required? unrestricted-hours? element-id on-blur] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
@@ -614,6 +614,8 @@
              :error-text false
              :input-style {:text-align "right"}
              :hint-style {:position "absolute" :right "0"}
+             :on-blur (when on-blur
+                        on-blur)
              :update! (fn [hour]
                         (let [h (if (str/blank? hour)
                                   nil
@@ -635,6 +637,8 @@
              :regex minute-regex
              :style {:width 30}
              :error-text false
+             :on-blur (when on-blur
+                        on-blur)
              :update! (fn [minute]
                         (let [m (if (str/blank? minute)
                                   nil
