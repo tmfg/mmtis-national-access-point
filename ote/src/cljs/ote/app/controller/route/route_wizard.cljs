@@ -320,7 +320,18 @@
 
   UpdateOperatorHomepageResponse
   (process-event [{response :response} app]
-    (assoc app :flash-message (tr [:route-wizard-page :homepage-update-success])))
+    (-> app
+        (update :transport-operators-with-services
+                (fn [operators]
+                  (map
+                    (fn [o]
+                      (update o :transport-operator
+                              (fn [operator]
+                                (if (= (::t-operator/id operator) (get-in app [:transport-operator ::t-operator/id]))
+                                  (:transport-operator app)
+                                  operator))))
+                    operators)))
+        (assoc :flash-message (tr [:route-wizard-page :homepage-update-success]))))
 
   UpdateOperatorHomepageFailure
   (process-event [{response :response} app]
