@@ -21,7 +21,8 @@
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.localization :refer [tr] :as localization]))
 
 (declare ->LoadRoute)
 
@@ -55,6 +56,8 @@
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
+(defrecord LoadStopsFailure [response])
+;(defrecord LoadStopsSuccess [response])
 
 ;; Load existing route
 (defrecord LoadRoute [id])
@@ -275,15 +278,22 @@
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
-    (let [on-success (tuck/send-async! ->LoadStopsResponse)]
-      (comm/get! "transit/stops.json"
-                 {:on-success on-success
-                  :response-format :json})
-      app))
+    (comm/get! "transit/stops.json"
+               {:on-success (tuck/send-async! ->LoadStopsResponse)
+                :on-failure (tuck/send-async! ->LoadStopsFailure)
+                :response-format :json})
+    app)
 
   LoadStopsResponse
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
+
+  LoadStopsFailure
+  (process-event [{response :response} app]
+    (routes/navigate! :error-landing)
+    (assoc-in app [:error-landing :desc]
+              (when (= 503 (:status response))
+                (tr [:error-landing :txt-maintenance-break]))))
 
   LoadRoute
   (process-event [{id :id} app]
