@@ -19,7 +19,8 @@
             [cheshire.core :as cheshire]
             [ote.db.tx :as tx]
             [jeesql.core :refer [defqueries]]
-            [ote.environment :as environment])
+            [ote.environment :as environment]
+            [ote.db.feature])                               ; specql table definitions
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defqueries "ote/services/routes.sql")
