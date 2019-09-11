@@ -14,7 +14,6 @@
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
-            [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
             [clojure.set :as set]
@@ -56,8 +55,6 @@
 ;; Load available stops from server (GeoJSON)
 (defrecord LoadStops [])
 (defrecord LoadStopsResponse [response])
-(defrecord LoadStopsFailure [response])
-;(defrecord LoadStopsSuccess [response])
 
 ;; Load existing route
 (defrecord LoadRoute [id])
@@ -280,7 +277,7 @@
   (process-event [_ app]
     (comm/get! "transit/stops.json"
                {:on-success (tuck/send-async! ->LoadStopsResponse)
-                :on-failure (tuck/send-async! ->LoadStopsFailure)
+                :on-failure (tuck/send-async! ->ServerError)
                 :response-format :json})
     app)
 
@@ -288,21 +285,13 @@
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
-  LoadStopsFailure
-  (process-event [{response :response} app]
-    (routes/navigate! :error-landing)
-    (assoc-in app [:error-landing :desc]
-              (when (= 503 (:status response))
-                (tr [:error-landing :txt-maintenance-break]))))
-
   LoadRoute
   (process-event [{id :id} app]
-    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
-      (comm/get! (str "routes/" id)
-                 {:on-success on-success
-                  :on-failure (send-async! ->ServerError)})
-      (-> app
-          (assoc-in [:route :loading?] true))))
+    (comm/get! (str "routes/" id)
+               {:on-success (tuck/send-async! ->LoadRouteResponse)
+                :on-failure (send-async! ->ServerError)})
+    (-> app
+        (assoc-in [:route :loading?] true)))
 
   LoadRouteResponse
   (process-event [{response :response} app]
