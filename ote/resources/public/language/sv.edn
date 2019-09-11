@@ -885,9 +885,9 @@
   :show-draw-tools "Ändra anlöpshamnar"
   :hide-draw-tools "Avsluta editeringen"
   :data-missing "Uppgifter saknas"
-  :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
-  :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
-  :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
+  :instructions-description "Du kan publicera rutt- och tidtabellsuppgifterna i din sjötrafiktjänst med hjälp av nedanstående blankett. Du hittar noggrannare anvisningar om hur man fyller i blanketten via bifogade länk."
+  :homepage-update-success "Webbadressen har uppdaterats."
+  :homepage-update-failure "Webbadressen kunde inte uppdateras."
   :back-to-routes "Tillbaka till ingångssidan för kartverktyget för sjötrafik"
   }
 

@@ -883,9 +883,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :show-draw-tools "Edit stops"
   :hide-draw-tools "Stop editing"
   :data-missing "Data missing"
-  :instructions-description "Use following form to publish sea traffic route and timetable data. Read more instructions from link below."
-  :homepage-update-success "Homepage saved successfully."
-  :homepage-update-failure "Saving homepage failed."
+  :instructions-description "You can publish the route and timetable information of your sea traffic service with the form below. For instructions on filling in the form, please click on the link provided."
+  :homepage-update-success "Web address successfully updated."
+  :homepage-update-failure "Failed to update web address."
   :back-to-routes "Back to Own sea traffic route and timetable information"
   }
 
