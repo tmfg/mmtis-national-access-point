@@ -12,7 +12,7 @@ FROM (
          FROM dates d
               LEFT JOIN "gtfs-date-hash" dh ON (dh.date = d.date AND dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
               -- Join gtfs_package to get external-interface-description-id
-              JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
+              LEFT JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
               LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON rh."route-hash-id" = :route-hash-id
         GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id" , eid
         ORDER BY d.date) x
