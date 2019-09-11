@@ -13,7 +13,4 @@
   (case (:status response)
     403 (assoc app :flash-message-error (tr [:common-texts :forbidden]))
     503 (error-landing app (tr [:error-landing :txt-maintenance-break]))
-    :else (assoc app :flash-message-error (tr [:common-texts :server-error]))))
-
-(defn user-logged-in? [app]
-  (not-empty (get-in app [:user])))
+    (assoc app :flash-message-error (tr [:common-texts :server-error]))))

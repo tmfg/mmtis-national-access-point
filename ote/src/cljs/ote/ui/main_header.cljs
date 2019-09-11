@@ -19,7 +19,7 @@
             [clojure.string :as str]
             [ote.localization :as localization]
             [ote.util.text :as text]
-            [ote.app.controller.common :refer [user-logged-in?]]
+            [ote.app.utils :refer [user-logged-in?]]
             [ote.app.routes :as routes]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
