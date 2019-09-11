@@ -121,7 +121,7 @@
   "Render a single row of stop times."
   [e! stop-count can-delete? edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
-  [:tr {:style {:max-height "40px"}}
+  [:tr {:style {:max-height "40px" :vertical-align "top"}}
    [:td [:div
          [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
                  :data-balloon-pos    "right"
