@@ -825,7 +825,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
-  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditorin käyttäminen edellyttää, että olet lisännyt palveluntuottajan NAP:iin tai olet jonkun palveluntuottajan jäsen."
   }
 
  :route-wizard-page
