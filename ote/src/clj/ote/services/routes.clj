@@ -25,7 +25,12 @@
 (defqueries "ote/services/routes.sql")
 
 (defn- service-state-response [db]
-  (when false                                               ;; TODO: fetch and check flag
+  (when (:ote.db.feature/value
+          (first
+            (fetch db
+                   :ote.db.feature/feature-variation
+                   (specql/columns :ote.db.feature/feature-variation)
+                   {:ote.db.feature/feature :maintenance-break-sea-route})))
     (http/transit-response "Under maintenance" 503)))
 
 (defn- interface-url
