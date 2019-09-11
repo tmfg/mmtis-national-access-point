@@ -32,7 +32,7 @@
                    :ote.db.feature/feature-variation
                    (specql/columns :ote.db.feature/feature-variation)
                    {:ote.db.feature/feature :maintenance-break-sea-route})))
-    (http/transit-response "Under maintenance" 503)))
+    (http/no-cache-transit-response "Under maintenance" 503)))
 
 (defn- interface-url
   "Create interface url for route."
