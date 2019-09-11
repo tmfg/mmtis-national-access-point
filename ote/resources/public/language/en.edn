@@ -820,7 +820,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :unlinked-routes "You have not added finalised sea traffic routes to any services."
   :no-draft-routes "No draft routes."
   :no-public-routes "No finalised routes."
-  :add-operator-and-service "To use the sea traffic route and timetable editor you must be a member of a transport operator and have saved at least one service in the NAP service."
+  :add-operator-and-service "To use the sea traffic route and timetable editor you have to create at least one transport operator or you must be a member of a transport operator."
   }
 
  :route-wizard-page

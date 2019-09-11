@@ -823,7 +823,7 @@
   :unlinked-routes "Du har ännu inte lagt till några färdiga sjörutter i någon tjänst."
   :no-draft-routes "Inga utkast till rutter."
   :no-public-routes "Inga färdiga rutter."
-  :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du är medlem av någon tjänsteproducent och om du har sparat åtminstone en tjänst i NAP-tjänsten."
+  :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du har skapat en eller flera tjänsteproducenter i NAP-tjänsten eller du är medlem av någon tjänsteproducent."
   }
 
  :route-wizard-page
