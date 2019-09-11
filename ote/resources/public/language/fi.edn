@@ -661,7 +661,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :table-header-actions "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page "Siirry omat palvelutiedot -näkymään"
+  :move-to-services-page "Siirry Omat palvelutiedot -näkymään"
   :move-to-organizations-page "Siirry palveluntuottajat-näkymään"
   :hello "Hei "
   :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
