@@ -11,6 +11,7 @@
 ;; Load users own routes
 (defrecord LoadRoutes [])
 (defrecord LoadRoutesResponse [response])
+(defrecord LoadRoutesFailure [response])
 
 ; Link interface to service
 (defrecord ToggleLinkInterfaceToService [service-id is-linked?])
@@ -74,6 +75,13 @@
   (process-event [{response :response} app]
     (-> app
         (handle-routes-response response)))
+
+  LoadRoutesFailure
+  (process-event [{response :response} app]
+    (routes/navigate! :error-landing)
+    (assoc-in app [:error-landing :desc]
+              (when (= 503 (:status response))
+                (tr [:error-landing :txt-maintenance-break]))))
 
   LinkInterfaceResponse
   (process-event [{is-linked? :is-linked?
@@ -155,7 +163,8 @@
 
 (define-event InitRouteList []
   {}
-  (comm/get! "routes/routes" {:on-success (tuck/send-async! ->LoadRoutesResponse)})
+  (comm/get! "routes/routes" {:on-success (tuck/send-async! ->LoadRoutesResponse)
+                              :on-failure (tuck/send-async! ->LoadRoutesFailure)})
   app)
 
 (defmethod routes/on-navigate-event :routes [_ app]
