@@ -42,6 +42,7 @@
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
             [ote.views.admin.monitor :as monitor]
+            [ote.views.error-landing :as error-landing]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
@@ -114,6 +115,7 @@
 
                   (case (:page app)
                     :login [login/login e! (:login app)]
+                    :error-landing [error-landing/error-landing-vw app]
                     :reset-password [login/reset-password e! app]
                     :register [register/register e! (:params app) (:register app) (:user app)]
                     :user [user/user e! (:user app)]
