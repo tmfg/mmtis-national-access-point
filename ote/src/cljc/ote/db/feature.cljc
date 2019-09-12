@@ -8,7 +8,6 @@
             [specql.impl.registry]
             [specql.data-types]
             [ote.db.common]
-            ;[ote.db.modification]
             [ote.db.user])
 
   #?(:cljs
