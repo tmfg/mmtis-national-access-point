@@ -3,7 +3,7 @@
   (:require [bide.core :as r]
             [ote.app.state :as state]
             [tuck.core :as tuck]
-            [ote.app.controller.common :refer [user-logged-in?]]))
+            [ote.app.utils :refer [user-logged-in?]]))
 
 (def ga-tracking-code
   (.getAttribute js/document.body "data-ga-tracking-code"))
@@ -11,13 +11,13 @@
 (def dev-mode?
   (.getAttribute js/document.body "data-dev-mode?"))
 
-
 ;; when adding a new view: also add the keyword to the auth-required set below, and
 ;; add behaviour for it in the (case ..) form in ote.views.main/ote-application.
 
 (def ote-router
   (r/router
    [["/" :front-page]
+    ["/error-landing" :error-landing]
     ["/login" :login]
     ["/reset-password" :reset-password]
     ["/register" :register]

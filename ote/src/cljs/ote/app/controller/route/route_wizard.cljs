@@ -14,14 +14,14 @@
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
-            [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
             [clojure.set :as set]
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.localization :refer [tr] :as localization]))
 
 (declare ->LoadRoute)
 
@@ -275,11 +275,11 @@
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
-    (let [on-success (tuck/send-async! ->LoadStopsResponse)]
-      (comm/get! "transit/stops.json"
-                 {:on-success on-success
-                  :response-format :json})
-      app))
+    (comm/get! "transit/stops.json"
+               {:on-success (tuck/send-async! ->LoadStopsResponse)
+                :on-failure (tuck/send-async! ->ServerError)
+                :response-format :json})
+    app)
 
   LoadStopsResponse
   (process-event [{response :response} app]
@@ -287,12 +287,11 @@
 
   LoadRoute
   (process-event [{id :id} app]
-    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
-      (comm/get! (str "routes/" id)
-                 {:on-success on-success
-                  :on-failure (send-async! ->ServerError)})
-      (-> app
-          (assoc-in [:route :loading?] true))))
+    (comm/get! (str "routes/" id)
+               {:on-success (tuck/send-async! ->LoadRouteResponse)
+                :on-failure (send-async! ->ServerError)})
+    (-> app
+        (assoc-in [:route :loading?] true)))
 
   LoadRouteResponse
   (process-event [{response :response} app]

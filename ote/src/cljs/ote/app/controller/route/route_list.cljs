@@ -6,7 +6,8 @@
             [ote.db.transit :as transit]
             [ote.localization :refer [tr tr-key]]
             [ote.app.routes :as routes]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [ote.app.controller.common :refer [->ServerError]]))
 
 ;; Load users own routes
 (defrecord LoadRoutes [])
@@ -155,7 +156,8 @@
 
 (define-event InitRouteList []
   {}
-  (comm/get! "routes/routes" {:on-success (tuck/send-async! ->LoadRoutesResponse)})
+  (comm/get! "routes/routes" {:on-success (tuck/send-async! ->LoadRoutesResponse)
+                              :on-failure (tuck/send-async! ->ServerError)})
   app)
 
 (defmethod routes/on-navigate-event :routes [_ app]

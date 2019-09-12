@@ -19,10 +19,21 @@
             [cheshire.core :as cheshire]
             [ote.db.tx :as tx]
             [jeesql.core :refer [defqueries]]
-            [ote.environment :as environment])
+            [ote.environment :as environment]
+            [ote.db.feature])                               ; specql table definitions
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defqueries "ote/services/routes.sql")
+
+(defn- service-state-response [db user]
+  (when (and (not (:admin? user))
+             (:ote.db.feature/value
+               (first
+                 (fetch db
+                        :ote.db.feature/feature-variation
+                        (specql/columns :ote.db.feature/feature-variation)
+                        {:ote.db.feature/feature :maintenance-break-sea-route}))))
+    (http/no-cache-transit-response "Under maintenance" 503)))
 
 (defn- interface-url
   "Create interface url for route."
@@ -286,41 +297,50 @@
                 {::t-operator/id operator-id})
        homepage)))
 
+(defn- get-route-response [db user id]
+  (let [route (get-route db user (Long/parseLong id))]
+    (cond
+      (not route) {:status 404}
+      (= "Forbidden" (:body route)) route
+      :else (http/no-cache-transit-response route))))
+
 (defn- routes-auth
   "Routes that require authentication"
   [db nap-config]
   (routes
     (GET "/routes/routes" {user :user}
-      (http/no-cache-transit-response
-        (get-user-routes db (:groups user) (:user user))))
+      (or (service-state-response db (:user user))
+          (http/no-cache-transit-response
+            (get-user-routes db (:groups user) (:user user)))))
 
     (POST "/routes/new" {form-data :body
                          user      :user}
-      (http/transit-response
-        (update-route-model! db user (http/transit-request form-data))))
+      (or (service-state-response db (:user user))
+          (http/transit-response
+            (update-route-model! db user (http/transit-request form-data)))))
 
     (POST "/routes/update-operator-homepage" {form-data :body
                                               user :user}
-      (http/transit-response
-        (update-operator-homepage! db user (http/transit-request form-data))))
+      (or (service-state-response db (:user user))
+          (http/transit-response
+            (update-operator-homepage! db user (http/transit-request form-data)))))
 
     (GET "/routes/:id" [id :as {user :user}]
-      (let [route (get-route db user (Long/parseLong id))]
-        (cond
-          (not route) {:status 404}
-          (= "Forbidden" (:body route)) route
-          :else (http/no-cache-transit-response route))))
+      (or (service-state-response db (:user user))
+          (get-route-response db user id)))
 
     (POST "/routes/delete" {form-data :body
                             user      :user}
-      (http/transit-response
-        (delete-route! db user
-                       (:id (http/transit-request form-data)))))
+      (or (service-state-response db (:user user))
+          (http/transit-response
+            (delete-route! db user
+                           (:id (http/transit-request form-data))))))
 
     (POST "/routes/link-interface" {form-data :body
                                     user :user}
-      (http/transit-response
-        (link-interface db user (http/transit-request form-data))))))
+      (or (service-state-response db (:user user))
+          (http/transit-response
+            (link-interface db user (http/transit-request form-data)))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode
@@ -339,10 +359,11 @@
   "Routes that are public (don't require authentication)"
   [db]
   (routes
-   (GET "/transit/stops.json" _
-        {:status 200
-         :headers {"Content-Type" "application/vnd.geo+json"}
-         :body (stops-geojson db)})))
+   (GET "/transit/stops.json" {user :user}
+     (or (service-state-response db (:user user))
+         {:status 200
+          :headers {"Content-Type" "application/vnd.geo+json"}
+          :body (stops-geojson db)}))))
 
 (defrecord Routes [nap-config]
   component/Lifecycle

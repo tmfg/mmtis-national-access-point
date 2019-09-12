@@ -1346,6 +1346,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 
+ :error-landing
+ {:resource-not-found "Pahoittelut! Valitsemaasi resurssia tai toimintoa ei löytynyt"
+  :go-to-frontpage "Siirry etusivulle"
+  :txt-maintenance-break "Tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi"}
 
  :leaflet
  {:zoom-in "Lähennä"
