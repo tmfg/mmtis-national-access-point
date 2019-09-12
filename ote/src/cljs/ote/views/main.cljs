@@ -87,7 +87,8 @@
           (if (nil? app)
             [spinner/circular-progress]
             [:div.ote-sovellus {:style {:display "flex"
-                                        :flex-direction "column"}}
+                                        :flex-direction "column"
+                                        :height "100vh"}}
              [top-nav e! app is-scrolled? desktop?]
              [:div (merge (stylefy/use-style style-base/sticky-footer)
                      {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
