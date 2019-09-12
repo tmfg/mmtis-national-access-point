@@ -3,7 +3,7 @@
             [ote.style.buttons :as style-buttons]
             [ote.localization :refer [tr]]))
 
-(defn error-landing-vw [{:keys [error-landing] :as app}]
+(defn error-landing-vw [{:keys [error-landing]}]
   [:div
    [:h2 (tr [:error-landing :resource-not-found])]
    [:div (:desc error-landing)]
