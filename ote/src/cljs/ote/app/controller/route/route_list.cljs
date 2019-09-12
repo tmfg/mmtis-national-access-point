@@ -158,9 +158,7 @@
   {}
   (comm/get! "routes/routes"
              {:on-success (tuck/send-async! ->LoadRoutesResponse)
-              :on-failure (tuck/send-async!
-                            ->ServerErrorDetails
-                            {:desc (str "Merenkulun reitti- ja aikataulueditori tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi")})})
+              :on-failure (tuck/send-async! ->ServerErrorDetails {:title (tr [:common-texts :navigation-route])})})
   app)
 
 (defmethod routes/on-navigate-event :routes [_ app]
