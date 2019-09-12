@@ -1336,7 +1336,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
 
  :error-landing
- {:resource-not-found "Pahoittelut! Valitsemaasi resurssia tai toimintoa ei löytynyt"
+ {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"
   :go-to-frontpage "Siirry etusivulle"
   :txt-maintenance-break "Tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi"}
 
