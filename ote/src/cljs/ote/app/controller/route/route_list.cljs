@@ -7,7 +7,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.app.routes :as routes]
             [ote.db.transport-operator :as t-operator]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerErrorDetails]]))
 
 ;; Load users own routes
 (defrecord LoadRoutes [])
@@ -156,8 +156,11 @@
 
 (define-event InitRouteList []
   {}
-  (comm/get! "routes/routes" {:on-success (tuck/send-async! ->LoadRoutesResponse)
-                              :on-failure (tuck/send-async! ->ServerError)})
+  (comm/get! "routes/routes"
+             {:on-success (tuck/send-async! ->LoadRoutesResponse)
+              :on-failure (tuck/send-async!
+                            ->ServerErrorDetails
+                            {:desc (str "Merenkulun reitti- ja aikataulueditori tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi")})})
   app)
 
 (defmethod routes/on-navigate-event :routes [_ app]
