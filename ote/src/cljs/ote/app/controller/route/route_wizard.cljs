@@ -90,6 +90,7 @@
 (defrecord DeleteTrip [trip-idx])
 
 (defrecord EditStopTime [trip-idx stop-idx form-data])
+(defrecord ValidateStopTime [trip-idx stop-idx form-data])
 (defrecord ShowStopException [stop-type stop-idx icon-type trip-idx])
 
 ;; Event to set service calendar
@@ -251,6 +252,26 @@
        (every? valid-calendar-rule?
                (::transit/service-rules calendar))))
 
+(defn stop-times-validated [stop-times]
+  ;; Marks arrival/departure time which is too early compared to previous, so view may
+  ;; display warning and disable saving
+  (reduce
+    (fn [v curr]
+      (let [stop-prev (last v)
+            chronology-problem (cond
+                                 (nil? stop-prev) nil       ; First stop cannot be non-chronological
+                                 (time/interval< (::transit/arrival-time curr)
+                                                 (::transit/departure-time stop-prev)) ::transit/arrival-time
+                                 (time/interval< (::transit/departure-time curr)
+                                                 (::transit/arrival-time curr)) ::transit/departure-time
+                                 :else nil)]
+        (conj v
+              (if chronology-problem
+                (assoc curr :time-invalid chronology-problem)
+                (dissoc curr :time-invalid)))))
+    []
+    stop-times))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -299,7 +320,18 @@
 
   UpdateOperatorHomepageResponse
   (process-event [{response :response} app]
-    (assoc app :flash-message (tr [:route-wizard-page :homepage-update-success])))
+    (-> app
+        (update :transport-operators-with-services
+                (fn [operators]
+                  (map
+                    (fn [o]
+                      (update o :transport-operator
+                              (fn [operator]
+                                (if (= (::t-operator/id operator) (get-in app [:transport-operator ::t-operator/id]))
+                                  (:transport-operator app)
+                                  operator))))
+                    operators)))
+        (assoc :flash-message (tr [:route-wizard-page :homepage-update-success]))))
 
   UpdateOperatorHomepageFailure
   (process-event [{response :response} app]
@@ -595,29 +627,14 @@
 
   EditStopTime
   (process-event [{:keys [trip-idx stop-idx form-data]} app]
-    (let [stop-times-validated (fn [stop-times]
-                                 ;; Marks arrival/departure time which is too early compared to previous, so view may
-                                 ;; display warning and disable saving
-                                 (reduce
-                                   (fn [v curr]
-                                     (let [stop-prev (last v)
-                                           chronology-problem (cond
-                                                                (nil? stop-prev) nil ; First stop cannot be non-chronological
-                                                                (time/interval< (::transit/arrival-time curr)
-                                                                                (::transit/departure-time stop-prev)) ::transit/arrival-time
-                                                                (time/interval< (::transit/departure-time curr)
-                                                                                (::transit/arrival-time curr)) ::transit/departure-time
-                                                                :else nil)]
-                                       (conj v
-                                             (if chronology-problem
-                                               (assoc curr :time-invalid chronology-problem)
-                                               (dissoc curr :time-invalid)))))
-                                   []
-                                   stop-times))]
-      (-> app
-          (route-updated)
-          (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)
-          (update-in [:route ::transit/trips trip-idx ::transit/stop-times] stop-times-validated))))
+    (-> app
+        (route-updated)
+        (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)))
+
+  ValidateStopTime
+  (process-event [{:keys [trip-idx stop-idx form-data] :as event} app]
+    (-> app
+        (update-in [:route ::transit/trips trip-idx ::transit/stop-times] stop-times-validated)))
 
   ShowStopException
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]

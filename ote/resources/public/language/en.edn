@@ -820,7 +820,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :unlinked-routes "You have not added finalised sea traffic routes to any services."
   :no-draft-routes "No draft routes."
   :no-public-routes "No finalised routes."
-  :add-operator-and-service "To use the sea traffic route and timetable editor you must be a member of a transport operator and have saved at least one service in the NAP service."
+  :add-operator-and-service "To use the sea traffic route and timetable editor you have to create at least one transport operator or you must be a member of a transport operator."
   }
 
  :route-wizard-page
@@ -883,9 +883,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :show-draw-tools "Edit stops"
   :hide-draw-tools "Stop editing"
   :data-missing "Data missing"
-  :instructions-description "Use following form to publish sea traffic route and timetable data. Read more instructions from link below."
-  :homepage-update-success "Homepage saved successfully."
-  :homepage-update-failure "Saving homepage failed."
+  :instructions-description "You can publish the route and timetable information of your sea traffic service with the form below. For instructions on filling in the form, please click on the link provided."
+  :homepage-update-success "Web address successfully updated."
+  :homepage-update-failure "Failed to update web address."
   :back-to-routes "Back to Own sea traffic route and timetable information"
   }
 

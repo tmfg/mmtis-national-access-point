@@ -40,5 +40,5 @@
              [:div {:style {:height "30px"}} [:span [ic/action-open-in-new {:style style-front-page/footer-small-icon}] (tr [:common-texts :footer-livi-url])]] {:target "_blank"}]]]]
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
       [:ul.unstyled
-       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 80 :height 52 :margin-right "20px"} :src "/img/EU-logo.svg"}] (tr [:common-texts :footer-funded])]]
-       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width 60 :height 60 :margin-right "40px"} :src "/img/icons/cc.svg"}] (tr [:common-texts :footer-copyright-disclaimer])]]]]]]])
+       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width "80px" :height "52px" :margin-right "20px"} :src "/img/EU-logo.svg"}] (tr [:common-texts :footer-funded])]]
+       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width "60px" :height "60px" :margin-right "40px"} :src "/img/icons/cc.svg"}] (tr [:common-texts :footer-copyright-disclaimer])]]]]]]])

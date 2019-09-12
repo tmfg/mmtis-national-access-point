@@ -661,7 +661,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :table-header-actions "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page "Siirry omat palvelutiedot -näkymään"
+  :move-to-services-page "Siirry Omat palvelutiedot -näkymään"
   :move-to-organizations-page "Siirry palveluntuottajat-näkymään"
   :hello "Hei "
   :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
@@ -825,7 +825,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
-  :add-operator-and-service "Merenkulun reitti- ja aikataulueditori käyttäminen edellyttää, että olet jonkin palveluntuottajan jäsen ja olet tallentanut NAP-palveluun vähintään yhden palvelun."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditorin käyttäminen edellyttää, että olet lisännyt palveluntuottajan NAP:iin tai olet jonkun palveluntuottajan jäsen."
   }
 
  :route-wizard-page

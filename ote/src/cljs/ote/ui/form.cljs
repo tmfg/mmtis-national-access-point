@@ -336,14 +336,14 @@
 
 (def balloon-header-tooltip
   "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left "8px"
                                                                 :position "relative"
-                                                                :top "-2"}})]
+                                                                :top "-2px"}})]
     (fn [opts]
-      [wrapped {:style {:width          19
-                        :height         19
+      [wrapped {:style {:width "19px"
+                        :height "19px"
                         :vertical-align "middle"
-                        :color          "white"}}
+                        :color "white"}}
        opts])))
 
 (defn form-group-ui [form-options group]
