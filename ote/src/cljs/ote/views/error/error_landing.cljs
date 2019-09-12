@@ -1,7 +1,7 @@
-(ns ote.views.error-landing
+(ns ote.views.error.error-landing
   (:require [stylefy.core :as stylefy]
             [ote.style.buttons :as style-buttons]
-            [ote.localization :refer [tr] :as localization]))
+            [ote.localization :refer [tr]]))
 
 (defn error-landing-vw [{:keys [error-landing] :as app}]
   [:div

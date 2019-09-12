@@ -42,7 +42,7 @@
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
             [ote.views.admin.monitor :as monitor]
-            [ote.views.error-landing :as error-landing]
+            [ote.views.error.error-landing :as error-landing]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
