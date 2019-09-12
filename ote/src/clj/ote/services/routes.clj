@@ -25,13 +25,14 @@
 
 (defqueries "ote/services/routes.sql")
 
-(defn- service-state-response [db]
-  (when (:ote.db.feature/value
-          (first
-            (fetch db
-                   :ote.db.feature/feature-variation
-                   (specql/columns :ote.db.feature/feature-variation)
-                   {:ote.db.feature/feature :maintenance-break-sea-route})))
+(defn- service-state-response [db user]
+  (when (and (not (:admin? user))
+             (:ote.db.feature/value
+               (first
+                 (fetch db
+                        :ote.db.feature/feature-variation
+                        (specql/columns :ote.db.feature/feature-variation)
+                        {:ote.db.feature/feature :maintenance-break-sea-route}))))
     (http/no-cache-transit-response "Under maintenance" 503)))
 
 (defn- interface-url
@@ -308,36 +309,36 @@
   [db nap-config]
   (routes
     (GET "/routes/routes" {user :user}
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (http/no-cache-transit-response
             (get-user-routes db (:groups user) (:user user)))))
 
     (POST "/routes/new" {form-data :body
                          user      :user}
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (http/transit-response
             (update-route-model! db user (http/transit-request form-data)))))
 
     (POST "/routes/update-operator-homepage" {form-data :body
                                               user :user}
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (http/transit-response
             (update-operator-homepage! db user (http/transit-request form-data)))))
 
     (GET "/routes/:id" [id :as {user :user}]
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (get-route-response db user id)))
 
     (POST "/routes/delete" {form-data :body
                             user      :user}
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (http/transit-response
             (delete-route! db user
                            (:id (http/transit-request form-data))))))
 
     (POST "/routes/link-interface" {form-data :body
                                     user :user}
-      (or (service-state-response db)
+      (or (service-state-response db (:user user))
           (http/transit-response
             (link-interface db user (http/transit-request form-data)))))))
 
@@ -358,8 +359,8 @@
   "Routes that are public (don't require authentication)"
   [db]
   (routes
-   (GET "/transit/stops.json" _
-     (or (service-state-response db)
+   (GET "/transit/stops.json" {user :user}
+     (or (service-state-response db (:user user))
          {:status 200
           :headers {"Content-Type" "application/vnd.geo+json"}
           :body (stops-geojson db)}))))
