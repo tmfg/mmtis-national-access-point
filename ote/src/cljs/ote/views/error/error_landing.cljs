@@ -5,7 +5,8 @@
 
 (defn error-landing-vw [{:keys [error-landing]}]
   [:div
-   [:h2 (tr [:error-landing :resource-not-found])]
+   [:h2 (or (:title error-landing)
+            (tr [:error-landing :resource-not-found]))]
    [:div (:desc error-landing)]
    [:br]
    [:div
