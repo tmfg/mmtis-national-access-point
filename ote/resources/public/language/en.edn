@@ -1334,7 +1334,7 @@ You can also draw the operating area or point to the map with drawing tools. You
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
 
  :error-landing
- {:resource-not-found "Sorry! The resource or functionality you selected was not found"
+ {:resource-not-found "Sorry, selected functionality was not found!"
   :go-to-frontpage "Go to front page"
   :txt-maintenance-break "Temporarily not available due to maintenance break"}
 

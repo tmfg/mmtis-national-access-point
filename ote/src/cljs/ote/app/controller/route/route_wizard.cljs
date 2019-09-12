@@ -20,7 +20,7 @@
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.common :refer [->ServerErrorDetails]]
             [ote.localization :refer [tr] :as localization]))
 
 (declare ->LoadRoute)
@@ -277,7 +277,7 @@
   (process-event [_ app]
     (comm/get! "transit/stops.json"
                {:on-success (tuck/send-async! ->LoadStopsResponse)
-                :on-failure (tuck/send-async! ->ServerError)
+                :on-failure (tuck/send-async! ->ServerErrorDetails {:title (tr [:common-texts :navigation-route])})
                 :response-format :json})
     app)
 
@@ -289,7 +289,7 @@
   (process-event [{id :id} app]
     (comm/get! (str "routes/" id)
                {:on-success (tuck/send-async! ->LoadRouteResponse)
-                :on-failure (send-async! ->ServerError)})
+                :on-failure (send-async! ->ServerErrorDetails {:title (tr [:common-texts :navigation-route])})})
     (-> app
         (assoc-in [:route :loading?] true)))
 
