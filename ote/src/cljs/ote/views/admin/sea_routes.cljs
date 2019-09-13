@@ -51,7 +51,8 @@
       3 ::transit/wednesday
       4 ::transit/thursday
       5 ::transit/friday
-      6 ::transit/saturday)))
+      6 ::transit/saturday
+      ::transit/sunday)))
 
 (defn- last-date-in-use
   "Admin needs to know which is last date when route has action. to-date is not always the case bacause there won't be
