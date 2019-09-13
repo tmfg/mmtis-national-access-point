@@ -5,7 +5,8 @@
             [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
             [ote.util.url :as url-util]
-            [ote.db.transport-operator :as t-operator]))
+            [ote.db.transport-operator :as t-operator]
+            [ote.app.routes :as routes]))
 
 (define-event SearchSuccess [result]
               {}
@@ -84,3 +85,13 @@
                   {}
                   {:on-success (tuck/send-async! ->RemoveSelectionSuccess transport-operator-id service-id)})
                 app))
+
+; Ensure that :transport-operator is not nil
+(define-event VerifyOperatorSelection []
+  {}
+  (if (nil? (:transport-operator app))
+    (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
+    app))
+
+(defmethod routes/on-navigate-event :own-services [_]
+  (->VerifyOperatorSelection))
