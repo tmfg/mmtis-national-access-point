@@ -38,7 +38,8 @@
     (-> app
         (assoc-in [:route :step] :basic-info)
         (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id])))))
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))
+        (assoc :selected-operator (:transport-operator app)))))
 
 (defmethod routes/on-navigate-event :new-route []
   (->NewRoute))
@@ -59,6 +60,7 @@
 ;; Load existing route
 (defrecord LoadRoute [id])
 (defrecord LoadRouteResponse [response])
+(defrecord LoadRouteOperatorResponse [response])
 
 ;; Edit route basic info
 (defrecord EditBasicInfo [form-data])
@@ -285,6 +287,10 @@
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
+  LoadRouteOperatorResponse
+  (process-event [{response :response} app]
+    (assoc app :selected-operator response))
+
   LoadRoute
   (process-event [{id :id} app]
     (comm/get! (str "routes/" id)
@@ -301,15 +307,20 @@
           stops (if (empty? trips)
                   stop-coordinates
                   (update-stop-times stop-coordinates trips))
-          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
-
-      (-> app
-          (assoc :route response)
-          ;; make sure we don't overwrite loaded stops
-          (assoc-in [:route :stops] (get-in app [:route :stops]))
-          (assoc-in [:route ::transit/stops] stops)
-          (assoc-in [:route ::transit/trips] trips)
-          (assoc-in [:route ::transit/service-calendars] service-calendars))))
+          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))
+          operator-id (::transit/transport-operator-id response)]
+      (do
+        (when (not= (get-in app [:selected-operator ::t-operator/id]) operator-id)
+          (comm/get! (str "/t-operator/" operator-id)
+                     {:on-success (tuck/send-async! ->LoadRouteOperatorResponse)
+                      :on-failure (send-async! ->ServerError)}))
+        (-> app
+            (assoc :route response)
+            ;; make sure we don't overwrite loaded stops
+            (assoc-in [:route :stops] (get-in app [:route :stops]))
+            (assoc-in [:route ::transit/stops] stops)
+            (assoc-in [:route ::transit/trips] trips)
+            (assoc-in [:route ::transit/service-calendars] service-calendars)))))
 
   EditBasicInfo
   (process-event [{form-data :form-data} app]
@@ -339,14 +350,16 @@
   SaveOperatorHomepage
   (process-event [{new-homepage :new-homepage} app]
     (comm/post! "routes/update-operator-homepage" {:homepage new-homepage
-                                                   :operator-id (get-in app [:transport-operator ::t-operator/id])}
+                                                   :operator-id (get-in app [:selected-operator ::t-operator/id])}
                 {:on-success (tuck/send-async! ->UpdateOperatorHomepageResponse)
                  :on-failure (tuck/send-async! ->UpdateOperatorHomepageFailure)})
     app)
 
   UpdateOperatorHomepage
   (process-event [{new-homepage :new-homepage} app]
-    (assoc-in app [:transport-operator ::t-operator/homepage] new-homepage))
+    (-> app
+        (assoc-in [:selected-operator ::t-operator/homepage] new-homepage)
+        (assoc-in [:transport-operator ::t-operator/homepage] new-homepage)))
 
   AddStop
   (process-event [{feature :feature} app]

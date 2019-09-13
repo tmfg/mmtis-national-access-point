@@ -44,7 +44,7 @@
        :update! nil
        :disabled? true
        :full-width? true}
-      (::t-operator/name (:transport-operator app))]]
+      (::t-operator/name (:selected-operator app))]]
     [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
      [form-fields/field
       {:label (tr [:field-labels ::t-operator/business-id])
@@ -53,7 +53,7 @@
        :update! nil
        :disabled? true
        :full-width? true}
-      (::t-operator/business-id (:transport-operator app))]]
+      (::t-operator/business-id (:selected-operator app))]]
     [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
      [form-fields/field
       {:label (tr [:field-labels ::t-operator/homepage])
@@ -62,7 +62,7 @@
        :update! #(e! (rw/->UpdateOperatorHomepage %))
        :on-blur #(e! (rw/->SaveOperatorHomepage (-> % .-target .-value)))
        :full-width? true}
-      (::t-operator/homepage (:transport-operator app))]]]])
+      (::t-operator/homepage (:selected-operator app))]]]])
 
 (defn- route-components [e! app]
   [:div
