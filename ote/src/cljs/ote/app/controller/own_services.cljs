@@ -86,7 +86,7 @@
                   {:on-success (tuck/send-async! ->RemoveSelectionSuccess transport-operator-id service-id)})
                 app))
 
-; Ensure that :transport-operator is not nil
+;; Ensure that :transport-operator is not nil
 (define-event VerifyOperatorSelection []
   {}
   (if (nil? (:transport-operator app))
