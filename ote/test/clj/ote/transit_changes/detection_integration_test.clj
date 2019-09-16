@@ -121,7 +121,7 @@
         store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" 4242
                                         my-intercept-fn)
         route-query-params {:service-id test-service-id
-                            :start-date (joda-datetime->inst (time/days-from (time/now) -120))
+                            :start-date (joda-datetime->inst (time/days-from (time/now) -60))
                             :end-date (joda-datetime->inst (time/days-from (time/now) 30))
                             :ignore-holidays? true}
         detection-result (detection/detect-route-changes-for-service db route-query-params)

@@ -158,6 +158,8 @@
                 [:div.col-md-11
                  [form-fields/field {:type :time
                                      :element-id stop-idx
+                                     :error-hour #(when (nil? (:hours %)) (str " ")) ; To show error underline material TextField error requires content
+                                     :error-min  #(when (nil? (:minutes %)) (str " ")) ; To show error underline material TextField error requires content
                                      :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
                                      :required? true
                                      ;; Restricted because first departure cannot be before 24 hours.
@@ -176,6 +178,8 @@
                 [:div.col-md-11
                  [form-fields/field {:type :time
                                      :element-id stop-idx
+                                     :error-hour #(when (nil? (:hours %)) (str " ")) ; To show error underline material TextField error requires content
+                                     :error-min #(when (nil? (:minutes %)) (str " ")) ; To show error underline material TextField error requires content
                                      :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
                                      :required? true
                                      ;; All arrival hours allowed because time between two stops could be 24h or more
