@@ -128,3 +128,7 @@
 (deftest combined-stop-sequences
   (let [result (transit-changes/combined-stop-sequence test-values/first-common-stop [test-values/trip1-test-values test-values/trip2-test-values])]
     (is (= result test-values/combined-stop-sequence-result))))
+
+(deftest ordered-stop-sequences
+  (let [result (transit-changes/combined-stop-sequence test-values/v2-first-common-stop [test-values/v2-trip1-test-values test-values/v2-trip2-test-values])]
+    (is (= result test-values/v2-combined-stop-sequences-result))))

@@ -138,6 +138,38 @@
 (defn earliest-stop-sequence [stop]
   (:gtfs/stop-sequence stop))
 
+(defn sequence-for-stop [stop stops]
+  (let [date1-departure-time (:gtfs/departure-time-date1 stop)
+        reversed-stops (reverse stops)
+        modified-stop (some
+                                 (fn [s]
+                                   (let [sequence (:gtfs/stop-sequence s)]
+                                     (when (< (time/interval->seconds (:gtfs/departure-time-date1 s)) (time/interval->seconds date1-departure-time))
+                                       (assoc stop :gtfs/stop-sequence (* sequence 1.01))))) ; create new sequence nro for removed stop
+                                 reversed-stops)]
+    (if (or (empty? modified-stop) (nil? modified-stop))
+      stop
+      modified-stop)))
+
+(defn reorder-removed-stops
+  "Receives vector of stops in trip2 departure time order. Update stop-sequence number based on this order"
+  [stops]
+  (let [indexed-stops (map-indexed
+                        (fn [index stop]
+                          (assoc stop :gtfs/stop-sequence index))
+                        stops)
+        removed-stops (filterv #(nil? (:gtfs/departure-time-date2 %)) indexed-stops)
+        other-stops (filterv #(not (nil? (:gtfs/departure-time-date2 %))) indexed-stops)
+        ors (reduce (fn [result stop]
+                      (sort-by
+                        (juxt :gtfs/stop-sequence :gtfs/original-stop-sequence)
+                        (conj result
+                              (sequence-for-stop stop result))))
+                    other-stops
+                    removed-stops)
+        ordered-removed-stops (sort-by :gtfs/stop-sequence ors)]
+    ordered-removed-stops))
+
 (defn format-stop-info
   "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
   [[_ stop-times]]
@@ -147,6 +179,7 @@
                             (or (:gtfs/stop-sequence
                                   (first (filter #(= 2 (:trip %)) stop-times))) 999999))]
   {:gtfs/stop-sequence min-stop-sequence
+   :gtfs/original-stop-sequence min-stop-sequence
    :gtfs/stop-name (str/join "->"
                              (into #{} (map
                                          #(:gtfs/stop-name %)
@@ -181,11 +214,13 @@
 
         trip2-normalized (normalize-trip-with-instance trip2 stop-seq-of-fcs-trip2 2)]
     ;; Combine the same stops!
-    (sort-by
-      (juxt earliest-departure-time earliest-stop-sequence)
-      (sort-by :gtfs/stop-name
-               (mapv format-stop-info (group-by stop-key-for-stop-list
-                               (sort-by :gtfs/stop-sequence (concat trip1-normalized trip2-normalized))))))))
+    (map
+      #(dissoc % :gtfs/original-stop-sequence)              ; Remove extra value that was only used for ordering
+      (reorder-removed-stops
+              (sort-by
+                (juxt earliest-departure-time earliest-stop-sequence)
+                (mapv format-stop-info (group-by stop-key-for-stop-list
+                                                 (sort-by :gtfs/stop-sequence (concat trip1-normalized trip2-normalized)))))))))
 
 
 (defn combine-trips [date1-trips date2-trips]
