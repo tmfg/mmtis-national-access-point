@@ -122,7 +122,7 @@ SELECT
        r.created AS "created"
   FROM
        "transit_route" r,
-       lateral unnest(
+       LATERAL unnest(
            CASE WHEN array_length(r."service-calendars", 1) >= 1
                     THEN r."service-calendars"
                 ELSE '{null}'::transit_service_calendar[]
