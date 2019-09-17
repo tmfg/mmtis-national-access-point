@@ -695,7 +695,7 @@
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
                                                 stop)))
-                    (dissoc :step :stops :new-start-time :edit-service-calendar))
+                    (dissoc :step :stops :new-start-time :edit-service-calendar :operator-loading?))
           ;; Update calendar indexes if user has added calendars
           route (if (seq calendars)
                   (update route ::transit/trips
