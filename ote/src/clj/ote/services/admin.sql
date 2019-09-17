@@ -121,7 +121,17 @@ SELECT
        r.modified AS "modified",
        r.created AS "created"
   FROM
-       "transit_route" r, unnest(r."service-calendars") c, unnest(c."service-rules") ru,
+       "transit_route" r,
+       LATERAL unnest(
+           CASE WHEN array_length(r."service-calendars", 1) >= 1
+                    THEN r."service-calendars"
+                ELSE '{null}'::transit_service_calendar[]
+           END) c,
+       LATERAL unnest (
+          CASE WHEN array_length(c."service-rules", 1) >= 1
+                   THEN c."service-rules"
+               ELSE '{null}'::transit_service_rule[]
+          END) ru,
        "transport-operator" top
  WHERE
        (:operator::TEXT IS NULL OR top.name ilike :operator)
