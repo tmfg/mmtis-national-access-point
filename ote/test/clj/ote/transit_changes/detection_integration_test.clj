@@ -120,8 +120,9 @@
                             file-data))
         store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" 4242
                                         my-intercept-fn)
+        current-start-date (time/days-from (time/beginning-of-week (time/now)) -7)
         route-query-params {:service-id test-service-id
-                            :start-date (joda-datetime->inst (time/days-from (time/now) -60))
+                            :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day
                             :end-date (joda-datetime->inst (time/days-from (time/now) 30))
                             :ignore-holidays? true}
         detection-result (detection/detect-route-changes-for-service db route-query-params)
