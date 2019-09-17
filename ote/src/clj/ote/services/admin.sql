@@ -111,8 +111,8 @@ SELECT p.code as code, (p.name[1]::localized_text).text as name, ST_X(p.location
 -- name: fetch-sea-routes-for-admin
 SELECT
        DISTINCT ON (r.id) r.id,
-       MAX(ru."to-date") AS "to-date",
-       EXTRACT(DOW FROM DATE (MAX(ru."to-date")::DATE)) weekday, --(0 sunday, 6, saturday)
+       GREATEST(MAX(ru."to-date"), MAX("added-dates")) AS "to-date",
+       EXTRACT(DOW FROM DATE (GREATEST(MAX(ru."to-date"), MAX("added-dates"))::DATE)) weekday, --(0 sunday, 6, saturday)
        ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday,
        top.id AS "operator-id",
        top.name AS "operator-name",
@@ -132,6 +132,11 @@ SELECT
                    THEN c."service-rules"
                ELSE '{null}'::transit_service_rule[]
           END) ru,
+       LATERAL unnest (
+          CASE WHEN array_length(c."service-added-dates", 1) >= 1
+                   THEN c."service-added-dates"
+               ELSE '{null}'::date[]
+          END) "added-dates",
        "transport-operator" top
  WHERE
        (:operator::TEXT IS NULL OR top.name ilike :operator)

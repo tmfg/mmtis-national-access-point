@@ -64,7 +64,9 @@
                                (if (true? ((weekday-index-to-keyword last-weekday-index) route))
                                  (* -1 index)
                                  (recur (inc index) (dec last-weekday-index)))
-                               nil))]
+                               ; return 0 days only if to-date and weekday are given.
+                               (when (and to-date weekday)
+                                 0)))]
     (if (not (nil? last-weekday-count))
       (time/native->date
         (t/plus (time/native->date-time to-date) (t/days last-weekday-count)))
