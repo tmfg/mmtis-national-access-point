@@ -127,7 +127,7 @@ SELECT
                     THEN r."service-calendars"
                 ELSE '{null}'::transit_service_calendar[]
            END) c,
-       lateral unnest (
+       LATERAL unnest (
           CASE WHEN array_length(c."service-rules", 1) >= 1
                    THEN c."service-rules"
                ELSE '{null}'::transit_service_rule[]
