@@ -20,7 +20,8 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.info :as info]
             [ote.app.controller.route.route-wizard :as rw]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [ote.ui.circular_progress :as circular-progress]))
 
 (defn route-save [e! {route :route :as app}]
   [ui/raised-button {:primary true
@@ -28,65 +29,71 @@
    (tr [:buttons :save-as-gtfs])])
 
 (defn- operator-data [e! app]
-  [:div {:style {:background-color colors/gray200
-                 :padding "0rem 1rem 2rem 1rem"
-                 :margin-bottom "1rem"}}
+  (if (get-in app [:route :operator-loading?])
+    [circular-progress/circular-progress]
 
-   [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "nowrap"}}
-    [:h3 {:style {:line-height "1rem"}} "Palveluntuottajan tiedot"]]
+    [:div {:style {:background-color colors/gray200
+                   :padding "0rem 1rem 2rem 1rem"
+                   :margin-bottom "1rem"}}
 
-   [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
-    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
-     [form-fields/field
-      {:label (tr [:field-labels ::t-operator/name])
-       :name ::t-operator/name
-       :type :string
-       :update! nil
-       :disabled? true
-       :full-width? true}
-      (::t-operator/name (:selected-operator app))]]
-    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
-     [form-fields/field
-      {:label (tr [:field-labels ::t-operator/business-id])
-       :name ::t-operator/business-id
-       :type :string
-       :update! nil
-       :disabled? true
-       :full-width? true}
-      (::t-operator/business-id (:selected-operator app))]]
-    [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
-     [form-fields/field
-      {:label (tr [:field-labels ::t-operator/homepage])
-       :name ::t-operator/homepage
-       :type :string
-       :update! #(e! (rw/->UpdateOperatorHomepage %))
-       :on-blur #(e! (rw/->SaveOperatorHomepage (-> % .-target .-value)))
-       :full-width? true}
-      (::t-operator/homepage (:selected-operator app))]]]])
+     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "nowrap"}}
+      [:h3 {:style {:line-height "1rem"}} "Palveluntuottajan tiedot"]]
 
-(defn- route-components [e! app]
+     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+      [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+       [form-fields/field
+        {:label (tr [:field-labels ::t-operator/name])
+         :name ::t-operator/name
+         :type :string
+         :update! nil
+         :disabled? true
+         :full-width? true}
+        (::t-operator/name (:selected-operator app))]]
+      [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+       [form-fields/field
+        {:label (tr [:field-labels ::t-operator/business-id])
+         :name ::t-operator/business-id
+         :type :string
+         :update! nil
+         :disabled? true
+         :full-width? true}
+        (::t-operator/business-id (:selected-operator app))]]
+      [:div {:style {:flex 1 :padding "0 0.5rem 0 0"}}
+       [form-fields/field
+        {:label (tr [:field-labels ::t-operator/homepage])
+         :name ::t-operator/homepage
+         :type :string
+         :update! #(e! (rw/->UpdateOperatorHomepage %))
+         :on-blur #(e! (rw/->SaveOperatorHomepage (-> % .-target .-value)))
+         :full-width? true}
+        (::t-operator/homepage (:selected-operator app))]]]]))
+
+(defn- route-components [e! {route :route :as app}]
   [:div
    [operator-data e! app]
-   [info/info-toggle
-    (tr [:common-texts :instructions])
-    [:div
-     [:p (tr [:route-wizard-page :instructions-description])]
-     [:a (merge {:href  "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
-                 :rel "noopener noreferrer"
-                 :target "_blank"
-                 :style {:margin-right "2rem"}
-                 :id "edit-transport-operator-btn"}
-                (stylefy/use-style style-base/gray-link-with-icon))
-      (ic/action-open-in-new {:style {:width 20
-                                  :height 20
-                                  :margin-right "0.5rem"
-                                  :color colors/gray950}})
-      (tr [:route-list-page :link-to-help-pdf])]]
-    {:default-open? false}]
+   (if (or (nil? route) (:loading? route))
+     [circular-progress/circular-progress]
+     [:div
+      [info/info-toggle
+       (tr [:common-texts :instructions])
+       [:div
+        [:p (tr [:route-wizard-page :instructions-description])]
+        [:a (merge {:href "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
+                    :rel "noopener noreferrer"
+                    :target "_blank"
+                    :style {:margin-right "2rem"}
+                    :id "edit-transport-operator-btn"}
+                   (stylefy/use-style style-base/gray-link-with-icon))
+         (ic/action-open-in-new {:style {:width 20
+                                         :height 20
+                                         :margin-right "0.5rem"
+                                         :color colors/gray950}})
+         (tr [:route-list-page :link-to-help-pdf])]]
+       {:default-open? false}]
 
-   [route-basic-info/basic-info e! app]
-   [route-stop-sequence/stop-sequence e! app]
-   [route-trips/trips e! app]])
+      [route-basic-info/basic-info e! app]
+      [route-stop-sequence/stop-sequence e! app]
+      [route-trips/trips e! app]])])
 
 (defn form-container [e! app]
   [:div
@@ -130,39 +137,37 @@
          (tr [:buttons :cancel])]]]]]))
 
 (defn edit-route-by-id [e! {:keys [route] :as app}]
-  (if (or (nil? route) (:loading? route))
-    [circular-progress/circular-progress]
-    [:div
-     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
-      [form-container e! app]]
-     [:div (stylefy/use-style style-base/form-footer)
-      [:div.container
-       [:div.col-xs-12.col-sm-12.col-md-12
-        [valid-route-container app]
-        (if (get-in app [:route ::transit/published?])
-          [:span
-           [buttons/save {:disabled (not (rw/valid-route? route))
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (rw/->SaveToDb true)))}
-            (tr [:buttons :save])]
-           [buttons/save {:disabled (disable-save-draft? route)
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (rw/->SaveToDb false)))}
-            (tr [:buttons :back-to-draft])]]
-          [:span
-           [buttons/save {:disabled (not (rw/valid-route? route))
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (rw/->SaveToDb true)))}
-            (tr [:buttons :save-and-publish])]
-           [buttons/save {:disabled (disable-save-draft? route)
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (rw/->SaveToDb false)))}
-            (tr [:buttons :save-as-draft])]])
-        [buttons/cancel {:on-click #(do
-                                      (.preventDefault %)
-                                      (e! (rw/->CancelRoute)))}
-         (tr [:buttons :cancel])]]]]]))
+  [:div
+   [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+    [form-container e! app]]
+   [:div (stylefy/use-style style-base/form-footer)
+    [:div.container
+     [:div.col-xs-12.col-sm-12.col-md-12
+      [valid-route-container app]
+      (if (get-in app [:route ::transit/published?])
+        [:span
+         [buttons/save {:disabled (not (rw/valid-route? route))
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb true)))}
+          (tr [:buttons :save])]
+         [buttons/save {:disabled (disable-save-draft? route)
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb false)))}
+          (tr [:buttons :back-to-draft])]]
+        [:span
+         [buttons/save {:disabled (not (rw/valid-route? route))
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb true)))}
+          (tr [:buttons :save-and-publish])]
+         [buttons/save {:disabled (disable-save-draft? route)
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (rw/->SaveToDb false)))}
+          (tr [:buttons :save-as-draft])]])
+      [buttons/cancel {:on-click #(do
+                                    (.preventDefault %)
+                                    (e! (rw/->CancelRoute)))}
+       (tr [:buttons :cancel])]]]]])
