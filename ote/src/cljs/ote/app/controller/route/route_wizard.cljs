@@ -320,17 +320,15 @@
                   (update-stop-times stop-coordinates trips))
           trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))
           operator-id (::transit/transport-operator-id response)]
-      (do
-
-        (-> app
-            (assoc :route response)
-            (load-operator operator-id)
-            ;; make sure we don't overwrite loaded stops
-            (assoc-in [:route :stops] (get-in app [:route :stops]))
-            (assoc-in [:route ::transit/stops] stops)
-            (assoc-in [:route :loading?] false)
-            (assoc-in [:route ::transit/trips] trips)
-            (assoc-in [:route ::transit/service-calendars] service-calendars)))))
+      (-> app
+          (assoc :route response)
+          (load-operator operator-id)
+          ;; make sure we don't overwrite loaded stops
+          (assoc-in [:route :stops] (get-in app [:route :stops]))
+          (assoc-in [:route ::transit/stops] stops)
+          (assoc-in [:route :loading?] false)
+          (assoc-in [:route ::transit/trips] trips)
+          (assoc-in [:route ::transit/service-calendars] service-calendars))))
 
   EditBasicInfo
   (process-event [{form-data :form-data} app]

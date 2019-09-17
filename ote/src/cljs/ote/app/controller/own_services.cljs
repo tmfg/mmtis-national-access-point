@@ -86,12 +86,14 @@
                   {:on-success (tuck/send-async! ->RemoveSelectionSuccess transport-operator-id service-id)})
                 app))
 
-;; Ensure that :transport-operator is not nil
-(define-event VerifyOperatorSelection []
+; Ensure that :transport-operator is not nil
+; When user refreshes page our app-state removes data from :transport-operator key. That data is used
+; everywhere to determine which operator is selected for usage.
+(define-event InitOwnServices []
   {}
   (if (nil? (:transport-operator app))
     (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
     app))
 
 (defmethod routes/on-navigate-event :own-services [_]
-  (->VerifyOperatorSelection))
+  (->InitOwnServices))
