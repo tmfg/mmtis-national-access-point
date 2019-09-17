@@ -20,7 +20,7 @@
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerErrorDetails]]
+            [ote.app.controller.common :refer [->ServerErrorDetails ->ServerError]]
             [ote.localization :refer [tr] :as localization]))
 
 (declare ->LoadRoute)
@@ -274,6 +274,15 @@
     []
     stop-times))
 
+(defn load-operator [app operator-id]
+  (if (not= (get-in app [:selected-operator ::t-operator/id]) operator-id)
+    (do
+      (comm/get! (str "/t-operator/" operator-id)
+                   {:on-success (tuck/send-async! ->LoadRouteOperatorResponse)
+                    :on-failure (send-async! ->ServerError)})
+      (assoc-in app [:route :operator-loading?] true))
+    app))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
@@ -289,7 +298,9 @@
 
   LoadRouteOperatorResponse
   (process-event [{response :response} app]
-    (assoc app :selected-operator response))
+    (-> app
+      (assoc-in [:route :operator-loading?] false)
+      (assoc :selected-operator response)))
 
   LoadRoute
   (process-event [{id :id} app]
@@ -310,15 +321,14 @@
           trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))
           operator-id (::transit/transport-operator-id response)]
       (do
-        (when (not= (get-in app [:selected-operator ::t-operator/id]) operator-id)
-          (comm/get! (str "/t-operator/" operator-id)
-                     {:on-success (tuck/send-async! ->LoadRouteOperatorResponse)
-                      :on-failure (send-async! ->ServerError)}))
+
         (-> app
             (assoc :route response)
+            (load-operator operator-id)
             ;; make sure we don't overwrite loaded stops
             (assoc-in [:route :stops] (get-in app [:route :stops]))
             (assoc-in [:route ::transit/stops] stops)
+            (assoc-in [:route :loading?] false)
             (assoc-in [:route ::transit/trips] trips)
             (assoc-in [:route ::transit/service-calendars] service-calendars)))))
 
