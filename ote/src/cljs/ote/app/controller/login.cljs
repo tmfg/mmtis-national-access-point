@@ -191,7 +191,7 @@
 
 (define-event SaveUser [form-data]
   {}
-  (comm/post! "save-user" form-data
+  (comm/post! "save-user" (assoc form-data :language @localization/selected-language)
               {:on-success (tuck/send-async! ->SaveUserSuccess)
                :on-failure (tuck/send-async! ->SaveUserError)})
   app)
