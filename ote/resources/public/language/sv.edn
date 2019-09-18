@@ -824,7 +824,7 @@
   :no-draft-routes "Inga utkast till rutter."
   :no-public-routes "Inga färdiga rutter."
   :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du har skapat en eller flera tjänsteproducenter i NAP-tjänsten eller du är medlem av någon tjänsteproducent."
-  :warn-check-stop-time "Tarkista tulo- ja lähtöajat"
+  :warn-check-stop-time "Kontrollera ankomst- och avgångstiderna"
   }
 
  :route-wizard-page
