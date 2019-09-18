@@ -110,5 +110,5 @@
                                                               "Ajopäivissä virhe")]
                [ui/table-row-column {:style {:width "10%"}}
                 [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                                "export/gtfs-sea/" operator-id)}
+                                "export/gtfs/" operator-id)}
                  "Lataa gtfs"]]]))]]])]))
