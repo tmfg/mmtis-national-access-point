@@ -28,7 +28,6 @@
         table-row-hover-color colors/gray400]
     [ui/table (merge
                 {:wrapperStyle {:overflow "visible"}
-                 :header-style {:border (str "solid 3px " colors/gray400)}
                  :body-style {:padding "3px"}
                  ;; FIXME: When we have tooltips in header labels, body does not need overflow: visible.
                  ;;        But, if any row includes tooltips, the body must also have visible overflow.
@@ -48,11 +47,14 @@
                 (when class
                   {:class class}))
      [ui/table-header {:key (str table-id "-hdr")
-                       :style {:overflow "visible" :background-color (color :grey300)}
+                       :style {:overflow "visible"
+                               :background-color (color :grey300)
+                               :border-bottom (str "1px solid " colors/gray650 " !important")}
                        :adjust-for-checkbox false
                        :display-select-all false}
       [ui/table-row {:key (str table-id "-hdr-row")         ;; When adding more rows remember to add their id to key
-                     :style {:overflow "visible"}
+                     :style {:overflow "visible"
+                             :border-bottom (str "1px solid " colors/gray650 " !important")}
                      :selectable false}
        (doall
          (map-indexed
@@ -87,6 +89,7 @@
                               (stylefy/use-style (merge {:background-color (if (even? i)
                                                                              table-row-color
                                                                              table-row-color-alt)} ; Add stripes
+                                                        {:border-bottom (str "1px solid " colors/gray650 " !important")}
                                                         (when on-select
                                                           {:cursor "pointer"
                                                            :transition (str "background-color " transitions/fast-ease-in-out)
