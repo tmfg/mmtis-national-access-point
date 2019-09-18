@@ -117,6 +117,9 @@
         [:th {:style {:font-size "80%" :font-variant "small-caps"}}
          (tr [:route-wizard-page :trip-stop-departure-header])])))]])
 
+;; Space because material-ui TextField error prop requires some content to show error "underline" under input control
+(def stop-time-empty-hour-min-error-str (str " "))
+
 (defn trip-row
   "Render a single row of stop times."
   [e! stop-count can-delete? edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
@@ -158,15 +161,15 @@
                 [:div.col-md-11
                  [form-fields/field {:type :time
                                      :element-id stop-idx
-                                     :error-hour #(when (nil? (:hours %)) (str " ")) ; To show error underline material TextField error requires content
-                                     :error-min  #(when (nil? (:minutes %)) (str " ")) ; To show error underline material TextField error requires content
+                                     :error-hour #(when (nil? (:hours %)) stop-time-empty-hour-min-error-str)
+                                     :error-min  #(when (nil? (:minutes %)) stop-time-empty-hour-min-error-str)
                                      :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
                                      :required? true
                                      ;; Restricted because first departure cannot be before 24 hours.
                                      :unrestricted-hours? (> stop-idx 0)
                                      :update! #(update! {::transit/arrival-time (time/time->interval %)})
                                      :warning (when (= time-invalid ::transit/arrival-time)
-                                                (tr [:common-texts :check-your-input]))}
+                                                (tr [:route-list-page :warn-check-stop-time]))}
                   arrival-time]]
                 [:div.col-md-1 {:style {:margin-left "-10px"}}
                  [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
@@ -178,15 +181,15 @@
                 [:div.col-md-11
                  [form-fields/field {:type :time
                                      :element-id stop-idx
-                                     :error-hour #(when (nil? (:hours %)) (str " ")) ; To show error underline material TextField error requires content
-                                     :error-min #(when (nil? (:minutes %)) (str " ")) ; To show error underline material TextField error requires content
+                                     :error-hour #(when (nil? (:hours %)) stop-time-empty-hour-min-error-str)
+                                     :error-min #(when (nil? (:minutes %)) stop-time-empty-hour-min-error-str)
                                      :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
                                      :required? true
                                      ;; All arrival hours allowed because time between two stops could be 24h or more
                                      :unrestricted-hours? true
                                      :update! #(update! {::transit/departure-time (time/time->interval %)})
                                      :warning (when (= time-invalid ::transit/departure-time)
-                                                (tr [:common-texts :check-your-input]))}
+                                                (tr [:route-list-page :warn-check-stop-time]))}
                   departure-time]]
                 [:div.col-md-1 {:style {:margin-left "-10px"}}
                  [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))

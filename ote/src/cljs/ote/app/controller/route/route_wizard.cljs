@@ -260,12 +260,17 @@
   (reduce
     (fn [v curr]
       (let [stop-prev (last v)
+            curr-arrival (::transit/arrival-time curr)
+            prev-departure (::transit/departure-time stop-prev)
+            curr-departure (::transit/departure-time curr)
             chronology-problem (cond
                                  (nil? stop-prev) nil       ; First stop cannot be non-chronological
-                                 (time/interval< (::transit/arrival-time curr)
-                                                 (::transit/departure-time stop-prev)) ::transit/arrival-time
-                                 (time/interval< (::transit/departure-time curr)
-                                                 (::transit/arrival-time curr)) ::transit/departure-time
+                                 (and (not (time/empty-time? curr-arrival))
+                                      (time/interval< curr-arrival
+                                                      prev-departure)) ::transit/arrival-time
+                                 (and (not (time/empty-time? curr-departure))
+                                      (time/interval< curr-departure
+                                                      curr-arrival)) ::transit/departure-time
                                  :else nil)]
         (conj v
               (if chronology-problem

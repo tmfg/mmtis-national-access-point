@@ -826,6 +826,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-draft-routes "Ei reittiluonnoksia."
   :no-public-routes "Ei valmiita reittejä."
   :add-operator-and-service "Merenkulun reitti- ja aikataulueditorin käyttäminen edellyttää, että olet lisännyt palveluntuottajan NAP:iin tai olet jonkun palveluntuottajan jäsen."
+  :warn-check-stop-time "Tarkista tulo- ja lähtöajat"
   }
 
  :route-wizard-page
