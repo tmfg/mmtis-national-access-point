@@ -224,7 +224,7 @@
        (if (not (empty? public-routes))
          (let [loc (.-location js/document)
                url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
-                        "export/gtfs-sea/" (::t-operator/id operator))]
+                        "export/gtfs/" (::t-operator/id operator))]
            [:div {:style {:padding-top "1rem"}}
             [:h4 (tr [:route-list-page :header-sea-route-interface])]
             [:p {:style (merge

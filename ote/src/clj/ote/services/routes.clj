@@ -38,7 +38,7 @@
 (defn- interface-url
   "Create interface url for route."
   [operator-id]
-  (str (environment/base-url) "export/gtfs-sea/" operator-id))
+  (str (environment/base-url) "export/gtfs/" operator-id))
 
 (def route-list-columns  #{::transit/route-id
                            ::transit/transport-operator-id
