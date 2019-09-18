@@ -339,6 +339,8 @@
   UpdateOperatorHomepageResponse
   (process-event [{response :response} app]
     (-> app
+        ; clear operator homepage from route - to prevent unnecessary save
+        (dissoc [:route :operator-homepage])
         (update :transport-operators-with-services
                 (fn [operators]
                   (map
@@ -367,7 +369,9 @@
   (process-event [{new-homepage :new-homepage} app]
     (-> app
         (assoc-in [:selected-operator ::t-operator/homepage] new-homepage)
-        (assoc-in [:transport-operator ::t-operator/homepage] new-homepage)))
+        (assoc-in [:transport-operator ::t-operator/homepage] new-homepage)
+        ; Update operator homepage to route while operator homepage is not saved to db
+        (assoc-in [:route :operator-homepage] new-homepage)))
 
   AddStop
   (process-event [{feature :feature} app]

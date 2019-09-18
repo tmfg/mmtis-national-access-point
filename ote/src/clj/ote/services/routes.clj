@@ -96,6 +96,16 @@
 (defn- next-stop-code [db]
   (str "OTE" (next-stop-sequence-number db)))
 
+(defn save-operator-homepage
+  "This is not usually needed. Operator homepage is updated via onBlur, but it is possible, that
+  user manages to save route form before onBlur event fires. So here we save operator homepage to db and clean up route form data."
+  [route db]
+  (when (:operator-homepage route)
+    (specql/update! db ::t-operator/transport-operator
+                    {::t-operator/homepage (:operator-homepage route)}
+                    {::t-operator/id (::transit/transport-operator-id route)}))
+  (dissoc route :operator-homepage))
+
 (defn save-custom-stops [route db user]
   (let [custom-stops
         (into {}
@@ -235,6 +245,7 @@
       (tx/with-transaction
         db
         (let [r (-> route
+                    (save-operator-homepage db)
                     (save-custom-stops db user)
                     (modification/with-modification-fields ::transit/route-id user)
                     (update ::transit/stops #(mapv stop-location-geometry %))

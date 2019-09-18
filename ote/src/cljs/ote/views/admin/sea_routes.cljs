@@ -64,11 +64,13 @@
                                (if (true? ((weekday-index-to-keyword last-weekday-index) route))
                                  (* -1 index)
                                  (recur (inc index) (dec last-weekday-index)))
-                               nil))]
-    (if (not (nil? last-weekday-count))
+                               ;; return 0 days if only to-date and weekday are given and selected weekdays are missing
+                               ;; because there is no need to count backwards the days when exact date is given (to-date without weekday)
+                               (when (and to-date weekday)
+                                 0)))]
+    (when-not (nil? last-weekday-count)
       (time/native->date
-        (t/plus (time/native->date-time to-date) (t/days last-weekday-count)))
-      nil)))
+        (t/plus (time/native->date-time to-date) (t/days last-weekday-count))))))
 
 (defn sea-routes [e! app]
   (let [{:keys [loading? results filters]}
