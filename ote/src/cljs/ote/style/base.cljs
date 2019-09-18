@@ -111,6 +111,12 @@
                   :padding-top "20px"
                   :font-weight "600"})
 
+(def small-text {:font-size "0.875rem"
+                 ;:font-size: 0.75rem - mobiili tekstikoko
+                 :font-weight "400"
+                 :line-height "1.5"
+                 :color colors/gray950})
+
 (def success-flash-message-body {:background-color "rgba(128, 149, 50, 0.87)"})
 (def error-flash-message-body {:max-width "800px" :background-color "rgba(190, 0, 0, 0.87)"})
 
