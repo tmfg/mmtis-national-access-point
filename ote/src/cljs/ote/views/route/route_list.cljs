@@ -32,11 +32,12 @@
                                 :keys [show-delete-modal?]
                                 :as route}]
   [:span
-   [ui/icon-button {:id (str "delete-route-" route-id)
-                    :href "#"
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (route-list/->OpenDeleteRouteModal route-id)))}
+   [ui/icon-button (merge {:id (str "delete-route-" route-id)
+                           :href "#"
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (route-list/->OpenDeleteRouteModal route-id)))}
+                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -62,7 +63,7 @@
   [ui/table {:style style-base/basic-table}
    [ui/table-header {:adjust-for-checkbox false
                      :display-select-all false}
-    [ui/table-row {:selectable false}
+    [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
      [ui/table-header-column {:class "table-header" :style {:width "18%"}} (tr [:route-list-page :route-list-table-name])]
      [ui/table-header-column {:class "table-header" :style {:width "15%"}} (tr [:route-list-page :route-list-table-modified])]
      [ui/table-header-column {:class "table-header" :style {:width "15%"}} (tr [:route-list-page :route-list-table-created])]
@@ -79,7 +80,7 @@
          (fn [i {::transit/keys [route-id name]
                  ::modification/keys [created modified] :as row}]
            ^{:key (str "route-" i)}
-           [ui/table-row {:key (str "route-" i) :selectable false :display-border false}
+           [ui/table-row {:key (str "route-" i) :selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
             [ui/table-row-column {:style {:width "18%"}}
              [:a {:href "#"
                   :on-click #(do
@@ -87,11 +88,13 @@
                                (e! (fp/->ChangePage :edit-route {:id route-id})))} (t-service/localized-text-with-fallback @selected-language name)]]
             [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui modified)]
             [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui created)]
-            [ui/table-row-column {:style {:width "13%"}}
-             [ui/icon-button {:href "#"
-                              :on-click #(do
-                                           (.preventDefault %)
-                                           (e! (fp/->ChangePage :edit-route {:id route-id})))}
+            [ui/table-row-column {:style {:width "11%" :padding-left "10px"}}
+             [ui/icon-button
+              (merge {:href "#"
+                      :on-click #(do
+                                   (.preventDefault %)
+                                   (e! (fp/->ChangePage :edit-route {:id route-id})))}
+                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
               [ic/content-create]]
              [delete-route-action e! row]]])
          routes)))]])
@@ -108,15 +111,23 @@
   (if has-public-routes
     [:div
      [:h4 (tr [:route-list-page :header-link-public-routes-to-service])]
-     [:p (tr [:route-list-page :select-services-to-link-interfaces])]
+     [:p {:style (merge
+                   {:margin-top "0px"}
+                   style-base/small-text)}
+      (tr [:route-list-page :select-services-to-link-interfaces])]
 
      (when (empty? services-with-route)
        [:div
-        [:span (stylefy/use-style style-base/icon-with-text)
+        [:span
+         {:style (merge
+                   {:margin-top "0px"}
+                   style-base/small-text
+                   style-base/icon-with-text)}
          [ic/alert-warning {:style {:color colors/negative-button
                                     :margin-right "0.5rem"
                                     :margin-bottom "0.25rem"}}]
-         [:p (tr [:route-list-page :unlinked-routes])]]])
+         [:p
+          (tr [:route-list-page :unlinked-routes])]]])
 
      (doall
        (for [{::t-service/keys [id name] :as s} services]
@@ -134,16 +145,24 @@
 
 (defn list-routes [e! public-routes draft-routes]
   [:div {:style {:padding-top "20px"}}
-   [:h4 (tr [:route-list-page :header-route-drafts])]
-   [:p (tr [:route-list-page :desc-route-drafts])]
-   [:div.drafts
-    [route-table e! draft-routes (when (empty? draft-routes)
-                                   (tr [:route-list-page :no-draft-routes]))]]
-   [:h4 (tr [:route-list-page :header-public-routes])]
-   [:p (tr [:route-list-page :desc-public-routes])]
-   [:div.public
-    [route-table e! public-routes (when (empty? public-routes)
-                                    (tr [:route-list-page :no-public-routes]))]]])
+   [:div {:style {:padding-bottom "1rem"}}
+    [:h4 (tr [:route-list-page :header-route-drafts])]
+    [:p {:style (merge
+                  {:margin-top "0px"}
+                  style-base/small-text)}
+     (tr [:route-list-page :desc-route-drafts])]
+    [:div.drafts
+     [route-table e! draft-routes (when (empty? draft-routes)
+                                    (tr [:route-list-page :no-draft-routes]))]]]
+   [:div {:style {:padding-bottom "1rem"}}
+    [:h4 (tr [:route-list-page :header-public-routes])]
+    [:p {:style (merge
+                  {:margin-top "0px"}
+                  style-base/small-text)}
+     (tr [:route-list-page :desc-public-routes])]
+    [:div.public
+     [route-table e! public-routes (when (empty? public-routes)
+                                     (tr [:route-list-page :no-public-routes]))]]]])
 
 (defn routes [e! {operator :transport-operator
                   operators :transport-operators-with-services
@@ -206,9 +225,12 @@
          (let [loc (.-location js/document)
                url (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
                         "export/gtfs-sea/" (::t-operator/id operator))]
-           [:div
+           [:div {:style {:padding-top "1rem"}}
             [:h4 (tr [:route-list-page :header-sea-route-interface])]
-            [:p (tr [:route-list-page :desc-sea-route-interface])]
+            [:p {:style (merge
+                          {:margin-top "0px"}
+                          style-base/small-text)}
+             (tr [:route-list-page :desc-sea-route-interface])]
             [common/linkify url (op-util/gtfs-file-name operator)]])
          [:div
           [:h4 (tr [:route-list-page :header-download-gtfs])]
