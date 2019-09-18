@@ -20,7 +20,7 @@
 
 (defn- parse-stops [stops]
   (mapv (fn [stop]
-          (let [[lat lon stop-name trip-id headsign] (str/split stop #",")]
+          (let [[lat lon stop-name trip-id headsign] (str/split stop #";")]
             {:lat (Double/parseDouble lat)
              :lon (Double/parseDouble lon)
              :stop-name stop-name
@@ -44,7 +44,7 @@
 
                     :stops (map
                              (fn [stop]
-                               (let [[lon lat name trip-id] (str/split stop #",")]
+                               (let [[lon lat name trip-id] (str/split stop #";")]
                                  {:type "Point"
                                   :coordinates [(Double/parseDouble lon)
                                                 (Double/parseDouble lat)]
