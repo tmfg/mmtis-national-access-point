@@ -176,5 +176,5 @@
   (POST "/transit-changes/force-interface-import/:service-id" {{:keys [service-id]} :params
                                                                user :user}
     (when (authorization/admin? user)
-      (let [upload-response (gtfs-tasks/update-one-gtfs! config db false (Long/parseLong service-id))]
+      (let [upload-response (gtfs-tasks/update-one-gtfs! config db true (Long/parseLong service-id))]
         (http/transit-response upload-response 200)))))
