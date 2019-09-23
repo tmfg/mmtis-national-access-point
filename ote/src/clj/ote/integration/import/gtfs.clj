@@ -9,17 +9,14 @@
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [specql.core :as specql]
-            [ote.db.gtfs :as gtfs]
             [ote.db.transport-service :as t-service]
             [clojure.java.io :as io]
             [digest]
-            [specql.op :as op]
             [taoensso.timbre :as log]
             [specql.impl.composite :as specql-composite]
             [specql.impl.registry :refer [table-info-registry]]
             [jeesql.core :refer [defqueries]]
             [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
-            [clojure.string :as string]
             [ote.transit-changes.detection :as detection])
   (:import (java.io File)))
 
@@ -32,7 +29,7 @@
   (with-open [in (:body (http-client/get url {:as :stream}))]
     (read-zip in)))
 
-(defn load-file-from-url [db interface-id url last-import-date etag force-download?]
+(defn load-file-from-url [_ interface-id url last-import-date etag force-download?]
   (let [query-headers {:headers (when (not force-download?)
                                   (merge
                                     (if (not (nil? etag))
@@ -82,7 +79,7 @@
     "transfers.txt" nil
     nil))
 
-(defmulti process-rows (fn [file rows] file))
+(defmulti process-rows (fn [file _] file))
 
 ;; Combine trips into an array by route and service ids
 (defmethod process-rows :gtfs/trips-txt [_ trips]
@@ -155,8 +152,6 @@
                                (intercept-fn file-type file-data)
                                file-data)]
                (log/debug file-type " file: " name " PARSED.")
-               (when (= file-type :gtfs/calendar-txt)
-                 (def debug-calendar file-data))
                (doseq [fk (process-rows file-type file-data)]
                  (when (and db-table-name (seq fk))
                    (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
@@ -228,7 +223,7 @@
       nil)))
 
 (defmulti validate-interface-zip-package
-          (fn [type byte-array-input] type))
+          (fn [type _] type))
 
 
 (defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
@@ -262,7 +257,7 @@
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
           Returns a response map or nil if it has not been modified."
-          (fn [type db interface-id url last-import-date saved-etag force-download?] type))
+          (fn [type _ _ _ _ _ _] type))
 
 (defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
@@ -305,7 +300,7 @@
 
 (defn download-and-store-transit-package
   "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
-  Requires s3 bucket config, database settings, operator-id and transport-service-id."
+  Requires nil or s3 bucket config, database settings, operator-id and transport-service-id."
   [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3? force-download?]
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db interface-id)
@@ -325,32 +320,31 @@
         (let [new-gtfs-hash (gtfs-hash gtfs-file)
               old-gtfs-hash (:gtfs/sha256 latest-package)]
 
-          ;; IF hash doesn't match, save new and upload file to s3
+          ;; IF hash doesn't match, save new and upload file to s3√
           (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
-            (do
-              (let [package (specql/insert! db :gtfs/package
-                                            {:gtfs/sha256 new-gtfs-hash
-                                             :gtfs/first_package (nil? latest-package)
-                                             :gtfs/transport-operator-id operator-id
-                                             :gtfs/transport-service-id ts-id
-                                             :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
-                                             :gtfs/etag new-etag
-                                             :gtfs/license license
-                                             :gtfs/external-interface-description-id interface-id})]
-                (log/debug "File: " filename " was stored to db successfully.")
-                (when upload-s3?
-                  (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
-                  (log/debug "File: " filename " was uploaded to S3 successfully."))
-                
+            (let [package (specql/insert! db :gtfs/package
+                                          {:gtfs/sha256 new-gtfs-hash
+                                           :gtfs/first_package (nil? latest-package)
+                                           :gtfs/transport-operator-id operator-id
+                                           :gtfs/transport-service-id ts-id
+                                           :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                           :gtfs/etag new-etag
+                                           :gtfs/license license
+                                           :gtfs/external-interface-description-id interface-id})]
+              (log/debug "File: " filename " was stored to db successfully.")
+              (when upload-s3?
+                (s3/put-object (:bucket gtfs-config) filename (java.io.ByteArrayInputStream. gtfs-file) {:content-length (count gtfs-file)})
+                (log/debug "File: " filename " was uploaded to S3 successfully."))
 
-                ;; Parse gtfs package and save it to database.
-                (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)
-                ;; Mark interface download a success
-                (specql/insert! db ::t-service/external-interface-download-status
-                                {::t-service/external-interface-description-id interface-id
-                                 ::t-service/download-status :success
-                                 ::t-service/package-id (:gtfs/id package)
-                                 ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})))
+
+              ;; Parse gtfs package and save it to database.
+              (save-gtfs-to-db db gtfs-file (:gtfs/id package) interface-id ts-id nil)
+              ;; Mark interface download a success
+              (specql/insert! db ::t-service/external-interface-download-status
+                              {::t-service/external-interface-description-id interface-id
+                               ::t-service/download-status :success
+                               ::t-service/package-id (:gtfs/id package)
+                               ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))}))
 
             (log/debug "File " filename " was found from db, no need to store or s3-upload. Thank you for trying."))))
       ;; Return nil in case of error
