@@ -10,7 +10,7 @@
     (is (= result '(:MON :FRI :SAT :SUN)))))
 
 (deftest test-every-postal-code-validation
-  (let [codes ["12345" "AU1234" "NNNNN-NNNNN" "ANA NAN"]
+  (let [codes ["12345" "AU1234" "NNNNN-NNNN" "ANA NAN"]
         error-codes ["NNNNN-NNNNNNNddddddddd" "    " "1,2,3,4,5"]]
     (is (= (tou/validate-every-postal-codes (first codes)) (first codes)))
     (is (= (tou/validate-every-postal-codes (second codes)) (second codes)))
