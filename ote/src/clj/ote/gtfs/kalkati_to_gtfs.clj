@@ -198,7 +198,7 @@ Kalkati Transport modes
    (vals calendars)))
 
 (defn- gtfs-time [kalkati-time]
-  (str (subs kalkati-time 0 2) ":" (subs kalkati-time 2)))
+  (str (subs kalkati-time 0 2) ":" (subs kalkati-time 2) ":00"))
 
 (defn stop-times-txt [routes-with-trips]
   (mapcat
