@@ -28,7 +28,8 @@
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
-            [ote.views.admin.sea-routes :as sea-routes]))
+            [ote.views.admin.sea-routes :as sea-routes]
+            [ote.views.admin.netex :as netex]))
 
 (def id-filter-type [:operators :services :ALL])
 
@@ -243,7 +244,8 @@
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}
-              {:label "Merireitit" :value "sea-routes"}]
+              {:label "Merireitit" :value "sea-routes"}
+              {:label "Netex" :value "netex"}]
         selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
     [:div
      [:div {:style {:position "absolute" :top "90px" :right "20px"}}
@@ -271,7 +273,9 @@
       (when (= "operators" selected-tab)
         [operator-page-controls e! app])
       (when (= "sea-routes" selected-tab)
-        [sea-routes/sea-routes-page-controls e! app])]]
+        [sea-routes/sea-routes-page-controls e! app])
+       (when (= "netex" selected-tab)
+         [netex/netex-page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
         "users" [users/user-listing e! app]
@@ -281,5 +285,6 @@
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
         "sea-routes" [sea-routes/sea-routes e! app]
+        "netex" [netex/netex e! app]
         ;;default
         [users/user-listing e! app])]]))
