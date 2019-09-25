@@ -17,6 +17,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
+            [ote.db.netex :as netex]
             [ote.services.transport :as transport]
             [ote.services.operators :as operators]
             [cheshire.core :as cheshire]
@@ -47,6 +48,17 @@
 
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
+
+(def netex-column-keys
+  {:netex-conversion-id ::netex/id
+   :external-interface-description-id ::netex/external-interface-description-id
+   :transport-service-id ::t-service/id
+   :url ::netex/url
+   :status ::netex/status
+   :modified ::netex/modified
+   :created ::netex/created
+   :operator-name ::t-operator/name
+   :service-name ::t-service/name})
 
 (def routes-column-keys
   {:id ::transit/id
@@ -233,12 +245,18 @@
         ;; Add namespace for non namespaced keywords because sql query returns values without namespace
         routes-with-namespace (mapv (fn [x] (set/rename-keys x routes-column-keys)) routes)
         routes-with-name (mapv (fn [route]
-                                (update route ::transit/name #(composite/parse @specql-registry/table-info-registry
-                                                                         {:category "A"
-                                                                          :element-type ::t-service/localized_text}
-                                                                         (str %))))
-                              routes-with-namespace)]
+                                 (update route ::transit/name #(composite/parse @specql-registry/table-info-registry
+                                                                                {:category "A"
+                                                                                 :element-type ::t-service/localized_text}
+                                                                                (str %))))
+                               routes-with-namespace)]
     routes-with-name))
+
+(defn- list-netex-conversions [db user query]
+  (let [netex (fetch-netex-conversions-for-admin db {:operator (when query (str "%" query "%"))})
+        ;; Add namespace for non namespaced keywords because sql query returns values without namespace
+        netex-with-namespace (mapv (fn [x] (set/rename-keys x netex-column-keys)) netex)]
+    netex-with-namespace))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
@@ -552,9 +570,9 @@
   (println "log-different-date-formations: java.time.LocalDateTime/now = " (java.time.LocalDateTime/now))
   (println "log-different-date-formations: java.time.ZoneId/of \"Europe/Helsinki\" = " (java.time.ZoneId/of "Europe/Helsinki"))
   (println "log-different-date-formations: java.time.ZonedDateTime/of = " (java.time.ZonedDateTime/of
-                                                  (java.time.LocalDateTime/now)
-                                                  (java.time.ZoneId/of "Europe/Helsinki")))
-  (println "log-different-date-formations:  java.time.format.DateTimeFormatter/ofPattern= " )
+                                                                            (java.time.LocalDateTime/now)
+                                                                            (java.time.ZoneId/of "Europe/Helsinki")))
+  (println "log-different-date-formations:  java.time.format.DateTimeFormatter/ofPattern= ")
   (println "log-different-date-formations:  java format DateTimeFormatter = "
            (.format
              (java.time.format.DateTimeFormatter/ofPattern "dd.MM.yyyy HH:mm")
@@ -618,6 +636,8 @@
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
 
     (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
+
+    (POST "/admin/netex" req (admin-service "netex" req db #'list-netex-conversions))
 
     (POST "/admin/transport-service/delete" req
       (admin-service "transport-service/delete" req db
@@ -710,7 +730,7 @@
   component/Lifecycle
   (start [{db :db http :http email :email :as this}]
     (assoc this ::stop
-           (http/publish! http (admin-routes db http nap-config email))))
+                (http/publish! http (admin-routes db http nap-config email))))
 
   (stop [{stop ::stop :as this}]
     (stop)
