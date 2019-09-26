@@ -1,6 +1,8 @@
 ALTER TYPE address
     ADD ATTRIBUTE "foreign_postal_code" VARCHAR(10);
 
+-- Create backup for "transport-service" table
+CREATE TABLE "transport-service_backup" AS TABLE "transport-service";
 
 CREATE OR REPLACE FUNCTION convert_transport_service_address_postalcodes()
 RETURNS VOID AS $$
@@ -13,12 +15,22 @@ BEGIN
               WHERE service.id = ts.id);
 
     -- update rental pick up addressess
-    UPDATE "transport-service" "t-service"
-       SET (rentals."pick-up-locations") =
-            (SELECT array_agg(locs.*)
-               FROM "transport-service" service,
-                    LATERAL UNNEST((service.rentals)."pick-up-locations") locs
-              WHERE service.id = "t-service".id);
+    UPDATE "transport-service" as ts
+    SET (rentals."pick-up-locations") =
+            (SELECT array_agg(ROW(pa."pick-up-name",
+                                  pa."pick-up-type",
+                                  pa."service-hours",
+                                  pa."service-exceptions",
+                                  ((pa."pick-up-address").street,
+                                   (pa."pick-up-address").postal_code,
+                                   (pa."pick-up-address").post_office,
+                                   (pa."pick-up-address").postal_code
+                                  )::address,
+                                  pa."service-hours-info")::pick_up_location)
+             FROM "transport-service" service
+                      join lateral unnest((service.rentals)."pick-up-locations") pa on true
+    WHERE service.type = 'rentals' AND ts.id = service.id
+                         GROUP BY service.id);
 END;
 $$ LANGUAGE plpgsql;
 
