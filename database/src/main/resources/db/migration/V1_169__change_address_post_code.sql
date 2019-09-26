@@ -27,10 +27,11 @@ BEGIN
                                    (pa."pick-up-address").postal_code
                                   )::address,
                                   pa."service-hours-info")::pick_up_location)
-             FROM "transport-service" service
-                      join lateral unnest((service.rentals)."pick-up-locations") pa on true
-    WHERE service.type = 'rentals' AND ts.id = service.id
-                         GROUP BY service.id);
+               FROM "transport-service" service,
+                    lateral unnest((service.rentals)."pick-up-locations") pa
+              WHERE service.type = 'rentals'
+                AND ts.id = service.id
+              GROUP BY service.id);
 END;
 $$ LANGUAGE plpgsql;
 
