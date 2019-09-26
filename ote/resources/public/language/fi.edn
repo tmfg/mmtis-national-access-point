@@ -1070,7 +1070,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-foreign-business-id "Ulkomaalaisessa Y-tunnuksessa on oltava vähintään 2 ja enintään 32 merkkiä."
   :no-finnish-business-id "Yritykselläni ei ole suomalaista Y-tunnusta."
-  :invalid-postal-code "Tarkista postinumero (5 numeroa)"
+  :invalid-postal-code "Tarkista postinumero"
   :invalid-file-type "Virheellinen tiedostotyyppi"
   :save-failure "Tallennus ei onnistunut."
   :save-success "Tallennus onnistui."

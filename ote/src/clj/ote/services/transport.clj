@@ -6,6 +6,7 @@
             [specql.op :as op]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
             [ote.db.auditlog :as auditlog]
             [ote.db.user :as user]
             [ote.util.db :as util]

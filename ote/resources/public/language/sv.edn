@@ -1063,7 +1063,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-foreign-business-id "Ett utländskt FO-nummer måste ha minst 2 och högst 32 tecken."
   :no-finnish-business-id "Mitt företag har inget finländskt FO-nummer"
-  :invalid-postal-code "Kolla postnumret (5 siffror)"
+  :invalid-postal-code "Kolla postnumret"
   :invalid-file-type "Ogiltig filtyp"
   :save-failure "Går ej att spara."
   :save-success "Sparat."

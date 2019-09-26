@@ -98,7 +98,7 @@
   (gen/vector gen-price-class 0 5))
 
 (def gen-postal-code
-  (gen/let [digits (gen/vector (gen/elements "0123456789") 5)]
+  (gen/let [digits (gen/vector (gen/elements "0123456789") 10)]
     (str/join digits)))
 
 (def gen-address

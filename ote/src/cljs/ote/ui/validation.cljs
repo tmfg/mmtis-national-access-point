@@ -12,7 +12,8 @@
             [cljs-time.core :as t]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
-            [ote.format :as fmt]))
+            [ote.format :as fmt]
+            [ote.util.transport-operator-util :as tou]))
 
 ;; max length 16 chars (optional plus followed by digits)
 (def phone-number-regex #"^((\+?\d{0,15})|(\d{0,16}))$")
@@ -135,6 +136,12 @@
 (defmethod validate-rule :postal-code [_ _ data _ _ & [message]]
   (when
     (and (not (empty-value? data)) (not (re-matches #"^\d{5}$" data)))
+    (or message (tr [:common-texts :invalid-postal-code]))))
+
+;; Valid every postal-code
+(defmethod validate-rule :every-postal-code [_ _ data _ _ & [message]]
+  (when
+    (and (not (empty-value? data)) (not (tou/validate-every-postal-codes data)))
     (or message (tr [:common-texts :invalid-postal-code]))))
 
 ;; Validate that checkbox is checked

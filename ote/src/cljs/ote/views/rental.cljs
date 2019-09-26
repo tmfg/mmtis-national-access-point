@@ -273,7 +273,7 @@
                      {:name ::common/postal_code
                       :type :string
                       :full-width? true
-                      :regex #"\d{0,5}"
+                      :validate [[:every-postal-code]]
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
                      {:name ::common/post_office
