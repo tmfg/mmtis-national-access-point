@@ -18,5 +18,8 @@ gtfs_bucket: "napote-gtfs-dev"
 matomo_piwik_url: "https://stat.viestintavirasto.fi/"
 matomo_site_id: "10"
 laundry_url: nil
+netex-chouette-path: "/opt/chouette/"
+netex-conversion-work-path: "/tmp/ote/netex-conversion/"
+netex-bucket: "napote-netex-dev"
 
 
