@@ -30,7 +30,8 @@
 (defn interface-type [format]
   (case format
     "GTFS" :gtfs
-    "Kalkati.net" :kalkati))
+    "Kalkati.net" :kalkati
+    nil))
 
 (defn mark-gtfs-package-imported! [db gtfs-data]
   (specql/update! db ::t-service/external-interface-description
