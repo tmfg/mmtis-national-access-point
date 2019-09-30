@@ -175,6 +175,8 @@
   ;; Force gtfs package download for given service
   (POST "/transit-changes/force-interface-import/:service-id" {{:keys [service-id]} :params
                                                                user :user}
-    (when (authorization/admin? user)
-      (let [upload-response (gtfs-tasks/update-one-gtfs! config db true (Long/parseLong service-id))]
-        (http/transit-response upload-response 200)))))
+    (if (authorization/admin? user)
+      (if-let [result-error (gtfs-tasks/update-one-gtfs! config db true (Long/parseLong service-id))]
+        (http/transit-response result-error 409)
+        (http/transit-response nil 200))
+      (http/transit-response nil 401))))
