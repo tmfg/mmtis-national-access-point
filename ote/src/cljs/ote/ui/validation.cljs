@@ -202,7 +202,7 @@
      (if-not s
        v
        (let [{:keys [name read type table-fields]} s
-             table? (= :table type)
+             table? (or (= :table type) (= :div-table type))
              validoi (error-type s)]
          (if (and (not table?) (empty? validoi))
            (recur v schemas)
