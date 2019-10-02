@@ -36,6 +36,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT convert_transport_service_address_postalcodes();
+DROP FUNCTION convert_transport_service_address_postalcodes();
 
 CREATE OR REPLACE FUNCTION convert_transport_operator_address_postalcodes()
 RETURNS VOID
@@ -57,6 +58,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT convert_transport_operator_address_postalcodes();
+DROP FUNCTION convert_transport_operator_address_postalcodes();
 
 ALTER TYPE address
     DROP ATTRIBUTE "postal_code";
