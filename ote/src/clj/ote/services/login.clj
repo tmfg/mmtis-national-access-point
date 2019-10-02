@@ -8,7 +8,7 @@
             [ote.nap.users :as users]
             [jeesql.core :refer [defqueries]]
             [ote.util.encrypt :as encrypt]
-            [ote.services.transport :as transport]
+            [ote.services.transport-operator :as transport-operator]
             [ote.components.service :refer [define-service-component]]
             [ote.db.tx :as tx :refer [with-transaction]]
             [specql.core :as specql]
@@ -21,7 +21,8 @@
             [specql.op :as op]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
-            [ote.util.throttle :refer [with-throttle-ms]]))
+            [ote.util.throttle :refer [with-throttle-ms]]
+            [clojure.string :as str]))
 
 (defqueries "ote/services/login.sql")
 
@@ -37,7 +38,7 @@
                                      "; Domain=." domain "; Secure")])))
 
 (defn login [db auth-tkt-config
-             {:keys [email password] :as credentials}]
+             {:keys [email password] :as credentials} lang]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
           (encrypt/passlib->buddy (:password login-info)))
@@ -48,7 +49,7 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user) lang))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
@@ -134,9 +135,10 @@
    :dependencies {email :email}}
 
   ^:unauthenticated
-  (POST "/login" {form-data :body}
-        (#'login db auth-tkt-config
-                 (http/transit-request form-data)))
+  (POST "/login" {form-data :body cookies :cookies}
+    (let [lang (str/upper-case (get-in cookies ["finap_lang" :value]))]
+      (#'login db auth-tkt-config
+        (http/transit-request form-data) lang)))
 
   ^:unauthenticated
   (POST "/logout" []

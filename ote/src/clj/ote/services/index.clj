@@ -10,7 +10,7 @@
             [ote.tools.git :refer [current-revision-sha]]
             [ring.middleware.anti-forgery :as anti-forgery]
             [ote.transit :as transit]
-            [ote.services.transport :as transport]))
+            [ote.services.transport-operator :as transport-operator]))
 
 (def stylesheets [{:href "css/normalize.css"}               ;; Normalize css on wide range of browsers
                   {:href "css/bootstrap_style_grid.css"}
@@ -80,11 +80,11 @@
     {:language language
      :translations (localization/translations language)})])
 
-(defn user-info [db user]
+(defn user-info [db user lang]
   [:script#ote-user-info {:type "x-ote-user-info"}
    (transit/clj->transit
     (when user
-      (transport/get-user-transport-operators-with-services db (:groups user) (:user user))))])
+      (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user) lang)))])
 
 (defn index-page [db user config]
   (let [dev-mode? (:dev-mode? config)
@@ -115,7 +115,7 @@
       (when (not (true? dev-mode?))
         (matomo-analytics-scripts matomo-config))
       (translations localization/*language*)
-      (user-info db user)]
+      (user-info db user (str/upper-case localization/*language*))]
 
      [:body (merge
              {:id "main-body"
