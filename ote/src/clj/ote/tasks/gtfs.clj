@@ -64,18 +64,19 @@
   ;; Ensure that gtfs-import flag is enabled
   ;; upload-s3? should be false when using local environment
   (let [;; Load next gtfs package or package that is related to given service-id
-        {:keys [id url operator-id ts-id last-import-date format license]
+        {:keys [id url operator-id operator-name ts-id last-import-date format license]
          :as gtfs-data} (if (nil? service-id)
                           (fetch-next-gtfs-interface! config db)
                           (fetch-given-gtfs-interface! db service-id))
         force-download? (integer? service-id)]
     (if gtfs-data
       (try
-        (if-let [gtfs-and-meta (import-gtfs/download-and-store-transit-package
-                                 (interface-type format)
-                                 (:gtfs config)
-                                 db url operator-id ts-id last-import-date license id upload-s3? force-download?)]
-          (if (netex/gtfs->netex-and-set-status db (:netex config) gtfs-and-meta)
+        (if-let [conversion-meta (import-gtfs/download-and-store-transit-package
+                                   (interface-type format)
+                                   (:gtfs config)
+                                   db url operator-id operator-name ts-id last-import-date license id upload-s3?
+                                   force-download?)]
+          (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
             nil                                             ; This if & nil used to make success branch more readable
             (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
           (log/spy :warn (str "GTFS: Could not import GTFS file. service-id = " ts-id)))
