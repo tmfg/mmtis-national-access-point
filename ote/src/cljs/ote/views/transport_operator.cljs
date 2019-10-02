@@ -2,6 +2,9 @@
   "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
+            [ote.localization :refer [tr tr-key]]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.common :as common]
             [ote.ui.form :as form]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
@@ -9,19 +12,15 @@
             [ote.ui.select_field :as sf]
             [ote.ui.warning_msg :as msg-warn]
             [ote.ui.success_msg :as msg-succ]
+            [ote.ui.common :as ui-common]
+            [ote.ui.common :as uicommon]
+            [ote.util.transport-operator-util :as tou]
             [ote.style.form :as style-form]
             [ote.style.form-fields :as style-fields]
-            [ote.ui.common :as ui-common]
-
-            [ote.app.controller.flags :as flags]
-            [ote.app.controller.transport-operator :as to]
-
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
+            [ote.style.dialog :as style-dialog]
             [ote.style.base :as style-base]
-            [ote.ui.common :as uicommon]
-            [ote.style.dialog :as style-dialog]))
+            [ote.app.controller.flags :as flags]
+            [ote.app.controller.transport-operator :as to]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -243,7 +242,7 @@
        :type :string
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
-       :regex #"\d{0,5}"
+       :validate [[:every-postal-code]]
        :read (comp ::common/postal_code ::t-operator/visiting-address)
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
@@ -278,7 +277,7 @@
        :type :string
        :disabled? disable-ytj-address-billing?
        :style style-fields/form-field
-       :regex #"\d{0,5}"
+       :validate [[:every-postal-code]]
        :read (comp ::common/postal_code ::t-operator/billing-address)
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/billing-address ::common/postal_code] postal-code))}

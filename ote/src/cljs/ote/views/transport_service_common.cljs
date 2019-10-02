@@ -1,28 +1,29 @@
 (ns ote.views.transport-service-common
   "View parts that are common to all transport service forms."
-  (:require [tuck.core :as tuck]
+  (:require [clojure.string :as str]
+            [tuck.core :as tuck]
+            [reagent.core :as r]
+            [cljs-react-material-ui.reagent :as ui]
+            [cljs-react-material-ui.icons :as ic]
+            [stylefy.core :as stylefy]
+            [ote.time :as time]
             [ote.db.transport-service :as t-service]
-            [ote.localization :refer [tr tr-key tr-tree]]
-            [ote.ui.form :as form]
             [ote.db.common :as common]
+            [ote.localization :refer [tr tr-key tr-tree]]
+            [ote.util.transport-operator-util :as tou]
+            [ote.util.values :as values]
+            [ote.theme.colors :as colors]
+            [ote.ui.form :as form]
             [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
             [ote.ui.buttons :as buttons]
-            [ote.app.controller.transport-service :as ts]
-            [ote.views.place-search :as place-search]
-            [clojure.string :as str]
-            [ote.time :as time]
-            [ote.util.values :as values]
+            [ote.ui.validation :as validation]
+            [ote.ui.form-fields :as form-fields]
             [ote.style.form :as style-form]
             [ote.style.dialog :as style-dialog]
-            [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.validation :as validation]
-            [stylefy.core :as stylefy]
             [ote.style.base :as style-base]
-            [cljs-react-material-ui.icons :as ic]
+            [ote.app.controller.transport-service :as ts]
             [ote.app.controller.flags :as flags]
-            [ote.ui.form-fields :as form-fields]
-            [reagent.core :as r]
-            [ote.theme.colors :as colors]))
+            [ote.views.place-search :as place-search]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -336,12 +337,11 @@
      :type :string
      :container-class "col-xs-12 col-sm-6 col-md-2"
      :full-width? true
-     :regex #"\d{0,5}"
      :read (comp ::common/postal_code ::t-service/contact-address)
      :write (fn [data postal-code]
               (assoc-in data [::t-service/contact-address ::common/postal_code] postal-code))
      :label (tr [:field-labels ::common/postal_code])
-     :validate [[:postal-code]]}
+     :validate [[:every-postal-code]]}
 
     {:name ::common/post_office
      :type :string

@@ -1062,7 +1062,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-foreign-business-id "A non-Finnish Business ID must be minimum 2 and maximum 32 characters."
   :no-finnish-business-id "My company does not have a  Finnish Business ID"
-  :invalid-postal-code "Please, check the postalcode (5 numbers)"
+  :invalid-postal-code "Please, check the postalcode"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."
   :save-success "Successfully saved."
