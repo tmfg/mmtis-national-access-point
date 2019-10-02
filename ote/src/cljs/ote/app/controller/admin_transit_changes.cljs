@@ -107,9 +107,7 @@
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
   {}
   (-> app
-      (assoc-in [:admin :transit-changes :single-download-gtfs-service-response]
-                {:status :success
-                 :msg nil})
+      (assoc-in [:admin :transit-changes :single-download-gtfs-service-response] nil)
       (assoc :flash-message (str "GTFS Paketin lataus onnistui " response))))
 
 (define-event ForceInterfaceImportForGivenServiceFailure [response]
