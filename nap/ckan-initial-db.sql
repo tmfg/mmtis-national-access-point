@@ -1,4 +1,4 @@
--- CKAN is not in used anymore but napote's database contain some tables that were made during CKAN period.
+-- CKAN is not in used anymore but napote's database contains some tables whose way of creation is inherited from CKAN.
 
 --
 -- PostgreSQL database dump
