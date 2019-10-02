@@ -26,20 +26,16 @@
   "Find out how far past orig-date is in history, and shift all calendar-data
   dates forward by that amount."
   [calendar-data orig-date filter-fn]
-  (let [day-diff (ote.time/day-difference (ote.time/native->date-time orig-date) (clj-time.core/now))
-        day-diff-weekfixed (round-up-to-nearest-multiple-of-7 day-diff)
-        ;; _ (println "rewrite-calendar: day difference (rounded to week):" day-diff-weekfixed)
-        
+  (let [day-diff (ote.time/day-difference (ote.time/native->date-time orig-date) (.plusDays (clj-time.core/now) -15))
+        day-diff-round-up (round-up-to-nearest-multiple-of-7 day-diff)
         calendar-data (if filter-fn
                         (filterv filter-fn
                                 calendar-data)
                         calendar-data)
-        rewritten-calendar-data (mapv (fn [record] (update record :gtfs/date #(.plusDays % day-diff-weekfixed))) calendar-data)
-        ]
+        rewritten-calendar-data (mapv (fn [record] (update record :gtfs/date #(.plusDays % day-diff-round-up))) calendar-data)]
        
     ;; (def *cd rewritten-calendar-data)
     rewritten-calendar-data))
-
 
 ;; [there was comment with construction notes on this test, check git history if interested]
 
@@ -88,7 +84,9 @@
 
 (defn store-gtfs-helper
   [gtfs-bytes db operator-id ts-id last-import-date license interface-id intercept-fn]
-  (let [filename (gtfs-import/gtfs-file-name operator-id ts-id)
+  (let [_ (specql/delete! db :gtfs/package
+                          {:gtfs/transport-service-id ts-id})  ; Clean up database
+        filename (gtfs-import/gtfs-file-name operator-id ts-id)
         latest-package (gtfs-import/interface-latest-package db interface-id)
         new-etag nil]
 
@@ -120,11 +118,11 @@
                             (rewrite-calendar file-data orig-date (fn calendar-filter-fn [row]
                                                                     (contains? #{"11" "22"} (:gtfs/service-id row))))
                             file-data))
-        store-result (store-gtfs-helper gtfs-zip-bytes db  test-operator-id test-service-id #inst "2012-12-12" "beerpl" 4242
-                                        my-intercept-fn
-                                        )
+        store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" 4242
+                                        my-intercept-fn)
+        current-start-date (time/days-from (time/beginning-of-week (time/now)) -7)
         route-query-params {:service-id test-service-id
-                            :start-date (joda-datetime->inst (time/days-from (time/now) -120))
+                            :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day
                             :end-date (joda-datetime->inst (time/days-from (time/now) 30))
                             :ignore-holidays? true}
         detection-result (detection/detect-route-changes-for-service db route-query-params)

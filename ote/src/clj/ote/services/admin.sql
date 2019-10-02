@@ -107,3 +107,40 @@ SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" a
 SELECT p.code as code, (p.name[1]::localized_text).text as name, ST_X(p.location) as lat, ST_Y(p.location) as lon,
        CASE WHEN p."created-by" IS NULL THEN 'ei' ELSE 'kyllä' END AS "user-added?", p.created as created
   FROM "finnish_ports" as p;
+
+-- name: fetch-sea-routes-for-admin
+SELECT
+       DISTINCT ON (r.id) r.id,
+       GREATEST(MAX(ru."to-date"), MAX("added-dates")) AS "to-date",
+       EXTRACT(DOW FROM DATE (GREATEST(MAX(ru."to-date"), MAX("added-dates"))::DATE)) weekday, --(0 sunday, 6, saturday)
+       ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday,
+       top.id AS "operator-id",
+       top.name AS "operator-name",
+       r.name AS "route-name",
+       r."published?" AS "published?",
+       r.modified AS "modified",
+       r.created AS "created"
+  FROM
+       "transit_route" r,
+       LATERAL unnest(
+           CASE WHEN array_length(r."service-calendars", 1) >= 1
+                    THEN r."service-calendars"
+                ELSE '{null}'::transit_service_calendar[]
+           END) c,
+       LATERAL unnest (
+          CASE WHEN array_length(c."service-rules", 1) >= 1
+                   THEN c."service-rules"
+               ELSE '{null}'::transit_service_rule[]
+          END) ru,
+       LATERAL unnest (
+          CASE WHEN array_length(c."service-added-dates", 1) >= 1
+                   THEN c."service-added-dates"
+               ELSE '{null}'::date[]
+          END) "added-dates",
+       "transport-operator" top
+ WHERE
+       (:operator::TEXT IS NULL OR top.name ilike :operator)
+   AND top.id = r."transport-operator-id"
+ GROUP BY
+          r.id, top.id, ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday
+ ORDER BY r.id, "to-date" DESC;

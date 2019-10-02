@@ -420,16 +420,17 @@
 (defn service-search [e! _]
   (r/create-class
     {:component-will-unmount #(e! (ss/->SaveScrollPosition))
-     :component-did-mount    #(e! (ss/->RestoreScrollPosition))
+     :component-did-mount #(e! (ss/->RestoreScrollPosition))
      :reagent-render
      (fn [e! {{results :results :as service-search} :service-search
-              params                                :params
-              :as                                   app}]
+              params :params
+              :as app}]
        [:div.service-search
         [page/page-controls
          ""
          (tr [:service-search :label])
-         [filters-form e! service-search]]
+         [:div {:style {:padding-top "0.5rem"}}
+          [filters-form e! service-search]]]
         (if (nil? results)
           [:div (tr [:service-search :no-filters])]
           [results-listing e! app])])}))

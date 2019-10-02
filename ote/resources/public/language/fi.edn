@@ -355,7 +355,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-new-service-hour "Lisää rivi"
   :add-new-service-exception "Lisää rivi"
   :add-new-company "Lisää rivi"
-  :add-new-route "Lisää uusi laivareitti"
+  :add-new-route "Lisää uusi merireitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
 
@@ -661,7 +661,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :table-header-actions "Toiminnot"
   :do-you-want-to-publish-service "Sinulla on jo oma, itse ylläpidetty rajapinta (esimerkiksi GTFS-muodossa), jonka haluat julkaista."
   :header-explain-more "Nyt en ymmärrä, selittäisitkö tarkemmin?"
-  :move-to-services-page "Siirry omat palvelutiedot -näkymään"
+  :move-to-services-page "Siirry Omat palvelutiedot -näkymään"
   :move-to-organizations-page "Siirry palveluntuottajat-näkymään"
   :hello "Hei "
   :NAP-service-short-description "NAP-tietojen hallintapalvelussa hoidat liikkumispalvelusi olennaisten tietojen kirjaamisen,
@@ -787,6 +787,17 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
+  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
+  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
+  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
+  :header-route-drafts "Reittiluonnokset"
+  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-public-routes "Valmiit reitit"
+  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
+  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
+  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
+  :header-download-gtfs "Rajapinnan lataaminen"
+  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
   :delete-dialog-header "Haluatko poistaa laivareitin?"
   :delete-dialog-remove-route "Poistetaan reitti "
   :route-list-table-name "Nimi"
@@ -797,7 +808,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-list-table-destination-point "Määränpää"
   :route-list-table-valid-from "Voimassa lähtien"
   :route-list-table-valid-to "Voimassa asti"
-  :route-list-table-created-modified "Luotu / Muokattu"
+  :route-list-table-modified "Muokattu"
+  :route-list-table-created "Luotu"
   :route-list-table-actions "Toiminnot"
   :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
   :route-list-gtfs-zip-file "GTFS Zip tiedosto"
@@ -805,6 +817,16 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :link-to-help-pdf "Merenkulun reittityökalun käyttöohje"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
   :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
+  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
+  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
+  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
+  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
+  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
+  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
+  :no-draft-routes "Ei reittiluonnoksia."
+  :no-public-routes "Ei valmiita reittejä."
+  :add-operator-and-service "Merenkulun reitti- ja aikataulueditorin käyttäminen edellyttää, että olet lisännyt palveluntuottajan NAP:iin tai olet jonkun palveluntuottajan jäsen."
+  :warn-check-stop-time "Tarkista tulo- ja lähtöajat"
   }
 
  :route-wizard-page
@@ -866,6 +888,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :show-draw-tools "Muokkaa pysähtymispaikkoja"
   :hide-draw-tools "Lopeta muokkaus"
   :data-missing "Tietoja täyttämättä"
+  :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
+  :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
+  :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
+  :back-to-routes "Takaisin Merenkulun reitti- ja aikataulueditorin etusivulle"
   }
 
  :pre-notice-list-page
@@ -904,6 +930,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :delete-pre-notice-dialog {:label "Poista luonnostilassa oleva muutosilmoitus?"
                              :content "Haluatko poistaa tämän muutosilmoituksen pysyvästi?"
                              :success-message "Muutosilmoitus poistettu"}
+  :add-operator-and-service "Muutosilmoituksen lisääminen edellyttää, että olet jonkin palveluntuottajan jäsen."
   }
 
  :pre-notice-page
@@ -1043,7 +1070,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :invalid-business-id "Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero."
   :invalid-foreign-business-id "Ulkomaalaisessa Y-tunnuksessa on oltava vähintään 2 ja enintään 32 merkkiä."
   :no-finnish-business-id "Yritykselläni ei ole suomalaista Y-tunnusta."
-  :invalid-postal-code "Tarkista postinumero (5 numeroa)"
+  :invalid-postal-code "Tarkista postinumero"
   :invalid-file-type "Virheellinen tiedostotyyppi"
   :save-failure "Tallennus ei onnistunut."
   :save-success "Tallennus onnistui."
@@ -1098,7 +1125,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week-4-short "To"
   :day-of-week-5-short "Pe"
   :day-of-week-6-short "La"
-  :day-of-week-7-short "Su"}
+  :day-of-week-7-short "Su"
+  :no-operators "Ei palveluntuottajia"
+  }
 
 
  :dialog
@@ -1273,6 +1302,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :parking-restricted-text "Pysäköintiaika rajoitettu?"
   :parking-restricted? {true "Kyllä"
                         false "Ei"}
+  :payment-method-description "Maksutapojen kuvaus"
   }
 
  :user
@@ -1317,6 +1347,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :gtfs-viewer
  {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
 
+ :error-landing
+ {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"
+  :go-to-frontpage "Siirry etusivulle"
+  :txt-maintenance-break "Tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi"}
 
  :leaflet
  {:zoom-in "Lähennä"

@@ -22,7 +22,8 @@
             [ote.db.transport-service :as t-service]
             [ote.util.values :as values]
             [goog.string :as gstr]
-            [ote.ui.validation :as validation]))
+            [ote.ui.validation :as validation]
+            [ote.theme.colors :as colors]))
 
 
 
@@ -101,11 +102,12 @@
 
 (def tooltip-icon
   "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left "8px"}})]
     (fn [opts]
-      [wrapped {:style {:width          16 :height 16
+      [wrapped {:style {:width "16px"
+                        :height "16px"
                         :vertical-align "middle"
-                        :color          "gray"}}
+                        :color "gray"}}
        opts])))
 
 (defn placeholder [{:keys [placeholder placeholder-fn row] :as field} data]
@@ -151,7 +153,7 @@
       {:error-text (or error warning) ;; Show error text or warning text
        :error-style (if error ;; Error is more critical than required - showing it first
                       style-base/error-element
-                      style-base/required-element)})
+                      style-base/required-input-element)})
      (when max-length
       {:max-length max-length})
     (when full-width?
@@ -184,9 +186,7 @@
                           {:disabled true}))
        [ic/action-delete]])))
 
-(defmethod field :file [{:keys [label button-label name disabled? on-change
-                                error warning]
-                         :as field} data]
+(defmethod field :file [{:keys [label button-label name disabled? on-change error warning] :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
    [:button (merge
               (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
@@ -239,12 +239,12 @@
         :multi-line true
         :rows rows}
        (when (or error (string? warning))
-         ;; Show error text or warning text
-         :error-text (or error warning)
-         ;; Error is more critical than required - showing it first
-         :error-style (if error
-                        style-base/error-element
-                        style-base/required-element))
+         {;; Show error text or warning text
+          :errorText (or error warning)
+          ;; Error is more critical than required - showing it first
+          :error-style (if error
+                         style-base/error-element
+                         style-base/required-input-element)})
        (when max-length
          {:max-length max-length})
        (when full-width?
@@ -270,8 +270,8 @@
           language-data (some #(when (= language (:ote.db.transport-service/lang %)) %) data)
           rows (or rows 1)]
       [:div {:style (merge
-                      ;; Push localized text field down for table-row-column top padding amount when in table column.
-                      (when table? {:margin-top "15px"})
+                      ;; Push localized text field down to match regular text input field.
+                      {:padding-top "16px"}
                       (when full-width? style-form/full-width)
                       style)}
        [text-field
@@ -311,10 +311,10 @@
                                             (reset! selected-language lang))})
              lang]))]
        (when (or error (string? warning))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (if error error warning)])
        (when (and (not error) (not warning) is-empty? (is-empty? data))
-         [:div (stylefy/use-style style-base/required-element)
+         [:div (stylefy/use-style style-base/required-input-element)
           (tr [:common-texts :required-field])])])))
 
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
@@ -476,8 +476,9 @@
         :style style
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
-        :value (option-idx data)
-        :on-change #(update! (option-value (nth options %2)))}
+        :value (option-idx data)}
+       (when update!
+         {:on-change #(update! (option-value (nth options %2)))})
        (when (or error (string? warning))
          {:error-text (or error warning) ;; Show error text or warning text
           :error-style (if error             ;; Error is more critical than required - showing it first
@@ -600,20 +601,24 @@
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! error warning required? unrestricted-hours? element-id] :as opts}
+(defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div (stylefy/use-style style-base/inline-block)
    [field (merge
             {:id (str "hours-" element-id)
              :type :string
              :name "hours"
+             :error (when error-hour
+                      (error-hour data))
+             :error-text false
              :regex (if unrestricted-hours?
                       unrestricted-hour-regex
                       hour-regex)
-             :style {:width 30}
-             :error-text false
+             :style {:width "30px"}
              :input-style {:text-align "right"}
              :hint-style {:position "absolute" :right "0"}
+             :on-blur (when on-blur
+                        on-blur)
              :update! (fn [hour]
                         (let [h (if (str/blank? hour)
                                   nil
@@ -632,9 +637,13 @@
             {:id (str "minutes-" element-id)
              :type :string
              :name "minutes"
-             :regex minute-regex
-             :style {:width 30}
+             :error (when error-min
+                      (error-min data))
              :error-text false
+             :regex minute-regex
+             :style {:width "30px"}
+             :on-blur (when on-blur
+                        on-blur)
              :update! (fn [minute]
                         (let [m (if (str/blank? minute)
                                   nil
@@ -698,9 +707,9 @@
                       :type :selection
                       :show-option (tr-key [:common-texts :time-units])
                       :options [:minutes :hours :days]
-                      :style {:width 150
+                      :style {:width "150px"
                               :position "relative"
-                              :top 15})
+                              :top "15px"})
          (or (::preferred-unit data) unit)]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
@@ -754,19 +763,21 @@
      (when show-clear?
        [ui/icon-button {:on-click #(update! nil)
                         :disabled (not data)
-                        :style {:width 16 :height 16
+                        :style {:width "16px"
+                                :height "16px"
                                 :position "relative"
                                 :padding 0
-                                :left -15
+                                :left "-15px"
                                 :top "5px"}
-                        :icon-style {:width 16 :height 16}}
-        [ic/content-clear {:style {:width 16 :height 16}}]])]))
+                        :icon-style {:width "16px"
+                                     :height "16px"}}
+        [ic/content-clear {:style {:width "16px" :height "16px"}}]])]))
 
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
+(defmethod field :table [{:keys [table-fields table-style table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -775,8 +786,10 @@
      [:div.table-wrapper {:style table-wrapper-style
                           :id id}
       ;; We need to make overflow visible to allow css-tooltips to be visible outside of the table wrapper or body.
-      [ui/table {:wrapperStyle {:overflow "visible"}
-                 :bodyStyle {:overflow "visible"}}
+      [ui/table (merge {:wrapperStyle {:overflow "visible"}
+                        :bodyStyle {:overflow "visible"}}
+                        (when table-style
+                          {:style table-style}))
        [ui/table-header (merge {:adjust-for-checkbox false :display-select-all false}
                                {:style style-form-fields/table-header})
         [ui/table-row (merge {:selectable false}
@@ -807,7 +820,7 @@
                                    ;; If there are errors or missing fields, make the
                                    ;; row taller to show error messages
                                    (when (or errors missing-required-fields)
-                                     {:style {:height 65}}))
+                                     {:style {:height "65px"}}))
                (doall
                 (for [{:keys [name read write width type component] :as tf} table-fields
                       :let [field-error (get errors name)

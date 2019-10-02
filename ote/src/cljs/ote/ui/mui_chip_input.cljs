@@ -28,8 +28,8 @@
                     ; Modify original style
                     ; For some reason, the text input underline is misplaced compared to other original mui-textfields.
                     ;        This change fixes those problems, in combination with conditional chipContainerStyle change.
-                    :inputStyle {:margin-top 12
-                                 :margin-bottom 14}
+                    :inputStyle {:margin-top "12px"
+                                 :margin-bottom "14px"}
                     :listStyle {:width "auto"}})
 
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))

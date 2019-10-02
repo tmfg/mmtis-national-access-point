@@ -785,6 +785,17 @@
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
+  :header-link-public-routes-to-service "Lägga till färdiga rutter i tjänsten"
+  :header-link-interface-to-service "Lägga till ett gränssnitt i tjänsten"
+  :desc-link-interface-to-service "Ett gränssnitt kan läggas till i en eller flera tjänster först när du har skapat en färdig rutt."
+  :header-route-drafts "Utkast till rutter"
+  :desc-route-drafts (:md "I tabellen finns en lista över **rutter i utkastformat**. Dessa rutter ingår inte i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-public-routes "Färdiga rutter"
+  :desc-public-routes (:md "I tabellen finns en lista över **färdiga rutter**. Dessa rutter ingår i det maskinläsbara gränssnittet för rutter och tidtabeller för sjötrafik.")
+  :header-sea-route-interface "Gränssnitt för rutter och tidtabeller för sjötrafik"
+  :desc-sea-route-interface (:md "NAP-tjänsten skapar och uppdaterar gränssnittet för rutter och tidtabeller för sjötrafik automatiskt. Gränssnittet innehåller uppgifter om rutterna som listats i tabellen **Färdiga rutter**. Om du vill använda gränssnittet för sjötrafik också i andra tjänster än i NAP-tjänsten, kan du ladda ner en uppdaterad gränssnittsfil via länken nedan.")
+  :header-download-gtfs "Ladda ner ett gränssnitt"
+  :desc-download-gtfs "Gränssnittet skapas och kan laddas ner först när du har skapat en färdig rutt."
   :delete-dialog-header "Vill du ta bort sjörutten?"
   :delete-dialog-remove-route "Rutten tas bort"
   :route-list-table-name "Namn"
@@ -795,7 +806,8 @@
   :route-list-table-destination-point "Destination"
   :route-list-table-valid-from "Gäller från och med"
   :route-list-table-valid-to "Gäller till"
-  :route-list-table-created-modified "Skapad / Ändrad"
+  :route-list-table-modified "Ändrad"
+  :route-list-table-created "Skapad"
   :route-list-table-actions "Funktioner"
   :route-list-active-routes "Tjänsteproducentens gällande rutter: "
   :route-list-gtfs-zip-file "GTFS Zip fil"
@@ -803,6 +815,16 @@
   :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
   :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
+  :link-interface-to-service-succeed "Gränssnittet lades till i tjänsten."
+  :delete-link-interface-to-service-succeed "Gränssnittet togs bort från tjänsten."
+  :link-interface-to-service-failed "Det gick inte att lägga till gränssnittet i tjänsten"
+  :delete-link-interface-to-service-failed "Det gick inte att ta bort gränssnittet från tjänsten"
+  :select-services-to-link-interfaces "Välj de tjänster i listan nedan i vilka du vill lägga till färdiga sjörutter."
+  :unlinked-routes "Du har ännu inte lagt till några färdiga sjörutter i någon tjänst."
+  :no-draft-routes "Inga utkast till rutter."
+  :no-public-routes "Inga färdiga rutter."
+  :add-operator-and-service "Du kan endast använda kartverktyget för sjötrafik om du har skapat en eller flera tjänsteproducenter i NAP-tjänsten eller du är medlem av någon tjänsteproducent."
+  :warn-check-stop-time "Kontrollera ankomst- och avgångstiderna"
   }
 
  :route-wizard-page
@@ -864,6 +886,10 @@
   :show-draw-tools "Ändra anlöpshamnar"
   :hide-draw-tools "Avsluta editeringen"
   :data-missing "Uppgifter saknas"
+  :instructions-description "Du kan publicera rutt- och tidtabellsuppgifterna i din sjötrafiktjänst med hjälp av nedanstående blankett. Du hittar noggrannare anvisningar om hur man fyller i blanketten via bifogade länk."
+  :homepage-update-success "Webbadressen har uppdaterats."
+  :homepage-update-failure "Webbadressen kunde inte uppdateras."
+  :back-to-routes "Tillbaka till ingångssidan för kartverktyget för sjötrafik"
   }
 
  :pre-notice-list-page
@@ -902,6 +928,7 @@
   :delete-pre-notice-dialog {:label "Ta bort ett ändringsmeddelande med utkast-status?"
                              :content "Vill du ta bort det här ändringsmeddelandet för gott?"
                              :success-message "Ändringsmeddelandet har tagits bort"}
+  :add-operator-and-service "Du kan bara göra en ändringsanmälan om du är medlem av någon tjänsteproducent."
   }
 
  :pre-notice-page
@@ -1036,7 +1063,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :invalid-business-id "FO-nummer måste vara i form av: 7 siffror, bindestreck och ett kontrollnummer." ;; Google translated
   :invalid-foreign-business-id "Ett utländskt FO-nummer måste ha minst 2 och högst 32 tecken."
   :no-finnish-business-id "Mitt företag har inget finländskt FO-nummer"
-  :invalid-postal-code "Kolla postnumret (5 siffror)"
+  :invalid-postal-code "Kolla postnumret"
   :invalid-file-type "Ogiltig filtyp"
   :save-failure "Går ej att spara."
   :save-success "Sparat."
@@ -1091,7 +1118,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-4-short "To"
   :day-of-week-5-short "Fr"
   :day-of-week-6-short "Lö"
-  :day-of-week-7-short "Sö"}
+  :day-of-week-7-short "Sö"
+  :no-operators "Inga tjänsteproducenter"
+  }
 
 
  :dialog
@@ -1262,6 +1291,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :parking-restricted-text "Begränsad parkeringstid?"
   :parking-restricted? {true "Ja"
                         false "Nej"}
+  :payment-method-description "Betalsätt beskrivning"
   }
 
  :user
@@ -1306,6 +1336,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
 
+ :error-landing
+ {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"
+  :go-to-frontpage "Siirry etusivulle"
+  :txt-maintenance-break "Tilapäisesti poissa käytöstä huoltotoimenpiteiden vuoksi"}
 
  :leaflet
  {:zoom-in "Zooma in"

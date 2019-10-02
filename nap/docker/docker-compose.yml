@@ -12,7 +12,6 @@ networks:
   napote:
 
 services:
-
   napotedb:
     restart: always
     container_name: napotedb
@@ -28,14 +27,3 @@ services:
       timeout: 30s
       retries: 3
 
-  napote-nginx:
-    restart: always
-    container_name: napote-nginx
-    image: solita/napote-nginx:latest
-    build: ./nginx
-    networks:
-      - napote
-    extra_hosts:
-      - "dockerhost:${DOCKER_HOST_IP}"
-    ports:
-      - "127.0.0.1:8080:8080"

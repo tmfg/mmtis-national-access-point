@@ -6,3 +6,9 @@
  */
 
 Cypress.on('uncaught:exception', (err, runnable) => false);
+
+// Show more debugging information on error
+
+Cypress.on('fail', (err, runnable) => {
+    debugger
+})

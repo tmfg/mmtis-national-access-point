@@ -1,6 +1,8 @@
 (ns ote.style.form-fields
   (:require [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]))
+            [ote.style.base :as style-base]
+            [ote.style.buttons :as buttons]
+            [ote.theme.colors :as colors]))
 
 (def localized-text-language-container
   {:height "20px"
@@ -44,18 +46,17 @@
    :overflow "hidden"
    :display "inline-block"
 
-   ::stylefy/sub-styles
-   {:button {:padding "10px 20px 10px 20px"
-             :text-transform "uppercase"
-             :color "#FFFFFF"
-             :background-color "#1565C0"
-             :font-size "12px"
-             :font-weight "bold"}
-    :file-input {:font-size "100px"
-                 :position "absolute"
-                 :left "0"
-                 :top "0"
-                 :opacity "0"}}})
+   ::stylefy/sub-styles {:button
+                         (merge buttons/button-common
+                                {:color colors/primary-text
+                                 :font-size "1rem"
+                                 :border 0
+                                 :background-color colors/primary})
+                         :file-input {:font-size "100px"
+                                      :position "absolute"
+                                      :left "0"
+                                      :top "0"
+                                      :opacity "0"}}})
 
 (def form-field
   {:width "100%"

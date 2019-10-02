@@ -781,8 +781,20 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
+  :header-link-public-routes-to-service "Adding finalised routes to a service"
+  :header-link-interface-to-service "Adding an interface to a service"
+  :desc-link-interface-to-service "You can add an interface to one or more services once you have created one finalised route."
+  :header-route-drafts "Draft routes"
+  :desc-route-drafts
+  (:md " The table below lists all **draft routes**. These routes are not included in the machine-readable sea traffic route and timetable interface.")
+  :header-public-routes "Finalised routes"
+  :desc-public-routes (:md "The table below lists all **finalised routes**. These routes are included in the machine-readable sea traffic route and timetable interface.")
+  :header-sea-route-interface "Sea traffic route and timetable interface"
+  :desc-sea-route-interface (:md "The NAP service automatically creates and updates the sea traffic route and timetable interface. The interface includes data on the routes listed in the table **Finalised routes**. If you wish to use the sea traffic interface outside the NAP service, you can download an up-to-date interface file from the link below. ")
+  :header-download-gtfs "Downloading an interface"
+  :desc-download-gtfs "The interface is created and can be downloaded once you have created one finalised route."
   :delete-dialog-header "Want to remove traffic route?"
-  :delete-dialog-remove-route "Removing route "
+  :delete-dialog-remove-route "Removing route"
   :route-list-table-name "Name"
   :route-list-published? "Route status"
   :route-list-published?-values {true "Published"
@@ -791,14 +803,25 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-list-table-destination-point "Destination point"
   :route-list-table-valid-from "Valid from"
   :route-list-table-valid-to "Valid to"
-  :route-list-table-created-modified "Created / Modified"
+  :route-list-table-modified "Modified"
+  :route-list-table-created "Created"
   :route-list-table-actions "Functions"
   :route-list-active-routes "Transport operator’s valid routes: "
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
   :link-to-help-pdf "Sea traffic route and timetable editor user guide"
-  :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
-  :create-new-route-disabled "Create new transport operator in \"Own services\" page first"
+  :link-to-help-pdf-url "https:// s3.eu-central-1.amazonaws.com / ote-assets/sea-route-user-guide.pdf"
+  :create-new-route-disabled "Create new transport operator in \"Own services \" page first"
+  :link-interface-to-service-succeed "The interface was successfully added to the service."
+  :delete-link-interface-to-service-succeed "The interface was successfully removed from the service."
+  :link-interface-to-service-failed "Failed to add the interface to the service."
+  :delete-link-interface-to-service-failed "Failed to remove the interface from the service."
+  :select-services-to-link-interfaces "Select from the list below the services to which you wish to add the finalised sea traffic routes."
+  :unlinked-routes "You have not added finalised sea traffic routes to any services."
+  :no-draft-routes "No draft routes."
+  :no-public-routes "No finalised routes."
+  :add-operator-and-service "To use the sea traffic route and timetable editor you have to create at least one transport operator or you must be a member of a transport operator."
+  :warn-check-stop-time "Check the arrival and departure times"
   }
 
  :route-wizard-page
@@ -861,6 +884,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :show-draw-tools "Edit stops"
   :hide-draw-tools "Stop editing"
   :data-missing "Data missing"
+  :instructions-description "You can publish the route and timetable information of your sea traffic service with the form below. For instructions on filling in the form, please click on the link provided."
+  :homepage-update-success "Web address successfully updated."
+  :homepage-update-failure "Failed to update web address."
+  :back-to-routes "Back to Own sea traffic route and timetable information"
   }
 
  :pre-notice-list-page
@@ -899,6 +926,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :delete-pre-notice-dialog {:label "Delete draft pre notice?"
                              :content "Permanently delete this pre notice?"
                              :success-message "Pre notice deleted"}
+  :add-operator-and-service "To report changes you must be a member of a transport operator."
   }
 
  :pre-notice-page
@@ -1034,7 +1062,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-foreign-business-id "A non-Finnish Business ID must be minimum 2 and maximum 32 characters."
   :no-finnish-business-id "My company does not have a  Finnish Business ID"
-  :invalid-postal-code "Please, check the postalcode (5 numbers)"
+  :invalid-postal-code "Please, check the postalcode"
   :invalid-file-type "Invalid file type"
   :save-failure "Saving failed."
   :save-success "Successfully saved."
@@ -1089,7 +1117,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :day-of-week-4-short "Thu"
   :day-of-week-5-short "Fri"
   :day-of-week-6-short "Sat"
-  :day-of-week-7-short "Sun"}
+  :day-of-week-7-short "Sun"
+  :no-operators "No transport operators"
+  }
 
 
  :dialog
@@ -1259,6 +1289,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :parking-restricted-text "Limited parking time?"
   :parking-restricted? {true "Yes"
                         false "No"}
+  :payment-method-description "Payment methods description"
   }
 
  :user
@@ -1303,6 +1334,10 @@ You can also draw the operating area or point to the map with drawing tools. You
  :gtfs-viewer
  {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
 
+ :error-landing
+ {:resource-not-found "Sorry, selected functionality was not found!"
+  :go-to-frontpage "Go to front page"
+  :txt-maintenance-break "Temporarily not available due to maintenance break"}
 
  :leaflet
  {:zoom-in "Zoom In"

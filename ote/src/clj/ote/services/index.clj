@@ -138,7 +138,9 @@
   (http/with-no-cache-headers
     {:status 200
      :headers {"Content-Type" "text/html; charset=UTF-8"}
-     :body (html (index-page db (:user req) dev-mode?))}))
+     ;; hiccup can't add all html elements so we need to add them by hand
+     :body (str "<!DOCTYPE html>"
+             (html (index-page db (:user req) dev-mode?)))}))
 
 (defrecord Index [dev-mode?]
   component/Lifecycle

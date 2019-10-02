@@ -142,7 +142,7 @@
                                                                                                 :font-size "1.2rem"
                                                                                                 :font-weight "400"}}})
 
-(def third-column-text {:margin-bottom 40
+(def third-column-text {:margin-bottom "40px"
                         :color "#c8c8c8"
                         :font-size "0.875rem"
                         :font-weight 300

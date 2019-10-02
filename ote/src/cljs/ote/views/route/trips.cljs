@@ -17,7 +17,8 @@
     [ote.views.route.service-calendar :as route-service-calendar]
     [ote.style.form :as style-form]
     [ote.db.transport-service :as t-service]
-    [ote.style.base :as style-base]))
+    [ote.style.base :as style-base]
+    [ote.theme.colors :as colors]))
 
 (defn badge-content [trip-calendar]
   (if (rw/valid-calendar? trip-calendar)
@@ -116,11 +117,14 @@
         [:th {:style {:font-size "80%" :font-variant "small-caps"}}
          (tr [:route-wizard-page :trip-stop-departure-header])])))]])
 
+;; Space because material-ui TextField error prop requires some content to show error "underline" under input control
+(def stop-time-empty-hour-min-error-str (str " "))
+
 (defn trip-row
   "Render a single row of stop times."
   [e! stop-count can-delete? edit-service-calendar service-calendars row-idx {stops ::transit/stop-times :as trip}]
   ^{:key row-idx}
-  [:tr {:style {:max-height "40px"}}
+  [:tr {:style {:max-height "40px" :vertical-align "top"}}
    [:td [:div
          [:span {:data-balloon        (tr [:route-wizard-page :trip-stop-calendar])
                  :data-balloon-pos    "right"
@@ -137,43 +141,59 @@
                                          (.preventDefault %)
                                          (e! (rw/->EditServiceCalendar row-idx)))}
             [ic/action-today]]]]]]
-   (map-indexed
-    (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop}]
-      (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
-            style {:style {:padding-left     "5px"
-                           :padding-right    "5px"
-                           :width            "125px"
-                           :background-color (if (even? stop-idx)
-                                               "#f4f4f4"
-                                               "#fafafa")}}]
-        (list
-         (if (zero? stop-idx)
-           ^{:key (str stop-idx "-first")}
-           [:td style " - "]
-           ^{:key (str stop-idx "-arr")}
-           [:td style
-            [:div.col-md-11
-             [form-fields/field {:type    :time
-                                 :required? true
-                                 :unrestricted-hours? (> stop-idx 0)
-                                 :update! #(update! {::transit/arrival-time %})}
-              arrival-time]]
-            [:div.col-md-1 {:style {:margin-left "-10px"}}
-             [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
-         (if (= stop-idx (dec stop-count))
-           ^{:key (str stop-idx "-last")}
-           [:td style " - "]
-           ^{:key (str stop-idx "-dep")}
-           [:td style
-            [:div.col-md-11
-             [form-fields/field {:type    :time
-                                 :required? true
-                                 :unrestricted-hours? (> stop-idx 0)
-                                 :update! #(update! {::transit/departure-time %})}
-              departure-time]]
-            [:div.col-md-1 {:style {:margin-left "-10px"}}
-             [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
-    stops)
+   (doall                                                   ; doall avoids react run-time warning about lazy seq deref
+     (map-indexed
+       (fn [stop-idx {::transit/keys [arrival-time departure-time pickup-type drop-off-type] :as stop
+                      :keys [:time-invalid]}]
+         (let [update! #(e! (rw/->EditStopTime row-idx stop-idx %))
+               style {:style {:padding-left "5px"
+                              :padding-right "5px"
+                              :width "125px"
+                              :background-color (if (even? stop-idx)
+                                                  "#f4f4f4"
+                                                  "#fafafa")}}]
+           (list
+             (if (zero? stop-idx)
+               ^{:key (str stop-idx "-first")}
+               [:td style " - "]
+               ^{:key (str stop-idx "-arr")}
+               [:td style
+                [:div.col-md-11
+                 [form-fields/field {:type :time
+                                     :element-id stop-idx
+                                     :error-hour #(when (nil? (:hours %)) stop-time-empty-hour-min-error-str)
+                                     :error-min  #(when (nil? (:minutes %)) stop-time-empty-hour-min-error-str)
+                                     :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
+                                     :required? true
+                                     ;; Restricted because first departure cannot be before 24 hours.
+                                     :unrestricted-hours? (> stop-idx 0)
+                                     :update! #(update! {::transit/arrival-time (time/time->interval %)})
+                                     :warning (when (= time-invalid ::transit/arrival-time)
+                                                (tr [:route-list-page :warn-check-stop-time]))}
+                  arrival-time]]
+                [:div.col-md-1 {:style {:margin-left "-10px"}}
+                 [exception-icon e! :arrival drop-off-type stop-idx row-idx]]])
+             (if (= stop-idx (dec stop-count))
+               ^{:key (str stop-idx "-last")}
+               [:td style " - "]
+               ^{:key (str stop-idx "-dep")}
+               [:td style
+                [:div.col-md-11
+                 [form-fields/field {:type :time
+                                     :element-id stop-idx
+                                     :error-hour #(when (nil? (:hours %)) stop-time-empty-hour-min-error-str)
+                                     :error-min #(when (nil? (:minutes %)) stop-time-empty-hour-min-error-str)
+                                     :on-blur #(e! (rw/->ValidateStopTime row-idx stop-idx %))
+                                     :required? true
+                                     ;; All arrival hours allowed because time between two stops could be 24h or more
+                                     :unrestricted-hours? true
+                                     :update! #(update! {::transit/departure-time (time/time->interval %)})
+                                     :warning (when (= time-invalid ::transit/departure-time)
+                                                (tr [:route-list-page :warn-check-stop-time]))}
+                  departure-time]]
+                [:div.col-md-1 {:style {:margin-left "-10px"}}
+                 [exception-icon e! :departure pickup-type stop-idx row-idx]]]))))
+       stops))
    (when can-delete?
      [:td
       [common/tooltip {:text (tr [:route-wizard-page :trip-delete])
@@ -220,9 +240,9 @@
 (defn trips [e! {route :route :as app}]
   (fn [e! {route :route :as app}]
     [:div {:style {:padding-top "20px"}}
-     [:div (stylefy/use-style style-form/form-card)
-      [:div (stylefy/use-style style-form/form-card-label) (tr [:route-wizard-page :wizard-step-times])]
-      [:div (merge (stylefy/use-style style-form/form-card-body))
+     [:div {:style {:border-top (str "2px solid" colors/gray950)}}
+      [:h3 (tr [:route-wizard-page :wizard-step-times])]
+      [:div
        (if (seq (get-in route [::transit/trips 0 ::transit/stop-times]))
          [trips-list e! route]
          [:div

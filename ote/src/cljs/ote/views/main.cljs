@@ -42,6 +42,7 @@
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
             [ote.views.admin.monitor :as monitor]
+            [ote.views.error.error-landing :as error-landing]
             [ote.ui.common :as common-ui]
             [ote.ui.main-header :refer [top-nav] :as main-header]))
 
@@ -72,7 +73,7 @@
     (fn [page]
       [:span])}))
 
-(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices :own-services :admin :services})
+(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices :own-services :admin :services :edit-route :new-route :routes :new-notice :edit-pre-notice})
 
 (defn ote-application
   "OTE application main view"
@@ -86,7 +87,8 @@
           (if (nil? app)
             [spinner/circular-progress]
             [:div.ote-sovellus {:style {:display "flex"
-                                        :flex-direction "column"}}
+                                        :flex-direction "column"
+                                        :height "100vh"}}
              [top-nav e! app is-scrolled? desktop?]
              [:div (merge (stylefy/use-style style-base/sticky-footer)
                      {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
@@ -114,6 +116,7 @@
 
                   (case (:page app)
                     :login [login/login e! (:login app)]
+                    :error-landing [error-landing/error-landing-vw app]
                     :reset-password [login/reset-password e! app]
                     :register [register/register e! (:params app) (:register app) (:user app)]
                     :user [user/user e! (:user app)]

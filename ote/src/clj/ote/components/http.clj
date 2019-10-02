@@ -155,9 +155,12 @@
     :body (transit/clj->transit data)}))
 
 (defn no-cache-transit-response
-  "Return the given Clojure `data` as a Transit response with status code 200 and no-cache headers."
-  [data]
-  (with-no-cache-headers (transit-response data)))
+  "Return the given Clojure `data` as a Transit response, using status code 200 if no status is defined,
+  and no-cache headers."
+  ([data]
+   (no-cache-transit-response data 200))
+  ([data status]
+   (with-no-cache-headers (transit-response data status))))
 
 (defn json-response [data]
   {:status 200

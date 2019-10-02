@@ -90,12 +90,12 @@
        (fn [{::t-service/keys [id type sub-type interface-types published name]
              ::modification/keys [created modified] :as row}]
          ^{:key id}
-         [ui/table-row {:selectable false :display-border false}
+         [ui/table-row {:selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
           [ui/table-row-column
            [:a (merge {:href (str "/#/edit-service/" id)
                        :on-click #(do (.preventDefault %)
                                       (e! (fp/->ChangePage :edit-service {:id id})))}
-                 (stylefy/use-sub-style style-base/front-page-service-table :link)) name]]
+                      (stylefy/use-sub-style style-base/basic-table :link)) name]]
           [ui/table-row-column {:class "hidden-xs "}
            (if (service-errors row)
              [:span (stylefy/use-style style-base/icon-with-text)
@@ -116,7 +116,7 @@
                          ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
              [:span.draft
               (tr [:field-labels :transport-service ::t-service/published?-values false])])]
-          [ui/table-row-column
+          [ui/table-row-column {:style {:padding-left "10px"}}
            [ui/icon-button (merge {:href "#" :on-click #(do
                                                           (.preventDefault %)
                                                           (e! (fp/->ChangePage :edit-service {:id id})))}
@@ -178,10 +178,10 @@
       [:div.row (stylefy/use-style style-base/section-margin)
        [:div {:class "col-xs-12 col-md-12"}
         [:h4 section-label]
-        [ui/table (stylefy/use-style style-base/front-page-service-table)
+        [ui/table (stylefy/use-style style-base/basic-table)
          [ui/table-header {:adjust-for-checkbox false
                            :display-select-all false}
-          [ui/table-row {:selectable false}
+          [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
            [ui/table-header-column {:class "table-header"} (tr [:front-page :table-header-service-name])]
            [ui/table-header-column {:class "hidden-xs table-header "} (tr [:front-page :table-header-NAP-status])]
            [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]

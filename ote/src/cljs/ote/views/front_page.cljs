@@ -29,7 +29,7 @@
             [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]
-            [ote.app.controller.common :refer [user-logged-in?]]))
+            [ote.app.utils :refer [user-logged-in?]]))
 
 
 (let [host (.-host (.-location js/document))]

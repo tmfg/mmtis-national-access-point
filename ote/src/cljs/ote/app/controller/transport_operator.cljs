@@ -12,6 +12,17 @@
             [ote.db.common :as common]
             [ote.ui.validation :as validation]))
 
+(defn current-operator-services
+  "Return services from :transport-operators-with-services that belongs to selected operator"
+  [{operator :transport-operator
+    operators :transport-operators-with-services
+    :as app-state}]
+  (some #(when (=
+                 (::t-operator/id operator)
+                 (get-in % [:transport-operator ::t-operator/id]))
+           (:transport-service-vector %))
+        operators))
+
 (defrecord SelectOperator [data])
 (defrecord SelectOperatorForTransit [data])
 (defrecord EditTransportOperator [id])
@@ -352,21 +363,21 @@
                                  (:transport-operators-with-services app))
           route-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
                                   %)
-                               (:route-list app))]
-      (assoc app
-        :transport-operator (:transport-operator service-operator)
-        :transport-service-vector (:transport-service-vector service-operator)
-        :routes-vector (:routes route-operator))))
+                               (get-in app [:routes :route-list]))]
+      (-> app
+          (assoc :transport-operator (:transport-operator service-operator)
+                 :transport-service-vector (:transport-service-vector service-operator))
+          (assoc-in [:routes :routes-vector] (:routes route-operator)))))
 
   SelectOperatorForTransit
   (process-event [{data :data} app]
     (let [id (get data ::t-operator/id)
           selected-operator (some #(when (= id (get-in % [:transport-operator ::t-operator/id]))
                                      %)
-                                  (:route-list app))]
-      (assoc app
-        :transport-operator (:transport-operator selected-operator)
-        :routes-vector (:routes selected-operator))))
+                                  (get-in app [:routes :route-list]))]
+      (-> app
+          (assoc :transport-operator (:transport-operator selected-operator))
+          (assoc-in [:routes :routes-vector] (:routes selected-operator)))))
 
   EditTransportOperator
   (process-event [{id :id} app]

@@ -37,7 +37,7 @@
         service (:transit ts)
         ps (::t-service/passenger-transportation service)]
     (is (= (::t-service/contact-address service)
-           #::common {:street "Street 1" :postal_code "90100" :post_office "Oulu"}))
+           #::common {:post_office "Oulu" :postal_code "90100" :street "Street 1"}))
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
                                        :price-per-unit 5.9M,

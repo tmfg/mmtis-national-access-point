@@ -61,5 +61,5 @@ FROM "transport-service" ts
 -- name: fetch-operator-users
 SELECT u.id, u.name, u.fullname, u.email
   FROM member m
-      JOIN "user" u ON m.table_id = u.id
+      JOIN "user" u ON m.table_id = u.id AND u.state = 'active' AND m.state = 'active'
 WHERE m.group_id = :ckan-group-id;

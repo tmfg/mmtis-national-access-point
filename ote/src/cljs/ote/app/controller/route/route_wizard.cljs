@@ -14,14 +14,14 @@
             [ote.app.routes :as routes]
             [ote.util.fn :refer [flip]]
             [clojure.set :as set]
-            [ote.localization :refer [tr tr-key]]
             [taoensso.timbre :as log]
             [ote.util.collections :as collections]
             [clojure.set :as set]
             [ote.localization :refer [selected-language]]
             [ote.ui.validation :as validation]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerErrorDetails ->ServerError]]
+            [ote.localization :refer [tr] :as localization]))
 
 (declare ->LoadRoute)
 
@@ -38,7 +38,8 @@
     (-> app
         (assoc-in [:route :step] :basic-info)
         (assoc-in [:route ::transit/route-type] :ferry)
-        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id])))))
+        (assoc-in [:route ::transit/transport-operator-id] (get-in app [:transport-operator ::t-operator/id]))
+        (assoc :selected-operator (:transport-operator app)))))
 
 (defmethod routes/on-navigate-event :new-route []
   (->NewRoute))
@@ -59,9 +60,14 @@
 ;; Load existing route
 (defrecord LoadRoute [id])
 (defrecord LoadRouteResponse [response])
+(defrecord LoadRouteOperatorResponse [response])
 
 ;; Edit route basic info
 (defrecord EditBasicInfo [form-data])
+(defrecord UpdateOperatorHomepage [new-homepage])
+(defrecord SaveOperatorHomepage [new-homepage])
+(defrecord UpdateOperatorHomepageResponse [response])
+(defrecord UpdateOperatorHomepageFailure [response])
 
 ;; Events to edit the route's stop sequence
 (defrecord AddStop [feature])
@@ -86,6 +92,7 @@
 (defrecord DeleteTrip [trip-idx])
 
 (defrecord EditStopTime [trip-idx stop-idx form-data])
+(defrecord ValidateStopTime [trip-idx stop-idx form-data])
 (defrecord ShowStopException [stop-type stop-idx icon-type trip-idx])
 
 ;; Event to set service calendar
@@ -247,27 +254,66 @@
        (every? valid-calendar-rule?
                (::transit/service-rules calendar))))
 
+(defn stop-times-validated [stop-times]
+  ;; Marks arrival/departure time which is too early compared to previous, so view may
+  ;; display warning and disable saving
+  (reduce
+    (fn [v curr]
+      (let [stop-prev (last v)
+            curr-arrival (::transit/arrival-time curr)
+            prev-departure (::transit/departure-time stop-prev)
+            curr-departure (::transit/departure-time curr)
+            chronology-problem (cond
+                                 (nil? stop-prev) nil       ; First stop cannot be non-chronological
+                                 (and (not (time/empty-time? curr-arrival))
+                                      (time/interval< curr-arrival
+                                                      prev-departure)) ::transit/arrival-time
+                                 (and (not (time/empty-time? curr-departure))
+                                      (time/interval< curr-departure
+                                                      curr-arrival)) ::transit/departure-time
+                                 :else nil)]
+        (conj v
+              (if chronology-problem
+                (assoc curr :time-invalid chronology-problem)
+                (dissoc curr :time-invalid)))))
+    []
+    stop-times))
+
+(defn load-operator [app operator-id]
+  (if (not= (get-in app [:selected-operator ::t-operator/id]) operator-id)
+    (do
+      (comm/get! (str "/t-operator/" operator-id)
+                   {:on-success (tuck/send-async! ->LoadRouteOperatorResponse)
+                    :on-failure (send-async! ->ServerError)})
+      (assoc-in app [:route :operator-loading?] true))
+    app))
+
 (extend-protocol tuck/Event
   LoadStops
   (process-event [_ app]
-    (let [on-success (tuck/send-async! ->LoadStopsResponse)]
-      (comm/get! "transit/stops.json"
-                 {:on-success on-success
-                  :response-format :json})
-      app))
+    (comm/get! "transit/stops.json"
+               {:on-success (tuck/send-async! ->LoadStopsResponse)
+                :on-failure (tuck/send-async! ->ServerErrorDetails {:title (tr [:common-texts :navigation-route])})
+                :response-format :json})
+    app)
 
   LoadStopsResponse
   (process-event [{response :response} app]
     (assoc-in app [:route :stops] response))
 
+  LoadRouteOperatorResponse
+  (process-event [{response :response} app]
+    (-> app
+      (assoc-in [:route :operator-loading?] false)
+      (assoc :selected-operator response)))
+
   LoadRoute
   (process-event [{id :id} app]
-    (let [on-success (tuck/send-async! ->LoadRouteResponse)]
-      (comm/get! (str "routes/" id)
-                 {:on-success on-success
-                  :on-failure (send-async! ->ServerError)})
-      (-> app
-          (assoc-in [:route :loading?] true))))
+    (comm/get! (str "routes/" id)
+               {:on-success (tuck/send-async! ->LoadRouteResponse)
+                :on-failure (send-async! ->ServerErrorDetails {:title (tr [:common-texts :navigation-route])})})
+    (-> app
+        (assoc-in [:route :loading?] true)))
 
   LoadRouteResponse
   (process-event [{response :response} app]
@@ -277,13 +323,15 @@
           stops (if (empty? trips)
                   stop-coordinates
                   (update-stop-times stop-coordinates trips))
-          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))]
-
+          trips (vec (map-indexed (fn [i trip] (assoc trip ::transit/service-calendar-idx i)) trips))
+          operator-id (::transit/transport-operator-id response)]
       (-> app
           (assoc :route response)
+          (load-operator operator-id)
           ;; make sure we don't overwrite loaded stops
           (assoc-in [:route :stops] (get-in app [:route :stops]))
           (assoc-in [:route ::transit/stops] stops)
+          (assoc-in [:route :loading?] false)
           (assoc-in [:route ::transit/trips] trips)
           (assoc-in [:route ::transit/service-calendars] service-calendars))))
 
@@ -292,6 +340,43 @@
     (-> app
         (route-updated)
         (update :route merge form-data)))
+
+  UpdateOperatorHomepageResponse
+  (process-event [{response :response} app]
+    (-> app
+        ; clear operator homepage from route - to prevent unnecessary save
+        (dissoc [:route :operator-homepage])
+        (update :transport-operators-with-services
+                (fn [operators]
+                  (map
+                    (fn [o]
+                      (update o :transport-operator
+                              (fn [operator]
+                                (if (= (::t-operator/id operator) (get-in app [:transport-operator ::t-operator/id]))
+                                  (:transport-operator app)
+                                  operator))))
+                    operators)))
+        (assoc :flash-message (tr [:route-wizard-page :homepage-update-success]))))
+
+  UpdateOperatorHomepageFailure
+  (process-event [{response :response} app]
+    (assoc app :flash-message (tr [:route-wizard-page :homepage-update-failure])))
+
+  SaveOperatorHomepage
+  (process-event [{new-homepage :new-homepage} app]
+    (comm/post! "routes/update-operator-homepage" {:homepage new-homepage
+                                                   :operator-id (get-in app [:selected-operator ::t-operator/id])}
+                {:on-success (tuck/send-async! ->UpdateOperatorHomepageResponse)
+                 :on-failure (tuck/send-async! ->UpdateOperatorHomepageFailure)})
+    app)
+
+  UpdateOperatorHomepage
+  (process-event [{new-homepage :new-homepage} app]
+    (-> app
+        (assoc-in [:selected-operator ::t-operator/homepage] new-homepage)
+        (assoc-in [:transport-operator ::t-operator/homepage] new-homepage)
+        ; Update operator homepage to route while operator homepage is not saved to db
+        (assoc-in [:route :operator-homepage] new-homepage)))
 
   AddStop
   (process-event [{feature :feature} app]
@@ -412,10 +497,21 @@
     (-> app
         (route-updated)
         (update-in [:route ::transit/stops] collections/remove-by-index idx)
+        ;; ::transit/stop-times must always be ordered by stop-idx so removal here trusts that.
+        ;; ::transit/stop-idx refers to a ::transit/stop so removing a stop requires updating stop-idx for all
+        ;; stop-times after the removed stop. If necessary, refactor stop-times later to use id instead of an idx reference.
         (update-in [:route ::transit/trips] (flip mapv)
                    (fn [trip]
-                     (update trip ::transit/stop-times collections/remove-by-index idx)))))
-
+                     (update trip
+                             ::transit/stop-times
+                             (fn [stop-times]
+                               (into []
+                                     (concat
+                                       (take idx stop-times)
+                                       (map
+                                         (fn [stop-time]
+                                           (update stop-time ::transit/stop-idx dec))
+                                         (drop (inc idx) stop-times))))))))))
 
   EditServiceCalendar
   (process-event [{trip-idx :trip-idx} app]
@@ -525,18 +621,21 @@
                                      time/minutes-from-midnight
                                      (- start-time)
                                      (+ new-start-time)
-                                     time/minutes-from-midnight->time))
-          update-times-from-new-start
-          #(-> %
-               (update ::transit/arrival-time time-from-new-start)
-               (update ::transit/departure-time time-from-new-start))]
+                                     time/minutes-from-midnight->time
+                                     time/time->interval))
+          stop-time-from-template #(-> %
+                                       (cond->
+                                         (some? (::transit/arrival-time %)) (update ::transit/arrival-time time-from-new-start)
+                                         (some? (::transit/departure-time %)) (update ::transit/departure-time time-from-new-start))
+                                       (dissoc ::transit/id ; Remove primary key(s) to avoid updating existing record
+                                               :transit-stop-time/stop-time-id))]
       (-> app
           (route-updated)
           (assoc-in [:route :new-start-time] nil)
           (update-in [:route ::transit/trips]
                      (fn [times]
                        (conj (or times [])
-                             {::transit/stop-times (mapv update-times-from-new-start
+                             {::transit/stop-times (mapv stop-time-from-template
                                                          (::transit/stop-times trip))
                               ::transit/service-calendar-idx (count (::transit/trips route))})))
           (update-in [:route ::transit/service-calendars]
@@ -560,6 +659,11 @@
     (-> app
         (route-updated)
         (update-in [:route ::transit/trips trip-idx ::transit/stop-times stop-idx] merge form-data)))
+
+  ValidateStopTime
+  (process-event [{:keys [trip-idx stop-idx form-data] :as event} app]
+    (-> app
+        (update-in [:route ::transit/trips trip-idx ::transit/stop-times] stop-times-validated)))
 
   ShowStopException
   (process-event [{stop-type :stop-type stop-idx :stop-idx icon-type :icon-type trip-idx :trip-idx :as evt} app]
@@ -596,7 +700,7 @@
                                               (map
                                                 #(dissoc % ::transit/departure-time ::transit/arrival-time)
                                                 stop)))
-                    (dissoc :step :stops :new-start-time :edit-service-calendar))
+                    (dissoc :step :stops :new-start-time :edit-service-calendar :operator-loading?))
           ;; Update calendar indexes if user has added calendars
           route (if (seq calendars)
                   (update route ::transit/trips
@@ -654,11 +758,19 @@
                                     time/minutes-from-midnight->time)))]
     (calc-from-new-start (get-in app [:route ::transit/stops stop-idx key]))))
 
-(defn validate-stop-times [first-stop last-stop other-stops]
-  (and (time/valid-time? (::transit/departure-time first-stop))
-       (time/valid-time? (::transit/arrival-time last-stop))
+(defn stop-times-input-valid? [stop-times]
+  (not
+    (some (fn [stop-time]
+            (:time-invalid stop-time))
+          stop-times)))
+
+(defn stop-times-valid? [stop-times]
+  (and (time/valid-time? (::transit/departure-time (first stop-times)))
+       (time/valid-time? (::transit/arrival-time (last stop-times)))
        (every? #(and (time/valid-time? (::transit/departure-time %))
-                     (time/valid-time? (::transit/arrival-time %))) other-stops)))
+                     (time/valid-time? (::transit/arrival-time %)))
+               (rest (butlast stop-times)))
+       (stop-times-input-valid? stop-times)))
 
 (defn valid-stop-sequence?
   "Check that a stop sequence has at least 2 stops."
@@ -693,11 +805,9 @@
       (fn [trip]
         (let [stops (::transit/stop-times trip)
               service-calendar-idx (::transit/service-calendar-idx trip)
-              first-stop (first stops)
-              last-stop (last stops)
-              other-stops (rest (butlast stops))
               calendar? (valid-calendar? (get-in route [::transit/service-calendars service-calendar-idx]))]
-          (and calendar? (validate-stop-times first-stop last-stop other-stops))))
+          (and calendar?
+               (stop-times-valid? stops))))
       trips)))
 
 (defn valid-route? [route]
@@ -708,8 +818,6 @@
 
 (defn valid-name [route]
   (if (empty? (get route ::transit/name)) false true))
-
-
 
 (defn empty-calendar-from-to-dates? [{::transit/keys [from-date to-date] :as data}]
   (or

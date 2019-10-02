@@ -47,6 +47,11 @@
                                                   :margin-bottom "-1px"
                                                   :color colors/primary-dark}}})
 
+(def gray-link-with-icon (merge blue-link-with-icon {:color colors/gray950
+                                                     ::stylefy/mode {:hover {:border-bottom (str "1px solid " colors/gray950)
+                                                                             :margin-bottom "-1px"
+                                                                             :color colors/gray950}}}))
+
 (def base-link {:color colors/primary
                 :text-decoration "none"
                 ::stylefy/mode {:hover {:text-decoration "underline"
@@ -82,14 +87,17 @@
                        :font-size 14
                        :font-weight "600"})                 ;; currently same as error
 
+(def required-input-element (merge required-element
+                                   {:margin-bottom "-1.3rem"}))
+
 (def error-element {:color "#B71C1C"
                     :font-weight "600"})
 
 ;; Front page
 
 (def front-page-add-service {:border-right "1px solid grey"})
-(def front-page-service-table (merge {:border (str "1px solid " colors/gray650)}
-                                     {::stylefy/sub-styles {:link {:text-decoration "none"
+(def basic-table (merge {:border (str "1px solid " colors/gray650)}
+                        {::stylefy/sub-styles {:link {:text-decoration "none"
                                                                    ::stylefy/mode {:visited {:text-decoration "none"}
                                                                                    :hover {:text-decoration "underline"}}}}}))
 
@@ -102,6 +110,12 @@
 (def header-font {:font-size "18px"
                   :padding-top "20px"
                   :font-weight "600"})
+
+(def small-text {:font-size "0.875rem"
+                 ;:font-size: 0.75rem - mobiili tekstikoko
+                 :font-weight "400"
+                 :line-height "1.5"
+                 :color colors/gray950})
 
 (def success-flash-message-body {:background-color "rgba(128, 149, 50, 0.87)"})
 (def error-flash-message-body {:max-width "800px" :background-color "rgba(190, 0, 0, 0.87)"})
@@ -277,8 +291,13 @@
                       ::stylefy/media {{:max-width (str width-xs "px")}
                                        {:flex-basis "50%"}}})
 
-
-
 (def capital-bold
   {:text-transform "uppercase"
    :font-weight "bold"})
+
+(def form-footer {:background-color colors/gray200
+                  :width "100%"
+                  :margin-bottom "-40px"
+                  :margin-top "1rem"
+                  :padding-bottom "2.5rem"
+                  :padding-top "1rem"})
