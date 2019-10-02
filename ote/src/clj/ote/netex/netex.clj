@@ -11,8 +11,9 @@
     [clojure.string :as str]
     [amazonica.aws.s3 :as s3]))
 
-(defn- path-allowed? [^String path]
-  ;; Sanity check to avoid operating in any system or app directory
+(defn- path-allowed?
+  "Checks if path is in a system directory or similar not allowed place. Returns true if allowed, false if not."
+  [^String path]
   (str/starts-with?
     (.getAbsolutePath (clojure.java.io/file path))          ; TODO: should use .getCanonicalPath but osx
     "/tmp/"))
