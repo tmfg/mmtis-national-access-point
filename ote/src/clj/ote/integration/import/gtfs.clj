@@ -301,11 +301,13 @@
 (defn download-and-store-transit-package
   "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
   Returns map containing an in-memory traffic gtfs package and related attribues or nil on failure "
-  [interface-type gtfs-config db url operator-id ts-id last-import-date license interface-id upload-s3? force-download?]
+  [interface-type gtfs-config db url operator-id operator-name ts-id last-import-date license interface-id upload-s3?
+   force-download?]
   (log/debug "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db interface-id)
-        response (load-transit-interface-url interface-type db interface-id url last-import-date (:gtfs/etag latest-package) force-download?)
+        response (load-transit-interface-url interface-type db interface-id url last-import-date
+                                             (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
@@ -348,8 +350,10 @@
       (log/debug (str "GTFS: service-id = " ts-id ", File imported and uploaded successfully, file = " filename))
       {:gtfs-file gtfs-file
        :gtfs-filename filename
+       :gtfs-basename (org.apache.commons.io.FilenameUtils/getBaseName filename)
        :external-interface-description-id interface-id
-       :service-id ts-id})))
+       :service-id ts-id
+       :operator-name operator-name})))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
