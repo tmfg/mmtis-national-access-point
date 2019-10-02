@@ -2,7 +2,8 @@
   (:require material-ui-chip-input
             [cljs-react-material-ui.reagent :as ui]
             [reagent.core :as r]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.theme.colors :as colors]))
 
 ;; TODO: Todo implement custom cljs version of mui chip-input component mirroring the amazing features of the component.
 
@@ -30,7 +31,8 @@
                     ;        This change fixes those problems, in combination with conditional chipContainerStyle change.
                     :inputStyle {:margin-top "12px"
                                  :margin-bottom "14px"}
-                    :listStyle {:width "auto"}})
+                    :listStyle {:width "auto"}
+                    :chipContainerStyle {:margin-top "6px"}})
 
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))
 
@@ -79,6 +81,10 @@
        (fn [props]
          [chip-input* (merge
                         default-props
+                        ; Cut margin and line-height if only one chip
+                        (when (= 1 (count (:value props)))
+                          {:inputStyle {:margin-top "5px"
+                                        :margin-bottom "5px"}})
                         ; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).
                         (when (empty? (:value props))
                           {:chipContainerStyle {:margin-top 0}})
