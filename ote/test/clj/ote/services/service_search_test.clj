@@ -14,7 +14,7 @@
 (use-fixtures :each
   (system-fixture
    :transport-service
-   (component/using (transport-service/->Transport nil) [:http :db])
+   (component/using (transport-service/->TransportService nil) [:http :db])
 
    :service-search
    (component/using (sut/->ServiceSearch) [:http :db])))
