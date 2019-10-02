@@ -339,6 +339,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :cancel "Peruuta"
   :delete "Poista"
   :delete-operator "Poista palveluntuottaja"
+  :delete-pick-up-location "Poista toimipiste"
+  :delete-interface "Poista rajapinta"
   :close "Sulje"
   :publish "Julkaise"
   :edit-service "Muokkaa palvelun tietoja"
@@ -364,7 +366,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-external-interface "Lisää rivi"
   :add-new-service-link "Lisää rivi"
   :add-add-new-row "Lisää uusi rivi"
-  :add-new-pick-up-location "Lisää rivi"
+  :add-new-pick-up-location "Lisää toimipiste"
   :add-new-additional-service "Lisää rivi"
   :add-new-vehicle "Lisää rivi"
   :add-new-transport-operator "Lisää uusi palveluntuottaja"
@@ -1127,6 +1129,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week-6-short "La"
   :day-of-week-7-short "Su"
   :no-operators "Ei palveluntuottajia"
+  :country "Maa"
   }
 
 
