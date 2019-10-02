@@ -11,7 +11,7 @@
 
 (deftest test-every-postal-code-validation
   (let [codes ["12345" "AU1234" "NNNNN-NNNN" "ANA NAN"]
-        error-codes ["NNNNN-NNNNN" "    " "    a" "1,2,3,4,5"]]
+        error-codes ["NNNNN-NNNNN" "    " "    a" "1,2,3,4,5" "1234_"]]
     (is (= (tou/validate-every-postal-codes (first codes)) (first codes)))
     (is (= (tou/validate-every-postal-codes (second codes)) (second codes)))
     (is (= (tou/validate-every-postal-codes (nth codes 2)) (nth codes 2)))
@@ -20,4 +20,5 @@
     (is (= (tou/validate-every-postal-codes (first error-codes)) false))
     (is (= (tou/validate-every-postal-codes (second error-codes)) false))
     (is (= (tou/validate-every-postal-codes (nth error-codes 2)) false))
-    (is (= (tou/validate-every-postal-codes (nth error-codes 3)) false))))
+    (is (= (tou/validate-every-postal-codes (nth error-codes 3)) false))
+    (is (= (tou/validate-every-postal-codes (nth error-codes 4)) false))))
