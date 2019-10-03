@@ -125,7 +125,7 @@
 (defn terminal [e! {form-data ::t-service/terminal} app]
   (r/with-let [groups [(ts-common/transport-type ::t-service/terminal)
                        (ts-common/name-group (tr [:terminal-page :header-service-info]))
-                       (ts-common/contact-info-group)
+                       (ts-common/contact-info-group app)
                        (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/terminal)
                        (ts-common/external-interfaces e!)
                        (ts-common/service-hours-group "terminal")

@@ -238,7 +238,7 @@
        data]]
      ]))
 
-(defn pick-up-locations [e!]
+(defn pick-up-locations [app-state]
   (let [tr* (tr-key [:field-labels :service-exception])
         write (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
@@ -281,6 +281,13 @@
                       :type :string
                       :read (comp ::common/post_office ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
+                     {:name :country
+                      :label (tr [:common-texts :country])
+                      :full-width? true
+                      :type :autocomplete
+                      :suggestions (mapv #(::common/value %) (:country-list app-state))
+                      :read (comp :country ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
                      {:name ::t-service/service-hours-and-exceptions
                       :full-width? true
                       :type :component
@@ -299,7 +306,7 @@
 (defn rental [e! service app]
   (with-let [groups [(ts-common/transport-type ::t-service/rentals)
                      (ts-common/name-group (tr [:rentals-page :header-service-info]))
-                     (ts-common/contact-info-group)
+                     (ts-common/contact-info-group app)
                      (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/rentals)
                      (ts-common/external-interfaces e!)
                      (vehicle-group)
@@ -315,7 +322,7 @@
                      (ts-common/service-url "booking-service-url"
                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                       ::t-service/booking-service)
-                     (pick-up-locations e!)]
+                     (pick-up-locations app)]
                      options (rental-form-options e! groups app)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))
