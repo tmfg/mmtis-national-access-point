@@ -9,6 +9,7 @@
             [ote.db.auditlog :as auditlog]
             [ote.db.common :as common]
             [ote.db.user :as user]
+            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.util.email-template :as email-template]
             [ote.config.email-config :as email-config]
             [compojure.core :refer [routes GET POST DELETE]]
@@ -489,7 +490,7 @@
       (POST "/transport-operator/data"
             {user :user
              cookies :cookies}
-        (let [lang (str/upper-case (get-in cookies ["finap_lang" :value]))]
+        (let [lang (get-lang-from-cookies cookies)]
           (http/transit-response
             (get-user-transport-operators-with-services db (:groups user) (:user user) lang))))
 
@@ -523,7 +524,7 @@
           cookies :cookies
           :as req}
       (let [id (Long/parseLong id)
-            lang (str/upper-case (get-in cookies ["finap_lang" :value]))]
+            lang (get-lang-from-cookies cookies)]
         (if (or (authorization/admin? user) (authorization/is-author? db user id))
           (private-data-transport-operator db id lang)
           (public-data-transport-operator db id lang))))))

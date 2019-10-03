@@ -16,6 +16,7 @@
             [taoensso.timbre :as log]
             [ote.db.modification :as modification]
             [ote.localization :as localization :refer [tr]]
+            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.email :as email]
             [ote.util.email-template :as email-template]
             [specql.op :as op]
@@ -136,9 +137,8 @@
 
   ^:unauthenticated
   (POST "/login" {form-data :body cookies :cookies}
-    (let [lang (str/upper-case (get-in cookies ["finap_lang" :value]))]
-      (#'login db auth-tkt-config
-        (http/transit-request form-data) lang)))
+    (#'login db auth-tkt-config
+      (http/transit-request form-data) (get-lang-from-cookies cookies)))
 
   ^:unauthenticated
   (POST "/logout" []

@@ -14,6 +14,7 @@
             [ote.services.places :as places]
             [ote.services.operators :as operators]
             [ote.services.external :as external]
+            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
             [ote.db.tx :as tx]
@@ -422,7 +423,7 @@
        user :user
        cookies :cookies}
       (let [id (Long/parseLong id)
-            lang (str/upper-case (get-in cookies ["finap_lang" :value]))
+            lang (get-lang-from-cookies cookies)
             operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
                                               #{::t-service/transport-operator-id}
                                               {::t-service/id id})))]
