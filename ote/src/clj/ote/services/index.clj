@@ -115,7 +115,7 @@
       (when (not (true? dev-mode?))
         (matomo-analytics-scripts matomo-config))
       (translations localization/*language*)
-      (user-info db user (str/upper-case localization/*language*))]
+      (user-info db user (str/upper-case (name localization/*language*)))]
 
      [:body (merge
              {:id "main-body"
