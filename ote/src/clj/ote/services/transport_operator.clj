@@ -59,11 +59,12 @@
     operator))
 
 (defn get-transport-operator
-  [db where-parameter]
+  [db where-parameter lang]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
         operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
                                where {::specql/limit 1}))
+        operator (translate-country operator db lang)
         associated-to-services-others (services-associated-to-operator db {:business-id (::t-operator/business-id operator)})
         own-associations (fetch-operators-associated-services db {:operator-id (::t-operator/id operator)})]
     (when operator
@@ -211,14 +212,17 @@
   (let [to (first (fetch db ::t-operator/transport-operator
                          (specql/columns ::t-operator/transport-operator)
                          {::t-operator/id id}))
-        to (translate-country to db lang)]
+        to (translate-country to db lang)
+        to (assoc to ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                         db {:id (::t-operator/ckan-group-id to)})
+                                                       ""))]
     (if to
       (http/transit-response to)
       {:status 404})))
 
 (defn public-data-transport-operator
   "Get single transport service by id"
-  [db id lang]
+  [db id]
   (let [to (first (fetch db ::t-operator/transport-operator
                          #{::t-operator/business-id
                            ::t-operator/name
@@ -392,7 +396,7 @@
                        {::t-operator/group-id ckan-group-id})))
 
 (defn get-user-transport-operators-with-services [db groups user lang]
-  (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
+  (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)} lang) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (transport-service/get-transport-services db operator-ids lang)]
     {:user (dissoc user :apikey :id)
@@ -483,16 +487,18 @@
             db user ckan-group-id
             #(remove-member-from-operator db user group form-data))))
 
-      (POST "/transport-operator/group" {user :user}
+      (POST "/transport-operator/group" {user :user cookies :cookies}
         (http/transit-response
-          (get-transport-operator db {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
+          (get-transport-operator db
+                                  {::t-operator/ckan-group-id (get (-> user :groups first) :id)}
+                                  (get-lang-from-cookies cookies))))
 
       (POST "/transport-operator/data"
             {user :user
              cookies :cookies}
-        (let [lang (get-lang-from-cookies cookies)]
-          (http/transit-response
-            (get-user-transport-operators-with-services db (:groups user) (:user user) lang))))
+        (http/transit-response
+          (get-user-transport-operators-with-services db (:groups user)
+                                                      (:user user) (get-lang-from-cookies cookies))))
 
       (POST "/transport-operator" {form-data :body
                                    user      :user}
@@ -513,21 +519,22 @@
   "Unauthenticated routes"
   [db config]
   (routes
-    (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
+    (GET "/transport-operator/:ckan-group-id" {{:keys [ckan-group-id]}
+                                               :params
+                                               cookies :cookies}
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id} (get-lang-from-cookies cookies))))
 
     (GET "/t-operator/:id"
          {{:keys [id]}
           :params
           user :user
-          cookies :cookies
-          :as req}
+          cookies :cookies}
       (let [id (Long/parseLong id)
             lang (get-lang-from-cookies cookies)]
         (if (or (authorization/admin? user) (authorization/is-author? db user id))
           (private-data-transport-operator db id lang)
-          (public-data-transport-operator db id lang))))))
+          (public-data-transport-operator db id))))))
 
 (defrecord TransportOperator [config]
   component/Lifecycle

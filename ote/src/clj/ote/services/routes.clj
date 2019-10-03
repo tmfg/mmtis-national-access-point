@@ -6,6 +6,7 @@
             [ote.components.http :as http]
             [ote.services.transport :as transport]
             [ote.services.transport-operator :as transport-operator]
+            [ote.services.localization :refer [get-lang-from-cookies]]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -54,8 +55,8 @@
   (fetch-services-with-route db {:operator-id operator-id
                                   :url (interface-url operator-id)}))
 
-(defn get-user-routes [db groups user]
-  (let [operators (keep #(transport-operator/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
+(defn get-user-routes [db groups user lang]
+  (let [operators (keep #(transport-operator/get-transport-operator db {::t-operator/ckan-group-id (:id %)} lang) groups)
         routes (fetch db
                       ::transit/route
                       route-list-columns
@@ -299,7 +300,7 @@
                             ::t-service/transport-service-id service-id}))
          ;; return all services with operator to update front end app-state
          {:services (transport/get-transport-services db #{operator-id} lang)
-          :routes (get-user-routes db (:groups user) (:user user))}))))
+          :routes (get-user-routes db (:groups user) (:user user) lang)}))))
 
 (defn- update-operator-homepage! [db user {:keys [operator-id homepage] :as form-data}]
   (authorization/with-transport-operator-check
@@ -321,10 +322,10 @@
   "Routes that require authentication"
   [db nap-config]
   (routes
-    (GET "/routes/routes" {user :user}
+    (GET "/routes/routes" {user :user cookies :cookies}
       (or (service-state-response db (:user user))
           (http/no-cache-transit-response
-            (get-user-routes db (:groups user) (:user user)))))
+            (get-user-routes db (:groups user) (:user user) (get-lang-from-cookies cookies)))))
 
     (POST "/routes/new" {form-data :body
                          user      :user}
