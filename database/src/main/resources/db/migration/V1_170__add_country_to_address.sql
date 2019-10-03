@@ -33,6 +33,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT convert_transport_service_address_countrycodes();
+DROP FUNCTION convert_transport_service_address_countrycodes();
 
 CREATE OR REPLACE FUNCTION convert_transport_operator_address_countrycodes()
     RETURNS VOID
@@ -54,3 +55,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT convert_transport_operator_address_countrycodes();
+DROP FUNCTION convert_transport_operator_address_countrycodes();
