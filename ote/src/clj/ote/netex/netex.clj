@@ -9,7 +9,8 @@
     [specql.core :as specql]
     [clojure.java.shell :refer [sh with-sh-dir]]
     [clojure.string :as str]
-    [amazonica.aws.s3 :as s3]))
+    [amazonica.aws.s3 :as s3]
+    [ote.config.netex-config :as config-nt]))
 
 (defn- path-allowed?
   "Checks if path is in a system directory or similar not allowed place. Returns true if allowed, false if not."
@@ -33,45 +34,64 @@
     (log/warn "Directory cleanup skipped, bad path = " path)))
 
 (defn- compose-chouette-import-gtfs-json [operator-name]
-  (cheshire/generate-string
-    {:gtfs-import
-     {:user_name "username-1"
-      :name "job 1"
-      :organisation_name operator-name
-      :referential_name "referential-name-1"
-      :object_id_prefix "GTFS"
-      :max_distance_for_connection_link 0
-      :max_distance_for_commercial 0
-      :ignore_end_chars 0
-      :ignoreLastWord false}}
-    {:pretty true}))
+  (cheshire/generate-string {:gtfs-import
+                             {:user_name "username-1"
+                              :name "job 1"
+                              :organisation_name operator-name
+                              :referential_name "referential-name-1"
+                              :object_id_prefix "GTFS"
+                              :max_distance_for_connection_link 0
+                              :max_distance_for_commercial 0
+                              :ignore_end_chars 0
+                              :ignoreLastWord false}}
+                            {:pretty true}))
 
 (defn- compose-chouette-export-netex-json [operator-name]
-  (cheshire/generate-string
-    {:netex-export
-     {:user_name "username-1"
-      :name "job 1"
-      :organisation_name operator-name
-      :referential_name "referential-name-1"
-      :add_metadata true
-      :projection_type "4326"                               ; 4326 is WSG86 projection for chouette
-      :add_extension true}}
-    {:pretty true}))
+  (cheshire/generate-string {:netex-export
+                             {:user_name "username-1"
+                              :name "job 1"
+                              :organisation_name operator-name
+                              :referential_name "referential-name-1"
+                              :add_metadata true
+                              :projection_type "4326"       ; 4326 is WSG86 projection for chouette
+                              :add_extension true}}
+                            {:pretty true}))
 
-(defn- validate-chouette-output
-  "Takes choutette process exit info and output path and evaluates if conversion was a success or failure.
+(defn- chouette-input-report-ok? [chouette-report-filepath]
+  (if (and (.exists (io/file chouette-report-filepath))
+           (.isFile (io/file chouette-report-filepath)))
+    (let [action_report (:action_report (cheshire/parse-string (slurp (str chouette-report-filepath)) keyword))
+          result (:result action_report)
+          error-files (->> action_report
+                           :files
+                           (filter #(= "NOK" (:status %)))
+                           (map :name))]
+
+      (if (and (= "OK" result) (empty? error-files))
+        true
+        (do (log/warn "NeTEx conversion chouette input report NOK: result = " result
+                      ", GTFS error files = '" error-files "'"
+                      ", chouette-report-filepath = " chouette-report-filepath)
+            false)))
+    (do
+      (log/warn "NeTEx conversion chouette input report missing. chouette-report-filepath = " chouette-report-filepath)
+      false)))
+
+(defn- chouette-output-valid?
+  "Takes chouette process exit info and output path and evaluates if conversion was a success or failure.
   Return: On success string defining filesystem path to output file, on failure nil"
-  [{:keys [exit err] :as ex-info} output-filepath chouette-cmd]
+  [{:keys [exit err] :as ex-info} {:keys [conversion-work-path]} {:keys [work-dir input-report-file]} output-filepath chouette-cmd]
   (if (and (= 0 exit)
            (str/blank? err)
+           (chouette-input-report-ok? (str conversion-work-path work-dir input-report-file))
            (.exists (io/file output-filepath)))
     output-filepath
-    (do (log/warn "chouette error = " ex-info ", tried = " chouette-cmd)
+    (do (log/warn "Netex conversion chouette error = " ex-info ", tried = " chouette-cmd)
         nil)))
 
 (defn- gtfs->netex!
-  "Return: On success string defining filesystem path to output file, on failure nil"
-  [{:keys [gtfs-file gtfs-filename gtfs-basename operator-name]} {:keys [chouette-path conversion-work-path] :as config}]
+  "Return: On success string defining filesystem path to output netex archive, on failure nil"
+  [{:keys [gtfs-file gtfs-filename gtfs-basename operator-name]} {:keys [chouette-path conversion-work-path] :as config-netex}]
   {:pre [(is (and (< 1 (count conversion-work-path))
                   (not (clojure.string/blank? conversion-work-path))))
          (is (not (clojure.string/blank? gtfs-filename)))
@@ -89,6 +109,8 @@
                       (str "-i " import-config-filepath)
                       (str "-o " export-config-filepath)
                       (str "-f " netex-filepath)
+                      ;; Set chouette's internal work dir under ote work dir so it gets deleted as part of task cleanup
+                      (str "-d " conversion-work-path (get-in (config-nt/config) [:chouette :work-dir]))
                       gtfs-filepath]]
 
     (if (and (path-allowed? gtfs-filepath)
@@ -108,9 +130,9 @@
         (->
           (with-sh-dir chouette-path
                        (apply sh chouette-cmd))             ; TODO: use a dedicated user with limited access rights
-          (validate-chouette-output netex-filepath chouette-cmd)))
+          (chouette-output-valid? config-netex (:chouette (config-nt/config)) netex-filepath chouette-cmd)))
       (do
-        (log/error (str "Bad path argument(s) " config))
+        (log/error (str "Bad path argument(s) " config-netex))
         nil))))
 
 (defn- upload-s3
