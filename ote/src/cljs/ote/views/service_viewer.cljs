@@ -131,24 +131,6 @@
      [:div (stylefy/use-sub-style service-viewer/info-container :right-block)
       rv]]]))
 
-#_ (defn info-sections-4-cols
-  ([title first-element second-element third-element fourth-element]
-   [info-sections-4-cols title first-element second-element third-element fourth-element {}])
-  ([title first-element second-element third-element fourth-element settings]
-   [:div
-    (if (:sub-title settings)
-      [:p (stylefy/use-style base/capital-bold) title]
-      [:h4 title])
-    [:div.info-block (stylefy/use-style service-viewer/info-container)
-     [:div (stylefy/use-sub-style service-viewer/info-container :first-block)
-      first-element]
-     [:div (stylefy/use-sub-style service-viewer/info-container :second-block)
-      second-element]
-     [:div (stylefy/use-sub-style service-viewer/info-container :third-block)
-      third-element]
-     [:div (stylefy/use-sub-style service-viewer/info-container :fourth-block)
-      fourth-element]]]))
-
 (def open-in-new-icon
   (ic/action-open-in-new {:style {:width 20
                                   :height 20

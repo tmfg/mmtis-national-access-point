@@ -3,26 +3,12 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
-            [specql.op :as op]
-            [ote.db.common :as common]
-            [ote.db.user :as user]
-            [ote.util.email-template :as email-template]
-            [ote.config.email-config :as email-config]
             [compojure.core :refer [routes GET POST DELETE]]
-            [taoensso.timbre :as log]
-            [ote.services.operators :as operators]
-            [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
-            [ote.db.tx :as tx]
-            [ote.email :as email]
             [hiccup.core :refer [html]]
-            [ote.time :as time]
-            [clj-time.core :as t]
             [clojure.set :refer [rename-keys]]
-            [clj-time.coerce :as tc]
             [clojure.string :as str]
-            [ote.services.transport :as transport-service])
-  (:import (java.util UUID)))
+            [ote.db.common :as common]))
 
 (defn country-list [db lang]
   (specql/fetch db ::common/country-list
