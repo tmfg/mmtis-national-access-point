@@ -1,5 +1,8 @@
 (ns ote.config.email-config
-  "Configuration values for email related thingies")
+  "Configuration values for the emailing feature.
+  This file contains constants which are not environment-specific, so they are defined here instead of hard-coding in
+  implementation files. Motivation is to have constants in one place for better overview to the feature and its
+  variability.")
 
 (defn config []
   {:e2e-test-email "user.userson@example.com"                          ;; To detect which email address needs to be replaced by amazon simulator address

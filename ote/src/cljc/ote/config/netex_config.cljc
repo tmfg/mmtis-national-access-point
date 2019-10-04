@@ -1,5 +1,8 @@
 (ns ote.config.netex-config
-  "Configuration values for the feature")
+  "Configuration values for the netex feature.
+  This file contains constants which are not environment-specific, so they are defined here instead of hard-coding in
+  implementation files. Motivation is to have constants in one place for better overview to the feature and its
+  variability.")
 
 (defn config []
   {:chouette {:work-dir "work/"
