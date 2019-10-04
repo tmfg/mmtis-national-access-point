@@ -10,7 +10,7 @@
             [jeesql.core :refer [defqueries]]
             [ote.util.feature :as feature]
             [clojure.string :as str]
-            [ote.services.transport :as transport]
+            [ote.services.transport-operator :as transport-operator]
             [taoensso.timbre :as log])
   (:import (java.util UUID)))
 
@@ -48,7 +48,7 @@
                             ::user/apikey (str (UUID/randomUUID))
                             ::user/activity_streams_email_notifications false})]
             (when (and token group-info)                    ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
-              (transport/create-member! db (::user/id new-user) (:ckan-group-id group-info))
+              (transport-operator/create-member! db (::user/id new-user) (:ckan-group-id group-info))
               (specql/delete! db ::user/user-token
                 {::user/token token})
               (log/info "New user (" email ") registered with token from " (:name group-info))))

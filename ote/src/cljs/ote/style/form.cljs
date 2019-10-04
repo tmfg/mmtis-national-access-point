@@ -9,6 +9,10 @@
 
 (def form-field {:margin-right "10px"})
 
+(def div-form-field {:padding-right "5px"
+                     :padding-left "5px"
+                     :min-height "88px"})
+
 (def form-group-base {:margin-bottom "1em"})
 
 (def form-group-column (merge form-group-base

@@ -5,7 +5,7 @@
             [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.localization :as localization :refer [tr]]
-            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.common :refer [->ServerError get-country-list]]
             [ote.util.url :as url-util]
             [ote.db.transport-service :as t-service]
             [ote.app.routes :as routes]
@@ -101,7 +101,7 @@
     (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
                {:on-success (tuck/send-async! ->OperatorSuccess)
                 :on-failure (tuck/send-async! ->OperatorFailure)}))
-  app)
+  (get-country-list app))
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]
   (when params

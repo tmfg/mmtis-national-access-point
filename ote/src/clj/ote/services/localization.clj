@@ -3,7 +3,8 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.localization :as localization]
-            [compojure.core :refer [routes GET]]))
+            [compojure.core :refer [routes GET]]
+            [clojure.string :as str]))
 
 (defn- fetch-language [language-name]
   (http/transit-response (localization/translations (keyword language-name))))
@@ -29,3 +30,8 @@
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
+
+(defn get-lang-from-cookies [cookies]
+  (if (and (not (nil? cookies)) (not (nil? (get-in cookies ["finap_lang" :value]))))
+    (str/upper-case (get-in cookies ["finap_lang" :value]))
+    "FI"))

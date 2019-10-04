@@ -5,6 +5,8 @@
             [ote.util.fn :refer [flip]]
             [ote.components.http :as http]
             [ote.services.transport :as transport]
+            [ote.services.transport-operator :as transport-operator]
+            [ote.services.localization :refer [get-lang-from-cookies]]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -20,7 +22,8 @@
             [ote.db.tx :as tx]
             [jeesql.core :refer [defqueries]]
             [ote.environment :as environment]
-            [ote.db.feature])                               ; specql table definitions
+            [ote.db.feature]
+            [clojure.string :as str])                               ; specql table definitions
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defqueries "ote/services/routes.sql")
@@ -52,8 +55,8 @@
   (fetch-services-with-route db {:operator-id operator-id
                                   :url (interface-url operator-id)}))
 
-(defn get-user-routes [db groups user]
-  (let [operators (keep #(transport/get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
+(defn get-user-routes [db groups user lang]
+  (let [operators (keep #(transport-operator/get-transport-operator db {::t-operator/ckan-group-id (:id %)} lang) groups)
         routes (fetch db
                       ::transit/route
                       route-list-columns
@@ -278,7 +281,7 @@
   Users can add interface by hand but this is much more convenient for them."
   [db user  {is-linked? :is-linked?
              service-id :service-id
-             operator-id :operator-id :as form-data}]
+             operator-id :operator-id :as form-data} lang]
   (let [interface-url (interface-url operator-id)]
     (authorization/with-transport-operator-check
       db user operator-id
@@ -296,8 +299,8 @@
                             ::t-service/license "CC BY 4.0"
                             ::t-service/transport-service-id service-id}))
          ;; return all services with operator to update front end app-state
-         {:services (transport/get-transport-services db #{operator-id})
-          :routes (get-user-routes db (:groups user) (:user user))}))))
+         {:services (transport/get-transport-services db #{operator-id} lang)
+          :routes (get-user-routes db (:groups user) (:user user) lang)}))))
 
 (defn- update-operator-homepage! [db user {:keys [operator-id homepage] :as form-data}]
   (authorization/with-transport-operator-check
@@ -319,10 +322,10 @@
   "Routes that require authentication"
   [db nap-config]
   (routes
-    (GET "/routes/routes" {user :user}
+    (GET "/routes/routes" {user :user cookies :cookies}
       (or (service-state-response db (:user user))
           (http/no-cache-transit-response
-            (get-user-routes db (:groups user) (:user user)))))
+            (get-user-routes db (:groups user) (:user user) (get-lang-from-cookies cookies)))))
 
     (POST "/routes/new" {form-data :body
                          user      :user}
@@ -347,11 +350,14 @@
             (delete-route! db user
                            (:id (http/transit-request form-data))))))
 
-    (POST "/routes/link-interface" {form-data :body
-                                    user :user}
-      (or (service-state-response db (:user user))
-          (http/transit-response
-            (link-interface db user (http/transit-request form-data)))))))
+    (POST "/routes/link-interface" {body :body
+                                    user :user
+                                    cookies :cookies}
+      (let [lang (str/upper-case (get-in cookies ["finap_lang" :value]))
+            form-data (http/transit-request body)]
+        (or (service-state-response db (:user user))
+            (http/transit-response
+              (link-interface db user form-data lang)))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode

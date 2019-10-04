@@ -345,6 +345,8 @@
   :cancel "Ångra"
   :delete "Ta bort"
   :delete-operator "Ta bort tjänsteproducent"
+  :delete-pick-up-location "Ta bort verksamhetsställe"
+  :delete-interface "Ta bort externt gränssnitt"
   :close "Stäng"
   :publish "Publicera"
   :edit-service "Redigera tjänstens info"
@@ -1120,6 +1122,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-6-short "Lö"
   :day-of-week-7-short "Sö"
   :no-operators "Inga tjänsteproducenter"
+  :country "Land"
   }
 
 

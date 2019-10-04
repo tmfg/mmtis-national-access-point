@@ -11,4 +11,5 @@
 
 (define-tables
   ;; Common UDT types
-  ["address" ::address])
+  ["address" ::address]
+  ["country_list" ::country-list])

@@ -50,6 +50,12 @@
                                                       :min-width "2rem"}}
    ::stylefy/auto-prefix #{:transition}})
 
+(def row-button (merge
+                  button-common
+                  {:padding "0.65rem 1.3rem 0.65rem 1.3rem"
+                   :display "inline-flex"
+                   :line-height "1.7rem"}))
+
 (def disabled-button (merge
                        button-common
                        {:color colors/primary-text
@@ -58,6 +64,22 @@
                         :border 0
                         :box-shadow "none"
                         :cursor "not-allowed"}))
+
+(def delete-row-button
+  (merge row-button
+         {:color colors/negative-text
+          :border 0
+          :background-color colors/gray700
+          ::stylefy/mode {:hover negative-btn-hover-focus
+                          :focus negative-btn-hover-focus}}))
+
+(def open-dialog-row-button
+  (merge row-button
+         {:color colors/negative-text
+          :border 0
+          :background-color colors/primary
+          ::stylefy/mode {:hover negative-btn-hover-focus
+                          :focus negative-btn-hover-focus}}))
 
 (def negative-button
   (merge button-common

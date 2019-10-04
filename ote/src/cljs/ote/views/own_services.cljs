@@ -32,7 +32,6 @@
             [ote.ui.form-fields :as form-fields]
             [ote.ui.common :as ui-common]
             [ote.ui.info :as info]
-            [ote.views.transport-operator-selection :as t-operator-sel]
             [ote.ui.list-header :as list-header]
             [clojure.string :as str]
             [ote.app.controller.front-page :as fp]

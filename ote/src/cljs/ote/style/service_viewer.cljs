@@ -45,4 +45,18 @@
                                :flex 1
                                ::stylefy/media {{:max-width (str width-xs "px")}
                                                 {:margin-right 0}}}
-                         :right {:flex 1}}})
+                         :right {:flex 1}
+
+                         :first-block {:flex 1
+                                       :margin-right "0.5rem"
+                                       ::stylefy/media {{:max-width (str width-xs "px")}
+                                                        {:margin-right 0}}}
+                         :second-block {:flex 1
+                                        :margin-right "0.5rem"
+                                        ::stylefy/media {{:max-width (str width-xs "px")}
+                                                         {:margin-right 0}}}
+                         :third-block {:flex 1
+                                       :margin-right "0.5rem"
+                                       ::stylefy/media {{:max-width (str width-xs "px")}
+                                                        {:margin-right 0}}}
+                         :fourth-block {:flex 1}}})
