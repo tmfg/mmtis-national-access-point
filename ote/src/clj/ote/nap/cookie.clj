@@ -1,5 +1,5 @@
 (ns ote.nap.cookie
-  "OTE CKAN interoperability tools: cookie authentication.
+  "OTE interoperability tools: cookie authentication.
   Read and validate cookies in mod_auth_tkt format."
   (:import (java.security MessageDigest)
            (java.util Date))

@@ -5,11 +5,6 @@ job('Daily staging env deploy') {
     }
     steps {
         downstreamParameterized {
-            trigger('Deploy CKAN plugin') {
-                parameters {
-                    predefinedProp('ENV','staging')
-                }
-            }
             trigger('Deploy OTE') {
                 parameters {
                     predefinedProp('ENV','staging')

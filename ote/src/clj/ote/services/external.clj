@@ -1,5 +1,5 @@
 (ns ote.services.external
-  "CKAN-integration tasks. Functions to invoke CKAN API calls from OTE."
+  "Integration tasks."
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.util.csv :as csv-util]
