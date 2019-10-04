@@ -20,7 +20,7 @@ If you encounter weird errors with docker containers or the images are taking to
 `docker-compose up -d`  
 
 If you want to take a look inside a docker container run e.g.
-`docker exec -it napote-nginx /bin/bash`
+`docker exec -it napote-db /bin/bash`
 
 ## ENV variables
 
