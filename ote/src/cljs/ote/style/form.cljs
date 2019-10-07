@@ -7,11 +7,11 @@
 ;; FIXME: use garden unit helpers (currently stylefy has a bug and they don't work)
 
 
-(def form-field {:margin-right "10px"})
+(def form-field {:margin-right "0.5rem"})
 
-(def div-form-field {:padding-right "5px"
-                     :padding-left "5px"
-                     :min-height "88px"})
+(def div-form-field {:padding-right "0.25rem"
+                     :padding-left "0.25rem"
+                     :min-height "5.5rem"})
 
 (def form-group-base {:margin-bottom "1em"})
 
@@ -21,18 +21,18 @@
                            (base/flex-container "row")
                            {:flex-wrap "wrap" :align-items "center"}))
 
-(def form-group-container {:padding-bottom "1em" :width "100%"})
+(def form-group-container {:padding-bottom "1rem" :width "100%"})
 
 (def form-card {:background-color "#fff"
                 :box-shadow "rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px"})
 
-(def form-card-label {:padding "15px 15px"
+(def form-card-label {:padding "1rem 1rem"
                       :font-size "1.125em"
                       :font-weight "bold"
                       :color "#fff"
                       :background-color "#06c"})
 
-(def form-card-body {:padding "15px 15px"
+(def form-card-body {:padding "1rem 1rem"
                      :font-size "1em"
                      :color "#444444"})
 
@@ -50,7 +50,7 @@
 (def subtitle-h {:margin "0"})
 
 (def subheader {:color "#666"
-                :margin-top "-10px"})
+                :margin-top "-0.5rem"})
 
 (def border-color "#C4C4C4")
 (def border-right {:border-right (str "solid 2px " border-color)
@@ -62,7 +62,7 @@
 
 (def organization-padding {:padding-top "20px"})
 
-(def padding-top {:padding-top "20px"})
+(def padding-top {:padding-top "2rem"})
 
 (def action-control-section-margin {:margin-top "2rem"})
 

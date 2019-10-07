@@ -792,7 +792,7 @@
             (let [{:keys [errors missing-required-fields]} (and error-data
                                                                 (< i (count error-data))
                                                                 (nth error-data i))]
-              ^{:key (str "div-" i)}
+              ^{:key (str "div-" id "-" i)}
               [:div
                [:div.row
                 (doall
@@ -840,7 +840,7 @@
                                           (add-label-disabled? (last data))
                                           (values/effectively-empty? (last data)))}
                              (when (not (nil? id))
-                               {:id (str id "-button")})) add-label]])]))
+                               {:id (str id "-button-save")})) add-label]])]))
 
 (defmethod field :table [{:keys [table-fields table-style table-wrapper-style update! delete? add-label
                                  add-label-disabled? error-data id] :as opts} data]

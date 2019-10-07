@@ -123,7 +123,7 @@
                      (some? nap-id) (merge (take-update-op-keys nap-item)))))
          operators-ytj)))
 
-(defn convert-country->code
+(defn translated-country->code-code
   "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
   [app operator]
   (let [visiting-country (get-in operator [::t-operator/visiting-address :country])
@@ -427,7 +427,7 @@
   (process-event [{data :data} app]
     (-> app
         (update :transport-operator merge data)
-        (convert-country->code data)
+        (translated-country->code-code data)
         (dissoc :transport-operator-save-q)
         (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 

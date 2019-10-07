@@ -2,8 +2,7 @@
   (:require material-ui-chip-input
             [cljs-react-material-ui.reagent :as ui]
             [reagent.core :as r]
-            [clojure.string :as str]
-            [ote.theme.colors :as colors]))
+            [clojure.string :as str]))
 
 ;; TODO: Todo implement custom cljs version of mui chip-input component mirroring the amazing features of the component.
 
@@ -81,11 +80,11 @@
        (fn [props]
          [chip-input* (merge
                         default-props
-                        ; Cut margin and line-height if only one chip
+                        ;; Cut margin and line-height if only one chip
                         (when (= 1 (count (:value props)))
                           {:inputStyle {:margin-top "5px"
                                         :margin-bottom "5px"}})
-                        ; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).
+                        ;; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).
                         (when (empty? (:value props))
                           {:chipContainerStyle {:margin-top 0}})
                         ;; Remove custom prop to prevent Reactunknown prop warning

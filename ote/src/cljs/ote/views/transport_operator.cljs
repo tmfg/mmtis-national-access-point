@@ -261,7 +261,8 @@
        :label (tr [:common-texts :country])
        :name :visit-country
        :type :autocomplete
-       :suggestions (mapv #(::common/value %) (:country-list state))
+       :full-width? true
+       :suggestions (mapv ::common/value (:country-list state))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :country :ote.db.transport-operator/visiting-address)
@@ -308,7 +309,8 @@
        :label (tr [:common-texts :country])
        :name :billing-country
        :type :autocomplete
-       :suggestions (mapv #(::common/value %) (:country-list state))
+       :full-width? true
+       :suggestions (mapv ::common/value (:country-list state))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :country :ote.db.transport-operator/billing-address)
