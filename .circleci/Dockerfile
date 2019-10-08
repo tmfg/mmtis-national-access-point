@@ -52,13 +52,19 @@ RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.
     unzip awscli-bundle.zip && \
     ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
+# Install gtfs to netex converstion shell tool
+RUN curl "https://ote-assets.s3.eu-central-1.amazonaws.com/chouette-command.zip" -o "/tmp/chouette-command.zip" && \
+    unzip -o /tmp/chouette-command.zip -d /opt/chouette/ && \
+    cp -r /opt/chouette/chouette-cmd_3.4.8/* /opt/chouette/ && \
+    rm -rf /opt/chouette/chouette-cmd_3.4.8 && \
+    rm -f /tmp/chouette-command.zip
+
 # Cleanup
 RUN apt-get -y autoremove && \
     apt-get -y autoclean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN google-chrome --version && aws --version && node --version && npm --version
-
 
 USER circleci
 
