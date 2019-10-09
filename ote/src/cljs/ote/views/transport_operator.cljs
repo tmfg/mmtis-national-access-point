@@ -310,7 +310,7 @@
        :name :billing-country
        :type :autocomplete
        :full-width? true
-       :suggestions (mapv ::common/value (:country-list state))
+       :suggestions (mapv second (:country-list state))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :country :ote.db.transport-operator/billing-address)
