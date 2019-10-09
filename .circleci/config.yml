@@ -46,8 +46,10 @@ jobs:
       - run: aws s3 cp s3://ote-assets/places/spatial_relations_places.csv database/spatial_relations_places.csv
       - run: cd database && sh circleci_setup.sh
 
+      # setup ote config
+      - run: mkdir /tmp/ote && envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
+
       # run tests!
-      - run: envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
       - run: cd ote && lein test
 
       - run:
@@ -57,7 +59,6 @@ jobs:
       - run:
           name: Configure build
           command: |
-            mkdir /tmp/ote
             mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
 
       - run:
