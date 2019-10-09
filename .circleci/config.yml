@@ -47,6 +47,7 @@ jobs:
       - run: cd database && sh circleci_setup.sh
 
       # run tests!
+      - run: envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
       - run: cd ote && lein test
 
       - run:
@@ -58,7 +59,6 @@ jobs:
           command: |
             mkdir /tmp/ote
             mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
-            envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
 
       - run:
           name: Deploy build artifacts
