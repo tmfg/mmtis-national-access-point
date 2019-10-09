@@ -5,7 +5,7 @@
 
 #?(:clj
    (defn slurp-bytes
-     "takes `arg` and returns a bytearray read from the path it points to. Throws an exception is target is missing."
+     "takes `arg` and returns a bytearray read from the path it points to. Throws an exception if target is missing."
      [arg]
      (with-open [out (java.io.ByteArrayOutputStream.)]
        (copy (input-stream arg) out)
