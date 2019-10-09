@@ -15,6 +15,7 @@
            :url "https://s3.eu-central-1.amazonaws.com/ote-assets/places/finnish-municipalities/SuomenKuntajako_2017_10k.shp"}}
  :nap {:api "${OTE_BASE_URL}/api/"
        :export-base-url "$OTE_BASE_URL"}
+ :pre-notices {:bucket "napote-pre-notice-attachment-localdev"}
  :enabled-features $OTE_FLAGS
  :netex {:chouette-path "$CHOUETTE_PATH"
          :conversion-work-path "$NETEX_CONVERSION_WORKPATH"
