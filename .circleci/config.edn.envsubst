@@ -16,6 +16,6 @@
  :nap {:api "${OTE_BASE_URL}/api/"
        :export-base-url "$OTE_BASE_URL"}
  :enabled-features $OTE_FLAGS
- :netex {:chouette-path "/tmp/chouette/"
-          :conversion-work-path "/tmp/ote/netex-conversion/"
-          :bucket nil}}
+ :netex {:chouette-path "$CHOUETTE_PATH"
+         :conversion-work-path "$NETEX_CONVERSION_WORKPATH"
+         :bucket nil}}
