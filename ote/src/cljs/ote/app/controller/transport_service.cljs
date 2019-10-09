@@ -43,15 +43,16 @@
   {}
   ;; Set transport-operator and sub-type
   (pre-set-transport-type
-   (assoc app
-          :transport-operator (->> app :transport-operators-with-services
-                                   (map :transport-operator)
-                                   (filter #(= (::t-operator/id %) operator-id))
-                                   first)
-          :transport-service (merge (:transport-service app)
-                                    (when sub-type
-                                      {::t-service/sub-type sub-type
-                                       ::t-service/type (service-type-from-sub-type sub-type)})))))
+    (-> app
+        (get-country-list)
+        (assoc :transport-operator (->> app :transport-operators-with-services
+                                        (map :transport-operator)
+                                        (filter #(= (::t-operator/id %) operator-id))
+                                        first)
+               :transport-service (merge (:transport-service app)
+                                         (when sub-type
+                                           {::t-service/sub-type sub-type
+                                            ::t-service/type (service-type-from-sub-type sub-type)}))))))
 
 (define-event ShowBrokeringServiceDialog []
   {}
@@ -255,8 +256,8 @@
   (mapv
     (fn [p]
       (let [pick-up-country (get-in p [::t-service/pick-up-address :country])
-            country-code (some #(when (= pick-up-country (::common/value %))
-                                  (::common/country_code %))
+            country-code (some #(when (= pick-up-country (second %))
+                                  (name (first %)))
                                country-list)]
         (if (and (some? country-code) (some? pick-up-country))
           (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)
@@ -266,8 +267,8 @@
 (defn convert-country-code [app service]
   (let [key (t-service/service-key-by-type (::t-service/type service))
         contact-country (get-in service [key ::t-service/contact-address :country])
-        country-code (some #(when (= contact-country (::common/value %))
-                              (::common/country_code %))
+        country-code (some #(when (= contact-country (second %))
+                              (name (first %)))
                            (:country-list app))
         app (if (= :rentals (::t-service/type service))
               (update-in app [:transport-service key ::t-service/pick-up-locations]

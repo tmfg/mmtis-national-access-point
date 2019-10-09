@@ -285,7 +285,7 @@
                       :label (tr [:common-texts :country])
                       :full-width? true
                       :type :autocomplete
-                      :suggestions (mapv ::common/value (:country-list app-state))
+                      :suggestions (mapv second (:country-list app-state))
                       :read (comp :country ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
                      {:name ::t-service/service-hours-and-exceptions

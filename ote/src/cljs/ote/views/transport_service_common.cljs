@@ -360,7 +360,7 @@
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :style {:margin-bottom "2rem"}
      :full-width? true
-     :suggestions (mapv #(::common/value %) (:country-list app-state))
+     :suggestions (mapv second (:country-list app-state))
      :read (comp :country ::t-service/contact-address)
      :write (fn [data country]
               (assoc-in data [::t-service/contact-address :country] country))}
