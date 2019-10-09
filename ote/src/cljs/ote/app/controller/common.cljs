@@ -1,7 +1,7 @@
 (ns ote.app.controller.common
   "Common controller functionality"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-tree]]
             [ote.communication :as comm]
             [ote.app.routes :refer [navigate!]]))
 
@@ -29,13 +29,6 @@
                    {}
                    (handle-error app response))
 
-(tuck/define-event CountryListResponse [response]
- {}
- (assoc app :country-list response
-            :country-list-loaded? true))
-
 (defn get-country-list [app]
-  (comm/get! "country-list"
-             {:on-success (tuck/send-async! ->CountryListResponse)
-              :on-failure (tuck/send-async! ->ServerError)})
-  (assoc app :country-list-loaded? false))
+  (assoc app :country-list (tr-tree [:country-list])
+    :country-list-loaded? true))

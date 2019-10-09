@@ -30,8 +30,3 @@
   (stop [{stop ::stop :as this}]
     (stop)
     (dissoc this ::stop)))
-
-(defn get-lang-from-cookies [cookies]
-  (if (and (not (nil? cookies)) (not (nil? (get-in cookies ["finap_lang" :value]))))
-    (str/upper-case (get-in cookies ["finap_lang" :value]))
-    "FI"))

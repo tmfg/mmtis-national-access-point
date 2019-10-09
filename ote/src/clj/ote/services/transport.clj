@@ -12,9 +12,7 @@
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
             [ote.services.places :as places]
-            [ote.services.operators :as operators]
             [ote.services.external :as external]
-            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
             [ote.db.tx :as tx]
@@ -64,25 +62,6 @@
           p)))
     pick-up-locations))
 
-(defn translate-country
-  "Translate country from country_code and assoc it to address as :country. It will be removed from address before
-  saving back to db."
-  [service db lang]
-  (let [country-list (specql/fetch db ::common/country-list
-                                   #{::common/value ::common/country_code}
-                                   {})
-        country-code (get-in service [::t-service/contact-address ::common/country_code])
-        service (cond-> service
-                        (not (nil? country-code))
-                        (assoc-in [::t-service/contact-address :country]
-                                  (::common/value (first (specql/fetch db ::common/country-list
-                                                                       #{::common/value}
-                                                                       {::common/country_code country-code
-                                                                        ::common/locale_code lang}))))
-                        (and (= :rentals (::t-service/type service)) (< 0 (count (get-in service [::t-service/rentals ::t-service/pick-up-locations]))))
-                        (update-in [::t-service/rentals ::t-service/pick-up-locations] #(translate-pick-up-country % country-list)))]
-    service))
-
 (defn add-error-data
   [service]
   (let [sub-type (::t-service/sub-type service)
@@ -94,7 +73,7 @@
 
 (defn get-transport-services
   "Return Vector of transport-services"
-  [db operators lang]
+  [db operators]
   (let [services (fetch-transport-services db {:operator-ids operators})
         ;; Add namespace for non namespaced keywords because sql query returns values without namespace
         modified-services (mapv (fn [x] (set/rename-keys x transport-services-column-keys)) services)]
@@ -105,20 +84,18 @@
                 (update ::t-service/sub-type keyword)
                 (update ::t-service/interface-types #(mapv keyword (util/PgArray->vec %)))
                 (update ::t-service/transport-type #(mapv keyword (util/PgArray->vec %)))
-                (translate-country db lang)
                 add-error-data))
           modified-services)))
 
 (defn all-data-transport-service
   "Get single transport service by id"
-  [db id lang]
+  [db id]
   (let [ts (first (fetch db ::t-service/transport-service
                          (conj (specql/columns ::t-service/transport-service)
                                ;; join external interfaces
                                [::t-service/external-interfaces
                                 (specql/columns ::t-service/external-interface-description)])
-                         {::t-service/id id}))
-        ts (translate-country ts db lang)]
+                         {::t-service/id id}))]
     (if ts
       (http/transit-response (assoc ts ::t-service/operation-area
                                        (places/fetch-transport-service-operation-area db id)))
@@ -423,12 +400,11 @@
        user :user
        cookies :cookies}
       (let [id (Long/parseLong id)
-            lang (get-lang-from-cookies cookies)
             operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
                                               #{::t-service/transport-operator-id}
                                               {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
-          (all-data-transport-service db id lang)
+          (all-data-transport-service db id)
           (public-data-transport-service db id))))))
 
 (defrecord TransportService [config]
