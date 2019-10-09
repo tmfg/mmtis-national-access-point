@@ -232,101 +232,12 @@
     :rows 1}))
 
 (defn service-hours-for-location [update-form! data]
-  (reagent/with-let [open? (reagent/atom false)]
-    [:div
-     [buttons/open-dialog-row {:on-click #(reset! open? true)}
-      (tr [:rentals-page :open-service-hours-and-exceptions])]
-     [ui/dialog
-      {:open @open?
-       :actionsContainerStyle style-dialog/dialog-action-container
-       :auto-scroll-body-content true
-       :title (tr [:opening-hours-dialog :header-dialog])
-       :actions [(reagent/as-element
-                  [ui/flat-button {:label (tr [:buttons :close])
-                                   :on-click #(reset! open? false)}])]}
-      [form/form {:update! update-form!
-                  :name->label (tr-key [:field-labels :rentals]
-                                       [:field-labels :transport-service]
-                                       [:field-labels])}
-       [(assoc-in (ts-common/service-hours-group "rental") [:options :card?] false)]
-       data]]
-     ]))
-
-(defn service-hours-for-location2 [update-form! data]
   [form/form {:update! update-form!
               :name->label (tr-key [:field-labels :rentals]
                                    [:field-labels :transport-service]
                                    [:field-labels])}
-   [(ts-common/service-hours-group2 "rental")]
+   [(ts-common/service-hours-group "rental")]
    data])
-
-(defn pick-up-locations [app-state]
-  (let [tr* (tr-key [:field-labels :service-exception])
-        write (fn [key]
-                (fn [{all-day? ::t-service/all-day :as data} time]
-                  ;; Don't allow changing time if all-day checked
-                  (if all-day?
-                    data
-                    (assoc data key time))))]
-    (form/group
-      {:label (tr [:passenger-transportation-page :header-pick-up-locations])
-       :columns 1
-       :card? false
-       :top-border true}
-
-     {:name ::t-service/pick-up-locations
-      :type :table
-      :prepare-for-save values/without-empty-rows
-      :table-fields [{:name ::t-service/pick-up-name
-                      :full-width? true
-                      :type :string
-                      :required? true}
-                     {:name ::t-service/pick-up-type
-                      :type :selection
-                      :full-width? true
-                      :auto-width? true
-                      :style {:width "100%"}
-                      :options t-service/pick-up-types
-                      :show-option (tr-key [:enums ::t-service/pick-up-type])
-                      :required? true}
-                     {:name ::common/street
-                      :full-width? true
-                      :type :string
-                      :read (comp ::common/street ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
-                     {:name ::common/postal_code
-                      :type :string
-                      :full-width? true
-                      :validate [[:every-postal-code]]
-                      :read (comp ::common/postal_code ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
-                     {:name ::common/post_office
-                      :full-width? true
-                      :type :string
-                      :read (comp ::common/post_office ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
-                     {:name :country
-                      :label (tr [:common-texts :country])
-                      :full-width? true
-                      :type :autocomplete
-                      :suggestions (mapv second (:country-list app-state))
-                      :read (comp :country ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
-                     {:name ::t-service/service-hours-and-exceptions
-                      :full-width? true
-                      :type :component
-                      :component (fn [{:keys [update-form! data]}]
-                                   [service-hours-for-location update-form! data])}]
-      :delete? true
-      :add-label (tr [:buttons :add-new-pick-up-location])}
-
-     (form/info (tr [:form-help :pick-up-locations-url]))
-
-     {:name ::t-service/pick-up-locations-url
-      :type :string
-      :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-      :full-width? true})))
-
 
 (defn service-hour-form-element
   "Define immutable function for service hours (and exceptions) so that reagent won't re-render the whole component in every
@@ -387,7 +298,7 @@
                      :label (tr [:common-texts :country])
                      :full-width? true
                      :type :autocomplete
-                     :suggestions (mapv #(::common/value %) (:country-list app-state))
+                     :suggestions (mapv second (:country-list app-state))
                      :read (comp :country ::t-service/pick-up-address)
                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
                     {:name ::t-service/service-hours-and-exceptions

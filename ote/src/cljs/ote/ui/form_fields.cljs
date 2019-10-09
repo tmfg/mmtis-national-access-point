@@ -811,6 +811,7 @@
                                           #(update data i write %)
                                           #(assoc-in data [i name] %))]]
                     ^{:key (str id name label type)}
+                    ^{:key (str id name label type)}
                     [:div {:class div-class
                            :style (merge
                                     style-form/div-form-field
@@ -973,18 +974,18 @@
 
 (defn- checkbox-container [update! table? label warning error style input-style checked? disabled? on-click]
   [:div (when error (stylefy/use-style style-base/required-element))
-      [ui/checkbox
-       (merge
-         {:label (when-not table? label)
-          :checked (boolean checked?)
-          :on-check #(update! (not checked?))
-          :disabled disabled?
-          :input-style input-style
-          :style style}
-         (when on-click
-           {:on-click #(on-click)}))]
-      (when error
-        (tr [:common-texts :required-field]))])
+   [ui/checkbox
+    (merge
+      {:label (when-not table? label)
+       :checked (boolean checked?)
+       :on-check #(update! (not checked?))
+       :disabled disabled?
+       :input-style input-style
+       :style style}
+      (when on-click
+        {:on-click #(on-click)}))]
+   (when error
+     (tr [:common-texts :required-field]))])
 
 (defmethod field :checkbox [{:keys [update! table? label warning error style input-style extended-help disabled? on-click]} checked?]
   (if extended-help
