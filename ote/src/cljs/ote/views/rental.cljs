@@ -18,7 +18,8 @@
             [ote.style.form :as style-form]
             [ote.util.values :as values]
             [ote.ui.validation :as validation]
-            [ote.style.dialog :as style-dialog])
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.info :as info])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -32,9 +33,11 @@
 
 (defn price-group []
   (form/group
-   {:label (tr [:rentals-page :header-service-info])
-    :columns 3
-    :layout :row}
+    {:label (tr [:rentals-page :header-service-info])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
    (form/info
     (tr [:field-labels :rentals :rentals-pricing-info]))
@@ -77,9 +80,11 @@
 
 (defn vehicle-group []
   (form/group
-   {:label (tr [:rentals-page :header-vehicles])
-    :columns 1
-    :layout :row}
+    {:label (tr [:rentals-page :header-vehicles])
+     :columns 1
+     :layout :row
+     :card? false
+     :top-border true}
 
    {:name ::t-service/vehicle-classes
     :type :table
@@ -104,8 +109,10 @@
 (defn accessibility-group []
   (form/group
     {:label (tr [:rentals-page :header-accessibility])
-    :columns 2
-    :layout :row}
+     :columns 2
+     :layout :row
+     :card? false
+     :top-border true}
 
     {:name        ::t-service/guaranteed-vehicle-accessibility
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
@@ -157,9 +164,11 @@
 
 (defn additional-services []
   (form/group
-   {:label (tr [:rentals-page :header-additional-services])
-    :columns 3
-    :layout :row}
+    {:label (tr [:rentals-page :header-additional-services])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
    {:name ::t-service/rental-additional-services
     :type :table
@@ -187,9 +196,11 @@
 
 (defn luggage-restrictions-groups []
   (form/group
-   {:label (tr [:rentals-page :header-restrictions-payments])
-    :columns 2
-    :layout :row}
+    {:label (tr [:rentals-page :header-restrictions-payments])
+     :columns 2
+     :layout :row
+     :card? false
+     :top-border true}
 
    {:name ::t-service/luggage-restrictions
     :type :localized-text
@@ -197,19 +208,22 @@
     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
     :full-width?  true}
 
-   {:name        ::t-service/payment-methods
-    :type        :multiselect-selection
-    :show-option (tr-key [:enums ::t-service/payment-methods])
-    :options     t-service/payment-methods
-    :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-    :full-width?  true})
+    {:name ::t-service/payment-methods
+     :type :multiselect-selection
+     :show-option (tr-key [:enums ::t-service/payment-methods])
+     :options t-service/payment-methods
+     :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+     :style {:margin-bottom "2rem"}
+     :full-width? true})
   )
 
 (defn usage-area []
   (form/group
-   {:label (tr [:rentals-page :header-usage-area])
-    :columns 1
-    :layout :row}
+    {:label (tr [:rentals-page :header-usage-area])
+     :columns 1
+     :layout :row
+     :card? false
+     :top-border true}
 
    {:name ::t-service/usage-area
     :type :string
@@ -220,8 +234,8 @@
 (defn service-hours-for-location [update-form! data]
   (reagent/with-let [open? (reagent/atom false)]
     [:div
-     [ui/flat-button {:label (tr [:rentals-page :open-service-hours-and-exceptions])
-                      :on-click #(reset! open? true)}]
+     [buttons/open-dialog-row {:on-click #(reset! open? true)}
+      (tr [:rentals-page :open-service-hours-and-exceptions])]
      [ui/dialog
       {:open @open?
        :actionsContainerStyle style-dialog/dialog-action-container
@@ -238,6 +252,14 @@
        data]]
      ]))
 
+(defn service-hours-for-location2 [update-form! data]
+  [form/form {:update! update-form!
+              :name->label (tr-key [:field-labels :rentals]
+                                   [:field-labels :transport-service]
+                                   [:field-labels])}
+   [(ts-common/service-hours-group2 "rental")]
+   data])
+
 (defn pick-up-locations [app-state]
   (let [tr* (tr-key [:field-labels :service-exception])
         write (fn [key]
@@ -247,8 +269,10 @@
                     data
                     (assoc data key time))))]
     (form/group
-     {:label (tr [:passenger-transportation-page :header-pick-up-locations])
-      :columns 1}
+      {:label (tr [:passenger-transportation-page :header-pick-up-locations])
+       :columns 1
+       :card? false
+       :top-border true}
 
      {:name ::t-service/pick-up-locations
       :type :table
@@ -303,26 +327,102 @@
       :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
       :full-width? true})))
 
+
+(defn service-hour-form-element
+  "Define immutable function for service hours (and exceptions) so that reagent won't re-render the whole component in every
+  keystroke. This had to be made to make :localized-text element to work inside [service-hours-for-location] component."
+  [{:keys [update-form! data] :as component-content}]
+  [service-hours-for-location update-form! data])
+
+(defn pick-up-locations [app-state]
+  (form/group
+    {:label (tr [:passenger-transportation-page :header-pick-up-locations])
+     :columns 1
+     :card? false
+     :top-border true}
+
+    {:name ::t-service/pick-up-locations
+     :id "pick-up-locations-div-table"
+     :type :div-table
+     :div-class "col-xs-12 col-sm-6 col-md-4"
+     :delete? true
+     :delete-label (tr [:buttons :delete-pick-up-location])
+     :add-label (tr [:buttons :add-new-pick-up-location])
+     :add-divider? true
+     :prepare-for-save values/without-empty-rows
+     :table-fields [{:name ::t-service/pick-up-name
+                     :label (tr [:field-labels :rentals ::t-service/pick-up-name])
+                     :full-width? true
+                     :type :string
+                     :required? true}
+                    {:name ::t-service/pick-up-type
+                     :label (tr [:field-labels :rentals ::t-service/pick-up-type])
+                     :type :selection
+                     :full-width? true
+                     :auto-width? true
+                     :style {:width "100%"}
+                     :options t-service/pick-up-types
+                     :show-option (tr-key [:enums ::t-service/pick-up-type])
+                     :required? true}
+                    {:name ::common/street
+                     :label (tr [:field-labels ::common/street])
+                     :full-width? true
+                     :type :string
+                     :read (comp ::common/street ::t-service/pick-up-address)
+                     :write #(assoc-in %1 [::t-service/pick-up-address ::common/street] %2)}
+                    {:name ::common/postal_code
+                     :label (tr [:field-labels ::common/postal_code])
+                     :type :string
+                     :full-width? true
+                     :validate [[:every-postal-code]]
+                     :read (comp ::common/postal_code ::t-service/pick-up-address)
+                     :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
+                    {:name ::common/post_office
+                     :label (tr [:field-labels ::common/post_office])
+                     :full-width? true
+                     :type :string
+                     :read (comp ::common/post_office ::t-service/pick-up-address)
+                     :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
+                    {:name :country
+                     :label (tr [:common-texts :country])
+                     :full-width? true
+                     :type :autocomplete
+                     :suggestions (mapv #(::common/value %) (:country-list app-state))
+                     :read (comp :country ::t-service/pick-up-address)
+                     :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
+                    {:name ::t-service/service-hours-and-exceptions
+                     :type :component
+                     :component-type :inner-row
+                     :component service-hour-form-element}]}
+
+    (form/info (tr [:form-help :pick-up-locations-url]))
+
+    {:name ::t-service/pick-up-locations-url
+     :type :string
+     :container-class "col-xs-12 col-sm-12 col-md-6"
+     :full-width? true}))
+
 (defn rental [e! service app]
-  (with-let [groups [(ts-common/transport-type ::t-service/rentals)
-                     (ts-common/name-group (tr [:rentals-page :header-service-info]))
-                     (ts-common/contact-info-group app)
-                     (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/rentals)
-                     (ts-common/external-interfaces e!)
-                     (vehicle-group)
-                     (luggage-restrictions-groups)
-                     (accessibility-group)
-                     (additional-services)
-                     (usage-area)
-                     (ts-common/service-url "real-time-information-url"
-                      (tr [:field-labels :rentals ::t-service/real-time-information])
-                      ::t-service/real-time-information
-                      (tr [:form-help :real-time-info]))
-                     (ts-common/advance-reservation-group)
-                     (ts-common/service-url "booking-service-url"
-                      (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                      ::t-service/booking-service)
-                     (pick-up-locations app)]
-                     options (rental-form-options e! groups app)]
+  (let [groups [(ts-common/transport-type ::t-service/rentals)
+                (ts-common/name-group (tr [:rentals-page :header-service-info]))
+                (ts-common/contact-info-group app)
+                (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/rentals)
+                (ts-common/external-interfaces e!)
+                #_(ts-common/external-interfaces2 e!)
+                (vehicle-group)
+                (luggage-restrictions-groups)
+                (accessibility-group)
+                (additional-services)
+                (usage-area)
+                (ts-common/service-url "real-time-information-url"
+                                       (tr [:field-labels :rentals ::t-service/real-time-information])
+                                       ::t-service/real-time-information
+                                       (tr [:form-help :real-time-info]))
+                (ts-common/advance-reservation-group)
+                (ts-common/service-url "booking-service-url"
+                                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                                       ::t-service/booking-service)
+                (pick-up-locations app)]
+        options (rental-form-options e! groups app)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

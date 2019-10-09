@@ -32,7 +32,9 @@
   (form/group
    {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    (form/info (tr [:form-help :advance-reservation-info]))
 
@@ -52,7 +54,9 @@
     form/group
     {:label label
      :layout :row
-     :columns 2}
+     :columns 2
+     :card? false
+     :top-border true}
 
     (concat
      (when info-message
@@ -84,7 +88,9 @@
   [label service-url-field]
   (form/group
     {:label label
-     :columns 3}
+     :columns 3
+     :card? false
+     :top-border true}
 
     {:name         service-url-field
      :type         :table
@@ -118,7 +124,9 @@
 
     (form/group
       {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
-       :columns 3}
+       :columns 3
+       :card? false
+       :top-border true}
 
       (form/info
         [:div
@@ -276,7 +284,9 @@
   [e!]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/companies])
-    :columns 3}
+    :columns 3
+     :card? false
+     :top-border true}
 
     (form/info (tr [:form-help :companies-main-info]) {:type :generic})
 
@@ -305,7 +315,9 @@
   [e!]
   (form/group
     {:label   (tr [:passenger-transportation-page :header-brokerage])
-     :columns 3}
+     :columns 3
+     :card? false
+     :top-border true}
 
     {:name          ::t-service/brokerage?
      :extended-help {:help-text      (tr [:form-help :brokerage?])
@@ -319,7 +331,9 @@
   (form/group
     {:label (tr [:passenger-transportation-page :header-contact-details])
      :columns 3
-     :layout :row}
+     :layout :row
+     :card? false
+     :top-border true}
 
     (form/info (tr [:form-help :description-why-contact-info]))
 
@@ -427,8 +441,8 @@
      (when true
        [:div.row
         (when (not (form/can-save? data))
-          [ui/card {:style {:margin-bottom "1rem"}}
-           [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6rem"}} (tr [:form-help :publish-missing-required])]])
+          [:div {:style {:margin "1em 0em 1em 0em"}}
+           [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
         (if published?
           ;; True
@@ -461,88 +475,113 @@
 (defn service-hours-group [service-type]
   (let [tr* (tr-key [:field-labels :service-exception])
         write-time (fn [key]
-                (fn [{all-day? ::t-service/all-day :as data} time]
-                  ;; Don't allow changing time if all-day checked
-                  (if all-day?
-                    data
-                    (assoc data key time))))]
+                     (fn [{all-day? ::t-service/all-day :as data} time]
+                       ;; Don't allow changing time if all-day checked
+                       (if all-day?
+                         data
+                         (assoc data key time))))]
     (form/group
-     {:label (tr [:passenger-transportation-page :header-service-hours])
-      :columns 3}
+      {:label (tr [:passenger-transportation-page :header-service-hours])
+       :columns 3
+       :card? false
+       :sub-component true}
 
-     {:name         ::t-service/service-hours
-      :type         :table
-      :prepare-for-save values/without-empty-rows
-      :table-fields
-      [{:name ::t-service/week-days
-        :width "40%"
-        :type :multiselect-selection
-        :options t-service/days
-        :show-option (tr-key [:enums ::t-service/day :full])
-        :show-option-short (tr-key [:enums ::t-service/day :short])
-        :required? true
-        :is-empty? validation/empty-enum-dropdown?}
-       {:name ::t-service/all-day
-        :width "10%"
-        :type :checkbox
-        :write (fn [data all-day?]
-                 (merge data
-                        {::t-service/all-day all-day?}
-                        (if all-day?
-                          {::t-service/from (time/->Time 0 0 nil)
-                           ::t-service/to (time/->Time 24 0 nil)}
-                          {::t-service/from nil
-                           ::t-service/to nil})))}
+      {:name ::t-service/service-hours
+       :id "service-hours-div-table"
+       :type :div-table
+       :div-class "col-xs-6 col-sm-4 col-md-2"
+       :inner-delete? true
+       :add-label (tr [:buttons :add-new-service-hour])
+       :inner-delete-label (tr [:buttons :delete-service-hours])
+       :prepare-for-save values/without-empty-rows
+       :table-fields
+       [{:name ::t-service/week-days
+         :label (tr [:field-labels :transport-service ::t-service/week-days])
+         :type :multiselect-selection
+         :field-class "col-xs-6 col-sm-4 col-md-4"
+         :options t-service/days
+         :show-option (tr-key [:enums ::t-service/day :full])
+         :show-option-short (tr-key [:enums ::t-service/day :short])
+         :required? true
+         :full-width? true
+         :is-empty? validation/empty-enum-dropdown?}
+        {:name ::t-service/all-day
+         :label (tr [:field-labels :transport-service ::t-service/all-day])
+         :type :checkbox
+         :input-style {:position "inherit"}
+         :field-class "col-xs-6 col-sm-2 col-md-2"
+         :write (fn [data all-day?]
+                  (merge data
+                         {::t-service/all-day all-day?}
+                         (if all-day?
+                           {::t-service/from (time/->Time 0 0 nil)
+                            ::t-service/to (time/->Time 24 0 nil)}
+                           {::t-service/from nil
+                            ::t-service/to nil})))}
 
-       (merge
-         (when (= "passenger-transportation" service-type)
-           {:label (tr [:common-texts :start-time])})
-         {:name ::t-service/from
-          :width "25%"
-          :type :time
-          :write (write-time ::t-service/from)
-          :required? true
-          :is-empty? time/empty-time?})
-       (merge
-         (when (= "passenger-transportation" service-type)
-           {:label (tr [:common-texts :ending-time])})
-         {:name ::t-service/to
-          :width "25%"
-          :type :time
-          :write (write-time ::t-service/to)
-          :required? true
-          :is-empty? time/empty-time?})]
-      :delete?      true
-      :add-label (tr [:buttons :add-new-service-hour])}
+        (merge
+          (when (= "passenger-transportation" service-type)
+            {:label (tr [:common-texts :start-time])})
+          {:name ::t-service/from
+           :label (tr [:field-labels :transport-service ::t-service/from])
+           :type :time
+           :container-style {:padding-top "1.5rem"}
+           :field-class "col-xs-6 col-sm-2 col-md-2"
+           :write (write-time ::t-service/from)
+           :required? true
+           :is-empty? time/empty-time?})
+        (merge
+          (when (= "passenger-transportation" service-type)
+            {:label (tr [:common-texts :ending-time])})
+          {:name ::t-service/to
+           :label (tr [:field-labels :transport-service ::t-service/to])
+           :type :time
+           :container-style {:padding-top "1.5rem"}
+           :field-class "col-xs-6 col-sm-2 col-md-2"
+           :write (write-time ::t-service/to)
+           :required? true
+           :is-empty? time/empty-time?})]}
 
-     {:name ::t-service/service-exceptions
-      :type :table
-      :prepare-for-save values/without-empty-rows
-      :table-fields [{:name ::t-service/description
-                      :label (tr* :description)
-                      :type :localized-text}
-                     {:name ::t-service/from-date
-                      :type :date-picker
-                      :label (tr* :from-date)
-                      :element-id "service-exception-from-date"}
-                     {:name ::t-service/to-date
-                      :type :date-picker
-                      :label (tr* :to-date)
-                      :element-id "service-exception-to-date"}]
-      :delete? true
-      :add-label (tr [:buttons :add-new-service-exception])}
+      (form/subtitle "Palveluaikojen poikkeukset")
 
-     {:name ::t-service/service-hours-info
-      :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
-      :type :localized-text
-      :full-width? true
-      :container-class "col-xs-12"})))
+      {:name ::t-service/service-exceptions
+       :type :div-table
+       :inner-delete? true
+       :inner-delete-label (tr [:buttons :delete-service-exceptions])
+       :add-label (tr [:buttons :add-new-service-exception])
+       :div-class "col-xs-6 col-sm-2 col-md-2"
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/description
+                       :label (tr* :description)
+                       :type :localized-text
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-6 col-md-6"}
+                      {:name ::t-service/from-date
+                       ;:label (tr [:field-labels :service-exception :t-service/from-date])
+                       :type :date-picker
+                       :label (tr* :from-date)
+                       :element-id "service-exception-from-date"
+                       :field-class "col-xs-6 col-sm-2 col-md-2"}
+                      {:name ::t-service/to-date
+                       ;:label (tr [:field-labels :service-exception :t-service/to-date])
+                       :type :date-picker
+                       :label (tr* :to-date)
+                       :element-id "service-exception-to-date"
+                       :field-class "col-xs-6 col-sm-2 col-md-2"}]}
+
+      {:name ::t-service/service-hours-info
+       :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
+       :type :localized-text
+       :full-width? true
+       :container-class "col-xs-12"})))
 
 (defn name-group [label]
   (form/group
    {:label label
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    (form/info (tr [:form-help :name-info]))
 
@@ -578,7 +617,9 @@
   (form/group
    {:label (tr [:field-labels :transport-service-common ::t-service/transport-type])
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    (when (not= sub-type :taxi)
      (form/info (tr [:form-help :transport-type-info])))
