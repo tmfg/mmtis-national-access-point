@@ -50,7 +50,6 @@ jobs:
       - run: aws s3 cp s3://ote-assets/places/spatial_relations_places.csv database/spatial_relations_places.csv
       - run: cd database && sh circleci_setup.sh
 
-      # setup ote config
 
       # run tests!
       - run:
