@@ -56,7 +56,8 @@ RUN curl "https://ote-assets.s3.eu-central-1.amazonaws.com/chouette-command.zip"
     unzip -o /tmp/chouette-command.zip -d /tmp/chouette/ && \
     cp -r /tmp/chouette/chouette-cmd_3.4.8/* /tmp/chouette/ && \
     rm -rf /tmp/chouette/chouette-cmd_3.4.8 && \
-    rm -f /tmp/chouette-command.zip
+    rm -f /tmp/chouette-command.zip && \
+    sudo chown -R circleci /tmp/chouette
 
 # Cleanup
 RUN apt-get -y autoremove && \
