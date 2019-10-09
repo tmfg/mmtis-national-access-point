@@ -47,7 +47,7 @@ jobs:
       - run: cd database && sh circleci_setup.sh
 
       # setup ote config
-      - run: mkdir /tmp/ote && envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
+      - run: mkdir /tmp/ote && pwd && envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
 
       # run tests!
       - run: cd ote && lein test
