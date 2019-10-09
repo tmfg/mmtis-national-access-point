@@ -508,7 +508,7 @@
         {:name ::t-service/all-day
          :label (tr [:field-labels :transport-service ::t-service/all-day])
          :type :checkbox
-         :input-style {:position "inherit"}
+         :style {:padding-top "2.5rem"}
          :field-class "col-xs-6 col-sm-2 col-md-2"
          :write (fn [data all-day?]
                   (merge data
