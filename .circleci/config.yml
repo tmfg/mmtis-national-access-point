@@ -34,7 +34,9 @@ jobs:
           - v4-dependencies-{{ .Branch }}
           - v4-dependencies-
 
-      - run: cd ote && lein deps
+      - run:
+          name: Lein deps
+          command: cd ote && lein deps
 
       - save_cache:
           key: v4-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
