@@ -7,7 +7,8 @@
             [clojure.java.io :as io]
             [ote.util.file :as file]))
 
-(def chouette-path "/opt/chouette/")                        ; Folder where chouette script is
+(def config-netex (:netex (read-string (slurp "config.edn"))))
+(def chouette-path (:chouette-path config-netex))                        ; Folder where chouette script is
 (def conversion-work-path-test "/tmp/ote/netex-conversion-test/") ; Temp folder to be created and removed for conversion
 (def test-input-gtfs-filepath "test/resources/netex/test_data_gtfs.zip") ; Conversion input gtfs zip
 (def test-reference-netex-filepath "test/resources/netex/test_data_netex.zip") ; Conversion reference result zip
