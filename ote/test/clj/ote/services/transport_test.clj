@@ -37,7 +37,7 @@
         service (:transit ts)
         ps (::t-service/passenger-transportation service)]
     (is (= (::t-service/contact-address service)
-           {::common/post_office "Oulu" ::common/postal_code "90100" ::common/street "Street 1" ::common/country_code "FI" :country "Suomi"}))
+           {::common/post_office "Oulu" ::common/postal_code "90100" ::common/street "Street 1" ::common/country_code "FI"}))
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
                                        :price-per-unit 5.9M,
