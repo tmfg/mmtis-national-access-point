@@ -16,7 +16,9 @@
                 (system-fixture))
 
 ;; File names contained by result archive, which shall have full comparison in test, instead of simple comparison
-(def full-compare-netex-names #{"metadata_chouette_dc.xml" "metadata_chouette.txt"})
+;; Update: all files include publication date so no full comparison to any, because don't want to parse every element
+;; in order to handle changing date
+(def full-compare-netex-names #{})
 
 (defn test-are-zips-same
   "Takes `reference-filepath` and `result-filepath` and compares if those match using clojure.test/is macros.
