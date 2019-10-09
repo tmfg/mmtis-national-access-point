@@ -62,11 +62,10 @@
                          :external-interface-description-id 1}
         res (sut/gtfs->netex! conversion-meta
                               config-netex)]
-    (is (not (str/blank? res))
-        "Conversion function should return a path to created netex archive")
-
-    (test-are-zips-same res
-                        test-reference-netex-filepath
-                        full-compare-netex-names)
+    (when (is (not (str/blank? res))
+              "Conversion function should return a path to created netex archive")
+      (test-are-zips-same res
+                          test-reference-netex-filepath
+                          full-compare-netex-names))
 
     (sut/cleanup-dir-recursive! (:conversion-work-path config-netex))))
