@@ -46,17 +46,16 @@ RUN apt-get install -y --no-install-recommends postgresql-client maven
 # Install extra packages (for our CI scripts)
 RUN apt-get install -y --no-install-recommends sudo zip git gettext-base
 
-
 # Install awscli bundle
 RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"&& \
     unzip awscli-bundle.zip && \
     ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
-# Install gtfs to netex converstion shell tool
+# Install gtfs to netex converstion shell tool. Under /tmp/ to avoid need for sudo
 RUN curl "https://ote-assets.s3.eu-central-1.amazonaws.com/chouette-command.zip" -o "/tmp/chouette-command.zip" && \
-    unzip -o /tmp/chouette-command.zip -d /opt/chouette/ && \
-    cp -r /opt/chouette/chouette-cmd_3.4.8/* /opt/chouette/ && \
-    rm -rf /opt/chouette/chouette-cmd_3.4.8 && \
+    unzip -o /tmp/chouette-command.zip -d /tmp/chouette/ && \
+    cp -r /tmp/chouette/chouette-cmd_3.4.8/* /tmp/chouette/ && \
+    rm -rf /tmp/chouette/chouette-cmd_3.4.8 && \
     rm -f /tmp/chouette-command.zip
 
 # Cleanup
