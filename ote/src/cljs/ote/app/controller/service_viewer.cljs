@@ -94,14 +94,15 @@
 
 (define-event FetchServiceData [operator-id service-id]
   {}
-  (do
-    (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
-               {:on-success (tuck/send-async! ->ServiceSuccess)
-                :on-failure (tuck/send-async! ->ServiceFailure)})
-    (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
-               {:on-success (tuck/send-async! ->OperatorSuccess)
-                :on-failure (tuck/send-async! ->OperatorFailure)}))
-  (get-country-list app))
+  (let [app (get-country-list app)]
+    (do
+      (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
+                 {:on-success (tuck/send-async! ->ServiceSuccess)
+                  :on-failure (tuck/send-async! ->ServiceFailure)})
+      (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
+                 {:on-success (tuck/send-async! ->OperatorSuccess)
+                  :on-failure (tuck/send-async! ->OperatorFailure)}))
+      app))
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]
   (when params

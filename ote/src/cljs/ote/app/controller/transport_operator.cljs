@@ -128,16 +128,33 @@
   [app operator]
   (let [visiting-country (get-in operator [::t-operator/visiting-address :country])
         billing-country (get-in operator [::t-operator/billing-address :country])
-        v-country-code (some #(when (= visiting-country (::common/value %))
-                               (::common/country_code %))
+        v-country-code (some #(when (= visiting-country (second %))
+                                (name (first %)))
                              (:country-list app))
-        b-country-code (some #(when (= billing-country (::common/value %))
-                                (::common/country_code %))
+        b-country-code (some #(when (= billing-country (second %))
+                                (name (first %)))
                              (:country-list app))]
     (if (some? operator)
       (-> app
           (assoc-in [:transport-operator ::t-operator/visiting-address ::common/country_code] v-country-code)
           (assoc-in [:transport-operator ::t-operator/billing-address ::common/country_code] b-country-code))
+      app)))
+
+(defn code-code->translated-country
+  "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
+  [app]
+  (let [visiting-country-code (get-in app [:transport-operator ::t-operator/visiting-address ::common/country_code])
+        billing-country-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
+        v-country (some #(when (= visiting-country-code (name (first %)))
+                            (second %))
+                             (:country-list app))
+        b-country (some #(when (= billing-country-code (name (first %)))
+                            (second %))
+                             (:country-list app))]
+    (if (some? (:transport-operator app))
+      (-> app
+          (assoc-in [:transport-operator ::t-operator/visiting-address :country] v-country)
+          (assoc-in [:transport-operator ::t-operator/billing-address :country] b-country))
       app)))
 
 ;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
@@ -415,6 +432,7 @@
     (let [state (assoc app :transport-operator response
                            :transport-operator-loaded? true
                            :ytj-response {})
+          state (code-code->translated-country state)
           nap-business-id (get-in state [:transport-operator ::t-operator/business-id])
           op-ytj-cache-miss? (or (empty? (:ytj-company-names state)) (not= nap-business-id (get-in state [:ytj-response :businessId])))]
       (if (flags/enabled? :open-ytj-integration)

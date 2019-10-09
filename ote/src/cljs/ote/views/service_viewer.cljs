@@ -647,8 +647,8 @@
                  post-office (get-in row [::t-service/pick-up-address :ote.db.common/post_office])
                  post-code (get-in row [::t-service/pick-up-address :ote.db.common/postal_code])
                  country-code (get-in row [::t-service/pick-up-address :ote.db.common/country_code])
-                 country (some #(when (= country-code (::common/country_code %))
-                                  (::common/value %))
+                 country (some #(when (= country-code (name (first %)))
+                                  (second %))
                                (:country-list app-state))]]
        ^{:key (str row)}
        [:div

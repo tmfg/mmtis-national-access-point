@@ -16,7 +16,6 @@
             [taoensso.timbre :as log]
             [ote.db.modification :as modification]
             [ote.localization :as localization :refer [tr]]
-            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.email :as email]
             [ote.util.email-template :as email-template]
             [specql.op :as op]
@@ -39,7 +38,7 @@
                                      "; Domain=." domain "; Secure")])))
 
 (defn login [db auth-tkt-config
-             {:keys [email password] :as credentials} lang]
+             {:keys [email password] :as credentials}]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
           (encrypt/passlib->buddy (:password login-info)))
@@ -50,7 +49,7 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user) lang))}
+               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
@@ -138,7 +137,7 @@
   ^:unauthenticated
   (POST "/login" {form-data :body cookies :cookies}
     (#'login db auth-tkt-config
-      (http/transit-request form-data) (get-lang-from-cookies cookies)))
+      (http/transit-request form-data)))
 
   ^:unauthenticated
   (POST "/logout" []

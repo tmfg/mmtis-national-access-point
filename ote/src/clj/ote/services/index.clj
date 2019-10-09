@@ -84,7 +84,7 @@
   [:script#ote-user-info {:type "x-ote-user-info"}
    (transit/clj->transit
     (when user
-      (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user) lang)))])
+      (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user))))])
 
 (defn index-page [db user config]
   (let [dev-mode? (:dev-mode? config)

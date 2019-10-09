@@ -28,7 +28,6 @@
             [ring.util.io :as ring-io]
             [ote.components.service :refer [define-service-component]]
             [ote.localization :as localization :refer [tr]]
-            [ote.services.localization :refer [get-lang-from-cookies]]
             [clj-time.core :as t]
             [ote.time :as time]
             [clj-http.client :as http-client]
@@ -274,8 +273,8 @@
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
-  [nap-config db user {id :id} lang]
-  (let [deleted-service (transport/all-data-transport-service db id lang)
+  [nap-config db user {id :id}]
+  (let [deleted-service (transport/all-data-transport-service db id)
         return (transport/delete-transport-service! nap-config db user id)
         auditlog {::auditlog/event-type :delete-service
                   ::auditlog/event-attributes
@@ -620,11 +619,11 @@
 
     (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 
-    (POST "/admin/transport-service/delete" {user :user form-data :body cookies :cookies :as req}
+    (POST "/admin/transport-service/delete" {user :user form-data :body :as req}
       (require-admin-user "random url that is not used" (:user user))
       (http/transit-response
         (admin-delete-transport-service!
-          nap-config db user (http/transit-request form-data) (get-lang-from-cookies cookies))))
+          nap-config db user (http/transit-request form-data))))
 
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
 

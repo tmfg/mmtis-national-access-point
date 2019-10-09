@@ -9,7 +9,6 @@
             [ote.db.auditlog :as auditlog]
             [ote.db.common :as common]
             [ote.db.user :as user]
-            [ote.services.localization :refer [get-lang-from-cookies]]
             [ote.util.email-template :as email-template]
             [ote.config.email-config :as email-config]
             [compojure.core :refer [routes GET POST DELETE]]
@@ -37,34 +36,12 @@
   #{::t-operator/id ::t-operator/business-id ::t-operator/email
     ::t-operator/name})
 
-(defn translate-country
-  "Translate country from country_code and assoc it to address as :country. It will be removed from address before
-  saving back to db."
-  [operator db lang]
-  (let [visiting-country-code (get-in operator [::t-operator/visiting-address ::common/country_code])
-        billing-country-code (get-in operator [::t-operator/billing-address ::common/country_code])
-        operator (cond-> operator
-                         (not (nil? visiting-country-code))
-                         (assoc-in [::t-operator/visiting-address :country]
-                                   (::common/value (first (specql/fetch db ::common/country-list
-                                                                        #{::common/value}
-                                                                        {::common/country_code visiting-country-code
-                                                                         ::common/locale_code lang}))))
-                         (not (nil? billing-country-code))
-                         (assoc-in [::t-operator/billing-address :country]
-                                   (::common/value (first (specql/fetch db ::common/country-list
-                                                                        #{::common/value}
-                                                                        {::common/country_code billing-country-code
-                                                                         ::common/locale_code lang})))))]
-    operator))
-
 (defn get-transport-operator
-  [db where-parameter lang]
+  [db where-parameter]
   (let [where  (merge  {::t-operator/deleted? false} where-parameter)
         operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
                                where {::specql/limit 1}))
-        operator (translate-country operator db lang)
         associated-to-services-others (services-associated-to-operator db {:business-id (::t-operator/business-id operator)})
         own-associations (fetch-operators-associated-services db {:operator-id (::t-operator/id operator)})]
     (when operator
@@ -208,11 +185,10 @@
 
 (defn private-data-transport-operator
   "Get single transport service by id"
-  [db id lang]
+  [db id]
   (let [to (first (fetch db ::t-operator/transport-operator
                          (specql/columns ::t-operator/transport-operator)
                          {::t-operator/id id}))
-        to (translate-country to db lang)
         to (assoc to ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
                                                          db {:id (::t-operator/ckan-group-id to)})
                                                        ""))]
@@ -395,10 +371,10 @@
                        (specql/columns ::t-operator/group)
                        {::t-operator/group-id ckan-group-id})))
 
-(defn get-user-transport-operators-with-services [db groups user lang]
-  (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)} lang) groups)
+(defn get-user-transport-operators-with-services [db groups user]
+  (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
-        operator-services (transport-service/get-transport-services db operator-ids lang)]
+        operator-services (transport-service/get-transport-services db operator-ids)]
     {:user (dissoc user :apikey :id)
      :transport-operators
      (map (fn [{id ::t-operator/id :as operator}]
@@ -490,15 +466,13 @@
       (POST "/transport-operator/group" {user :user cookies :cookies}
         (http/transit-response
           (get-transport-operator db
-                                  {::t-operator/ckan-group-id (get (-> user :groups first) :id)}
-                                  (get-lang-from-cookies cookies))))
+                                  {::t-operator/ckan-group-id (get (-> user :groups first) :id)})))
 
       (POST "/transport-operator/data"
             {user :user
              cookies :cookies}
         (http/transit-response
-          (get-user-transport-operators-with-services db (:groups user)
-                                                      (:user user) (get-lang-from-cookies cookies))))
+          (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
       (POST "/transport-operator" {form-data :body
                                    user      :user}
@@ -519,21 +493,17 @@
   "Unauthenticated routes"
   [db config]
   (routes
-    (GET "/transport-operator/:ckan-group-id" {{:keys [ckan-group-id]}
-                                               :params
-                                               cookies :cookies}
+    (GET "/transport-operator/:ckan-group-id" [ckan-group-id]
       (http/transit-response
-        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id} (get-lang-from-cookies cookies))))
+        (get-transport-operator db {::t-operator/ckan-group-id ckan-group-id})))
 
     (GET "/t-operator/:id"
          {{:keys [id]}
           :params
-          user :user
-          cookies :cookies}
-      (let [id (Long/parseLong id)
-            lang (get-lang-from-cookies cookies)]
+          user :user}
+      (let [id (Long/parseLong id)]
         (if (or (authorization/admin? user) (authorization/is-author? db user id))
-          (private-data-transport-operator db id lang)
+          (private-data-transport-operator db id)
           (public-data-transport-operator db id))))))
 
 (defrecord TransportOperator [config]
