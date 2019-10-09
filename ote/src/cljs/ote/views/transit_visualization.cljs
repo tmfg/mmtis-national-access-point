@@ -6,7 +6,6 @@
             [stylefy.core :as stylefy]
             [ote.style.transit-changes :as style]
             [ote.style.base :as style-base]
-            [ote.theme.colors :as color]
             [ote.app.controller.transit-visualization :as tv]
             [ote.time :as time]
             [cljs-react-material-ui.reagent :as ui]
@@ -17,7 +16,6 @@
             [clojure.string :as str]
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
-            [ote.app.routes :as routes]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
             [ote.views.transit-visualization.calendar :as tv-calendar]
@@ -195,7 +193,7 @@
              [:td {:style {:vertical-align "top"}}
               [stop-listing (:stops date2-trip)]]]]]]))]))
 
-(defn date-comparison [e! {:keys [date->hash hash->color compare]}]
+(defn date-comparison [e! {:keys [date->hash compare]}]
   (let [date1 (:date1 compare)
         date2 (:date2 compare)
         dow1 (day-of-week-short (time/parse-date-eu date1))
@@ -214,27 +212,6 @@
 
        ;; Show trip list
        [date-trips e! compare]])))
-
-(defn days-to-diff-info [e! {:keys [days-to-diff]} highlight]
-  (let [hovered-date (:day highlight)
-        days (:days days-to-diff)
-        diff-date (:date days-to-diff)]
-    (when (and hovered-date days (:hash highlight))
-      [:div {:style {:position "fixed"
-                     :top "80px"
-                     :left "50px"
-                     :min-height "50px"
-                     :width "250px"
-                     :border "solid black 1px"
-                     :padding "5px"
-                     :background-color "#fff"
-                     :z-index 9}}
-       [:div [:b (str days " päivää")]
-        [:div "ensimmäiseen muutokseen"]]
-       [:div
-        [:div (str "päivänä: " (time/format-date diff-date) " (" (day-of-week-short diff-date) ")")]
-        [:div (str "alkaen: " (time/format-date hovered-date) " (" (day-of-week-short hovered-date) ")")]
-        ]])))
 
 (defn highlight-mode-switch [e! highlight]
   [:div
@@ -305,7 +282,7 @@
                             :route-short-name :route-long-name
                             :count})
 
-(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type changes-all]
+(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
         table-height (str
@@ -334,7 +311,10 @@
                                    (.pushState js/window.history #js {} js/document.title
                                      (str current-url route))
                                    (e! (tv/->SelectRouteForDisplay (first %)))
-                                   (.setTimeout js/window (fn [] (scroll/scroll-to-id "route-calendar-anchor")) 150)))
+                                   (.setTimeout js/window
+                                                (fn []
+                                                  (scroll/scroll-to-id "route-calendar-anchor"))
+                                                150)))
                    :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
       [{:name ""
@@ -475,7 +455,7 @@
                          (= 0 stop-time-changes stop-seq-changes)
                          [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
 
-                         :default
+                         :else
                          [:div (stylefy/use-style style/transit-changes-icon-row-container)
                           [:div (stylefy/use-style {:width "50%"})
                            [tv-change-icons/stop-seq-changes-icon stop-seq-changes]]
@@ -542,7 +522,7 @@
                          (time/format-minutes-elapsed
                            (time/minutes-elapsed departure-time-date1 departure-time-date2))]
 
-                        :default
+                        :else
                         ""))}]                              ;; Empty string just to ensure nil/null are never displayed
           combined-stop-sequence]]])]))
 
@@ -566,8 +546,8 @@
                                                     (reset! zoom-level (.getZoom m)))))
                               (update this))
        :component-will-receive-props
-       (fn [this [_ _ _ _ {show-stops? :show-stops?
-                           show-route-lines :show-route-lines}]]
+       (fn [_ [_ _ _ _ {show-stops? :show-stops?
+                        show-route-lines :show-route-lines}]]
          ;; This is a bit of a kludge, but because the stops are in the
          ;; same GeoJSON layer as the lines, we can't easily control their
          ;; visibility using react components.
@@ -583,15 +563,15 @@
                                               show-stops?
                                               show-route-lines]}]
          (let [show-date1? (and date1-show?
-                                (not (empty? (get date1-route-lines "features"))))
+                                (seq (get date1-route-lines "features")))
                show-date2? (and date2-show?
-                                (not (empty? (get date2-route-lines "features"))))
+                                (seq (get date2-route-lines "features")))
                zoom @zoom-level
                [line-weight offset icon-size] (cond
                                                 (< zoom 9) [2 1 [6 6]]
                                                 (< zoom 12) [2 2 [12 12]]
                                                 (< zoom 14) [3 2 [16 16]]
-                                                :default [3 2 [18 18]])
+                                                :else [3 2 [18 18]])
                date1-filtered-trips (filter
                                       (fn [trip]
                                         (get show-route-lines (get-in trip ["route-line" "properties" "routename"])))
@@ -678,7 +658,7 @@
                                            (rest (get grouped-packages k))))
                                        group-keys))
         open? (get open-sections :gtfs-package-info false)
-        pkg (fn [{:keys [created min-date max-date interface-url download-status error]} show-link?]
+        pkg (fn [{:keys [created min-date max-date interface-url download-status]} show-link?]
               (when created
                 [:div.gtfs-package (stylefy/use-style (style-base/flex-container "row"))
                  [:span interface-url " Ladattu NAPiin "
@@ -702,9 +682,7 @@
         (for [p latests-packages]
           ^{:key (str "latest-package-id-" (:id p))}
           [pkg p false]))]
-     (when (and
-             (seq previous-packages)
-             (not (empty? previous-packages)))
+     (when (seq previous-packages)
        [:div
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
          {:icon (if open?
@@ -759,7 +737,7 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type changes-all]]]
+        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
