@@ -34,7 +34,9 @@
   (form/group
     {:label (tr [:terminal-page :header-assistance])
      :columns 3
-     :layout :row}
+     :layout :row
+     :card? false
+     :top-border true}
 
     {:name ::t-service/assistance-description
      :type :localized-text
@@ -93,7 +95,9 @@
   (form/group
    {:label (tr [:terminal-page :header-accessibility])
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/accessibility-description

@@ -33,7 +33,9 @@
   (form/group
     {:label   (tr [:parking-page :header-price-and-payment-methods])
      :columns 3
-     :layout  :row}
+     :layout  :row
+     :card? false
+     :top-border true}
 
     (form/info
      [:div (tr [:form-help :pricing-info])])
@@ -96,7 +98,9 @@
     (form/group
       {:label   (tr [:parking-page :header-service-hours])
        :columns 3
-       :layout  :row}
+       :layout  :row
+       :card? false
+       :top-border true}
 
       {:name      ::t-service/service-hours
        :type      :table
@@ -164,7 +168,9 @@
   (form/group
     {:label   (tr [:parking-page :header-facilities-and-capacities])
      :columns 3
-     :layout  :row}
+     :layout  :row
+     :card? false
+     :top-border true}
 
     {:name         ::t-service/parking-capacities
      :type         :table
@@ -183,7 +189,9 @@
   (form/group
     {:label   (tr [:parking-page :header-charging-points])
      :columns 3
-     :layout  :row}
+     :layout  :row
+     :card? false
+     :top-border true}
 
     {:name            ::t-service/charging-points
      :rows            2
@@ -195,7 +203,9 @@
   (form/group
     {:label   (tr [:parking-page :header-accessibility])
      :columns 3
-     :layout  :row}
+     :layout  :row
+     :card? false
+     :top-border true}
 
     {:name            ::t-service/accessibility
      :type            :checkbox-group
