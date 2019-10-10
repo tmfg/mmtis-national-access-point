@@ -1,7 +1,8 @@
 (ns ote.app.controller.common
   "Common controller functionality"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-tree]]
+            [ote.communication :as comm]
             [ote.app.routes :refer [navigate!]]))
 
 (defn error-landing [app landing]
@@ -27,3 +28,7 @@
 (tuck/define-event ServerError [response]
                    {}
                    (handle-error app response))
+
+(defn get-country-list [app]
+  (assoc app :country-list (tr-tree [:country-list])
+    :country-list-loaded? true))

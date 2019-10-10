@@ -8,6 +8,7 @@
             [reagent.core :as r]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
             [ote.util.transport-service-util :as tsu]
             [ote.app.controller.service-viewer :as svc]
             [ote.app.controller.transport-service :as ts-controller]
@@ -634,7 +635,7 @@
      [common-ui/information-row-with-option (tr [:common-texts :description]) data true]]]
    [spacer]])
 
-(defn- pick-up-locations [title data url]
+(defn- pick-up-locations [title data url app-state]
   [:section
    [:h4 title]
    [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/pick-up-locations-url]) url true]
@@ -644,7 +645,11 @@
                  service-exceptions (get row ::t-service/service-exceptions)
                  street (get-in row [::t-service/pick-up-address :ote.db.common/street])
                  post-office (get-in row [::t-service/pick-up-address :ote.db.common/post_office])
-                 post-code (get-in row [::t-service/pick-up-address :ote.db.common/postal_code])]]
+                 post-code (get-in row [::t-service/pick-up-address :ote.db.common/postal_code])
+                 country-code (get-in row [::t-service/pick-up-address :ote.db.common/country_code])
+                 country (some #(when (= country-code (name (first %)))
+                                  (second %))
+                               (:country-list app-state))]]
        ^{:key (str row)}
        [:div
         [:h4 (string/upper-case (::t-service/pick-up-name row))]
@@ -653,9 +658,13 @@
          [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
           [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/street]) street true]]
          [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/postal_code]) post-code true]]
-         [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/post_office]) post-office true]]]
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/postal_code]) post-code true]]]
+        [:div (stylefy/use-style service-viewer/info-row)
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/post_office]) post-office true]]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+          [common-ui/information-row-with-option (tr [:common-texts :country]) country true]]]
+
 
         ; Service hours
         (doall
@@ -805,7 +814,7 @@
      [spacer]]))
 
 (defn service-view
-  [e! {{to :transport-operator ts :transport-service} :service-view}]
+  [e! {{to :transport-operator ts :transport-service} :service-view :as app-state}]
   (let [service-sub-type (get ts ::t-service/sub-type)
         sub-type-key (svc/create-sub-type-key service-sub-type)
         interfaces (::t-service/external-interfaces ts)
@@ -844,7 +853,7 @@
           [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
           [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
           [booking-service (tr [:service-viewer :reservation-service]) booking-data]
-          [pick-up-locations (tr [:service-viewer :pick-up-locations]) rental-pick-up-locations pick-up-locations-url]]
+          [pick-up-locations (tr [:service-viewer :pick-up-locations]) rental-pick-up-locations pick-up-locations-url app-state]]
 
          :terminal
          [:div

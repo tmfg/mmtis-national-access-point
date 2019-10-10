@@ -7,7 +7,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.common :refer [->ServerError get-country-list]]
             [ote.app.controller.flags :as flags]
             [ote.db.common :as common]
             [ote.ui.validation :as validation]))
@@ -122,6 +122,40 @@
                      true (dissoc ::t-operator/id)          ;; Nap id removed just in case there's no more NAP operator match
                      (some? nap-id) (merge (take-update-op-keys nap-item)))))
          operators-ytj)))
+
+(defn translated-country->code-code
+  "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
+  [app operator]
+  (let [visiting-country (get-in operator [::t-operator/visiting-address :country])
+        billing-country (get-in operator [::t-operator/billing-address :country])
+        v-country-code (some #(when (= visiting-country (second %))
+                                (name (first %)))
+                             (:country-list app))
+        b-country-code (some #(when (= billing-country (second %))
+                                (name (first %)))
+                             (:country-list app))]
+    (if (some? operator)
+      (-> app
+          (assoc-in [:transport-operator ::t-operator/visiting-address ::common/country_code] v-country-code)
+          (assoc-in [:transport-operator ::t-operator/billing-address ::common/country_code] b-country-code))
+      app)))
+
+(defn code-code->translated-country
+  "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
+  [app]
+  (let [visiting-country-code (get-in app [:transport-operator ::t-operator/visiting-address ::common/country_code])
+        billing-country-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
+        v-country (some #(when (= visiting-country-code (name (first %)))
+                            (second %))
+                             (:country-list app))
+        b-country (some #(when (= billing-country-code (name (first %)))
+                            (second %))
+                             (:country-list app))]
+    (if (some? (:transport-operator app))
+      (-> app
+          (assoc-in [:transport-operator ::t-operator/visiting-address :country] v-country)
+          (assoc-in [:transport-operator ::t-operator/billing-address :country] b-country))
+      app)))
 
 ;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
 ;; Returns a new app state.
@@ -384,15 +418,21 @@
     (if id
       (do
         (comm/get! (str "t-operator/" id)
-                   {:on-success (send-async! ->EditTransportOperatorResponse)})
-        (assoc app :transport-operator-loaded? false))
-      (assoc app :transport-operator-loaded? true)))
+                   {:on-success (send-async! ->EditTransportOperatorResponse)
+                    :on-failure (send-async! ->ServerError)})
+        (-> app
+            (get-country-list)
+            (assoc :transport-operator-loaded? false)))
+      (-> app
+          (get-country-list)
+          (assoc :transport-operator-loaded? true))))
 
   EditTransportOperatorResponse
   (process-event [{response :response} app]
     (let [state (assoc app :transport-operator response
                            :transport-operator-loaded? true
                            :ytj-response {})
+          state (code-code->translated-country state)
           nap-business-id (get-in state [:transport-operator ::t-operator/business-id])
           op-ytj-cache-miss? (or (empty? (:ytj-company-names state)) (not= nap-business-id (get-in state [:ytj-response :businessId])))]
       (if (flags/enabled? :open-ytj-integration)
@@ -405,6 +445,7 @@
   (process-event [{data :data} app]
     (-> app
         (update :transport-operator merge data)
+        (translated-country->code-code data)
         (dissoc :transport-operator-save-q)
         (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 

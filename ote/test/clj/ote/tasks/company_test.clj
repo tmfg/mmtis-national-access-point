@@ -13,7 +13,7 @@
 (use-fixtures :each
   (system-fixture
    :transport (component/using
-                (transport-service/->Transport
+                (transport-service/->TransportService
                   (:nap nil))
                 [:http :db])))
 

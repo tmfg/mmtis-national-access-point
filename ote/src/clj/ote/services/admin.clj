@@ -619,9 +619,11 @@
 
     (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 
-    (POST "/admin/transport-service/delete" req
-      (admin-service "transport-service/delete" req db
-                     (partial admin-delete-transport-service! nap-config)))
+    (POST "/admin/transport-service/delete" {user :user form-data :body :as req}
+      (require-admin-user "random url that is not used" (:user user))
+      (http/transit-response
+        (admin-delete-transport-service!
+          nap-config db user (http/transit-request form-data))))
 
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
 

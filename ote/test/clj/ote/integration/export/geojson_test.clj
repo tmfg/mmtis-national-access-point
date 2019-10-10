@@ -20,7 +20,7 @@
 
 (use-fixtures :each
   (system-fixture
-   :transport (component/using (transport-service/->Transport nil) [:http :db :email])
+   :transport (component/using (transport-service/->TransportService nil) [:http :db :email])
    :export-geojson (component/using (geojson/->GeoJSONExport) [:db :http])))
 
 (defn interval-value [{:keys [years months days hours minutes seconds]}]

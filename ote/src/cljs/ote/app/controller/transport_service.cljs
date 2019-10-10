@@ -2,19 +2,21 @@
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
-            [ote.util.csv :as csv-util]
-            [ote.db.transport-service :as t-service]
-            [ote.ui.form :as form]
-            [ote.app.routes :as routes]
-            [ote.time :as time]
             [taoensso.timbre :as log]
-            [ote.db.transport-operator :as t-operator]
-            [ote.localization :refer [tr tr-key]]
-            [ote.app.controller.place-search :as place-search]
-            [ote.app.controller.front-page :as front-page]
             [clojure.string :as str]
             [testdouble.cljs.csv :as csv]
-            [ote.ui.validation :as validation]))
+            [ote.time :as time]
+            [ote.util.csv :as csv-util]
+            [ote.localization :refer [tr tr-key]]
+            [ote.db.transport-service :as t-service]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.common :as common]
+            [ote.ui.form :as form]
+            [ote.ui.validation :as validation]
+            [ote.app.routes :as routes]
+            [ote.app.controller.place-search :as place-search]
+            [ote.app.controller.front-page :as front-page]
+            [ote.app.controller.common :refer [->ServerError get-country-list]]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
@@ -41,15 +43,16 @@
   {}
   ;; Set transport-operator and sub-type
   (pre-set-transport-type
-   (assoc app
-          :transport-operator (->> app :transport-operators-with-services
-                                   (map :transport-operator)
-                                   (filter #(= (::t-operator/id %) operator-id))
-                                   first)
-          :transport-service (merge (:transport-service app)
-                                    (when sub-type
-                                      {::t-service/sub-type sub-type
-                                       ::t-service/type (service-type-from-sub-type sub-type)})))))
+    (-> app
+        (get-country-list)
+        (assoc :transport-operator (->> app :transport-operators-with-services
+                                        (map :transport-operator)
+                                        (filter #(= (::t-operator/id %) operator-id))
+                                        first)
+               :transport-service (merge (:transport-service app)
+                                         (when sub-type
+                                           {::t-service/sub-type sub-type
+                                            ::t-service/type (service-type-from-sub-type sub-type)}))))))
 
 (define-event ShowBrokeringServiceDialog []
   {}
@@ -249,6 +252,58 @@
                           (:transport-service-vector %))
                        (:transport-operators-with-services app)))))
 
+(defn pul-country->country-code [country-list pick-up-addresses]
+  (mapv
+    (fn [p]
+      (let [pick-up-country (get-in p [::t-service/pick-up-address :country])
+            country-code (some #(when (= pick-up-country (second %))
+                                  (name (first %)))
+                               country-list)]
+        (if (and (some? country-code) (some? pick-up-country))
+          (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)
+          p)))
+    pick-up-addresses))
+
+(defn pul-country-code->country [country-list pick-up-addresses]
+  (mapv
+    (fn [p]
+      (let [country-code (get-in p [::t-service/pick-up-address ::common/country_code])
+            pick-up-country (some #(when (= country-code (name (first %)))
+                                  (second %))
+                               country-list)]
+        (if (and (some? country-code) (some? pick-up-country))
+          (assoc-in p [::t-service/pick-up-address :country] pick-up-country)
+          p)))
+    pick-up-addresses))
+
+(defn country->country-code [app service]
+  (let [key (t-service/service-key-by-type (::t-service/type service))
+        country (get-in service [key ::t-service/contact-address :country])
+        country-code (some #(when (= country (second %))
+                         (name (first %)))
+                      (:country-list app))
+       app (if (= :rentals (::t-service/type service))
+              (update-in app [:transport-service key ::t-service/pick-up-locations]
+                         #(pul-country->country-code (:country-list app) %))
+              app)]
+    (if (and (some? country-code) (some? country))
+      (assoc-in app [:transport-service key ::t-service/contact-address ::common/country_code] country-code)
+      app)))
+
+(defn country-code->country [app service]
+  (let [key (t-service/service-key-by-type (::t-service/type service))
+        country-code (get-in service [key ::t-service/contact-address ::common/country_code])
+        country (some #(when (= country-code (name (first %)))
+                         (second %))
+                      (:country-list app))
+        app (if (= :rentals (::t-service/type service))
+              (update-in app [:transport-service key ::t-service/pick-up-locations]
+                         #(pul-country-code->country (:country-list app) %))
+              app)]
+    (if (and (some? country-code) (some? country))
+      (assoc-in app [:transport-service key ::t-service/contact-address :country] country)
+      app)))
+
 (extend-protocol tuck/Event
 
   AddPriceClassRow
@@ -294,22 +349,26 @@
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/" id)
                {:on-success (tuck/send-async! ->ModifyTransportServiceResponse)})
-     (assoc app :transport-service-loaded? false))
+    (-> app
+        (get-country-list)
+        (assoc :transport-service-loaded? false)))
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]
-    (let [type (::t-service/type response)]
-      (assoc app
-        :transport-service-loaded? true
-        :transport-service (-> response
-                               (update ::t-service/operation-area place-search/operation-area-to-places)
-                               (move-service-level-keys-to-form (t-service/service-key-by-type type))
-                               transform-edit-by-type)
-        :transport-operator (->> app :transport-operators-with-services
-                                 (map :transport-operator)
-                                 (filter #(= (::t-operator/id %)
-                                             (::t-service/transport-operator-id response)))
-                                 first))))
+    (let [type (::t-service/type response)
+          app (assoc app
+                :transport-service-loaded? true
+                :transport-service (-> response
+                                       (update ::t-service/operation-area place-search/operation-area-to-places)
+                                       (move-service-level-keys-to-form (t-service/service-key-by-type type))
+                                       transform-edit-by-type)
+                :transport-operator (->> app :transport-operators-with-services
+                                         (map :transport-operator)
+                                         (filter #(= (::t-operator/id %)
+                                                     (::t-service/transport-operator-id response)))
+                                         first))
+          app (country-code->country app (:transport-service app))]
+      app))
 
   EnsureCsvFile
   (process-event [_ app]
@@ -502,6 +561,7 @@
     (let [key (t-service/service-key-by-type (::t-service/type ts))]
       (-> app
           (update-in [:transport-service key] merge form-data)
+          (country->country-code ts)
           (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
 
   CancelTransportServiceForm

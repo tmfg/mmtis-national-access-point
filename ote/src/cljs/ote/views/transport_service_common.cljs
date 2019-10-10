@@ -315,7 +315,7 @@
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 
-(defn contact-info-group []
+(defn contact-info-group [app-state]
   (form/group
     {:label (tr [:passenger-transportation-page :header-contact-details])
      :columns 3
@@ -325,7 +325,7 @@
 
     {:name ::common/street
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-4"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/street ::t-service/contact-address)
      :write (fn [data street]
@@ -335,7 +335,7 @@
 
     {:name ::common/postal_code
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-2"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/postal_code ::t-service/contact-address)
      :write (fn [data postal-code]
@@ -345,7 +345,7 @@
 
     {:name ::common/post_office
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-5"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/post_office ::t-service/contact-address)
      :write (fn [data post-office]
@@ -353,21 +353,33 @@
      :label (tr [:field-labels ::common/post_office])
      :max-length 64}
 
+    {:element-id "input-service-country"
+     :label (tr [:common-texts :country])
+     :name :country
+     :type :autocomplete
+     :container-class "col-xs-12 col-sm-6 col-md-6"
+     :style {:margin-bottom "2rem"}
+     :full-width? true
+     :suggestions (mapv second (:country-list app-state))
+     :read (comp :country ::t-service/contact-address)
+     :write (fn [data country]
+              (assoc-in data [::t-service/contact-address :country] country))}
+
     {:name ::t-service/contact-email
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-4"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :max-length 200}
 
     {:name ::t-service/contact-phone
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-2"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :max-length 16
      :full-width? true}
 
     {:name ::t-service/homepage
      :type :string
-     :container-class "col-xs-12 col-sm-6 col-md-5"
+     :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :max-length 200}))
 
