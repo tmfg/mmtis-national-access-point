@@ -90,7 +90,7 @@
            (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
            (.exists (io/file output-filepath)))
     output-filepath
-    (do (log/warn "Netex conversion chouette error = " ex-info ", tried = " chouette-cmd)
+    (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
         nil)))
 
 (defn gtfs->netex!
