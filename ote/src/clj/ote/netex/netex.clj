@@ -115,7 +115,7 @@
     (if (and (path-allowed? gtfs-filepath)
              (path-allowed? conversion-work-path))
       (do
-        ;; Setup input files for choutette command line tool conversion call.
+        ;; Setup input files for chouette command line tool conversion call.
         ;; No return condition checks because calls throw and exception on failure
         ;(cleanup-dir-recursive! conversion-work-path)
         (.mkdirs (clojure.java.io/file conversion-work-path)) ; Returns true when created, false otherwise
