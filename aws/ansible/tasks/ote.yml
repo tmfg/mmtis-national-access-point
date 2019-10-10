@@ -29,7 +29,7 @@
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote
 
-- name: Create choutte folder
+- name: Create chouette folder
     file: path=/opt/chouette state=directory owner=napote group=napote
 
 - name: Ensure botocore and boto3 modules are installed
@@ -41,7 +41,7 @@
     aws_s3:
       bucket: ote-assets
       object: chouette-command.zip
-      dest: /opt/choutette/chouette-command.zip
+      dest: /opt/chouette-command.zip
       mode: get
 
 - name: Extract chouette-command.zip into /opt/ will make folder /opt/chouette-cmd_3.4.8/
