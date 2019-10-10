@@ -56,7 +56,7 @@
                               :add_extension true}}
                             {:pretty true}))
 
-(defn- chouette-input-report-ok? [chouette-report-filepath]
+(defn- chouette-report-ok? [chouette-report-filepath]
   (if (and (.exists (io/file chouette-report-filepath))
            (.isFile (io/file chouette-report-filepath)))
     (let [action_report (:action_report (cheshire/parse-string (slurp (str chouette-report-filepath)) keyword))
@@ -68,24 +68,29 @@
 
       (if (and (= "OK" result) (empty? error-files))
         true
-        (do (log/warn "NeTEx conversion chouette input report NOK: result = " result
+        (do (log/warn "NeTEx conversion chouette report NOK: result = " result
                       ", GTFS error files = '" error-files "'"
                       ", chouette-report-filepath = " chouette-report-filepath)
             false)))
     (do
-      (log/warn "NeTEx conversion chouette input report missing. chouette-report-filepath = " chouette-report-filepath)
+      (log/warn "NeTEx conversion chouette report missing. filepath = " chouette-report-filepath)
       false)))
 
 (defn- chouette-output-valid?
   "Takes chouette process exit info and output path and evaluates if conversion was a success or failure.
   Return: On success string defining filesystem path to output file, on failure nil"
-  [{:keys [exit err] :as ex-info} {:keys [conversion-work-path]} {:keys [work-dir input-report-file]} output-filepath chouette-cmd]
+  [{:keys [exit err] :as ex-info}                           ; Conversion command exit info
+   {:keys [conversion-work-path]}                           ; Ote netex config
+   {:keys [work-dir input-report-file output-report-file]}  ; Ote chouette config
+   output-filepath
+   chouette-cmd]
   (if (and (= 0 exit)
            (str/blank? err)
-           (chouette-input-report-ok? (str conversion-work-path work-dir input-report-file))
+           (chouette-report-ok? (str conversion-work-path work-dir input-report-file))
+           (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
            (.exists (io/file output-filepath)))
     output-filepath
-    (do (log/warn "Netex conversion chouette error = " ex-info ", tried = " chouette-cmd)
+    (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
         nil)))
 
 (defn gtfs->netex!
