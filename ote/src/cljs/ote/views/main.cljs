@@ -133,8 +133,6 @@
 
                     ;; service catalog page
                     :services [service-search/service-search e! app]
-                    ;; show single service GeoJSON
-                    :service [service-search/service-geojson e! (:service-search app)]
                     :service-view [sv/service-view e! app]
 
                     :admin [admin/admin-panel e! app]
