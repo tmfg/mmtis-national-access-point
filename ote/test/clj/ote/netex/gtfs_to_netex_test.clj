@@ -24,7 +24,7 @@
 (defn test-are-zips-same
   "Takes `reference-filepath` and `result-filepath` and compares if those match using clojure.test/is macros.
   Only names of files in zips are compared because result timestamp elements change on each test run.
-  Result zip name matching to a name in `full-compare-netex-names` will have full comparison instead of simple comparsion."
+  Result zip names matching to a name in `full-compare-netex-names` will have full comparison."
   [reference-filepath result-filepath full-compare-netex-names]
   (let [extra-result-elements (loop [ref-coll (zip/read-zip (io/input-stream reference-filepath))
                                      result-coll (zip/read-zip (io/input-stream result-filepath))]
