@@ -21,6 +21,8 @@ jobs:
       OTE_DB_PASSWORD: ""
       OTE_AUTH_SHARED_SECRET: "test"
       OTE_FLAGS: "#{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}"
+      CHOUETTE_PATH: "/tmp/chouette/"
+      NETEX_CONVERSION_WORKPATH: "/tmp/ote/netex-conversion/"
 
     steps:
       - checkout
@@ -32,7 +34,9 @@ jobs:
           - v4-dependencies-{{ .Branch }}
           - v4-dependencies-
 
-      - run: cd ote && lein deps
+      - run:
+          name: Lein deps
+          command: cd ote && lein deps
 
       - save_cache:
           key: v4-dependencies-{{ .Branch }}-{{ checksum "ote/project.clj" }}
@@ -46,8 +50,15 @@ jobs:
       - run: aws s3 cp s3://ote-assets/places/spatial_relations_places.csv database/spatial_relations_places.csv
       - run: cd database && sh circleci_setup.sh
 
+
       # run tests!
-      - run: cd ote && lein test
+      - run:
+          name: Setup config.edn for tests
+          command: envsubst < .circleci/config.edn.envsubst > ote/config.edn
+
+      - run:
+          name: Run tests
+          command: cd ote && cat config.edn && lein test
 
       - run:
           name: Make production build of OTE app
@@ -56,9 +67,9 @@ jobs:
       - run:
           name: Configure build
           command: |
-            mkdir /tmp/ote
+            set +e
+            mkdir /tmp/ote && envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
             mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
-            envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
 
       - run:
           name: Deploy build artifacts

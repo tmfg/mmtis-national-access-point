@@ -3,7 +3,6 @@
   (:require
     [taoensso.timbre :as log]
     [clojure.java.io :as io]
-    [clojure.test :refer [is]]
     [cheshire.core :as cheshire]
     [ote.db.netex :as netex]
     [specql.core :as specql]
@@ -89,13 +88,13 @@
     (do (log/warn "Netex conversion chouette error = " ex-info ", tried = " chouette-cmd)
         nil)))
 
-(defn- gtfs->netex!
+(defn gtfs->netex!
   "Return: On success string defining filesystem path to output netex archive, on failure nil"
   [{:keys [gtfs-file gtfs-filename gtfs-basename operator-name]} {:keys [chouette-path conversion-work-path] :as config-netex}]
-  {:pre [(is (and (< 1 (count conversion-work-path))
-                  (not (clojure.string/blank? conversion-work-path))))
-         (is (not (clojure.string/blank? gtfs-filename)))
-         (is (seq gtfs-file))]}                             ;`is` used to print the value of a failed precondition
+  {:pre [(and (< 1 (count conversion-work-path))
+              (not (clojure.string/blank? conversion-work-path)))
+         (not (clojure.string/blank? gtfs-filename))
+         (seq gtfs-file)]}                             ;`is` used to print the value of a failed precondition
   (let [import-config-filepath (str conversion-work-path "importGtfs.json")
         export-config-filepath (str conversion-work-path "exportNetexjson")
         gtfs-filepath (str conversion-work-path gtfs-filename)

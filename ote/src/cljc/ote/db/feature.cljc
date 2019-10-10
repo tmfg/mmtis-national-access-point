@@ -1,6 +1,6 @@
 (ns ote.db.feature
   "Data model for dynamic feature flags"
-  (:require
+  (:require [clojure.spec.alpha]                            ; Requiring this removes compile warning for define-tables
             #?@(:clj [[ote.db.specql-db :refer [define-tables]]
                       [specql.postgis]
                       [clj-time.coerce :as tc]]
