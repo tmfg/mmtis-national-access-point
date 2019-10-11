@@ -438,7 +438,7 @@
         form-groups (cond-> []
                             show-ytj-id-entry? (conj (business-id-selection e! state ytj-supported?))
                             show-details? (conj (operator-form-groups e! state creating? ytj-supported?)))]
-    (if (and (:country-list-loaded? state) (:transport-operator-loaded? state))
+    (if (:transport-operator-loaded? state)
       [:div
        [:div
         [:div

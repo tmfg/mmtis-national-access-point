@@ -30,5 +30,4 @@
                    (handle-error app response))
 
 (defn get-country-list [app]
-  (assoc app :country-list (tr-tree [:country-list])
-    :country-list-loaded? true))
+  (assoc app :country-list (tr-tree [:country-list])))

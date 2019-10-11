@@ -293,20 +293,22 @@
       (assoc :ytj-response-loading true)))
 
 (define-event FetchYtjOperator [id]
-              {}
-              (send-fetch-ytj app id))
+  {}
+  (send-fetch-ytj app id))
 
 (define-event CancelTransportOperator []
-              {}
-              (routes/navigate! :own-services)
-              (update-in app [:transport-operator] dissoc :new?))
+  {}
+  (routes/navigate! :own-services)
+  (update-in app [:transport-operator] dissoc :new?))
 
 (define-event VerifyCreateState []
-              {}
-              ;; To avoid app state problems redirect to own services if user refreshes on operator creation view
-              (when-not (get-in app [:transport-operator :new?])
-                (routes/navigate! :own-services))
-              app)
+  {}
+  ;; To avoid app state problems redirect to own services if user refreshes on operator creation view
+  (when-not (get-in app [:transport-operator :new?])
+    (routes/navigate! :own-services))
+  (-> app
+      (get-country-list)
+      (assoc :transport-operator-loaded? true)))
 
 (define-event ToggleListTransportOperatorDeleteDialog [operator]
               {}
