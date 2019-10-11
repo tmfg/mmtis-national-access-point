@@ -5,7 +5,7 @@
             [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
             [ote.localization :as localization :refer [tr]]
-            [ote.app.controller.common :refer [->ServerError get-country-list]]
+            [ote.app.controller.common :refer [->ServerError]]
             [ote.util.url :as url-util]
             [ote.db.transport-service :as t-service]
             [ote.app.routes :as routes]
@@ -94,15 +94,14 @@
 
 (define-event FetchServiceData [operator-id service-id]
   {}
-  (let [app (get-country-list app)]
-    (do
-      (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
-                 {:on-success (tuck/send-async! ->ServiceSuccess)
-                  :on-failure (tuck/send-async! ->ServiceFailure)})
-      (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
-                 {:on-success (tuck/send-async! ->OperatorSuccess)
-                  :on-failure (tuck/send-async! ->OperatorFailure)}))
-      app))
+  (do
+    (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
+               {:on-success (tuck/send-async! ->ServiceSuccess)
+                :on-failure (tuck/send-async! ->ServiceFailure)})
+    (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
+               {:on-success (tuck/send-async! ->OperatorSuccess)
+                :on-failure (tuck/send-async! ->OperatorFailure)}))
+  app)
 
 (defmethod routes/on-navigate-event :service-view [{params :params}]
   (when params

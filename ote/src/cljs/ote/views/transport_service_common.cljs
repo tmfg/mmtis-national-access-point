@@ -315,7 +315,7 @@
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 
-(defn contact-info-group [app-state]
+(defn contact-info-group []
   (form/group
     {:label (tr [:passenger-transportation-page :header-contact-details])
      :columns 3
@@ -360,7 +360,7 @@
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :style {:margin-bottom "2rem"}
      :full-width? true
-     :suggestions (mapv second (:country-list app-state))
+     :suggestions (mapv second (tr-tree [:country-list]))
      :read (comp :country ::t-service/contact-address)
      :write (fn [data country]
               (assoc-in data [::t-service/contact-address :country] country))}
