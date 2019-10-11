@@ -28,6 +28,3 @@
 (tuck/define-event ServerError [response]
                    {}
                    (handle-error app response))
-
-(defn get-country-list [app]
-  (assoc app :country-list (tr-tree [:country-list])))

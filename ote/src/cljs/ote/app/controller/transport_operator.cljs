@@ -1,13 +1,13 @@
 (ns ote.app.controller.transport-operator
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
-  (:require  [tuck.core :as tuck :refer-macros [define-event]]
-             [ote.communication :as comm]
+  (:require [tuck.core :as tuck :refer-macros [define-event]]
+            [ote.communication :as comm]
             [ote.ui.form :as form]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
             [tuck.core :refer [define-event send-async! Event]]
-            [ote.app.controller.common :refer [->ServerError get-country-list]]
+            [ote.app.controller.common :refer [->ServerError]]
             [ote.app.controller.flags :as flags]
             [ote.db.common :as common]
             [ote.ui.validation :as validation]))
@@ -66,6 +66,8 @@
         (recur remaining (if match (conj result match) result)))
       (first result))))                                     ;; Return first because expected value is string not vector
 
+(defn- take-common-address-keys [coll] (select-keys coll [::common/country_code ::common/street ::common/post_office ::common/postal_code]))
+
 ;; Keys for saving fields common with all companies sharing the same Y-tunnus/business-id
 (defn- take-common-op-keys [coll] (select-keys coll [::t-operator/business-id
                                                      ::t-operator/billing-address
@@ -83,7 +85,15 @@
 (defn- take-update-op-keys [coll] (select-keys coll [::t-operator/id ::t-operator/ckan-description ::t-operator/ckan-group-id]))
 
 ;; Take keys supported by backend transport-operator API
-(defn take-operator-api-keys [op] (merge (take-new-op-keys op) (take-update-op-keys op) (take-common-op-keys op)))
+(defn take-operator-api-keys [op]
+  (let [op (merge
+             (take-new-op-keys op)
+             (take-update-op-keys op)
+             (take-common-op-keys op))
+        op (-> op
+            (update ::t-operator/visiting-address dissoc :country)
+            (update ::t-operator/billing-address dissoc :country))]
+    op))
 
 ;; Takes 'ytj-name' and finds the first from `nap-operators` whose name is a match, or nil.
 (defn- name->nap-operator [ytj-name nap-operators]
@@ -130,10 +140,10 @@
         billing-country (get-in operator [::t-operator/billing-address :country])
         v-country-code (some #(when (= visiting-country (second %))
                                 (name (first %)))
-                             (:country-list app))
+                             (tr-tree [:country-list]))
         b-country-code (some #(when (= billing-country (second %))
                                 (name (first %)))
-                             (:country-list app))]
+                             (tr-tree [:country-list]))]
     (if (some? operator)
       (-> app
           (assoc-in [:transport-operator ::t-operator/visiting-address ::common/country_code] v-country-code)
@@ -147,10 +157,10 @@
         billing-country-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
         v-country (some #(when (= visiting-country-code (name (first %)))
                             (second %))
-                             (:country-list app))
+                        (tr-tree [:country-list]))
         b-country (some #(when (= billing-country-code (name (first %)))
                             (second %))
-                             (:country-list app))]
+                        (tr-tree [:country-list]))]
     (if (some? (:transport-operator app))
       (-> app
           (assoc-in [:transport-operator ::t-operator/visiting-address :country] v-country)
@@ -306,9 +316,7 @@
   ;; To avoid app state problems redirect to own services if user refreshes on operator creation view
   (when-not (get-in app [:transport-operator :new?])
     (routes/navigate! :own-services))
-  (-> app
-      (get-country-list)
-      (assoc :transport-operator-loaded? true)))
+  (assoc app :transport-operator-loaded? true))
 
 (define-event ToggleListTransportOperatorDeleteDialog [operator]
               {}
@@ -422,12 +430,8 @@
         (comm/get! (str "t-operator/" id)
                    {:on-success (send-async! ->EditTransportOperatorResponse)
                     :on-failure (send-async! ->ServerError)})
-        (-> app
-            (get-country-list)
-            (assoc :transport-operator-loaded? false)))
-      (-> app
-          (get-country-list)
-          (assoc :transport-operator-loaded? true))))
+        (assoc app :transport-operator-loaded? false))
+      (assoc app :transport-operator-loaded? true)))
 
   EditTransportOperatorResponse
   (process-event [{response :response} app]

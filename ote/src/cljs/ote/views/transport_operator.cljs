@@ -2,7 +2,7 @@
   "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.ui.form :as form]
@@ -262,7 +262,7 @@
        :name :visit-country
        :type :autocomplete
        :full-width? true
-       :suggestions (mapv second (:country-list state))
+       :suggestions (mapv second (tr-tree [:country-list]))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :country :ote.db.transport-operator/visiting-address)
@@ -310,7 +310,7 @@
        :name :billing-country
        :type :autocomplete
        :full-width? true
-       :suggestions (mapv second (:country-list state))
+       :suggestions (mapv second (tr-tree [:country-list]))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp :country :ote.db.transport-operator/billing-address)
