@@ -185,8 +185,9 @@ SELECT array_agg(x.id)
 $$ LANGUAGE SQL STABLE;
 
 -- New sproc for getting packages is need when calendar wants to show what kind of traffic was back
--- in the day. We
-CREATE OR REPLACE FUNCTION gtfs_service_packages_for_detection_date(service_id INTEGER, dt DATE)
+-- in the day. We need to set detection_date to pick only those packages that were downloaded when detection
+-- was run.
+CREATE OR REPLACE FUNCTION gtfs_service_packages_for_detection_date(service_id INTEGER, dt DATE, detection_date DATE)
     RETURNS INTEGER[]
 AS $$
 SELECT array_agg(x.id)
@@ -194,7 +195,7 @@ FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
       FROM gtfs_package p
       WHERE "transport-service-id" = service_id
         AND p."deleted?" = FALSE
-        AND  p.created::DATE <= dt
+        AND p.created::DATE <= dt
         AND p.created::DATE <= detection_date
       ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
