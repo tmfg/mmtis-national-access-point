@@ -147,7 +147,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
   FROM (SELECT d.date, package_id, rh.hash::text, p."external-interface-description-id" as e_id
           FROM dates d
           -- Join packages for each date
-          JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date))
+          JOIN LATERAL unnest(gtfs_service_packages_for_detection_date(:service-id::INTEGER, d.date, :detection-date::DATE))
             AS ps (package_id) ON TRUE
           -- Join gtfs_package to get external-interface-description-id
           JOIN gtfs_package p ON p.id = package_id AND p."deleted?" = FALSE
