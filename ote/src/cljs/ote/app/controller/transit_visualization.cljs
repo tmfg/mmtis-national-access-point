@@ -7,7 +7,6 @@
             [cljs-time.format :as tf]
             [cljs-time.coerce :as tc]
             [ote.time :as time]
-            [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
             [ote.transit-changes :as tcu]
@@ -478,11 +477,10 @@
                   changes))]
     (if route                                             ;;route-hash exists when you have a url where route is selected
       (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-        {:params {:route-hash-id (ensure-route-hash-id route)}
+        {:params {:route-hash-id (ensure-route-hash-id route)
+                  :detection-date detection-date}
          :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-      (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")]
-        (.pushState js/window.history #js {} js/document.title
-          current-url)))
+      (change-visualization-url nil))
     (-> app
       (assoc :transit-visualization
              (assoc (:transit-visualization app)
@@ -493,12 +491,14 @@
                :changes-route-filtered (sorted-route-changes false changes)
                :gtfs-package-info (:gtfs-package-info response)
                :route-hash-id-type (:route-hash-id-type response)
-               :selected-route route)))))
+               :selected-route route
+               :detection-date detection-date)))))
 
 (define-event SelectRouteForDisplay [route]
   {}
   (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-             {:params  {:route-hash-id (ensure-route-hash-id route)}
+             {:params  {:route-hash-id (ensure-route-hash-id route)
+                        :detection-date (get-in app [:transit-visualization :detection-date])}
               :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
   (-> app
       (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
