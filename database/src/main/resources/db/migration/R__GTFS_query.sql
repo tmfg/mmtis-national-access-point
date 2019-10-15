@@ -184,6 +184,21 @@ SELECT array_agg(x.id)
          ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
+-- New sproc for getting packages is need when calendar wants to show what kind of traffic was back
+-- in the day. We
+CREATE OR REPLACE FUNCTION gtfs_service_packages_for_detection_date(service_id INTEGER, dt DATE)
+    RETURNS INTEGER[]
+AS $$
+SELECT array_agg(x.id)
+FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
+      FROM gtfs_package p
+      WHERE "transport-service-id" = service_id
+        AND p."deleted?" = FALSE
+        AND  p.created::DATE <= dt
+        AND p.created::DATE <= detection_date
+      ORDER BY "external-interface-description-id", created DESC) x
+$$ LANGUAGE SQL STABLE;
+
 CREATE OR REPLACE FUNCTION gtfs_trip_stop_departure_time(trip "gtfs-package-trip-info", stopname TEXT)
 RETURNS interval
 AS $$
