@@ -14,6 +14,15 @@
             [clojure.set :as set]
             [clojure.string :as str]))
 
+(defn change-visualization-url [route]
+  (let [window-loc (str js/window.location)
+        current-url (if (str/includes? window-loc "/now")
+                      (str/replace window-loc #"/now(.*)" "/now/")
+                      (str/replace window-loc #"/all(.*)" "/all/"))]
+    (if route
+      (.pushState js/window.history #js {} js/document.title (str current-url route))
+      (.pushState js/window.history #js {} js/document.title current-url))))
+
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
   [route]
