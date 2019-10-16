@@ -1184,7 +1184,8 @@
                    :disabled disabled})
    label])
 
-(defmethod field :text-label [{:keys [label style h-style full-width?]}]
+(defmethod field :text-label [{:keys [label style h-style h-inner-style full-width?]}]
+  (.log js/console ":h-inner-style " (pr-str h-inner-style))
   ;; Options
   ; :label Text for displaying
   [:div
@@ -1194,8 +1195,20 @@
              (when style
                style))}
    (if h-style
-     [h-style label]
-     [:p label])])
+     [h-style (when h-inner-style {:style h-inner-style}) label]
+     [:p  label])])
+
+(defmethod field :text [{:keys [label style full-width?] :as field} data]
+  (let [text (str/replace data #"\r\n|\n|\r" "====")
+        text-list (str/split text #"====")]
+    [:div {:style (merge
+                    (when full-width?
+                      {:width "100%"})
+                    (when style
+                      style))}
+     (doall
+       (for [row text-list]
+         [:p row]))]))
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
   [info/info-toggle label body {:default-open? default-state}])
