@@ -105,7 +105,7 @@ describe('Operator creation basic tests', function () {
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
 
     });
-
+/*
     xit('add user to opeperator', function () {
 
         cy.server();
@@ -134,6 +134,8 @@ describe('Operator creation basic tests', function () {
         // cy.get('#select-operator-at-own-services').click();
         // cy.contains(testOp1.name).should('not.exist');
         // cy.contains('Omat palvelutiedot').click();
+
+ */
 /*
         cy.get('#btn-add-new-transport-operator').click();
         cy.get('#btn-submit-business-id').as('btnSubmit')
