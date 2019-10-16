@@ -137,7 +137,7 @@
                    (op/and
                     {::transit/id pre-notice-attachment-id}
                     (when-not can-view-all-attachments?
-                      {::transit/created-by (authorization/user-id user)}))))))
+                      {::modification/created-by (authorization/user-id user)}))))))
 
 (defn download-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [attachment (attachment-info db user (Long/parseLong (get-in req [:params :id])))
