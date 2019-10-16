@@ -17,5 +17,7 @@
   "viewportWidth": 1080,
   "waitForAnimations": true,
   "watchForFileChanges": true,
-  "blacklistHosts": "stat.viestintavirasto.fi"
+  "blacklistHosts": [
+    "stat.viestintavirasto.fi"
+  ]
 }
