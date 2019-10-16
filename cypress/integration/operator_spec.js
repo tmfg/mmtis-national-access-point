@@ -105,6 +105,11 @@ describe('Operator creation basic tests', function () {
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
 
     });
+
+    it('should not do anyting but make the tests work', function () {
+        cy.contains('Omat palvelutiedot');
+    });
+
 /*
     xit('add user to opeperator', function () {
 
