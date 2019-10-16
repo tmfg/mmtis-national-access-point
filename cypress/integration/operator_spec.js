@@ -54,6 +54,38 @@ describe('Operator creation basic tests', function () {
         cy.visit('/#/');
         cy.get('#btn-confirm-leave-page').click({ force: true });
     });
+});
+
+describe('Operator creation advanced tests', function () {
+    const testOp1 = {
+        businessId: "1234567-9",
+        name: "e2eAcmeCorp",
+        addrBillingStreet: "Billing Street",
+        addrBillingPostalCode: "999999",
+        addrBillingCity: "Megalopolis",
+        addrVisitStreet: "Visiting Street",
+        addrVisitPostalCode: "000000",
+        addrVisitCity: "Hyperpolis",
+        mobilePhone: "123 12345678",
+        telephone: "555 4567890",
+        email: "e2eacmecorp@localhost",
+        web: "www.acmecorp.acme",
+        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@traficom.fi',
+        businessIdInvalidWarding: 'Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero.'
+
+    };
+
+    // Login in only once before tests run
+    before(function () {
+        cy.login();
+    });
+
+    beforeEach(function () {
+        // Session cookies will not be cleared before the NEXT test starts
+        cy.preserveSessionOnce();
+
+        cy.visit('/#/own-services');
+    });
 
     it('should add new operator', function () {
 
@@ -107,8 +139,11 @@ describe('Operator creation basic tests', function () {
     });
 
     it('should not do anyting but make the tests work', function () {
+        cy.visit('/#/own-services');
         cy.contains('Omat palvelutiedot');
     });
+});
+
 
 /*
     xit('add user to opeperator', function () {
@@ -191,4 +226,4 @@ describe('Operator creation basic tests', function () {
 // TODO: test delete test operator
     });
 */
-});
+
