@@ -18,6 +18,7 @@
   "waitForAnimations": true,
   "watchForFileChanges": true,
   "blacklistHosts": [
+    "stat.viestintavirasto.fi:443",
     "stat.viestintavirasto.fi"
   ]
 }
