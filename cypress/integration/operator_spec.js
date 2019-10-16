@@ -127,7 +127,8 @@ describe('Operator creation basic tests', function () {
         //cy.wait('@removeMember'); // Take into use when removing members is implemented
 
     });
-
+*/
+/*
     xit('should validate and invalidate business id', function () {
 
         // Uncomment these when YTJ service is stubbed and creation is tested fully
@@ -135,8 +136,6 @@ describe('Operator creation basic tests', function () {
         // cy.contains(testOp1.name).should('not.exist');
         // cy.contains('Omat palvelutiedot').click();
 
- */
-/*
         cy.get('#btn-add-new-transport-operator').click();
         cy.get('#btn-submit-business-id').as('btnSubmit')
         cy.get('@btnSubmit').should('be.disabled')
@@ -162,7 +161,7 @@ describe('Operator creation basic tests', function () {
         cy.get('#btn-submit-business-id').should('be.disabled')
         cy.get('@inputBid').type('{backspace}')
         cy.get('#btn-submit-business-id').should('be.enabled')
-*/
+
 
         // Uncomment these whe YTJ
         // cy.get('@btnSubmit').click()
@@ -186,5 +185,5 @@ describe('Operator creation basic tests', function () {
 
 // TODO: test delete test operator
     });
-
+*/
 });
