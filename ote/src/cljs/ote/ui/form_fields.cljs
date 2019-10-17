@@ -1185,7 +1185,6 @@
    label])
 
 (defmethod field :text-label [{:keys [label style h-style h-inner-style full-width?]}]
-  (.log js/console ":h-inner-style " (pr-str h-inner-style))
   ;; Options
   ; :label Text for displaying
   [:div
