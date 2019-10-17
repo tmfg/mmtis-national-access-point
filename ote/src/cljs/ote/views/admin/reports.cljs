@@ -1,22 +1,9 @@
 (ns ote.views.admin.reports
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
-  (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.form-fields :as form-fields]
-            [ote.app.controller.admin :as admin-controller]
-            [ote.db.transport-service :as t-service]
-            [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
+  (:require [stylefy.core :as stylefy]
             [ote.ui.common :refer [linkify]]
-            [ote.time :as time]
-            [cljs-react-material-ui.icons :as ic]
-            [reagent.core :as r]
-            [ote.ui.common :as ui-common]
-            [ote.ui.common :as common-ui]
-            [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
-            [ote.style.admin :as style-admin]
-            [cljs-time.core :as t]))
+            [ote.style.base :as style-base]))
 
 (defn reports [e!]
   [:div
@@ -30,5 +17,6 @@
     [linkify "/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
     [linkify "/admin/reports/transport-operator/schedule-operators" "Säännöllistä aikataulun mukaista liikennettä tuottavat yritykset ja aliyritykset"]
     [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
-    [linkify "/admin/reports/port" "Satama-aineisto csv"]]])
+    [linkify "/admin/reports/port" "Satama-aineisto csv"]
+    [linkify "/admin/reports/tvv" "Toimivaltaiset viranomaiset"]]])
 

@@ -81,9 +81,9 @@
          [chip-input* (merge
                         default-props
                         ;; Cut margin and line-height if only one chip
-                        (when (= 1 (count (:value props)))
-                          {:inputStyle {:margin-top "5px"
-                                        :margin-bottom "5px"}})
+                         (when (= 1 (count (:value props)))
+                          {:inputStyle {:margin-top "9px"
+                                        :margin-bottom "9px"}})
                         ;; Remove margin if there are no chips (works only in "controlled" case i.e. :value prop is used).
                         (when (empty? (:value props))
                           {:chipContainerStyle {:margin-top 0}})
