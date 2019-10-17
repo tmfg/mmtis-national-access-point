@@ -15,7 +15,7 @@ job('Backup FINAP database') {
             propertiesFilePath('build.properties')
         }
 
-        shell('PGPASSWORD=${vault_db_flyway_password} pg_dump -h ${vault_db_host} -U ${vault_db_flyway_user} --schema=public -Fc napote > napote-${ENV}.dump')
+        shell('PGPASSWORD=${vault_db_flyway_password} pg_dump -h ${vault_db_host} -U ${vault_db_flyway_user} --schema=public -Fc -Z 9 napote > napote-${ENV}.dump')
 
         shell('mv napote-${ENV}.dump napote-${ENV}-`date +%Y-%m-%d`.dump')
 

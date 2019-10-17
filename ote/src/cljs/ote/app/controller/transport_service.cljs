@@ -7,7 +7,7 @@
             [testdouble.cljs.csv :as csv]
             [ote.time :as time]
             [ote.util.csv :as csv-util]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
@@ -16,7 +16,7 @@
             [ote.app.routes :as routes]
             [ote.app.controller.place-search :as place-search]
             [ote.app.controller.front-page :as front-page]
-            [ote.app.controller.common :refer [->ServerError get-country-list]]))
+            [ote.app.controller.common :refer [->ServerError]]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
@@ -44,7 +44,6 @@
   ;; Set transport-operator and sub-type
   (pre-set-transport-type
     (-> app
-        (get-country-list)
         (assoc :transport-operator (->> app :transport-operators-with-services
                                         (map :transport-operator)
                                         (filter #(= (::t-operator/id %) operator-id))
@@ -252,25 +251,25 @@
                           (:transport-service-vector %))
                        (:transport-operators-with-services app)))))
 
-(defn pul-country->country-code [country-list pick-up-addresses]
+(defn pul-country->country-code [pick-up-addresses]
   (mapv
     (fn [p]
       (let [pick-up-country (get-in p [::t-service/pick-up-address :country])
             country-code (some #(when (= pick-up-country (second %))
                                   (name (first %)))
-                               country-list)]
-        (if (and (some? country-code) (some? pick-up-country))
+                               (tr-tree [:country-list]))]
+        (if (some? pick-up-addresses)
           (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)
           p)))
     pick-up-addresses))
 
-(defn pul-country-code->country [country-list pick-up-addresses]
+(defn pul-country-code->country [pick-up-addresses]
   (mapv
     (fn [p]
       (let [country-code (get-in p [::t-service/pick-up-address ::common/country_code])
             pick-up-country (some #(when (= country-code (name (first %)))
                                   (second %))
-                               country-list)]
+                                  (tr-tree [:country-list]))]
         (if (and (some? country-code) (some? pick-up-country))
           (assoc-in p [::t-service/pick-up-address :country] pick-up-country)
           p)))
@@ -281,12 +280,12 @@
         country (get-in service [key ::t-service/contact-address :country])
         country-code (some #(when (= country (second %))
                          (name (first %)))
-                      (:country-list app))
+                           (tr-tree [:country-list]))
        app (if (= :rentals (::t-service/type service))
               (update-in app [:transport-service key ::t-service/pick-up-locations]
-                         #(pul-country->country-code (:country-list app) %))
+                         #(pul-country->country-code %))
               app)]
-    (if (and (some? country-code) (some? country))
+    (if (some? service)
       (assoc-in app [:transport-service key ::t-service/contact-address ::common/country_code] country-code)
       app)))
 
@@ -295,10 +294,10 @@
         country-code (get-in service [key ::t-service/contact-address ::common/country_code])
         country (some #(when (= country-code (name (first %)))
                          (second %))
-                      (:country-list app))
+                      (tr-tree [:country-list]))
         app (if (= :rentals (::t-service/type service))
               (update-in app [:transport-service key ::t-service/pick-up-locations]
-                         #(pul-country-code->country (:country-list app) %))
+                         #(pul-country-code->country %))
               app)]
     (if (and (some? country-code) (some? country))
       (assoc-in app [:transport-service key ::t-service/contact-address :country] country)
@@ -349,9 +348,7 @@
   (process-event [{id :id} app]
     (comm/get! (str "transport-service/" id)
                {:on-success (tuck/send-async! ->ModifyTransportServiceResponse)})
-    (-> app
-        (get-country-list)
-        (assoc :transport-service-loaded? false)))
+    (assoc app :transport-service-loaded? false))
 
   ModifyTransportServiceResponse
   (process-event [{response :response} app]

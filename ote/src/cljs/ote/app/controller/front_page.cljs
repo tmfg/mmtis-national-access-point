@@ -4,7 +4,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
             [ote.app.controller.login :as login]
-            [ote.app.controller.common :refer [get-country-list]]
+            [ote.app.controller.login :as login]
             [ote.app.controller.flags :as flags]
             [ote.localization :as localization :refer [tr]]
             [reagent.core :as r]))
@@ -177,7 +177,7 @@
   ForceUpdateAll
   (process-event [{app :app scroll-y :scroll-y} _]
     (r/after-render #(.scrollTo js/window 0 scroll-y))
-    (get-country-list app))
+    app)
 
   ClearFlashMessage
   (process-event [_ app]

@@ -11,10 +11,9 @@
             [ote.db.common :as common]
             [ote.util.transport-service-util :as tsu]
             [ote.app.controller.service-viewer :as svc]
-            [ote.app.controller.transport-service :as ts-controller]
             [ote.ui.common :as common-ui]
             [ote.style.base :as style-base]
-            [ote.localization :refer [tr supported-languages tr-key selected-language]]
+            [ote.localization :refer [tr supported-languages tr-key selected-language tr-tree]]
             [ote.ui.icons :as icons]
             [ote.theme.colors :as colors]
             [ote.ui.link-icon :refer [link-with-icon]]
@@ -649,7 +648,7 @@
                  country-code (get-in row [::t-service/pick-up-address :ote.db.common/country_code])
                  country (some #(when (= country-code (name (first %)))
                                   (second %))
-                               (:country-list app-state))]]
+                               (tr-tree [:country-list]))]]
        ^{:key (str row)}
        [:div
         [:h4 (string/upper-case (::t-service/pick-up-name row))]

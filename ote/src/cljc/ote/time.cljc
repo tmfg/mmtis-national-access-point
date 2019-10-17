@@ -435,11 +435,6 @@
     6 :saturday
     7 :sunday))
 
-(defn joda-datetime->java-localdate [joda-dt]
-  (let [str-dt (format-date-iso-8601 joda-dt)
-        java-ld (java.time.LocalDate/parse str-dt)]
-    java-ld))
-
 (defn native->date-time
   "Convert a platform native Date object to clj(s)-time.
   Takes into account that the JS date objects for timezones added
