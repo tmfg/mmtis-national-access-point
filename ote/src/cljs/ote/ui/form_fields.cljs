@@ -1195,7 +1195,7 @@
                style))}
    (if h-style
      [h-style (when h-inner-style {:style h-inner-style}) label]
-     [:p  label])])
+     [:p label])])
 
 (defmethod field :text [{:keys [label style full-width?] :as field} data]
   (let [text (str/replace data #"\r\n|\n|\r" "====")
