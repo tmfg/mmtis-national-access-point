@@ -104,12 +104,21 @@
                           (count right-different-stop-keys))}))
 
 
-(defn time-for-stop [stoptimes-display stop-name]
-  (some #(when (= stop-name (:gtfs/stop-name %))
-           (:gtfs/departure-time %))
-        (:stoptimes stoptimes-display)))
+(defn time-for-stop
+  "Stoptime-display is mainly a list of stops that are combined from trip1 and trip2. Here we use only stoptime data from :stoptime key.
+  If stop isn't in stoptime-display list, return the first one to enable some kind of possibility to compare trips."
+  [stoptimes-display stop-name]
+  (let [stop-time (some #(when (= stop-name (:gtfs/stop-name %))
+                           (:gtfs/departure-time %))
+                        (:stoptimes stoptimes-display))
+        stop-time (if stop-time
+                    stop-time
+                    (:gtfs/departure-time (first (:stoptimes stoptimes-display))))]
+    stop-time))
 
-(defn first-common-stop [stoptime-displays]
+(defn first-common-stop
+  "Stoptime-display is mainly a list of stops that are combined from trip1 and trip2"
+  [stoptime-displays]
   (let [distinct-stops (into #{}
                              (mapcat (fn [stoptime-display]
                                        (map #(select-keys % [:gtfs/stop-name :gtfs/stop-sequence])
@@ -119,7 +128,6 @@
             (when (every? #(time-for-stop % stop-name) stoptime-displays)
               stop-name))
           (sort-by :gtfs/stop-sequence distinct-stops))))
-
 
 (defn normalize-stop-sequence-numbers [stop-seq-of-zero stop-seq]
   (map (fn [stoptime]

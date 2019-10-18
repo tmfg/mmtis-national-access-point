@@ -240,16 +240,9 @@
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
-        date2-trips (get-in transit-visualization [:compare :date2-trips])
-        loading (or (:route-trips-for-date1-loading? transit-visualization) ;; both trips should be loaded
-                    (:route-trips-for-date2-loading? transit-visualization))]
-    (cond
-      (and (not loading)
-           (not-empty date1-trips)
-           (not-empty date2-trips))
+        date2-trips (get-in transit-visualization [:compare :date2-trips])]
+    (if (and (seq date1-trips) (seq date2-trips))
       (combined-trips-and-stop-differences transit-visualization date1-trips date2-trips)
-
-      (not loading)
       ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
       (-> transit-visualization
           (combined-trips-and-stop-differences date1-trips date2-trips)
@@ -258,28 +251,24 @@
                       ;ending - count trips from date1, because date2 is empty
                       {:removed-trips (count date1-trips)}
                       ;added - count trips from date2 because date1 is empty
-                      {:added-trips (count date2-trips)})))
-
-      :else
-      transit-visualization)))
+                      {:added-trips (count date2-trips)}))))))
 
 ;; Routes trip data
 (define-event RouteTripsForDateResponse [trips date]
   {:path [:transit-visualization]}
   (let [app (cond
-          (= date (get-in app [:compare :date1]))
-          (-> app
-              (assoc :route-trips-for-date1-loading? false)
-              (assoc-in [:compare :date1-trips] trips))
+              (= date (get-in app [:compare :date1]))
+              (-> app
+                  (assoc :route-trips-for-date1-loading? false)
+                  (assoc-in [:compare :date1-trips] trips))
 
-          (= date (get-in app [:compare :date2] app))
-          (-> app
-              (assoc :route-trips-for-date2-loading? false)
-              (assoc-in [:compare :date2-trips] trips))
+              (= date (get-in app [:compare :date2]))
+              (-> app
+                  (assoc :route-trips-for-date2-loading? false)
+                  (assoc-in [:compare :date2-trips] trips))
 
-          :else
-          app)
-        app (if (loading-trips? app)
+              :else app)
+        app (if (or (:route-trips-for-date1-loading? app) (:route-trips-for-date2-loading? app))
               app
               ;; Combine only after all data available to avoid rendering incorrect numbers
               (combine-trips app))]
