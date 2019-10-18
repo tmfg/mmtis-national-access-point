@@ -7,12 +7,20 @@
             [cljs-time.format :as tf]
             [cljs-time.coerce :as tc]
             [ote.time :as time]
-            [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
             [ote.transit-changes :as tcu]
             [clojure.set :as set]
             [clojure.string :as str]))
+
+(defn change-visualization-url [route]
+  (let [window-loc (str js/window.location)
+        current-url (if (str/includes? window-loc "/now")
+                      (str/replace window-loc #"/now(.*)" "/now/")
+                      (str/replace window-loc #"/all(.*)" "/all/"))]
+    (if route
+      (.pushState js/window.history #js {} js/document.title (str current-url route))
+      (.pushState js/window.history #js {} js/document.title current-url))))
 
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
@@ -458,11 +466,10 @@
                   changes))]
     (if route                                             ;;route-hash exists when you have a url where route is selected
       (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-        {:params {:route-hash-id (ensure-route-hash-id route)}
+        {:params {:route-hash-id (ensure-route-hash-id route)
+                  :detection-date detection-date}
          :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-      (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")]
-        (.pushState js/window.history #js {} js/document.title
-          current-url)))
+      (change-visualization-url nil))
     (-> app
       (assoc :transit-visualization
              (assoc (:transit-visualization app)
@@ -473,12 +480,14 @@
                :changes-route-filtered (sorted-route-changes false changes)
                :gtfs-package-info (:gtfs-package-info response)
                :route-hash-id-type (:route-hash-id-type response)
-               :selected-route route)))))
+               :selected-route route
+               :detection-date detection-date)))))
 
 (define-event SelectRouteForDisplay [route]
   {}
   (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-             {:params  {:route-hash-id (ensure-route-hash-id route)}
+             {:params  {:route-hash-id (ensure-route-hash-id route)
+                        :detection-date (get-in app [:transit-visualization :detection-date])}
               :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
   (-> app
       (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)

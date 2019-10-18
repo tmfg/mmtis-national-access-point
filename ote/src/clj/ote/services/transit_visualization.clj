@@ -71,11 +71,14 @@
                  {:gtfs/transport-service-id service-id
                   :gtfs/date date})))
 
-(defn service-calendar-for-route [db service-id route-hash-id]
-  (into {}
-        (map (juxt :date :hash))
-        (fetch-date-hashes-for-route-with-route-hash-id db {:service-id service-id
-                                                            :route-hash-id route-hash-id})))
+(defn service-calendar-for-route [db service-id route-hash-id detection-date]
+  (if (and (integer? service-id) (string? route-hash-id) (string? detection-date))
+    (into {}
+          (map (juxt :date :hash))
+          (fetch-date-hashes-for-route-with-route-hash-id db {:service-id service-id
+                                                              :route-hash-id route-hash-id
+                                                              :detection-date detection-date}))
+    nil))
 
 (defn parse-gtfs-stoptimes [pg-array]
   (let [string (str pg-array)]
@@ -132,10 +135,10 @@
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
-        {:strs [route-hash-id]} :query-params
+        {:strs [route-hash-id detection-date]} :query-params
         user :user}
     (or (authorization/transit-authority-authorization-response user)
-        {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id)}))
+        {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id detection-date)}))
 
 
   ^{:unauthenticated false}

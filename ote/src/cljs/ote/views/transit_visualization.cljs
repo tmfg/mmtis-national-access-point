@@ -306,15 +306,14 @@
                    :name->label str
                    :show-row-hover? true
                    :on-select #(when (first %)
-                                 (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")
-                                       route (str/replace (:route-hash-id (first %)) #"\s" "")]
-                                   (.pushState js/window.history #js {} js/document.title
-                                     (str current-url route))
-                                   (e! (tv/->SelectRouteForDisplay (first %)))
-                                   (.setTimeout js/window
-                                                (fn []
-                                                  (scroll/scroll-to-id "route-calendar-anchor"))
-                                                150)))
+                                 (let [route (str/replace (:route-hash-id (first %)) #"\s" "")]
+                                   (do
+                                     (tv/change-visualization-url route)
+                                     (e! (tv/->SelectRouteForDisplay (first %)))
+                                     (.setTimeout js/window
+                                                  (fn []
+                                                    (scroll/scroll-to-id "route-calendar-anchor"))
+                                                  150))))
                    :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
       [{:name ""
