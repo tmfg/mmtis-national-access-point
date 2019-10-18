@@ -30,7 +30,7 @@
   file: path=/opt/ote state=directory owner=napote group=napote
 
 - name: Create chouette folder
-    file: path=/opt/chouette state=directory owner=napote group=napote
+  file: path=/opt/chouette state=directory owner=napote group=napote
 
 - name: Ensure botocore and boto3 modules are installed
     pip:
