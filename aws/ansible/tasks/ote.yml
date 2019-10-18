@@ -26,9 +26,6 @@
 - name: Install required packages
   yum: name=[u'java-1.8.0-openjdk'] state=installed
 
-- name: Create OTE app folder
-  file: path=/opt/ote state=directory owner=napote group=napote
-
 - name: Create chouette folder
   file: path=/opt/chouette state=directory owner=napote group=napote
 
@@ -58,6 +55,9 @@
 
 - name: Delete ZIP chouette-command.zip
   command: rm -rf /opt/chouette-command.zip
+
+- name: Create OTE app folder
+  file: path=/opt/ote state=directory owner=napote group=napote
 
 - name: Create OTE config
   template: src=templates/ote/config.edn.j2 dest=/opt/ote/config.edn
