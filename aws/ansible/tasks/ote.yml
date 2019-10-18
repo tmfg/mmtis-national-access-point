@@ -21,7 +21,7 @@
     --targets Id="{{instance_id}}",Port="3000"
 
 - pause:
-  seconds: 10
+    seconds: 10
 
 - name: Install required packages
   yum: name=[u'java-1.8.0-openjdk'] state=installed
@@ -101,4 +101,4 @@
     --targets Id="{{instance_id}}",Port="3000"
 
 - pause:
-  seconds: 10
+    seconds: 10
