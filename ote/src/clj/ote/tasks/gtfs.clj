@@ -14,12 +14,11 @@
             [ote.time :as time]
             [ote.tasks.util :refer [daily-at timezone]]
             [ote.db.lock :as lock]
-            [clojure.string :as str]
             [ote.util.functor :refer [fmap]]
             [ote.util.collections :refer [map-by]]
             [ote.transit-changes.detection :as detection]
             [ote.config.transit-changes-config :as config-tc]
-            [ote.components.http :as http])
+            [ote.netex.netex :as netex])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -31,7 +30,8 @@
 (defn interface-type [format]
   (case format
     "GTFS" :gtfs
-    "Kalkati.net" :kalkati))
+    "Kalkati.net" :kalkati
+    nil))
 
 (defn mark-gtfs-package-imported! [db gtfs-data]
   (specql/update! db ::t-service/external-interface-description
@@ -63,30 +63,26 @@
   ([config db upload-s3? service-id]
   ;; Ensure that gtfs-import flag is enabled
   ;; upload-s3? should be false when using local environment
-  (let [{:keys [id url operator-id ts-id last-import-date format license] :as gtfs-data}
-        ;; Load next gtfs package or package that is related to given service-id
-        (if (nil? service-id)
-          (fetch-next-gtfs-interface! config db)
-          (fetch-given-gtfs-interface! db service-id))
+  (let [;; Load next gtfs package or package that is related to given service-id
+        {:keys [id url operator-id operator-name ts-id last-import-date format license]
+         :as gtfs-data} (if (nil? service-id)
+                          (fetch-next-gtfs-interface! config db)
+                          (fetch-given-gtfs-interface! db service-id))
         force-download? (integer? service-id)]
-    (if (nil? gtfs-data)
-      (do
-        (log/debug "ERROR: No gtfs files to upload.")
-        (str "ERROR: No gtfs files to upload."))
+    (if gtfs-data
       (try
-        (log/debug "GTFS File url found. " (pr-str gtfs-data))
-        (if (not (nil? (import-gtfs/download-and-store-transit-package
-                         (interface-type format) (:gtfs config) db url operator-id ts-id last-import-date license id upload-s3? force-download?)))
-          (do
-            (log/debug "GTFS file imported and uploaded successfully!")
-            (str "GTFS file imported and uploaded successfully!"))
-          (do
-            (log/debug "ERROR: Could not import GTFS file")
-            (str "ERROR: Could not import GTFS file")))
+        (if-let [conversion-meta (import-gtfs/download-and-store-transit-package
+                                   (interface-type format)
+                                   (:gtfs config)
+                                   db url operator-id operator-name ts-id last-import-date license id upload-s3?
+                                   force-download?)]
+          (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
+            nil                                             ; This if & nil used to make success branch more readable
+            (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
+          (log/spy :warn (str "GTFS: Could not import GTFS file. service-id = " ts-id)))
         (catch Exception e
-          (do
-            (log/warn e "Error when importing, uploading or saving gtfs package to db!")
-            (str "ERROR: Error when importing, uploading or saving gtfs package to db!"))))))))
+          (log/spy :warn (str "GTFS: Error when importing, uploading or saving gtfs package to db! : \n" e))))
+      (log/spy :debug (str "GTFS: No gtfs files to upload. service-id = " service-id))))))
 
 (def night-hours #{0 1 2 3 4})
 

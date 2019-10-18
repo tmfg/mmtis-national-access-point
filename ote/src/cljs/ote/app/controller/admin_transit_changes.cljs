@@ -106,22 +106,17 @@
 
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
   {}
-  (let [app (if (str/includes? response "ERROR")
-              (-> app
-                  (assoc-in [:admin :transit-changes :single-download-gtfs-service-response]
-                            {:status :error
-                             :msg (str "GTFS paketin latauksessa virhe: " response)})
-                  (assoc :flash-message-error "GTFS paketin latauksessa virhe!"))
-              (-> app
-                  (assoc-in [:admin :transit-changes :single-download-gtfs-service-response]
-                            {:status :success
-                             :msg response})
-                  (assoc :flash-message response)))]
-    app))
+  (-> app
+      (assoc-in [:admin :transit-changes :single-download-gtfs-service-response] nil)
+      (assoc :flash-message (str "GTFS Paketin lataus onnistui " response))))
 
 (define-event ForceInterfaceImportForGivenServiceFailure [response]
   {}
-  (assoc app :flash-message-error (:response response)))
+  (-> app
+      (assoc-in [:admin :transit-changes :single-download-gtfs-service-response]
+                {:status :error
+                 :msg response})
+      (assoc :flash-message-error (:response response))))
 
 (define-event ForceInterfaceImportForGivenService []
   {}
