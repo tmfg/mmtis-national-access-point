@@ -261,7 +261,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! table? is-empty? label name rows rows-max warning error full-width? style]
+(defmethod field :localized-text [{:keys [update! div-table? table? is-empty? label name rows rows-max warning error full-width? style]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -271,7 +271,8 @@
           rows (or rows 1)]
       [:div {:style (merge
                       ;; Push localized text field down to match regular text input field.
-                      {:padding-top "16px"}
+                      (when (not div-table?)
+                        {:padding-top "16px"})
                       (when full-width? style-form/full-width)
                       style)}
        [text-field
@@ -777,7 +778,72 @@
   [:div.error "Missing field type: " (:type opts)])
 
 
-(defmethod field :table [{:keys [table-fields table-style table-wrapper-style update! delete? add-label add-label-disabled? error-data id] :as opts} data]
+(defmethod field :div-table [{:keys [table-fields div-class update! error-data delete? delete-label
+                                     add-label add-label-disabled? id] :as options} data]
+  (let [data (if (empty? data)
+               ;; div-table always contains at least one row
+               [{}]
+               data)]
+    [:div
+     [:div {:key (str "div-table-" id)}
+      (doall
+        (map-indexed
+          (fn [i row]
+            (let [{:keys [errors missing-required-fields]} (and error-data
+                                                                (< i (count error-data))
+                                                                (nth error-data i))]
+              ^{:key (str "div-" id "-" i)}
+              [:div
+               [:div.row
+                (doall
+                  (for [{:keys [name label read write type component div-style] :as div-component} table-fields
+                        :let [value ((or read name) row)
+                              field-error (get errors name)
+                              missing? (get missing-required-fields name)
+                              update-fn (if write
+                                          #(update data i write %)
+                                          #(assoc-in data [i name] %))]]
+                    ^{:key (str name label type)}
+
+                    [:div {:class div-class
+                           :style (merge
+                                    style-form/div-form-field
+                                    div-style)}
+                     (if (= :component type)
+                       ;; Render component
+                       (component {:update-form! #(update! (update-fn %))
+                                   :div-table? true
+                                   :row-number i
+                                   :data value})
+                       ;; Render field
+                       [field (merge
+                                (assoc div-component :update! #(update! (update-fn %))
+                                                     :div-table? true)
+                                (when missing?
+                                  {:warning (tr [:common-texts :required-field])})
+                                (when field-error
+                                  {:error field-error}))
+                        value])]))]
+               (when delete?
+                 [:div.row
+                  [:div {:class div-class
+                         :style style-form-fields/table-row-column}
+                   [buttons/delete-table-row {:on-click #(update! (vec (concat (when (pos? i)
+                                                                                 (take i data))
+                                                                               (drop (inc i) data))))}
+                    delete-label]]])]))
+          data))]
+      (when add-label
+       [:div (stylefy/use-style style-base/button-add-row)
+        [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
+                              :disabled (if add-label-disabled?
+                                          (add-label-disabled? (last data))
+                                          (values/effectively-empty? (last data)))}
+                             (when (not (nil? id))
+                               {:id (str id "-button-save")})) add-label]])]))
+
+(defmethod field :table [{:keys [table-fields table-style table-wrapper-style update! delete? add-label
+                                 add-label-disabled? error-data id] :as opts} data]
   (let [data (if (empty? data)
                ;; table always contains at least one row
                [{}]
@@ -804,7 +870,7 @@
              (when tooltip
                [tooltip-icon {:text tooltip :pos  tooltip-pos :len tooltip-len}])]))
          (when delete?
-           [ui/table-header-column {:style (merge {:width "70px"} style-form-fields/table-header-column)}
+           [ui/table-header-column {:style (merge {:width "50px"} style-form-fields/table-header-column)}
             (tr [:buttons :delete])])]]
 
        [ui/table-body {:display-row-checkbox false}
@@ -848,11 +914,11 @@
                                      {:error field-error}))
                       value])]))
                (when delete?
-                 [ui/table-row-column {:style (merge style-form-fields/table-row-column {:width "70px"})}
+                 [ui/table-row-column {:style (merge style-form-fields/table-row-column {:width "50px"})}
                   [ui/icon-button {:on-click #(update! (vec (concat (when (pos? i)
                                                                       (take i data))
                                                                     (drop (inc i) data))))}
-                   [ic/action-delete]]])]))
+                   [ic/action-delete {:style {:margin-left "-20px"}}]]])]))
           data))]]]
      (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
@@ -1118,7 +1184,7 @@
                    :disabled disabled})
    label])
 
-(defmethod field :text-label [{:keys [label style h-style full-width?]}]
+(defmethod field :text-label [{:keys [label style h-style h-inner-style full-width?]}]
   ;; Options
   ; :label Text for displaying
   [:div
@@ -1128,8 +1194,20 @@
              (when style
                style))}
    (if h-style
-     [h-style label]
+     [h-style (when h-inner-style {:style h-inner-style}) label]
      [:p label])])
+
+(defmethod field :text [{:keys [label style full-width?] :as field} data]
+  (let [text (str/replace data #"\r\n|\n|\r" "====")
+        text-list (str/split text #"====")]
+    [:div {:style (merge
+                    (when full-width?
+                      {:width "100%"})
+                    (when style
+                      style))}
+     (doall
+       (for [row text-list]
+         [:p row]))]))
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
   [info/info-toggle label body {:default-open? default-state}])

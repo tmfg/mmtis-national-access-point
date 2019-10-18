@@ -10,15 +10,15 @@
             [ote.app.controller.transport-service :as ts]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.views.place-search :as place-search]
             [tuck.core :as tuck]
             [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
             [ote.style.form :as style-form]
+            [ote.style.dialog :as style-dialog]
             [ote.util.values :as values]
-            [ote.ui.validation :as validation]
-            [ote.style.dialog :as style-dialog])
+            [ote.ui.validation :as validation])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -238,7 +238,7 @@
        data]]
      ]))
 
-(defn pick-up-locations [e!]
+(defn pick-up-locations []
   (let [tr* (tr-key [:field-labels :service-exception])
         write (fn [key]
                 (fn [{all-day? ::t-service/all-day :as data} time]
@@ -273,7 +273,7 @@
                      {:name ::common/postal_code
                       :type :string
                       :full-width? true
-                      :regex #"\d{0,5}"
+                      :validate [[:every-postal-code]]
                       :read (comp ::common/postal_code ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/postal_code] %2)}
                      {:name ::common/post_office
@@ -281,6 +281,13 @@
                       :type :string
                       :read (comp ::common/post_office ::t-service/pick-up-address)
                       :write #(assoc-in %1 [::t-service/pick-up-address ::common/post_office] %2)}
+                     {:name :country
+                      :label (tr [:common-texts :country])
+                      :full-width? true
+                      :type :autocomplete
+                      :suggestions (mapv second (tr-tree [:country-list]))
+                      :read (comp :country ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
                      {:name ::t-service/service-hours-and-exceptions
                       :full-width? true
                       :type :component
@@ -315,7 +322,7 @@
                      (ts-common/service-url "booking-service-url"
                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
                       ::t-service/booking-service)
-                     (pick-up-locations e!)]
+                     (pick-up-locations)]
                      options (rental-form-options e! groups app)]
     [:div.row
      [form/form options groups (get service ::t-service/rentals)]]))

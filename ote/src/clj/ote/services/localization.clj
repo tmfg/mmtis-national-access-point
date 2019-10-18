@@ -3,7 +3,8 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.localization :as localization]
-            [compojure.core :refer [routes GET]]))
+            [compojure.core :refer [routes GET]]
+            [clojure.string :as str]))
 
 (defn- fetch-language [language-name]
   (http/transit-response (localization/translations (keyword language-name))))

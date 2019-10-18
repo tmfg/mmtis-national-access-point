@@ -25,7 +25,7 @@
 (t/use-fixtures :each
   (system-fixture
    :transport (component/using
-                (transport-service/->Transport
+                (transport-service/->TransportService
                   (:nap nil))
                 [:http :db])))
 
@@ -37,7 +37,7 @@
         service (:transit ts)
         ps (::t-service/passenger-transportation service)]
     (is (= (::t-service/contact-address service)
-           #::common {:street "Street 1" :postal_code "90100" :post_office "Oulu"}))
+           {::common/post_office "Oulu" ::common/postal_code "90100" ::common/street "Street 1" ::common/country_code "FI"}))
     (is (= (::t-service/price-classes ps)
            [#:ote.db.transport-service{:name "starting",
                                        :price-per-unit 5.9M,

@@ -1,7 +1,8 @@
 (ns ote.app.controller.common
   "Common controller functionality"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.localization :refer [tr]]
+            [ote.localization :refer [tr tr-tree]]
+            [ote.communication :as comm]
             [ote.app.routes :refer [navigate!]]))
 
 (defn error-landing [app landing]

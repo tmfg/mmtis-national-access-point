@@ -2,6 +2,9 @@
   "Form to edit transport operator information."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
+            [ote.localization :refer [tr tr-key tr-tree]]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.common :as common]
             [ote.ui.form :as form]
             [ote.ui.buttons :as buttons]
             [ote.ui.validation :as ui-validation]
@@ -9,19 +12,16 @@
             [ote.ui.select_field :as sf]
             [ote.ui.warning_msg :as msg-warn]
             [ote.ui.success_msg :as msg-succ]
+            [ote.ui.common :as ui-common]
+            [ote.ui.common :as uicommon]
+            [ote.ui.circular_progress :as spinner]
+            [ote.util.transport-operator-util :as tou]
             [ote.style.form :as style-form]
             [ote.style.form-fields :as style-fields]
-            [ote.ui.common :as ui-common]
-
-            [ote.app.controller.flags :as flags]
-            [ote.app.controller.transport-operator :as to]
-
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
+            [ote.style.dialog :as style-dialog]
             [ote.style.base :as style-base]
-            [ote.ui.common :as uicommon]
-            [ote.style.dialog :as style-dialog]))
+            [ote.app.controller.flags :as flags]
+            [ote.app.controller.transport-operator :as to]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -243,7 +243,7 @@
        :type :string
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
-       :regex #"\d{0,5}"
+       :validate [[:every-postal-code]]
        :read (comp ::common/postal_code ::t-operator/visiting-address)
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/visiting-address ::common/postal_code] postal-code))}
@@ -256,6 +256,18 @@
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/visiting-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/visiting-address :ote.db.common/post_office] post-office))}
+
+      {:element-id "input-operator-addrVisitCountry"
+       :label (tr [:common-texts :country])
+       :name :visit-country
+       :type :autocomplete
+       :full-width? true
+       :suggestions (mapv second (tr-tree [:country-list]))
+       :disabled? disable-ytj-address-visiting?
+       :style style-fields/form-field
+       :read (comp :country :ote.db.transport-operator/visiting-address)
+       :write (fn [data country]
+                (assoc-in data [:ote.db.transport-operator/visiting-address :country] country))}
 
       {:name :heading-address-postal
        :label (tr [:organization-page :address-postal])
@@ -278,7 +290,7 @@
        :type :string
        :disabled? disable-ytj-address-billing?
        :style style-fields/form-field
-       :regex #"\d{0,5}"
+       :validate [[:every-postal-code]]
        :read (comp ::common/postal_code ::t-operator/billing-address)
        :write (fn [data postal-code]
                 (assoc-in data [::t-operator/billing-address ::common/postal_code] postal-code))}
@@ -292,6 +304,18 @@
        :read (comp :ote.db.common/post_office :ote.db.transport-operator/billing-address)
        :write (fn [data post-office]
                 (assoc-in data [:ote.db.transport-operator/billing-address :ote.db.common/post_office] post-office))}
+
+      {:element-id "input-operator-addrBillingCountry"
+       :label (tr [:common-texts :country])
+       :name :billing-country
+       :type :autocomplete
+       :full-width? true
+       :suggestions (mapv second (tr-tree [:country-list]))
+       :disabled? disable-ytj-address-visiting?
+       :style style-fields/form-field
+       :read (comp :country :ote.db.transport-operator/billing-address)
+       :write (fn [data country]
+                (assoc-in data [:ote.db.transport-operator/billing-address :country] country))}
 
       {:name :heading-contact-details-other
        :label (tr [:organization-page :contact-details-other])
@@ -414,34 +438,36 @@
         form-groups (cond-> []
                             show-ytj-id-entry? (conj (business-id-selection e! state ytj-supported?))
                             show-details? (conj (operator-form-groups e! state creating? ytj-supported?)))]
-    [:div
-     [:div
+    (if (:transport-operator-loaded? state)
       [:div
-       [:h1 (tr [:organization-page
-                 (if (:new? operator)
-                   :organization-new-title
-                   :organization-form-title)])]]]
-     [:div
-      [info/info-toggle (tr [:common-texts :instructions] true)
-       (if ytj-supported?
-         [:div
-          [:div (tr [:organization-page :help-ytj-integration-desc])]
-          [:div (tr [:organization-page :help-desc-1])]
-          [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
-          [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]
-         [:div
-          [:div (tr [:organization-page :basic-info-tooltip])]])]]
+       [:div
+        [:div
+         [:h1 (tr [:organization-page
+                   (if (:new? operator)
+                     :organization-new-title
+                     :organization-form-title)])]]]
+       [:div
+        [info/info-toggle (tr [:common-texts :instructions] true)
+         (if ytj-supported?
+           [:div
+            [:div (tr [:organization-page :help-ytj-integration-desc])]
+            [:div (tr [:organization-page :help-desc-1])]
+            [uicommon/extended-help-link (tr [:organization-page :help-about-ytj-link]) (tr [:organization-page :help-about-ytj-link-desc])]
+            [uicommon/extended-help-link (tr [:organization-page :help-ytj-contact-change-link]) (tr [:organization-page :help-ytj-contact-change-link-desc])]]
+           [:div
+            [:div (tr [:organization-page :basic-info-tooltip])]])]]
 
-     ;; When business-id has multiple companies create list of delete-operator dialogs. Otherwise add only one
-     (if (empty? (:ytj-company-names state))
-       [delete-operator e! operator (:transport-operators-with-services state)]
-       (for [o (get-in state [:transport-operator :transport-operators-to-save])]
-         ^{:key (str "operator-delete-control-" (::t-operator/name o) "-" (::t-operator/id o) )}
-         [delete-operator e! o (:transport-operators-with-services state)]))
+       ;; When business-id has multiple companies create list of delete-operator dialogs. Otherwise add only one
+       (if (empty? (:ytj-company-names state))
+         [delete-operator e! operator (:transport-operators-with-services state)]
+         (for [o (get-in state [:transport-operator :transport-operators-to-save])]
+           ^{:key (str "operator-delete-control-" (::t-operator/name o) "-" (::t-operator/id o))}
+           [delete-operator e! o (:transport-operators-with-services state)]))
 
-     (if show-merge-companies?
-       (operator-merge-section e! operator (:ytj-company-names state))
-       [form/form
-        (operator-form-options e! state show-details?)
-        form-groups
-        operator])]))
+       (if show-merge-companies?
+         (operator-merge-section e! operator (:ytj-company-names state))
+         [form/form
+          (operator-form-options e! state show-details?)
+          form-groups
+          operator])]
+      [spinner/circular-progress])))

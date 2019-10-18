@@ -558,6 +558,13 @@
             (map (juxt :code :name :lat :lon :user-added? :created)
                  (fetch-all-ports db))))
 
+(defn- tvv-response
+  "Return Toimivaltaiset viranomaiset in one csv list"
+  [db]
+  (csv-data ["Nimi" "Sähköposti"]
+            (map (juxt :name :email)
+                 (nap-users/list-authority-users db))))
+
 (defn- send-pre-notice-email-response [db config-nap config-email]
   (log/debug "send-pre-notice-email-response")
   (pn/send-pre-notice-emails! db config-email (pn/pre-notice-recipient-emails config-nap))
@@ -639,9 +646,11 @@
 
     (POST "/admin/netex" req (admin-service "netex" req db #'list-netex-conversions))
 
-    (POST "/admin/transport-service/delete" req
-      (admin-service "transport-service/delete" req db
-                     (partial admin-delete-transport-service! nap-config)))
+    (POST "/admin/transport-service/delete" {user :user form-data :body :as req}
+      (require-admin-user "random url that is not used" (:user user))
+      (http/transit-response
+        (admin-delete-transport-service!
+          nap-config db user (http/transit-request form-data))))
 
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
 
@@ -707,7 +716,13 @@
     :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/port" {user :user}
     (or (authorization-fail-response (:user user))
-        (all-ports-response db))))
+        (all-ports-response db)))
+
+  ^{:format :csv
+    :filename (str "toimivaltaiset-viranomaiset-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/tvv" {user :user}
+    (or (authorization-fail-response (:user user))
+        (tvv-response db))))
 
 (define-service-component MonitorReport []
   {}

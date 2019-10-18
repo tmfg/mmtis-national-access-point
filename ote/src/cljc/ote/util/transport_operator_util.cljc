@@ -10,3 +10,8 @@
                                       (string/replace operator-name " " "_")
                                       "_gtfs.zip"))]
     filename))
+
+(def every-postal-code-regex #"(?i)^(?=.{1,10}$)[a-z0-9][a-z0-9\- ]*[a-zA-Z0-9]$")
+(defn validate-every-postal-codes [code]
+  (let [valid (re-matches every-postal-code-regex code)]
+    (or valid false)))

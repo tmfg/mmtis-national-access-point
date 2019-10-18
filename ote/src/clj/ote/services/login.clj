@@ -8,7 +8,7 @@
             [ote.nap.users :as users]
             [jeesql.core :refer [defqueries]]
             [ote.util.encrypt :as encrypt]
-            [ote.services.transport :as transport]
+            [ote.services.transport-operator :as transport-operator]
             [ote.components.service :refer [define-service-component]]
             [ote.db.tx :as tx :refer [with-transaction]]
             [specql.core :as specql]
@@ -21,7 +21,8 @@
             [specql.op :as op]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
-            [ote.util.throttle :refer [with-throttle-ms]]))
+            [ote.util.throttle :refer [with-throttle-ms]]
+            [clojure.string :as str]))
 
 (defqueries "ote/services/login.sql")
 
@@ -48,7 +49,7 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (transport/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
@@ -134,9 +135,9 @@
    :dependencies {email :email}}
 
   ^:unauthenticated
-  (POST "/login" {form-data :body}
-        (#'login db auth-tkt-config
-                 (http/transit-request form-data)))
+  (POST "/login" {form-data :body cookies :cookies}
+    (#'login db auth-tkt-config
+      (http/transit-request form-data)))
 
   ^:unauthenticated
   (POST "/logout" []

@@ -179,14 +179,25 @@
        :options notice-types
        :show-option (tr-key [:enums ::transit/pre-notice-type])})
 
-    {:name ::transit/description
-     :type :text-area
-     :rows 1
-     :disabled? sent?
-     :hint-text (tr [:pre-notice-page :notice-description-hint])
-     :full-width? true
-     :required? true
-     :container-class "col-xs-12 col-sm-12 col-md-6"}))
+    (when sent?
+      {:element-id "label-transit-description"
+       :name :label-transit-description
+       :label (tr [:field-labels :pre-notice ::transit/description])
+       :type :text-label
+       :full-width? true
+       :h-style :p
+       :h-inner-style {:margin-bottom "0px"}})
+    (if sent?
+      {:name ::transit/description
+       :type :text
+       :full-width? true}
+      {:name ::transit/description
+       :type :text-area
+       :rows 1
+       :hint-text (tr [:pre-notice-page :notice-description-hint])
+       :full-width? true
+       :required? true
+       :container-class "col-xs-12 col-sm-12 col-md-6"})))
 
 (defn effective-dates [e! sent?]
   (form/group

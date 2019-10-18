@@ -108,10 +108,10 @@ describe('Authority pre notice tests', () => {
     });
 
     beforeEach(() => {
-        cy.visit('/#/authority-pre-notices');
-        cy.server();
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
+
+        cy.visit('/#/authority-pre-notices');
     });
 
     it('should render authority pre notice list', () => {
