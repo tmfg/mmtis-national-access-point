@@ -19,7 +19,7 @@
             [ote.style.dialog :as style-dialog]
             [ote.util.values :as values]
             [ote.ui.info :as info]
-            [ote.ui.validation :as validation]
+            [ote.ui.validation :as validation])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -245,7 +245,7 @@
   [{:keys [update-form! data] :as component-content}]
   [service-hours-for-location update-form! data])
 
-(defn pick-up-locations [app-state]
+(defn pick-up-locations []
   (form/group
     {:label (tr [:passenger-transportation-page :header-pick-up-locations])
      :columns 1

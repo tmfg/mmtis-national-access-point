@@ -786,8 +786,7 @@
                ;; div-table always contains at least one row
                [{}]
                data)]
-    [:div {:key (str "main-div-table-" id)
-           :style {:clear "both"}}
+    [:div {:key (str "main-div-table-" id)}
      [:div {:key (str "div-table-" id)}
       (doall
         (map-indexed
@@ -810,7 +809,6 @@
                               update-fn (if write
                                           #(update data i write %)
                                           #(assoc-in data [i name] %))]]
-                    ^{:key (str id name label type)}
                     ^{:key (str id name label type)}
                     [:div {:class div-class
                            :style (merge
