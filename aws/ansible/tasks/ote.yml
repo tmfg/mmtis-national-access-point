@@ -21,7 +21,7 @@
     --targets Id="{{instance_id}}",Port="3000"
 
 - pause:
-    seconds: 10
+  seconds: 10
 
 - name: Install required packages
   yum: name=[u'java-1.8.0-openjdk'] state=installed
@@ -33,31 +33,31 @@
   file: path=/opt/chouette state=directory owner=napote group=napote
 
 - name: Ensure botocore and boto3 modules are installed
-    pip:
-      name:         [ "boto3"]
-      extra_args:   "--user"
+  pip:
+    name:         [ "boto3"]
+    extra_args:   "--user"
 
 - name: Copy chouette-command.zip from s3
-    aws_s3:
-      bucket: ote-assets
-      object: chouette-command.zip
-      dest: /opt/chouette-command.zip
-      mode: get
+  aws_s3:
+    bucket: ote-assets
+    object: chouette-command.zip
+    dest: /opt/chouette-command.zip
+    mode: get
 
 - name: Extract chouette-command.zip into /opt/ will make folder /opt/chouette-cmd_3.4.8/
-    unarchive:
-      src: /opt/chouette-command.zip
-      remote_src: yes
-      dest: /opt/
+  unarchive:
+    src: /opt/chouette-command.zip
+    remote_src: yes
+    dest: /opt/
 
-    - name: Copy /opt/chouette-cmd_3.4.8/ to /opt/chouette
-      command: cp -r /opt/chouette-cmd_3.4.8/. /opt/chouette/
+  - name: Copy /opt/chouette-cmd_3.4.8/ to /opt/chouette
+    command: cp -r /opt/chouette-cmd_3.4.8/. /opt/chouette/
 
-    - name: Delete folder /opt/chouette-cmd_3.4.8/
-      command: rm -rf /opt/chouette-cmd_3.4.8/
+  - name: Delete folder /opt/chouette-cmd_3.4.8/
+    command: rm -rf /opt/chouette-cmd_3.4.8/
 
-    - name: Delete ZIP chouette-command.zip
-      command: rm -rf /opt/chouette-command.zip
+  - name: Delete ZIP chouette-command.zip
+    command: rm -rf /opt/chouette-command.zip
 
 - name: Create OTE config
   template: src=templates/ote/config.edn.j2 dest=/opt/ote/config.edn
@@ -101,4 +101,4 @@
     --targets Id="{{instance_id}}",Port="3000"
 
 - pause:
-    seconds: 10
+  seconds: 10
