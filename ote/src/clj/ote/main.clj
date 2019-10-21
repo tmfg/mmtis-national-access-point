@@ -100,7 +100,7 @@
            [:db :http :email])
 
    :admin (component/using
-           (admin-service/->Admin (:nap config))
+           (admin-service/->Admin config)
            [:db :http :email])
 
    :admin-reports (component/using

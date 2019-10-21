@@ -18,6 +18,7 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.db.netex :as netex]
+            [ote.integration.export.netex :as export-netex]
             [ote.services.transport :as transport]
             [ote.services.operators :as operators]
             [cheshire.core :as cheshire]
@@ -252,11 +253,23 @@
                                routes-with-namespace)]
     routes-with-name))
 
-(defn- list-netex-conversions [db user query]
-  (let [netex (fetch-netex-conversions-for-admin db {:operator (when query (str "%" query "%"))})
-        ;; Add namespace for non namespaced keywords because sql query returns values without namespace
-        netex-with-namespace (mapv (fn [x] (set/rename-keys x netex-column-keys)) netex)]
-    netex-with-namespace))
+(defn- assoc-download-url [config conversions]
+  (mapv (fn [conv]
+          (if (= :ok (keyword (:ote.db.netex/status conv)))
+            (assoc conv :url (export-netex/file-download-url config
+                                                (:ote.db.transport-service/id conv)
+                                                (:ote.db.netex/id conv)))
+            conv))
+        conversions))
+
+(defn- list-netex-conversions-response [config db query]
+  (as->
+    (fetch-netex-conversions-for-admin db {:operator (when query (str "%" query "%"))}) tmp
+    (mapv (fn [x]
+            (set/rename-keys x netex-column-keys))
+          tmp)
+    (assoc-download-url config tmp)
+    (http/transit-response tmp 200)))
 
 (defn distinct-by [f coll]
   (let [groups (group-by f coll)]
@@ -291,8 +304,8 @@
 
 (defn- admin-delete-transport-service!
   "Allow admin to delete single transport service by id"
-  [nap-config db user {id :id}]
-  (let [deleted-service (transport/all-data-transport-service nap-config db id)
+  [config db user {id :id}]
+  (let [deleted-service (transport/all-data-transport-service config db id)
         return (transport/delete-transport-service! db user id)
         auditlog {::auditlog/event-type :delete-service
                   ::auditlog/event-attributes
@@ -565,9 +578,9 @@
             (map (juxt :name :email)
                  (nap-users/list-authority-users db))))
 
-(defn- send-pre-notice-email-response [db config-nap config-email]
+(defn- send-pre-notice-email-response [db config]
   (log/debug "send-pre-notice-email-response")
-  (pn/send-pre-notice-emails! db config-email (pn/pre-notice-recipient-emails config-nap))
+  (pn/send-pre-notice-emails! db (:email config) (pn/pre-notice-recipient-emails (:pre-notices config)))
   (http/transit-response nil 200))
 
 ;; Ensure that defonce was the reason for the wrong date
@@ -619,7 +632,7 @@
     (log-java-time-objs)
     (http/transit-response date-str 200)))
 
-(defn- admin-routes [db http nap-config email-config]
+(defn- admin-routes [db config]
   (routes
 
     (GET "/admin/user" req
@@ -644,13 +657,15 @@
 
     (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 
-    (POST "/admin/netex" req (admin-service "netex" req db #'list-netex-conversions))
+    (POST "/admin/netex" {:keys [body user]}
+      (or (authorization-fail-response (:user user))
+          (list-netex-conversions-response config db (http/transit-request body))))
 
-    (POST "/admin/transport-service/delete" {user :user form-data :body :as req}
+    (POST "/admin/transport-service/delete" {user :user form-data :body}
       (require-admin-user "random url that is not used" (:user user))
       (http/transit-response
         (admin-delete-transport-service!
-          nap-config db user (http/transit-request form-data))))
+          config db user (http/transit-request form-data))))
 
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
 
@@ -684,7 +699,7 @@
 
     (GET "/admin/pre-notices/notify" req
       (or (authorization-fail-response (get-in req [:user :user]))
-          (send-pre-notice-email-response db nap-config email-config)))
+          (send-pre-notice-email-response db config)))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req
@@ -741,11 +756,11 @@
     (require-admin-user "reports/monitor" (:user user))
     (monitor-csv-report db type)))
 
-(defrecord Admin [nap-config]
+(defrecord Admin [config]
   component/Lifecycle
-  (start [{db :db http :http email :email :as this}]
+  (start [{db :db http :http :as this}]
     (assoc this ::stop
-                (http/publish! http (admin-routes db http nap-config email))))
+                (http/publish! http (admin-routes db config))))
 
   (stop [{stop ::stop :as this}]
     (stop)
