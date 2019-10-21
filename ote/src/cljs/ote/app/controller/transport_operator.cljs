@@ -139,11 +139,11 @@
   [operator]
   (when operator
     (let [v-code (get-in operator [::t-operator/visiting-address ::common/country_code])
-          v-code (if (and v-code (not= "AA" v-code))
+          v-code (if (and v-code (not= :AA v-code))
                    (name v-code)
                    nil)
           b-code (get-in operator [::t-operator/billing-address ::common/country_code])
-          b-code (if (and b-code (not= "AA" b-code))
+          b-code (if (and b-code (not= :AA b-code))
                    (name b-code)
                    nil)]
 
