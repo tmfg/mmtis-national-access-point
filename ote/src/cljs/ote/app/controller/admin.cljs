@@ -355,7 +355,8 @@
   SearchNetexConversions
   (process-event [_ app]
     (comm/post! "admin/netex" (get-in app [:admin :netex :filters])
-                {:on-success (tuck/send-async! ->SearchNetexConversionsResponse)})
+                {:on-success (tuck/send-async! ->SearchNetexConversionsResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
     (assoc-in app [:admin :netex :loading?] true))
 
   SearchNetexConversionsResponse
