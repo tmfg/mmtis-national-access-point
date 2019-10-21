@@ -1225,6 +1225,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :type "Tyyppi"
   :transport-type "Liikennemuoto"
   :homepage "Verkko-osoite"
+  :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 
