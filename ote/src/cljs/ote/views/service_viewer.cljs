@@ -307,7 +307,7 @@
       (tr [:service-viewer :not-disclosed])])])
 
 (defn- ote-interfaces
-  [title data]
+  [data]
   [:div
    (when data
      (doall
@@ -323,7 +323,7 @@
          [info-sections-2-cols (string/upper-case title)
           [:div
            [common-ui/information-row-with-option
-            (tr [:service-search :homepage])
+            (tr [:service-search :ote-generated-url])
             (when url [common-ui/linkify
                        url
                        url
@@ -876,7 +876,7 @@
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-       [ote-interfaces "ote-netex-rajapinnat" (:ote-interfaces ts)]
+       [ote-interfaces (:ote-interfaces ts)]
        [spacer]
 
        (case service-sub-type
