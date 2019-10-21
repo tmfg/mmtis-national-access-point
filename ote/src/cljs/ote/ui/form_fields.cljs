@@ -464,7 +464,7 @@
         (if error error warning)])]))
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
-                               error warning auto-width? disabled?
+                               error warning auto-width? full-width? disabled?
                                option-value class-name element-id] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -474,6 +474,7 @@
      (merge
        (when element-id {:id element-id})
        {:auto-width (boolean auto-width?)
+        :full-width (boolean full-width?)
         :style style
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
