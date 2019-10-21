@@ -356,39 +356,36 @@
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"
-  [db config email]
-  (let [nap-config (:nap config)]
-    (routes
+  [db]
+  (routes
 
-      (POST "/transport-service/:service-id/associated-operators"
-            {{:keys [service-id]} :params
-             user :user
-             data :body}
-        (let [operator-id (:operator-id (http/transit-request data))
-              user-id (get-in user [:user :id])
-              service-id (Long/parseLong service-id)]
-          (authorization/with-transport-operator-check db user operator-id
-                                                       #(save-associated-operator db user-id service-id operator-id))))
+    (POST "/transport-service/:service-id/associated-operators"
+          {{:keys [service-id]} :params
+           user :user
+           data :body}
+      (let [operator-id (:operator-id (http/transit-request data))
+            user-id (get-in user [:user :id])
+            service-id (Long/parseLong service-id)]
+        (authorization/with-transport-operator-check db user operator-id
+                                                     #(save-associated-operator db user-id service-id operator-id))))
 
-      (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
-              {{:keys [service-id operator-id]}
-               :params
-               user :user}
-        (let [service-id (Long/parseLong service-id)
-              operator-id (Long/parseLong operator-id)]
-          (authorization/with-transport-operator-check db user operator-id
-                                                       #(delete-associated-operator db service-id operator-id))))
+    (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
+            {{:keys [service-id operator-id]}
+             :params
+             user :user}
+      (let [service-id (Long/parseLong service-id)
+            operator-id (Long/parseLong operator-id)]
+        (authorization/with-transport-operator-check db user operator-id
+                                                     #(delete-associated-operator db service-id operator-id))))
 
-      (POST "/transport-service" {form-data :body
-                                  user      :user}
-        (save-transport-service-handler db user (http/transit-request form-data)))
+    (POST "/transport-service" {form-data :body
+                                user :user}
+      (save-transport-service-handler db user (http/transit-request form-data)))
 
-      (POST "/transport-service/delete" {form-data :body
-                                         user      :user}
-        (http/transit-response
-          (delete-transport-service! db user (:id (http/transit-request form-data)))))
-
-      )))
+    (POST "/transport-service/delete" {form-data :body
+                                       user :user}
+      (http/transit-response
+        (delete-transport-service! db user (:id (http/transit-request form-data)))))))
 
 (defn- transport-service-routes
   "Unauthenticated routes"
@@ -409,10 +406,10 @@
 
 (defrecord TransportService [config]
   component/Lifecycle
-  (start [{:keys [db http email] :as this}]
+  (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-      [(http/publish! http (transport-service-routes-auth db config email))
+      [(http/publish! http (transport-service-routes-auth db))
        (http/publish! http {:authenticated? false} (transport-service-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]
