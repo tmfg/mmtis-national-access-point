@@ -266,7 +266,8 @@
                          floats-to-bigdec
                          (set-publish-time db)
                          (dissoc ::t-service/external-interfaces
-                                 ::t-service/service-company)
+                                 ::t-service/service-company
+                                 :ote-interfaces)
                          (maybe-clear-companies))
 
         resources-from-db (fetch-transport-service-external-interfaces db (::t-service/id data))
