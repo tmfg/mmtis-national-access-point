@@ -15,8 +15,7 @@
             [ote.netex.netex :refer [fetch-conversions]]
             [ote.integration.export.netex :as export-netex]
             [ote.util.feature :as feature]
-    ;; Require time which extends PGInterval JSON generation
-            [ote.time]
+            [ote.time]                                      ; Require time which extends PGInterval JSON generation
             [clojure.spec.alpha :as s]
             [taoensso.timbre :as log]
             [specql.op :as op]))
