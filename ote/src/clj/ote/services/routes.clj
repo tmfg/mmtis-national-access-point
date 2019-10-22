@@ -11,6 +11,8 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
+            [ote.db.tx :as tx]
+            [ote.db.feature]
             [compojure.core :refer [routes GET POST DELETE]]
             [ote.geo :as geo]
             [ote.time :as time]
@@ -18,11 +20,9 @@
             [specql.op :as op]
             [ote.authorization :as authorization]
             [cheshire.core :as cheshire]
-            [ote.db.tx :as tx]
             [jeesql.core :refer [defqueries]]
             [ote.environment :as environment]
-            [ote.db.feature]
-            [clojure.string :as str])                               ; specql table definitions
+            [clojure.string :as str])
   (:import (org.postgis PGgeometry Point Geometry)))
 
 (defqueries "ote/services/routes.sql")
@@ -280,7 +280,7 @@
   Users can add interface by hand but this is much more convenient for them."
   [db user  {is-linked? :is-linked?
              service-id :service-id
-             operator-id :operator-id :as form-data} lang]
+             operator-id :operator-id :as form-data}]
   (let [interface-url (interface-url operator-id)]
     (authorization/with-transport-operator-check
       db user operator-id
@@ -298,8 +298,8 @@
                             ::t-service/license "CC BY 4.0"
                             ::t-service/transport-service-id service-id}))
          ;; return all services with operator to update front end app-state
-         {:services (transport/get-transport-services db #{operator-id} lang)
-          :routes (get-user-routes db (:groups user) (:user user) lang)}))))
+         {:services (transport/get-transport-services db #{operator-id})
+          :routes (get-user-routes db (:groups user) (:user user))}))))
 
 (defn- update-operator-homepage! [db user {:keys [operator-id homepage] :as form-data}]
   (authorization/with-transport-operator-check

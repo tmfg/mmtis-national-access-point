@@ -4,7 +4,6 @@
   (:require [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.services.transport-operator :as transport-operator]
-            [ote.services.common :as common]
             [ote.services.register :as register-services]
             [ote.components.http :as http]
             [ote.components.db :as db]
@@ -66,7 +65,6 @@
    :register (component/using (register-services/->Register config) [:http :db :email])
    :transport (component/using (transport-service/->TransportService config) [:http :db :email])
    :transport-operator (component/using (transport-operator/->TransportOperator config) [:http :db :email])
-   :common (component/using (common/->Common config) [:http :db])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
