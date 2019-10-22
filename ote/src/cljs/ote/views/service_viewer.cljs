@@ -317,9 +317,8 @@
                                         #(tr [:enums ::netex/interface-data-content %])
                                         (::netex/data-content interface)))
                    url (:url interface)
-                   format (:format interface)
-                   descriptions ""]]
-         ^{:key (str (::netex/id interface) title)}
+                   format (:format interface)]]
+         ^{:key (str (::netex/id interface) title url)}
          [info-sections-2-cols (string/upper-case title)
           [:div
            [common-ui/information-row-with-option
