@@ -240,7 +240,7 @@ Negative return value is an invalid match"
        (mapv without-personal-info)))
 
 (defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
-                   :as filters}]
+                  :as filters}]
   (let [;; Get service id's using different filters. If filter is not given no results will be returned.
         result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
@@ -254,17 +254,17 @@ Negative return value is an invalid match"
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection (remove nil? result-id-sets)))]
-    (-> (if operation-area
-                  (transport-services-in-operation-area db ids operation-area offset limit)
-                  (transport-services-page db ids offset limit))
-        (pare-results operators)
-        (as-> results (merge
-                       {:empty-filters? empty-filters?
-                        :results results
-                        :filter-service-count (count ids)}
-                       (when empty-filters?
-                         {:total-service-count (total-service-count db)
-                          :total-company-count (total-company-count db)}))))))
+    (as-> (if operation-area
+            (transport-services-in-operation-area db ids operation-area offset limit)
+            (transport-services-page db ids offset limit)) results
+          (pare-results results operators)
+          (merge
+            {:empty-filters? empty-filters?
+             :results results
+             :filter-service-count (count ids)}
+            (when empty-filters?
+              {:total-service-count (total-service-count db)
+               :total-company-count (total-company-count db)})))))
 
 (defn- service-search-parameters
   "Extract service search parameters from query parameters."
