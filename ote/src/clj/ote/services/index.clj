@@ -80,7 +80,7 @@
     {:language language
      :translations (localization/translations language)})])
 
-(defn user-info [db user lang]
+(defn user-info [db user]
   [:script#ote-user-info {:type "x-ote-user-info"}
    (transit/clj->transit
     (when user
@@ -115,7 +115,7 @@
       (when (not (true? dev-mode?))
         (matomo-analytics-scripts matomo-config))
       (translations localization/*language*)
-      (user-info db user (str/upper-case (name localization/*language*)))]
+      (user-info db user)]
 
      [:body (merge
              {:id "main-body"

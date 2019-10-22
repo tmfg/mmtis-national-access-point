@@ -1,9 +1,7 @@
 (ns ote.app.controller.front-page
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
-            [ote.db.transport-operator :as t-operator]
             [ote.app.routes :as routes]
-            [ote.app.controller.login :as login]
             [ote.app.controller.login :as login]
             [ote.app.controller.flags :as flags]
             [ote.localization :as localization :refer [tr]]
