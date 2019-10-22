@@ -64,9 +64,7 @@
                  areas)})
 
 (defn- append-nap-generated-netex-file-links
-  "NOTE: needs ::t-service/external-interface id property for external-interfaces in order to
-  copy `data-content` from interface into matching generated NeTEx link.
-  Returns `service` collection where external-interfaces is appended with interfaces with url to NAP NeTEx download link."
+  "Returns `service` collection where NAP NeTEx file download link is appended to interfaces collection."
   [service db config transport-service-id]
   (if (feature/feature-enabled? config :netex-conversion-automated)
     (when service
