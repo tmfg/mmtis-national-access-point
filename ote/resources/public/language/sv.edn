@@ -1408,7 +1408,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                        :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}}
 
  :country-list
- {:AC "Ascension"
+ {:A "Välj"
+  :AC "Ascension"
   :AD "Andorra"
   :AE "Förenade Arabemiraten"
   :AF "Afghanistan"

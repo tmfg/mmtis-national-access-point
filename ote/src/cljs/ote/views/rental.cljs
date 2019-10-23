@@ -8,6 +8,7 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.common :as common-c]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
@@ -284,10 +285,11 @@
                      {:name :country
                       :label (tr [:common-texts :country])
                       :full-width? true
-                      :type :autocomplete
-                      :suggestions (mapv second (tr-tree [:country-list]))
-                      :read (comp :country ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
+                      :type :selection
+                      :show-option (tr-key [:country-list])
+                      :options (common-c/country-list (tr-tree [:country-list]))
+                      :read (comp ::common/country_code ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/country_code] %2)}
                      {:name ::t-service/service-hours-and-exceptions
                       :full-width? true
                       :type :component

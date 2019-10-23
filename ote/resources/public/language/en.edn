@@ -1405,7 +1405,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                        :if-not-registered "If you have not recently registered with the NAP service, you can ignore this message."}}
 
  :country-list
- {:AF "Afghanistan"
+ {:A "Select"
+  :AF "Afghanistan"
   :AX "Åland Islands"
   :AL "Albania"
   :DZ "Algeria"

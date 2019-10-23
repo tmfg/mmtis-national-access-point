@@ -23,6 +23,7 @@
             [ote.style.base :as style-base]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.flags :as flags]
+            [ote.app.controller.common :as common-c]
             [ote.views.place-search :as place-search]))
 
 (defn advance-reservation-group
@@ -356,14 +357,15 @@
     {:element-id "input-service-country"
      :label (tr [:common-texts :country])
      :name :country
-     :type :autocomplete
+     :type :selection
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :style {:margin-bottom "2rem"}
      :full-width? true
-     :suggestions (mapv second (tr-tree [:country-list]))
-     :read (comp :country ::t-service/contact-address)
-     :write (fn [data country]
-              (assoc-in data [::t-service/contact-address :country] country))}
+     :show-option (tr-key [:country-list])
+     :options (common-c/country-list (tr-tree [:country-list]))
+     :read (comp ::common/country_code ::t-service/contact-address)
+     :write (fn [data country_code]
+              (assoc-in data [::t-service/contact-address ::common/country_code] country_code))}
 
     {:name ::t-service/contact-email
      :type :string
