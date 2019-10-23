@@ -258,7 +258,7 @@
     (fn [p]
       (let [p-code (get-in p [::t-service/pick-up-address ::common/country_code])
             p-code (if (nil? p-code)
-                     :AA
+                     :A
                      (keyword p-code))]
         (if (some? pick-up-addresses)
           (assoc-in p [::t-service/pick-up-address ::common/country_code] p-code)
@@ -271,9 +271,8 @@
   (mapv
     (fn [p]
       (let [country-code (get-in p [::t-service/pick-up-address ::common/country_code])
-            country-code (if (and country-code (not= :AA country-code))
-                           (name country-code)
-                           nil)]
+            country-code (when (and country-code (not= :A country-code))
+                           (name country-code))]
         (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)))
     pick-up-addresses))
 
@@ -283,7 +282,7 @@
   (let [key (t-service/service-key-by-type (::t-service/type service))
         country-code (get-in service [key ::t-service/contact-address ::common/country_code])
         country-code (if (nil? country-code)
-                       :AA
+                       :A
                        (keyword country-code))
         app (if (= :rentals (::t-service/type service))
               (update-in app [:transport-service key ::t-service/pick-up-locations]
@@ -298,9 +297,8 @@
   [service]
   (let [key (t-service/service-key-by-type (::t-service/type service))
         country-code (get-in service [key ::t-service/contact-address ::common/country_code])
-        country-code (if (and country-code (not= :AA country-code))
-                       (name country-code)
-                       nil)
+        country-code (when (and country-code (not= :A country-code))
+                       (name country-code))
         service (if (= :rentals (::t-service/type service))
                   (update-in service [key ::t-service/pick-up-locations]
                              #(keyword-pul-cc->str-cc %))

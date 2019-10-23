@@ -139,13 +139,11 @@
   [operator]
   (when operator
     (let [v-code (get-in operator [::t-operator/visiting-address ::common/country_code])
-          v-code (if (and v-code (not= :AA v-code))
-                   (name v-code)
-                   nil)
+          v-code (when (and v-code (not= :A v-code))
+                   (name v-code))
           b-code (get-in operator [::t-operator/billing-address ::common/country_code])
-          b-code (if (and b-code (not= :AA b-code))
-                   (name b-code)
-                   nil)]
+          b-code (when (and b-code (not= :A b-code))
+                   (name b-code))]
 
       (-> operator
           (assoc-in [::t-operator/visiting-address ::common/country_code] v-code)
@@ -157,11 +155,11 @@
   [app]
   (let [v-code (get-in app [:transport-operator ::t-operator/visiting-address ::common/country_code])
         v-code (if (nil? v-code)
-                 :AA
+                 :A
                  (keyword v-code))
         b-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
         b-code (if (nil? b-code)
-                 :AA
+                 :A
                  (keyword b-code))]
 
     (cond-> app
@@ -453,7 +451,6 @@
   (process-event [{data :data} app]
     (-> app
         (update :transport-operator merge data)
-        ;(str-country-code->keyword-country-code data)
         (dissoc :transport-operator-save-q)
         (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 

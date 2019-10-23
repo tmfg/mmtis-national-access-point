@@ -1418,7 +1418,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}
 
  :country-list
- {:AA "Valitse"
+ {:A "Valitse"
   :AF "Afganistan"
   :AX "Ahvenanmaa"
   :NL "Alankomaat"
