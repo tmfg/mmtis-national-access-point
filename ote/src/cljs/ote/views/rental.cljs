@@ -285,6 +285,7 @@
                      {:name :country
                       :label (tr [:common-texts :country])
                       :full-width? true
+                      :auto-width? true
                       :type :selection
                       :show-option (tr-key [:country-list])
                       :options (common-c/country-list (tr-tree [:country-list]))
