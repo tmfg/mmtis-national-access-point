@@ -260,14 +260,16 @@
       {:element-id "input-operator-addrVisitCountry"
        :label (tr [:common-texts :country])
        :name :visit-country
-       :type :autocomplete
+       :type :selection
        :full-width? true
-       :suggestions (mapv second (tr-tree [:country-list]))
+       :show-option (tr-key [:country-list])
+       :options (sort (mapv first (tr-tree [:country-list])))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
-       :read (comp :country :ote.db.transport-operator/visiting-address)
-       :write (fn [data country]
-                (assoc-in data [:ote.db.transport-operator/visiting-address :country] country))}
+       :read (comp ::common/country_code :ote.db.transport-operator/visiting-address)
+       :write (fn [data country_code]
+                (assoc-in data [:ote.db.transport-operator/visiting-address ::common/country_code] country_code))}
+
 
       {:name :heading-address-postal
        :label (tr [:organization-page :address-postal])
@@ -308,14 +310,15 @@
       {:element-id "input-operator-addrBillingCountry"
        :label (tr [:common-texts :country])
        :name :billing-country
-       :type :autocomplete
+       :type :selection
        :full-width? true
-       :suggestions (mapv second (tr-tree [:country-list]))
+       :show-option (tr-key [:country-list])
+       :options (sort (mapv first (tr-tree [:country-list])))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
-       :read (comp :country :ote.db.transport-operator/billing-address)
-       :write (fn [data country]
-                (assoc-in data [:ote.db.transport-operator/billing-address :country] country))}
+       :read (comp ::common/country_code :ote.db.transport-operator/billing-address)
+       :write (fn [data country_code]
+                (assoc-in data [:ote.db.transport-operator/billing-address ::common/country_code] country_code))}
 
       {:name :heading-contact-details-other
        :label (tr [:organization-page :contact-details-other])

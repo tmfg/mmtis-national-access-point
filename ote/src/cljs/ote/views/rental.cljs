@@ -284,10 +284,11 @@
                      {:name :country
                       :label (tr [:common-texts :country])
                       :full-width? true
-                      :type :autocomplete
-                      :suggestions (mapv second (tr-tree [:country-list]))
-                      :read (comp :country ::t-service/pick-up-address)
-                      :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
+                      :type :selection
+                      :show-option (tr-key [:country-list])
+                      :options (sort (mapv first (tr-tree [:country-list])))
+                      :read (comp ::common/country_code ::t-service/pick-up-address)
+                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/country_code] %2)}
                      {:name ::t-service/service-hours-and-exceptions
                       :full-width? true
                       :type :component

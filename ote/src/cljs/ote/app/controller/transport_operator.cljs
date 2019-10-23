@@ -133,45 +133,45 @@
                      (some? nap-id) (merge (take-update-op-keys nap-item)))))
          operators-ytj)))
 
-(defn translated-country->code-code
-  "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
-  [app operator]
-  (let [visiting-country (get-in operator [::t-operator/visiting-address :country])
-        billing-country (get-in operator [::t-operator/billing-address :country])
-        v-country-code (some #(when (= visiting-country (second %))
-                                (name (first %)))
-                             (tr-tree [:country-list]))
-        b-country-code (some #(when (= billing-country (second %))
-                                (name (first %)))
-                             (tr-tree [:country-list]))]
-    (if (some? operator)
-      (-> app
-          (assoc-in [:transport-operator ::t-operator/visiting-address ::common/country_code] v-country-code)
-          (assoc-in [:transport-operator ::t-operator/billing-address ::common/country_code] b-country-code))
-      app)))
+(defn keyword-country-code->str-country-code
+  "DB stores country-code as a string but ui uses a keyword. This fn converts keyword to string and removes 'AA' which is
+  used in a dropdownlist to show value 'Select'"
+  [operator]
+  (when operator
+    (let [v-code (get-in operator [::t-operator/visiting-address ::common/country_code])
+          v-code (when (and v-code (not= :A v-code))
+                   (name v-code))
+          b-code (get-in operator [::t-operator/billing-address ::common/country_code])
+          b-code (when (and b-code (not= :A b-code))
+                   (name b-code))]
 
-(defn code-code->translated-country
-  "DB stores only country-code but translated country is used in ui. This fn converts translated country to country-code."
+      (-> operator
+          (assoc-in [::t-operator/visiting-address ::common/country_code] v-code)
+          (assoc-in [::t-operator/billing-address ::common/country_code] b-code)))))
+
+(defn str-country-code->keyword-country-code
+  "DB stores country-code as a string but ui uses a keyword. This fn converts string country-code to keyword
+  and adds 'AA' in nil cases which is used in a dropdownlist to show value 'Select'"
   [app]
-  (let [visiting-country-code (get-in app [:transport-operator ::t-operator/visiting-address ::common/country_code])
-        billing-country-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
-        v-country (some #(when (= visiting-country-code (name (first %)))
-                            (second %))
-                        (tr-tree [:country-list]))
-        b-country (some #(when (= billing-country-code (name (first %)))
-                            (second %))
-                        (tr-tree [:country-list]))]
-    (if (some? (:transport-operator app))
-      (-> app
-          (assoc-in [:transport-operator ::t-operator/visiting-address :country] v-country)
-          (assoc-in [:transport-operator ::t-operator/billing-address :country] b-country))
-      app)))
+  (let [v-code (get-in app [:transport-operator ::t-operator/visiting-address ::common/country_code])
+        v-code (if (nil? v-code)
+                 :A
+                 (keyword v-code))
+        b-code (get-in app [:transport-operator ::t-operator/billing-address ::common/country_code])
+        b-code (if (nil? b-code)
+                 :A
+                 (keyword b-code))]
+
+    (cond-> app
+            (not (nil? v-code)) (assoc-in [:transport-operator ::t-operator/visiting-address ::common/country_code] v-code)
+            (not (nil? b-code)) (assoc-in [:transport-operator ::t-operator/billing-address ::common/country_code] b-code))))
 
 ;; Takes `app`, POSTs the next transport operator in queue and updates the queue.
 ;; Returns a new app state.
 (defn- save-next-operator! [app]
   (let [ops-to-save (:transport-operator-save-q app)
         op-next (form/without-form-metadata (first ops-to-save))
+        op-next (keyword-country-code->str-country-code op-next)
         ops-rest (rest ops-to-save)]
     (if (some? op-next)
       (do (comm/post! "transport-operator" op-next
@@ -438,7 +438,7 @@
     (let [state (assoc app :transport-operator response
                            :transport-operator-loaded? true
                            :ytj-response {})
-          state (code-code->translated-country state)
+          state (str-country-code->keyword-country-code state)
           nap-business-id (get-in state [:transport-operator ::t-operator/business-id])
           op-ytj-cache-miss? (or (empty? (:ytj-company-names state)) (not= nap-business-id (get-in state [:ytj-response :businessId])))]
       (if (flags/enabled? :open-ytj-integration)
@@ -451,7 +451,6 @@
   (process-event [{data :data} app]
     (-> app
         (update :transport-operator merge data)
-        (translated-country->code-code data)
         (dissoc :transport-operator-save-q)
         (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data])))
 

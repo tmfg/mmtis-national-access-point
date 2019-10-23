@@ -251,57 +251,59 @@
                           (:transport-service-vector %))
                        (:transport-operators-with-services app)))))
 
-(defn pul-country->country-code [pick-up-addresses]
+(defn str-pul-cc->keyword-cc
+  "DB stores country-codes as a string. Change pick-up country-code strings to keywords for ui."
+  [pick-up-addresses]
   (mapv
     (fn [p]
-      (let [pick-up-country (get-in p [::t-service/pick-up-address :country])
-            country-code (some #(when (= pick-up-country (second %))
-                                  (name (first %)))
-                               (tr-tree [:country-list]))]
+      (let [p-code (get-in p [::t-service/pick-up-address ::common/country_code])
+            p-code (if (nil? p-code)
+                     :A
+                     (keyword p-code))]
         (if (some? pick-up-addresses)
-          (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)
+          (assoc-in p [::t-service/pick-up-address ::common/country_code] p-code)
           p)))
     pick-up-addresses))
 
-(defn pul-country-code->country [pick-up-addresses]
+(defn keyword-pul-cc->str-cc
+  "DB stores country-codes as a string. Change pick-up country-code keyword to strings for DB."
+  [pick-up-addresses]
   (mapv
     (fn [p]
       (let [country-code (get-in p [::t-service/pick-up-address ::common/country_code])
-            pick-up-country (some #(when (= country-code (name (first %)))
-                                  (second %))
-                                  (tr-tree [:country-list]))]
-        (if (and (some? country-code) (some? pick-up-country))
-          (assoc-in p [::t-service/pick-up-address :country] pick-up-country)
-          p)))
+            country-code (when (and country-code (not= :A country-code))
+                           (name country-code))]
+        (assoc-in p [::t-service/pick-up-address ::common/country_code] country-code)))
     pick-up-addresses))
 
-(defn country->country-code [app service]
+(defn str-cc->keyword-cc
+  "DB stores country-codes as a string. Change pick-up country-code strings to keywords for ui."
+  [app service]
   (let [key (t-service/service-key-by-type (::t-service/type service))
-        country (get-in service [key ::t-service/contact-address :country])
-        country-code (some #(when (= country (second %))
-                         (name (first %)))
-                           (tr-tree [:country-list]))
-       app (if (= :rentals (::t-service/type service))
+        country-code (get-in service [key ::t-service/contact-address ::common/country_code])
+        country-code (if (nil? country-code)
+                       :A
+                       (keyword country-code))
+        app (if (= :rentals (::t-service/type service))
               (update-in app [:transport-service key ::t-service/pick-up-locations]
-                         #(pul-country->country-code %))
+                         #(str-pul-cc->keyword-cc %))
               app)]
     (if (some? service)
       (assoc-in app [:transport-service key ::t-service/contact-address ::common/country_code] country-code)
       app)))
 
-(defn country-code->country [app service]
+(defn keyword-cc->str-cc
+  "DB stores country-codes as a string. Change pick-up country-code keyword to strings for DB."
+  [service]
   (let [key (t-service/service-key-by-type (::t-service/type service))
         country-code (get-in service [key ::t-service/contact-address ::common/country_code])
-        country (some #(when (= country-code (name (first %)))
-                         (second %))
-                      (tr-tree [:country-list]))
-        app (if (= :rentals (::t-service/type service))
-              (update-in app [:transport-service key ::t-service/pick-up-locations]
-                         #(pul-country-code->country %))
-              app)]
-    (if (and (some? country-code) (some? country))
-      (assoc-in app [:transport-service key ::t-service/contact-address :country] country)
-      app)))
+        country-code (when (and country-code (not= :A country-code))
+                       (name country-code))
+        service (if (= :rentals (::t-service/type service))
+                  (update-in service [key ::t-service/pick-up-locations]
+                             #(keyword-pul-cc->str-cc %))
+                  service)]
+    (assoc-in service [key ::t-service/contact-address ::common/country_code] country-code)))
 
 (extend-protocol tuck/Event
 
@@ -364,7 +366,7 @@
                                          (filter #(= (::t-operator/id %)
                                                      (::t-service/transport-operator-id response)))
                                          first))
-          app (country-code->country app (:transport-service app))]
+          app (str-cc->keyword-cc app (:transport-service app))]
       app))
 
   EnsureCsvFile
@@ -517,6 +519,7 @@
               (dissoc :transport-service-type-subtype
                       :select-transport-operator
                       :show-brokering-service-dialog?)
+              (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/published? publish?
                      ::t-service/transport-operator-id operator-id)
@@ -558,7 +561,6 @@
     (let [key (t-service/service-key-by-type (::t-service/type ts))]
       (-> app
           (update-in [:transport-service key] merge form-data)
-          (country->country-code ts)
           (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
 
   CancelTransportServiceForm
