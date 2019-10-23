@@ -21,7 +21,8 @@
             [ote.style.dialog :as style-dialog]
             [ote.style.base :as style-base]
             [ote.app.controller.flags :as flags]
-            [ote.app.controller.transport-operator :as to]))
+            [ote.app.controller.transport-operator :as to]
+            [ote.app.controller.common :as common-c]))
 
 ;; Returns boolean about if there are any orphan nap operators which need renaming to ytj-company-names
 (defn- unmerged-ytj-nap-ops? [orphans]
@@ -263,7 +264,7 @@
        :type :selection
        :full-width? true
        :show-option (tr-key [:country-list])
-       :options (sort (mapv first (tr-tree [:country-list])))
+       :options (common-c/country-list (tr-tree [:country-list]))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp ::common/country_code :ote.db.transport-operator/visiting-address)
@@ -313,7 +314,7 @@
        :type :selection
        :full-width? true
        :show-option (tr-key [:country-list])
-       :options (sort (mapv first (tr-tree [:country-list])))
+       :options (common-c/country-list (tr-tree [:country-list]))
        :disabled? disable-ytj-address-visiting?
        :style style-fields/form-field
        :read (comp ::common/country_code :ote.db.transport-operator/billing-address)

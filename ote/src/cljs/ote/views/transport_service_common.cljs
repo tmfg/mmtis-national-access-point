@@ -23,6 +23,7 @@
             [ote.style.base :as style-base]
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.flags :as flags]
+            [ote.app.controller.common :as common-c]
             [ote.views.place-search :as place-search]))
 
 (defn advance-reservation-group
@@ -361,7 +362,7 @@
      :style {:margin-bottom "2rem"}
      :full-width? true
      :show-option (tr-key [:country-list])
-     :options (sort (mapv first (tr-tree [:country-list])))
+     :options (common-c/country-list (tr-tree [:country-list]))
      :read (comp ::common/country_code ::t-service/contact-address)
      :write (fn [data country_code]
               (assoc-in data [::t-service/contact-address ::common/country_code] country_code))}
