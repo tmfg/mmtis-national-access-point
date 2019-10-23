@@ -4,7 +4,6 @@
   (:require [com.stuartsierra.component :as component]
             [ote.services.transport :as transport-service]
             [ote.services.transport-operator :as transport-operator]
-            [ote.services.common :as common]
             [ote.services.register :as register-services]
             [ote.components.http :as http]
             [ote.components.db :as db]
@@ -29,6 +28,8 @@
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.export.csv :as export-csv]
+            [ote.integration.export.netex :as export-netex]
+
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.import.kalkati :as import-kalkati]
             [ote.integration.import.ytj :as fetch-ytj]
@@ -64,7 +65,6 @@
    :register (component/using (register-services/->Register config) [:http :db :email])
    :transport (component/using (transport-service/->TransportService config) [:http :db :email])
    :transport-operator (component/using (transport-operator/->TransportOperator config) [:http :db :email])
-   :common (component/using (common/->Common config) [:http :db])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
@@ -83,9 +83,10 @@
                     [:http :db])
 
    ;; Integration: export GeoJSON, GTFS and CSV
-   :export-geojson (component/using (export-geojson/->GeoJSONExport) [:db :http])
+   :export-geojson (component/using (export-geojson/->GeoJSONExport config) [:db :http])
    :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
    :export-csv (component/using (export-csv/->CSVExport) [:db :http])
+   :export-netex (component/using (export-netex/->NeTExExport config) [:db :http])
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
 
@@ -97,7 +98,7 @@
            [:db :http :email])
 
    :admin (component/using
-           (admin-service/->Admin (:nap config))
+           (admin-service/->Admin config)
            [:db :http :email])
 
    :admin-reports (component/using

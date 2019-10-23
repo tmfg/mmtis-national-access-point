@@ -9,14 +9,34 @@
     [clojure.java.shell :refer [sh with-sh-dir]]
     [clojure.string :as str]
     [amazonica.aws.s3 :as s3]
-    [ote.config.netex-config :as config-nt]))
+    [ote.config.netex-config :as config-nt-static]
+    [specql.op :as op]))
+
+(defn fetch-conversions [db transport-service-id]
+  (specql/fetch db
+                ::netex/netex-conversion
+                #{::netex/filename ::netex/id ::netex/data-content ::netex/transport-service-id}
+                (op/and
+                  {::netex/transport-service-id transport-service-id}
+                  {::netex/status :ok}
+                  {::netex/filename op/not-null?})))
+
+(defn fetch-conversion [db file-id]
+  (first
+    (specql/fetch db
+                  ::netex/netex-conversion
+                  #{::netex/filename ::netex/id ::netex/data-content}
+                  (op/and
+                    {::netex/id file-id}
+                    {::netex/status :ok}
+                    {::netex/filename op/not-null?}))))
 
 (defn- path-allowed?
   "Checks if path is in a system directory or similar not allowed place. Returns true if allowed, false if not."
   [^String path]
-  (str/starts-with?
-    (.getAbsolutePath (clojure.java.io/file path))          ; TODO: should use .getCanonicalPath but osx
-    "/tmp/"))
+  (when-let [path-resolved (.getCanonicalPath (clojure.java.io/file path))]
+    (or (str/starts-with? path-resolved "/tmp/")
+        (str/starts-with? path-resolved "/private/tmp/")))) ; OSX resolves path under /private/
 
 (defn delete-files-recursively! [f1]
   (when (.isDirectory (io/file f1))
@@ -99,9 +119,10 @@
   {:pre [(and (< 1 (count conversion-work-path))
               (not (clojure.string/blank? conversion-work-path)))
          (not (clojure.string/blank? gtfs-filename))
-         (seq gtfs-file)]}                             ;`is` used to print the value of a failed precondition
-  (let [import-config-filepath (str conversion-work-path "importGtfs.json")
-        export-config-filepath (str conversion-work-path "exportNetexjson")
+         (seq gtfs-file)]}
+  (let [netex-config-static (config-nt-static/config)
+        import-config-filepath (str conversion-work-path (get-in netex-config-static [:chouette :input-config-file]))
+        export-config-filepath (str conversion-work-path (get-in netex-config-static [:chouette :export-config-file]))
         gtfs-filepath (str conversion-work-path gtfs-filename)
         gtfs-name-suffix "_gtfs"
         netex-filepath (str conversion-work-path
@@ -110,11 +131,11 @@
                               gtfs-basename)
                             "_netex.zip")
         chouette-cmd ["./chouette.sh"                       ; Vector used to allow logging shell invocation on error
-                      (str "-i " import-config-filepath)
-                      (str "-o " export-config-filepath)
-                      (str "-f " netex-filepath)
+                      "-i " import-config-filepath
+                      "-o " export-config-filepath
+                      "-f " netex-filepath
                       ;; Set chouette's internal work dir under ote work dir so it gets deleted as part of task cleanup
-                      (str "-d " conversion-work-path (get-in (config-nt/config) [:chouette :work-dir]))
+                      "-d " (str conversion-work-path (get-in netex-config-static [:chouette :work-dir]))
                       gtfs-filepath]]
 
     (if (and (path-allowed? gtfs-filepath)
@@ -134,7 +155,10 @@
         (->
           (with-sh-dir chouette-path
                        (apply sh chouette-cmd))             ; TODO: use a dedicated user with limited access rights
-          (chouette-output-valid? config-netex (:chouette (config-nt/config)) netex-filepath chouette-cmd)))
+          (chouette-output-valid? config-netex
+                                  (:chouette (config-nt-static/config))
+                                  netex-filepath
+                                  chouette-cmd)))
       (do
         (log/error (str "Bad path argument(s) " config-netex))
         nil))))
@@ -155,21 +179,24 @@
 (defn set-conversion-status!
   "Resolves operation result based on input args and updates status to db.
   Return: On successful conversion true, on failure false"
-  [{:keys [netex-filepath s3-filename]} db {:keys [service-id external-interface-description-id]}]
+  [{:keys [netex-filepath s3-filename]}
+   db
+   {:keys [service-id external-interface-description-id external-interface-data-content] :as conversion-meta}]
   (let [result (if (clojure.string/blank? netex-filepath)
                  :error
                  :ok)]
     (log/info (str "GTFS->NeTEx result to db: service-id = " service-id
                    " result = " result
-                   ", external-interface-description-id = " external-interface-description-id
-                   ", s3-filename = " s3-filename))
+                   ", s3-filename = " s3-filename
+                   ", conversion-meta=" conversion-meta))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
                     {::netex/transport-service-id service-id
                      ::netex/external-interface-description-id external-interface-description-id
                      ::netex/filename (or s3-filename "")
-                     ::netex/modified (ote.time/sql-date (java.time.LocalDate/now)) ; TODO: db created and modified use different timezone like this
-                     ::netex/status result})
+                     ::netex/modified (java.util.Date.)
+                     ::netex/status result
+                     ::netex/data-content (set (mapv keyword external-interface-data-content))})
     (= :ok result)))
 
 (defn gtfs->netex-and-set-status!

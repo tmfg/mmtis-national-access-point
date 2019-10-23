@@ -1,8 +1,7 @@
 (ns ote.integration.export.geojson
   "Integration service that serves GeoJSON documents for published
   transport services."
-  (:require [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
+  (:require [ote.components.http :as http]
             [ote.components.service :refer [define-service-component]]
             [compojure.core :refer [GET]]
             [specql.core :as specql]
@@ -13,9 +12,10 @@
             [ote.db.modification :as modification]
             [clojure.set :as set]
             [ote.integration.export.transform :as transform]
-
-            ;; Require time which extends PGInterval JSON generation
-            [ote.time]
+            [ote.netex.netex :refer [fetch-conversions]]
+            [ote.integration.export.netex :as export-netex]
+            [ote.util.feature :as feature]
+            [ote.time]                                      ; Require time which extends PGInterval JSON generation
             [clojure.spec.alpha :as s]
             [taoensso.timbre :as log]
             [specql.op :as op]))
@@ -44,7 +44,8 @@
   transport-service-properties-columns
   (set/difference (conj (specql/columns ::t-service/transport-service)
                         ;; Fetch linked external interfaces
-                        [::t-service/external-interfaces #{::t-service/format ::t-service/license
+                        [::t-service/external-interfaces #{::t-service/format
+                                                           ::t-service/license
                                                            ::t-service/data-content
                                                            ::t-service/external-interface}])
                   modification/modification-field-keys
@@ -54,46 +55,67 @@
                     ::t-service/ckan-resource-id
                     ::t-service/ckan-dataset-id}))
 
-(defn- link-to-companies-csv-url
-  "Brokerage services could have lots of companies providing the service. With this function
-  we remove company data from the geojson data set and replace it with link where companies data could be loaded."
-  [service]
-  (cond
-    (not (empty? (::t-service/companies service)))
-      (-> service
-          (assoc :csv-url (str "/export-company-csv/" (::t-service/id service)))
-          (dissoc ::t-service/companies))
-    (not (nil? (::t-service/companies-csv-url service)))
-      (assoc service :csv-url (::t-service/companies-csv-url service))
-    :else service))
-
 (defn- styled-operation-area [areas]
   {:type "GeometryCollection"
    :geometries (mapv
-                (fn [{:keys [geojson primary?]}]
-                  (assoc (cheshire/decode geojson keyword)
-                         :style {:fill (if primary? "green" "orange")}))
-                areas)})
+                 (fn [{:keys [geojson primary?]}]
+                   (assoc (cheshire/decode geojson keyword)
+                     :style {:fill (if primary? "green" "orange")}))
+                 areas)})
 
-(defn- export-geojson [db transport-operator-id transport-service-id]
-  (let [areas (fetch-operation-area-for-service db {:transport-service-id transport-service-id})
-        operator (first (specql/fetch db ::t-operator/transport-operator
-                                      transport-operator-properties-columns
-                                      {::t-operator/id transport-operator-id}))
-        service (first (specql/fetch db ::t-service/transport-service
-                                     transport-service-properties-columns
-                                     {::t-service/transport-operator-id transport-operator-id
-                                      ::t-service/id transport-service-id
-                                      ::t-service/published op/not-null?}))
-        service (link-to-companies-csv-url service)
-        operator-without-personal-info (dissoc operator ::t-operator/gsm ::t-operator/visiting-address ::t-operator/email ::t-operator/phone)
-        service-without-personal-info (dissoc service ::t-service/contact-address ::t-service/contact-email ::t-service/contact-phone)]
-    (if (and (seq areas) operator service)
+(defn- append-nap-generated-netex-file-links
+  "NOTE: needs ::t-service/external-interface id property for external-interfaces in order to
+  copy `data-content` from interface into matching generated NeTEx link.
+  Returns `service` collection where external-interfaces is appended with interfaces with url to NAP NeTEx download link."
+  [service db config transport-service-id]
+  (if (feature/feature-enabled? config :netex-conversion-automated)
+    (when service
+      (let [netex-conversions (fetch-conversions db transport-service-id)]
+        (update service
+                ::t-service/external-interfaces
+                #(vec
+                   (concat []
+                           %
+                           (for [conversion netex-conversions]
+                             {:format "NeTEx"
+                              :data-content (:ote.db.netex/data-content conversion)
+                              ::t-service/external-interface (export-netex/file-download-url config
+                                                                                             transport-service-id
+                                                                                             (:ote.db.netex/id conversion))}))))))
+    service))
+
+(defn- export-geojson [db config transport-operator-id transport-service-id]
+  (let [areas (seq
+                (fetch-operation-area-for-service db
+                                                  {:transport-service-id transport-service-id}))
+        operator (when areas
+                   (-> (first
+                         (specql/fetch db
+                                       ::t-operator/transport-operator
+                                       transport-operator-properties-columns
+                                       {::t-operator/id transport-operator-id}))
+                       ;; Personal data should not be exported due to privacy requirement
+                       (dissoc ::t-operator/gsm ::t-operator/visiting-address ::t-operator/email ::t-operator/phone)))
+        service (when operator
+                  (-> (first
+                        (specql/fetch db
+                                      ::t-service/transport-service
+                                      transport-service-properties-columns
+                                      {::t-service/transport-operator-id transport-operator-id
+                                       ::t-service/id transport-service-id
+                                       ::t-service/published op/not-null?}))
+                      (append-nap-generated-netex-file-links db config transport-service-id)
+                      ;; Company contact details removed because of privacy requirement
+                      (dissoc ::t-service/contact-address
+                              ::t-service/contact-email
+                              ::t-service/contact-phone
+                              ::t-service/id)))]
+    (if (and areas operator service)
       (-> areas
           styled-operation-area
           (feature-collection (transform/transform-deep
-                               {:transport-operator operator-without-personal-info
-                                :transport-service service-without-personal-info}))
+                                {:transport-operator operator
+                                 :transport-service service}))
           (cheshire/encode {:key-fn name})
           json-response)
       {:status 404
@@ -125,8 +147,7 @@
       {:anyOf [{:type "null"}
                (spec->json-schema (second spec))]}
 
-
-       ;; A nested object
+      ;; A nested object
       (= first-elt 'keys)
       {:type "object"
        :properties
@@ -142,10 +163,10 @@
       kw
       (case kw
         (:specql.data-types/varchar
-         :specql.data-types/bpchar
-         :specql.data-types/text
-         :specql.data-types/date
-         ::t-service/maximum-stay)
+          :specql.data-types/bpchar
+          :specql.data-types/text
+          :specql.data-types/date
+          ::t-service/maximum-stay)
         {:type "string"}
 
         :specql.data-types/bool
@@ -174,7 +195,7 @@
         ;; Default: Unrecognized, describe it and recurse
         (spec->json-schema (s/describe spec)))
 
-      :default
+      :else
       (do
         (log/debug "I don't know what this spec is: " (pr-str spec))
         {}))))
@@ -188,11 +209,11 @@
              [(name (first c))
               {:anyOf [{:type "null"}
                        {:type "array"
-                         :item {:type "object"
-                                :properties
-                                (into {}
-                                      (for [c (second c)]
-                                        [(name c) (spec->json-schema (s/describe c))]))}}]}]
+                        :item {:type "object"
+                               :properties
+                               (into {}
+                                     (for [c (second c)]
+                                       [(name c) (spec->json-schema (s/describe c))]))}}]}]
              [(name c) (spec->json-schema (s/describe c))])))})
 
 (def transport-operator-schema
@@ -201,8 +222,6 @@
    (into {}
          (for [c transport-operator-properties-columns]
            [(name c) (spec->json-schema (s/describe c))]))})
-
-
 
 (defn export-geojson-schema []
   {:$schema "http://json-schema.org/draft-07/schema#"
@@ -220,15 +239,16 @@
               "geometry" {:type "object"}}}}}})
 
 
-(define-service-component GeoJSONExport {}
-
+(define-service-component GeoJSONExport {:fields [config]}
   ^:unauthenticated
   (GET "/export/geojson/:transport-operator-id{[0-9]+}/:transport-service-id{[0-9]+}"
        [transport-operator-id transport-service-id]
-       (export-geojson db
-                       (Long/parseLong transport-operator-id)
-                       (Long/parseLong transport-service-id)))
+    (export-geojson db
+                    config
+                    (Long/parseLong transport-operator-id)
+                    (Long/parseLong transport-service-id)))
 
   ^:unauthenticated
-  (GET "/export/geojson/transport-service.schema.json" []
-       (http/json-response (#'export-geojson-schema))))
+  (GET "/export/geojson/transport-service.schema.json"
+       []
+    (http/json-response (#'export-geojson-schema))))

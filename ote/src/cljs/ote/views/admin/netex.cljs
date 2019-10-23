@@ -64,4 +64,4 @@
                [ui/table-row-column {:style {:width "25%"}} (::t-service/name row)]
                [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui (::netex/modified row))]
                [ui/table-row-column {:style {:width "15%"}} (::netex/status row)]
-               [ui/table-row-column {:style {:width "20%"}} "Linkki pakettiin"]]))]]])]))
+               [ui/table-row-column {:style {:width "20%"}} [linkify (:url row) (:url row) {:target "_blank"}]]]))]]])]))

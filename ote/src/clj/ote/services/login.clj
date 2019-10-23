@@ -135,7 +135,7 @@
    :dependencies {email :email}}
 
   ^:unauthenticated
-  (POST "/login" {form-data :body cookies :cookies}
+  (POST "/login" {form-data :body}
     (#'login db auth-tkt-config
       (http/transit-request form-data)))
 
