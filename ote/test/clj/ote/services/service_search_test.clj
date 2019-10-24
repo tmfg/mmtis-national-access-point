@@ -17,7 +17,7 @@
    (component/using (transport-service/->TransportService nil) [:http :db])
 
    :service-search
-   (component/using (sut/->ServiceSearch) [:http :db])))
+   (component/using (sut/->ServiceSearch (slurp "config.edn")) [:http :db])))
 
 (defn- generate-services []
    (take 10 (repeatedly
