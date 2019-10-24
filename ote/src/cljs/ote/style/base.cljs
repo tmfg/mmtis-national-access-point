@@ -153,7 +153,7 @@
 
 (def help {:border-radius "0.2em"
            :color "#666666"
-           :background-color "#DAEDF7"
+           :background-color colors/gray200
            :padding "10px"
            :margin-bottom "10px"
            :align-items "center"})

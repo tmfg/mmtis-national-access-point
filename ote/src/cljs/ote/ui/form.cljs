@@ -371,6 +371,7 @@
                      style-form/form-group-column)
              container-style (:container-style options)
              card-style (:card-style options)
+             sub-component (:sub-component options)
              group-component [group-ui
                               style
                               schemas
@@ -392,7 +393,9 @@
           (if-not card?
             [:div
              (when label
-               [:div [:h3 label]
+               [:div (if sub-component
+                       [:h4 label]
+                       [:h3 label])
                 (when tooltip
                   [balloon-header-tooltip {:text tooltip :len tooltip-length}])])
              group-component]

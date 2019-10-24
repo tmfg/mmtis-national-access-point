@@ -603,9 +603,10 @@
 ;; Matches empty or any valid minute (0 (or 00) - 59)
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
-(defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning] :as opts}
+(defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning
+                                style input-style container-style] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
-  [:div (stylefy/use-style style-base/inline-block)
+  [:div {:style (merge style-base/inline-block container-style)}
    [field (merge
             {:id (str "hours-" element-id)
              :type :string
@@ -616,8 +617,9 @@
              :regex (if unrestricted-hours?
                       unrestricted-hour-regex
                       hour-regex)
-             :style {:width "30px"}
-             :input-style {:text-align "right"}
+             :style (merge {:width "30px"} style)
+             :input-style (merge {:text-align "right"}
+                                 input-style)
              :hint-style {:position "absolute" :right "0"}
              :on-blur (when on-blur
                         on-blur)
@@ -643,7 +645,8 @@
                       (error-min data))
              :error-text false
              :regex minute-regex
-             :style {:width "30px"}
+             :style (merge {:width "30px"} style)
+             :input-style input-style
              :on-blur (when on-blur
                         on-blur)
              :update! (fn [minute]
@@ -778,44 +781,51 @@
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
-
-(defmethod field :div-table [{:keys [table-fields div-class update! error-data delete? delete-label
-                                     add-label add-label-disabled? id] :as options} data]
+(defmethod field :div-table [{:keys [table-fields div-class update! error-data delete? inner-delete? delete-label
+                                     inner-delete-label add-label add-inner-label add-label-disabled? id add-divider?] :as options} data]
   (let [data (if (empty? data)
                ;; div-table always contains at least one row
                [{}]
                data)]
-    [:div
+    [:div {:key (str "main-div-table-" id)}
      [:div {:key (str "div-table-" id)}
       (doall
         (map-indexed
           (fn [i row]
             (let [{:keys [errors missing-required-fields]} (and error-data
                                                                 (< i (count error-data))
-                                                                (nth error-data i))]
-              ^{:key (str "div-" id "-" i)}
+                                                                (nth error-data i))
+                  fields (filter #(when (not= :inner-row (:component-type %)) %) table-fields)
+                  inner-component (first (filter #(when (= :inner-row (:component-type %)) %) table-fields))]
+              ^{:key (str id "div-" i)}
               [:div
+               {:key (str id "div-row-" i)}
                [:div.row
                 (doall
-                  (for [{:keys [name label read write type component div-style] :as div-component} table-fields
-                        :let [value ((or read name) row)
+                  (for [{:keys [name label read write type component-type component div-style field-class] :as div-component} fields
+                        :let [div-class (or field-class div-class)
+                              value ((or read name) row)
                               field-error (get errors name)
                               missing? (get missing-required-fields name)
                               update-fn (if write
                                           #(update data i write %)
                                           #(assoc-in data [i name] %))]]
-                    ^{:key (str name label type)}
-
+                    ^{:key (str id name label type)}
                     [:div {:class div-class
                            :style (merge
                                     style-form/div-form-field
-                                    div-style)}
-                     (if (= :component type)
+                                    div-style
+                                    ;; Warnings and error text will make div element too high, so set max-height
+                                    (when (or field-error missing?)
+                                      {:max-height "5.5rem"}))}
+                     (cond
+                       (and (= :component type) (not= :inner-row component-type))
                        ;; Render component
                        (component {:update-form! #(update! (update-fn %))
                                    :div-table? true
                                    :row-number i
                                    :data value})
+                       (not= :component type)
                        ;; Render field
                        [field (merge
                                 (assoc div-component :update! #(update! (update-fn %))
@@ -824,17 +834,48 @@
                                   {:warning (tr [:common-texts :required-field])})
                                 (when field-error
                                   {:error field-error}))
-                        value])]))]
-               (when delete?
-                 [:div.row
+                        value]
+                       :else nil)]))
+                (when inner-delete?
                   [:div {:class div-class
-                         :style style-form-fields/table-row-column}
+                         :style {:padding-top "1rem"}}
                    [buttons/delete-table-row {:on-click #(update! (vec (concat (when (pos? i)
                                                                                  (take i data))
                                                                                (drop (inc i) data))))}
-                    delete-label]]])]))
+                    inner-delete-label]])]
+
+               (when inner-component
+                 (let [component (:component inner-component)
+                       name (:name inner-component)
+                       write (:write inner-component)
+                       read (:read inner-component)
+                       div-class (:div-class inner-component)
+                       value ((or read name) row)
+                       update-fn (if write
+                                   #(update data i write %)
+                                   #(assoc-in data [i name] %))]
+                   [:div.row {:key (str " inner-component-container" id)}
+                    ^{:key (str " inner-component-" id)}
+                    [component {:update-form! #(update! (update-fn %))
+                                :div-table? true
+                                :row-number i
+                                :div-class div-class
+                                :data value}]]))
+
+               (when delete?
+                 [:div
+                  [:div.row
+                   [:div {:class div-class
+                          :style style-form-fields/table-row-column}
+                    [buttons/delete-set {:on-click #(update! (vec (concat (when (pos? i)
+                                                                            (take i data))
+                                                                          (drop (inc i) data))))}
+                     delete-label]]]
+                  [:div.row
+                   [ui/divider {:style {:margin-bottom "2rem" :height "2px"}}]]])]))
           data))]
-      (when add-label
+
+     (when add-label
        [:div (stylefy/use-style style-base/button-add-row)
         [buttons/save (merge {:on-click #(update! (conj (or data []) {}))
                               :disabled (if add-label-disabled?
@@ -934,13 +975,13 @@
   [:div (when error (stylefy/use-style style-base/required-element))
    [ui/checkbox
     (merge
-    {:label    (when-not table? label)
-                 :checked  (boolean checked?)
-                 :on-check #(update! (not checked?))
-                 :disabled disabled?
-                 :style    style}
-    (when on-click
-      {:on-click #(on-click)}))]
+      {:label (when-not table? label)
+       :checked (boolean checked?)
+       :on-check #(update! (not checked?))
+       :disabled disabled?
+       :style style}
+      (when on-click
+        {:on-click #(on-click)}))]
    (when error
      (tr [:common-texts :required-field]))])
 

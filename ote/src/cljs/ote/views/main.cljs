@@ -1,26 +1,20 @@
 (ns ote.views.main
-  "OTE-sovelluksen päänäkymä"
+  "OTE application view composer"
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
-            [cljs-react-material-ui.icons :as ic]
+            [stylefy.core :as stylefy]
+            [ote.localization :refer [tr tr-key]]
+            [ote.style.base :as style-base]
+            [ote.ui.circular_progress :as spinner]
+            [ote.ui.main-header :refer [top-nav]]
             [ote.ui.common :refer [linkify ckan-iframe-dialog]]
+            [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
-            [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-service :as t-service]
             [ote.views.footer :as footer]
-            [ote.localization :refer [tr tr-key] :as localization]
-            [ote.views.place-search :as place-search]
-            [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
-            [ote.style.topnav :as style-topnav]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
-            [ote.ui.form :as form]
-            [ote.app.controller.flags :as flags]
-            [ote.ui.circular_progress :as spinner]
-            [ote.ui.form-fields :as form-fields]
             [ote.views.own-services :as os]
             [ote.views.operator-users :as ou]
             [ote.views.service-viewer :as sv]
@@ -37,18 +31,11 @@
             [ote.views.gtfs-viewer :as gtfs-viewer]
             [ote.views.pre-notices.pre-notice :as notice]
             [ote.views.pre-notices.listing :as pre-notices-listing]
-            [ote.views.pre-notices.authority-listing :as pre-notices-authority-listing]
             [ote.views.transit-visualization :as transit-visualization]
             [ote.views.transit-changes :as transit-changes]
             [ote.views.register :as register]
             [ote.views.admin.monitor :as monitor]
-            [ote.views.error.error-landing :as error-landing]
-            [ote.ui.common :as common-ui]
-            [ote.ui.main-header :refer [top-nav] :as main-header]))
-
-(def pages {:own-services #{:own-services :transport-service :new-service
-                            :edit-service :transport-operator :organizations}
-            :services #{:services}})
+            [ote.views.error.error-landing :as error-landing]))
 
 (defn document-title [page]
   (set! (.-title js/document)

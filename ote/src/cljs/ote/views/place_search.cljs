@@ -198,7 +198,9 @@
   (let [empty-places? #(not-any? (comp ::places/primary? :place) (get-in % [:place-search :results]))]
     (form/group
      {:label label
-      :columns 3}
+      :columns 3
+      :card? false
+      :top-border true}
 
      (form/info (tr [:form-help :operation-area]))
 
