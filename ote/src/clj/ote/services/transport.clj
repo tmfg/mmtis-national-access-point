@@ -112,11 +112,6 @@
          (delete! db ::t-service/transport-service {::t-service/id id})
          id))))
 
-(defn- business-id-exists [db business-id]
-  (if (empty? (does-business-id-exists db {:business-id business-id}))
-    {:business-id-exists false}
-    {:business-id-exists true}))
-
 (defn ensure-bigdec [value]
   (when-not (nil? value ) (bigdec value)))
 
