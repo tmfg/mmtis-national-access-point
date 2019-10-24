@@ -16,8 +16,7 @@
             [jeesql.core :refer [defqueries]]
             [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.netex.netex :as netex]
-            [ote.integration.export.netex :as export-netex])
+            [ote.netex.netex_util :as netex-util])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -80,16 +79,6 @@
                 add-error-data))
           modified-services)))
 
-(defn- append-ote-netex-interfaces [{::t-service/keys [id] :as service} config db]
-  (assoc service
-    :ote-interfaces
-    (vec
-      (sort-by :url
-               (mapv #(assoc %
-                        :url (export-netex/file-download-url config id (:ote.db.netex/id %))
-                        :format "NeTEx")
-                     (netex/fetch-conversions db id))))))
-
 (defn all-data-transport-service
   "Get single transport service by id"
   [config db id]
@@ -103,7 +92,9 @@
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
-            (append-ote-netex-interfaces config db))
+            vector
+            (netex-util/append-ote-netex-urls config db)
+            first)
         200)
       {:status 404})))
 
@@ -346,7 +337,10 @@
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
-            (append-ote-netex-interfaces config db)))
+
+            vector
+            (netex-util/append-ote-netex-urls config db)
+            first))
       {:status 404})))
 
 (defn ckan-group-id->group
