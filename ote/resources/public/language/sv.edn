@@ -346,6 +346,8 @@
   :delete "Ta bort"
   :delete-operator "Ta bort tjänsteproducent"
   :delete-pick-up-location "Ta bort verksamhetsställe"
+  :delete-service-hours "Ta bort"
+  :delete-service-exceptions "Ta bort"
   :delete-interface "Ta bort externt gränssnitt"
   :close "Stäng"
   :publish "Publicera"

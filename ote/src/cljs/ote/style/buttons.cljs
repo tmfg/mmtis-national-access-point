@@ -37,6 +37,7 @@
 
 (def button-common
   {:padding "1.3rem"
+   :line-height "1.7rem"
    :min-width "4rem"
    :display "inline-flex"
    :white-space "nowrap"
@@ -53,8 +54,7 @@
 (def row-button (merge
                   button-common
                   {:padding "0.65rem 1.3rem 0.65rem 1.3rem"
-                   :display "inline-flex"
-                   :line-height "1.7rem"}))
+                   :display "inline-flex"}))
 
 (def disabled-button (merge
                        button-common
@@ -86,6 +86,14 @@
          {:color colors/negative-text
           :border 0
           :background-color colors/negative-button
+          ::stylefy/mode {:hover negative-btn-hover-focus
+                          :focus negative-btn-hover-focus}}))
+
+(def delete-set-button
+  (merge button-common
+         {:color colors/negative-text
+          :border 0
+          :background-color colors/gray700
           ::stylefy/mode {:hover negative-btn-hover-focus
                           :focus negative-btn-hover-focus}}))
 

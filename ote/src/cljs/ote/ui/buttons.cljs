@@ -45,6 +45,14 @@
                      (stylefy/use-style style-buttons/delete-row-button)))
     [ic/action-delete {:style {:color "#FFFFFF" :margin-left "-10px"}}] [:span label]]])
 
+(defn delete-set [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     (stylefy/use-style style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/delete-set-button)))
+    [ic/action-delete {:style {:color "#FFFFFF" :margin-left "-10px"}}] [:span label]]])
+
 (defn open-dialog-row [opts label]
   [button-container
    [:button (merge opts

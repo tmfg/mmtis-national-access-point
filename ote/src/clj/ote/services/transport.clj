@@ -100,7 +100,7 @@
                                 (specql/columns ::t-service/external-interface-description)])
                          {::t-service/id id}))]
     (if ts
-      (http/transit-response
+      (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             (append-ote-netex-interfaces config db))
@@ -343,7 +343,7 @@
                                 transport-service-personal-columns)
                          {::t-service/id id}))]
     (if ts
-      (http/transit-response
+      (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             (append-ote-netex-interfaces config db)))

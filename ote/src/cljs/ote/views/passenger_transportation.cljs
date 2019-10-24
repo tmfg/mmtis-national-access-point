@@ -33,7 +33,9 @@
   (form/group
     {:label (tr [:passenger-transportation-page :header-restrictions])
     :columns 3
-    :layout :row}
+    :layout :row
+     :card? false
+     :top-border true}
 
     {:name      ::t-service/luggage-restrictions
      :type      :localized-text
@@ -47,7 +49,9 @@
   (form/group
    {:label (tr [:passenger-transportation-page :header-other-services-and-accessibility])
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    {:name        ::t-service/guaranteed-vehicle-accessibility
     :help (tr [:form-help :guaranteed-vehicle-accessibility])
@@ -113,6 +117,7 @@
 
    {:name        ::t-service/additional-services
     :type        :multiselect-selection
+    :style {:margin-bottom "2rem"}
     :show-option (tr-key [:enums ::t-service/additional-services])
     :options     t-service/additional-services
     :container-class "col-xs-12 col-sm-6 col-md-6"
@@ -132,7 +137,9 @@
   (form/group
    {:label (tr [:passenger-transportation-page :header-price-information])
     :columns 3
-    :layout :row}
+    :layout :row
+    :card? false
+    :top-border true}
 
    (form/info
      [:div (tr [:form-help :pricing-info])])

@@ -193,7 +193,7 @@
                                                          db {:id (::t-operator/ckan-group-id to)})
                                                        ""))]
     (if to
-      (http/transit-response to)
+      (http/no-cache-transit-response to)
       {:status 404})))
 
 (defn public-data-transport-operator
@@ -206,7 +206,7 @@
                            ::t-operator/homepage}
                          {::t-operator/id id}))]
     (if to
-      (http/transit-response to)
+      (http/no-cache-transit-response to)
       {:status 404})))
 
 (defn operator-users&invites
