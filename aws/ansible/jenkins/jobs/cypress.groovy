@@ -11,8 +11,8 @@ job('Cypress-e2e-tests') {
         xvfb('default') {
             screen('1920x1080x24')
         }
-        nodejs('nodejs-8.x-cypress')
-        toolenv('nodejs-8.x-cypress')
+        nodejs('nodejs-10.x-cypress')
+        toolenv('nodejs-10.x-cypress')
     }
 
     steps {
