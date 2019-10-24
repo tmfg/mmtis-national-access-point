@@ -4,6 +4,7 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
+            [ote.db.netex]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
@@ -13,14 +14,12 @@
             [ote.ui.common :as common-ui]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icons :as icons]
             [ote.app.controller.service-search :as ss]
             [ote.style.base :as style-base]
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
             [ote.app.controller.admin :as admin]
-            [tuck.core :as tuck]
             [ote.ui.validation :as validation]
             [ote.util.text :as text]
             [ote.ui.page :as page]
@@ -97,12 +96,16 @@
    (when-not (empty? external-interface-links)
      (doall
        (map-indexed
-         (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+         (fn [i {::t-service/keys [external-interface format data-content]
+                 :keys [url-ote-netex] :as row}]
            (let [data-content (if (nil? data-content)
                                 (::t-service/url external-interface)
                                 (parse-content-value data-content))]
              [:div {:key (str i "-" id)}
-              [common-ui/information-row-default data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
+              [common-ui/information-row-default data-content [:span (str/join format)
+                                                               (when url-ote-netex
+                                                                 ", NeTEx")
+                                                               [gtfs-viewer-link row]]]]))
          external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
@@ -114,7 +117,7 @@
                                      (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
                                        (when (not (empty? s)) (first s))))
                                    service-companies)
-          presented-companies-count (if (not (empty? found-business-ids))
+          presented-companies-count (if (seq found-business-ids)
                                       (count found-business-ids)
                                       company-list-max-size)
           extra-companies (- service-company-count presented-companies-count)]
