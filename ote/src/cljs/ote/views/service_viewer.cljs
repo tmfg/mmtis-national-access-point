@@ -276,6 +276,7 @@
                                          #(tr [:enums ::t-service/interface-data-content %])
                                          (::t-service/data-content interface)))
                    url (::t-service/url (::t-service/external-interface interface))
+                   url-ote-netex (:url-ote-netex interface)
                    license (::t-service/license interface)
                    format (first (::t-service/format interface))
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
@@ -292,7 +293,15 @@
            [common-ui/information-row-with-option
             (tr [:field-labels :transport-service-common ::t-service/license])
             license
-            false]]
+            false]
+           (when url-ote-netex
+             [common-ui/information-row-with-option
+              (tr [:service-search :ote-generated-url])
+              [common-ui/linkify
+               url-ote-netex
+               url-ote-netex
+               {:target "_blank"}]
+              false])]
           [:div
            [common-ui/information-row-with-option (tr [:common-texts :format]) format false]
            [information-row-with-selection
@@ -875,7 +884,6 @@
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
-       [ote-interfaces (:ote-interfaces ts)]
        [spacer]
 
        (case service-sub-type
