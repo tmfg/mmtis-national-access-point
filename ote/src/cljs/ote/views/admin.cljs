@@ -2,25 +2,18 @@
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.core :refer [color]]
             [clojure.string :as str]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
             [stylefy.core :as stylefy]
 
-            [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.modification :as modification]
             [ote.localization :refer [tr tr-key]]
-            [ote.time :as time]
 
             [ote.app.controller.admin :as admin-controller]
             [ote.app.controller.front-page :as fp]
-            [ote.theme.colors :as colors]
             [ote.style.base :as style-base]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.common :refer [linkify]]
-            [ote.ui.common :as ui-common]
             [ote.ui.page :as page]
             [ote.ui.tabs :as tabs]
             [ote.ui.form-fields :as form-fields]
@@ -113,8 +106,7 @@
             [ui/table-header-column {:style {:width "12%" :padding-left "15px" :padding-right "15px"}} "Toiminnot"]]]
           [ui/table-body {:display-row-checkbox false}
            (doall
-             (for [{::t-operator/keys [id name gsm phone business-id ckan-group-id email ]
-                    :keys [show-add-member-dialog?] :as result} results]
+             (for [{::t-operator/keys [id name gsm phone business-id ckan-group-id email ] :as result} results]
                ^{:key (::t-operator/id result)}
                [ui/table-row {:selectable false}
                 [ui/table-row-column {:style {:width "7%" :padding-left "15px" :padding-right "15px"}} id]
@@ -237,8 +229,7 @@
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn admin-panel [e! app]
-  (let [page (:page app)
-        tabs [{:label "Käyttäjä" :value "users"}
+  (let [tabs [{:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
               {:label "Palveluntuottajat" :value "operators"}
@@ -285,6 +276,6 @@
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
         "sea-routes" [sea-routes/sea-routes e! app]
-        "netex" [netex/netex e! app]
+        "netex" [netex/netex app]
         ;;default
         [users/user-listing e! app])]]))
