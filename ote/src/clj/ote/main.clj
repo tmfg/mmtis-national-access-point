@@ -79,7 +79,7 @@
 
    ;; Service search
    :service-search (component/using
-                    (service-search/->ServiceSearch)
+                    (service-search/->ServiceSearch config)
                     [:http :db])
 
    ;; Integration: export GeoJSON, GTFS and CSV
