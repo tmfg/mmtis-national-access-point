@@ -33,19 +33,6 @@
                        {::netex/filename op/not-null?}))
        (assoc-download-url config)))
 
-(defn append-ote-netex-interfaces [services config db]
-  (let [conversions (fetch-conversions-for-services config
-                                                    db
-                                                    (set (map #(::t-service/id %)
-                                                              services)))]
-    (vec
-      (for [srv services]
-        (assoc srv
-          :ote-interfaces
-          (filterv (fn [conversion]
-                     (= (::t-service/id srv) (::netex/transport-service-id conversion)))
-                   conversions))))))
-
 (defn- append-ote-netex-url-to-interface
   "Takes netex `conversions` and walks through `interfaces`, appending a netex download url to an interface which
   matches to a conversion.
@@ -63,9 +50,11 @@
 
 (defn append-ote-netex-urls
   "`services` = collection of services
-  Appends an ote-generated netex url to external-interface object, if a netex url is available.
-  Return: collection of services with netex interface url appended to each external interface"
-  [services config db]
+  `config` = object which contains ote configuration properties for the environment
+  `db`= ote database
+  `ext-ifs-key` = A key, within a service object, which contains external interface objects collection
+  Return: collection of services with an ote-generated netex appended to those external interfaces for which a netex url is available."
+  [services config db ext-ifs-key]
   (let [conversions (fetch-conversions-for-services config
                                                     db
                                                     (set (map #(::t-service/id %)
@@ -78,14 +67,13 @@
                                          (and (= (::t-service/id service) find-srv-id)
                                               (some (fn [exif]
                                                       (= (::t-service/id exif) find-exif-id))
-                                                    (::t-service/external-interfaces service))))
+                                                    (ext-ifs-key service))))
                                        services-mod)
               service-match (first (service-groups true))]
           (concat
-            []
             (vector
               (update service-match
-                      ::t-service/external-interfaces
+                      ext-ifs-key
                       #(append-ote-netex-url-to-interface config % find-exif-id conversion)))
             (service-groups false))))
       services
