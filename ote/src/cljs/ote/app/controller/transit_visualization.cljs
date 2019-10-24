@@ -7,12 +7,20 @@
             [cljs-time.format :as tf]
             [cljs-time.coerce :as tc]
             [ote.time :as time]
-            [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
             [taoensso.timbre :as log]
             [ote.transit-changes :as tcu]
             [clojure.set :as set]
             [clojure.string :as str]))
+
+(defn change-visualization-url [route]
+  (let [window-loc (str js/window.location)
+        current-url (if (str/includes? window-loc "/now")
+                      (str/replace window-loc #"/now(.*)" "/now/")
+                      (str/replace window-loc #"/all(.*)" "/all/"))]
+    (if route
+      (.pushState js/window.history #js {} js/document.title (str current-url route))
+      (.pushState js/window.history #js {} js/document.title current-url))))
 
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
@@ -240,16 +248,9 @@
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
-        date2-trips (get-in transit-visualization [:compare :date2-trips])
-        loading (or (:route-trips-for-date1-loading? transit-visualization) ;; both trips should be loaded
-                    (:route-trips-for-date2-loading? transit-visualization))]
-    (cond
-      (and (not loading)
-           (not-empty date1-trips)
-           (not-empty date2-trips))
+        date2-trips (get-in transit-visualization [:compare :date2-trips])]
+    (if (and (seq date1-trips) (seq date2-trips))
       (combined-trips-and-stop-differences transit-visualization date1-trips date2-trips)
-
-      (not loading)
       ;; Both dates not fetched, don't try to calculate - assume that route is a new one or ending
       (-> transit-visualization
           (combined-trips-and-stop-differences date1-trips date2-trips)
@@ -258,28 +259,24 @@
                       ;ending - count trips from date1, because date2 is empty
                       {:removed-trips (count date1-trips)}
                       ;added - count trips from date2 because date1 is empty
-                      {:added-trips (count date2-trips)})))
-
-      :else
-      transit-visualization)))
+                      {:added-trips (count date2-trips)}))))))
 
 ;; Routes trip data
 (define-event RouteTripsForDateResponse [trips date]
   {:path [:transit-visualization]}
   (let [app (cond
-          (= date (get-in app [:compare :date1]))
-          (-> app
-              (assoc :route-trips-for-date1-loading? false)
-              (assoc-in [:compare :date1-trips] trips))
+              (= date (get-in app [:compare :date1]))
+              (-> app
+                  (assoc :route-trips-for-date1-loading? false)
+                  (assoc-in [:compare :date1-trips] trips))
 
-          (= date (get-in app [:compare :date2] app))
-          (-> app
-              (assoc :route-trips-for-date2-loading? false)
-              (assoc-in [:compare :date2-trips] trips))
+              (= date (get-in app [:compare :date2]))
+              (-> app
+                  (assoc :route-trips-for-date2-loading? false)
+                  (assoc-in [:compare :date2-trips] trips))
 
-          :else
-          app)
-        app (if (loading-trips? app)
+              :else app)
+        app (if (or (:route-trips-for-date1-loading? app) (:route-trips-for-date2-loading? app))
               app
               ;; Combine only after all data available to avoid rendering incorrect numbers
               (combine-trips app))]
@@ -469,11 +466,10 @@
                   changes))]
     (if route                                             ;;route-hash exists when you have a url where route is selected
       (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-        {:params {:route-hash-id (ensure-route-hash-id route)}
+        {:params {:route-hash-id (ensure-route-hash-id route)
+                  :detection-date detection-date}
          :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-      (let [current-url (str/replace (str js/window.location) #"/now(.*)" "/now/")]
-        (.pushState js/window.history #js {} js/document.title
-          current-url)))
+      (change-visualization-url nil))
     (-> app
       (assoc :transit-visualization
              (assoc (:transit-visualization app)
@@ -484,12 +480,14 @@
                :changes-route-filtered (sorted-route-changes false changes)
                :gtfs-package-info (:gtfs-package-info response)
                :route-hash-id-type (:route-hash-id-type response)
-               :selected-route route)))))
+               :selected-route route
+               :detection-date detection-date)))))
 
 (define-event SelectRouteForDisplay [route]
   {}
   (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-             {:params  {:route-hash-id (ensure-route-hash-id route)}
+             {:params  {:route-hash-id (ensure-route-hash-id route)
+                        :detection-date (get-in app [:transit-visualization :detection-date])}
               :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
   (-> app
       (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)

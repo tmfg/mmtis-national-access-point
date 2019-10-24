@@ -19,7 +19,8 @@
             [ote.style.dialog :as style-dialog]
             [ote.util.values :as values]
             [ote.ui.info :as info]
-            [ote.ui.validation :as validation])
+            [ote.ui.validation :as validation]
+            [ote.app.controller.common :as common-c])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -297,10 +298,11 @@
                     {:name :country
                      :label (tr [:common-texts :country])
                      :full-width? true
-                     :type :autocomplete
-                     :suggestions (mapv second (tr-tree [:country-list]))
-                     :read (comp :country ::t-service/pick-up-address)
-                     :write #(assoc-in %1 [::t-service/pick-up-address :country] %2)}
+                     :type :selection
+                     :show-option (tr-key [:country-list])
+                     :options (common-c/country-list (tr-tree [:country-list]))
+                     :read (comp ::common/country_code ::t-service/pick-up-address)
+                     :write #(assoc-in %1 [::t-service/pick-up-address ::common/country_code] %2)}
                     {:name ::t-service/service-hours-and-exceptions
                      :type :component
                      :component-type :inner-row

@@ -2,10 +2,9 @@
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
-            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
+            [specql.core :refer [fetch upsert! delete!] :as specql]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.db.user :as user]
             [ote.db.common :as common]
             [ote.util.db :as util]
             [compojure.core :refer [routes GET POST DELETE]]
@@ -15,16 +14,10 @@
             [ote.services.external :as external]
             [ote.authorization :as authorization]
             [jeesql.core :refer [defqueries]]
-            [ote.db.tx :as tx]
             [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.email :as email]
-            [hiccup.core :refer [html]]
-            [ote.time :as time]
-            [clj-time.core :as t]
-            [clojure.set :refer [rename-keys]]
-            [clj-time.coerce :as tc]
-            [clojure.string :as str])
+            [ote.netex.netex :as netex]
+            [ote.integration.export.netex :as export-netex])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -87,9 +80,19 @@
                 add-error-data))
           modified-services)))
 
+(defn- append-ote-netex-interfaces [{::t-service/keys [id] :as service} config db]
+  (assoc service
+    :ote-interfaces
+    (vec
+      (sort-by :url
+               (mapv #(assoc %
+                        :url (export-netex/file-download-url config id (:ote.db.netex/id %))
+                        :format "NeTEx")
+                     (netex/fetch-conversions db id))))))
+
 (defn all-data-transport-service
   "Get single transport service by id"
-  [db id]
+  [config db id]
   (let [ts (first (fetch db ::t-service/transport-service
                          (conj (specql/columns ::t-service/transport-service)
                                ;; join external interfaces
@@ -97,15 +100,17 @@
                                 (specql/columns ::t-service/external-interface-description)])
                          {::t-service/id id}))]
     (if ts
-      (http/transit-response (assoc ts ::t-service/operation-area
-                                       (places/fetch-transport-service-operation-area db id)))
+      (http/transit-response
+        (-> (assoc ts ::t-service/operation-area
+                      (places/fetch-transport-service-operation-area db id))
+            (append-ote-netex-interfaces config db))
+        200)
       {:status 404})))
 
 (defn delete-transport-service!
   "Delete single transport service by id"
-  [nap-config db user id]
-
-  (let [{::t-service/keys [transport-operator-id published]}
+  [db user id]
+  (let [{::t-service/keys [transport-operator-id]}
         (first (specql/fetch db ::t-service/transport-service
                              #{::t-service/transport-operator-id
                                ::t-service/published}
@@ -136,9 +141,7 @@
 (defn- update-rental-price-classes [service]
   (update-in service [::t-service/rentals ::t-service/vehicle-classes]
              (fn [vehicles]
-               (mapv #(let [before %
-                            after (fix-price-classes % [::t-service/price-classes])]
-                        after)
+               (mapv #(fix-price-classes % [::t-service/price-classes])
                      vehicles))))
 
 (defn- floats-to-bigdec
@@ -193,8 +196,7 @@
 
 (defn- removable-resources
   [from-db from-client]
-  (let [in-db (into #{} (map ::t-service/id) from-db)
-        from-ui (into #{} (map ::t-service/id) from-client)
+  (let [from-ui (into #{} (map ::t-service/id) from-client)
         to-delete (map #(select-keys % #{::t-service/id})
                        (filter (comp (complement from-ui) ::t-service/id) from-db))]
     to-delete))
@@ -255,18 +257,17 @@
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [nap-config db user {places ::t-service/operation-area
+  [db user {places ::t-service/operation-area
                        external-interfaces ::t-service/external-interfaces
-                       service-company ::t-service/service-company
                        :as data}]
-  ;(println "DATA: " (pr-str data))
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
                          (set-publish-time db)
                          (dissoc ::t-service/external-interfaces
-                                 ::t-service/service-company)
+                                 ::t-service/service-company
+                                 :ote-interfaces)
                          (maybe-clear-companies))
 
         resources-from-db (fetch-transport-service-external-interfaces db (::t-service/id data))
@@ -300,11 +301,11 @@
   in the service to be stored is in the set of allowed operators for the user.
   If authorization check succeeds, the transport service is saved to the database and optionally
   published to CKAN."
-  [nap-config db user request]
+  [db user request]
     (authorization/with-transport-operator-check
       db user (::t-service/transport-operator-id request)
       #(http/transit-response
-        (save-transport-service nap-config db user request))))
+        (save-transport-service db user request))))
 
 (defn- save-associated-operator
   "Save association between transport service and transport operator"
@@ -332,7 +333,7 @@
 
 (defn public-data-transport-service
   "Get single transport service by id"
-  [db id]
+  [config db id]
   (let [ts (first (fetch db ::t-service/transport-service
                          (apply disj
                                 (conj (specql/columns ::t-service/transport-service)
@@ -343,8 +344,9 @@
                          {::t-service/id id}))]
     (if ts
       (http/transit-response
-        (assoc ts ::t-service/operation-area
-                  (places/fetch-transport-service-operation-area db id)))
+        (-> (assoc ts ::t-service/operation-area
+                      (places/fetch-transport-service-operation-area db id))
+            (append-ote-netex-interfaces config db)))
       {:status 404})))
 
 (defn ckan-group-id->group
@@ -355,40 +357,36 @@
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"
-  [db config email]
-  (let [nap-config (:nap config)]
-    (routes
+  [db]
+  (routes
 
-      (POST "/transport-service/:service-id/associated-operators"
-            {{:keys [service-id]} :params
-             user :user
-             data :body}
-        (let [operator-id (:operator-id (http/transit-request data))
-              user-id (get-in user [:user :id])
-              service-id (Long/parseLong service-id)]
-          (authorization/with-transport-operator-check db user operator-id
-                                                       #(save-associated-operator db user-id service-id operator-id))))
+    (POST "/transport-service/:service-id/associated-operators"
+          {{:keys [service-id]} :params
+           user :user
+           data :body}
+      (let [operator-id (:operator-id (http/transit-request data))
+            user-id (get-in user [:user :id])
+            service-id (Long/parseLong service-id)]
+        (authorization/with-transport-operator-check db user operator-id
+                                                     #(save-associated-operator db user-id service-id operator-id))))
 
-      (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
-              {{:keys [service-id operator-id]}
-               :params
-               user :user}
-        (let [service-id (Long/parseLong service-id)
-              operator-id (Long/parseLong operator-id)]
-          (authorization/with-transport-operator-check db user operator-id
-                                                       #(delete-associated-operator db service-id operator-id))))
+    (DELETE "/transport-service/:service-id/associated-operators/:operator-id"
+            {{:keys [service-id operator-id]}
+             :params
+             user :user}
+      (let [service-id (Long/parseLong service-id)
+            operator-id (Long/parseLong operator-id)]
+        (authorization/with-transport-operator-check db user operator-id
+                                                     #(delete-associated-operator db service-id operator-id))))
 
-      (POST "/transport-service" {form-data :body
-                                  user      :user}
-        (save-transport-service-handler nap-config db user (http/transit-request form-data)))
+    (POST "/transport-service" {form-data :body
+                                user :user}
+      (save-transport-service-handler db user (http/transit-request form-data)))
 
-      (POST "/transport-service/delete" {form-data :body
-                                         user      :user}
-        (http/transit-response
-          (delete-transport-service! nap-config db user
-                                     (:id (http/transit-request form-data)))))
-
-      )))
+    (POST "/transport-service/delete" {form-data :body
+                                       user :user}
+      (http/transit-response
+        (delete-transport-service! db user (:id (http/transit-request form-data)))))))
 
 (defn- transport-service-routes
   "Unauthenticated routes"
@@ -404,15 +402,15 @@
                                               #{::t-service/transport-operator-id}
                                               {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
-          (all-data-transport-service db id)
-          (public-data-transport-service db id))))))
+          (all-data-transport-service config db id)
+          (public-data-transport-service config db id))))))
 
 (defrecord TransportService [config]
   component/Lifecycle
-  (start [{:keys [db http email] :as this}]
+  (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-      [(http/publish! http (transport-service-routes-auth db config email))
+      [(http/publish! http (transport-service-routes-auth db))
        (http/publish! http {:authenticated? false} (transport-service-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]

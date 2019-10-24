@@ -464,7 +464,7 @@
         (if error error warning)])]))
 
 (defn field-selection [{:keys [update! table? label name style show-option options form?
-                               error warning auto-width? disabled?
+                               error warning auto-width? full-width? disabled?
                                option-value class-name element-id] :as field}
                              data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -474,6 +474,7 @@
      (merge
        (when element-id {:id element-id})
        {:auto-width (boolean auto-width?)
+        :full-width (boolean full-width?)
         :style style
         :floating-label-text (when-not table? label)
         :floating-label-fixed true
@@ -1225,7 +1226,7 @@
                    :disabled disabled})
    label])
 
-(defmethod field :text-label [{:keys [label style h-style full-width?]}]
+(defmethod field :text-label [{:keys [label style h-style h-inner-style full-width?]}]
   ;; Options
   ; :label Text for displaying
   [:div
@@ -1235,8 +1236,20 @@
              (when style
                style))}
    (if h-style
-     [h-style label]
+     [h-style (when h-inner-style {:style h-inner-style}) label]
      [:p label])])
+
+(defmethod field :text [{:keys [label style full-width?] :as field} data]
+  (let [text (str/replace data #"\r\n|\n|\r" "====")
+        text-list (str/split text #"====")]
+    [:div {:style (merge
+                    (when full-width?
+                      {:width "100%"})
+                    (when style
+                      style))}
+     (doall
+       (for [row text-list]
+         [:p row]))]))
 
 (defmethod field :info-toggle [{:keys [label body default-state]}]
   [info/info-toggle label body {:default-open? default-state}])

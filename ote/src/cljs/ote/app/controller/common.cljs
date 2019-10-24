@@ -28,3 +28,10 @@
 (tuck/define-event ServerError [response]
                    {}
                    (handle-error app response))
+
+(defn country-list [c-list]
+  (let [select (first (sort-by first c-list))
+        c-list (as-> (rest (sort-by first c-list)) c-list
+                     (map first (sort-by second c-list))
+                     (concat (conj [] (first select)) c-list))]
+    c-list))

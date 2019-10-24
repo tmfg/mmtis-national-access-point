@@ -74,6 +74,11 @@
 (defrecord SearchSeaRoutes [])
 (defrecord SearchSeaRoutesResponse [response])
 
+;; Netex tab
+(defrecord UpdateNetexFilters [filter])
+(defrecord SearchNetexConversions [])
+(defrecord SearchNetexConversionsResponse [response])
+
 ;; Delete Transport Operator
 (defrecord OpenDeleteOperatorModal [id])
 (defrecord CancelDeleteOperator [id])
@@ -340,6 +345,23 @@
   SearchSeaRoutesResponse
   (process-event [{response :response} app]
     (update-in app [:admin :sea-routes] assoc
+               :loading? false
+               :results response))
+
+  UpdateNetexFilters
+  (process-event [{filter :filter} app]
+    (update-in app [:admin :netex] assoc :filters filter))
+
+  SearchNetexConversions
+  (process-event [_ app]
+    (comm/post! "admin/netex" (get-in app [:admin :netex :filters])
+                {:on-success (tuck/send-async! ->SearchNetexConversionsResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc-in app [:admin :netex :loading?] true))
+
+  SearchNetexConversionsResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :netex] assoc
                :loading? false
                :results response))
 

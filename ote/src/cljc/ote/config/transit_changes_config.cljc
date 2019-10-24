@@ -1,5 +1,8 @@
 (ns ote.config.transit-changes-config
-  "Configuration values for the feature")
+  "Configuration values for the transit change detection feature.
+  This file contains constants which are not environment-specific, so they are defined here instead of hard-coding in
+  implementation files. Motivation is to have constants in one place for better overview to the feature and its
+  variability.")
 
 (defn config []
   {:detection-threshold-no-traffic-days 16                  ;; For reporting a no-traffic change, the length of no-traffic period must exceed this value

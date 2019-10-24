@@ -1227,6 +1227,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :type "Tyyppi"
   :transport-type "Liikennemuoto"
   :homepage "Verkko-osoite"
+  :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 
@@ -1419,7 +1420,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}}
 
  :country-list
- {:AF "Afganistan"
+ {:A "Valitse"
+  :AF "Afganistan"
   :AX "Ahvenanmaa"
   :NL "Alankomaat"
   :AL "Albania"
