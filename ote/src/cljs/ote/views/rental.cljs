@@ -8,6 +8,7 @@
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.common :as common-c]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
@@ -298,6 +299,7 @@
                     {:name :country
                      :label (tr [:common-texts :country])
                      :full-width? true
+                     :auto-width? true
                      :type :selection
                      :show-option (tr-key [:country-list])
                      :options (common-c/country-list (tr-tree [:country-list]))

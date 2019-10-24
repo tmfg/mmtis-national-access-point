@@ -24,7 +24,8 @@
             [ote.app.controller.transport-service :as ts]
             [ote.app.controller.flags :as flags]
             [ote.views.place-search :as place-search]
-            [ote.app.controller.common :as common-c]))
+            [ote.app.controller.common :as common-c]
+            [ote.views.place-search :as place-search]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.

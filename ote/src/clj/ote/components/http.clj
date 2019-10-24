@@ -140,7 +140,8 @@
              (fn [handlers]
                (filterv (partial not= handler) handlers))))))
 
-(def no-cache-headers  {"Cache-Control" "no-cache, no-store"})
+(def no-cache-headers  {"Expires" "-1"
+                        "Cache-Control" "no-cache, no-store, must-revalidate"})
 
 (defn with-no-cache-headers [response]
   (update response :headers merge no-cache-headers))
