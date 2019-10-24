@@ -22,6 +22,7 @@
                        :name :operator-name
                        :label "Palveluntuottaja"
                        :type :string
+                       :style {:margin-right "1rem"}
                        :hint-text "Palveluntuottajan nimi tai sen osa"
                        :container-class "col-xs-12 col-sm-4 col-md-4"}
     (get-in app [:admin :netex :filters])]
@@ -33,8 +34,7 @@
 
 (defn netex [app]
   (let [{:keys [loading? results]}
-        (get-in app [:admin :netex])
-        loc (.-location js/document)]
+        (get-in app [:admin :netex])]
     [:div.row {:style {:padding-top "40px"}}
      (when loading?
        [circular/circular-progress
