@@ -4,15 +4,15 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.app.controller.admin :as admin-controller]
             [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
-            [ote.ui.common :refer [linkify]]
             [ote.localization :refer [selected-language]]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]
             [ote.app.controller.front-page :as fp]
             [ote.ui.form-fields :as form-fields]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
             [ote.db.transit :as transit]
             [ote.ui.circular_progress :as circular]
+            [ote.ui.buttons :as buttons]
             [ote.time :as time]
             [cljs-time.core :as t]))
 
@@ -35,10 +35,11 @@
                        :container-class "col-xs-12 col-sm-4 col-md-4"}
     (get-in app [:admin :sea-routes :filters])]
 
-   [ui/raised-button {:primary true
-                      :disabled (str/blank? filter)
-                      :on-click #(e! (admin-controller/->SearchSeaRoutes))
-                      :label "Hae merireitit"}]])
+   [buttons/save
+    {:on-click #(e! (admin-controller/->SearchSeaRoutes))
+     :disabled (str/blank? filter)
+     :style {:margin-left "1rem"}}
+    "Hae merireitit"]])
 
 (defn weekday-index-to-keyword [weekday-index]
   (let [weekday-index (if (< weekday-index 0)
@@ -73,27 +74,40 @@
         (t/plus (time/native->date-time to-date) (t/days last-weekday-count))))))
 
 (defn sea-routes [e! app]
-  (let [{:keys [loading? results filters]}
+  (let [{:keys [loading? results]}
         (get-in app [:admin :sea-routes])
         loc (.-location js/document)]
-     [:div.row {:style {:padding-top "40px"}}
-      (when loading?
-        [circular/circular-progress
-         [:span "Ladataan merireittejä..."]])
+    [:div.row {:style {:padding-top "40px"}}
+     (when loading?
+       [circular/circular-progress
+        [:span "Ladataan merireittejä..."]])
 
      (when results
        [:div
         [:div "Hakuehdoilla löytyi " (count results) " merireittiä."]
         [ui/table {:selectable false}
-         [ui/table-header {:adjust-for-checkbox false
+         [ui/table-header {:class "table-header-wrap"
+                           :adjust-for-checkbox false
                            :display-select-all false}
           [ui/table-row
-           [ui/table-header-column {:style {:width "25%"}} "Palveluntuottaja"]
-           [ui/table-header-column {:style {:width "25%"}} "Merireitti"]
-           [ui/table-header-column {:style {:width "10%"}} "Julkaistu?"]
-           [ui/table-header-column {:style {:width "15%"}} "Viim. Muokkaus"]
-           [ui/table-header-column {:style {:width "15%"}} "Viim. Ajopäivä"]
-           [ui/table-header-column {:style {:width "10%"}} "GTFS paketti"]]]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "25%"}}
+            "Palveluntuottaja"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "25%"}}
+            "Merireitti"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "10%"}}
+            "Julkaistu?"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "15%"}}
+            "Viim. Muokkaus"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "15%"}}
+            "Viim. Ajopäivä"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "10%"}}
+            "GTFS paketti"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
             (for [{::transit/keys [id name operator-name operator-id published? modified created] :as sea-route} results
@@ -101,14 +115,31 @@
                         last-modification (max created modified)]]
               ^{:key (str "link_" sea-route)}
               [ui/table-row {:selectable false}
-               [ui/table-row-column {:style {:width "25%"}} operator-name]
-               [ui/table-row-column {:style {:width "25%"}} [edit-sea-route-link e! id name]]
-               [ui/table-row-column {:style {:width "10%"}} (if published? "Kyllä" "Ei")]
-               [ui/table-row-column {:style {:width "15%"}} (time/format-timestamp-for-ui last-modification)]
-               [ui/table-row-column {:style {:width "15%"}} (if (not (nil? last-active-date))
-                                                              (time/format-date last-active-date)
-                                                              "Ajopäivissä virhe")]
-               [ui/table-row-column {:style {:width "10%"}}
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "25%"})
+                operator-name]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "25%"})
+                [edit-sea-route-link e! id name]]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "10%"})
+                (if published? "Kyllä" "Ei")]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "15%"})
+                (time/format-timestamp-for-ui last-modification)]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "15%"})
+                (if (not (nil? last-active-date))
+                  (time/format-date last-active-date)
+                  "Ajopäivissä virhe")]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "10%"})
                 [:a {:href (str (.-protocol loc) "//" (.-host loc) (.-pathname loc)
                                 "export/gtfs/" operator-id)}
                  "Lataa gtfs"]]]))]]])]))
