@@ -146,10 +146,19 @@ SELECT
  ORDER BY r.id, "to-date" DESC;
 
 -- name: fetch-netex-conversions-for-admin
-SELECT n.id as "netex-conversion-id", n."external-interface-description-id", n."transport-service-id",
-       n.filename, n.status, n.created, n.modified,
-       top.name as "operator-name", ts.name as "service-name"
-  FROM "netex-conversion" n, "transport-service" ts, "transport-operator" top
+SELECT n.id as "netex-conversion-id",
+       n."external-interface-description-id",
+       n."transport-service-id",
+       n.filename,
+       n.status,
+       n.created,
+       n.modified,
+       top.name as "operator-name",
+       ts.name as "service-name"
+  FROM "netex-conversion" n,
+       "transport-service" ts,
+       "transport-operator" top
  WHERE ts.id = n."transport-service-id"
    AND top.id = ts."transport-operator-id"
-   AND (:operator::TEXT IS NULL OR top.name ilike :operator);
+   AND (:operator::TEXT IS NULL OR top.name ilike :operator)
+ORDER BY n.modified DESC, n.created, ts.name;
