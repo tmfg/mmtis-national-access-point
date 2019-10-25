@@ -260,7 +260,7 @@
   {:margin-left "1rem"})
 
 (def table-col-style-wrap
-  {:padding-left "0.5rem !important"
+  {:padding-left "0.5rem"
    :padding-right "0"
    :overflow-wrap "break-word"
    :white-space "normal !important"})
