@@ -38,7 +38,7 @@
        [:div.col-md-8
         [:div.row
          [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
-         [:div.col-md-6 [linkify/linkify (:url interface) (:url interface) {:target "_blank"}]]]
+         [:div.col-md-6 [common-ui/linkify (:url interface) (:url interface) {:target "_blank"}]]]
         [:div.row
          [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
          [:div.col-md-6 (str/join ", " (:format interface))]]
