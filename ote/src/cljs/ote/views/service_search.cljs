@@ -101,10 +101,12 @@
                                 (::t-service/url external-interface)
                                 (parse-content-value data-content))]
              [:div {:key (str i "-" id)}
-              [common-ui/information-row-default data-content [:span (str/join format)
-                                                               (when url-ote-netex
-                                                                 ", NeTEx")
-                                                               [gtfs-viewer-link row]]]]))
+              [common-ui/information-row-default data-content
+               [:span
+                (str (str/join format)
+                     (when url-ote-netex
+                       ", NeTEx"))
+                [gtfs-viewer-link row]]]]))
          external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
