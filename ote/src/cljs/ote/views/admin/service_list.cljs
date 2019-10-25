@@ -114,14 +114,13 @@
                [ui/table-row-column
                 (merge (stylefy/use-style style-base/table-col-style-wrap)
                        {:width "10%"})
-                [:span
-                 (cond
-                   (= published fd)
-                   "Kyllä"
-                   (nil? published)
-                   "Ei"
-                   :else
-                   (time/format-timestamp-for-ui published))]]
+                (cond
+                  (= published fd)
+                  "Kyllä"
+                  (nil? published)
+                  "Ei"
+                  :else
+                  (time/format-timestamp-for-ui published))]
                [ui/table-row-column
                 (merge (stylefy/use-style style-base/table-col-style-wrap)
                        {:width "15%"})
