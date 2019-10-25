@@ -2,17 +2,13 @@
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
-            [ote.db.transport-service :as t-service]
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
-            [ote.ui.common :refer [linkify]]
-            [ote.time :as time]
-            [cljs-react-material-ui.icons :as ic]
-            [reagent.core :as r]
-            [ote.ui.common :as ui-common]
             [ote.ui.common :as common-ui]
+            [ote.time :as time]
+            [reagent.core :as r]
+            [ote.ui.buttons :as buttons]
             [ote.theme.colors :as colors]
             [stylefy.core :as stylefy]
             [ote.style.admin :as style-admin]
@@ -42,7 +38,7 @@
        [:div.col-md-8
         [:div.row
          [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan osoite: "]
-         [:div.col-md-6 [linkify (:url interface) (:url interface) {:target "_blank"}]]]
+         [:div.col-md-6 [linkify/linkify (:url interface) (:url interface) {:target "_blank"}]]]
         [:div.row
          [:div.col-md-6 (stylefy/use-style style-admin/modal-data-label) "Rajapinnan tyyppi: "]
          [:div.col-md-6 (str/join ", " (:format interface))]]
@@ -152,7 +148,7 @@
    [ui/table-row-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} (first format)]
    [ui/table-row-column {:style {:width "35%" :padding "0px 5px 0px 5px"}} (if (= "Rajapinta puuttuu" import-error)
                                                                              url
-                                                                             [linkify url url {:target "_blank"}])]
+                                                                             [common-ui/linkify url url {:target "_blank"}])]
    [ui/table-row-column {:style {:width "14%" :padding "0px 5px 0px 5px"}}
     (if (= date-0 imported)
       ""
@@ -233,7 +229,7 @@
            :width "100%"
            :container-class "col-xs-12 col-sm-10 col-md-10"
            :full-width? true
-           :component (fn [data]
+           :component (fn [_]
                         [:div {:style {:display "flex"
                                        :flex-direction "row"}}
                          [ui/radio-button-group {:name (str "admin-interface-type-selection")
@@ -260,34 +256,54 @@
                                             :id "radio-no-interface"
                                             :value :no-interface
                                             :on-click #(e! (admin-controller/->UpdateInterfaceRadioFilter :no-interface))}]]])})]
-       filters]
+       filters]]
 
-      [ui/raised-button {:primary true
-                         :disabled (str/blank? filter)
-                         :on-click #(e! (admin-controller/->SearchInterfaces))
-                         :label "Hae rajapintoja"}]]
+     [buttons/save
+      {:on-click #(e! (admin-controller/->SearchInterfaces))
+       :disabled (or (str/blank? filter) loading?)}
+      "Hae rajapintoja"]
 
-     [:div.row {:style {:padding-top "40px"}}
+     [:div
       (when loading?
-        [:span "Ladataan rajapintoja..."])
+        [:p "Ladataan rajapintoja..."])
 
       (when results
         [:div
-         [:div "Hakuehdoilla löytyi " (count first-from-grouped-results) " rajapintaa. "
-          [ui/raised-button {:secondary true
-                             :on-click #(e! (admin-controller/->DownloadInterfacesCSV))
-                             :label "Lataa CSV"}]]
+         [:div {:style {:margin "1rem 0 1rem 0"
+                        }}
+          [:p
+           (str " Hakuehdoilla löytyi " (count first-from-grouped-results) " rajapintaa.")]
+          [:div
+           [buttons/save
+            {:on-click #(e! (admin-controller/->DownloadInterfacesCSV))}
+            "Lataa rajapinnat CSV:nä"]]]
+
          [ui/table {:selectable false}
-          [ui/table-header {:adjust-for-checkbox false
+          [ui/table-header {:class "table-header-wrap"
+                            :adjust-for-checkbox false
                             :display-select-all false}
            [ui/table-row
-            [ui/table-header-column {:style {:width "2%" :padding "0px 5px 0px 5px"}} "#"]
-            [ui/table-header-column {:style {:width "17%" :padding "0px 5px 0px 5px"}} "Palveluntuottaja"]
-            [ui/table-header-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} "Sisältö"]
-            [ui/table-header-column {:style {:width "8%" :padding "0px 5px 0px 5px"}} "Tyyppi"]
-            [ui/table-header-column {:style {:width "35%" :padding "0px 5px 0px 5px"}} "Rajapinta"]
-            [ui/table-header-column {:style {:width "14%" :padding "0px 5px 0px 5px"}} "Viimeisin käsittely"]
-            [ui/table-header-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} "Katso"]]]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "2%"}}
+             "#"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "17%"}}
+             "Palveluntuottaja"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "14%"}}
+             "Sisältö"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "8%"}}
+             "Tyyppi"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "35%"}}
+             "Rajapinta"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "14%"}}
+             "Viimeisin käsittely"]
+            [ui/table-header-column
+             {:class "table-header-wrap" :style {:width "10%"}}
+             "Katso"]]]
           [ui/table-body {:display-row-checkbox false}
            rows]]])
 
