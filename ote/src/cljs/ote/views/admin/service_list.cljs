@@ -9,6 +9,9 @@
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
+            [ote.ui.buttons :as buttons]
+            [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]
             [ote.time :as time]
             [ote.app.controller.front-page :as fp]))
 
@@ -23,10 +26,12 @@
                         :on-enter #(e! (admin-controller/->SearchServices))}
      (get-in app [:admin :service-listing :service-filter])]
 
-    [ui/raised-button {:label    "Hae"
-                       :primary  true
-                       :disabled (str/blank? filter)
-                       :on-click #(e! (admin-controller/->SearchServices))}]]
+    [buttons/save
+     {:on-click  #(e! (admin-controller/->SearchServices))
+      :disabled (str/blank? filter)
+      :style {:margin-left "1rem"}}
+     "Hae"]]
+
    [:div.col-md-5
 
     [form-fields/field {:type    :string :label "Hae palveluntuottajan nimellä tai sen osalla"
@@ -34,10 +39,11 @@
                         :on-enter #(e! (admin-controller/->SearchServicesByOperator))}
      (get-in app [:admin :service-listing :operator-filter])]
 
-    [ui/raised-button {:label    "Hae"
-                       :primary  true
-                       :disabled (str/blank? filter)
-                       :on-click #(e! (admin-controller/->SearchServicesByOperator))}]]
+    [buttons/save
+     {:on-click  #(e! (admin-controller/->SearchServicesByOperator))
+      :disabled (str/blank? filter)
+      :style {:margin-left "1rem"}}
+     "Hae"]]
 
    [:div.row.col-md-2
     [form-fields/field {:type        :selection
@@ -58,33 +64,68 @@
        [:span
         [:div "Hakuehdoilla löytyi " (count results) " palvelua."]
         [ui/table {:selectable false}
-         [ui/table-header {:adjust-for-checkbox false
+         [ui/table-header {:class "table-header-wrap"
+                           :adjust-for-checkbox false
                            :display-select-all  false}
           [ui/table-row
-           [ui/table-header-column {:style {:width "20%" :padding 5}} "Nimi"]
-           [ui/table-header-column {:style {:width "20%"}} "Palveluntuottaja"]
-           [ui/table-header-column {:style {:width "15%"}} "Tyyppi"]
-           [ui/table-header-column {:style {:width "20%"}} "Alityyppi"]
-           [ui/table-header-column {:style {:width "10%" :padding 5}} "Julkaistu"]
-           [ui/table-header-column {:style {:width "15%" :padding 5}} "Luotu / Muokattu"]]]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "20%"}}
+            "Nimi"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "20%"}}
+            "Palveluntuottaja"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "15%"}}
+            "Tyyppi"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "20%"}}
+            "Alityyppi"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "10%"}}
+            "Julkaistu"]
+           [ui/table-header-column
+            {:class "table-header-wrap" :style {:width "15%"}}
+            "Luotu / Muokattu"]]]
          [ui/table-body {:display-row-checkbox false}
           (doall
             (for [{::t-service/keys    [id name operator-name type sub-type published]
                    ::modification/keys [created modified] :as result} results]
               ^{:key (::t-service/id result)}
               [ui/table-row {:selectable false}
-               [ui/table-row-column {:style {:width "20%" :padding 5}} [:a {:href (str "/edit-service/" id)
-                                                                            :on-click #(do
-                                                                                         (.preventDefault %)
-                                                                                         (e! (fp/->ChangePage :edit-service {:id id})))} name]]
-               [ui/table-row-column {:style {:width "20%"}} operator-name]
-               [ui/table-row-column {:style {:width "15%"}} (tr [:enums :ote.db.transport-service/type (keyword type)])]
-               [ui/table-row-column {:style {:width "20%"}} (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
-               [ui/table-row-column {:style {:width "10%" :padding 5}} [:span (cond
-                                                                                (= published fd)
-                                                                                "Kyllä"
-                                                                                (nil? published)
-                                                                                "Ei"
-                                                                                :else
-                                                                                (time/format-timestamp-for-ui published))]]
-               [ui/table-row-column {:style {:width "15%" :padding 5}} [:span (time/format-timestamp-for-ui created) [:br] (time/format-timestamp-for-ui modified)]]]))]]])]))
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "20%"})
+                [:a {:href (str "/edit-service/" id)
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (fp/->ChangePage :edit-service {:id id})))} name]]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "20%"})
+                operator-name]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "15%"})
+                (tr [:enums :ote.db.transport-service/type (keyword type)])]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "20%"})
+                (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "10%"})
+                [:span
+                 (cond
+                   (= published fd)
+                   "Kyllä"
+                   (nil? published)
+                   "Ei"
+                   :else
+                   (time/format-timestamp-for-ui published))]]
+               [ui/table-row-column
+                (merge (stylefy/use-style style-base/table-col-style-wrap)
+                       {:width "15%"})
+                [:span
+                 (time/format-timestamp-for-ui created)
+                 [:br]
+                 (time/format-timestamp-for-ui modified)]]]))]]])]))
