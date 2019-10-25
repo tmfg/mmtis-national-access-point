@@ -8,7 +8,6 @@ CREATE VIEW transport_service_search_result AS
 SELECT t.*,
        op.name as "operator-name",
        op."business-id" as "business-id",
-       -- Changed Start
        array_cat(
                array_cat(
                        (SELECT sc."companies"
@@ -16,7 +15,7 @@ SELECT t.*,
                         WHERE sc."transport-service-id" = t.id),
                        t."companies"),
                array_agg((aso.name, aso."business-id")::company)) AS "service-companies",
-       -- Changed End
+       -- Changed code Starts
        (SELECT array_agg(oaf."operation-area")
         FROM "operation-area-facet" oaf
         WHERE oaf."transport-service-id" = t.id) AS "operation-area-description",
@@ -28,6 +27,7 @@ SELECT t.*,
                            eids."download-error",
                            eids."db-error",
                            ei."id")::external_interface_search_result)
+       -- Changed code Ends
         FROM "external-interface-description" ei
                  LEFT JOIN (SELECT DISTINCT ON (eids."external-interface-description-id") eids."external-interface-description-id",
                                                                                           eids.id,
