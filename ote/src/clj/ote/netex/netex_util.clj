@@ -3,8 +3,7 @@
   (:require [specql.core :as specql]
             [specql.op :as op]
             [ote.db.netex :as netex]
-            [ote.db.transport-service :as t-service]
-            ))
+            [ote.db.transport-service :as t-service]))
 
 (defn file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
   (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
