@@ -32,21 +32,6 @@
                        {::netex/filename op/not-null?}))
        (assoc-download-url config)))
 
-(defn- append-ote-netex-url-to-interface
-  "Takes netex `conversions` and walks through `interfaces`, appending a netex download url to an interface which
-  matches to a conversion.
-  Return: `interfaces` where a netex download url is appended "
-  [config interfaces find-exif-id conversion]
-  (mapv (fn [exif]
-          (if (= (::t-service/id exif) find-exif-id)
-            (assoc exif
-              :url-ote-netex
-              (file-download-url config
-                                 (::netex/transport-service-id conversion)
-                                 (::netex/id conversion)))
-            exif))
-        interfaces))
-
 (defn append-ote-netex-urls
   "`services` = collection of services
   `config` = object which contains ote configuration properties for the environment
@@ -58,22 +43,21 @@
                                                     db
                                                     (set (map #(::t-service/id %)
                                                               services)))]
-    (reduce
-      (fn [services-mod conversion]
-        (let [find-srv-id (::netex/transport-service-id conversion)
-              find-exif-id (::netex/external-interface-description-id conversion)
-              service-groups (group-by (fn [service]
-                                         (and (= (::t-service/id service) find-srv-id)
-                                              (some (fn [exif]
-                                                      (= (::t-service/id exif) find-exif-id))
-                                                    (ext-ifs-key service))))
-                                       services-mod)
-              service-match (first (service-groups true))]
-          (concat
-            (vector
-              (update service-match
-                      ext-ifs-key
-                      #(append-ote-netex-url-to-interface config % find-exif-id conversion)))
-            (service-groups false))))
-      services
-      conversions)))
+    (mapv (fn [service]
+            (update service
+                    ext-ifs-key
+                    (fn [interfaces]
+                      (vec
+                        (for [interface interfaces
+                              :let [service-id (::t-service/id interface)]]
+                          (if-let [interface-conversion (some (fn [conversion]
+                                                                (when (= service-id
+                                                                         (::netex/transport-service-id conversion))
+                                                                  conversion))
+                                                              conversions)]
+                            (assoc interface :url-ote-netex
+                                             (file-download-url config
+                                                                service-id
+                                                                (::netex/id interface-conversion)))
+                            interface))))))
+          services)))
