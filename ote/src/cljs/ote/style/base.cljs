@@ -107,6 +107,16 @@
    :font-weight "bold !important"
    :position "inherit !important"})
 
+(stylefy/class "table-header-wrap"
+  {:background-color (str colors/gray300 " !important")
+   :color (str colors/gray900 " !important")
+   :font-weight "bold !important"
+   :position "inherit !important"
+   :white-space "normal !important"
+   :overflow-wrap "break-word !important"
+   :padding-left "0.5rem !important"
+   :padding-right "0 !important"})
+
 (def header-font {:font-size "18px"
                   :padding-top "20px"
                   :font-weight "600"})
@@ -250,9 +260,10 @@
   {:margin-left "1rem"})
 
 (def table-col-style-wrap
-  {:padding-left "0.5rem"
+  {:padding-left "0.5rem !important"
    :padding-right "0"
-   :overflow-wrap "break-word"})
+   :overflow-wrap "break-word"
+   :white-space "normal !important"})
 
 (def info-row {:border-bottom (str "1px solid " colors/gray350)
                :display "flex"
