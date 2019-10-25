@@ -16,8 +16,7 @@
             [jeesql.core :refer [defqueries]]
             [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.netex.netex :as netex]
-            [ote.integration.export.netex :as export-netex])
+            [ote.netex.netex_util :as netex-util])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -80,16 +79,6 @@
                 add-error-data))
           modified-services)))
 
-(defn- append-ote-netex-interfaces [{::t-service/keys [id] :as service} config db]
-  (assoc service
-    :ote-interfaces
-    (vec
-      (sort-by :url
-               (mapv #(assoc %
-                        :url (export-netex/file-download-url config id (:ote.db.netex/id %))
-                        :format "NeTEx")
-                     (netex/fetch-conversions db id))))))
-
 (defn all-data-transport-service
   "Get single transport service by id"
   [config db id]
@@ -103,7 +92,9 @@
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
-            (append-ote-netex-interfaces config db))
+            vector
+            (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
+            first)
         200)
       {:status 404})))
 
@@ -120,11 +111,6 @@
       #(do
          (delete! db ::t-service/transport-service {::t-service/id id})
          id))))
-
-(defn- business-id-exists [db business-id]
-  (if (empty? (does-business-id-exists db {:business-id business-id}))
-    {:business-id-exists false}
-    {:business-id-exists true}))
 
 (defn ensure-bigdec [value]
   (when-not (nil? value ) (bigdec value)))
@@ -173,26 +159,28 @@
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removed-resources]
+  (let [external-interfaces (mapv #(dissoc % :url-ote-netex) ; Remove because not part of db data model
+                                  external-interfaces)]
 
-  ;; Delete removed services from OTE db
-  (doseq [{id ::t-service/id} removed-resources]
-    ;; Mark possible gtfs_packages to removed and then remove interface
-    (mark-package-as-deleted db id)
-    ;; Delete from external-interface-download-status
-    (specql/delete! db ::t-service/external-interface-download-status
-                    {::t-service/external-interface-description-id id})
-    ;; Delete from external-interface-description
-    (specql/delete! db ::t-service/external-interface-description
-                    {::t-service/id id}))
+    ;; Delete removed services from OTE db
+    (doseq [{id ::t-service/id} removed-resources]
+      ;; Mark possible gtfs_packages to removed and then remove interface
+      (mark-package-as-deleted db id)
+      ;; Delete from external-interface-download-status
+      (specql/delete! db ::t-service/external-interface-download-status
+                      {::t-service/external-interface-description-id id})
+      ;; Delete from external-interface-description
+      (specql/delete! db ::t-service/external-interface-description
+                      {::t-service/id id}))
 
-  (doseq [{id ::t-service/id :as ext-if} external-interfaces]
-    (if id
-      (specql/update! db ::t-service/external-interface-description
-                      ext-if
-                      {::t-service/transport-service-id transport-service-id
-                       ::t-service/id id})
-      (specql/insert! db ::t-service/external-interface-description
-                      (assoc ext-if ::t-service/transport-service-id transport-service-id)))))
+    (doseq [{id ::t-service/id :as ext-if} external-interfaces]
+      (if id
+        (specql/update! db ::t-service/external-interface-description
+                        ext-if
+                        {::t-service/transport-service-id transport-service-id
+                         ::t-service/id id})
+        (specql/insert! db ::t-service/external-interface-description
+                        (assoc ext-if ::t-service/transport-service-id transport-service-id))))))
 
 (defn- removable-resources
   [from-db from-client]
@@ -266,8 +254,7 @@
                          floats-to-bigdec
                          (set-publish-time db)
                          (dissoc ::t-service/external-interfaces
-                                 ::t-service/service-company
-                                 :ote-interfaces)
+                                 ::t-service/service-company)
                          (maybe-clear-companies))
 
         resources-from-db (fetch-transport-service-external-interfaces db (::t-service/id data))
@@ -346,7 +333,10 @@
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
-            (append-ote-netex-interfaces config db)))
+
+            vector
+            (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
+            first))
       {:status 404})))
 
 (defn ckan-group-id->group

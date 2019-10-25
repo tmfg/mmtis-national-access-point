@@ -4,10 +4,8 @@
             [ote.test :refer [system-fixture *ote* http-post http-get sql-execute! sql-query]]
             [com.stuartsierra.component :as component]
             [clojure.test.check.generators :as gen]
-            [ote.db.generators :as otegen]
             [ote.db.service-generators :as service-generators]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
             [ote.services.transport :as transport-service]
             [clojure.string :as str]))
 
@@ -17,7 +15,7 @@
    (component/using (transport-service/->TransportService nil) [:http :db])
 
    :service-search
-   (component/using (sut/->ServiceSearch) [:http :db])))
+   (component/using (sut/->ServiceSearch (slurp "config.edn")) [:http :db])))
 
 (defn- generate-services []
    (take 10 (repeatedly
@@ -42,7 +40,7 @@
     (publish-services! (map ::t-service/id saved-services))
 
     (testing "Searching by exact name returns it"
-      (let [{name ::t-service/name :as s} (first services)
+      (let [{name ::t-service/name} (first services)
             result (http-get (str "service-search?text="
                                   name
                                   "&response_format=json"))]
@@ -84,7 +82,7 @@
                   transit-result))))
 
     (testing "Search by operator"
-      (let [{op-id ::t-service/transport-operator-id :as s} (first services)
+      (let [{op-id ::t-service/transport-operator-id} (first services)
             operator (sql-query  "SELECT * FROM \"transport-operator\" WHERE id = " op-id)
             op-bi (:business-id (first operator))
             result (http-get (str "service-search?operators=" op-bi "&response_format=json"))]

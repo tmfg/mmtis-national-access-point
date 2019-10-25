@@ -9,7 +9,8 @@
             [ote.db.transport-service :as t-service]
             [specql.op :as op]
             [clojure.set :as set]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ote.netex.netex_util :as netex-util]))
 
 (defqueries "ote/services/service_search.sql")
 
@@ -239,8 +240,9 @@ Negative return value is an invalid match"
        (mapv (filtering-operators searched-operators))
        (mapv without-personal-info)))
 
-(defn search [db {:keys [operation-area sub-type data-content transport-type text operators offset limit]
-                   :as filters}]
+(defn search [config
+              db
+              {:keys [operation-area sub-type data-content transport-type text operators offset limit] :as filters}]
   (let [;; Get service id's using different filters. If filter is not given no results will be returned.
         result-id-sets [(services-operating-in db operation-area)
                         (sub-type-ids db sub-type)
@@ -254,17 +256,18 @@ Negative return value is an invalid match"
               (latest-service-ids db)
               ;; Combine with intersection (AND)
               (apply set/intersection (remove nil? result-id-sets)))]
-    (-> (if operation-area
-                  (transport-services-in-operation-area db ids operation-area offset limit)
-                  (transport-services-page db ids offset limit))
-        (pare-results operators)
-        (as-> results (merge
-                       {:empty-filters? empty-filters?
-                        :results results
-                        :filter-service-count (count ids)}
-                       (when empty-filters?
-                         {:total-service-count (total-service-count db)
-                          :total-company-count (total-company-count db)}))))))
+    (as-> (if operation-area
+            (transport-services-in-operation-area db ids operation-area offset limit)
+            (transport-services-page db ids offset limit)) services
+          (pare-results services operators)
+          (netex-util/append-ote-netex-urls services config db ::t-service/external-interface-links)
+          (merge
+            {:empty-filters? empty-filters?
+             :results services
+             :filter-service-count (count ids)}
+            (when empty-filters?
+              {:total-service-count (total-service-count db)
+               :total-company-count (total-company-count db)})))))
 
 (defn- service-search-parameters
   "Extract service search parameters from query parameters."
@@ -284,7 +287,7 @@ Negative return value is an invalid match"
    :limit (some-> "limit" params (Integer/parseInt))
    :offset (some-> "offset" params (Integer/parseInt))})
 
-(defn- service-search-routes [db]
+(defn- service-search-routes [config db]
   (routes
     (GET ["/operator-completions/:term", :term #".+"] {{term :term} :params :as req}
       (http/api-response req (operator-completions db term)))
@@ -300,16 +303,16 @@ Negative return value is an invalid match"
         (http/with-no-cache-headers
           (http/api-response
            req
-           (search db (service-search-parameters params)))))))
+           (search config db (service-search-parameters params)))))))
 
-(defrecord ServiceSearch []
+(defrecord ServiceSearch [config]
   component/Lifecycle
   (start [{db :db
            http :http
            :as this}]
     (assoc this ::stop
            (http/publish! http {:authenticated? false}
-                          (service-search-routes db))))
+                          (service-search-routes config db))))
 
   (stop [{stop ::stop :as this}]
     (stop)

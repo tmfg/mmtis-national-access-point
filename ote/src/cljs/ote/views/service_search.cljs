@@ -2,8 +2,8 @@
   "A service search page that allows filtering and listing published services."
   (:require [reagent.core :as r]
             [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
+            [ote.db.netex]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
@@ -13,14 +13,12 @@
             [ote.ui.common :as common-ui]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icons :as icons]
             [ote.app.controller.service-search :as ss]
             [ote.style.base :as style-base]
             [ote.style.service-search :as style]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
             [ote.app.controller.admin :as admin]
-            [tuck.core :as tuck]
             [ote.ui.validation :as validation]
             [ote.util.text :as text]
             [ote.ui.page :as page]
@@ -62,7 +60,7 @@
        item])]])
 
 (defn- format-address [{::common/keys [street postal_code post_office]}]
-  (let [comma (if (not (empty? street)) ", " " ")]
+  (let [comma (if (seq street) ", " " ")]
     (str street comma postal_code " " post_office)))
 
 (defn- gtfs-viewer-link [{interface ::t-service/external-interface [format] ::t-service/format
@@ -97,12 +95,18 @@
    (when-not (empty? external-interface-links)
      (doall
        (map-indexed
-         (fn [i {::t-service/keys [external-interface format data-content] :as row}]
+         (fn [i {::t-service/keys [external-interface format data-content]
+                 :keys [url-ote-netex] :as row}]
            (let [data-content (if (nil? data-content)
                                 (::t-service/url external-interface)
                                 (parse-content-value data-content))]
              [:div {:key (str i "-" id)}
-              [common-ui/information-row-default data-content [:span (str/join format) [gtfs-viewer-link row]]]]))
+              [common-ui/information-row-default data-content
+               [:span
+                (str (str/join format)
+                     (when url-ote-netex
+                       ", NeTEx"))
+                [gtfs-viewer-link row]]]]))
          external-interface-links)))])
 
 (defn- list-service-companies [service-companies service-search]
@@ -112,16 +116,16 @@
           searched-business-ids (str/split (get-in service-search [:params :operators]) ",")
           found-business-ids (keep (fn [sc]
                                      (let [s (keep #(when (= (::t-service/business-id sc) %) sc) searched-business-ids)]
-                                       (when (not (empty? s)) (first s))))
+                                       (when (seq s) (first s))))
                                    service-companies)
-          presented-companies-count (if (not (empty? found-business-ids))
+          presented-companies-count (if (seq found-business-ids)
                                       (count found-business-ids)
                                       company-list-max-size)
           extra-companies (- service-company-count presented-companies-count)]
       [:div
        [:h4 (tr [:service-search :other-involved-companies])]
        ;; Show searched companies or list involved companies
-       (if (not (empty? found-business-ids))
+       (if (seq? found-business-ids)
          [:div
           (doall (for [c found-business-ids]
                    (when (::t-service/name c)
@@ -145,7 +149,7 @@
 (defn- result-card
   [e! admin?
    {::t-service/keys [id name sub-type description transport-type homepage
-                      operator-name business-id transport-operator-id service-companies companies difference]
+                      operator-name business-id transport-operator-id service-companies companies]
     :as service}]
   (let [sub-type-tr (tr-key [:enums ::t-service/sub-type])
         e-links [external-interface-links service]
@@ -218,7 +222,7 @@
              [:span (tr [:service-search :participating-operator])]]))])]))
 
 (defn results-listing [e! {service-search :service-search user :user :as app}]
-  (let [{:keys [results empty-filters? total-service-count filter-service-count fetching-more?]} service-search
+  (let [{:keys [results empty-filters? filter-service-count fetching-more?]} service-search
         operation-area-filter (get-in app [:service-search :params :operation_area])
         operating-area-match-results (filter #(zero? (:difference %)) results)
         other-results (filter #(or (pos? (:difference %))
@@ -423,7 +427,6 @@
      :component-did-mount #(e! (ss/->RestoreScrollPosition))
      :reagent-render
      (fn [e! {{results :results :as service-search} :service-search
-              params :params
               :as app}]
        [:div.service-search
         [page/page-controls

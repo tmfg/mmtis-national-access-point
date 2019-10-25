@@ -115,7 +115,8 @@
 
 (defn gtfs->netex!
   "Return: On success string defining filesystem path to output netex archive, on failure nil"
-  [{:keys [gtfs-file gtfs-filename gtfs-basename operator-name]} {:keys [chouette-path conversion-work-path] :as config-netex}]
+  [{:keys [gtfs-file gtfs-filename gtfs-basename operator-name external-interface-description-id]}
+   {:keys [chouette-path conversion-work-path] :as config-netex}]
   {:pre [(and (< 1 (count conversion-work-path))
               (not (clojure.string/blank? conversion-work-path)))
          (not (clojure.string/blank? gtfs-filename))
@@ -129,6 +130,8 @@
                             (if (str/ends-with? gtfs-basename gtfs-name-suffix)
                               (subs gtfs-basename 0 (- (count gtfs-basename) (count gtfs-name-suffix)))
                               gtfs-basename)
+                            "_"
+                            external-interface-description-id
                             "_netex.zip")
         chouette-cmd ["./chouette.sh"                       ; Vector used to allow logging shell invocation on error
                       "-i " import-config-filepath

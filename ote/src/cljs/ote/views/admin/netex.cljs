@@ -31,8 +31,8 @@
                       :on-click #(e! (admin-controller/->SearchNetexConversions))
                       :label "Hae Netex konversiot"}]])
 
-(defn netex [e! app]
-  (let [{:keys [loading? results filters]}
+(defn netex [app]
+  (let [{:keys [loading? results]}
         (get-in app [:admin :netex])
         loc (.-location js/document)]
     [:div.row {:style {:padding-top "40px"}}
