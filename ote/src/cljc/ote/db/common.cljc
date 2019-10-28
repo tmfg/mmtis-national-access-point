@@ -10,5 +10,12 @@
      (:require-macros [ote.db.specql-db :refer [define-tables]])))
 
 (define-tables
+  ;; Enums
+  ["stat_type" ::stat_type (specql.transform/transform (specql.transform/to-keyword))]
+
   ;; Common UDT types
-  ["address" ::address])
+  ["address" ::address]
+
+  ;; Tables
+  ["stats-service" ::stats-service]
+  )
