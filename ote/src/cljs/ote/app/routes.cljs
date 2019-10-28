@@ -49,8 +49,8 @@
     ["/edit-route/:id" :edit-route]
 
     ["/routes/view-gtfs" :view-gtfs]
-    ["/transit-visualization/:service-id/:date/:scope/:route" :transit-visualization]
-    ["/transit-visualization/:service-id/:date/:scope" :transit-visualization]
+    ["/transit-visualization/:service-id/:date/:scope/:route-hash-id/" :transit-visualization]
+    ["/transit-visualization/:service-id/:date/:scope/" :transit-visualization]
     ["/transit-changes" :transit-changes]
 
     ;; 60 day pre-notice
