@@ -282,7 +282,7 @@
                             :route-short-name :route-long-name
                             :count})
 
-(defn route-changes [e! route-changes no-change-routes selected-route route-hash-id-type]
+(defn changed-routes-list [e! route-changes no-change-routes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
         table-height (str
@@ -736,7 +736,7 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [route-changes e! routes changes-route-no-change selected-route route-hash-id-type]]]
+        [changed-routes-list e! routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
