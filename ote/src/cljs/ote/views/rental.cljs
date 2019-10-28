@@ -242,10 +242,32 @@
    data])
 
 (defn service-hour-form-element
-  "Define immutable function for service hours (and exceptions) so that reagent won't re-render the whole component in every
+  "Not used currently: Define immutable function for service hours (and exceptions) so that reagent won't re-render the whole component in every
   keystroke. This had to be made to make :localized-text element to work inside [service-hours-for-location] component."
   [{:keys [update-form! data] :as component-content}]
   [service-hours-for-location update-form! data])
+
+(defn modal-service-hours-for-location
+  "Add pick up locations service hours and exceptions to modal."
+  [update-form! data]
+  (reagent/with-let [open? (reagent/atom false)]
+    [:div
+     [buttons/open-dialog-row {:on-click #(reset! open? true)}
+      (tr [:rentals-page :open-service-hours-and-exceptions])]
+     [ui/dialog
+      {:open @open?
+       :actionsContainerStyle style-dialog/dialog-action-container
+       :auto-scroll-body-content true
+       :title (tr [:opening-hours-dialog :header-dialog])
+       :actions [(reagent/as-element
+                   [ui/flat-button {:label (tr [:buttons :close])
+                                    :on-click #(reset! open? false)}])]}
+      [form/form {:update! update-form!
+                  :name->label (tr-key [:field-labels :rentals]
+                                       [:field-labels :transport-service]
+                                       [:field-labels])}
+       [(ts-common/service-hours-group "rental")]
+       data]]]))
 
 (defn pick-up-locations []
   (form/group
@@ -307,8 +329,8 @@
                      :write #(assoc-in %1 [::t-service/pick-up-address ::common/country_code] %2)}
                     {:name ::t-service/service-hours-and-exceptions
                      :type :component
-                     :component-type :inner-row
-                     :component service-hour-form-element}]}
+                     :component (fn [{:keys [update-form! data]}]
+                                  [modal-service-hours-for-location update-form! data])}]}
 
     (form/info (tr [:form-help :pick-up-locations-url]))
 
