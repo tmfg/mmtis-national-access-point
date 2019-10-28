@@ -12,8 +12,7 @@
             [ote.db.modification :as modification]
             [clojure.set :as set]
             [ote.integration.export.transform :as transform]
-            [ote.netex.netex :refer [fetch-conversions]]
-            [ote.integration.export.netex :as export-netex]
+            [ote.netex.netex_util :as netex-util]
             [ote.util.feature :as feature]
             [ote.time]                                      ; Require time which extends PGInterval JSON generation
             [clojure.spec.alpha :as s]
@@ -44,7 +43,8 @@
   transport-service-properties-columns
   (set/difference (conj (specql/columns ::t-service/transport-service)
                         ;; Fetch linked external interfaces
-                        [::t-service/external-interfaces #{::t-service/format
+                        [::t-service/external-interfaces #{::t-service/id
+                                                           ::t-service/format
                                                            ::t-service/license
                                                            ::t-service/data-content
                                                            ::t-service/external-interface}])
@@ -64,24 +64,15 @@
                  areas)})
 
 (defn- append-nap-generated-netex-file-links
-  "NOTE: needs ::t-service/external-interface id property for external-interfaces in order to
-  copy `data-content` from interface into matching generated NeTEx link.
-  Returns `service` collection where external-interfaces is appended with interfaces with url to NAP NeTEx download link."
-  [service db config transport-service-id]
+  "Returns `service` collection where NAP NeTEx file download link is appended to interfaces collection."
+  [service db config]
   (if (feature/feature-enabled? config :netex-conversion-automated)
     (when service
-      (let [netex-conversions (fetch-conversions db transport-service-id)]
-        (update service
-                ::t-service/external-interfaces
-                #(vec
-                   (concat []
-                           %
-                           (for [conversion netex-conversions]
-                             {:format "NeTEx"
-                              :data-content (:ote.db.netex/data-content conversion)
-                              ::t-service/external-interface (export-netex/file-download-url config
-                                                                                             transport-service-id
-                                                                                             (:ote.db.netex/id conversion))}))))))
+      (-> (vector service)
+          (netex-util/append-ote-netex-urls config
+                                            db
+                                            ::t-service/external-interfaces)
+          first))
     service))
 
 (defn- export-geojson [db config transport-operator-id transport-service-id]
@@ -104,7 +95,7 @@
                                       {::t-service/transport-operator-id transport-operator-id
                                        ::t-service/id transport-service-id
                                        ::t-service/published op/not-null?}))
-                      (append-nap-generated-netex-file-links db config transport-service-id)
+                      (append-nap-generated-netex-file-links db config)
                       ;; Company contact details removed because of privacy requirement
                       (dissoc ::t-service/contact-address
                               ::t-service/contact-email

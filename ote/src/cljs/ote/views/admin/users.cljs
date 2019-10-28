@@ -6,12 +6,14 @@
             [clojure.string :as str]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :refer [linkify]]
+            [ote.ui.buttons :as buttons]
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
-            [ote.ui.common :as common-ui]
             [ote.style.dialog :as style-dialog]
             [ote.theme.colors :as colors]
             [stylefy.core :as stylefy]
+            [ote.style.base :as style-base]
+            [ote.theme.colors :as colors]
             [ote.app.controller.front-page :as fp]))
 
 (defn- edit-user-action [e! {:keys [id username show-edit-dialog?] :as user}]
@@ -111,16 +113,16 @@
 
 (defn users-page-controls [e! app]
   [:div {:style {:margin-bottom "25px"}}
-   [form-fields/field {:style   {:margin-right "10px"}
+   [form-fields/field {:style   {:margin-right "1rem"}
                        :type    :string :label "Nimen tai sähköpostiosoitteen osa"
                        :update! #(e! (admin-controller/->UpdateUserFilter %))
                        :on-enter #(e! (admin-controller/->SearchUsers))}
     (get-in app [:admin :user-listing :user-filter])]
 
-   [ui/raised-button {:primary  true
-                      :disabled (str/blank? filter)
-                      :on-click #(e! (admin-controller/->SearchUsers))
-                      :label    "Hae käyttäjiä"}]])
+   [buttons/save
+    {:on-click  #(e! (admin-controller/->SearchUsers))
+     :disabled (str/blank? filter)}
+    "Hae käyttäjiä"]])
 
 (defn user-listing [e! app]
   (let [{:keys [loading? results]} (get-in app [:admin :user-listing])]
@@ -130,34 +132,40 @@
        [:div {:style {:margin-bottom "10px"}} "Hakuehdoilla löytyi " (count results) " käyttäjää."])
 
      (when (seq results)
-       [:span
+       [:div
         [ui/table {:selectable false
-                   :fixed-header false
-                   :style {:width "100%" :table-layout "fixed"}
-                   :wrapper-style {:border-style "solid"
-                                   :border-color "rgb(224, 224, 224)"
-                                   :border-width "1px 1px 0 1px"}}
-         [ui/table-header {:adjust-for-checkbox false
-                           :display-select-all  false}
+                   :style style-base/basic-table}
+         [ui/table-header
+          {:class "table-header-wrap"
+           :adjust-for-checkbox false
+           :display-select-all false
+           :selectable false}
+
           [ui/table-row
-           [ui/table-header-column "Sähköposti"]
-           [ui/table-header-column "Nimi"]
-           [ui/table-header-column "Palveluntuottajat"]
-           [ui/table-header-column "Toiminnot"]]]
+           [ui/table-header-column
+            {:class "table-header-wrap"}
+            "Sähköposti"]
+           [ui/table-header-column
+            {:class "table-header-wrap"}
+            "Nimi"]
+           [ui/table-header-column
+            {:class "table-header-wrap"}
+            "Palveluntuottajat"]
+           [ui/table-header-column
+            {:class "table-header-wrap"}
+            "Toiminnot"]]]
 
          [ui/table-body {:display-row-checkbox false}
           (doall
-            (for [{:keys [id username name email groups] :as user} results]
+            (for [{:keys [id name email groups] :as user} results]
               ^{:key (str "user-" id)}
               [ui/table-row {:style {:border-bottom "3px solid rgb(224, 224, 224)"}
                              :selectable false}
                [ui/table-row-column
-                {:style {:word-break "break-all"            ;; inline because otherwise style does not take effect
-                         :white-space "normal"}}
+                (stylefy/use-style style-base/table-col-style-wrap)
                 email]
                [ui/table-row-column
-                {:style {:word-break "break-all"            ;; inline because otherwise style does not take effect
-                         :white-space "normal"}}
+                (stylefy/use-style style-base/table-col-style-wrap)
                 name ]
                [ui/table-row-column
                 {:style {:padding 0}}
