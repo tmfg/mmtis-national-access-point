@@ -298,7 +298,7 @@
              [common-ui/information-row-with-option
               (tr [:service-search :ote-generated-url])
               [common-ui/linkify
-               url-ote-netex
+               (str url-ote-netex "?origin=ui")
                url-ote-netex
                {:target "_blank"}]
               false])]

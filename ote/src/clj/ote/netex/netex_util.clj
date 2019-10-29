@@ -39,9 +39,8 @@
   `ext-ifs-key` = A key, within a service object, which contains external interface objects collection
   Return: collection of services with an ote-generated netex appended to those external interfaces for which a netex url is available."
   [services config db ext-ifs-key]
-  (let [conversions
-        (fetch-conversions-for-services config db (set (map #(::t-service/id %)
-                                                            services)))]
+  (let [conversions (fetch-conversions-for-services config db (set (map #(::t-service/id %)
+                                                                        services)))]
     (if (some? conversions)
       (mapv (fn [service]
               (update service
@@ -49,15 +48,15 @@
                       (fn [interfaces]
                         (vec
                           (for [interface interfaces
-                                :let [service-id (::t-service/id interface)]]
+                                :let [interface-id (::t-service/id interface)]]
                             (if-let [interface-conversion (some (fn [conversion]
-                                                                  (when (= service-id
-                                                                           (::netex/transport-service-id conversion))
+                                                                  (when (= interface-id
+                                                                           (::netex/external-interface-description-id conversion))
                                                                     conversion))
                                                                 conversions)]
                               (assoc interface :url-ote-netex
                                                (file-download-url config
-                                                                  service-id
+                                                                  (::netex/transport-service-id interface-conversion)
                                                                   (::netex/id interface-conversion)))
                               interface))))))
             services)
