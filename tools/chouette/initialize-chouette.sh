@@ -3,7 +3,7 @@
 echo "1. Create /opt/chouette/ folder"
 if [ ! -d "/opt/chouette/" ]; then
 
-  sudo mkdir /opt/chouette
+  sudo mkdir -p /opt/chouette
   response=$?
   if [ $response -eq 0 ]; then
       echo "OK"
