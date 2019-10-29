@@ -41,21 +41,23 @@
   [services config db ext-ifs-key]
   (let [conversions (fetch-conversions-for-services config db (set (map #(::t-service/id %)
                                                                         services)))]
-        (mapv (fn [service]
-                (update service
-                        ext-ifs-key
-                        (fn [interfaces]
-                          (vec
-                            (for [interface interfaces
-                                  :let [interface-id (::t-service/id interface)]]
-                              (if-let [interface-conversion (some (fn [conversion]
-                                                                    (when (= interface-id
-                                                                             (::netex/external-interface-description-id conversion))
-                                                                      conversion))
-                                                                  conversions)]
-                                (assoc interface :url-ote-netex
-                                                 (file-download-url config
-                                                                    (::netex/transport-service-id interface-conversion)
-                                                                    (::netex/id interface-conversion)))
-                                interface))))))
-              services)))
+    (if (some? conversions)
+      (mapv (fn [service]
+              (update service
+                      ext-ifs-key
+                      (fn [interfaces]
+                        (vec
+                          (for [interface interfaces
+                                :let [interface-id (::t-service/id interface)]]
+                            (if-let [interface-conversion (some (fn [conversion]
+                                                                  (when (= interface-id
+                                                                           (::netex/external-interface-description-id conversion))
+                                                                    conversion))
+                                                                conversions)]
+                              (assoc interface :url-ote-netex
+                                               (file-download-url config
+                                                                  (::netex/transport-service-id interface-conversion)
+                                                                  (::netex/id interface-conversion)))
+                              interface))))))
+            services)
+      services)))
