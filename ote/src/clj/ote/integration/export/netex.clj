@@ -16,7 +16,7 @@
 
 (defn fetch-netex-response
   "Return netex file as reponse.
-  `origin` parameter is not mandatody. If it is missing, it is handled as api call."
+  `origin` parameter is not mandatory. If it is missing, it is handled as api call."
   [db {:keys [bucket]} file-id service-id origin]
   (let [filename (:ote.db.netex/filename (netex/fetch-conversion db file-id))
         file (when (and bucket
