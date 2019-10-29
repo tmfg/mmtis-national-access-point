@@ -9,7 +9,7 @@
             [compojure.core :refer [GET]]
             [clojure.java.io :as io]
             [specql.core :as specql]
-            [ote.db.common :as common]))
+            [ote.db.stats :as stats]))
 
 (defn file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
   (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
@@ -27,10 +27,10 @@
                      :download-route-netex-ui)]
     (do
       ;; Store download statistics to database
-      (specql/insert! db ::common/stats-service
-                      {::common/transport-service-id service-id
-                       ::common/type stats-type
-                       ::common/created (java.sql.Timestamp. (System/currentTimeMillis))})
+      (specql/insert! db ::stats/stats-service
+                      {::stats/transport-service-id service-id
+                       ::stats/type stats-type
+                       ::stats/created (java.sql.Timestamp. (System/currentTimeMillis))})
       ;; Return file
       (if file
         {:status 200
