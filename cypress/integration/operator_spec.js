@@ -139,7 +139,6 @@ describe('Operator creation advanced tests', function () {
     });
 
     it('should not do anyting but make the tests work', function () {
-        cy.visit('/#/own-services');
         cy.contains('Omat palvelutiedot');
     });
 });
