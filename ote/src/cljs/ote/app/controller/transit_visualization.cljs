@@ -413,7 +413,8 @@
                              :date2 (time/format-date-iso-8601 later-date)
                              :route-hash-id (ensure-route-hash-id route)}
 
-                    :on-success (tuck/send-async! ->RouteDifferencesResponse)})
+                    :on-success (tuck/send-async! ->RouteDifferencesResponse)
+                    :on-failure (tuck/send-async! ->ServerError)})
         (-> app
             (assoc-in [:transit-visualization :route-differences-loading?] true)
             (assoc-in [:transit-visualization :compare :date1] earlier-date)
