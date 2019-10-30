@@ -7,7 +7,6 @@
             [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.localization :refer [tr]]
-            [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.service-calendar :as service-calendar]
             [ote.ui.table :as table]
@@ -17,7 +16,8 @@
             [ote.views.transit-visualization.change-utilities :as tv-section]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
             [ote.app.controller.transit-visualization :as tv]
-            [ote.ui.circular_progress :as prog]))
+            [ote.ui.circular_progress :as prog]
+            [ote.app.routes :as routes]))
 
 ;; Utility methods
 (defn day-of-week-number->text [dof]
@@ -82,8 +82,9 @@
      [tv-change-icons/change-icons-for-calendar diff true])])
 
 ;; Ui
-(defn route-calendar [e! {:keys [date->hash hash->color show-previous-year? show-next-year? compare open-sections route-dates-selected-from-calendar?]
-                          :as transit-visualization}
+(defn route-calendar [e! url-router-params
+                      {:keys [date->hash hash->color show-previous-year? show-next-year? compare open-sections route-dates-selected-from-calendar?]
+                       :as transit-visualization}
                       routes selected-route]
   (let [current-year (time/year (time/now))
         changes (filter
@@ -117,8 +118,11 @@
                      :name->label str
                      :label-style style-base/table-col-style-wrap
                      :show-row-hover? true
-                     :on-select #(when (first %)
-                                   (e! (tv/->SelectRouteForDisplay (first %))))
+                     :on-select #(when-let [{:keys [route-hash-id different-week-date]} (first %)]
+                                   (routes/navigate! :transit-visualization
+                                                     (assoc url-router-params
+                                                       :route-hash-id route-hash-id
+                                                       :change-id different-week-date)))
                      :row-selected? #(and
                                        (= (:different-week-date %) (:different-week-date selected-route))
                                        (not route-dates-selected-from-calendar?))}

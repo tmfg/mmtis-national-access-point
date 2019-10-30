@@ -145,7 +145,7 @@
                     :pre-notices [pre-notices-listing/pre-notices e! app]
 
                     :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                    :transit-visualization [transit-visualization/transit-visualization e! (:transit-visualization app)]
+                    :transit-visualization [transit-visualization/transit-visualization e! app]
 
                     (:transit-changes :authority-pre-notices)
                     [transit-changes/transit-changes e! app]
