@@ -34,9 +34,9 @@
   (seq changes-route-no-change))
 
 (defn loading-trips? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
-                                route-trips-for-date2-loading? route-calendar-hash-loading?
-                                route-differences-loading? routes-for-dates-loading?
-                                service-changes-for-dates-loading?]}]
+                              route-trips-for-date2-loading? route-calendar-hash-loading?
+                              route-differences-loading? routes-for-dates-loading?
+                              service-changes-for-dates-loading?]}]
   (or route-lines-for-date-loading?
       route-trips-for-date1-loading?
       route-trips-for-date2-loading?
@@ -116,9 +116,9 @@
         ;; Group by only-changes by route-hash-id
         grouped-changes (group-by :route-hash-id only-changes)
         group-recent? (map
-                         (fn [[_ changes]]
-                           (some? (some :recent-change? changes)))
-                         grouped-changes)
+                        (fn [[_ changes]]
+                          (some? (some :recent-change? changes)))
+                        grouped-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
         route-changes-with-recent (map
@@ -178,48 +178,48 @@
                                (keep #(get-in % ["route-line" "properties" "routename"]))
                                (get geojson "features"))]
     (update-in
-     (cond
-       (= date (get-in app [:compare :date1]))
-       (-> app
-           (assoc :route-lines-for-date-loading? false)
-           (assoc-in [:compare :date1-route-lines] geojson)
-           (assoc-in [:compare :date1-show?] true))
+      (cond
+        (= date (get-in app [:compare :date1]))
+        (-> app
+            (assoc :route-lines-for-date-loading? false)
+            (assoc-in [:compare :date1-route-lines] geojson)
+            (assoc-in [:compare :date1-show?] true))
 
-       (= date (get-in app [:compare :date2]))
-       (-> app
-           (assoc :route-lines-for-date-loading? false)
-           (assoc-in [:compare :date2-route-lines] geojson)
-           (assoc-in [:compare :date2-show?] true))
+        (= date (get-in app [:compare :date2]))
+        (-> app
+            (assoc :route-lines-for-date-loading? false)
+            (assoc-in [:compare :date2-route-lines] geojson)
+            (assoc-in [:compare :date2-show?] true))
 
-       :else
-       (assoc app :route-lines-for-date-loading? false))
+        :else
+        (assoc app :route-lines-for-date-loading? false))
 
-     ;; Add all received routes to shown map
-     [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
+      ;; Add all received routes to shown map
+      [:compare :show-route-lines] merge (zipmap route-line-names (repeat true)))))
 
 (defn combined-trips-and-stop-differences
   "Combine trips from date1 and date2 vectors. When trips are combined calculate stop difference counts between those
   two vectors."
   [transit-visualization date1-trips date2-trips]
   (if-let [first-common-stop (tcu/first-common-stop (concat date1-trips date2-trips))]
-          (let [first-common-stop
-                #(assoc %
-                   :first-common-stop first-common-stop
-                   :first-common-stop-time (tcu/time-for-stop % first-common-stop))
-                date1-trips (mapv first-common-stop date1-trips)
-                date2-trips (mapv first-common-stop date2-trips)
-                combined-trips (tcu/merge-trips-by-closest-time
-                                 :first-common-stop-time
-                                 date1-trips date2-trips)]
+    (let [first-common-stop
+          #(assoc %
+             :first-common-stop first-common-stop
+             :first-common-stop-time (tcu/time-for-stop % first-common-stop))
+          date1-trips (mapv first-common-stop date1-trips)
+          date2-trips (mapv first-common-stop date2-trips)
+          combined-trips (tcu/merge-trips-by-closest-time
+                           :first-common-stop-time
+                           date1-trips date2-trips)]
 
-            ;; Calculate stop differences => {:stop-time-changes :stop-seq-changes}
-            (assoc-in transit-visualization [:compare :combined-trips]
-                      (mapv (fn [[l r]]
-                              [l r (tcu/trip-stop-differences l r)])
-                            combined-trips)))
+      ;; Calculate stop differences => {:stop-time-changes :stop-seq-changes}
+      (assoc-in transit-visualization [:compare :combined-trips]
+                (mapv (fn [[l r]]
+                        [l r (tcu/trip-stop-differences l r)])
+                      combined-trips)))
 
-          ;; Can't find common stop
-          (assoc-in transit-visualization [:compare :combined-trips] nil)))
+    ;; Can't find common stop
+    (assoc-in transit-visualization [:compare :combined-trips] nil)))
 
 (defn combine-trips [transit-visualization]
   (let [date1-trips (get-in transit-visualization [:compare :date1-trips])
@@ -315,7 +315,7 @@
                             (get-next-best-day-for-no-change start-date new-date new-direction calendar-days)
                             new-date)
         first-not-nil-day (if (= :problem new-direction)
-                            start-date ;; Return start-date because we did't find any better day.
+                            start-date                      ;; Return start-date because we did't find any better day.
                             first-not-nil-day)]
     first-not-nil-day))
 
@@ -389,43 +389,43 @@
               :date2-route-lines nil))
 
 (define-event SelectDatesForComparison [date]
-              {}
-              (let [service-id (get-in app [:params :service-id])
-                    date1 (get-in app [:transit-visualization :compare :date1])
-                    date2 (get-in app [:transit-visualization :compare :date2])
-                    route (get-in app [:transit-visualization :selected-route])
-                    goog-date1 (goog.date.DateTime. date1)
-                    goog-date (goog.date.DateTime. date)
-                    date-after-date1? (t/after? goog-date goog-date1)
-                    earlier-date (if date-after-date1? date1 date)
-                    later-date (if date-after-date1? date date1)]
-                (cond
-                  (or (and date1 date2) (t/equal? goog-date1 goog-date)) ;; Re-selection of day pair after to replace previous day pair selection
-                  (-> app
-                      (assoc-in [:transit-visualization :compare :date1] date)
-                      (update-in [:transit-visualization :compare] remove-date2-keys)
-                      (assoc-in [:transit-visualization :route-dates-selected-from-calendar?] true))
+  {}
+  (let [service-id (get-in app [:params :service-id])
+        date1 (get-in app [:transit-visualization :compare :date1])
+        date2 (get-in app [:transit-visualization :compare :date2])
+        route (get-in app [:transit-visualization :selected-route])
+        goog-date1 (goog.date.DateTime. date1)
+        goog-date (goog.date.DateTime. date)
+        date-after-date1? (t/after? goog-date goog-date1)
+        earlier-date (if date-after-date1? date1 date)
+        later-date (if date-after-date1? date date1)]
+    (cond
+      (or (and date1 date2) (t/equal? goog-date1 goog-date)) ;; Re-selection of day pair after to replace previous day pair selection
+      (-> app
+          (assoc-in [:transit-visualization :compare :date1] date)
+          (update-in [:transit-visualization :compare] remove-date2-keys)
+          (assoc-in [:transit-visualization :route-dates-selected-from-calendar?] true))
 
-                  (nil? date2)
-                  (do
-                    (comm/get! (str "transit-visualization/" service-id "/route-differences")
-                               {:params {:date1 (time/format-date-iso-8601 earlier-date)
-                                         :date2 (time/format-date-iso-8601 later-date)
-                                         :route-hash-id (ensure-route-hash-id route)}
+      (nil? date2)
+      (do
+        (comm/get! (str "transit-visualization/" service-id "/route-differences")
+                   {:params {:date1 (time/format-date-iso-8601 earlier-date)
+                             :date2 (time/format-date-iso-8601 later-date)
+                             :route-hash-id (ensure-route-hash-id route)}
 
-                                :on-success (tuck/send-async! ->RouteDifferencesResponse)})
-                    (-> app
-                        (assoc-in [:transit-visualization :route-differences-loading?] true)
-                        (assoc-in [:transit-visualization :compare :date1]
-                                  earlier-date)
-                        (assoc-in [:transit-visualization :compare :date2]
-                                  later-date)
-                        (assoc-in [:transit-visualization]
-                                  (fetch-trip-data-for-dates (:transit-visualization app)
-                                                             service-id
-                                                             route
-                                                             earlier-date
-                                                             later-date)))))))
+                    :on-success (tuck/send-async! ->RouteDifferencesResponse)})
+        (-> app
+            (assoc-in [:transit-visualization :route-differences-loading?] true)
+            (assoc-in [:transit-visualization :compare :date1]
+                      earlier-date)
+            (assoc-in [:transit-visualization :compare :date2]
+                      later-date)
+            (assoc-in [:transit-visualization]
+                      (fetch-trip-data-for-dates (:transit-visualization app)
+                                                 service-id
+                                                 route
+                                                 earlier-date
+                                                 later-date)))))))
 
 
 (defn- fetch-change-details
