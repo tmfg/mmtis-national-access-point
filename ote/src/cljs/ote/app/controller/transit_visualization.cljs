@@ -2,7 +2,6 @@
   (:require [ote.communication :as comm]
             [tuck.core :as tuck :refer-macros [define-event]]
             [ote.app.routes :as routes]
-            [ote.util.fn :refer [flip]]
             [cljs-time.core :as t]
             [cljs-time.format :as tf]
             [cljs-time.coerce :as tc]
@@ -11,7 +10,6 @@
             [ote.transit-changes :as tcu]
             [clojure.string :as str]
             [ote.app.controller.common :refer [->ServerError]]
-            [clojure.string :as string]
             [taoensso.timbre :as log]))
 
 (defn ensure-route-hash-id
@@ -32,14 +30,13 @@
    ;; 60% opacity
    "#99c2eb" "#99dde4" "#99e4cf" "#99dd99" "#d6eb99" "#f1eb99" "#ffcf99" "#f19999" "#ff99bb" "#f199dd" "#d699f1" "#adadf1"])
 
-(defn route-filtering-available? [{:keys [changes-route-no-change] :as transit-visualization}]
+(defn route-filtering-available? [{:keys [changes-route-no-change]}]
   (seq changes-route-no-change))
 
 (defn loading-trips? [{:keys [route-lines-for-date-loading? route-trips-for-date1-loading?
                                 route-trips-for-date2-loading? route-calendar-hash-loading?
                                 route-differences-loading? routes-for-dates-loading?
-                                service-changes-for-dates-loading?]
-                         :as   transit-visualization}]
+                                service-changes-for-dates-loading?]}]
   (or route-lines-for-date-loading?
       route-trips-for-date1-loading?
       route-trips-for-date2-loading?
@@ -120,7 +117,7 @@
         grouped-changes (group-by :route-hash-id only-changes)
         group-recent? (map
                          (fn [[_ changes]]
-                           (some? (some #(:recent-change? %) changes)))
+                           (some? (some :recent-change? changes)))
                          grouped-changes)
         ;; Take first from every vector
         route-changes (map #(first (second %)) grouped-changes)
@@ -284,20 +281,19 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteTripsForDateResponse date)
                 :on-failure (tuck/send-async! ->ServerError)}))
-  (-> t-vis
-      (assoc :compare
-             (assoc compare
-               :show-route-lines {}
-               :date1 date1
-               :date2 date2
-               :date1-route-lines nil
-               :date2-route-lines nil
-               :date1-trips nil
-               :date2-trips nil
-               :show-stops? true
-               :differences nil)
-             :route-trips-for-date1-loading? true
-             :route-trips-for-date2-loading? true)))
+  (assoc t-vis :compare
+               (assoc compare
+                 :show-route-lines {}
+                 :date1 date1
+                 :date2 date2
+                 :date1-route-lines nil
+                 :date2-route-lines nil
+                 :date1-trips nil
+                 :date2-trips nil
+                 :show-stops? true
+                 :differences nil)
+               :route-trips-for-date1-loading? true
+               :route-trips-for-date2-loading? true))
 
 ;; When route type is :no-change we need to find date that has traffic
 (defn- get-next-best-day-for-no-change [start-date current-date direction calendar-days]
@@ -388,10 +384,9 @@
       (assoc-in [:transit-visualization :compare :differences] response)))
 
 (defn- remove-date2-keys [coll]
-  (-> coll
-      (assoc :date2 nil
-             :date2-trips nil
-             :date2-route-lines nil)))
+  (assoc coll :date2 nil
+              :date2-trips nil
+              :date2-route-lines nil))
 
 (define-event SelectDatesForComparison [date]
               {}
@@ -450,7 +445,7 @@
           (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
           (assoc-in [:transit-visualization :compare :differences] nil)))
     (do
-      (js/console.error "fetch-change-details: No matching route data for selection: " change service-id date)
+      (log/error "fetch-change-details: No matching route data for selection: " change service-id date)
       ;; Reset selection if no matching change
       (assoc-in app [:transit-visualization :selected-route] nil))))
 
@@ -521,7 +516,7 @@
   {}
   (let [{:keys [service-id date route-hash-id change-id] :as params-new} (:params url-router-params)
         params-previous (:params-previous app)]
-    (->
+    (assoc
       ;; cond resolves new app state based on url changes. Move into a function if assocs get complicated in future.
       ;; Each case MUST RETURN AN APP STATE, please
       (cond
@@ -530,7 +525,7 @@
         (fetch-changed-routes-list app params-new)
 
         ;; Use-case: selection of route-hash-id cleared. E.g. manually or via page history navigation
-        (string/blank? route-hash-id)
+        (str/blank? route-hash-id)
         (assoc-in app [:transit-visualization :selected-route] nil)
 
         ;; Use-case: selection of route-hash-id changes. E.g. via user selection or browser history navigation
@@ -542,7 +537,7 @@
                                                   (get-in app [:transit-visualization :changes-all])))
         :else                                               ; Unexpected case, clear route selection as a safety measure
         (assoc-in app [:transit-visualization :selected-route] nil))
-      (assoc :params-previous params-new))))
+      :params-previous params-new)))
 
 (defmethod routes/on-navigate-event :transit-visualization [router-params]
   (->UrlNavigation router-params))
