@@ -21,7 +21,8 @@
             [ote.views.transit-visualization.calendar :as tv-calendar]
             [ote.views.transit-visualization.change-utilities :as tv-utilities]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
-            [ote.ui.circular_progress :as prog]))
+            [ote.ui.circular_progress :as prog]
+            [ote.app.routes :as routes]))
 
 (set! *warn-on-infer* true)
 
@@ -305,15 +306,14 @@
                    :label-style style-base/table-col-style-wrap
                    :name->label str
                    :show-row-hover? true
-                   :on-select #(when (first %)
-                                 (let [route (str/replace (:route-hash-id (first %)) #"\s" "")]
-                                   (do
-                                     (tv/change-visualization-url route)
-                                     (e! (tv/->SelectRouteForDisplay (first %)))
-                                     (.setTimeout js/window
-                                                  (fn []
-                                                    (scroll/scroll-to-id "route-calendar-anchor"))
-                                                  150))))
+                   :on-select #(when-let [{:keys [route-hash-id]} (first %)]
+                                 (routes/navigate! :transit-visualization
+                                                   (assoc url-router-params :route-hash-id route-hash-id
+                                                                            :change-id nil))
+                                 (.setTimeout js/window
+                                              (fn []
+                                                (scroll/scroll-to-id "route-calendar-anchor"))
+                                              150))
                    :row-selected? #(= (:route-hash-id %) (:route-hash-id selected-route))}
 
       [{:name ""
@@ -663,7 +663,7 @@
                  [:span interface-url " Ladattu NAPiin "
                   (if show-link?
                     (common/linkify
-                      (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all")
+                      (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all/")
                       (str (time/format-timestamp-for-ui created)))
                     (str (time/format-timestamp-for-ui created)))] ". "
                  "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
@@ -698,10 +698,11 @@
               ^{:key (str "gtfs-package-info-" id)}
               [pkg p true]))])])]))
 
-(defn transit-visualization [e! {:keys [hash->color date->hash service-info changes-route-no-change changes-all
-                                        changes-route-filtered selected-route compare open-sections route-hash-id-type
-                                        all-route-changes-display? all-route-changes-checkbox]
-                                 :as transit-visualization}]
+(defn transit-visualization [e! {{:keys [hash->color date->hash service-info changes-route-no-change changes-all
+                                         changes-route-filtered selected-route compare open-sections route-hash-id-type
+                                         all-route-changes-display? all-route-changes-checkbox]
+                                  :as transit-visualization} :transit-visualization
+                                 url-router-params :params}]
   (let [routes (if all-route-changes-display?
                  changes-route-no-change
                  changes-route-filtered)
@@ -710,7 +711,7 @@
                           (:route-long-name selected-route)
                           " (" (:trip-headsign selected-route) ")")
                      (str (:route-short-name selected-route) " "
-                       (:route-long-name selected-route)))]
+                          (:route-long-name selected-route)))]
     [:div
      [:div.transit-visualization
 
@@ -736,7 +737,7 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [changed-routes-list e! routes changes-route-no-change selected-route route-hash-id-type]]]
+        [changed-routes-list e! url-router-params routes changes-route-no-change selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
