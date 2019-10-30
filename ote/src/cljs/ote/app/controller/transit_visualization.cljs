@@ -8,19 +8,11 @@
             [cljs-time.coerce :as tc]
             [ote.time :as time]
             [ote.db.transport-operator :as t-operator]
-            [taoensso.timbre :as log]
             [ote.transit-changes :as tcu]
-            [clojure.set :as set]
-            [clojure.string :as str]))
-
-(defn change-visualization-url [route]
-  (let [window-loc (str js/window.location)
-        current-url (if (str/includes? window-loc "/now")
-                      (str/replace window-loc #"/now(.*)" "/now/")
-                      (str/replace window-loc #"/all(.*)" "/all/"))]
-    (if route
-      (.pushState js/window.history #js {} js/document.title (str current-url route))
-      (.pushState js/window.history #js {} js/document.title current-url))))
+            [clojure.string :as str]
+            [ote.app.controller.common :refer [->ServerError]]
+            [clojure.string :as string]
+            [taoensso.timbre :as log]))
 
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
@@ -178,20 +170,6 @@
 (define-event DaysToFirstDiff [start-date date->hash]
   {:path [:transit-visualization :days-to-diff]}
   (days-to-first-diff start-date date->hash))
-
-(defn- init-view-state [app scope]
-  (let [current-year (.getFullYear (js/Date.))
-        initial-view-state {:all-route-changes-display? false
-                            :all-route-changes-chenckbox false
-                            :open-sections {:gtfs-package-info false}
-                            :scope scope
-                            :service-changes-for-date-loading? true
-                            :show-next-year? (or
-                                               (t/after?
-                                                 (goog.date.DateTime. (js/Date.))
-                                                 (goog.date.DateTime. (js/Date. current-year 8 1))) ;; next years calendar will be shown by default if date is past 1.9.<current-year>
-                                               false)}]
-    (assoc app :transit-visualization initial-view-state)))
 
 (define-event HighlightHash [hash day]
   {:path [:transit-visualization :highlight]}
@@ -452,55 +430,120 @@
                                                              earlier-date
                                                              later-date)))))))
 
-(define-event LoadServiceChangesForDateResponse [response detection-date]
+
+(defn- fetch-change-details
+  "Takes `params` and initiates request for data for service id and data from service.
+  Clears route selection from app state if fetch could not be initiated.
+  Return: Updated app state"
+  [app {:keys [date service-id] :as params} change]
+  (if (and change service-id date)
+    (do
+      (comm/get! (str "transit-visualization/" service-id "/route")
+                 {:params {:route-hash-id (ensure-route-hash-id change) ; ensure-route-hash-id might not be needed anymore...
+                           :detection-date date}
+                  :on-success (tuck/send-async! ->RouteCalendarDatesResponse change)
+                  :on-failure (tuck/send-async! ->ServerError)})
+      (-> app
+          (assoc-in [:transit-visualization :params-previous] params)
+          (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
+          (assoc-in [:transit-visualization :compare :differences] nil)))
+    (do
+      (js/console.error "fetch-change-details: No matching route data for selection: " change service-id date)
+      ;; Reset selection if no matching change
+      (assoc-in app [:transit-visualization :selected-route] nil))))
+
+(defn- url-route-hash-id->change [changes route-hash-id-url-format]
+  (when-let [route-hash-id (js/decodeURIComponent route-hash-id-url-format)]
+    (some #(when (= (:route-hash-id %) route-hash-id)
+             %)
+          changes)))
+
+(defn- url-change-id->change [url-change-id url-route-hash-id changes-all]
+  (when (and url-change-id url-route-hash-id changes-all)
+    (let [route-hash-id-decoded (js/decodeURIComponent url-route-hash-id)
+          diff-wk-date-decoded (js/decodeURIComponent url-change-id)]
+      (some (fn [change]
+              (when (and (= (:route-hash-id change) route-hash-id-decoded)
+                         (= (str (:different-week-date change)) diff-wk-date-decoded))
+                change))
+            changes-all))))
+
+(defn- url-params->change [{:keys [route-hash-id change-id]} changes-all]
+  (or (url-change-id->change change-id route-hash-id changes-all)
+      (url-route-hash-id->change changes-all route-hash-id)))
+
+;; Detection date and selected route are taken as arg just to ensure url route is changed to what initiated the fetch
+(define-event LoadChangedRoutesListResponse [response router-params]
   {}
-  (let [date-filter (if (= "now" (:scope app))
+  (let [{:keys [date scope] :as router-params} router-params
+        detection-date date
+        date-filter (if (= (name :now) scope)
                       (time/now-iso-date-str)
                       detection-date)
         changes (future-changes date-filter (:route-changes response))
-        route (when-let [route-hash (js/decodeURIComponent (get-in app [:params :route]))]
-                (some
-                  #(when
-                     (= (str/replace (:route-hash-id %) #"\s" "") route-hash)
-                     %)
-                  changes))]
-    (if route                                             ;;route-hash exists when you have a url where route is selected
-      (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-        {:params {:route-hash-id (ensure-route-hash-id route)
-                  :detection-date detection-date}
-         :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-      (change-visualization-url nil))
-    (-> app
-      (assoc :transit-visualization
-             (assoc (:transit-visualization app)
-               :service-changes-for-date-loading? false
-               :service-info (:service-info response)
-               :changes-all (sort-by :different-week-date < changes)
-               :changes-route-no-change (sorted-route-changes true changes)
-               :changes-route-filtered (sorted-route-changes false changes)
-               :gtfs-package-info (:gtfs-package-info response)
-               :route-hash-id-type (:route-hash-id-type response)
-               :selected-route route
-               :detection-date detection-date)))))
+        changes-all (sort-by :different-week-date < changes)
+        route (url-params->change router-params changes-all)]
 
-(define-event SelectRouteForDisplay [route]
+    (-> (fetch-change-details app router-params route)
+        (assoc :transit-visualization
+               (assoc (:transit-visualization app)
+                 :service-changes-for-date-loading? false
+                 :service-info (:service-info response)
+                 :changes-all changes-all
+                 :changes-route-no-change (sorted-route-changes true changes)
+                 :changes-route-filtered (sorted-route-changes false changes)
+                 :gtfs-package-info (:gtfs-package-info response)
+                 :route-hash-id-type (:route-hash-id-type response)
+                 :selected-route route
+                 :detection-date detection-date)))))
+
+(defn- fetch-changed-routes-list [app {:keys [service-id date] :as url-router-params}]
+  (comm/get! (str "transit-visualization/" service-id "/" date)
+             {:on-success (tuck/send-async! ->LoadChangedRoutesListResponse url-router-params)
+              :on-failure (tuck/send-async! ->ServerError)})
+  (assoc app
+    :transit-visualization
+    {:all-route-changes-display? false
+     :all-route-changes-chenckbox false
+     :open-sections {:gtfs-package-info false}
+     :service-changes-for-date-loading? true
+     :show-next-year? (or
+                        (t/after?
+                          (goog.date.DateTime. (js/Date.))
+                          ;; Next years calendar will be shown by default if date is past 1.9.<current-year>
+                          (goog.date.DateTime. (js/Date.
+                                                 (.getFullYear (js/Date.)) 8 1)))
+                        false)}))
+
+(define-event UrlNavigation [url-router-params]
   {}
-  (comm/get! (str "transit-visualization/" (get-in app [:params :service-id]) "/route")
-             {:params  {:route-hash-id (ensure-route-hash-id route)
-                        :detection-date (get-in app [:transit-visualization :detection-date])}
-              :on-success (tuck/send-async! ->RouteCalendarDatesResponse route)})
-  (-> app
-      (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
-      (assoc-in [:transit-visualization :compare :differences] nil)))
+  (let [{:keys [service-id date route-hash-id change-id] :as params-new} (:params url-router-params)
+        params-previous (:params-previous app)]
+    (->
+      ;; cond resolves new app state based on url changes. Move into a function if assocs get complicated in future.
+      ;; Each case MUST RETURN AN APP STATE, please
+      (cond
+        (or (not= date (:date params-previous))
+            (not= service-id (:service-id params-previous)))
+        (fetch-changed-routes-list app params-new)
 
-(define-event InitTransitVisualization [service-id detection-date scope]
-  {}
-  (comm/get! (str "transit-visualization/" service-id "/" detection-date)
-    {:on-success (tuck/send-async! ->LoadServiceChangesForDateResponse detection-date)})
-  (init-view-state app scope))
+        ;; Use-case: selection of route-hash-id cleared. E.g. manually or via page history navigation
+        (string/blank? route-hash-id)
+        (assoc-in app [:transit-visualization :selected-route] nil)
 
-(defmethod routes/on-navigate-event :transit-visualization [{params :params}]
-  (->InitTransitVisualization (:service-id params) (:date params) (:scope params)))
+        ;; Use-case: selection of route-hash-id changes. E.g. via user selection or browser history navigation
+        (or (not= route-hash-id (:route-hash-id params-previous))
+            (not= change-id (:change-id params-previous)))
+        (fetch-change-details app
+                              params-new
+                              (url-params->change params-new
+                                                  (get-in app [:transit-visualization :changes-all])))
+        :else                                               ; Unexpected case, clear route selection as a safety measure
+        (assoc-in app [:transit-visualization :selected-route] nil))
+      (assoc :params-previous params-new))))
+
+(defmethod routes/on-navigate-event :transit-visualization [router-params]
+  (->UrlNavigation router-params))
 
 (define-event ToggleRouteDisplayDate [date]
   {:path [:transit-visualization :compare]}
@@ -551,10 +594,6 @@
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}
   (update app routename not))
-
-(define-event LoadingRoutesResponse []
-  {:path [:transit-visualization]}
-  (assoc app :route-changes-loading? false))
 
 (define-event InitiateRouteModelUpdate []
   {}
