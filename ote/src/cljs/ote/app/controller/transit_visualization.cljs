@@ -416,10 +416,8 @@
                     :on-success (tuck/send-async! ->RouteDifferencesResponse)})
         (-> app
             (assoc-in [:transit-visualization :route-differences-loading?] true)
-            (assoc-in [:transit-visualization :compare :date1]
-                      earlier-date)
-            (assoc-in [:transit-visualization :compare :date2]
-                      later-date)
+            (assoc-in [:transit-visualization :compare :date1] earlier-date)
+            (assoc-in [:transit-visualization :compare :date2] later-date)
             (assoc-in [:transit-visualization]
                       (fetch-trip-data-for-dates (:transit-visualization app)
                                                  service-id
@@ -429,7 +427,7 @@
 
 
 (defn- fetch-change-details
-  "Takes `params` and initiates request for data for service id and data from service.
+  "Takes `params` and initiates request for data for service id and date from service.
   Clears route selection from app state if fetch could not be initiated.
   Return: Updated app state"
   [app {:keys [date service-id] :as params} change]
