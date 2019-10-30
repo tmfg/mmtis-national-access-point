@@ -443,10 +443,7 @@
           (assoc-in [:transit-visualization :params-previous] params)
           (assoc-in [:transit-visualization :route-calendar-hash-loading?] true)
           (assoc-in [:transit-visualization :compare :differences] nil)))
-    (do
-      (log/error "fetch-change-details: No matching route data for selection: " change service-id date)
-      ;; Reset selection if no matching change
-      (assoc-in app [:transit-visualization :selected-route] nil))))
+    (assoc-in app [:transit-visualization :selected-route] nil)))
 
 (defn- url-route-hash-id->change [changes route-hash-id-url-format]
   (when-let [route-hash-id (js/decodeURIComponent route-hash-id-url-format)]
