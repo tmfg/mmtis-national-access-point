@@ -532,7 +532,9 @@
                               (url-params->change params-new
                                                   (get-in app [:transit-visualization :changes-all])))
         :else
-        (assoc-in app [:transit-visualization :selected-route] nil))
+        (do
+          (log/error "Unexpected url navigation failed. Clearing selected route")
+          (assoc-in app [:transit-visualization :selected-route] nil)))
       :params-previous params-new)))
 
 (defmethod routes/on-navigate-event :transit-visualization [router-params]
