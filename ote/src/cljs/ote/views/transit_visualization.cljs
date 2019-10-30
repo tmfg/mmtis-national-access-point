@@ -283,7 +283,7 @@
                             :route-short-name :route-long-name
                             :count})
 
-(defn changed-routes-list [e! route-changes no-change-routes selected-route route-hash-id-type]
+(defn changed-routes-list [e! url-router-params route-changes no-change-routes selected-route route-hash-id-type]
   (let [route-count (count route-changes)
         no-change-routes-count (count no-change-routes)
         table-height (str
@@ -742,7 +742,7 @@
       (when selected-route
         [:div.transit-visualization-route.container
          [:h3 "Valittu reitti: " route-name]
-         [tv-calendar/route-calendar e! transit-visualization changes-all selected-route]
+         [tv-calendar/route-calendar e! url-router-params transit-visualization changes-all selected-route]
 
          (if (tv/loading-trips? transit-visualization)
            [prog/circular-progress (tr [:common-texts :loading])]
