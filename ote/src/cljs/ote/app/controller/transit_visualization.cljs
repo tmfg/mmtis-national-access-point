@@ -534,7 +534,7 @@
                               params-new
                               (url-params->change params-new
                                                   (get-in app [:transit-visualization :changes-all])))
-        :else                                               ; Unexpected case, clear route selection as a safety measure
+        :else
         (assoc-in app [:transit-visualization :selected-route] nil))
       :params-previous params-new)))
 
