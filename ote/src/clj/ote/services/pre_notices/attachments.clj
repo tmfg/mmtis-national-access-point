@@ -88,7 +88,7 @@
           orig-filename (:filename uploaded-file)
           converted-filename orig-filename ;; we don't convert between formats in our case so keep filename
           orig-suffix (fn-suffix orig-filename)
-          laundry-url (:laundry-url config)
+          laundry-url (:laundry_url config)
           converted-file (when laundry-url
                            (laundry-convert-file->file! laundry-url (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
           ;; we save both the original and converted files but return only one id to the client (converted if successful, original otherwise)

@@ -51,7 +51,7 @@
 
  :gtfs {:bucket "napote-gtfs-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
-               ;; :laundry-url "http://localhost:8080/"
+               ;; :laundry_url "http://localhost:8080/"
                }
 
  ;; add features to the set to enable them in in this environment
