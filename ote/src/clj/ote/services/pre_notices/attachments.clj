@@ -53,8 +53,8 @@
             (log/info "laundry conversion returning tempfile")
             temp-file)
         (do
-          (log/info "Conversion failed, file name was: " (when input-file (.getName input-file)))
-          (log/info "Error response from laundry service: " (pr-str resp))
+          (log/error "Conversion failed, file name was: " (when input-file (.getName input-file)))
+          (log/error "Error response from laundry service: " (pr-str resp))
           (.delete temp-file)
           nil)))
     (catch Exception ex
