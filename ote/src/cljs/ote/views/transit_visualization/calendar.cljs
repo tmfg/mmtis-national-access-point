@@ -7,7 +7,6 @@
             [cljs-time.core :as t]
             [cljs-react-material-ui.reagent :as ui]
             [ote.localization :refer [tr]]
-            [ote.ui.icons :as ote-icons]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.service-calendar :as service-calendar]
             [ote.ui.table :as table]
