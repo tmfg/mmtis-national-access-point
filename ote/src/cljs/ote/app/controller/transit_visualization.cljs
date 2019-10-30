@@ -278,10 +278,12 @@
           :when date]
     (comm/get! (str "transit-visualization/" service-id "/route-lines-for-date")
                {:params params
-                :on-success (tuck/send-async! ->RouteLinesForDateResponse date)})
+                :on-success (tuck/send-async! ->RouteLinesForDateResponse date)
+                :on-failure (tuck/send-async! ->ServerError)})
     (comm/get! (str "transit-visualization/" service-id "/route-trips-for-date")
                {:params params
-                :on-success (tuck/send-async! ->RouteTripsForDateResponse date)}))
+                :on-success (tuck/send-async! ->RouteTripsForDateResponse date)
+                :on-failure (tuck/send-async! ->ServerError)}))
   (-> t-vis
       (assoc :compare
              (assoc compare
