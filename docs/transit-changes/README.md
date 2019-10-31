@@ -37,7 +37,8 @@ Manually declared transit data is visualized separately for transit authorities 
 
 ## Datamodel
 
-![er-transit-changes](er-transit-changes.png)
+Transit change detection related database tables:
+![transit-changes-db-tables](transit-changes-db-tables.png)
 
 - `detected-change-history` : stores first occurrence when a change is detected using a calculated hash value
 - `detected-route-change` : each record represents one detected change for one route for one service. Includes a link to a `gtfs-transit-changes` record.
