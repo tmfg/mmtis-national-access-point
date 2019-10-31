@@ -200,12 +200,7 @@ Reference: `detection.clj`
          Stop time differences are computed per compared trip pair. The departure time differences are computed for each 
          matching stop pair
 
-- 5: **Post-process**
-  - Due to legacy reasons there is an additional post-processing stage.  
-  - Last and final part of logic for resolving transit service change type and route change types.
-  - Resolve next change detection analysis date for service
-  - Resolve summary statistics fro service's changes (sums of different trip changes)
-  - Convert data structures to match the relational data model of database. 
+- 6: **Store to db**
   - Reference: `update-transit-changes!`, `transform-route-change`
 
 ## Additional information
@@ -226,9 +221,9 @@ Notification is composed using data from this table.
 
 ### Holiday dates
 
-A static list of holiday dates is defined statically in `transit-changes/static-holidays`. 
-Operation to import a list of holiday date definitions may be triggered via the admin user on the admin UI. Results are stored into database `detection-holidays`. 
-Transit change detection will prefer the list retrieved from db and if list is not available, fall back to the static list. 
+A static list of holiday dates is defined in `transit-changes/static-holidays`. 
+Operation to import an additional list of holiday date definitions may be triggered via the admin user on the admin UI. 
+Results are stored into database `detection-holidays`. `detection-holidays` is prioritized, if empty then logic falls back to the static list. 
 
 ## Notes for developers
 
