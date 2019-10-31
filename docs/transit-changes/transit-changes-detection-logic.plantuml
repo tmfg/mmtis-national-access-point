@@ -1,29 +1,28 @@
 @startuml
 title __Transit change detection logic__
 
-(*)--> "Scheduled detection task \n or \n Manually triggered detection task"
+(*)--> "**0:** Scheduled detection task \n or \n Manually triggered detection task"
 --> "1: Query from db \n services for which to run change detection"
-partition "2: Query and prepare data" {
-    --> [list of service ids] "2a: Query route hashes from db"
-    --> "2b: Override holidays in route hashes"
+partition "2: Prepare input data" {
+    --> [ **List of service ids**] "**2a**: Query route hashes from db"
+    --> "**2b:** Mark holiday/exception days in input data"
     -->  "Format route vectors"
 }
 
---> [ **list of routes**] "Iterate list of routes" as a0
+--> [ **List of routes** ] "Iterate list of routes" as a0
 
-partition "3: Iterate & analyse: \n weeks of each route" {
-    --> [ **list of weeks** \n for every route, every service] "Iterate weeks \n filter remaining weeks" as a1
-    --> [list of remaining \n un-analysed weeks] "3b: Find next week \n with traffic changes"
-    --> "Detect some change types: \n no-traffic, changed"
-    if weeks remaining?
+partition "3: Find weeks with traffic pattern changes" {
+    --> [ **List of weeks** \n for every route, every service] "3a: Analyse remaining weeks" as a1
+    --> [ **List of remaining** \n **un-analysed weeks**] "3b: Find next week \n with traffic hash different \n than baseline week, \ntaking rules into account"
+    if Unanalysed weeks remaining?
     --> [true] a1
     else
-    --> [false] "Detect some change types: \n ending"
+    ' nothing to draw here, go to next step
     endif
 }
 
-partition "4: Iterate & Analyse: \n days of each traffic change week" {
---> [ **list of changed weeks** \n for every route, every service] "4a: Iterate list of weeks \n of a route" as b1
+partition "4: Find days with traffic pattern changes" {
+--> [ **Lists of traffic pattern change weeks** \n for every route, every service] "4a: Iterate list of weeks \n of a route" as b1
 --> "4b: Fetch from db data \n for trips for days of the week"
     partition "Compare trips of different and baseline day" {
         --> "4c: Compare trips of \n different week's day \n and baseline week's day"
