@@ -154,7 +154,7 @@ User UI visualization of transit change detection results
 
 ##### Sequence
 
-![transit-changes-detection-logic](transit-changes-detection-logic.png)
+![transit_changes_detection_logic](transit_changes_detection_logic.png)
 - 0: **Detection task**  
  ote.tasks.gtfs` is scheduled to run nightly or triggered manually from admin panel view.
 
