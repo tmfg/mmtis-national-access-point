@@ -28,7 +28,7 @@ According to [Finnish national legislation on transport][1],
 a transport operator must declare changes to transit service routes 60 days in advance to the transit authorities.  
 Legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
 
-NAP implements in a following way 
+NAP implementation 
 * Transit data for a service is automatically imported by periodically reading machine-readable interfaces of each service. 
 * An automated analysis procedure is run periodically on the imported data
 * National Transit authorities (certain users) are notified on the analysis result. 
@@ -37,7 +37,8 @@ Manually declared transit data is visualized separately for transit authorities 
 
 ## Datamodel
 
-![er-transit-changes](er-transit-changes.png)
+Transit change detection related database tables:
+![transit-changes-db-tables](transit-changes-db-tables.png)
 
 - `detected-change-history` : stores first occurrence when a change is detected using a calculated hash value
 - `detected-route-change` : each record represents one detected change for one route for one service. Includes a link to a `gtfs-transit-changes` record.
@@ -75,7 +76,6 @@ The NAP import procedure of GTFS-formatted transit data supports mandatory GTFS 
 For more information on GTFS files refer to [GTFS file requirements](https://developers.google.com/transit/gtfs/reference/#file-requirements)
 
 ![background import process](import-process.png)
-
 
 1. Fetch interfaces which qualify for new data import run
    - `gtfs_imported timestamp` older than one day ago
@@ -135,7 +135,7 @@ User UI visualization of transit change detection results
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
    - [Transit changes related db tables](#Datamodel)
    
-#### Detection algorithm
+#### Detection logic
 
 ##### Important notes
 - No history data is used from preceding imports or analyses. Latest package is analysed independently
@@ -155,32 +155,35 @@ User UI visualization of transit change detection results
 
 ##### Sequence
 
-![transit-changes-detection-logic](transit-changes-detection-logic.png)
+![transit_changes_detection_logic](transit_changes_detection_logic.png)
+- 0: **Detection task**  
+ ote.tasks.gtfs` is scheduled to run nightly or triggered manually from admin panel view.
 
 - 1: **Query from db services.**   
-The detection algorithm processes one transport service per time.  
-On this run those services are selected for change detection, which qualify for a new run. 
-(Reference: `services-for-nightly-change-detection`)
+The detection logic processes one service per iteration.  
+(Note: one service may include several interfaces, download logic is separate from this documentation)  
+Reference: `services-for-nightly-change-detection`
 - 2a: **Query route hashes from db.**  
-Fetch all routes for selected services. A route record includes information about route start and end times as well as unique hashes.  
+A route record contains route start and end times and unique hashes, into which details of traffic data is compressed for easy comparison.  
 Routes that have already ended are removed from further inspection.
-- 2b: **Override holidays in route hashes**  
-Holidays are earmarked by replacing day traffic hash using a keyword value. 
+- 2b: **Mark holiday/exception days in input data**  
+In list of days objects holidays are earmarked by replacing day traffic hash using a keyword value. 
 Replacing allows later steps to handle holidays.  
-Holiday dates are configured to NAP application itself.
-- 3b: **Find next changed week.**  
-Iterate weeks: compare 'current' week and a week in the future. Week is analyzed by comparing _day hashes_ of the same weekdays of the two separate weeks.  
-For efficiency, only simple day hash string comparison is done instead of detailed analysis of the daily routes and trips.  
-_Holiday days are skipped in analysis_ because they typically have different traffic, but such short changes are of no interest to user.  
+Refer to [Holiday dates](#holiday-dates) for more details.
+- 3a: **Iteratively analyse remaining weeks**
+Run change detection for route iteratively until all weeks have been analysed, then continue to next route. 
+- 3b: **Find next changed week**  
+Analyse weeks: compare 'current' week (n) and a week in the future (n+m, where m is increased until a change is found).  
+Week is analyzed by comparing _day hashes_ of the corresponding weekdays of the two weeks.  
+_Holiday days are skipped in analysis_ because of a requirement: they typically have different traffic and such short changes are of no interest to officials.  
 Return a map which specifies date of detected changed week, and date to which 'current' week it was compared to.
-If algorithm does not find a different week, it returns just that there is traffic for the route.  
-(Reference: `detection.clj`)  
-- 4: **Analyse days of each changed week**  
-   Iterates the list of weeks with traffic changes, received from previous step.  
-   First weekday is selected for comparison on both weeks, after analysis is done then second days pair is selected, until all weekdays have been compared as pairs (Mon-Mon, Tue-Tue etc).
+Reference: `detection.clj`
+- 4: **Find days with traffic pattern changes**  
+   Iterates the list of weeks with traffic changes received from previous step.  
+   First weekday of both weeks are compared, then seconds and so forth until all have been compared (Mon-Mon, Tue-Tue etc).
    - 4b: **Query from db detailed trip data** for the selected weekday of analysis week and of baseline week.
    - 4c: **Compare trips of a day**  
-   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences per route.  
+   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences results per route.  
        - **Trip differences**  
           ![Trip differences example](trip-differences.png)
           
@@ -197,17 +200,8 @@ If algorithm does not find a different week, it returns just that there is traff
          Stop time differences are computed per compared trip pair. The departure time differences are computed for each 
          matching stop pair
 
-- 5: **Post-process**
-  - Due to legacy reasons there is an additional post-processing stage.  
-  - Last and final part of logic for resolving transit service change type and route change types.
-  - Resolve next change detection analysis date for service
-  - Resolve summary statistics fro service's changes (sums of different trip changes)
-  - Convert data structures to match the relational data model of database. 
-  - Reference: `update-transit-changes!`, `transform-route-change`
 - 6: **Store to db**
-  - Reference:   
-  `update-transit-changes!`  
-  Updated db tables `transit-changes`, `detected-route-change`, `detected-change-history`
+  - Reference: `update-transit-changes!`, `transform-route-change`
 
 ## Additional information
 
@@ -227,9 +221,10 @@ Notification is composed using data from this table.
 
 ### Holiday dates
 
-A static list of holiday dates is defined statically in `transit-changes/static-holidays`. 
-Operation to import a list of holiday date definitions may be triggered via the admin user on the admin UI. Results are stored into database `detection-holidays`. 
-Transit change detection will prefer the list retrieved from db and if list is not available, fall back to the static list. 
+A static list of holiday dates is defined in `transit-changes/static-holidays`. 
+Operation to import an additional list of holiday date definitions may be triggered via the admin user on the admin UI. 
+Import downloads a list of dates in CSV format from an external source, refer to `fetch-new-exception-csv`.
+Results are stored into database `detection-holidays`. `detection-holidays` is prioritized, if empty then logic falls back to the static list. 
 
 ## Notes for developers
 
