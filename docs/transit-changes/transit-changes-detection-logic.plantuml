@@ -39,16 +39,10 @@ partition "4: Find days with traffic pattern changes" {
     endif
 }
 
-partition "5: Iterate & Analyse: \n Post-process" {
-    --> [false] "Detect some change types: \n added, no-change"
-    --> "Resolve final change type"
-    --> "Resolve next change detection date"
-}
-
-partition "6: Store to db" {
-    --> "Insert to db \n analysis for transport service"
-    --> "Insert to db \n analysis for every transit change for route"
-    --> "Update to db \n transit change history"
+partition "5: Store to db" {
+    --> "Resolve & Update to db \n next change detection date for service"
+    --> "Resolve summary of traffic changes for services\nInsert to db `gtfs-transit-changes` records"
+    --> "Resolve summary of traffic changes for routes (of each service) \nInsert to db `detected-route-change` records \nInsert to db `detected-change-history` records"
 }
 --> (*)
 
