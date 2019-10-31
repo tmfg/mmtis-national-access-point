@@ -156,31 +156,34 @@ User UI visualization of transit change detection results
 ##### Sequence
 
 ![transit-changes-detection-logic](transit-changes-detection-logic.png)
+- 0: **Detection task**  
+ ote.tasks.gtfs` is scheduled to run nightly or triggered manually from admin panel view.
 
 - 1: **Query from db services.**   
-The detection algorithm processes one transport service per time.  
-On this run those services are selected for change detection, which qualify for a new run. 
-(Reference: `services-for-nightly-change-detection`)
+The detection logic processes one service per iteration.  
+(Note: one service may include several interfaces, download logic is separate from this documentation)  
+Reference: `services-for-nightly-change-detection`
 - 2a: **Query route hashes from db.**  
-Fetch all routes for selected services. A route record includes information about route start and end times as well as unique hashes.  
+A route record contains route start and end times and unique hashes, into which details of traffic data is compressed for easy comparison.  
 Routes that have already ended are removed from further inspection.
-- 2b: **Override holidays in route hashes**  
-Holidays are earmarked by replacing day traffic hash using a keyword value. 
+- 2b: **Mark holiday/exception days in input data**  
+In list of days objects holidays are earmarked by replacing day traffic hash using a keyword value. 
 Replacing allows later steps to handle holidays.  
-Holiday dates are configured to NAP application itself.
-- 3b: **Find next changed week.**  
-Iterate weeks: compare 'current' week and a week in the future. Week is analyzed by comparing _day hashes_ of the same weekdays of the two separate weeks.  
-For efficiency, only simple day hash string comparison is done instead of detailed analysis of the daily routes and trips.  
-_Holiday days are skipped in analysis_ because they typically have different traffic, but such short changes are of no interest to user.  
+Holiday dates are read from db or as a fallback statically configured to NAP application.
+- 3a: **Iteratively analyse remaining weeks**
+Run change detection for route iteratively until all weeks have been analysed, then continue to next route. 
+- 3b: **Find next changed week**  
+Analyse weeks: compare 'current' week (n) and a week in the future (n+m, where m is increased until a change is found).  
+Week is analyzed by comparing _day hashes_ of the corresponding weekdays of the two weeks.  
+_Holiday days are skipped in analysis_ because of a requirement: they typically have different traffic and such short changes are of no interest to officials.  
 Return a map which specifies date of detected changed week, and date to which 'current' week it was compared to.
-If algorithm does not find a different week, it returns just that there is traffic for the route.  
-(Reference: `detection.clj`)  
-- 4: **Analyse days of each changed week**  
-   Iterates the list of weeks with traffic changes, received from previous step.  
-   First weekday is selected for comparison on both weeks, after analysis is done then second days pair is selected, until all weekdays have been compared as pairs (Mon-Mon, Tue-Tue etc).
+Reference: `detection.clj`
+- 4: **Find days with traffic pattern changes**  
+   Iterates the list of weeks with traffic changes received from previous step.  
+   First weekday of both weeks are compared, then seconds and so forth until all have been compared (Mon-Mon, Tue-Tue etc).
    - 4b: **Query from db detailed trip data** for the selected weekday of analysis week and of baseline week.
    - 4c: **Compare trips of a day**  
-   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences per route.  
+   The in-depth comparison of the two differing days generates trip, stop sequence and stop time differences results per route.  
        - **Trip differences**  
           ![Trip differences example](trip-differences.png)
           
@@ -204,10 +207,6 @@ If algorithm does not find a different week, it returns just that there is traff
   - Resolve summary statistics fro service's changes (sums of different trip changes)
   - Convert data structures to match the relational data model of database. 
   - Reference: `update-transit-changes!`, `transform-route-change`
-- 6: **Store to db**
-  - Reference:   
-  `update-transit-changes!`  
-  Updated db tables `transit-changes`, `detected-route-change`, `detected-change-history`
 
 ## Additional information
 
