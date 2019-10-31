@@ -28,7 +28,7 @@ According to [Finnish national legislation on transport][1],
 a transport operator must declare changes to transit service routes 60 days in advance to the transit authorities.  
 Legislation also states that transit service data must be made available via a machine-readable interface in a common, easily modifiable format.
 
-NAP implements in a following way 
+NAP implementation 
 * Transit data for a service is automatically imported by periodically reading machine-readable interfaces of each service. 
 * An automated analysis procedure is run periodically on the imported data
 * National Transit authorities (certain users) are notified on the analysis result. 
@@ -75,7 +75,6 @@ The NAP import procedure of GTFS-formatted transit data supports mandatory GTFS 
 For more information on GTFS files refer to [GTFS file requirements](https://developers.google.com/transit/gtfs/reference/#file-requirements)
 
 ![background import process](import-process.png)
-
 
 1. Fetch interfaces which qualify for new data import run
    - `gtfs_imported timestamp` older than one day ago
@@ -135,7 +134,7 @@ User UI visualization of transit change detection results
    - https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/src/clj/ote/tasks/gtfs.clj
    - [Transit changes related db tables](#Datamodel)
    
-#### Detection algorithm
+#### Detection logic
 
 ##### Important notes
 - No history data is used from preceding imports or analyses. Latest package is analysed independently
