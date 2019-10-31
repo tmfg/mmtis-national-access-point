@@ -168,7 +168,7 @@ Routes that have already ended are removed from further inspection.
 - 2b: **Mark holiday/exception days in input data**  
 In list of days objects holidays are earmarked by replacing day traffic hash using a keyword value. 
 Replacing allows later steps to handle holidays.  
-Holiday dates are read from db or as a fallback statically configured to NAP application.
+Refer to [Holiday dates](#holiday-dates) for more details.
 - 3a: **Iteratively analyse remaining weeks**
 Run change detection for route iteratively until all weeks have been analysed, then continue to next route. 
 - 3b: **Find next changed week**  
@@ -222,6 +222,7 @@ Notification is composed using data from this table.
 
 A static list of holiday dates is defined in `transit-changes/static-holidays`. 
 Operation to import an additional list of holiday date definitions may be triggered via the admin user on the admin UI. 
+Import downloads a list of dates in CSV format from an external source, refer to `fetch-new-exception-csv`.
 Results are stored into database `detection-holidays`. `detection-holidays` is prioritized, if empty then logic falls back to the static list. 
 
 ## Notes for developers
