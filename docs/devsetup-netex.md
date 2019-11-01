@@ -8,4 +8,5 @@
     1. Create service with correct gtfs url (see more from devsetup-route-changes.md)
     2. Download gtfs package using admin panel -> this starts netex conversion
     3. In repl log should be indications if everyting is ok    
+4. Run Unit Tests - there is tests for Netex conversions also
   

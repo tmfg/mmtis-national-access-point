@@ -80,6 +80,7 @@ The following shows an example of the response in the JSON format:
              "format":["GTFS"],
              "license":"url",
              "data-content":["pricing"]}],
+             "url-ote-netex": "http://finap.fi/export/netex/1/1",
       "homepage":"url"
     },
     ... more results ...
