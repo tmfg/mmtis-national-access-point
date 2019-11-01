@@ -5,5 +5,5 @@ ALTER TABLE "external-interface-download-status"
 -- Add url to old rows in "external-interface-download-status" table.
 -- Get url from "external-interface-description"
 UPDATE "external-interface-download-status" d SET url = (SELECT (e."external-interface").url
-                                                           FROM napote.public."external-interface-description" e
+                                                           FROM "external-interface-description" e
                                                           WHERE e.id = d."external-interface-description-id")
