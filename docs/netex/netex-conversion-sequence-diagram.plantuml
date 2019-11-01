@@ -1,0 +1,28 @@
+@startuml
+title NeTEx conversion sequenced diagram
+autonumber
+hide footbox
+
+actor "USER" as USER
+participant "NAP" as NAP
+database "S3" as S3
+database "NAP DB" as DB
+participant "ote.netex.netex" as CONVERTER
+box <<process>>
+participant "mobi.chouette.command.jar" as CHOUETTE
+end box
+
+activate NAP
+
+NAP -> NAP : Scheduled GTFS download
+NAP -> CONVERTER : GTFS->NeTEx conversion
+activate CONVERTER
+CONVERTER->CHOUETTE: invoke choutette.sh shell script
+activate CHOUETTE
+return result process exit info
+CONVERTER->CONVERTER : Parse process exit info and file system output files
+CONVERTER->S3 : "Save NeTEx archive"
+CONVERTER->DB : Save conversion status metadata
+return
+
+@enduml
