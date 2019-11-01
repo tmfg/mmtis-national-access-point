@@ -1,0 +1,24 @@
+@startuml
+title NeTEx use-case overview diagram
+'autonumber
+hide footbox
+
+actor "USER" as USER
+actor "ADMIN" as ADMIN
+participant "NAP" as NAP
+participant "Chouette" as CONVERTER
+
+
+group Scheduled task
+activate NAP
+NAP->NAP : Import GTFS
+NAP->CONVERTER : Convert GTFS to NeTEx
+return
+end
+USER->NAP : Open service viewer
+return  Include NeTEx package link
+
+ADMIN -> NAP : Open Admin panel
+return Include NeTEx creation status
+
+@enduml

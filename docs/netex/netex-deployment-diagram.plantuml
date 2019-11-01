@@ -1,0 +1,76 @@
+@startuml
+title NeTEx solution deployment diagram
+hide footbox
+
+!include <aws/common>
+!include <aws/Storage/AmazonS3/AmazonS3>
+!include <aws/General/AWScloud/AWScloud>
+!include <aws/Compute/AWSLambda/LambdaFunction/LambdaFunction>
+!include <aws/Compute/AWSLambda/AWSLambda>
+
+
+cloud Internet as INTERNET {
+}
+
+AWSCLOUD(VALTORI,Valtori AWS) {
+
+    rectangle "NAP dev" as DEV {
+        component "<<AWS ALB>>" as LBd
+
+        rectangle <<AWS EC2>> #lightyellow {
+            node "OTE App server" as OTEd
+            rectangle "Converter" as CONVERSION_D #lightgreen {
+                component Chouettte as CONVERSION_FW_D
+            }
+        }
+
+        database dbd [
+            <<AWS RDS>>
+            PostgreSQL
+        ]
+
+        AMAZONS3(S3d,"S3")
+
+        LBd -- OTEd
+        OTEd --> S3d
+        OTEd --> dbd
+        OTEd -right-> CONVERSION_FW_D
+    }
+
+    rectangle "NAP prod" as PROD {
+        component "<<AWS ALB>>" as LBp
+
+        rectangle <<AWS EC2>> #lightyellow {
+            node "OTE app server" as OTEp
+            rectangle "Converter" as CONVERSION_P #lightgreen {
+            component Chouette as CONVERSION_FW_P
+            }
+        }
+
+        database dbp [
+            <<AWS RDS>>
+            PostgreSQL
+        ]
+
+        AMAZONS3(S3p,"S3")
+
+        LBp -- OTEp
+        OTEp --> S3p
+        OTEp --> dbp
+        OTEp -right-> CONVERSION_FW_P
+    }
+
+    INTERNET ==> LBd
+    INTERNET ==> LBp
+}
+
+
+rectangle Legend #lightgray {
+    rectangle new #lightgreen
+    node Node
+    database Database
+    component Component
+    Legend -[hidden]up- S3p
+}
+
+@enduml
