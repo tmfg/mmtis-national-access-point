@@ -77,9 +77,11 @@
                                                                   db ::t-service/transport-service
                                                                   #{::t-service/transport-operator-id}
                                                                   {::t-service/id service-id})))
-          interface-id (::t-service/id (first (specql/fetch db ::t-service/external-interface-description
-                                                            #{::t-service/id}
-                                                            {::t-service/transport-service-id service-id})))
+          interface (first (specql/fetch db ::t-service/external-interface-description
+                                         #{::t-service/id ::t-service/external-interface}
+                                         {::t-service/transport-service-id service-id}))
+          interface-id (::t-service/id interface)
+          interface-url (get-in interface [::t-service/external-interface ::t-service/url])
           latest-package (import/interface-latest-package db interface-id)
           package (specql/insert! db :gtfs/package
                                   {:gtfs/first_package                     (nil? latest-package)
@@ -87,7 +89,7 @@
                                    :gtfs/transport-service-id              service-id
                                    :gtfs/created                           (time/date-string->inst-date date)
                                    :gtfs/external-interface-description-id interface-id})
-          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil)]
+          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url)]
       "OK")
     (catch Exception e
       (let [msg (.getMessage e)]
