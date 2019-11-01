@@ -104,6 +104,29 @@ WHERE (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
 GROUP BY ts.id, op.id
 ORDER BY "format" ASC, "import-error" DESC;
 
+-- name: search-interface-downloads
+SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+       op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
+       op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
+       ts."contact-email" as "service-email", eid."data-content" as "data-content", id.url as url,
+       eid.format as format, id."created" as imported, id."download-error" as "import-error",
+       id."db-error" as "db-error"
+FROM
+    "transport-operator" as op,
+    "transport-service" as ts,
+    "external-interface-description" as eid,
+    "external-interface-download-status" id
+WHERE
+      eid.id = :interface-id
+  AND id."external-interface-description-id" = eid.id
+  AND ts.published IS NOT NULL
+  AND ts."transport-operator-id" = op.id
+  AND eid."transport-service-id" = ts.id
+  AND ts."sub-type" = 'schedule'
+  AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+GROUP BY eid.id, id.created, eid.id, id."download-error", id."db-error", ts.id, op.id, id.id, id.url
+ORDER BY eid.id ASC, id.id DESC;
+
 -- name: fetch-commercial-services
 SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" as "commercial?",
        o.id as "operator-id", o.name as "operator-name"

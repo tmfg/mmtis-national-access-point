@@ -128,14 +128,14 @@
       [:a {:style {:text-decoration "none" :font-size 20}
            :href "#"
            :on-click #(do (.preventDefault %)
-                          (e! (admin-controller/->CloseInterfaceList)))}
+                          (e! (admin-controller/->CloseDownloadList)))}
        [:div {:dangerouslySetInnerHTML {:__html "&#8743;"}}]]]
-     (and first? (not= selected-interface-id interface-id) (> list-count 1))
+     (and first? (not= selected-interface-id interface-id))
      [ui/table-row-column {:style {:width "2%" :padding "0px 0px 0px 5px"}}
       [:a {:style {:text-decoration "none" :font-size 20}
            :href "#"
            :on-click #(do (.preventDefault %)
-                          (e! (admin-controller/->OpenInterfaceList interface-id)))}
+                          (e! (admin-controller/->GetInterfaceDownloads interface-id)))}
        [:div {:dangerouslySetInnerHTML {:__html "&or;"}}]]]
      :else
      [ui/table-row-column {:style {:width "2%" :padding "0"}} " "])
@@ -196,6 +196,7 @@
                                                date-0 imported db-error interface first? list-count selected-interface-id)])
                        (sort-by :interface-id (concat
                                                 first-from-grouped-results selected-interfaces))))]
+
     [:div.row
      [:div.row.col-md-12 {:style {:padding-top "20px"}}
       [form/form {:update! #(e! (admin-controller/->UpdateInterfaceFilters %))}
@@ -203,6 +204,15 @@
           {:label "Etsi rajapintoja"
            :columns 3
            :layout :row}
+          {:name :help-interface
+           :type :info-toggle
+           :label "Ohjeet rajapintojen hakemiseen"
+           :body [:div
+                  [:p "Rajapintoja voidaan hakea palveluntuottajan, palvelun tai rajapinnan osoitteen tiedoilla. Annettujen tietojen ei tarvitse olla täydellisiä. Pieni osa hakuehdosta riittää. "]
+                  [:p "Hakua voi tarkentaa rajapinnan tyypillä tai erilaisilla virheillä."]
+                  [:p "Tuloksiin listataan vain yksi rivi per rajapinta. Jos tarvitset koko rajapinnan lataushistorian klikkaa rajapintarivin väkästä."]]
+           :default-state false
+           :container-class "col-xs-12 col-sm-12 col-md-12"}
           {:type :string
            :name :operator-name
            :label "Palveluntuottaja"
