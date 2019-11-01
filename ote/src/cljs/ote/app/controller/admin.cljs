@@ -66,8 +66,9 @@
 (defrecord CloseInterfaceErrorModal [])
 (defrecord OpenOperatorModal [interface])
 (defrecord CloseOperatorModal [])
-(defrecord OpenInterfaceList [interface-id])
-(defrecord CloseInterfaceList [])
+(defrecord GetInterfaceDownloads [interface-id])
+(defrecord GetInterfaceDownloadsResponse [response interface-id])
+(defrecord CloseDownloadList [])
 
 ;; Sea route tab
 (defrecord UpdateSeaRouteFilters [filter])
@@ -308,11 +309,32 @@
       ;; default
       app))
 
-  OpenInterfaceList
-  (process-event [{interface-id :interface-id} app]
-    (assoc-in app [:admin :interface-list :selected-interface-id] interface-id))
+  GetInterfaceDownloadsResponse
+  (process-event [{response :response interface-id :interface-id} app]
+    (-> app
+        ;; Mark selected interface as open
+        (assoc-in [:admin :interface-list :selected-interface-id] interface-id)
+        ;; Loading ended
+        (assoc-in [:admin :interface-list :loading-tab?] false)
+        ;; Delete old data
+        (update-in [:admin :interface-list :results] (fn [results]
+                                                       (filter
+                                                         #(not= interface-id (:interface-id %))
+                                                         results)))
+        ;; Add response data
+        (update-in [:admin :interface-list :results] #(concat % response))))
 
-  CloseInterfaceList
+  ;; Open interface list and fetches all download data from the server
+  GetInterfaceDownloads
+  (process-event [{interface-id :interface-id} app]
+    (comm/get! (str "admin/list-interface-downloads/" interface-id)
+               {:on-success (tuck/send-async! ->GetInterfaceDownloadsResponse interface-id)
+                :on-failure (tuck/send-async! ->ServerError)})
+    (-> app
+        (assoc-in [:admin :interface-list :selected-interface-id] interface-id)
+        (assoc-in [:admin :sea-routes :loading-tab?] true)))
+
+  CloseDownloadList
   (process-event [_ app]
     (assoc-in app [:admin :interface-list :selected-interface-id] nil))
 

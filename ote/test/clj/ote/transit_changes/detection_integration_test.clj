@@ -104,7 +104,7 @@
                                      :gtfs/license license
                                      :gtfs/external-interface-description-id interface-id})]            
         ;; Parse gtfs package and save it to database.
-        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn)))))
+        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil)))))
 
 (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)

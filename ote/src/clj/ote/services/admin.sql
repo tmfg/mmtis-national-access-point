@@ -42,32 +42,46 @@ SELECT o.id, o."name" as "operator", o."business-id" as "business-id",
 
 -- name: search-services-with-interfaces
 -- Find published interfaces using operator name, service name
-SELECT eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+WITH download_status AS (
+    SELECT
+           DISTINCT ON (s."external-interface-description-id") "external-interface-description-id",
+           id,
+           s.created,
+           s."download-error",
+           s."db-error",
+           s.url
+      FROM "external-interface-download-status" s
+     ORDER BY s."external-interface-description-id" ASC,
+              s.id DESC)
+SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
        op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
        op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
-       ts."contact-email" as "service-email", eid."data-content" as "data-content", (eid."external-interface").url as url,
+       ts."contact-email" as "service-email", eid."data-content" as "data-content", id.url as url,
        eid.format as format, id."created" as imported, id."download-error" as "import-error",
        id."db-error" as "db-error"
   FROM
        "transport-operator" as op,
        "transport-service" as ts,
-       "external-interface-description" as eid,
-       "external-interface-download-status" as id
+       "external-interface-description" as eid
+       JOIN download_status id ON id."external-interface-description-id" = eid.id
  WHERE
        (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
    AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
    AND (:interface-url::TEXT IS NULL OR (eid."external-interface").url ilike :interface-url)
-   AND (:import-error::BOOLEAN IS NULL OR id."download-error" IS NOT NULL)
-   AND (:db-error::BOOLEAN IS NULL OR id."db-error" IS NOT NULL)
+   AND ((:import-error::BOOLEAN IS NULL AND (id."download-error" IS NULL OR id."download-error" IS NOT NULL))
+        OR
+        (:import-error::BOOLEAN IS NOT NULL AND id."download-error" IS NOT NULL))
+   AND ((:db-error::BOOLEAN IS NULL AND (id."db-error" IS NULL OR id."db-error" IS NOT NULL ))
+       OR
+        (:db-error::BOOLEAN IS NOT NULL AND id."db-error" IS NOT NULL))
    AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(eid.format::text)::text[]))
    AND ts.published IS NOT NULL
    AND ts."transport-operator-id" = op.id
    AND eid."transport-service-id" = ts.id
-   AND id."external-interface-description-id" = eid.id
    AND ts."sub-type" = 'schedule'
    AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
- GROUP BY id.created, eid.id, id."download-error", id."db-error", ts.id, op.id
- ORDER BY eid.id ASC, id.created DESC;
+ GROUP BY eid.id, id.id, id.created, eid.id, id."download-error", id."db-error", ts.id, op.id, id.id, id.url
+ ORDER BY eid.id ASC, id.id DESC;
 
 -- name: search-services-wihtout-interface
 select ts.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
@@ -89,6 +103,29 @@ WHERE (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
                    WHERE i."transport-service-id" = ts.id)
 GROUP BY ts.id, op.id
 ORDER BY "format" ASC, "import-error" DESC;
+
+-- name: search-interface-downloads
+SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", op.id as "operator-id",
+       op.name as "operator-name", op.email as "operator-email", op.phone as "operator-phone",
+       op.gsm as "operator-gsm", ts.name as "service-name", ts."contact-phone" as "service-phone",
+       ts."contact-email" as "service-email", eid."data-content" as "data-content", id.url as url,
+       eid.format as format, id."created" as imported, id."download-error" as "import-error",
+       id."db-error" as "db-error"
+FROM
+    "transport-operator" as op,
+    "transport-service" as ts,
+    "external-interface-description" as eid,
+    "external-interface-download-status" id
+WHERE
+      eid.id = :interface-id
+  AND id."external-interface-description-id" = eid.id
+  AND ts.published IS NOT NULL
+  AND ts."transport-operator-id" = op.id
+  AND eid."transport-service-id" = ts.id
+  AND ts."sub-type" = 'schedule'
+  AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+GROUP BY eid.id, id.created, eid.id, id."download-error", id."db-error", ts.id, op.id, id.id, id.url
+ORDER BY eid.id ASC, id.id DESC;
 
 -- name: fetch-commercial-services
 SELECT t.id as "service-id", t.name as "service-name", t."commercial-traffic?" as "commercial?",
