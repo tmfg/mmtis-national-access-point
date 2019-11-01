@@ -47,7 +47,9 @@
                         :content input-file
                         :filename (str "input" fn-suffix)
                         :mime-type "application/octet-stream"}]}
-          resp (deref (htclient/post (str laundry-url conv-name) request-opts))]
+          resp (deref (htclient/post (str laundry-url conv-name) request-opts))
+          _ (log/info "laundry - url " (pr-str str laundry-url conv-name))
+          _ (log/info "laundry - response " (pr-str resp))]
       (if (= 200 (:status resp))
         (do (io/copy (:body resp) temp-file)
             (log/info "laundry conversion returning tempfile")
