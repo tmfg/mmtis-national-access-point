@@ -42,13 +42,12 @@ Valid values are
 
 Value | Description
 ----- | -----------
-taxi | Taxi (passenger transportation)
-request | Request based (passenger transportation)
-schedule | Regularly scheduled (passenger transportation)
-other | Other (passenger transportation)
-terminal | Terminals and stations
-rentals | Vehicle rental services
-parking | Parking areas
+taxi | Taxi service (road traffic)
+request | Charter traffic and other equest based
+schedule | Regular scheduled traffic 
+terminal | Stations, ports and other terminals
+rentals | Vehicle rentals and commercial shared vehicle solutions
+parking | General commercial parking services
 
 
 ### Response values
@@ -61,17 +60,28 @@ The following shows an example of the response in the JSON format:
   "total-service-count": 123,
   "results": [
     {
-      "contact-address": {
-        "street": "Some street 1",
-        "postal_code": "112233",
-        "post_office": "Somewhere"
-      },
       "transport-operator-id": 1,
       "type": "terminal",
       "operator-name": "Some operator, Inc",
-      "name": "The bus stop to somewhere",
+      "name": "The bus stop",
       "sub-type": "terminal",
-      "id": 2
+      "id": 2,
+      "published":"1970-01-01T00:00:00Z",
+      "description":[
+        {"lang":"FI","text":"Bussipysäkki keskellä suomea"}, 
+        {"lang":"EN","text":"Bus stop in the middle of nowhere"}],
+      "business-id":"1234567-0",
+      "external-interface-links":[
+      {"external-interface":
+            {"url":"url",
+             "description":[
+               {"lang":"FI","text":"Matkahinnat, toimialue, aukioloajat, tilaustavat: url"},
+               {"lang":"EN","text":"See more info from: url"}]},
+             "format":["GTFS"],
+             "license":"url",
+             "data-content":["pricing"]}],
+             "url-ote-netex": "http://finap.fi/export/netex/1/1",
+      "homepage":"url"
     },
     ... more results ...
   ],
@@ -98,7 +108,7 @@ Substitute `<transport-operator-id>` and `<id>` using values from the JSON resul
 
 Please note that "external-interface" links obtained from exported NAP GeoJSON service descriptions do not always lead directly to the actual machine-readable data or API. Sometimes the link can lead to a human-readable web page containing information about how to access the data or API. When assuming that the external-interface link is a direct link to the external data or API, errors can occur in your application.
 
-The Finnish Transport and Communications Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API.  If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
+The Finnish Transport and Communications Agency assumes no responsibility for the correctness of the transport service information obtained by using the FINAP Service Catalog API. If you encounter errors other than technical problems with service search API or the format of responses, please contact the service provider in question.
 
 ### GeoJSON schema
 
@@ -217,3 +227,11 @@ The operator completions will return an array of results and each result will co
   }
 ]
 ```
+
+## NeTEx
+
+NeTEx is a CEN Technical Standard for exchanging Public Transport schedules and related data.
+
+Service converts GTFS and Kalkati.net packages to NeTEx.
+Make query using service search api and search external-interface-links - external-interface object. 
+NeTEx data can be downloaded from url that has is in "NeTEx" format.
