@@ -137,10 +137,6 @@ describe('Operator creation advanced tests', function () {
         cy.contains('Palveluntuottaja poistettiin onnistuneesti.');
 
     });
-
-    it('should not do anyting but make the tests work', function () {
-        cy.contains('Omat palvelutiedot');
-    });
 });
 
 
