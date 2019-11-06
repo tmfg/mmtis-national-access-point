@@ -90,11 +90,11 @@
                nil                                          ; SUCCESS. Explicit nil to make success branch more obvious
                (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
              nil)                                           ; SUCCESS. Explicit nil to make success branch more obvious
-           (log/spy :warn (str "GTFS: Could not import GTFS file. service-id = " (:ts-id interface))))
+           (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
 
         (catch Exception e
-          (log/spy :warn (str "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e))))
-      (log/spy :debug (str "GTFS: No gtfs files to upload. service-id = " service-id))))))
+          (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
+      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " service-id)))))
 
 (def night-hours #{0 1 2 3 4})
 
