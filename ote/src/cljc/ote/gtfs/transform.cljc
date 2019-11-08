@@ -33,7 +33,7 @@
 (defn- agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
   [{:gtfs/agency-id id
     :gtfs/agency-name name
-    :gtfs/agency-url homepage
+    :gtfs/agency-url (ensure-has-protocol homepage transport-operator)
     :gtfs/agency-timezone "Europe/Helsinki"
     :gtfs/agency-lang "FI"
     :gtfs/agency-phone phone
