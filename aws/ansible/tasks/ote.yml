@@ -27,16 +27,24 @@
   yum: name=[u'java-1.8.0-openjdk'] state=installed
 
 - name: Install required package for nsjail - bison
-  yum: name=[u'bison'] state=installed
+  yum:
+    name: bison
+    state: installed
 
 - name: Install required package for nsjail - flex
-  yum: name=[u'flex'] state=installed
+  yum:
+    name: flex
+    state: installed
 
 - name: Install required package for nsjail - protobuf-devel
-  yum: name=[u'protobuf-devel'] state=installed
+  yum:
+    name: protobuf-devel
+    state: installed
 
 - name: Install required package for nsjail - protobuf-compiler
-  yum: name=[u'protobuf-compiler'] state=installed
+  yum:
+    name: protobuf-compiler
+    state: installed
 
 - name: Create chouette folder
   file: path=/opt/chouette state=directory owner=napote group=napote
