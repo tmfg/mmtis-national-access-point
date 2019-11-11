@@ -134,7 +134,8 @@
                             "_"
                             external-interface-description-id
                             "_netex.zip")
-        netex-script (if (clojure.string/includes? (env/base-url) "localhost")
+        netex-script (if (or (nil? (env/base-url)) ;; ci environment
+                             (clojure.string/includes? (env/base-url) "localhost")) ;; localhost
                        "./chouette.sh"
                        "./ns-chouette.sh")
         chouette-cmd [netex-script                      ; Vector used to allow logging shell invocation on error
