@@ -37,7 +37,8 @@
   {}
   (routes/navigate! :transit-visualization {:service-id id
                                             :date (time/format-date-iso-8601 date)
-                                            :scope "now"})
+                                            :scope (name :now) ; bide converts to string, done also here just in case
+                                            :route-hash-id nil})
   app)
 
 (define-event SetRegionFilter [regions]

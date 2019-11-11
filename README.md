@@ -24,6 +24,25 @@ Here is a overview of our AWS production architecture. CI and other development 
 
 ![AWS Architecture Overview](./docs/images/aws_prod_architecture_overview.png)
 
+## Development environment setup
 
+ - [Database setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/database/README.md)
+ - [Cypress setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/cypress/README.md)
+ - [AWS](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/aws/ansible/README.md)
+ - [CircleCI](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/.circleci/README.md)
+ - [Docker](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/nap/docker/README.md)
+ - [Route Changes DevEnv setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/devsetup-route-changes.md)
+ - [Netex configuration DevEnv setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/devsetup-netex.md)
+ - [Chouette](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/tools/chouette/README.md)
+ - [Geometry Data](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/geometry-data.md)
 
+## API documentation
+ 
+  - [Search Service Api documentation](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md)
+
+## Transit changes documentation
+
+ - [Transit changes](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/transit-changes/README.md)
+ 
+ 
 <a href="https://www.browserstack.com" target="_blank" rel="noopener noreferrer"><img src="./Browserstack-logo.svg" width="200"></a>

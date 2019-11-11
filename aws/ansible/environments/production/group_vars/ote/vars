@@ -17,7 +17,7 @@ allow_robots: "true"
 gtfs_bucket: "napote-gtfs"
 matomo_piwik_url: "https://stat.viestintavirasto.fi/"
 matomo_site_id: "11"
-laundry_url: nil
+laundry_url: "https://{{vault_laundry_username}}:{{vault_laundry_password}}@finap.fi/laundry/"
 netex_chouette_path: "/opt/chouette/"
 netex_conversion_work_path: "/tmp/ote/netex-conversion/"
 netex_bucket: "napote-netex"

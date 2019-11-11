@@ -91,4 +91,4 @@
                [ui/table-row-column
                 (merge (stylefy/use-style style-base/table-col-style-wrap)
                        {:width "20%"})
-                [linkify (:url row) (:url row) {:target "_blank"}]]]))]]])]))
+                [linkify (str (:url row) "?origin=ui") (:url row) {:target "_blank"}]]]))]]])]))

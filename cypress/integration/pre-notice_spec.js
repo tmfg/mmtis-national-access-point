@@ -76,10 +76,10 @@ describe('Pre notice tests', () => {
         // Open pre notice form
         cy.visit('/#/pre-notices');
         cy.server();
-        cy.route('GET', '/pre-notices/list').as('getPreNotices');
+        cy.route('GET', '/pre-notices/list').as('getPreNoticeList');
 
         // Wait for pre-notices query because it causes re-render of the view.
-        cy.wait('@getPreNotices');
+        cy.wait('@getPreNoticeList');
 
         cy.route('GET', '/pre-notices/*').as('getPreNotice');
         cy.route('GET', '/pre-notices/regions').as('getRegions');

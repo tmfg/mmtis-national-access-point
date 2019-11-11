@@ -239,6 +239,9 @@
                                                                             :operator-name (when operator-name (str "%" operator-name "%"))}))]
     (concat services-with-interface services-without-interface)))
 
+(defn- list-interface-downloads [db interface-id]
+  (interfaces-array->vec (search-interface-downloads db {:interface-id interface-id})))
+
 (defn- list-sea-routes [db user query]
   (let [routes (fetch-sea-routes-for-admin db {:operator (if query
                                                            (str "%" query "%")
@@ -654,6 +657,12 @@
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
+
+    (GET "/admin/list-interface-downloads/:interface-id" {{:keys [interface-id]}
+                                                          :params
+                                                          user :user}
+      (or (authorization-fail-response (:user user))
+          (http/transit-response (list-interface-downloads db (Long/parseLong interface-id)))))
 
     (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
 

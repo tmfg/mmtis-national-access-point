@@ -6,14 +6,14 @@
                  ;; CSV parser for frontend
                  [testdouble/clojurescript.csv "0.3.0"]
 
-                 ;; Komponenttikirjasto
+                 ;; Components
                  [com.stuartsierra/component "0.3.2"]
 
-                 ;; Logitus (clj + cljs)
+                 ;; Logging (clj + cljs)
                  [com.taoensso/timbre "4.10.0"]
                  [com.fzakaria/slf4j-timbre "0.3.8"]
 
-                 ;; PostgreSQL JDBC ajuri, yhteyspooli ja muut apukirjastot
+                 ;; PostgreSQL JDBC driver, connection pool and other libraries
                  [org.postgresql/postgresql "42.1.4"]
                  [net.postgis/postgis-jdbc "2.1.7.2"
                   :exclusions [ch.qos.logback/logback-classic
@@ -27,7 +27,7 @@
                  [http-kit "2.3.0"]
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-anti-forgery "1.1.0"]
-                 [clj-http "3.7.0"]
+                 [clj-http "3.10.0"]
                  [commons-fileupload/commons-fileupload "1.3.3"]
                  [javax.servlet/javax.servlet-api "4.0.0"]
 
@@ -35,7 +35,7 @@
                  [com.draines/postal "2.0.2"]
 
                  ;; Routing library for publishing services
-                 [compojure "1.6.0"]
+                 [compojure "1.6.1"]
 
                  ;; Password hashing
                  [buddy/buddy-hashers "1.3.0"]
@@ -45,15 +45,14 @@
                  ;; Cache libraries
                  [org.clojure/core.cache "0.7.1"]
 
-                 ;; Transit tietomuoto
+                 ;; Transit data format
                  [com.cognitect/transit-clj "0.8.313"]
                  [com.cognitect/transit-cljs "0.8.256"]
 
                  ;; Lightweight scheduler
                  [jarohen/chime "0.2.2"]
 
-
-                 [cljs-ajax "0.7.2"
+                 [cljs-ajax "0.8.0"
                   :exclusions [org.apache.httpcomponents/httpasyncclient]]
 
                  ;; Frontend UI libraries
@@ -74,7 +73,7 @@
                  [cljsjs/marked "0.3.5-1"]
                  [data-frisk-reagent "0.4.5"]
 
-                 ;; Aika
+                 ;; Time
                  [com.andrewmcveigh/cljs-time "0.5.0"]
 
                  ;; HTML/XML generation from Clojure data

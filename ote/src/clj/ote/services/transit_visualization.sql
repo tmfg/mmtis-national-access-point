@@ -174,7 +174,7 @@ SELECT ts.name AS "transport-service-name",
 SELECT p.id, p.created,
        to_char(lower(dr.daterange), 'dd.mm.yyyy') as "min-date",
        to_char(upper(dr.daterange), 'dd.mm.yyyy') as "max-date",
-       (eid."external-interface").url as "interface-url",
+       id.url as "interface-url",
        id."download-status",
        concat(id."db-error", id."download-error") as error
   FROM gtfs_package p

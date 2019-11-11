@@ -133,7 +133,7 @@
           (recur (inc i) ps))))))
 
 
-(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn]
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn interface-url]
   ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
@@ -179,6 +179,7 @@
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/download-status :failure
                          ::t-service/package-id package-id
+                         ::t-service/url interface-url
                          ::t-service/db-error (str (.getName (class e)) ": " (.getMessage e))
                          ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
         (.printStackTrace e))
@@ -205,7 +206,7 @@
                     (.toByteArray out)))]
       (println "**************************** START test-hsl-gtfs *********************")
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1 1 1 nil)
+      (save-gtfs-to-db db bytes 1 1 1 nil nil)
       (println "******************* test-hsl-gtfs end *********************"))))
 
 (defn- load-interface-url [db interface-id url last-import-date saved-etag force-download?]
@@ -219,6 +220,7 @@
                        ::t-service/download-error (str "Error when loading gtfs package from url "
                                                        url ": "
                                                        (.getMessage e))
+                       ::t-service/url url
                        ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
       nil)))
 
@@ -316,13 +318,7 @@
         gtfs-file (:body response)]
 
     (if (nil? gtfs-file)
-      (do
-        (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
-        (specql/insert! db ::t-service/external-interface-download-status
-                        {::t-service/external-interface-description-id id
-                         ::t-service/download-status :failure
-                         ::t-service/download-error (str "Virhe ladatatessa pakettia: " (pr-str response))
-                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))}))
+      (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
@@ -341,12 +337,13 @@
                              filename (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
-              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil)
+              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url)
               ;; Mark interface download a success
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id
                                ::t-service/download-status :success
                                ::t-service/package-id (:gtfs/id package)
+                               ::t-service/url url
                                ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})))
 
           (log/debug (str "GTFS: service-id=" ts-id ", File=" filename

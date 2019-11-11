@@ -12,12 +12,28 @@
 
 ;; NOTE: In case we have service calendars that have no rules, but only date additions, we'll use
 ;; service_id 0 everywhere by default.
+#?(:clj
+   (defn ensure-has-protocol
+     "Agency url must contain http or https protocol. If url does not contain protocol add https to it."
+     [url transport-operator]
+     (try
+       (do
+         (log/info "Check if agency url contains a protocol" url)
+         (clojure.java.io/as-url url))
+       (catch Exception e
+         (log/warn "Malformed url:" url e "transport-operator-id:" (::t-operator/id transport-operator))
+         (str "https://" url))))
+   :cljs
+   (defn ensure-has-protocol
+     "Agency url must contain http or https protocol. If url does not contain protocol add https to it."
+     [url transport-operator]
+     url))
 
 
 (defn- agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
   [{:gtfs/agency-id id
     :gtfs/agency-name name
-    :gtfs/agency-url homepage
+    :gtfs/agency-url (ensure-has-protocol homepage transport-operator)
     :gtfs/agency-timezone "Europe/Helsinki"
     :gtfs/agency-lang "FI"
     :gtfs/agency-phone phone
