@@ -26,6 +26,16 @@
 - name: Install required packages
   yum: name=[u'java-1.8.0-openjdk'] state=installed
 
+- name: Ensure and Install required package for nsjail
+    yum:
+      name: "{{ packages }}"
+    vars:
+      packages:
+        - bison
+        - flex
+        - protobuf-devel
+        - protobuf-compiler
+
 - name: Create chouette folder
   file: path=/opt/chouette state=directory owner=napote group=napote
 
@@ -55,6 +65,23 @@
 
 - name: Delete ZIP chouette-command.zip
   command: rm -rf /opt/chouette-command.zip
+
+- name: Create nsjail folder
+  file: path=/opt/nsjail state=directory owner=napote group=napote
+
+- name: Get nsjail from github
+  git:
+    repo: 'https://github.com/google/nsjail.git'
+    dest: /opt/nsjail
+    version: '2.8'
+
+- name: Install nsjail using make
+  make:
+    chdir: /opt/nsjail
+
+- name: Write ns-chouette script which uses nsjail
+  template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh mode=755
+  tags: configuration
 
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote

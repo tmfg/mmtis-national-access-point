@@ -133,7 +133,7 @@
                             "_"
                             external-interface-description-id
                             "_netex.zip")
-        chouette-cmd ["./chouette.sh"                       ; Vector used to allow logging shell invocation on error
+        chouette-cmd ["./ns-chouette.sh"                       ; Vector used to allow logging shell invocation on error
                       "-i " import-config-filepath
                       "-o " export-config-filepath
                       "-f " netex-filepath
