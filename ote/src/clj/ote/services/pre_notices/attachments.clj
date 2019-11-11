@@ -43,7 +43,7 @@
     (let [temp-file (java.io.File/createTempFile "laundry-tmp" fn-suffix)
           request-opts
           {:as :byte-array
-           :basic-auth [(:laundry_apikey config) (:laundry_password config)]
+           :basic-auth [(:laundry-apikey config) (:laundry-password config)]
            :multipart [{:name "file"
                         :content input-file
                         :filename (str "input" fn-suffix)
