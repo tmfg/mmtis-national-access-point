@@ -4,13 +4,14 @@
     [taoensso.timbre :as log]
     [clojure.java.io :as io]
     [cheshire.core :as cheshire]
-    [ote.db.netex :as netex]
+    [ote.environment :as env]
+    [specql.op :as op]
     [specql.core :as specql]
     [clojure.java.shell :refer [sh with-sh-dir]]
     [clojure.string :as str]
     [amazonica.aws.s3 :as s3]
     [ote.config.netex-config :as config-nt-static]
-    [specql.op :as op]))
+    [ote.db.netex :as netex]))
 
 (defn fetch-conversions [db transport-service-id]
   (specql/fetch db
@@ -133,7 +134,11 @@
                             "_"
                             external-interface-description-id
                             "_netex.zip")
-        chouette-cmd ["./chouette.sh"                       ; Vector used to allow logging shell invocation on error
+        netex-script (if (or (nil? (env/base-url)) ;; ci environment
+                             (clojure.string/includes? (env/base-url) "localhost")) ;; localhost
+                       "./chouette.sh"
+                       "./ns-chouette.sh")
+        chouette-cmd [netex-script                      ; Vector used to allow logging shell invocation on error
                       "-i " import-config-filepath
                       "-o " export-config-filepath
                       "-f " netex-filepath
