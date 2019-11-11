@@ -59,13 +59,14 @@
   URL parameters can be given with the `:body` key.
   Callbacks for successful and failure are provided with `:on-success` and `:on-failure`
   keys respectively"
-  [url body {:keys [on-success on-failure response-format]}]
+  [url body {:keys [on-success on-failure response-format timeout]}]
 
   (progress/start)
   (swap! query-counter inc)
   (POST (request-url url)
         {:headers (anti-csrf-token-header)
          :params          body
+         :timeout         (or timeout 30000)
          :handler         (response-handler! on-success)
          :error-handler   (response-handler! on-failure)
          :format          (transit-request-format)
