@@ -97,7 +97,7 @@
     mode: '0755'
 
 - name: Write ns-chouette script which uses nsjail
-  template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh mode=755
+  template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
   tags: configuration
 
 - name: Create OTE app folder
