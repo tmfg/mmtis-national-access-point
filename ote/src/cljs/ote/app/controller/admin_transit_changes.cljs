@@ -122,7 +122,8 @@
   {}
   (let [service-id (get-in app [:admin :transit-changes :single-download-gtfs-service-id])]
     (comm/post! (str "/transit-changes/force-interface-import/" service-id) nil
-                {:on-success (tuck/send-async! ->ForceInterfaceImportForGivenServiceSuccess)
+                {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+                 :on-success (tuck/send-async! ->ForceInterfaceImportForGivenServiceSuccess)
                  :on-failure (tuck/send-async! ->ForceInterfaceImportForGivenServiceFailure)})
     app))
 
