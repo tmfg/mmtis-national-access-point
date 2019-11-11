@@ -89,6 +89,13 @@
   make:
     chdir: /opt/nsjail
 
+- name: Change nsjail ownership, group and permissions
+  file:
+    path: /opt/nsjail/nsjail
+    owner: napote
+    group: napote
+    mode: '0755'
+
 - name: Write ns-chouette script which uses nsjail
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh mode=755
   tags: configuration
