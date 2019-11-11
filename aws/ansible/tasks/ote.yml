@@ -70,6 +70,13 @@
 - name: Copy /opt/chouette-cmd_3.4.8/ to /opt/chouette
   command: cp -r /opt/chouette-cmd_3.4.8/. /opt/chouette/
 
+- name: Change chouette.sh ownership, group and permissions
+  file:
+    path: /opt/chouette/chouette.sh
+    owner: napote
+    group: napote
+    mode: '0755'
+
 - name: Delete folder /opt/chouette-cmd_3.4.8/
   command: rm -rf /opt/chouette-cmd_3.4.8/
 
