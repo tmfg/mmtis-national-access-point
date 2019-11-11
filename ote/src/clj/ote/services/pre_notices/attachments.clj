@@ -36,13 +36,14 @@
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
 
-(defn- laundry-convert-file->file! "java.io/file -> java.io/file | nil" [laundry-url input-file fn-suffix conv-name]
+(defn- laundry-convert-file->file! "java.io/file -> java.io/file | nil" [laundry-url input-file fn-suffix conv-name config]
   {:pre [(some? input-file)]}
   ;; conv-name is used for the subpath of converter service, eg "checksum/sha256" or "pdf/pdf2pdfa"
   (try
     (let [temp-file (java.io.File/createTempFile "laundry-tmp" fn-suffix)
           request-opts
           {:as :byte-array
+           :basic-auth [(:laundry_apikey config) (:laundry_password config)]
            :multipart [{:name "file"
                         :content input-file
                         :filename (str "input" fn-suffix)
@@ -92,7 +93,7 @@
           orig-suffix (fn-suffix orig-filename)
           laundry-url (:laundry-url config)
           converted-file (when laundry-url
-                           (laundry-convert-file->file! laundry-url (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat")))
+                           (laundry-convert-file->file! laundry-url (:tempfile uploaded-file) orig-suffix (get conversions orig-suffix ".dat") config))
           ;; we save both the original and converted files but return only one id to the client (converted if successful, original otherwise)
           file (specql/insert! db ::transit/pre-notice-attachment
                                (modification/with-modification-timestamp-and-user
