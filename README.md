@@ -22,7 +22,7 @@ Directories:
 
 Here is a overview of our AWS production architecture. CI and other development related parts are not included.
 
-![AWS Architecture Overview](./docs/images/aws_architecture_overview.png)
+![AWS Architecture Overview](./docs/images/aws_prod_architecture_overview.png)
 
 ## Development environment setup
 
