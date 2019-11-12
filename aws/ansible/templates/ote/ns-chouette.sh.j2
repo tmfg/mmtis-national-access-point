@@ -1,8 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -eu
 set -x
 
-COMMAND=$1
-
-/opt/nsjail/nsjail -Mo --chroot / --disable_clone_newcgroup --disable_clone_newuser  -- /bin/sh /opt/chouette/chouette.sh $COMMAND
+firejail --noprofile java -Xmx1024M -jar mobi.chouette.command-3.4.8.jar $*
