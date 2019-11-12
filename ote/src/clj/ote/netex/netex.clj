@@ -106,7 +106,7 @@
    output-filepath
    chouette-cmd]
   (if (and (= 0 exit)
-           (str/blank? err)
+           ;(str/blank? err) Let conversion return something
            (chouette-report-ok? (str conversion-work-path work-dir input-report-file))
            (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
            (.exists (io/file output-filepath)))
