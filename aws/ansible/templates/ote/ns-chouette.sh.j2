@@ -3,4 +3,4 @@
 set -eu
 set -x
 
-firejail --noprofile java -Xmx1024M -jar mobi.chouette.command-3.4.8.jar $*
+firejail --noprofile --net=none java -Xmx1024M -jar mobi.chouette.command-3.4.8.jar $*
