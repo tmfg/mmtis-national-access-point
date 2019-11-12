@@ -26,26 +26,6 @@
 - name: Install required packages
   yum: name=[u'java-1.8.0-openjdk'] state=installed
 
-- name: Install required package for nsjail - bison
-  yum:
-    name: bison
-    state: installed
-
-- name: Install required package for nsjail - flex
-  yum:
-    name: flex
-    state: installed
-
-- name: Install required package for nsjail - protobuf-devel
-  yum:
-    name: protobuf-devel
-    state: installed
-
-- name: Install required package for nsjail - protobuf-compiler
-  yum:
-    name: protobuf-compiler
-    state: installed
-
 - name: Create chouette folder
   file: path=/opt/chouette state=directory owner=napote group=napote
 
@@ -60,6 +40,7 @@
     object: chouette-command.zip
     dest: /opt/chouette-command.zip
     mode: get
+    overwrite: different
 
 - name: Extract chouette-command.zip into /opt/ will make folder /opt/chouette-cmd_3.4.8/
   unarchive:
@@ -83,27 +64,12 @@
 - name: Delete ZIP chouette-command.zip
   command: rm -rf /opt/chouette-command.zip
 
-- name: Create nsjail folder
-  file: path=/opt/nsjail state=directory owner=napote group=napote
+- name: Install firejail
+    yum:
+      name: /opt/firejail-0.9.60-1.x86_64.rpm
+      state: present
 
-- name: Get nsjail from github
-  git:
-    repo: 'https://github.com/google/nsjail.git'
-    dest: /opt/nsjail
-    version: '2.8'
-
-- name: Install nsjail using make
-  make:
-    chdir: /opt/nsjail
-
-- name: Change nsjail ownership, group and permissions
-  file:
-    path: /opt/nsjail/nsjail
-    owner: napote
-    group: napote
-    mode: '0755'
-
-- name: Write ns-chouette script which uses nsjail
+- name: Write ns-chouette script which uses firejail
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
   tags: configuration
 
