@@ -83,25 +83,10 @@
 - name: Delete ZIP chouette-command.zip
   command: rm -rf /opt/chouette-command.zip
 
-- name: Create nsjail folder
-  file: path=/opt/nsjail state=directory owner=napote group=napote
-
-- name: Get nsjail from github
-  git:
-    repo: 'https://github.com/google/nsjail.git'
-    dest: /opt/nsjail
-    version: '2.8'
-
-- name: Install nsjail using make
-  make:
-    chdir: /opt/nsjail
-
-- name: Change nsjail ownership, group and permissions
-  file:
-    path: /opt/nsjail/nsjail
-    owner: napote
-    group: napote
-    mode: '0755'
+- name: Install firejail
+  yum:
+    name: /opt/firejail-0.9.60-1.x86_64.rpm
+    state: present
 
 - name: Write ns-chouette script which uses nsjail
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
