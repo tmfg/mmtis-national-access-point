@@ -131,31 +131,9 @@ Kalkati Transport modes
                         :footnote-variant-for-trip (str (:first-stop valid-footnote) "_" (:last-stop valid-footnote))
                         :stop-sequence (z/xml-> service :Stop
                                                 (fn [stop]
-                                                  (when (or
-                                                          ;; no first or last stop restrictions
-                                                          (and
-                                                            (nil? (:first-stop valid-footnote))
-                                                            (nil? (:last-stop valid-footnote)))
-                                                          ;; First stop is given, so ensure that stop index is same or greater
-                                                          (and
-                                                            (not (nil? (:first-stop valid-footnote)))
-                                                            (>= (int-attr stop :Ix) (:first-stop valid-footnote))
-                                                            (nil? (:last-stop valid-footnote)))
-                                                          ;; First and last stop are given, so ensure that stop index is same or greater than first stop
-                                                          ;; and lesser or same as last stop
-                                                          (and
-                                                            (not (nil? (:first-stop valid-footnote)))
-                                                            (not (nil? (:last-stop valid-footnote)))
-                                                            (>= (int-attr stop :Ix) (:first-stop valid-footnote))
-                                                            (<= (int-attr stop :Ix) (:last-stop valid-footnote)))
-                                                          ;; only last stop is given, so ensure that stop index is same or lesser than last stop
-                                                          (and
-                                                            (nil? (:first-stop valid-footnote))
-                                                            (not (nil? (:last-stop valid-footnote)))
-                                                            (<= (int-attr stop :Ix) (:last-stop valid-footnote))))
-                                                    {:stop-sequence (int-attr stop :Ix)
-                                                     :station-id (z/attr stop :StationId)
-                                                     :departure (z/attr stop :Departure)})))})
+                                                  {:stop-sequence (int-attr stop :Ix)
+                                                   :station-id (z/attr stop :StationId)
+                                                   :departure (z/attr stop :Departure)}))})
              valid-footnote-list)))))
 
 (defn calendars
