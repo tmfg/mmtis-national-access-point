@@ -84,7 +84,8 @@
 (define-event ForceDetectTransitChanges []
   {}
   (comm/post! "/transit-changes/force-detect/" nil
-              {:on-success #(.log js/console %)})
+              {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+               :on-success #(.log js/console %)})
   app)
 
 (define-event SetSingleDetectionServiceId [service-id]
@@ -101,7 +102,8 @@
     ;; When service-id is not given, do not try to start detection
     (when service-id
       (comm/post! (str "transit-changes/force-detect/" service-id) nil
-                  {:on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+                  {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+                   :on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))
 
 (define-event ForceInterfaceImportForGivenServiceSuccess [response]
