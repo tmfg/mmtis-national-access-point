@@ -64,10 +64,19 @@
 - name: Delete ZIP chouette-command.zip
   command: rm -rf /opt/chouette-command.zip
 
+- name: Download firejail from s3
+  aws_s3:
+    bucket: ote-assets
+    object: firejail-0.9.60-1.x86_64.rpm
+    dest: /opt/firejail-0.9.60-1.x86_64.rpm
+    mode: get
+    overwrite: different
+
+
 - name: Install firejail
   yum:
     name: /opt/firejail-0.9.60-1.x86_64.rpm
-    state: installed
+    state: present
 
 - name: Write ns-chouette script which uses firejail
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
