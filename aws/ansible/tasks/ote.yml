@@ -67,7 +67,7 @@
 - name: Install firejail
   yum:
     name: /opt/firejail-0.9.60-1.x86_64.rpm
-    state: present
+    state: installed
 
 - name: Write ns-chouette script which uses firejail
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
