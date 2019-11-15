@@ -77,11 +77,47 @@
 
 (defn tooltip
   "Render child-component with tooltip"
-  [{:keys [text pos len]} child-component]
-  [:span {:data-balloon text
-          :data-balloon-pos (or pos "up")
-          :data-balloon-length (or len "medium")}
+  [{:keys [text pos len visible]} child-component]
+  [:span (merge
+           {:data-balloon text
+            :data-balloon-pos (or pos "up-right")
+            :data-balloon-length (or len "medium")}
+           (when visible
+             {:data-balloon-visible true}))
    child-component])
+
+(defn input-tooltip
+  "Render input field with tooltip"
+  [{:keys [text pos len visible]} child-component]
+  [:div.col-xs-12
+   [:div (merge
+           {:data-balloon text
+            :data-balloon-pos (or pos "up-right")
+            :data-balloon-length (or len "medium")}
+           (when visible
+             {:data-balloon-visible true}))
+    child-component]])
+
+(defn tooltip-label
+  "Render input label with tooltip"
+  [options input-element]
+  [:div.col-xs-12
+   [:div {:style {:font-size "0.75rem"
+                  :position "relative"
+                  :padding-top "15px"
+                  :margin-bottom "-9px"
+                  :z-index 1}
+
+          :data-balloon (:text options)
+          :data-balloon-pos (or (:pos options) "up")
+          :data-balloon-length (or (:len options) "medium")}
+    [:span (:label options) [ic/action-help {:style {:margin-top "-2px"
+                                                     :margin-left "8px"
+                                                     :width "16px"
+                                                     :height "16px"
+                                                     :vertical-align "middle"
+                                                     :color "gray"}}]]]
+   input-element])
 
 (defn dialog
   "Creates a dialog with a link trigger. The body can be in hiccup format."
