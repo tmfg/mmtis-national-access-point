@@ -116,7 +116,7 @@
       ""))
 
 (defmethod field :string [{:keys [update! label name max-length min-length regex
-                                  focus on-blur on-change form? error warning table? full-width?
+                                  on-focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
                                   hint-text autocomplete disabled? element-id]
                            :as   field} data]
@@ -129,6 +129,7 @@
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
       :on-blur on-blur
+      :on-focus on-focus
       :hint-text (or hint-text (placeholder field data) "")
       :value (or data "")
       :hint-style (merge style-base/placeholder
@@ -318,51 +319,72 @@
          [:div (stylefy/use-style style-base/required-input-element)
           (tr [:common-texts :required-field])])])))
 
+(defn tooltip-wrapper [element tooltip-text element-label]
+  [common/tooltip-label {:text tooltip-text
+                         :len "medium"
+                         :label element-label}
+   element])
+
+(defn tooltip-on-focus [element tooltip-text visible]
+  [common/input-tooltip {:text tooltip-text
+                         :len "medium"
+                         :pos "up"
+                         :visible visible}
+   element])
+
 (defmethod field :autocomplete [{:keys [update! label name error warning regex
-                                        max-length style hint-style hint-text
-                                        filter suggestions max-results
-                                        on-blur disabled?
+                                        max-length style hint-style hint-text wrap-in-tooltip active-tooltip
+                                        filter suggestions max-results on-blur disabled?
                                         form? table? full-width? open-on-focus?] :as field}
                                 data]
-
+  (r/with-let [visible? (r/atom false)]
   (let [handle-change! #(let [v %1]
                           (if regex
                             (when (re-matches regex v)
                               (update! v))
-                            (update! v)))]
-    [ui/auto-complete
-     (merge
-       {:name name
-        :floating-label-text (when-not table? label)
-        :floating-label-fixed true
-        :dataSource suggestions
-        :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
-        :max-search-results (or max-results 10)
-        :open-on-focus open-on-focus?
-        :search-text (or data "")
-        :disabled disabled?
-        :hint-text (or hint-text (placeholder field data))
-        :full-width full-width?
+                            (update! v)))
 
-
-
-        :hint-style (merge style-base/placeholder
-                           hint-style)
-        :on-update-input handle-change!
-        :on-new-request handle-change!}
-       (when (or error (string? warning))
-         {;; Show error text or warning text
-          :error-text (or error warning)
-          ;; Error is more critical than required - showing it first
-          :error-style (if error
-                         style-base/error-element
-                         style-base/required-element)})
-       (when on-blur
-         {:on-blur on-blur})
-       (when max-length
-         {:max-length max-length})
-       (when style
-         {:style style}))]))
+        element
+        [ui/auto-complete
+         (merge
+           {:name name
+            :floating-label-text (when-not (or table? wrap-in-tooltip) label)
+            :floating-label-fixed true
+            :dataSource suggestions
+            :filter (or filter (aget js/MaterialUI "AutoComplete" "caseInsensitiveFilter"))
+            :max-search-results (or max-results 10)
+            :open-on-focus open-on-focus?
+            :search-text (or data "")
+            :disabled disabled?
+            :hint-text (or hint-text (placeholder field data))
+            :full-width full-width?
+            :hint-style (merge style-base/placeholder
+                               hint-style)
+            :on-update-input handle-change!
+            :on-new-request handle-change!}
+           (when (or error (string? warning))
+             {;; Show error text or warning text
+              :error-text (or error warning)
+              ;; Error is more critical than required - showing it first
+              :error-style (if error
+                             style-base/error-element
+                             style-base/required-element)})
+           (if on-blur
+             {:on-blur on-blur}
+             (when active-tooltip
+               {:on-focus #(reset! visible? true)
+                :on-blur #(reset! visible? false)}))
+           (when max-length
+             {:max-length max-length})
+           (when style
+             {:style style}))]]
+    (cond
+      (not (nil? wrap-in-tooltip))
+      [tooltip-wrapper element wrap-in-tooltip label]
+      (not (nil? active-tooltip))
+      [tooltip-on-focus element active-tooltip @visible?]
+      :else
+      element))))
 
 (defmethod field :chip-input [{:keys [update! label name error warning regex
                                       on-blur on-update-input on-request-add on-request-delete
@@ -401,7 +423,8 @@
         :allow-duplicates allow-duplicates?
         ; Vector of key-codes for triggering new chip creation, 13 => enter, 32 => space
         :new-chip-key-codes (or new-chip-key-codes [13])
-
+        ;; Show error text or warning text or empty string
+        :error-text (or error warning "")
         ;; == Styling ==
         :full-width full-width?
         :full-width-input full-width-input?
@@ -429,9 +452,6 @@
        ;;   ((:value dataSourceConfig) {:key 2}) -> 2
        (when suggestions-config
          {:dataSourceConfig suggestions-config})
-       (when error
-         ;; Show error text or warning text
-         {:error-text (or error warning)})
        (when max-length
          {:max-length max-length})
        (when style
@@ -506,52 +526,65 @@
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
-           auto-width? full-width? id]
+           auto-width? full-width? id wrap-in-tooltip active-tooltip max-height]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
+  (r/with-let [visible? (r/atom false)]
   (let [selected-set (set (or data #{}))
-        option-idx (zipmap options (range))]
-    [:div
-      [ui/select-field
-       (merge
-        {:id id
-         :style style
-         :floating-label-text (when-not table? label)
-         :floating-label-fixed true
-         :multiple true
-         :value (clj->js (map option-idx selected-set))
-         :selection-renderer (fn [values]
-                               (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
-         :on-change (fn [event index values]
-                      (cond
-                        ;; Select all - if :ALL option is present, if first element is selected and if all options aren't selected
-                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (<= (count values) (count (drop 1 options))))
-                          (update! (drop 1 options))
-                        ;;Deselect all
-                        (and (some #(= :ALL %) options) (some #(= 0 %) values) (= (count options) (count values)))
-                          (update! (into #{} nil))
-                        ;; Select one
-                        :else (update! (into #{}
-                                             (map (partial nth options))
-                                             values))))}
-        (when auto-width?
-          {:auto-width true})
-        (when full-width?
-          {:full-width true}))
-       ;; Add selected value to vector
-       (doall
-        (map-indexed
-         (fn [i option]
-           ^{:key i}
-           [ui/menu-item {:value i
-                          :primary-text (show-option option)
-                          :inset-children true
-                          :checked (boolean (selected-set option))}])
-         options))]
-    (when (or error (string? warning))
-      [:div (stylefy/use-style style-base/required-element)
-       (if error error warning)])]))
+        option-idx (zipmap options (range))
+        element
+        [:div
+         [ui/select-field
+          (merge
+            {:id id
+             :style style
+             :on-focus (when active-tooltip
+                         #(reset! visible? true))
+             :on-blur (when active-tooltip
+                        #(reset! visible? false))
+             :floating-label-text (when-not (or table? wrap-in-tooltip) label)
+             :floating-label-fixed true
+             :multiple true
+             :auto-width true
+             :max-height (or max-height 400)
+             :value (clj->js (map option-idx selected-set))
+             :selection-renderer (fn [values]
+                                   (str/join ", " (map (comp (or show-option-short show-option) (partial nth options)) values)))
+             :on-change (fn [event index values]
+                          (cond
+                            ;; Select all - if :ALL option is present, if first element is selected and if all options aren't selected
+                            (and (some #(= :ALL %) options) (some #(= 0 %) values) (<= (count values) (count (drop 1 options))))
+                            (update! (drop 1 options))
+                            ;;Deselect all
+                            (and (some #(= :ALL %) options) (some #(= 0 %) values) (= (count options) (count values)))
+                            (update! (into #{} nil))
+                            ;; Select one
+                            :else (update! (into #{}
+                                                 (map (partial nth options))
+                                                 values))))}
+            (when auto-width?
+              {:auto-width true})
+            (when full-width?
+              {:full-width true}))
+          ;; Add selected value to vector
+          (doall
+            (map-indexed
+              (fn [i option]
+                ^{:key i}
+                [ui/menu-item {:value i
+                               :primary-text (show-option option)
+                               :inset-children true
+                               :checked (boolean (selected-set option))}])
+              options))]
+         (when (or error (string? warning))
+           [:div (stylefy/use-style style-base/required-element)
+            (if error error warning)])]]
+    (if wrap-in-tooltip
+      [tooltip-wrapper element wrap-in-tooltip label]
+      (if active-tooltip
+        [tooltip-on-focus element active-tooltip @visible?]
+        element)))))
 
 (def phone-regex #"\+?\d+")
 
@@ -781,7 +814,7 @@
 (defmethod field :default [opts data]
   [:div.error "Missing field type: " (:type opts)])
 
-(defmethod field :div-table [{:keys [table-fields div-class update! error-data delete? inner-delete? delete-label
+(defmethod field :div-table [{:keys [table-fields div-class update! error-data delete? inner-delete? delete-label inner-delete-class
                                      inner-delete-label add-label add-inner-label add-label-disabled? id add-divider?] :as options} data]
   (let [data (if (empty? data)
                ;; div-table always contains at least one row
@@ -837,8 +870,8 @@
                         value]
                        :else nil)]))
                 (when inner-delete?
-                  [:div {:class div-class
-                         :style {:padding-top "1rem"}}
+                  [:div {:class inner-delete-class
+                         :style {:padding-top "1rem" :padding-left "2rem"}}
                    [buttons/delete-table-row {:on-click #(update! (vec (concat (when (pos? i)
                                                                                  (take i data))
                                                                                (drop (inc i) data))))}
