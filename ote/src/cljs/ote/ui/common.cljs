@@ -27,11 +27,11 @@
    (linkify url label nil))
   ([url label {:keys [icon target style] :as props}]
    (let [a-props (dissoc
-                  (if (= target "_blank")
-                    ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
-                    (assoc props :rel "noopener noreferrer")
-                    props)
-                  :icon :style)]
+                   (if (= target "_blank")
+                     ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
+                     (assoc props :rel "noopener noreferrer")
+                     props)
+                   :icon :style)]
 
      (if-not url
        [:span]
@@ -52,8 +52,8 @@
                (stylefy/use-style (merge style-base/base-link
                                          (when style
                                            style)))
-              {:href url}
-              a-props)
+               {:href url}
+               a-props)
           (if icon
             (let [[icon-elt icon-attrs] icon]
               [:span [icon-elt (merge icon-attrs
@@ -69,8 +69,8 @@
   "Wrap any ui component with balloon.css tooltip bindings."
   [component & [wrapper-opts]]
   (fn [data {:keys [text pos len] :as opts}]
-    [:span (merge {:data-balloon        text
-                   :data-balloon-pos    (or pos "up")
+    [:span (merge {:data-balloon text
+                   :data-balloon-pos (or pos "up")
                    :data-balloon-length (or len "medium")}
                   wrapper-opts)
      (component data)]))
@@ -174,12 +174,12 @@
   [:table
    [:tbody
     (map-indexed
-     (fn [i [left right]]
-       ^{:key i}
-       [:tr
-        [:td {:style {:vertical-align "top"}} left]
-        [:td right]])
-     (partition 2 items))]])
+      (fn [i [left right]]
+        ^{:key i}
+        [:tr
+         [:td {:style {:vertical-align "top"}} left]
+         [:td right]])
+      (partition 2 items))]])
 
 (defn scroll-sensor [on-scroll]
   (let [sensor-node (atom nil)
@@ -192,16 +192,16 @@
                            (on-scroll))))]
 
     (r/create-class
-     {:component-did-mount
-      (fn [this]
-        (reset! sensor-node (aget this "refs" "sensor"))
-        (.addEventListener js/window "scroll" check-scroll))
-      :component-will-unmount
-      (fn [this]
-        (.removeEventListener js/window "scroll" check-scroll))
-      :reagent-render
-      (fn [_]
-        [:span {:ref "sensor"}])})))
+      {:component-did-mount
+       (fn [this]
+         (reset! sensor-node (aget this "refs" "sensor"))
+         (.addEventListener js/window "scroll" check-scroll))
+       :component-will-unmount
+       (fn [this]
+         (.removeEventListener js/window "scroll" check-scroll))
+       :reagent-render
+       (fn [_]
+         [:span {:ref "sensor"}])})))
 
 (defn copy-to-clipboard [text-to-copy]
   (let [id (name (gensym "ctc"))
@@ -226,11 +226,11 @@
   the path to access key :name from my-thing is: [0 :name]."
   [& accessor-paths]
   (fn [_ old-argv new-argv]
-    (let [old-argv  (subvec old-argv 1)
+    (let [old-argv (subvec old-argv 1)
           new-argv (subvec new-argv 1)]
       (boolean
-       (some #(not= (get-in old-argv %) (get-in new-argv %))
-             accessor-paths)))))
+        (some #(not= (get-in old-argv %) (get-in new-argv %))
+              accessor-paths)))))
 
 
 (defn gravatar
@@ -248,29 +248,29 @@
    (ckan-iframe-dialog title url on-close on-close))
   ([title url on-close on-ckan-close]
    (r/create-class
-    {:component-did-mount
-     (fn [_]
-       (aset js/window "closeOteCkanDialog" on-ckan-close))
-     :reagent-render
-     (fn [title url on-close _]
-       [ui/dialog
-        {:open true
-         :modal true
-         :title   title
-         :actions [(r/as-element
-                    [ui/flat-button
-                     {:label     (tr [:buttons :close])
-                      :primary   true
-                      :on-click  on-close}])]}
-        [:iframe {:style {:width "100%"
-                          :height "400px"
-                          :border "none"}
-                  :src url}]])})))
+     {:component-did-mount
+      (fn [_]
+        (aset js/window "closeOteCkanDialog" on-ckan-close))
+      :reagent-render
+      (fn [title url on-close _]
+        [ui/dialog
+         {:open true
+          :modal true
+          :title title
+          :actions [(r/as-element
+                      [ui/flat-button
+                       {:label (tr [:buttons :close])
+                        :primary true
+                        :on-click on-close}])]}
+         [:iframe {:style {:width "100%"
+                           :height "400px"
+                           :border "none"}
+                   :src url}]])})))
 
 (defonce keyframes
-  (stylefy/keyframes "fade-out"
-                     [:from {:opacity 1}]
-                     [:to {:opacity 0 :visibility "hidden"}]))
+         (stylefy/keyframes "fade-out"
+                            [:from {:opacity 1}]
+                            [:to {:opacity 0 :visibility "hidden"}]))
 
 
 (defn rotate-device-notice []
