@@ -66,7 +66,7 @@
   (POST (request-url url)
         {:headers (anti-csrf-token-header)
          :params          body
-         :timeout         (or timeout 30000)
+         :timeout         (or timeout 60000)                ;; By default - set timeout to 60 sec
          :handler         (response-handler! on-success)
          :error-handler   (response-handler! on-failure)
          :format          (transit-request-format)
