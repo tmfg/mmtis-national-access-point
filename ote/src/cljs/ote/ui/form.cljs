@@ -260,7 +260,7 @@
                 show-errors? (or (not hide-error-until-modified?)
                                  (get modified name))]]
       ^{:key name}
-      [:div.form-field {:class container-class :style (merge (if (#{:string :localized-text} (:type s))
+      [:div.form-field {:class container-class :style (merge (if (#{:string :localized-text :number :multiselect-selection} (:type s))
                                                                {:margin-bottom (if (some? margin-bottom)
                                                                                  margin-bottom
                                                                                  "2rem")}

@@ -61,27 +61,27 @@
      :add-label    (tr [:buttons :add-new-price-class])
      :delete?      true}
 
-    {:container-class "col-md-6"
+    {:container-class "col-xs-12 col-sm-6 col-md-6"
      :name            ::t-service/pricing-description
      :type            :localized-text
      :full-width?     true
      :write           #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
      :read            (comp ::t-service/description ::t-service/pricing)}
 
-    {:container-class "col-md-5"
+    {:container-class "col-xs-12 col-sm-6 col-md-6"
      :name  ::t-service/pricing-url
      :type  :string
      :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
      :read  (comp ::t-service/url ::t-service/pricing)}
 
-    {:container-class "col-md-3"
+    {:container-class "col-xs-12 col-sm-6 col-md-4"
      :name            ::t-service/payment-methods
      :type            :multiselect-selection
      :show-option     (tr-key [:enums ::t-service/payment-methods])
      :options         t-service/payment-methods}
 
-    {:container-class "col-md-8"
+    {:container-class "col-xs-12 col-sm-6 col-md-8"
      :name ::t-service/payment-method-description
      :type :localized-text
      :rows 1
@@ -219,11 +219,12 @@
      :show-option     (tr-key [:enums ::t-service/information-service-accessibility])
      :options         t-service/parking-information-service-accessibility
      :full-width?     true
-     :container-class "col-md-5"}
+     :container-class "col-md-5"
+     :container-style {:align-self "baseline"}}
 
     {:name            ::t-service/accessibility-description
      :type            :localized-text
-     :rows            2
+     :rows            1
      :container-class "col-md-6"
      :full-width?     true}
 
