@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
+            [ote.ui.common :refer [linkify]]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
             [ote.app.controller.front-page :as fp-controller]
