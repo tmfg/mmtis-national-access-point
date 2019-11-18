@@ -1125,6 +1125,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :day-of-week-7-short "Sö"
   :no-operators "Inga tjänsteproducenter"
   :country "Land"
+  :filling-info "Anvisning"
   }
 
 

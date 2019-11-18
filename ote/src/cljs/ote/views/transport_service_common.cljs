@@ -84,7 +84,6 @@
        :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
        :full-width?  true}]))))
 
-
 (defn service-urls
   "Creates a table for additional service urls."
   [label service-url-field]
@@ -327,7 +326,6 @@
                      :help-link      "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
      :type          :checkbox
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
-
 
 (defn contact-info-group []
   (form/group
@@ -641,7 +639,6 @@
                        (if (= sub-type :taxi)
                          false
                           true))}))
-
 
 (defn place-search-dirty-event [e!]
   ;; To set transport service form dirty when adding / removing places using the place-search component,
