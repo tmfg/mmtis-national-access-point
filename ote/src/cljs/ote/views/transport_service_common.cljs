@@ -119,7 +119,7 @@
             {:text (tr [:form-help :external-interfaces-tooltips :view-routes])}]]
           {:target "_blank"})))))
 
-(defn external-interfaces-active-tooltip
+(defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
   [& [e! type sub-type transport-type]]
   (let [type (or type :other)
@@ -175,17 +175,6 @@
                        :full-width? true
                        :options t-service/interface-data-contents
                        :show-option (tr-key [:enums ::t-service/interface-data-content])
-
-                       ;:write (fn [data vals]
-                       ;         (assoc-in data [::t-service/data-content]
-                       ;                   ;; Values lose their keyword status inside the component, so we'll make
-                       ;                   ;; sure that they will be keywords in the state.
-                       ;                   (mapv (comp keyword :value) vals)))
-                       ;:read #(as-> % data
-                       ;             (get-in data [::t-service/data-content])
-                       ;             (mapv (fn [val]
-                       ;                     {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
-                       ;                   data))
                        :required? true
                        :is-empty? validation/empty-enum-dropdown?}
                       {:name ::t-service/format
@@ -296,180 +285,6 @@
        :inner-delete? true
        :inner-delete-class "col-xs-6 col-sm-3 col-md-3"
        :inner-delete-label (tr [:buttons :delete-interface])})))
-
-(defn external-interfaces
-  "Creates a form group for external services. Displays help texts conditionally by transport operator type."
-  [& [e! type sub-type transport-type]]
-  (let [type (or type :other)
-        transport-type (set transport-type)]
-
-    (form/group
-      {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
-       :columns 3
-       :card? false
-       :top-border true}
-
-      {:name :external-interface-instructions
-       :type :component
-       :full-width? true
-       :component (fn [_]
-                    [info/info-toggle
-                     (tr [:own-services-page :filling-info])
-                     [:div
-                      [:div
-                       [:b (if (= :schedule sub-type)
-                             [:span (str (tr [:form-help :external-interfaces-intro-1]) " ")
-                              (when (:road transport-type)
-                                [:span (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
-                                 [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
-                                  (str (tr [:form-help :RAE-link-text]) ". ")
-                                  {:target "_blank"}]])
-                              (when (and (flags/enabled? :sea-routes) (:sea transport-type))
-                                [:span
-                                 (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
-                                 [linkify "/ote/#/routes" (tr [:form-help :SEA-ROUTE-link-text])
-                                  {:target "_blank"}]])]
-                             (tr [:form-help :external-interfaces-intro]))]]
-                      [:div (tr [:form-help :external-interfaces])]
-                      [dialog
-                       (tr [:form-help :external-interfaces-read-more :link])
-                       (tr [:form-help :external-interfaces-read-more :dialog-title])
-                       [:div
-                        (tr [:form-help :external-interfaces-read-more :dialog-text])]]
-                      (when (= :passenger-transportation type)
-                        [:div {:style {:margin-top "20px"}}
-                         [:b (tr [:form-help :external-interfaces-payment-systems])]])]
-                     {:default-open? false}])}
-
-      {:name ::t-service/external-interfaces
-       :type :div-table
-       :prepare-for-save values/without-empty-rows
-       :table-fields [{:name ::t-service/data-content
-                       :type :multiselect-selection
-                       :wrap-in-tooltip (tr [:form-help :external-interfaces-tooltips :data-content])
-                       :label (tr [:field-labels :transport-service-common ::t-service/data-content])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :options t-service/interface-data-contents
-                       :show-option (tr-key [:enums ::t-service/interface-data-content])
-
-                       ;:write (fn [data vals]
-                       ;         (assoc-in data [::t-service/data-content]
-                       ;                   ;; Values lose their keyword status inside the component, so we'll make
-                       ;                   ;; sure that they will be keywords in the state.
-                       ;                   (mapv (comp keyword :value) vals)))
-                       ;:read #(as-> % data
-                       ;             (get-in data [::t-service/data-content])
-                       ;             (mapv (fn [val]
-                       ;                     {:text (tr [:enums ::t-service/interface-data-content val]) :value val})
-                       ;                   data))
-                       :required? true
-                       :is-empty? validation/empty-enum-dropdown?}
-                      {:name ::t-service/format
-                       :type :autocomplete
-                       :wrap-in-tooltip (tr [:form-help :external-interfaces-tooltips :format])
-                       :open-on-focus? true
-                       :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
-                       :max-results 10
-                       :label (tr [:field-labels :transport-service-common ::t-service/format])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :required? true
-                       ;; Wrap value with vector to support current type of format field in the database.
-                       :write (fn [row val]
-                                (let [{eif ::t-service/external-interface} row]
-                                  ;; validate external interface again, if changing format.
-                                  ;; Invoke event asynchronously so that the value will be update before sending the
-                                  ;; validation request to prevent stuttering user interface.
-                                  (.setTimeout
-                                    js/window
-                                    #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
-                                  (assoc row ::t-service/format #{val})))
-                       :read #(first (get-in % [::t-service/format]))}
-                      {:name ::t-service/external-service-url
-                       :type :component
-                       :wrap-in-tooltip (tr [:form-help :external-interfaces-tooltips :external-service-url])
-                       :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                       :field-class "col-xs-6 col-sm-6 col-md-6"
-                       :read #(identity %)
-                       :write (fn [row val]
-                                (assoc-in row [::t-service/external-interface ::t-service/url] val))
-                       :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
-                                         :as row} :data
-                                        update-form! :update-form!
-                                        row-number :row-number}]
-
-                                    [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
-                                     [common-ui/tooltip-label {:text (tr [:form-help :external-interfaces-tooltips :external-service-url])
-                                                               :len "medium"
-                                                               :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])}
-                                      [form-fields/field
-                                       (merge
-                                         {:name ::t-service/external-service-url
-                                          :type :string
-                                          ;:label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                                          ;:width "70%"
-                                          :required? true
-                                          :full-width? true
-                                          :update! #(update-form! %)
-                                          :on-blur #(e! (ts/->EnsureExternalInterfaceUrl (-> % .-target .-value) (first format)))
-                                          :max-length 200}
-                                         ;; For first row: If there is data in other fields, show this required field warning
-                                         ;; For other rows, if this required field is missing, show the warning.
-                                         (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
-                                                   (and (> row-number 0) (empty? (::t-service/url external-interface))))
-                                           {:warning (tr [:common-texts :required-field])}))
-                                       (::t-service/url external-interface)]]
-
-                                     [:span {:style {:width "30%" :margin-left "0.5rem" :padding-top "1.5rem"}}
-                                      (let [url-status (get-in external-interface [:url-status :status])
-                                            url-error (get-in external-interface [:url-status :error])]
-                                        (if-not url-status
-                                          [gtfs-viewer-link row]
-
-                                          (if (= :success url-status)
-                                            [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
-                                             [(tooltip-wrapper ic/action-done)
-                                              {:style (merge style-base/icon-small
-                                                             {:color "green"
-                                                              :position "relative"
-                                                              :top "15px"})}
-                                              {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                             [gtfs-viewer-link row]]
-                                            [:span [(tooltip-wrapper ic/alert-warning)
-                                                    {:style (merge style-base/icon-small
-                                                                   {:color "cccc00"
-                                                                    :position "relative"
-                                                                    :top "15px"})}
-
-                                                    {:text (tr [:field-labels :transport-service-common
-                                                                (if (= :zip-validation-failed url-error)
-                                                                  :external-interfaces-validation-error
-                                                                  :external-interfaces-warning)])}]])))]])}
-
-                      {:name ::t-service/external-service-description
-                       :type :localized-text
-                       :wrap-in-tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
-                       :label (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-                       :field-class "col-xs-6 col-sm-6 col-md-6"
-                       :full-width? true
-                       :read (comp ::t-service/description ::t-service/external-interface)
-                       :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                       :required? false}
-                      {:name ::t-service/license
-                       :type :autocomplete
-                       :open-on-focus? true
-                       :wrap-in-tooltip (tr [:form-help :external-interfaces-tooltips :license])
-                       :label (tr [:field-labels :transport-service-common ::t-service/license])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :suggestions (tr-tree [:licenses :external-interfaces])
-                       :max-results 10}]
-       :add-label (tr [:buttons :add-external-interface])
-       :inner-delete? true
-       :inner-delete-class "col-xs-6 col-sm-3 col-md-3"
-       :inner-delete-label (tr [:buttons :delete-interface])})))
-
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
