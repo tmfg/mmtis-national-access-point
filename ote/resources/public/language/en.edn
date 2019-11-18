@@ -1124,6 +1124,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :day-of-week-7-short "Sun"
   :no-operators "No transport operators"
   :country "Country"
+  :filling-info "Filling instructions"
   }
 
 

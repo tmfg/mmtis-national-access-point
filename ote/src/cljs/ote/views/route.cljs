@@ -75,7 +75,7 @@
      [circular-progress/circular-progress]
      [:div
       [info/info-toggle
-       (tr [:common-texts :instructions])
+       (tr [:common-texts :filling-info])
        [:div
         [:p (tr [:route-wizard-page :instructions-description])]
         [:a (merge {:href "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"

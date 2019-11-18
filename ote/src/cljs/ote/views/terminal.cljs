@@ -103,7 +103,7 @@
     :name ::t-service/accessibility-description
     :type :localized-text
     :full-width? true
-    :rows 2}
+    :rows 1}
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name ::t-service/accessibility-info-url
@@ -119,12 +119,13 @@
     :show-option (tr-key [:enums ::t-service/accessibility])
     :options     t-service/accessibility}
 
-   {:name        ::t-service/information-service-accessibility
-    :type        :checkbox-group
+   {:name ::t-service/information-service-accessibility
+    :type :checkbox-group
     :full-width? true
     :container-class "col-xs-12 col-sm-6 col-md-6"
     :show-option (tr-key [:enums ::t-service/information-service-accessibility])
-    :options     t-service/information-service-accessibility}))
+    :options t-service/information-service-accessibility
+    :container-style {:align-self "baseline"}}))
 
 (defn terminal [e! {form-data ::t-service/terminal} app]
   (r/with-let [groups [(ts-common/transport-type ::t-service/terminal)
@@ -132,7 +133,7 @@
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/terminal)
                        (ts-common/external-interfaces e!)
-                       (ts-common/service-hours-group "terminal")
+                       (ts-common/service-hours-group "terminal" false)
                        (indoor-map-group)
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]

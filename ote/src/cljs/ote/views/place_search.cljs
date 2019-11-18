@@ -201,8 +201,12 @@
       :columns 3
       :card? false
       :top-border true}
-
-     (form/info (tr [:form-help :operation-area]))
+     
+     {:name          :help-palce-search-form-group
+      :type          :info-toggle
+      :label         (tr [:common-texts :filling-info])
+      :body          [:div (tr [:form-help :operation-area])]
+      :default-state false}
 
      {:type :component
       :name name
