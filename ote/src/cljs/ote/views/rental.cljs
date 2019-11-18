@@ -238,7 +238,7 @@
               :name->label (tr-key [:field-labels :rentals]
                                    [:field-labels :transport-service]
                                    [:field-labels])}
-   [(ts-common/service-hours-group "rental")]
+   [(ts-common/service-hours-group "rental" true)]
    data])
 
 (defn service-hour-form-element
@@ -266,7 +266,7 @@
                   :name->label (tr-key [:field-labels :rentals]
                                        [:field-labels :transport-service]
                                        [:field-labels])}
-       [(ts-common/service-hours-group "rental")]
+       [(ts-common/service-hours-group "rental" true)]
        data]]]))
 
 (defn pick-up-locations []

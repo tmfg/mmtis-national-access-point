@@ -133,7 +133,7 @@
                        (ts-common/contact-info-group)
                        (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/terminal)
                        (ts-common/external-interfaces e!)
-                       (ts-common/service-hours-group "terminal")
+                       (ts-common/service-hours-group "terminal" false)
                        (indoor-map-group)
                        (assistance-service-group)
                        (accessibility-and-other-services-group)]
