@@ -4,7 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [ote.ui.icons :as icons]
-            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.form :as form]
             [ote.ui.form-groups :as form-groups]
             [ote.ui.buttons :as buttons]

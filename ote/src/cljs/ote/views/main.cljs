@@ -7,7 +7,7 @@
             [ote.style.base :as style-base]
             [ote.ui.circular_progress :as spinner]
             [ote.ui.main-header :refer [top-nav]]
-            [ote.ui.common :refer [linkify ckan-iframe-dialog]]
+            [ote.ui.common :refer [linkify]]
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]

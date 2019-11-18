@@ -106,57 +106,37 @@ Kalkati Transport modes
              (let [;; Kalkati.net Timetbls Service can contain multiple footnotes. All of which are not valid.
                    ;; We take first and last stop from those footnotes
                    valid-footnote-list (z/xml-> service :ServiceValidity
-                                                   (fn [servicevalidity]
-                                                     {:footnote-id (int-attr servicevalidity :FootnoteId)
-                                                      :first-stop (when (z/attr servicevalidity :Firststop)
-                                                                    (Integer/parseInt (z/attr servicevalidity :Firststop)))
-                                                      :last-stop (when (z/attr servicevalidity :Laststop)
-                                                                   (Integer/parseInt (z/attr servicevalidity :Laststop)))}))
+                                                (fn [servicevalidity]
+                                                  {:footnote-id (int-attr servicevalidity :FootnoteId)
+                                                   :first-stop (when (z/attr servicevalidity :Firststop)
+                                                                 (Integer/parseInt (z/attr servicevalidity :Firststop)))
+                                                   :last-stop (when (z/attr servicevalidity :Laststop)
+                                                                (Integer/parseInt (z/attr servicevalidity :Laststop)))}))
                    ;; Filter out all footnotes that are not in calendars list
                    valid-footnote-list (filter
-                                            (fn [fid]
-                                              (some
-                                                (fn [c]
-                                                  (= (:footnote-id fid) (Integer/parseInt c)))
-                                                (map #(:id (second %)) calendars)))
-                                            valid-footnote-list)]
-                (map (fn [valid-footnote]
-                       {:service-id (z/attr service :ServiceId)
-                        :company-id (z/xml1-> service :ServiceNbr (z/attr :CompanyId))
-                        :number (z/xml1-> service :ServiceNbr (z/attr :ServiceNbr))
-                        :name (z/xml1-> service :ServiceNbr (z/attr :Name))
-                        :variant (z/xml1-> service :ServiceNbr (z/attr :Variant))
-                        :mode-id (z/xml1-> service :ServiceTrnsmode (z/attr :TrnsmodeId))
-                        :validity-footnote-id (:footnote-id valid-footnote)
-                        :footnote-variant-for-trip (str (:first-stop valid-footnote) "_" (:last-stop valid-footnote))
-                        :stop-sequence (z/xml-> service :Stop
-                                                (fn [stop]
-                                                  (when (or
-                                                          ;; no first or last stop restrictions
-                                                          (and
-                                                            (nil? (:first-stop valid-footnote))
-                                                            (nil? (:last-stop valid-footnote)))
-                                                          ;; First stop is given, so ensure that stop index is same or greater
-                                                          (and
-                                                            (not (nil? (:first-stop valid-footnote)))
-                                                            (>= (int-attr stop :Ix) (:first-stop valid-footnote))
-                                                            (nil? (:last-stop valid-footnote)))
-                                                          ;; First and last stop are given, so ensure that stop index is same or greater than first stop
-                                                          ;; and lesser or same as last stop
-                                                          (and
-                                                            (not (nil? (:first-stop valid-footnote)))
-                                                            (not (nil? (:last-stop valid-footnote)))
-                                                            (>= (int-attr stop :Ix) (:first-stop valid-footnote))
-                                                            (<= (int-attr stop :Ix) (:last-stop valid-footnote)))
-                                                          ;; only last stop is given, so ensure that stop index is same or lesser than last stop
-                                                          (and
-                                                            (nil? (:first-stop valid-footnote))
-                                                            (not (nil? (:last-stop valid-footnote)))
-                                                            (<= (int-attr stop :Ix) (:last-stop valid-footnote))))
-                                                    {:stop-sequence (int-attr stop :Ix)
-                                                     :station-id (z/attr stop :StationId)
-                                                     :departure (z/attr stop :Departure)})))})
-             valid-footnote-list)))))
+                                         (fn [fid]
+                                           (some
+                                             (fn [c]
+                                               (= (:footnote-id fid) (Integer/parseInt c)))
+                                             (map #(:id (second %)) calendars)))
+                                         valid-footnote-list)
+                   ;; kalkati.net producers doesn't follow the specification on footnotes and services
+                   ;; So there might be wrong firststop and laststop values and wrong footnotes (calendars)
+                   ;; And for that reason we can only take first valid footnote (calendar) into account
+                   valid-footnote (first valid-footnote-list)]
+               {:service-id (z/attr service :ServiceId)
+                :company-id (z/xml1-> service :ServiceNbr (z/attr :CompanyId))
+                :number (z/xml1-> service :ServiceNbr (z/attr :ServiceNbr))
+                :name (z/xml1-> service :ServiceNbr (z/attr :Name))
+                :variant (z/xml1-> service :ServiceNbr (z/attr :Variant))
+                :mode-id (z/xml1-> service :ServiceTrnsmode (z/attr :TrnsmodeId))
+                :validity-footnote-id (:footnote-id valid-footnote)
+                :footnote-variant-for-trip (str (:first-stop valid-footnote) "_" (:last-stop valid-footnote))
+                :stop-sequence (z/xml-> service :Stop
+                                        (fn [stop]
+                                          {:stop-sequence (int-attr stop :Ix)
+                                           :station-id (z/attr stop :StationId)
+                                           :departure (z/attr stop :Departure)}))}))))
 
 (defn calendars
   "Return all calendars mapped by footnote id.

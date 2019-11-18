@@ -333,7 +333,6 @@
      :type          :checkbox
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
-
 (defn contact-info-group []
   (form/group
     {:label (tr [:passenger-transportation-page :header-contact-details])
@@ -480,7 +479,7 @@
    (tr [:field-labels :transport-service-common ::t-service/operation-area])
    ::t-service/operation-area))
 
-(defn service-hours-group [service-type]
+(defn service-hours-group [service-type sub-component?]
   (let [tr* (tr-key [:field-labels :service-exception])
         write-time (fn [key]
                      (fn [{all-day? ::t-service/all-day :as data} time]
@@ -489,10 +488,13 @@
                          data
                          (assoc data key time))))]
     (form/group
-      {:label (tr [:passenger-transportation-page :header-service-hours])
-       :columns 3
-       :card? false
-       :sub-component true}
+      (merge
+        {:label (tr [:passenger-transportation-page :header-service-hours])
+              :columns 3
+              :card? false
+              :sub-component sub-component?}
+        (when (= false sub-component?)
+          {:top-border true}))
 
       {:name ::t-service/service-hours
        :id "service-hours-div-table"
@@ -643,7 +645,6 @@
                        (if (= sub-type :taxi)
                          false
                           true))}))
-
 
 (defn place-search-dirty-event [e!]
   ;; To set transport service form dirty when adding / removing places using the place-search component,

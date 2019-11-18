@@ -1132,6 +1132,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :day-of-week-7-short "Su"
   :no-operators "Ei palveluntuottajia"
   :country "Maa"
+  :filling-info "Täyttöohje"
   }
 
 
