@@ -79,7 +79,8 @@
      :name            ::t-service/payment-methods
      :type            :multiselect-selection
      :show-option     (tr-key [:enums ::t-service/payment-methods])
-     :options         t-service/payment-methods}
+     :options         t-service/payment-methods
+     :container-style {:padding-bottom "2rem"}}
 
     {:container-class "col-xs-12 col-sm-6 col-md-8"
      :name ::t-service/payment-method-description

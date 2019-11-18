@@ -27,11 +27,11 @@
    (linkify url label nil))
   ([url label {:keys [icon target style] :as props}]
    (let [a-props (dissoc
-                  (if (= target "_blank")
-                    ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
-                    (assoc props :rel "noopener noreferrer")
-                    props)
-                  :icon :style)]
+                   (if (= target "_blank")
+                     ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
+                     (assoc props :rel "noopener noreferrer")
+                     props)
+                   :icon :style)]
 
      (if-not url
        [:span]
@@ -52,8 +52,8 @@
                (stylefy/use-style (merge style-base/base-link
                                          (when style
                                            style)))
-              {:href url}
-              a-props)
+               {:href url}
+               a-props)
           (if icon
             (let [[icon-elt icon-attrs] icon]
               [:span [icon-elt (merge icon-attrs
@@ -69,19 +69,55 @@
   "Wrap any ui component with balloon.css tooltip bindings."
   [component & [wrapper-opts]]
   (fn [data {:keys [text pos len] :as opts}]
-    [:span (merge {:data-balloon        text
-                   :data-balloon-pos    (or pos "up")
+    [:span (merge {:data-balloon text
+                   :data-balloon-pos (or pos "up")
                    :data-balloon-length (or len "medium")}
                   wrapper-opts)
      (component data)]))
 
 (defn tooltip
   "Render child-component with tooltip"
-  [{:keys [text pos len]} child-component]
-  [:span {:data-balloon text
-          :data-balloon-pos (or pos "up")
-          :data-balloon-length (or len "medium")}
+  [{:keys [text pos len visible]} child-component]
+  [:span (merge
+           {:data-balloon text
+            :data-balloon-pos (or pos "up-right")
+            :data-balloon-length (or len "medium")}
+           (when visible
+             {:data-balloon-visible true}))
    child-component])
+
+(defn input-tooltip
+  "Render input field with tooltip"
+  [{:keys [text pos len visible]} child-component]
+  [:div.col-xs-12
+   [:div (merge
+           {:data-balloon text
+            :data-balloon-pos (or pos "up-right")
+            :data-balloon-length (or len "medium")}
+           (when visible
+             {:data-balloon-visible true}))
+    child-component]])
+
+(defn tooltip-label
+  "Render input label with tooltip"
+  [options input-element]
+  [:div.col-xs-12
+   [:div {:style {:font-size "0.75rem"
+                  :position "relative"
+                  :padding-top "15px"
+                  :margin-bottom "-9px"
+                  :z-index 1}
+
+          :data-balloon (:text options)
+          :data-balloon-pos (or (:pos options) "up")
+          :data-balloon-length (or (:len options) "medium")}
+    [:span (:label options) [ic/action-help {:style {:margin-top "-2px"
+                                                     :margin-left "8px"
+                                                     :width "16px"
+                                                     :height "16px"
+                                                     :vertical-align "middle"
+                                                     :color "gray"}}]]]
+   input-element])
 
 (defn dialog
   "Creates a dialog with a link trigger. The body can be in hiccup format."
@@ -129,12 +165,12 @@
   [:table
    [:tbody
     (map-indexed
-     (fn [i [left right]]
-       ^{:key i}
-       [:tr
-        [:td {:style {:vertical-align "top"}} left]
-        [:td right]])
-     (partition 2 items))]])
+      (fn [i [left right]]
+        ^{:key i}
+        [:tr
+         [:td {:style {:vertical-align "top"}} left]
+         [:td right]])
+      (partition 2 items))]])
 
 (defn scroll-sensor [on-scroll]
   (let [sensor-node (atom nil)
@@ -147,16 +183,16 @@
                            (on-scroll))))]
 
     (r/create-class
-     {:component-did-mount
-      (fn [this]
-        (reset! sensor-node (aget this "refs" "sensor"))
-        (.addEventListener js/window "scroll" check-scroll))
-      :component-will-unmount
-      (fn [this]
-        (.removeEventListener js/window "scroll" check-scroll))
-      :reagent-render
-      (fn [_]
-        [:span {:ref "sensor"}])})))
+      {:component-did-mount
+       (fn [this]
+         (reset! sensor-node (aget this "refs" "sensor"))
+         (.addEventListener js/window "scroll" check-scroll))
+       :component-will-unmount
+       (fn [this]
+         (.removeEventListener js/window "scroll" check-scroll))
+       :reagent-render
+       (fn [_]
+         [:span {:ref "sensor"}])})))
 
 (defn copy-to-clipboard [text-to-copy]
   (let [id (name (gensym "ctc"))
@@ -181,11 +217,11 @@
   the path to access key :name from my-thing is: [0 :name]."
   [& accessor-paths]
   (fn [_ old-argv new-argv]
-    (let [old-argv  (subvec old-argv 1)
+    (let [old-argv (subvec old-argv 1)
           new-argv (subvec new-argv 1)]
       (boolean
-       (some #(not= (get-in old-argv %) (get-in new-argv %))
-             accessor-paths)))))
+        (some #(not= (get-in old-argv %) (get-in new-argv %))
+              accessor-paths)))))
 
 
 (defn gravatar
