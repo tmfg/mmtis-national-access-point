@@ -823,7 +823,7 @@
               ^{:key (str id "div-" i)}
               [:div
                {:key (str id "div-row-" i)}
-               [:div.row
+               [:div.row {:style {:padding-bottom "3rem"}}
                 (doall
                   (for [{:keys [name label read write type component-type component div-style field-class] :as div-component} fields
                         :let [div-class (or field-class div-class)

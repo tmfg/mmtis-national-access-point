@@ -124,7 +124,11 @@
   [& [e! type sub-type transport-type]]
   (let [type (or type :other)
         transport-type (set transport-type)
-        url-tooltip? (r/atom false)]
+        field-help (fn [label help-text]
+                     [:div {:style {:padding-top "1rem"}}
+                      [:strong {:padding-right "1rem"}
+                       (str label ": ")]
+                      [:span help-text]])]
 
     (form/group
       {:label (tr [:field-labels :transport-service-common ::t-service/external-interfaces])
@@ -161,7 +165,13 @@
                         (tr [:form-help :external-interfaces-read-more :dialog-text])]]
                       (when (= :passenger-transportation type)
                         [:div {:style {:margin-top "20px"}}
-                         [:b (tr [:form-help :external-interfaces-payment-systems])]])]
+                         [:b (tr [:form-help :external-interfaces-payment-systems])]])
+                      [:div
+                       [field-help (tr [:field-labels :transport-service-common ::t-service/data-content]) (tr [:form-help :external-interfaces-tooltips :data-content])]
+                       [field-help (tr [:field-labels :transport-service-common ::t-service/format]) (tr [:form-help :external-interfaces-tooltips :format])]
+                       [field-help (tr [:field-labels :transport-service-common ::t-service/external-service-url]) (tr [:form-help :external-interfaces-tooltips :external-service-url])]
+                       [field-help (tr [:field-labels :transport-service-common ::t-service/external-service-description]) (tr [:form-help :external-interfaces-tooltips :external-service-description])]
+                       [field-help (tr [:field-labels :transport-service-common ::t-service/license]) (tr [:form-help :external-interfaces-tooltips :license])]]]
                      {:default-open? false}])}
 
       {:name ::t-service/external-interfaces
@@ -169,7 +179,6 @@
        :prepare-for-save values/without-empty-rows
        :table-fields [{:name ::t-service/data-content
                        :type :multiselect-selection
-                       :active-tooltip (tr [:form-help :external-interfaces-tooltips :data-content])
                        :label (tr [:field-labels :transport-service-common ::t-service/data-content])
                        :field-class "col-xs-6 col-sm-3 col-md-3"
                        :full-width? true
@@ -179,7 +188,6 @@
                        :is-empty? validation/empty-enum-dropdown?}
                       {:name ::t-service/format
                        :type :autocomplete
-                       :active-tooltip (tr [:form-help :external-interfaces-tooltips :format])
                        :open-on-focus? true
                        :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
                        :max-results 10
@@ -211,31 +219,23 @@
                                         row-number :row-number}]
 
                                     [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
-                                     [common-ui/input-tooltip {:text (tr [:form-help :external-interfaces-tooltips :external-service-url])
-                                                               :len "large"
-                                                               :pos "up"
-                                                               :visible @url-tooltip?}
-
-                                      [form-fields/field
-                                       (merge
-                                         {:name ::t-service/external-service-url
-                                          :type :string
-                                          :on-focus #(swap! url-tooltip? not)
-                                          :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                                          :required? true
-                                          :full-width? true
-                                          :update! #(update-form! %)
-                                          :on-blur (fn [e]
-                                                     (do
-                                                       (swap! url-tooltip? not)
-                                                       (e! (ts/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format)))))
-                                          :max-length 200}
-                                         ;; For first row: If there is data in other fields, show this required field warning
-                                         ;; For other rows, if this required field is missing, show the warning.
-                                         (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
-                                                   (and (> row-number 0) (empty? (::t-service/url external-interface))))
-                                           {:warning (tr [:common-texts :required-field])}))
-                                       (::t-service/url external-interface)]]
+                                     [form-fields/field
+                                      (merge
+                                        {:name ::t-service/external-service-url
+                                         :type :string
+                                         :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
+                                         :required? true
+                                         :full-width? true
+                                         :update! #(update-form! %)
+                                         :on-blur (fn [e]
+                                                    (e! (ts/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format))))
+                                         :max-length 200}
+                                        ;; For first row: If there is data in other fields, show this required field warning
+                                        ;; For other rows, if this required field is missing, show the warning.
+                                        (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
+                                                  (and (> row-number 0) (empty? (::t-service/url external-interface))))
+                                          {:warning (tr [:common-texts :required-field])}))
+                                      (::t-service/url external-interface)]
 
                                      [:span {:style {:width "30%" :margin-left "0.5rem" :padding-top "1.5rem"}}
                                       (let [url-status (get-in external-interface [:url-status :status])
@@ -265,7 +265,6 @@
 
                       {:name ::t-service/external-service-description
                        :type :localized-text
-                       :active-tooltip (tr [:form-help :external-interfaces-tooltips :external-service-description])
                        :label (tr [:field-labels :transport-service-common ::t-service/external-service-description])
                        :field-class "col-xs-6 col-sm-6 col-md-6"
                        :full-width? true
@@ -275,7 +274,6 @@
                       {:name ::t-service/license
                        :type :autocomplete
                        :open-on-focus? true
-                       :active-tooltip (tr [:form-help :external-interfaces-tooltips :license])
                        :label (tr [:field-labels :transport-service-common ::t-service/license])
                        :field-class "col-xs-6 col-sm-3 col-md-3"
                        :full-width? true
