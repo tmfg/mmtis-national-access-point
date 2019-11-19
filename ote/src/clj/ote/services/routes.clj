@@ -278,7 +278,7 @@
 (defn link-interface
   "This is a helper function for users. Links created route to given service.
   Users can add interface by hand but this is much more convenient for them."
-  [db user  {is-linked? :is-linked?
+  [db user {is-linked? :is-linked?
              service-id :service-id
              operator-id :operator-id :as form-data}]
   (let [interface-url (interface-url operator-id)]
@@ -352,11 +352,10 @@
     (POST "/routes/link-interface" {body :body
                                     user :user
                                     cookies :cookies}
-      (let [lang (str/upper-case (get-in cookies ["finap_lang" :value]))
-            form-data (http/transit-request body)]
+      (let [form-data (http/transit-request body)]
         (or (service-state-response db (:user user))
             (http/transit-response
-              (link-interface db user form-data lang)))))))
+              (link-interface db user form-data)))))))
 
 (defn- stops-geojson [db]
   (cheshire/encode
