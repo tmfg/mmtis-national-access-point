@@ -11,16 +11,43 @@
     [clojure.string :as str]
     [amazonica.aws.s3 :as s3]
     [ote.config.netex-config :as config-nt-static]
-    [ote.db.netex :as netex]))
+    [ote.db.netex :as netex]
+    [ote.gtfs.spec :as gtfs-spec]
+    [ote.gtfs.parse :as gtfs-parse]
+    [ote.util.zip :refer [write-zip read-zip-with]]
+    [ote.util.zip :as zip-file]))
 
-(defn fetch-conversions [db transport-service-id]
-  (specql/fetch db
-                ::netex/netex-conversion
-                #{::netex/filename ::netex/id ::netex/data-content ::netex/transport-service-id}
-                (op/and
-                  {::netex/transport-service-id transport-service-id}
-                  {::netex/status :ok}
-                  {::netex/filename op/not-null?})))
+(defn- stop->station
+  "Netex doesn't add coordinates to the xml files if station location_type = 0. So convert location_type = 0 (stop) to 1 (station)."
+  [stops]
+  (map
+    (fn [val]
+      (assoc val :gtfs/location-type 1))
+    stops))
+
+(defn- pre-process-gtfsfile
+  "Change stoptxt location_type to 1 and remove or add one empty row after all data rows."
+  [zipped-gtfs-file]
+  (let [csvfilemap (zip-file/read-zip (java.io.ByteArrayInputStream. zipped-gtfs-file))
+        out (java.io.ByteArrayOutputStream.)]
+    (try
+      ;; Write zip
+      (write-zip (mapv (fn [{:keys [name data]}]
+                         (let [gtfs-file-type (gtfs-spec/name->keyword name)
+                               parsed-data (gtfs-parse/parse-gtfs-file gtfs-file-type data)
+                               parsed-data (filter #(not (empty? %)) parsed-data)
+                               parsed-data (if (= "stops.txt" name)
+                                             (stop->station parsed-data)
+                                             parsed-data)
+                               unparsed-data (gtfs-parse/unparse-gtfs-file gtfs-file-type parsed-data)]
+                           {:name name
+                            :data unparsed-data}))
+                       csvfilemap)
+                 out)
+      ;; Stream it out
+      (.toByteArray out)
+      (catch Exception e
+        (log/error "ERROR - preprosessing GTFS file: " (pr-str e))))))
 
 (defn fetch-conversion [db file-id]
   (first
@@ -214,7 +241,9 @@
   (cleanup-dir-recursive! conversion-work-path)
   ;; If s3 bucket is not defined conversion result is set to db as success in order to reflect conversion tool
   ;; invocation result. Even though created netex file is lost if s3 upload is skipped.
-  (let [meta (try
+  (let [gtfs-file (pre-process-gtfsfile (:gtfs-file conversion-meta))
+        conversion-meta (assoc conversion-meta :gtfs-file gtfs-file)
+        meta (try
                (as-> (assoc conversion-meta
                        :netex-filepath (gtfs->netex! conversion-meta config-netex)) meta
                      (assoc meta
