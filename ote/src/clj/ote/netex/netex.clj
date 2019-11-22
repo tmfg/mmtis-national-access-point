@@ -15,7 +15,76 @@
     [ote.gtfs.spec :as gtfs-spec]
     [ote.gtfs.parse :as gtfs-parse]
     [ote.util.zip :refer [write-zip read-zip-with]]
-    [ote.util.zip :as zip-file]))
+    [ote.util.zip :as zip-file]
+    [ote.util.file :as file]
+    [clojure.zip :as zip]
+    [clojure.data.zip.xml :as z]
+    [clojure.xml :as xml])
+  (:import (java.util TimeZone)))
+
+(def compose-default-locale
+  (let [country-code "fi"
+        new-date (new java.util.Date)
+        summer-date (new java.util.Date)
+        _ (.setMonth summer-date 6)
+        timezone (TimeZone/getTimeZone "Europe/Helsinki")
+        current-offset (/ (.getOffset timezone (.getTime new-date)) 1000 60 60)
+        summer-offset (/ (.getOffset timezone (.getTime summer-date)) 1000 60 60)]
+    {:country-code country-code
+     :current-offset current-offset
+     :summer-offset summer-offset}))
+
+(defn post-process-default-locale! [netext-xml-file]
+  "Change language-code fr to fi. Timezone offset to europe/helsinki (-2) and summer time timezone offset to europe/helsinki (-3)"
+  (let [_ (log/debug "processing - " (:name netext-xml-file))
+        default-locale compose-default-locale
+        zipper-file (ote.gtfs.kalkati-to-gtfs/kalkati-zipper (java.io.ByteArrayInputStream. (.getBytes (:data netext-xml-file) "UTF-8")))
+        zipper-file (as-> (z/xml1-> zipper-file
+                                    :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :SummerTimeZoneOffset
+                                    #(zip/edit % assoc :content
+                                               (vector (str (:summer-offset default-locale)))) zip/root) zipper-file
+                          (ote.gtfs.kalkati-to-gtfs/kalkati-zipper
+                            (java.io.ByteArrayInputStream. (.getBytes (with-out-str (xml/emit zipper-file)) "UTF-8")))
+                          (z/xml1-> zipper-file :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :DefaultLanguage
+                                    (fn [val]
+                                      (zip/edit val assoc :content
+                                                (vector (:country-code default-locale)))) zip/root)
+                          (ote.gtfs.kalkati-to-gtfs/kalkati-zipper
+                            (java.io.ByteArrayInputStream. (.getBytes (with-out-str (xml/emit zipper-file)) "UTF-8")))
+                          (z/xml1-> zipper-file :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :TimeZoneOffset
+                                    (fn [val]
+                                      (zip/edit val assoc :content
+                                                (vector (str (:current-offset default-locale))))) zip/root))
+        output-str (->
+                     (with-out-str (xml/emit zipper-file))
+                     (str/replace "\n\n\n" "\n")
+                     (str/replace "\n\n" "\n")
+                     (str/replace ">\n" ">")
+                     (str/replace "\n<" "<")
+                     (str/replace "><" ">\n<"))]
+    output-str))
+
+(defn- post-process-netex
+  "Current chouette command line tool has some issues. It uses only fr as locale, sets timezone to france and adds too much log lines."
+  [netex-filepath]
+  (try
+    (let [_ (log/debug "POST PROCESS - netex.zip")
+          netex-zip (io/input-stream netex-filepath)
+          netex-files (zip-file/read-zip netex-zip)
+          processed-files (mapv
+                            (fn [f]
+                              (if (re-matches #"^(\d+).xml$" (:name f)) ; e.g. "1.xml" or "111.xml"
+                                {:name (:name f)
+                                 :data (post-process-default-locale! f)}
+                                f))
+                            netex-files)
+          out (java.io.ByteArrayOutputStream.)]
+      (write-zip processed-files out)
+      (io/copy
+        (.toByteArray out)
+        (io/file netex-filepath)))
+    (catch Exception e
+      (log/error "POST PROCESS ERROR " (pr-str e)))))
 
 (defn- stop->station
   "Netex doesn't add coordinates to the xml files if station location_type = 0. So convert location_type = 0 (stop) to 1 (station)."
@@ -137,7 +206,9 @@
            (chouette-report-ok? (str conversion-work-path work-dir input-report-file))
            (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
            (.exists (io/file output-filepath)))
-    output-filepath
+    (do
+      (post-process-netex output-filepath)
+      output-filepath)
     (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
         nil)))
 
@@ -161,11 +232,11 @@
                             "_"
                             external-interface-description-id
                             "_netex.zip")
-        netex-script (if (or (nil? (env/base-url)) ;; ci environment
+        netex-script (if (or (nil? (env/base-url))          ;; ci environment
                              (clojure.string/includes? (env/base-url) "localhost")) ;; localhost
                        "./chouette.sh"
                        "./ns-chouette.sh")
-        chouette-cmd [netex-script                      ; Vector used to allow logging shell invocation on error
+        chouette-cmd [netex-script                          ; Vector used to allow logging shell invocation on error
                       "-i " import-config-filepath
                       "-o " export-config-filepath
                       "-f " netex-filepath
@@ -189,7 +260,7 @@
         (log/info (str "GTFS->NeTEx invokes: " chouette-cmd))
         (->
           (with-sh-dir chouette-path
-                       (apply sh chouette-cmd))             ; TODO: use a dedicated user with limited access rights
+                       (apply sh chouette-cmd))
           (chouette-output-valid? config-netex
                                   (:chouette (config-nt-static/config))
                                   netex-filepath
