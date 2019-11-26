@@ -817,7 +817,7 @@
   :route-list-gtfs-zip-file "GTFS Zip fil"
   :route-list-copy-link "Kopiera adressen: "
   :link-to-help-pdf "Användarinstruktioner för kartverktyget för sjötrafik"
-  :link-to-help-pdf-url "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide-sv.pdf"
+  :link-to-help-pdf-url "https://www.traficom.fi/sites/default/files/media/file/sea-route-user-guide-sv.pdf"
   :create-new-route-disabled "Skapa ny tjänsteproducenten först från \"Egna tjänsteuppgifter\""
   :link-interface-to-service-succeed "Gränssnittet lades till i tjänsten."
   :delete-link-interface-to-service-succeed "Gränssnittet togs bort från tjänsten."
