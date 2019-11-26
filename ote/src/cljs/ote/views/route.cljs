@@ -78,16 +78,16 @@
        (tr [:common-texts :filling-info])
        [:div
         [:p (tr [:route-wizard-page :instructions-description])]
-        [:a (merge {:href "https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
+        [:a (merge {:href (tr [:route-list-page :link-to-help-pdf-url])  ;"https://s3.eu-central-1.amazonaws.com/ote-assets/sea-route-user-guide.pdf"
                     :rel "noopener noreferrer"
                     :target "_blank"
                     :style {:margin-right "2rem"}
                     :id "edit-transport-operator-btn"}
-                   (stylefy/use-style style-base/gray-link-with-icon))
+                   (stylefy/use-style style-base/blue-link-with-icon))
          (ic/action-open-in-new {:style {:width 20
                                          :height 20
                                          :margin-right "0.5rem"
-                                         :color colors/gray950}})
+                                         :color colors/primary}})
          (tr [:route-list-page :link-to-help-pdf])]]
        {:default-open? false}]
 

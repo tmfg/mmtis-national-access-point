@@ -3,25 +3,18 @@
   Vuokraus- ja yhteiskäyttöpalveluille"
   (:require [reagent.core :as reagent]
             [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
-            [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.common :as common-c]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
-            [ote.views.place-search :as place-search]
-            [tuck.core :as tuck]
-            [ote.views.transport-service-common :as ts-common]
-            [ote.time :as time]
-            [ote.style.form :as style-form]
-            [ote.style.dialog :as style-dialog]
             [ote.util.values :as values]
+            [ote.style.dialog :as style-dialog]
+            [ote.ui.form :as form]
             [ote.ui.info :as info]
-            [ote.ui.validation :as validation]
-            [ote.app.controller.common :as common-c])
+            [ote.ui.buttons :as buttons]
+            [ote.app.controller.common :as common-c]
+            [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.common :as common-c]
+            [ote.views.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas app]
@@ -41,8 +34,13 @@
      :card? false
      :top-border true}
 
-   (form/info
-    (tr [:field-labels :rentals :rentals-pricing-info]))
+    {:type :info-toggle
+     :name :pricing-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:field-labels :rentals :rentals-pricing-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
    {:name ::t-service/price-classes
     :type :table
@@ -332,7 +330,13 @@
                      :component (fn [{:keys [update-form! data]}]
                                   [modal-service-hours-for-location update-form! data])}]}
 
-    (form/info (tr [:form-help :pick-up-locations-url]))
+    {:type :info-toggle
+     :name :pricing-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :pick-up-locations-url])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     {:name ::t-service/pick-up-locations-url
      :type :string
