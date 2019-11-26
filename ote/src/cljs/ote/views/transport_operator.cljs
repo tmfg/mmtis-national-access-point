@@ -404,13 +404,13 @@
                  [:div {:style style-form/action-control-section-margin}
                   [:div
                    (when show-actions?
-                     [buttons/save {:id "btn-operator-save"
+                     [buttons/save-publish {:id "btn-operator-save"
                                     :on-click #(e! (to/->SaveTransportOperator))
                                     :disabled (or (get-in state [:transport-operator :business-id-exists?])
                                                   (form/disable-save? data))}
                       (tr [:buttons :save])])
 
-                   [buttons/cancel {:on-click #(e! (to/->CancelTransportOperator))}
+                   [buttons/cancel-with-icon {:on-click #(e! (to/->CancelTransportOperator))}
                     (tr [:buttons :cancel])]]
 
                   (when (and show-actions? (empty? (:ytj-company-names state)))
@@ -421,7 +421,7 @@
                        [:br]
                        [:div [:h3 (tr [:dialog :delete-transport-operator :title-base-view])]]
                        [info/info-toggle (tr [:common-texts :instructions]) (tr [:organization-page :help-operator-how-delete]) {:default-open? true}]
-                       [buttons/save {:id "btn-delete-transport-operator"
+                       [buttons/delete-with-icon {:id "btn-delete-transport-operator"
                                       :on-click #(e! (to/->ToggleSingleTransportOperatorDeleteDialog))
                                       :disabled (if (and
                                                       (empty? (:transport-service-vector state))

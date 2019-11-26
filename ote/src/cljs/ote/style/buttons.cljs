@@ -61,7 +61,6 @@
                        {:color colors/primary-text
                         :background-color colors/primary-disabled
                         :pointer-events "none"
-                        :border 0
                         :box-shadow "none"
                         :cursor "not-allowed"}))
 
@@ -111,7 +110,8 @@
 (def primary-button
   (merge button-common
          {:color colors/primary-text
-          :border 0
+          :cursor "pointer"
+          :border-color colors/primary
           :background-color colors/primary
           ::stylefy/mode {:hover primary-btn-hover-focus
                           :focus primary-btn-hover-focus
