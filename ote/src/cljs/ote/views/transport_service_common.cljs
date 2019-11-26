@@ -474,23 +474,23 @@
         (if published?
           ;; True
           [:span
-           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
                           :disabled (not (form/can-save? data))}
             (tr [:buttons :save-updated])]
-           [buttons/save {:disabled name-missing?
+           [buttons/save-draft {:disabled name-missing?
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (ts/->SaveTransportService schemas false)))}
             (tr [:buttons :back-to-draft])]]
           ;; False
           [:span
-           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas true))
+           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
                           :disabled (not (form/can-save? data))}
             (tr [:buttons :save-and-publish])]
-           [buttons/save {:on-click #(e! (ts/->SaveTransportService schemas false))
+           [buttons/save-draft {:on-click #(e! (ts/->SaveTransportService schemas false))
                           :disabled name-missing?}
             (tr [:buttons :save-as-draft])]])
-        [buttons/cancel {:on-click #(e! (ts/->CancelTransportServiceForm))}
+        [buttons/cancel-with-icon {:on-click #(e! (ts/->CancelTransportServiceForm))}
          (tr [:buttons :discard])]])]))
 
 (defn place-search-group [e! key]
