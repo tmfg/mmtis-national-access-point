@@ -44,19 +44,19 @@
     (when (not valid-notice?)
       [ui/card {:style {:margin "1em 0em 1em 0em"}}
        [ui/card-text {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:pre-notice-page :publish-missing-required])]])
-    [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-top "20px"}}
+    [:div.col-xs-12.col-sm-12.col-md-12 {:style {:padding-top "20px" :display "inline-flex"}}
      (when-not sent?
-       [:span
-        [buttons/save {:disabled (not valid-notice?)
+       [:span {:style {:display "inline-flex"}}
+        [buttons/save-publish {:disabled (not valid-notice?)
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (pre-notice/->OpenSendModal)))}
          (tr [:buttons :save-and-send])]
-        [buttons/save {:on-click #(do
+        [buttons/save-draft {:on-click #(do
                                     (.preventDefault %)
                                     (e! (pre-notice/->SaveToDb false)))}
          (tr [:buttons :save-as-draft])]])
-     [buttons/cancel {:on-click #(do
+     [buttons/cancel-with-icon {:on-click #(do
                                    (.preventDefault %)
                                    (e! (pre-notice/->CancelNotice)))}
       (if sent?
@@ -263,16 +263,13 @@
      :should-update-check (juxt ::transit/route-description ::transit/regions :regions)
      :read identity
      :disabled? sent?
-     ;:required? true
      :is-empty? (fn [{regions ::transit/regions description ::transit/route-description}]
                   (or (empty? regions) (str/blank? description)))
      :container-style style-form/full-width
      :component (fn [{pre-notice :data}]
                   [:div
-                   [:div.col-md-5
-                    #_(when (empty-regions? pre-notice)
-                        [:div (stylefy/use-style style-base/required-element)
-                         (tr [:common-texts :required-field])])
+                   [:diw.row]
+                   [:div.col-xs-12.col-sm-6.col-md-6 {:style {:padding-right "1rem"}}
                     [form-fields/field
                      {:id "route-description"
                       :label (tr [:field-labels :pre-notice ::transit/route-description])
@@ -286,8 +283,8 @@
                       :rows 1
                       :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))
                       }
-                     (::transit/route-description pre-notice)]
-
+                     (::transit/route-description pre-notice)]]
+                   [:div.col-xs-12.col-sm-6.col-md-6
                     (let [regions-with-show
                           (mapv #(assoc % :show (str (:id %) " " (:name %)))
                                 (sort-by :id (vals (:regions pre-notice))))
@@ -313,8 +310,9 @@
                        (into #{}
                              (keep #(when (selected-ids (:id %)) %))
                              regions-with-show)])]
-                   [:div.col-md-7
-                    [notice-area-map pre-notice]]])}))
+                   [:div.row
+                    [:div.col-md-12 {:style {:padding-top "2rem"}}
+                     [notice-area-map pre-notice]]]])}))
 
 (defn notice-attachments [e! sent?]
   (form/group

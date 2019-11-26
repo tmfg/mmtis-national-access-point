@@ -21,6 +21,22 @@
                      (stylefy/use-style style-buttons/primary-button)))
     label]])
 
+(defn save-publish [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     (stylefy/use-style style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/primary-button)))
+    [ic/editor-publish {:style {:color "#FFFFFF" :margin-right "1rem"}}] [:span label]]])
+
+(defn save-draft [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     ( style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/primary-button)))
+    [ic/content-drafts {:style {:color "#FFFFFF" :margin-right "1rem"}}] [:span label]]])
+
 (defn cancel [opts label]
   [button-container
    [:button (merge opts
@@ -28,6 +44,14 @@
                      (stylefy/use-style style-buttons/disabled-button)
                      (stylefy/use-style style-buttons/outline-button)))
     label]])
+
+(defn cancel-with-icon [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     (stylefy/use-style style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/outline-button)))
+    [ic/navigation-close {:style {:color colors/primary :margin-right "1rem"}}] [:span label]]])
 
 (defn delete [opts label]
   [button-container
