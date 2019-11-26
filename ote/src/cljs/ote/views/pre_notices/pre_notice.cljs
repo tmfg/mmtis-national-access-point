@@ -281,8 +281,7 @@
                       :warning (when (str/blank? (::transit/route-description pre-notice))
                                  (tr [:common-texts :required-field]))
                       :rows 1
-                      :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))
-                      }
+                      :update! #(e! (pre-notice/->EditSingleFormElement ::transit/route-description %))}
                      (::transit/route-description pre-notice)]]
                    [:div.col-xs-12.col-sm-6.col-md-6
                     (let [regions-with-show
@@ -363,10 +362,7 @@
 
 (defn- pre-notice-form [e! {:keys [pre-notice transport-operator] :as app}]
   (let [operators (mapv :transport-operator (:transport-operators-with-services app))
-        sent? (= :sent (::transit/pre-notice-state pre-notice))
-        form-options {:name->label (tr-key [:field-labels :pre-notice])
-                      :footer-fn (r/partial footer e! sent?)
-                      :update! #(e! (pre-notice/->EditForm %))}]
+        sent? (= :sent (::transit/pre-notice-state pre-notice))]
     [:div
      [common/back-link-with-event :pre-notices (tr [:pre-notice-page :back-to-pre-notices])]
      [:h1 (tr [:pre-notice-page :pre-notice-form-title])]

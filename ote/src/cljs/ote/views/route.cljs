@@ -4,13 +4,14 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-
+            [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
+            [ote.localization :refer [tr tr-key]]
             [ote.ui.buttons :as buttons]
             [ote.theme.colors :as colors]
             [ote.style.base :as style-base]
-            [ote.localization :refer [tr tr-key]]
-            [ote.db.transit :as transit]
-            [ote.db.transport-operator :as t-operator]
+
+
 
             [ote.views.route.basic-info :as route-basic-info]
             [ote.views.route.stop-sequence :as route-stop-sequence]

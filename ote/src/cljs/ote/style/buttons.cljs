@@ -110,7 +110,6 @@
 (def primary-button
   (merge button-common
          {:color colors/primary-text
-          ;:border "1px solid"
           :cursor "pointer"
           :border-color colors/primary
           :background-color colors/primary
