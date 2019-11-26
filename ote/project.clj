@@ -78,8 +78,8 @@
 
                  ;; HTML/XML generation from Clojure data
                  [hiccup "1.0.5"]
-                 ;; XML zippers
-                 [org.clojure/data.zip "0.1.2"]
+                 ;; XML zippers - Eclipse Public License 1.0
+                 [org.clojure/data.zip "0.1.3"]
 
                  ;; GeoTools
                  [org.geotools/gt-epsg-wkt "20.0"]

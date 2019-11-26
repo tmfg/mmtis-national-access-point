@@ -5,7 +5,8 @@
             [ote.util.zip :as zip]
             [clojure.string :as str]
             [clojure.java.io :as io]
-            [ote.util.file :as file]))
+            [ote.util.file :as file]
+            [ote.netex.netex :as netex]))
 
 (def config-netex (:netex (read-string (slurp "config.edn"))))
 (def chouette-path (:chouette-path config-netex))                        ; Folder where chouette script is
@@ -70,3 +71,14 @@
                           full-compare-netex-names))
 
     (sut/cleanup-dir-recursive! (:conversion-work-path config-netex))))
+
+(deftest test-post-process
+  (let [netex-file {:name "netex.zip"
+                    :data (slurp (str "test/resources/netex/46.xml"))}
+        processed (netex/post-process-default-locale! netex-file)]
+    ;; Comments are removed
+    (is (= false (str/includes? processed "This mapping involves" )))
+    ;; Default lang is fi
+    (is (= true (str/includes? processed "<DefaultLanguage>fi</DefaultLanguage>" )))
+    ;; Summer time offset is 3
+    (is (= true (str/includes? processed "<SummerTimeZoneOffset>3</SummerTimeZoneOffset>")))))

@@ -1,24 +1,15 @@
 (ns ote.views.parking
   "Required data input fields for parking services"
   (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
             [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
-            [ote.views.place-search :as place-search]
-            [tuck.core :as tuck]
-            [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
-            [ote.style.form :as style-form]
-            [ote.app.controller.transport-service :as ts]
-            [ote.views.transport-service-common :as ts-common]
             [ote.time :as time]
             [ote.util.values :as values]
-            [ote.ui.validation :as validation]))
+            [ote.style.form :as style-form]
+            [ote.ui.validation :as validation]
+            [ote.ui.form :as form]
+            [ote.app.controller.transport-service :as ts]
+            [ote.views.transport-service-common :as ts-common]))
 
 (defn form-options [e! schemas app]
   {:name->label (tr-key [:field-labels :parking]
@@ -37,8 +28,13 @@
      :card? false
      :top-border true}
 
-    (form/info
-     [:div (tr [:form-help :pricing-info])])
+    {:type :info-toggle
+     :name :pricing-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :pricing-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     {:name         ::t-service/price-classes
      :type         :table
