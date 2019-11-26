@@ -61,6 +61,14 @@
                      (stylefy/use-style style-buttons/negative-button)))
     label]])
 
+(defn delete-with-icon [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     (stylefy/use-style style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/negative-button)))
+    [ic/action-delete {:style {:color "#FFFFFF" :margin-right "1rem"}}] [:span label]]])
+
 (defn delete-table-row [opts label]
   [button-container
    [:button (merge opts
