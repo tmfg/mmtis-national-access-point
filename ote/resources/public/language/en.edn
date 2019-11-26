@@ -814,7 +814,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-list-gtfs-zip-file "GTFS.Zip file"
   :route-list-copy-link "Copy address: "
   :link-to-help-pdf "Sea traffic route and timetable editor user guide"
-  :link-to-help-pdf-url "https:// s3.eu-central-1.amazonaws.com / ote-assets/sea-route-user-guide.pdf"
+  :link-to-help-pdf-url "https://www.traficom.fi/sites/default/files/media/file/merenkulun%20editorin%20kayttoohje.pdf"
   :create-new-route-disabled "Create new transport operator in \"Own services \" page first"
   :link-interface-to-service-succeed "The interface was successfully added to the service."
   :delete-link-interface-to-service-succeed "The interface was successfully removed from the service."
