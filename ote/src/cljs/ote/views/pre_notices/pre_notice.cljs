@@ -2,25 +2,24 @@
   "Pre notice main form"
   (:require [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.localization :refer [tr tr-key]]
-            [ote.app.controller.pre-notices :as pre-notice]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.form-fields :as form-fields]
+            [clojure.string :as str]
+            [stylefy.core :as stylefy]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as db-common]
             [ote.db.transit :as transit]
-            [ote.ui.form :as form]
+            [ote.localization :refer [tr tr-key]]
+            [ote.theme.colors :as colors]
+            [ote.style.base :as style-base]
             [ote.style.form :as style-form]
-            [ote.ui.leaflet :as leaflet]
-            [clojure.string :as str]
             [ote.style.dialog :as style-dialog]
+            [ote.ui.buttons :as buttons]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.form :as form]
+            [ote.ui.leaflet :as leaflet]
             [ote.ui.circular_progress :as circular-progress]
             [ote.ui.common :as common]
-            [ote.theme.colors :as colors]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.style.base :as style-base]
-            [stylefy.core :as stylefy]
-            [ote.ui.info :as info]))
+            [ote.ui.info :as info]
+            [ote.app.controller.pre-notices :as pre-notice]))
 
 (def notice-types [:termination :new :schedule-change :route-change :other])
 (def effective-date-descriptions [:year-start :school-start :school-end :season-schedule-change])
@@ -31,7 +30,8 @@
     (not (empty? (::transit/pre-notice-type pre-notice)))
     (not (str/blank? (::transit/route-description pre-notice)))
     (not (str/blank? (::transit/description pre-notice)))
-    (not (empty? (::transit/effective-dates pre-notice)))))
+    (not (empty? (::transit/effective-dates pre-notice)))
+    (not (empty? (::transit/regions pre-notice)))))
 
 (defn- valid-pre-notice-container [pre-notice]
   (let [valid-notice? (valid-notice? pre-notice)]
