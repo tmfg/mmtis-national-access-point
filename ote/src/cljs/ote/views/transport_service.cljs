@@ -1,30 +1,21 @@
 (ns ote.views.transport-service
   "Transport service related functionality"
-  (:require [reagent.core :as reagent]
-            [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.transport-operator :as to]
+  (:require [cljs-react-material-ui.reagent :as ui]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key]]
-            [tuck.core :as tuck]
-            [ote.communication :as comm]
-            [ote.views.passenger-transportation :as pt]
-            [ote.views.terminal :as terminal]
-            [ote.app.routes :as routes]
-            [ote.views.parking :as parking]
-            [ote.views.rental :as rental]
-            [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]
             [stylefy.core :as stylefy]
             [ote.style.form :as style-form]
-            [reagent.core :as r]
             [ote.ui.circular_progress :as circular-progress]
-            [ote.ui.info :as info]))
+            [ote.ui.info :as info]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.common :as ui-common]
+            [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.transport-operator :as to]
+            [ote.views.passenger-transportation :as pt]
+            [ote.views.terminal :as terminal]
+            [ote.views.parking :as parking]
+            [ote.views.rental :as rental]))
 
 (def modified-transport-service-types
   ;; Create order for service type selection dropdown
@@ -36,8 +27,7 @@
    :parking])
 
 (defn select-service-type [e! {:keys [transport-operator transport-service] :as state}]
-  (let [multiple-operators (if (second (:transport-operators-with-services state)) true false)
-        disabled? (or (nil? (::t-service/sub-type transport-service))
+  (let [disabled? (or (nil? (::t-service/sub-type transport-service))
                       (nil? (::t-operator/id transport-operator)))]
   [:div.row
    [:div {:class "col-sx-12 col-md-12"}
@@ -54,7 +44,6 @@
       {:default-open? false}]]
 
     [:div.row
-
         [:div
           [:div {:class "col-sx-12 col-sm-4 col-md-4"}
           [form-fields/field

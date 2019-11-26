@@ -1,26 +1,11 @@
  (ns ote.views.passenger-transportation
   "Required datas for passenger transportation provider"
-   (:require [reagent.core :as reagent]
-             [cljs-react-material-ui.reagent :as ui]
-             [cljs-react-material-ui.icons :as ic]
-             [ote.ui.form :as form]
-             [ote.ui.form-groups :as form-groups]
-             [ote.ui.buttons :as buttons]
-             [ote.app.controller.transport-service :as ts]
-             [ote.db.transport-service :as t-service]
-             [ote.db.transport-operator :as t-operator]
-             [ote.db.common :as common]
+   (:require [ote.db.transport-service :as t-service]
              [ote.localization :refer [tr tr-key]]
-             [ote.views.place-search :as place-search]
-             [tuck.core :as tuck]
-             [stylefy.core :as stylefy]
-             [ote.style.base :as style-base]
-             [ote.views.transport-service-common :as ts-common]
-             [ote.time :as time]
-             [ote.style.form :as style-form]
              [ote.util.values :as values]
-             [ote.ui.validation :as validation]
-             [reagent.core :as r])
+             [ote.ui.form :as form]
+             [ote.app.controller.transport-service :as ts]
+             [ote.views.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn transportation-form-options [e! schemas app]
@@ -141,8 +126,13 @@
     :card? false
     :top-border true}
 
-   (form/info
-     [:div (tr [:form-help :pricing-info])])
+   {:type :info-toggle
+    :name :pricing-group-info
+    :label (tr [:common-texts :filling-info])
+    :body [:div (tr [:form-help :pricing-info])]
+    :default-state false
+    :full-width? true
+    :container-class "col-xs-12 col-sm-12 col-md-12"}
 
    {:container-class "col-xs-12"
     :name         ::t-service/price-classes

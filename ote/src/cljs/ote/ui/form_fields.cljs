@@ -1033,7 +1033,7 @@
      (when (not (false? header?))
        [:h4 (stylefy/use-style style-form-fields/checkbox-group-label) label])
      (when help
-       [common/help help])
+       [info/info-toggle (tr [:common-texts :filling-info]) [:div help] {:default-open? false}])
      (doall
        (map-indexed
          (fn [i option]

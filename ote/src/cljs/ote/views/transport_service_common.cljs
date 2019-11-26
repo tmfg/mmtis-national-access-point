@@ -10,7 +10,6 @@
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
-            [ote.util.transport-operator-util :as tou]
             [ote.util.values :as values]
             [ote.theme.colors :as colors]
             [ote.ui.form :as form]
@@ -26,65 +25,76 @@
             [ote.views.place-search :as place-search]
             [ote.app.controller.common :as common-c]
             [ote.views.place-search :as place-search]
-            [ote.ui.info :as info]
-            [ote.ui.common :as common-ui]))
+            [ote.ui.info :as info]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
    Form displays header text and selection list by radio button group."
   []
   (form/group
-   {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
-    :columns 3
-    :layout :row
-    :card? false
-    :top-border true}
+    {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
-   (form/info (tr [:form-help :advance-reservation-info]))
+    {:type :info-toggle
+     :name :advance-reservation-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :advance-reservation-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-   {:name ::t-service/advance-reservation
-    :type :selection
-    :show-option (tr-key [:enums ::t-service/advance-reservation])
-    :options t-service/advance-reservation
-    :radio? true
-    :required? true
-    :container-class "col-md-12"}))
+    {:name ::t-service/advance-reservation
+     :type :selection
+     :show-option (tr-key [:enums ::t-service/advance-reservation])
+     :options t-service/advance-reservation
+     :radio? true
+     :required? true
+     :container-class "col-md-12"}))
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
   ([element-id label service-url-field] (service-url element-id label service-url-field nil))
   ([element-id label service-url-field info-message]
    (apply
-    form/group
-    {:label label
-     :layout :row
-     :columns 2
-     :card? false
-     :top-border true}
+     form/group
+     {:label label
+      :layout :row
+      :columns 2
+      :card? false
+      :top-border true}
 
-    (concat
-     (when info-message
-       [(form/info info-message)])
+     (concat
+       (when info-message
+         [{:type :info-toggle
+           :name :service-url-info
+           :label (tr [:common-texts :filling-info])
+           :body [:div info-message]
+           :default-state false
+           :full-width? true
+           :container-class "col-xs-12 col-sm-12 col-md-12"}])
 
-     [{:class "set-bottom"
-       :element-id element-id
-       :name   ::t-service/url
-       :type   :string
-       :read   (comp ::t-service/url service-url-field)
-       :write  (fn [data url]
-                 (assoc-in data [service-url-field ::t-service/url] url))
-       :full-width? true
-       :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-       :max-length 200}
+       [{:class "set-bottom"
+         :element-id element-id
+         :name ::t-service/url
+         :type :string
+         :read (comp ::t-service/url service-url-field)
+         :write (fn [data url]
+                  (assoc-in data [service-url-field ::t-service/url] url))
+         :full-width? true
+         :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+         :max-length 200}
 
-      {:name ::t-service/description
-       :type  :localized-text
-       :rows  1
-       :read  (comp ::t-service/description service-url-field)
-       :write (fn [data desc]
-                (assoc-in data [service-url-field ::t-service/description] desc))
-       :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-       :full-width?  true}]))))
+        {:name ::t-service/description
+         :type :localized-text
+         :rows 1
+         :read (comp ::t-service/description service-url-field)
+         :write (fn [data desc]
+                  (assoc-in data [service-url-field ::t-service/description] desc))
+         :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+         :full-width? true}]))))
 
 (defn service-urls
   "Creates a table for additional service urls."
@@ -95,15 +105,15 @@
      :card? false
      :top-border true}
 
-    {:name         service-url-field
-     :type         :table
+    {:name service-url-field
+     :type :table
      :prepare-for-save values/without-empty-rows
      :table-fields [{:name ::t-service/url
                      :type :string}
                     {:name ::t-service/description
                      :type :localized-text}]
-     :delete?      true
-     :add-label    (tr [:buttons :add-new-service-link])}))
+     :delete? true
+     :add-label (tr [:buttons :add-new-service-link])}))
 
 (defn- gtfs-viewer-link [{interface ::t-service/external-interface format ::t-service/format}]
   (when (seq format)
@@ -289,11 +299,17 @@
   [e!]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/companies])
-    :columns 3
+     :columns 3
      :card? false
      :top-border true}
 
-    (form/info (tr [:form-help :companies-main-info]) {:type :generic})
+    {:type :info-toggle
+     :name :companies-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :companies-main-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     {:name ::t-service/company-source
      :read identity
@@ -319,16 +335,16 @@
   "Creates a form group for brokerage selection."
   [e!]
   (form/group
-    {:label   (tr [:passenger-transportation-page :header-brokerage])
+    {:label (tr [:passenger-transportation-page :header-brokerage])
      :columns 3
      :card? false
      :top-border true}
 
-    {:name          ::t-service/brokerage?
-     :extended-help {:help-text      (tr [:form-help :brokerage?])
+    {:name ::t-service/brokerage?
+     :extended-help {:help-text (tr [:form-help :brokerage?])
                      :help-link-text (tr [:form-help :brokerage-link])
-                     :help-link      "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
-     :type          :checkbox
+                     :help-link "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
+     :type :checkbox
      :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
 
 (defn contact-info-group []
@@ -339,7 +355,13 @@
      :card? false
      :top-border true}
 
-    (form/info (tr [:form-help :description-why-contact-info]))
+    {:type :info-toggle
+     :name :contact-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :description-why-contact-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     {:name ::common/street
      :type :string
@@ -439,7 +461,7 @@
                                                :height 20
                                                :margin-right "0.5rem"
                                                :color colors/primary}})
-                    (tr [:dialog :brokering-service :link-text])]
+                   (tr [:dialog :brokering-service :link-text])]
                   {:target "_blank" :style {:text-decoration "none"}})]])
 
      ;show-footer? - Take owner check away for now
@@ -473,9 +495,9 @@
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group
-   (tuck/wrap-path e! :transport-service key ::t-service/operation-area)
-   (tr [:field-labels :transport-service-common ::t-service/operation-area])
-   ::t-service/operation-area))
+    (tuck/wrap-path e! :transport-service key ::t-service/operation-area)
+    (tr [:field-labels :transport-service-common ::t-service/operation-area])
+    ::t-service/operation-area))
 
 (defn service-hours-group [service-type sub-component?]
   (let [tr* (tr-key [:field-labels :service-exception])
@@ -488,9 +510,9 @@
     (form/group
       (merge
         {:label (tr [:passenger-transportation-page :header-service-hours])
-              :columns 3
-              :card? false
-              :sub-component sub-component?}
+         :columns 3
+         :card? false
+         :sub-component sub-component?}
         (when (= false sub-component?)
           {:top-border true}))
 
@@ -585,63 +607,83 @@
 
 (defn name-group [label]
   (form/group
-   {:label label
-    :columns 3
-    :layout :row
-    :card? false
-    :top-border true}
+    {:label label
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
-   (form/info (tr [:form-help :name-info]))
+    {:type :info-toggle
+     :name :name-group-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :name-info])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-   {:name           ::t-service/name
-    :type           :string
-    :full-width?    true
-    :container-class "col-xs-12 col-sm-12 col-md-6"
-    :required?      true
-    :max-length 200}
 
-   {:name ::t-service/description
-    :type :localized-text
-    :rows 2
-    :full-width? true
-    :container-class "col-xs-12 col-sm-12 col-md-8"}
+    {:name ::t-service/name
+     :type :string
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-6"
+     :required? true
+     :max-length 200}
 
-   (form/subtitle (tr [:field-labels :transport-service ::t-service/available-from-and-to-title]))
+    {:name ::t-service/description
+     :type :localized-text
+     :rows 2
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-8"}
 
-   (form/info (tr [:form-help :available-from-and-to]))
+    (form/subtitle (tr [:field-labels :transport-service ::t-service/available-from-and-to-title]))
+
+    {:type :info-toggle
+     :name :available-info
+     :label (tr [:common-texts :filling-info])
+     :body [:div (tr [:form-help :available-from-and-to])]
+     :default-state false
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
+
     {:name ::t-service/available-from
-    :type :date-picker
-    :show-clear? true
-    :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])
+     :type :date-picker
+     :show-clear? true
+     :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}
 
     {:name ::t-service/available-to
-    :type :date-picker
-    :show-clear? true
-    :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])
+     :type :date-picker
+     :show-clear? true
+     :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}))
 
 (defn transport-type [sub-type]
   (form/group
-   {:label (tr [:field-labels :transport-service-common ::t-service/transport-type])
-    :columns 3
-    :layout :row
-    :card? false
-    :top-border true}
+    {:label (tr [:field-labels :transport-service-common ::t-service/transport-type])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
 
-   (when (not= sub-type :taxi)
-     (form/info (tr [:form-help :transport-type-info])))
+    (when (not= sub-type :taxi)
+      {:type :info-toggle
+       :name :transport-type-info
+       :label (tr [:common-texts :filling-info])
+       :body [:div (tr [:form-help :transport-type-info])]
+       :default-state false
+       :full-width? true
+       :container-class "col-xs-12 col-sm-12 col-md-12"})
 
-   {:name ::t-service/transport-type
-    :type :checkbox-group
-    :container-class "col-md-12"
-    :header? false
-    :required? true
-    :options t-service/transport-type
-    :show-option (tr-key [:enums ::t-service/transport-type])
-    :option-enabled? (fn [option]
-                       (if (= sub-type :taxi)
-                         false
+    {:name ::t-service/transport-type
+     :type :checkbox-group
+     :container-class "col-md-12"
+     :header? false
+     :required? true
+     :options t-service/transport-type
+     :show-option (tr-key [:enums ::t-service/transport-type])
+     :option-enabled? (fn [option]
+                        (if (= sub-type :taxi)
+                          false
                           true))}))
 
 (defn place-search-dirty-event [e!]
