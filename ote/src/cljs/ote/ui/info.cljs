@@ -20,12 +20,14 @@
                                   style-info/info-button
                                   {:padding "0.5rem 1rem 0.5rem 1rem"})}
                         {:on-click #(swap! is-open? not)})
-         [:span {:style {:margin-right "0.5rem" :padding-top "0.5rem"}}
+         [:span {:style {:margin-right "0.5rem" :padding-top "0.25rem"}}
           (if @is-open?
             [ic/hardware-keyboard-arrow-up]
             [ic/hardware-keyboard-arrow-down])]
          (when (:icon options)
-           [:span (stylefy/use-style style-info/info-icon)
+           [:span {:style (merge
+                            style-info/info-icon
+                            {:padding-top "3px"})}
             (:icon options)])
          title]
         [:div
