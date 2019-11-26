@@ -33,7 +33,7 @@
   [button-container
    [:button (merge opts
                    (if (:disabled opts)
-                     ( style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/disabled-button)
                      (stylefy/use-style style-buttons/primary-button)))
     [ic/content-drafts {:style {:color "#FFFFFF" :margin-right "1rem"}}] [:span label]]])
 

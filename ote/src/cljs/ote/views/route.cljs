@@ -119,19 +119,19 @@
      [form-container e! app]]
      [:div (stylefy/use-style style-base/form-footer)
       [:div.container
-       [:div.col-xs-12.col-sm-12.col-md-12
+       [:div.col-xs-12.col-sm-12.col-md-12 {:style {:padding-top "1rem"}}
         [valid-route-container app]
-        [buttons/save {:disabled (not (rw/valid-route? route))
+        [buttons/save-publish {:disabled (not (rw/valid-route? route))
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->SaveToDb true)))}
          (tr [:buttons :save-and-publish])]
-        [buttons/save {:disabled (disable-save-draft? route)
+        [buttons/save-draft {:disabled (disable-save-draft? route)
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->SaveToDb false)))}
          (tr [:buttons :save-as-draft])]
-        [buttons/cancel {:on-click #(do
+        [buttons/cancel-with-icon {:on-click #(do
                                       (.preventDefault %)
                                       (e! (rw/->CancelRoute)))}
          (tr [:buttons :cancel])]]]]]))
@@ -142,32 +142,32 @@
     [form-container e! app]]
    [:div (stylefy/use-style style-base/form-footer)
     [:div.container
-     [:div.col-xs-12.col-sm-12.col-md-12
+     [:div.col-xs-12.col-sm-12.col-md-12 {:style {:padding-top "1rem"}}
       [valid-route-container app]
       (if (get-in app [:route ::transit/published?])
         [:span
-         [buttons/save {:disabled (not (rw/valid-route? route))
+         [buttons/save-publish {:disabled (not (rw/valid-route? route))
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb true)))}
           (tr [:buttons :save])]
-         [buttons/save {:disabled (disable-save-draft? route)
+         [buttons/save-draft {:disabled (disable-save-draft? route)
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb false)))}
           (tr [:buttons :back-to-draft])]]
         [:span
-         [buttons/save {:disabled (not (rw/valid-route? route))
+         [buttons/save-publish {:disabled (not (rw/valid-route? route))
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb true)))}
           (tr [:buttons :save-and-publish])]
-         [buttons/save {:disabled (disable-save-draft? route)
+         [buttons/save-draft {:disabled (disable-save-draft? route)
                         :on-click #(do
                                      (.preventDefault %)
                                      (e! (rw/->SaveToDb false)))}
           (tr [:buttons :save-as-draft])]])
-      [buttons/cancel {:on-click #(do
+      [buttons/cancel-with-icon {:on-click #(do
                                     (.preventDefault %)
                                     (e! (rw/->CancelRoute)))}
        (tr [:buttons :cancel])]]]]])
