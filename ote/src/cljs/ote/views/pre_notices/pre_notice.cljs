@@ -186,11 +186,12 @@
        :type :text-label
        :full-width? true
        :h-style :p
-       :h-inner-style {:margin-bottom "0px"}})
+       :h-inner-style {:margin-bottom "-1rem" :font-size "0.875rem"}})
     (if sent?
       {:name ::transit/description
        :type :text
-       :full-width? true}
+       :full-width? true
+       :container-class "col-xs-12 col-sm-12 col-md-12"}
       {:name ::transit/description
        :type :text-area
        :rows 1
@@ -347,7 +348,7 @@
                      :component (fn [{data :data}]
                                   (let [id (:ote.db.transit/id data)
                                         file-name (:ote.db.transit/attachment-file-name data)]
-                                    [:div
+                                    [:div {:style {:font-size "1rem"}}
                                      (if id
                                        (common/linkify (str "pre-notice/attachment/" id) file-name {:target "_blank"})
                                        file-name)]))}
