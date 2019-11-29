@@ -389,6 +389,8 @@
   :back-to-draft "Ändra status till utkast"
   :add-new-effective-date "Lägg till nytt datum"
   :transport-service-catalog "Tjänstekatalogen"
+  :other-access-points "Övriga åtkomstpunkter"
+  :other-access-points-url "https://www.traficom.fi/sv/transport/transportsystem/its"
   :register-to-service "Registrering"
   :check-out-the-service "Bekanta dig med informationen"}
 

@@ -382,7 +382,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-calendar-clear "Tyhjennä kalenteri"
   :back-to-draft "Muuta luonnokseksi"
   :add-new-effective-date "Lisää uusi päivämäärä"
-  :transport-service-catalog "Liikkumispalvelukatalogi"
+  :transport-service-catalog "Tarkistele palvelukatalogia"
+  :other-access-points "Tutustu muihin yhteyspisteisiin"
+  :other-access-points-url "https://www.traficom.fi/fi/liikenne/liikennejarjestelma/alykkaat-liikennejarjestelma"
   :register-to-service "Rekisteröidy palveluun"
   :check-out-the-service "Tutustu tietoihin"
   }
