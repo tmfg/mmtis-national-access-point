@@ -59,13 +59,18 @@
     [:div.container {:style {:padding-top "20px" }}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
-      [:div.row (stylefy/use-style style-front-page/hero-btn)
+      [:div.row (stylefy/use-style style-front-page/hero-btn-container)
        [:a {:on-click   #(do
                             (.preventDefault %)
                             (e! (fp/->ChangePage :services nil)))}
-       [:button (stylefy/use-style style-front-page/transport-service-btn)
+       [:button (stylefy/use-style style-front-page/hero-btn)
         [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-        (tr [:buttons :transport-service-catalog])]]]]]]
+        (tr [:buttons :transport-service-catalog])]]
+
+       [:a {:href (tr [:buttons :other-access-points-url])}
+        [:button (stylefy/use-style style-front-page/hero-btn)
+         [:span [ic/action-open-in-new {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+         (tr [:buttons :other-access-points])]]]]]]
 
     (when test-env?
      [test-env-warning])
