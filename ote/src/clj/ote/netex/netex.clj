@@ -19,7 +19,8 @@
     [ote.util.file :as file]
     [clojure.zip :as zip]
     [clojure.data.zip.xml :as z]
-    [clojure.xml :as xml])
+    [clojure.xml :as xml]
+    [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs])
   (:import (java.util TimeZone)))
 
 (def compose-default-locale
@@ -38,18 +39,18 @@
   "Change language-code fr to fi. Timezone offset to europe/helsinki (-2) and summer time timezone offset to europe/helsinki (-3)"
   (let [_ (log/debug "processing - " (:name netext-xml-file))
         default-locale compose-default-locale
-        zipper-file (ote.gtfs.kalkati-to-gtfs/kalkati-zipper (java.io.ByteArrayInputStream. (.getBytes (:data netext-xml-file) "UTF-8")))
+        zipper-file (kalkati-to-gtfs/kalkati-zipper (java.io.ByteArrayInputStream. (.getBytes (:data netext-xml-file) "UTF-8")))
         zipper-file (as-> (z/xml1-> zipper-file
                                     :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :SummerTimeZoneOffset
                                     #(zip/edit % assoc :content
                                                (vector (str (:summer-offset default-locale)))) zip/root) zipper-file
-                          (ote.gtfs.kalkati-to-gtfs/kalkati-zipper
+                          (kalkati-to-gtfs/kalkati-zipper
                             (java.io.ByteArrayInputStream. (.getBytes (with-out-str (xml/emit zipper-file)) "UTF-8")))
                           (z/xml1-> zipper-file :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :DefaultLanguage
                                     (fn [val]
                                       (zip/edit val assoc :content
                                                 (vector (:country-code default-locale)))) zip/root)
-                          (ote.gtfs.kalkati-to-gtfs/kalkati-zipper
+                          (kalkati-to-gtfs/kalkati-zipper
                             (java.io.ByteArrayInputStream. (.getBytes (with-out-str (xml/emit zipper-file)) "UTF-8")))
                           (z/xml1-> zipper-file :PublicationDelivery :dataObjects :CompositeFrame :FrameDefaults :DefaultLocale :TimeZoneOffset
                                     (fn [val]
