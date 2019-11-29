@@ -113,7 +113,7 @@ WITH route_stops as (
         (trip.trip)."trip-headsign" as headsign, stoptime."stop-id" as "stop-id",
         stoptime."arrival-time" as "arrival-time", stoptime."departure-time" as "departure-time",
         stoptime."stop-sequence" as "stop-sequence"
-  FROM gtfs_route_trips_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::date) rt
+  FROM gtfs_route_trips_for_date(:route-hash-id, gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::date) rt
        JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
        JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
@@ -130,7 +130,6 @@ SELECT rs."package-id", rs."trip-id", rs."headsign" as headsign,
  WHERE s."package-id" = rs."package-id"
    AND s."stop-id" = rs."stop-id"
  GROUP BY rs."package-id", rs."trip-id", rs.headsign;
-
 
 -- name: fetch-date-hashes-for-route-with-route-hash-id
 -- Fetch the date/hash pairs for a given route using route-hash-id which isn't used for all services
