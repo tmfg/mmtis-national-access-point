@@ -90,9 +90,10 @@
              (take-new-op-keys op)
              (take-update-op-keys op)
              (take-common-op-keys op))
+        ;; Dissoc country_code because operator view adds country_code A when there isn't one set.
         op (-> op
-            (update ::t-operator/visiting-address dissoc :country)
-            (update ::t-operator/billing-address dissoc :country))]
+               (update ::t-operator/visiting-address dissoc ::common/country_code)
+            (update ::t-operator/billing-address dissoc ::common/country_code))]
     op))
 
 ;; Takes 'ytj-name' and finds the first from `nap-operators` whose name is a match, or nil.

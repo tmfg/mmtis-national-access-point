@@ -294,7 +294,7 @@
                   (if @is-scrolled?
                     {:padding-top "0px"}
                     {:padding-top "11px"}))
-         :href "#"
+         :href "/#/"
          :on-click #(do
                       (e! (fp-controller/->CloseHeaderMenus))
                       (routes/navigate! :front-page))}
@@ -319,8 +319,9 @@
                 (merge style-topnav/desktop-link
                        (when @is-scrolled?
                          {:height "56px"})))
-              {:href (str "#/" (name page))
+              {:href (str "/#/" (name page))
                :on-click #(do
+                            (.preventDefault %)
                             (e! (fp-controller/->CloseHeaderMenus))
                             (routes/navigate! page))})
             [:div
