@@ -146,7 +146,7 @@
     service))
 
 (defn mark-package-as-deleted
-  "When external interface is deleted (when it is delted or service is delted) we don't want to
+  "When external interface is deleted (when it is deleted or service is deleted) we don't want to
   remove all gtfs data that we have aquired. So we only mark gtfs_packages.deleted = TRUE for those packages and
   remove the interface url."
   [db external-interface-description-id]
