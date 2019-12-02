@@ -20,7 +20,7 @@ jobs:
       OTE_DB_USERNAME: "napote"
       OTE_DB_PASSWORD: ""
       OTE_AUTH_SHARED_SECRET: "test"
-      OTE_FLAGS: "#{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register}"
+      OTE_FLAGS: "#{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register :netex-conversion-automated}"
       CHOUETTE_PATH: "/tmp/chouette/"
       NETEX_CONVERSION_WORKPATH: "/tmp/ote/netex-conversion/"
 
