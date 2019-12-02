@@ -389,7 +389,7 @@
                                                               {::stylefy/with-classes classes})
                                            {:style container-style}
                                            (when top-border
-                                             {:style {:border-top (str "solid 2px" colors/gray950)}}))
+                                             {:style {:border-top (str "solid 2px " colors/gray950)}}))
           (if-not card?
             [:div
              (when label
