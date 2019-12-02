@@ -417,6 +417,7 @@
                                                         :value val})
                                                      t-service/interface-data-contents))
             :max-results (count t-service/interface-data-contents)
+            :list-style {:max-height "300px" :overflow "auto"}
             :suggestions-config {:text :text :value :value}
             :is-empty?          validation/empty-enum-dropdown?})]
       filters]]))
