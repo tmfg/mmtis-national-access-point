@@ -69,7 +69,7 @@ jobs:
           command: |
             set +e
             mkdir /tmp/ote && envsubst < .circleci/config.edn.envsubst > /tmp/ote/config.edn
-            mv ote/target/ote-0.1-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
+            mv ote/target/ote-1.4-SNAPSHOT-standalone.jar /tmp/ote/ote.jar
 
       - run:
           name: Deploy build artifacts
