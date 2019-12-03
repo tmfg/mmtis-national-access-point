@@ -29,7 +29,7 @@
                  ;; A Clojure library for using SQL - Eclipse Public License 1.0
                  [webjure/jeesql "0.4.7"]
                  ;; A library for simple PostgreSQL queries with namespaced keys. - MIT
-                 [specql "20190301"]
+                 [specql "20180706"]
 
                  ;; http-kit HTTP server (and client) - Apache License Version 2.0.
                  [http-kit "2.3.0"]
