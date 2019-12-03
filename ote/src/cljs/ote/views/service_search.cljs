@@ -404,22 +404,14 @@
             :suggestions (sub-types-to-list (::t-service/sub-type facets))
             :open-on-focus? true}
 
-           {:name               ::t-service/data-content
-            :label              (tr [:service-search :data-content-search-label])
-            :type               :chip-input
-            :full-width?        true
-            :container-class    "col-xs-12 col-sm-4 col-md-4"
-            :auto-select?       true
-            :open-on-focus?     true
-            ;; Translate visible suggestion text, but keep the value intact.
-            :suggestions        (sort-by :text (mapv (fn [val]
-                                                       {:text  (tr [:enums ::t-service/interface-data-content val])
-                                                        :value val})
-                                                     t-service/interface-data-contents))
-            :max-results (count t-service/interface-data-contents)
-            :list-style {:max-height "300px" :overflow "auto"}
-            :suggestions-config {:text :text :value :value}
-            :is-empty?          validation/empty-enum-dropdown?})]
+           {:name ::t-service/data-content
+            :type :multiselect-selection
+            :label (tr [:service-search :data-content-search-label])
+            :container-class "col-xs-12 col-sm-4 col-md-4"
+            :full-width? true
+            :options t-service/interface-data-contents
+            :show-option (tr-key [:enums ::t-service/interface-data-content])
+            :is-empty? validation/empty-enum-dropdown?})]
       filters]]))
 
 (defn service-search [e! _]
