@@ -4,6 +4,8 @@ FINAP backend exposes to 3rd party developers the same query interface as the ap
 The interface can be used without authentication. Query interface returns 3rd party interfaces with their own licenses
 under external-interface-links[].external-interface.license. 
 
+NAP is an open source project. See more about the licenses that are involved: https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/ote/project.clj
+
 ## Service search
 
 The service search API is used for fetching information about published transport services.
