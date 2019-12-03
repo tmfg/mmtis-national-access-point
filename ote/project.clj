@@ -131,7 +131,7 @@
                  [com.amazonaws/aws-java-sdk-core "1.11.312"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
-                 ;; override old guava version from deps - Apache 2.0
+                 ;; Override old guava version from deps - Apache 2.0
                  [com.google.guava/guava "21.0"]
                  ;; Infer clojure specs from sample data. - Eclipse Public License 1.0
                  #_[spec-provider "0.4.14"]
@@ -153,7 +153,7 @@
             [lein-cljsbuild "1.1.7"]
             ;; Figwheel builds your ClojureScript code and hot loads it into the browser - Eclipse Public License 1.0
             [lein-figwheel "0.5.13"]
-            ;; static code analyzer for Clojure, ClojureScript - Eclipse Public License 1.0
+            ;; Static code analyzer for Clojure, ClojureScript - Eclipse Public License 1.0
             [lein-kibit "0.1.6"]]
 
   ;; Backend sources: clj and cljc which is used in front end (cljc) also
