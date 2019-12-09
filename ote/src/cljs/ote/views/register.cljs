@@ -1,15 +1,18 @@
 (ns ote.views.register
   "OTE registration form page."
   (:require [reagent.core :as r]
-            [ote.ui.form :as form]
-            [ote.app.controller.login :as lc]
-            [ote.localization :refer [tr tr-key]]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.common :as common]
-            [ote.style.register :as register-style]
+            [clojure.string :as str]
             [stylefy.core :as stylefy]
             [ote.db.user :as user]
-            [ote.ui.notification :as notification]))
+            [ote.localization :refer [tr tr-key]]
+            [ote.style.register :as register-style]
+            [ote.style.base :as base]
+            [ote.ui.common :as common]
+            [ote.ui.buttons :as buttons]
+            [ote.ui.form :as form]
+            [ote.ui.notification :as notification]
+            [ote.ui.common :refer [linkify]]
+            [ote.app.controller.login :as lc]))
 
 (defn invitation-token-check
   [token-info]
@@ -23,6 +26,9 @@
     (notification/notification
       {:text (tr [:register :valid-token] {:operator-name (:name token-info)})
        :type :success})))
+
+(defn- disable-due-tos? [data]
+  (not (:acceped-tos? data)))
 
 ;; PENDING:
 ;; This form has a new ":show-errors?" flag in the schemas that only
@@ -54,7 +60,8 @@
                              [common/help (tr [:register :errors :logged-in] user)])
                            [buttons/save {:on-click #(e! (lc/->Register (form/without-form-metadata data)))
                                           :disabled (or (some? user)
-                                                      (form/disable-save? data))}
+                                                        (form/disable-save? data)
+                                                        (disable-due-tos? data))}
                             (tr [:register :label])]])
              :hide-error-until-modified? true}
             [(form/group
@@ -73,8 +80,8 @@
                                (tr [:register :errors :email-taken])))]
                 :on-blur #(edit! :email)
                 :show-errors? (or (and email-taken
-                                    (email-taken (:email form-data)))
-                                (@edited :email))
+                                       (email-taken (:email form-data)))
+                                  (@edited :email))
                 :should-update-check form/always-update}
                {:element-id "register-name"
                 :name :name
@@ -108,5 +115,16 @@
                                (tr [:register :errors :passwords-must-match])))]
                 :on-blur #(edit! :confirm)
                 :show-errors? (@edited :confirm)
-                :should-update-check form/always-update})]
+                :should-update-check form/always-update}
+               {:element-id "accept-tof"
+                :name :acceped-tos?
+                :type :checkbox-register
+                :required? true
+                :label [:div (tr [:common-texts :have-read-services])
+                        (linkify (tr [:common-texts :navigation-privacy-policy-url])
+                                 (tr [:common-texts :navigation-privacy-policy-text2]) {:style base/base-link})
+                        (tr [:common-texts :and-agree-service-terms])
+                        (linkify (tr [:common-texts :navigation-terms-of-service-url])
+                                 (str/lower-case (str (tr [:common-texts :navigation-terms-of-service]) "."))
+                                 {:style base/base-link})]})]
             form-data]]]]))))
