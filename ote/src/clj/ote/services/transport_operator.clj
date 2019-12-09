@@ -1,29 +1,29 @@
 (ns ote.services.transport-operator
   "Services for getting transport-operator data from database"
-  (:require [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
+  (:require [clojure.string :as str]
+            [clojure.set :refer [rename-keys]]
+            [clj-time.core :as t]
+            [clj-time.coerce :as tc]
+            [taoensso.timbre :as log]
+            [compojure.core :refer [routes GET POST DELETE]]
+            [hiccup.core :refer [html]]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
             [specql.op :as op]
+            [jeesql.core :refer [defqueries]]
+            [com.stuartsierra.component :as component]
+            [ote.config.email-config :as email-config]
+            [ote.time :as time]
+            [ote.components.http :as http]
+            [ote.util.email-template :as email-template]
+            [ote.authorization :as authorization]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.auditlog :as auditlog]
             [ote.db.common :as common]
             [ote.db.user :as user]
-            [ote.util.email-template :as email-template]
-            [ote.config.email-config :as email-config]
-            [compojure.core :refer [routes GET POST DELETE]]
-            [taoensso.timbre :as log]
-            [ote.services.operators :as operators]
-            [ote.authorization :as authorization]
-            [jeesql.core :refer [defqueries]]
             [ote.db.tx :as tx]
             [ote.email :as email]
-            [hiccup.core :refer [html]]
-            [ote.time :as time]
-            [clj-time.core :as t]
-            [clojure.set :refer [rename-keys]]
-            [clj-time.coerce :as tc]
-            [clojure.string :as str]
+            [ote.services.operators :as operators]
             [ote.services.transport :as transport-service])
   (:import (java.util UUID)))
 
@@ -362,8 +362,6 @@
     (if (= 0 delete-count)
       (http/transit-response "Delete failed" 400)
       (http/transit-response "Deleted successfully" 200))))
-
-
 
 (defn ckan-group-id->group
   [db ckan-group-id]
