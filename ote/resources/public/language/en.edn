@@ -1046,7 +1046,12 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-pre-notice "Report changes in regular scheduled passenger transport"
   :navigation-authority-pre-notices "Saapuneet ilmoitukset"
   :navigation-privacy-policy "Privacy Policy"
+  :navigation-privacy-policy-text "privacy policy"
+  :navigation-privacy-policy-text2 "privacy policy"
   :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-of-service "Terms of service"
+  :navigation-terms-of-service-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-and-cookies " including cookie policy."
   :navigation-general-menu "Menu"
   :navigation-for-developers "API for developers"
   :navigation-email-notification-settings "Email notification settings"
@@ -1125,6 +1130,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-operators "No transport operators"
   :country "Country"
   :filling-info "Filling instructions"
+  :and "and"
+  :agree-to-privacy-and-terms "By using Finap.fi, you agree to the service"
+  :have-read-services "I have reviewed the "
+  :and-agree-service-terms " and accept "
   }
 
 

@@ -1047,7 +1047,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-pre-notice "Meddelande om ändring i regelbunden persontrafik"
   :navigation-authority-pre-notices "Inkomna ändringsmeddelanden"
   :navigation-privacy-policy "Registerbeskrivning"
+  :navigation-privacy-policy-text "registerbeskrivning"
+  :navigation-privacy-policy-text2 "registerbeskrivning"
   :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-of-service "Villkor för tjänsten"
+  :navigation-terms-of-service-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-and-cookies ", mukaan lukien evästekäytännöt."
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
@@ -1126,6 +1131,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-operators "Inga tjänsteproducenter"
   :country "Land"
   :filling-info "Anvisning"
+  :and "och"
+  :agree-to-privacy-and-terms "Genom att använda denna webbplats godkänner du tjänsten"
+  :have-read-services "Jag har granskat tjänsten "
+  :and-agree-service-terms " och acceptera tjänsten "
   }
 
 
