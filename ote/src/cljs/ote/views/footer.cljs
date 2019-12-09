@@ -17,7 +17,7 @@
    [:footer.site-footer
     [:div.container {:style {:margin-bottom "60px"}}
      [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
-      [:ul.unstyled (stylefy/use-style style-front-page/footer-logo-ul)
+      [:ul.unstyled
        [:li (stylefy/use-style style-front-page/third-column-text)
         [:a.logo {:href (tr [:common-texts :footer-livi-url-link])}
              [:img {:class (:class (stylefy/use-style style-front-page/footer-logo)) :src "/img/icons/TRAFICOM_rgb.svg" :alt (tr [:common-texts :footer-livi-logo])}]]]
@@ -34,6 +34,8 @@
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]
         [:span (stylefy/use-style style-front-page/footer-gray-info-text)
          (tr [:common-texts :navigation-feedback-email])]]
+       [:li [linkify (tr [:common-texts :navigation-terms-of-service-url])
+             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-terms-of-service])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :footer-livi-url-link])
