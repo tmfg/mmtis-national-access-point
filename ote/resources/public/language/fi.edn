@@ -1058,6 +1058,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-privacy-policy-text2 "tietosuojaselosteeseen"
   :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-terms-of-service "Käyttöehdot"
+  :navigation-terms-of-service-text "Käyttöehdot"
   :navigation-terms-of-service-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
   :navigation-terms-and-cookies ", mukaan lukien evästekäytännöt."
   :navigation-general-menu "Valikko"
@@ -1142,6 +1143,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :agree-to-privacy-and-terms "Käyttämällä NAP-sivustoa hyväksyt palvelun"
   :have-read-services "Olen tutustunut NAP-palvelun "
   :and-agree-service-terms " ja hyväksyn palvelun "
+  :of-service "."
   }
 
 

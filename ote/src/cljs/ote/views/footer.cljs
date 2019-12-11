@@ -35,7 +35,7 @@
         [:span (stylefy/use-style style-front-page/footer-gray-info-text)
          (tr [:common-texts :navigation-feedback-email])]]
        [:li [linkify (tr [:common-texts :navigation-terms-of-service-url])
-             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-terms-of-service])]] {:target "_blank"}]]
+             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-terms-of-service-text])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
              [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
        [:li [linkify (tr [:common-texts :footer-livi-url-link])

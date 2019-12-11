@@ -125,6 +125,7 @@
                                  (tr [:common-texts :navigation-privacy-policy-text2]) {:style base/base-link})
                         (tr [:common-texts :and-agree-service-terms])
                         (linkify (tr [:common-texts :navigation-terms-of-service-url])
-                                 (str/lower-case (str (tr [:common-texts :navigation-terms-of-service]) "."))
-                                 {:style base/base-link})]})]
+                                 (str/lower-case (str (tr [:common-texts :navigation-terms-of-service]) ))
+                                 {:style base/base-link})
+                        (tr [:common-texts :of-service])]})]
             form-data]]]]))))
