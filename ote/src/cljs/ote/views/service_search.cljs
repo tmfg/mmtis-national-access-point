@@ -305,22 +305,11 @@
                         operation-area-filter-completions :operation-area-filter-completions
                         total-company-count :total-company-count
                         total-service-count :total-service-count}]
-  (let [sub-types-to-list (fn [data]
-                            (keep (fn [val]
-                                    (let [subtype (:sub-type val)]
-                                      (when-not (= :other subtype)
-                                        (into (sorted-map)
-                                              (-> val
-                                                  (dissoc :sub-type)
-                                                  (assoc :value subtype
-                                                         :text (tr [:enums ::t-service/sub-type subtype])))))))
-                                  data))
-        transport-types-to-list (fn [data]
-                                  (keep (fn [val]
-                                          (into (sorted-map)
-                                                (assoc {} :text (tr [:enums ::t-service/transport-type val])
-                                                          :value val)))
-                                        data))]
+  (let [sub-type-options (keep (fn [val]
+                                 (let [subtype (:sub-type val)]
+                                   (when-not (= :other subtype)
+                                     subtype)))
+                               (::t-service/sub-type facets))]
 
     [:div
      [:p (stylefy/use-style style/title-group-description) (tr [:service-search :service-summary-text])
@@ -378,13 +367,13 @@
 
          {:id "transport-types"
           :name ::t-service/transport-type
-          :type :chip-input
+          :type :multiselect-selection
           :container-class "col-xs-12 col-sm-4 col-md-4"
           :full-width? true
-          :full-width-input? false
-          :suggestions-config {:text :text :value :text}
-          :suggestions (transport-types-to-list transport-types)
-          :open-on-focus? true})
+          :options transport-types
+          :show-option (tr-key [:enums ::t-service/transport-type])
+          :open-on-focus? true
+          :is-empty? validation/empty-enum-dropdown?})
 
          (form/group
            {:columns 3
@@ -396,13 +385,13 @@
            {:id "sub-types"
             :name ::t-service/sub-type
             :label (tr [:service-search :type-search])
-            :type :chip-input
+            :type :multiselect-selection
             :container-class "col-xs-12 col-sm-4 col-md-4"
             :full-width? true
-            :full-width-input? false
-            :suggestions-config {:text :text :value :text}
-            :suggestions (sub-types-to-list (::t-service/sub-type facets))
-            :open-on-focus? true}
+            :options sub-type-options
+            :show-option (tr-key [:enums ::t-service/sub-type])
+            :open-on-focus? true
+            :is-empty? validation/empty-enum-dropdown?}
 
            {:name ::t-service/data-content
             :type :multiselect-selection
