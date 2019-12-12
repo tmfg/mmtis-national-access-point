@@ -1,18 +1,19 @@
 (ns ote.app.controller.admin
   (:require [tuck.core :as tuck :refer-macros [define-event]]
+            [testdouble.cljs.csv :as csv]
+            [clojure.string :as str]
+            cljsjs.filesaverjs
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]
             [ote.ui.form :as form]
-            [testdouble.cljs.csv :as csv]
             [ote.localization :refer [tr]]
-            [clojure.string :as str]
             [ote.util.text :as text]
             [ote.time :as time]
+            [ote.app.routes :as routes]
             [ote.app.controller.common :refer [->ServerError]]
-            cljsjs.filesaverjs
-            [ote.app.routes :as routes]))
+            [ote.app.controller.admin-validation :as admin-validation]))
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
@@ -491,6 +492,9 @@
   ChangeTab
   (process-event [{tab-value :tab-value} app]
     (assoc-in app [:admin :tab :admin-page] tab-value)))
+
+(defmethod routes/on-navigate-event :admin [{params :params}]
+  (admin-validation/->LoadValidationServices))
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
