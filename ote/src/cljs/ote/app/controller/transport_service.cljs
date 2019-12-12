@@ -96,6 +96,7 @@
     ::t-service/operation-area
     ::t-service/companies
     ::t-service/published
+    ::t-service/validate
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from
@@ -130,7 +131,9 @@
 (defrecord PublishTransportServiceResponse [success? transport-service-id])
 
 (defrecord EditTransportService [form-data])
-(defrecord SaveTransportService [schemas publish?])
+(defrecord ConfirmSaveTransportService [schemas])
+(defrecord SaveTransportService [schemas validate?])
+(defrecord CancelSaveTransportService [])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord FailedTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [])
@@ -505,8 +508,17 @@
   (process-event [{response :response} app]
     (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
+  CancelSaveTransportService
+  (process-event [_ app]
+    ;; Close modal
+    (assoc-in app [:transport-service :show-confirm-save-dialog?] false))
+
+  ConfirmSaveTransportService
+  (process-event [{schemas :schemas} app]
+    (assoc-in app [:transport-service :show-confirm-save-dialog?] true))
+
   SaveTransportService
-  (process-event [{:keys [schemas publish?]} {service :transport-service
+  (process-event [{:keys [schemas validate?]} {service :transport-service
                                               operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           operator-id (if (nil? (::t-service/transport-operator-id service))
@@ -518,10 +530,11 @@
                                 form/without-form-metadata))
               (dissoc :transport-service-type-subtype
                       :select-transport-operator
-                      :show-brokering-service-dialog?)
+                      :show-brokering-service-dialog?
+                      :show-confirm-save-dialog?)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
-              (assoc ::t-service/published? publish?
+              (assoc ::t-service/validate? validate?
                      ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
               (update ::t-service/external-interfaces
@@ -637,3 +650,9 @@
                   csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator separator))]
               (e! (->AddImportedCompaniesToService csv filename)))))
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
+
+(defn service-state [validate published]
+  (cond
+    (and (some? published) (nil? validate)) :public
+    (and (some? validate)) :validation
+    :else :draft))
