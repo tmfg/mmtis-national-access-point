@@ -64,7 +64,6 @@
                label])
             label)])))))
 
-
 (defn tooltip-wrapper
   "Wrap any ui component with balloon.css tooltip bindings."
   [component & [wrapper-opts]]
@@ -97,6 +96,16 @@
            (when visible
              {:data-balloon-visible true}))
     child-component]])
+
+(def tooltip-icon
+  "A tooltip icon that shows balloon.css tooltip on hover."
+  (let [wrapped (tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
+    (fn [opts]
+      [wrapped {:style {:width "16px"
+                        :height "16px"
+                        :vertical-align "middle"
+                        :color "gray"}}
+       opts])))
 
 (defn tooltip-label
   "Render input label with tooltip"

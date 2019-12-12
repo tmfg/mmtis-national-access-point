@@ -107,7 +107,7 @@
    :font-weight "bold !important"
    :position "inherit !important"})
 
-(stylefy/class "table-header-wrap"
+(def table-header-wrap-map
   {:background-color (str colors/gray300 " !important")
    :color (str colors/gray900 " !important")
    :font-weight "bold !important"
@@ -116,6 +116,14 @@
    :overflow-wrap "break-word !important"
    :padding-left "0.5rem !important"
    :padding-right "0 !important"})
+
+(stylefy/class "table-header-wrap"
+  table-header-wrap-map)
+
+(stylefy/class "table-header-semi-wrap"
+               (merge table-header-wrap-map
+                      {:padding-left "0.75rem !important"
+                       :padding-right "0.75rem !important"}))
 
 (def header-font {:font-size "18px"
                   :padding-top "20px"
@@ -260,10 +268,17 @@
   {:margin-left "1rem"})
 
 (def table-col-style-wrap
-  {:padding-left "0.5rem"
-   :padding-right "0"
+  {:padding-left "0.5rem !important"
+   :padding-right "0 !important"
    :overflow-wrap "break-word"
    :white-space "normal !important"})
+
+(def table-col-style-semi-wrap (merge table-col-style-wrap
+                                      {:padding-left "0.75rem !important"
+                                       :padding-right "0.75rem !important"}))
+
+(stylefy/class "table-col-style-wrap" table-col-style-wrap)
+(stylefy/class "table-col-style-semi-wrap" table-col-style-semi-wrap)
 
 (def info-row {:border-bottom (str "1px solid " colors/gray350)
                :display "flex"
