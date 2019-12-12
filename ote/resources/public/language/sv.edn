@@ -776,7 +776,6 @@
   :header-accessibility "Tillgänglihet"
   :header-checkboxlist-accessibility "Tillgänglighet"}
 
-
  :parking-page
  {:header-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
   :header-edit-parking "Redigera uppgifter om allmän kommersiell parkeringstjänst"
@@ -790,6 +789,10 @@
   :header-facilities-and-capacities "Parkeringsområden och antaler P-platser"
   :header-charging-points "Laddningspunkter"
   :header-service-hours "Tjänstens öppettider och parkeringstid"}
+
+ :transport-services-common-page
+ {:validation-modal-header "Tietoa julkaisuprosessista"
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
