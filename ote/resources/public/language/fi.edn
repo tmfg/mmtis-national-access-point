@@ -213,8 +213,9 @@
    :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
    :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
-   :ote.db.transport-service/published?-values {true "Julkaistu"
-                                                false "Ei julkaistu"}
+   :ote.db.transport-service/published?-values {:public "Julkaistu"
+                                                :validation "Odottaa tarkistusta"
+                                                :draft "Luonnos"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Viikonpäivät"
@@ -351,6 +352,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :manage-access-rights "Hallinnoi käyttäjäoikeuksia"
 
   :save-and-publish "Tallenna ja julkaise"
+  :save-and-validate "Tallenna ja siirrä tarkistukseen"
+  :send "Lähetä"
   :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
@@ -600,7 +603,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :schedule-creation "Reitti- ja aikataulutietorajapintojen tuottaminen"
                      :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
                      :open-rae "Avaa Traficomin RAE-työkalu"
-                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
+                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"
+                     :service-in-validation-info "Palvelun tiedot ovat Traficomilla käsittelyssä ja ne julkaistaan mahdollisimman pian."}
 
  :transport-users-page {:username "Nimi"
                         :members "Jäsenet"
@@ -659,7 +663,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :table-header-service-name "Palvelun nimi"
   :table-header-service-url "Palvelun verkko-osoite"
-  :table-header-NAP-status "NAP tila"
+  :table-header-NAP-status "Palvelun tila"
   :table-header-modified "Muokattu"
   :table-header-created "Luotu"
   :table-header-actions "Toiminnot"
@@ -788,6 +792,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :header-charging-points "Latauspisteet"
   :header-service-hours "Palveluajat ja pysäköintiaika"}
 
+ :transport-services-common-page
+ {:validation-modal-header "Tietoa julkaisuprosessista"
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"

@@ -7,25 +7,25 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.time :as time]
-            [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
             [ote.util.values :as values]
+            [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
             [ote.theme.colors :as colors]
-            [ote.ui.form :as form]
-            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.validation :as validation]
-            [ote.ui.form-fields :as form-fields]
             [ote.style.form :as style-form]
             [ote.style.dialog :as style-dialog]
             [ote.style.base :as style-base]
-            [ote.app.controller.transport-service :as ts]
+            [ote.ui.buttons :as buttons]
+            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
+            [ote.ui.form :as form]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.info :as info]
+            [ote.ui.validation :as validation]
+            [ote.app.controller.common :as common-c]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.app.controller.flags :as flags]
             [ote.views.place-search :as place-search]
-            [ote.app.controller.common :as common-c]
-            [ote.views.place-search :as place-search]
-            [ote.ui.info :as info]))
+            [ote.views.place-search :as place-search]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -213,7 +213,7 @@
                                   ;; validation request to prevent stuttering user interface.
                                   (.setTimeout
                                     js/window
-                                    #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
+                                    #(e! (ts-controller/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
                                   (assoc row ::t-service/format #{val})))
                        :read #(first (get-in % [::t-service/format]))}
                       {:name ::t-service/external-service-url
@@ -238,7 +238,7 @@
                                          :full-width? true
                                          :update! #(update-form! %)
                                          :on-blur (fn [e]
-                                                    (e! (ts/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format))))
+                                                    (e! (ts-controller/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format))))
                                          :max-length 200}
                                         ;; For first row: If there is data in other fields, show this required field warning
                                         ;; For other rows, if this required field is missing, show the warning.
@@ -318,8 +318,8 @@
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
      :on-file-selected (fn [evt filename]
-                         (ts/read-companies-csv! e! (.-target evt) filename))
-     :on-url-given #(e! (ts/->EnsureCsvFile))
+                         (ts-controller/read-companies-csv! e! (.-target evt) filename))
+     :on-url-given #(e! (ts-controller/->EnsureCsvFile))
      :validate [(fn [data row]
                   (let [companies (::t-service/companies row)]
                     (case (::t-service/company-source data)
@@ -345,7 +345,7 @@
                      :help-link-text (tr [:form-help :brokerage-link])
                      :help-link "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
      :type :checkbox
-     :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
+     :on-click #(e! (ts-controller/->ShowBrokeringServiceDialog))}))
 
 (defn contact-info-group []
   (form/group
@@ -424,45 +424,49 @@
      :full-width? true
      :max-length 200}))
 
+(defn- brokering-dialog [e! app]
+  (when (get-in app [:transport-service :show-brokering-service-dialog?])
+    [ui/dialog
+     {:id "brokering-service-dialog"
+      :open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:dialog :brokering-service :title])
+      :actions [
+                (r/as-element
+                  [ui/flat-button
+                   {:id "confirm-brokering-service"
+                    :label (tr [:dialog :brokering-service :ok])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (ts-controller/->SelectBrokeringService true))}])
+                (r/as-element
+                  [ui/raised-button
+                   {:label (tr [:dialog :brokering-service :cancel])
+                    :primary true
+                    :on-click #(e! (ts-controller/->SelectBrokeringService false))}])]}
+     [:p (tr [:dialog :brokering-service :body])]
+     [:div
+      (linkify (tr [:dialog :brokering-service :link-url])
+               [:span (stylefy/use-style style-base/blue-link-with-icon)
+                (ic/content-create {:style {:width 20
+                                            :height 20
+                                            :margin-right "0.5rem"
+                                            :color colors/primary}})
+                (tr [:dialog :brokering-service :link-text])]
+               {:target "_blank" :style {:text-decoration "none"}})]]))
+
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
   [e! {published ::t-service/published :as data} schemas app]
   (let [name-missing? (str/blank? (::t-service/name data))
         show-footer? (if (get-in app [:transport-service ::t-service/id])
-                       (ts/is-service-owner? app)
+                       (ts-controller/is-service-owner? app)
                        true)
-        published? (not (nil? published))]
+        service-state (ts-controller/service-state (::t-service/validate data) published)
+        show-validate-modal? (get-in app [:transport-service :show-confirm-save-dialog?])]
     [:div
      ;; Show brokering dialog
-     (when (get-in app [:transport-service :show-brokering-service-dialog?])
-       [ui/dialog
-        {:id "brokering-service-dialog"
-         :open true
-         :actionsContainerStyle style-dialog/dialog-action-container
-         :title (tr [:dialog :brokering-service :title])
-         :actions [
-                   (r/as-element
-                     [ui/flat-button
-                      {:id "confirm-brokering-service"
-                       :label (tr [:dialog :brokering-service :ok])
-                       :secondary true
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService true))}])
-                   (r/as-element
-                     [ui/raised-button
-                      {:label (tr [:dialog :brokering-service :cancel])
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService false))}])]}
-        [:p (tr [:dialog :brokering-service :body])]
-        [:div
-         (linkify (tr [:dialog :brokering-service :link-url])
-                  [:span (stylefy/use-style style-base/blue-link-with-icon)
-                   (ic/content-create {:style {:width 20
-                                               :height 20
-                                               :margin-right "0.5rem"
-                                               :color colors/primary}})
-                   (tr [:dialog :brokering-service :link-text])]
-                  {:target "_blank" :style {:text-decoration "none"}})]])
+     [brokering-dialog e! app]
 
      ;show-footer? - Take owner check away for now
      (when true
@@ -471,27 +475,48 @@
           [:div {:style {:margin "1em 0em 1em 0em"}}
            [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
 
-        (if published?
-          ;; True
-          [:span
-           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
-                          :disabled (not (form/can-save? data))}
-            (tr [:buttons :save-updated])]
-           [buttons/save-draft {:disabled name-missing?
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (ts/->SaveTransportService schemas false)))}
-            (tr [:buttons :back-to-draft])]]
-          ;; False
-          [:span
-           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
-                          :disabled (not (form/can-save? data))}
-            (tr [:buttons :save-and-publish])]
-           [buttons/save-draft {:on-click #(e! (ts/->SaveTransportService schemas false))
-                          :disabled name-missing?}
-            (tr [:buttons :save-as-draft])]])
-        [buttons/cancel-with-icon {:on-click #(e! (ts/->CancelTransportServiceForm))}
-         (tr [:buttons :discard])]])]))
+        (case service-state
+          :public [:span
+                   [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                          :disabled (not (form/can-save? data))}
+                    (tr [:buttons :save-and-validate])]
+                   [buttons/save-draft {:disabled name-missing?
+                                        :on-click #(do
+                                                     (.preventDefault %)
+                                                     (e! (ts-controller/->SaveTransportService schemas false)))}
+                    (tr [:buttons :back-to-draft])]]
+          :validation [:span
+                       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                              :disabled (not (form/can-save? data))}
+                        (tr [:buttons :save-and-validate])]
+                       [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                                            :disabled name-missing?}
+                        (tr [:buttons :back-to-draft])]]
+          :draft [:span
+                  [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                         :disabled (not (form/can-save? data))}
+                   (tr [:buttons :save-and-validate])]
+                  [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                                       :disabled name-missing?}
+                   (tr [:buttons :save-as-draft])]])
+        [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm))}
+         (tr [:buttons :discard])]])
+
+     (when show-validate-modal?
+       [ui/dialog
+        {:open true
+         :actionsContainerStyle style-dialog/dialog-action-container
+         :title (tr [:transport-services-common-page :validation-modal-header])
+         :actions [(r/as-element
+                     [buttons/cancel
+                      {:on-click #(e! (ts-controller/->CancelSaveTransportService))}
+                      (tr [:buttons :cancel])])
+                   (r/as-element
+                     [buttons/save
+                      {:icon (ic/action-delete-forever)
+                       :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
+                      (tr [:buttons :send])])]}
+        (tr [:transport-services-common-page :validation-modal-text])])]))
 
 (defn place-search-group [e! key]
   (place-search/place-search-form-group
@@ -690,5 +715,5 @@
   ;; To set transport service form dirty when adding / removing places using the place-search component,
   ;; we'll have to manually trigger EditTransportService event with empty data.
   #(do
-     (e! (ts/->EditTransportService {}))
+     (e! (ts-controller/->EditTransportService {}))
      (e! %)))

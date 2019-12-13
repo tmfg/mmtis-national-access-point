@@ -6,20 +6,21 @@
             [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
             [stylefy.core :as stylefy]
-            [ote.ui.buttons :as buttons]
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
-            [ote.app.controller.admin :as admin-controller]
-            [ote.app.controller.front-page :as fp]
+            [ote.ui.buttons :as buttons]
             [ote.style.base :as style-base]
             [ote.style.dialog :as style-dialog]
             [ote.ui.page :as page]
             [ote.ui.tabs :as tabs]
             [ote.ui.form-fields :as form-fields]
+            [ote.app.controller.admin :as admin-controller]
+            [ote.app.controller.front-page :as fp]
             [ote.views.admin.interfaces :as interfaces]
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
+            [ote.views.admin.validate-service :as validate-view]
             [ote.views.admin.sea-routes :as sea-routes]
             [ote.views.admin.netex :as netex]))
 
@@ -312,7 +313,8 @@
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn admin-panel [e! app]
-  (let [tabs [{:label "Käyttäjä" :value "users"}
+  (let [tabs [{:label "Tarkistettavat palvelut" :value "validation"}
+              {:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
               {:label "Palveluntuottajat" :value "operators"}
@@ -320,7 +322,7 @@
               {:label "CSV Raportit" :value "reports"}
               {:label "Merireitit" :value "sea-routes"}
               {:label "Netex" :value "netex"}]
-        selected-tab (or (get-in app [:admin :tab :admin-page]) "users")]
+        selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
      [:div {:style {:position "absolute" :top "90px" :right "20px"}}
       [:a (merge {:href "/#/admin/detected-changes/detect-changes"
@@ -338,6 +340,8 @@
        [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))
                         :selected-tab (get-in app [:admin :tab :admin-page])}]
        ;; Show search parameters in page-controls section
+       (when (= "validation" selected-tab)
+         [validate-view/page-controls e! app])
        (when (= "users" selected-tab)
          [users/users-page-controls e! app])
        (when (= "services" selected-tab)
@@ -352,6 +356,7 @@
          [netex/netex-page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
+        "validation" [validate-view/validate-services e! app]
         "users" [users/user-listing e! app]
         "services" [service-list/service-listing e! app]
         "businessid" [business-id-report e! app]
@@ -361,4 +366,4 @@
         "sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex app]
         ;;default
-        [users/user-listing e! app])]]))
+        [validate-view/validate-services e! app])]]))

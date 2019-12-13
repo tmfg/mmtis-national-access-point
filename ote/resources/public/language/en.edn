@@ -211,8 +211,9 @@
    :ote.db.transport-service/type "Transport service mode"
    :ote.db.transport-service/sub-type "Transport service sub mode"
    :ote.db.transport-service/published? "NAP-status"
-   :ote.db.transport-service/published?-values {true "Published"
-                                                false "Not published"}
+   :ote.db.transport-service/published?-values {:public "Published"
+                                                :validation "Waiting validation"
+                                                :draft "Draft"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Day of the week"
@@ -350,6 +351,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :manage-access-rights "Manage access rights"
 
   :save-and-publish "Save and publish"
+  :save-and-validate "Save and add to validation"
+  :send "Send"
   :save-and-send "Save and send"
   :save-as-draft "Save a draft"
   :save-updated "Save updated information"
@@ -599,7 +602,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :schedule-creation "Creating interfaces for route and timetable data"
                      :if-no-interfaces "If you do not have any interfaces for route and timetable data, you can digitalize your transport service´s route and timetable data with the tools listed below."
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
-                     :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"}
+                     :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"
+                     :service-in-validation-info "Service is in validation in Traficom. It will be published as soon as possible."}
 
  :transport-users-page {:username "Name"
                         :members "Members"
@@ -654,7 +658,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :new-user? "New user?"
   :table-header-service-name "Service name"
   :table-header-service-url "Service WWW-address"
-  :table-header-NAP-status "NAP-status"
+  :table-header-NAP-status "Service status"
   :table-header-modified "Modified"
   :table-header-created "Created"
   :table-header-actions "Functions"
@@ -768,7 +772,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-accessibility "Accessibility and information service accessibility"
   :header-checkboxlist-accessibility "Accessibility"}
 
-
  :parking-page
  {:header-new-parking "Add information about general commercial parking"
   :header-edit-parking "Edit information about general commercial parking"
@@ -782,6 +785,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-facilities-and-capacities "Parking capacity"
   :header-charging-points "Charging points"
   :header-service-hours "Service hours and maximum parking time"}
+
+ :transport-services-common-page
+ {:validation-modal-header "Validation process information"
+  :validation-modal-text "Service will be validated Mon - Fri 9 am to 3 pm. When service is validated it will be published to service catalog."}
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"

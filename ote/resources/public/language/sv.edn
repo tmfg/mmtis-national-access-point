@@ -216,8 +216,9 @@
    :ote.db.transport-service/type "Tjänstetyp"
    :ote.db.transport-service/sub-type "Kategori"
    :ote.db.transport-service/published? "NAP-status"
-   :ote.db.transport-service/published?-values {true "Publicerad"
-                                                false "Ej publicerad"}
+   :ote.db.transport-service/published?-values {:public "Publicerad"
+                                                :validation "Päntar på publicering\n"
+                                                :draft "Utkast"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Veckodagar"
@@ -357,6 +358,8 @@
   :manage-access-rights "Hanterar användarrättigheter"
 
   :save-and-publish "Spara och publicera"
+  :save-and-validate "Spara och flytta för att granska"
+  :send "Skicka"
   :save-as-draft "Spara utkast"
   :save-and-send "Spara och skicka"
   :save-updated "Spara uppdaterad info"
@@ -602,7 +605,8 @@
                      :schedule-creation "Skapa gränssnitt för rutt- och tidtabellsdata"
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
-                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"}
+                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
+                     :service-in-validation-info "Palvelun tiedot ovat Traficomilla käsittelyssä ja ne julkaistaan mahdollisimman pian."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"
@@ -661,7 +665,7 @@
   :new-user? "Ny användare?"
   :table-header-service-name "Tjänstens namn"
   :table-header-service-url "Tjänstens www-adress"
-  :table-header-NAP-status "NAP status"
+  :table-header-NAP-status "Tjänstens status"
   :table-header-modified "Redigerat"
   :table-header-created "Skapat"
   :table-header-actions "Funktioner"
@@ -772,7 +776,6 @@
   :header-accessibility "Tillgänglihet"
   :header-checkboxlist-accessibility "Tillgänglighet"}
 
-
  :parking-page
  {:header-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
   :header-edit-parking "Redigera uppgifter om allmän kommersiell parkeringstjänst"
@@ -786,6 +789,10 @@
   :header-facilities-and-capacities "Parkeringsområden och antaler P-platser"
   :header-charging-points "Laddningspunkter"
   :header-service-hours "Tjänstens öppettider och parkeringstid"}
+
+ :transport-services-common-page
+ {:validation-modal-header "Tietoa julkaisuprosessista"
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"

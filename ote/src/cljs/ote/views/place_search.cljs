@@ -123,16 +123,6 @@
                              [ui/menu-item {:primary-text namefin}])})
               completions)))
 
-
-(def tooltip-icon
-  "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
-    (fn [opts]
-      [wrapped {:style {:width          16 :height 16
-                        :vertical-align "middle"
-                        :color          "gray"}}
-       opts])))
-
 (defn  place-search [e! place-search]
   (let [{primary-results true
          secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
@@ -142,7 +132,7 @@
                                ::stylefy/media {{:min-width (str width-xs "px")} {:width "30%"}}})
       [:div {:style {:font-weight "bold"}}
        [:span (tr [:place-search :primary-header])]
-       [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
+       [:span [common/tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
       [result-chips e! primary-results true]
       [ui/auto-complete {:id :place-auto-complete-primary
@@ -156,7 +146,7 @@
                          :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
       [:div {:style {:font-weight "bold" :margin-top "60px"}}
        [:span (tr [:place-search :secondary-header])]
-       [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
+       [:span [common/tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
       [ui/auto-complete {:id :place-auto-complete-secondary
