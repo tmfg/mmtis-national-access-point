@@ -13,7 +13,7 @@ job('Deploy OTE') {
           def ote_job = jenkins.model.Jenkins.getInstance().getItem('OTE build from master')
           def ote_build = ote_job.getLastSuccessfulBuild()
           def ote_artifact_path = new java.io.File(ote_build.getArtifactManager().root().toURI())
-          return [ote_build_artifact: ote_artifact_path.getAbsolutePath() + '/ote/target/ote-1.4-SNAPSHOT-standalone.jar']
+          return [ote_build_artifact: ote_artifact_path.getAbsolutePath() + '/ote/target/ote-0.1-SNAPSHOT-standalone.jar']
         ''')
     }
 
