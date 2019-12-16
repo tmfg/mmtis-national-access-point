@@ -768,13 +768,18 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
-                                       show-clear? hint-text id date-fields? disabled? element-id] :as opts} data]
+                                       show-clear? hint-text id date-fields? disabled? element-id full-width?] :as opts} data]
   (let [warning (when (and required? (not data))
                   (tr [:common-texts :required-field]))]
-    [:div (stylefy/use-style style-base/inline-block)
+    [:div {:style (merge
+                    style-base/inline-block
+                    (when full-width? {:width "100%"} ))}
      [ui/date-picker (merge {:id (if element-id element-id (str label))
-                             :style {:display "inline-block"}
-                             :text-field-style {:width "150px"}
+                             :style (merge
+                                      {:display "inline-block"}
+                                      (when full-width?
+                                        {:width "92%"}))
+                             :text-field-style (if full-width? {:width "100%"} {:width "150px"})
                              :hint-text (or hint-text "")
                              :floating-label-text (when-not table? label)
                              :floating-label-fixed true

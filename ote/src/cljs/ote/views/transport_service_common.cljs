@@ -195,7 +195,7 @@
                          :type :multiselect-selection
                          :disabled? in-validation?
                          :label (tr [:field-labels :transport-service-common ::t-service/data-content])
-                         :field-class "col-xs-6 col-sm-3 col-md-3"
+                         :field-class "col-xs-12 col-sm-3 col-md-3"
                          :full-width? true
                          :options t-service/interface-data-contents
                          :show-option (tr-key [:enums ::t-service/interface-data-content])
@@ -206,7 +206,7 @@
                            :type :string
                            :disabled? in-validation?
                            :label (tr [:field-labels :transport-service-common ::t-service/format])
-                           :field-class "col-xs-6 col-sm-3 col-md-3"
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
                            :full-width? true}
                           {:name ::t-service/format
                            :type :autocomplete
@@ -214,7 +214,7 @@
                            :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
                            :max-results 10
                            :label (tr [:field-labels :transport-service-common ::t-service/format])
-                           :field-class "col-xs-6 col-sm-3 col-md-3"
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
                            :full-width? true
                            :required? true
                            ;; Wrap value with vector to support current type of format field in the database.
@@ -231,7 +231,7 @@
                         {:name ::t-service/external-service-url
                          :type :component
                          :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                         :field-class "col-xs-6 col-sm-6 col-md-6"
+                         :field-class "col-xs-12 col-sm-6 col-md-6"
                          :read #(identity %)
                          :write (fn [row val]
                                   (assoc-in row [::t-service/external-interface ::t-service/url] val))
@@ -290,7 +290,7 @@
                          :type :localized-text
                          :disabled? in-validation?
                          :label (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-                         :field-class "col-xs-6 col-sm-6 col-md-6"
+                         :field-class "col-xs-12 col-sm-6 col-md-6"
                          :full-width? true
                          :read (comp ::t-service/description ::t-service/external-interface)
                          :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
@@ -301,20 +301,20 @@
                            :disabled? in-validation?
                            :read (fn [val] (get val ::t-service/license))
                            :label (tr [:field-labels :transport-service-common ::t-service/license])
-                           :field-class "col-xs-6 col-sm-3 col-md-3"
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
                            :full-width? true}
                           {:name ::t-service/license
                            :type :autocomplete
                            :open-on-focus? true
                            :label (tr [:field-labels :transport-service-common ::t-service/license])
-                           :field-class "col-xs-6 col-sm-3 col-md-3"
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
                            :full-width? true
                            :suggestions (tr-tree [:licenses :external-interfaces])
                            :max-results 10})]}
         (when-not in-validation?
           {:add-label (tr [:buttons :add-external-interface])
            :inner-delete? true
-           :inner-delete-class "col-xs-6 col-sm-3 col-md-3"
+           :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
            :inner-delete-label (tr [:buttons :delete-interface])})))))
 
 (defn companies-group
@@ -499,7 +499,7 @@
     [:div
      ;; Show brokering dialog
      [brokering-dialog e! app]
-     
+
      ;; show-footer? - Take owner check away for now
      ;; But if service is in-validation? true, then do not show footer. It should be enabled first
      (when-not in-validation?
@@ -690,7 +690,6 @@
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-
     {:name ::t-service/name
      :type :string
      :disabled? in-validation?
@@ -715,16 +714,19 @@
      :default-state false
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-12"}
+
     {:name ::t-service/available-from
      :type :date-picker
      :disabled? in-validation?
      :show-clear? true
+     :full-width? true
      :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}
     {:name ::t-service/available-to
      :type :date-picker
      :disabled? in-validation?
      :show-clear? true
+     :full-width? true
      :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}))
 

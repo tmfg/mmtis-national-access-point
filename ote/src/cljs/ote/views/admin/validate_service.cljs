@@ -38,17 +38,15 @@
      [:div "Julkaise painamalla julkaise"]]))
 
 (defn validate-services [e! app]
-  [:div "je"]
-   (let [services (get-in app [:admin :in-validation :results])
-         _ (.log js/console "view services " (pr-str services))]
+  (let [services (get-in app [:admin :in-validation :results])]
     [:div.row
-    [open-publish-dialog e! app]
+     [open-publish-dialog e! app]
      (when services
        [:span
         [ui/table {:selectable false}
          [ui/table-header {:class "table-header-wrap"
                            :adjust-for-checkbox false
-                           :display-select-all  false}
+                           :display-select-all false}
           [ui/table-row
            [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Nimi"]
            [ui/table-header-column {:class "table-header-wrap" :style {:width "15%"}} "Palveluntuottaja"]
