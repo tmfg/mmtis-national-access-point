@@ -116,7 +116,7 @@
 (def section-header
   {:padding "1rem"
    :background-color "#F0F0F0"
-   :line-height 1.5})
+   :line-height "1.5rem"})
 
 (def section-body
   {:padding-left "1.25rem"
