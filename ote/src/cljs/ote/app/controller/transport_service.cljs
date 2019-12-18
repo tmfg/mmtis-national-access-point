@@ -1,16 +1,16 @@
 (ns ote.app.controller.transport-service
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.communication :as comm]
-            [taoensso.timbre :as log]
             [clojure.string :as str]
+            [taoensso.timbre :as log]
             [testdouble.cljs.csv :as csv]
-            [ote.time :as time]
-            [ote.util.csv :as csv-util]
-            [ote.localization :refer [tr tr-key tr-tree]]
+            [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
+            [ote.time :as time]
+            [ote.util.csv :as csv-util]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
             [ote.ui.validation :as validation]
             [ote.app.routes :as routes]
@@ -21,14 +21,14 @@
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
         set-transport-type (fn [app service-type options]
-                                 (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
+                             (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
     (cond
       (= sub-type :taxi) (set-transport-type app ::t-service/passenger-transportation #{:road})
       (= sub-type :parking) (set-transport-type app ::t-service/parking #{:road})
       :else app)))
 
 (defn service-type-from-sub-type
-      "Returns service type keyword based on sub-type."
+  "Returns service type keyword based on sub-type."
   [type]
   (case type
     :taxi :passenger-transportation
@@ -64,9 +64,9 @@
   {}
   (let [type (get-in app [:transport-service ::t-service/type])
         type-key (t-service/service-key-by-type type)]
-  (-> app
-      (assoc-in [:transport-service :show-brokering-service-dialog?] false )
-      (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
+    (-> app
+        (assoc-in [:transport-service :show-brokering-service-dialog?] false)
+        (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
 
 ;;; Navigation hook events for new service creation and editing
 
@@ -84,7 +84,7 @@
 
 (defn new-transport-service [app]
   (pre-set-transport-type
-   (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})))
+    (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -163,9 +163,9 @@
                  services))))
 
 (defmulti transform-save-by-type
-  "Transform transport service before sending it to the server.
-  Dispatches on the type. By default, returns service as is."
-  ::t-service/type)
+          "Transform transport service before sending it to the server.
+          Dispatches on the type. By default, returns service as is."
+          ::t-service/type)
 
 (defmethod transform-save-by-type :rentals [service]
   (-> service
@@ -173,33 +173,33 @@
                  (fn [pick-up-locations]
                    (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
                           (as-> pick-up-location loc
-                            (if-let [hours (::t-service/service-hours hours-and-exceptions)]
-                              (assoc loc ::t-service/service-hours hours)
-                              loc)
-                            (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
-                              (assoc loc ::t-service/service-exceptions exceptions)
-                              loc)
-                            (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
-                              (assoc loc ::t-service/service-hours-info info)
-                              loc)
-                            (dissoc loc ::t-service/service-hours-and-exceptions)))
+                                (if-let [hours (::t-service/service-hours hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-hours hours)
+                                  loc)
+                                (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-exceptions exceptions)
+                                  loc)
+                                (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-hours-info info)
+                                  loc)
+                                (dissoc loc ::t-service/service-hours-and-exceptions)))
                         pick-up-locations)))
       (update-in [::t-service/rentals ::t-service/vehicle-classes]
                  (fn [vehicle-classes]
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
                            (as-> price-group price
-                             (if-let [prices (::t-service/price-classes prices-and-units)]
-                               (assoc price ::t-service/price-classes prices)
-                               price)
-                             (dissoc price :price-group)))
+                                 (if-let [prices (::t-service/price-classes prices-and-units)]
+                                   (assoc price ::t-service/price-classes prices)
+                                   price)
+                                 (dissoc price :price-group)))
                          vehicle-classes)))))
 
 (defmethod transform-save-by-type :default [service] service)
 
 (defmulti transform-edit-by-type
-  "Transform transport service for editing after receiving it from the server.
-  Dispatches on the type. By default, returns service as is."
-  ::t-service/type)
+          "Transform transport service for editing after receiving it from the server.
+          Dispatches on the type. By default, returns service as is."
+          ::t-service/type)
 
 (defmethod transform-edit-by-type :rentals [service]
   (-> service
@@ -232,27 +232,27 @@
 (defn- add-service-for-operator [app service]
   ;; Add service for currently selected transport operator and transport-operator-vector
   (as-> app app
-      (update app :transport-operators-with-services
-              (fn [operators-with-services]
-                (map (fn [operator-with-services]
-                       (if (= (get-in operator-with-services [:transport-operator ::t-operator/id])
-                              (::t-service/transport-operator-id service))
-                         (update operator-with-services :transport-service-vector
-                                 (fn [services]
-                                   (let [service-idx (first (keep-indexed (fn [i s]
-                                                                            (when (= (::t-service/id s)
-                                                                                     (::t-service/id service))
-                                                                              i)) services))]
-                                     (if service-idx
-                                       (assoc (vec services) service-idx service)
-                                       (conj (vec services) service)))))
-                         operator-with-services))
-                     operators-with-services)))
-      (assoc app :transport-service-vector
-                 (some #(when (= (get-in % [:transport-operator ::t-operator/id])
-                                 (get-in app [:transport-operator ::t-operator/id]))
-                          (:transport-service-vector %))
-                       (:transport-operators-with-services app)))))
+        (update app :transport-operators-with-services
+                (fn [operators-with-services]
+                  (map (fn [operator-with-services]
+                         (if (= (get-in operator-with-services [:transport-operator ::t-operator/id])
+                                (::t-service/transport-operator-id service))
+                           (update operator-with-services :transport-service-vector
+                                   (fn [services]
+                                     (let [service-idx (first (keep-indexed (fn [i s]
+                                                                              (when (= (::t-service/id s)
+                                                                                       (::t-service/id service))
+                                                                                i)) services))]
+                                       (if service-idx
+                                         (assoc (vec services) service-idx service)
+                                         (conj (vec services) service)))))
+                           operator-with-services))
+                       operators-with-services)))
+        (assoc app :transport-service-vector
+                   (some #(when (= (get-in % [:transport-operator ::t-operator/id])
+                                   (get-in app [:transport-operator ::t-operator/id]))
+                            (:transport-service-vector %))
+                         (:transport-operators-with-services app)))))
 
 (defn str-pul-cc->keyword-cc
   "DB stores country-codes as a string. Change pick-up country-code strings to keywords for ui."
@@ -479,14 +479,14 @@
   DeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
-     app id
-     assoc :show-delete-modal? true))
+      app id
+      assoc :show-delete-modal? true))
 
   CancelDeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
-     app id
-     dissoc :show-delete-modal?))
+      app id
+      dissoc :show-delete-modal?))
 
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
@@ -519,7 +519,7 @@
 
   SaveTransportService
   (process-event [{:keys [schemas validate?]} {service :transport-service
-                                              operator :transport-operator :as app}]
+                                               operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           operator-id (if (nil? (::t-service/transport-operator-id service))
                         (::t-operator/id operator)
@@ -538,8 +538,8 @@
                      ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
               (update ::t-service/external-interfaces
-                       (fn [d]
-                         (mapv #(dissoc % :eif-validation-timeout) d)))
+                      (fn [d]
+                        (mapv #(dissoc % :eif-validation-timeout) d)))
               transform-save-by-type)]
       ;; Disable post if concurrent save event is in progress
       (if (not (:service-save-in-progress app))
@@ -556,13 +556,13 @@
     (let [app (add-service-for-operator
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
-    (routes/navigate! :own-services)
-    (-> app
-        (assoc :service-save-in-progress false
-               :services-changed? true)
-        (dissoc :transport-service
-                ;; Remove navigation prompt message only if save was successful.
-                :before-unload-message))))
+      (routes/navigate! :own-services)
+      (-> app
+          (assoc :service-save-in-progress false
+                 :services-changed? true)
+          (dissoc :transport-service
+                  ;; Remove navigation prompt message only if save was successful.
+                  :before-unload-message))))
 
   FailedTransportServiceResponse
   (process-event [{response :response} app]
@@ -596,10 +596,10 @@
   [service from]
   (reduce (fn [service key]
             (as-> service s
-              (if (contains? (get service from) key)
-                (assoc s key (get-in service [from key]))
-                s)
-              (update s from dissoc key)))
+                  (if (contains? (get service from) key)
+                    (assoc s key (get-in service [from key]))
+                    s)
+                  (update s from dissoc key)))
           service
           service-level-keys))
 
@@ -608,10 +608,10 @@
   [service to]
   (reduce (fn [service key]
             (as-> service s
-              (if (contains? service key)
-                (assoc-in s [to key] (get service key))
-                s)
-              (dissoc s key)))
+                  (if (contains? service key)
+                    (assoc-in s [to key] (get service key))
+                    s)
+                  (dissoc s key)))
           service
           service-level-keys))
 
@@ -636,9 +636,9 @@
   [csv-data]
   (let [headers (first csv-data)
         companies (map (fn [[business-id name]]
-           {::t-service/business-id (clean-up-csv-value business-id)
-            ::t-service/name        (clean-up-csv-value name)})
-         (rest csv-data))]
+                         {::t-service/business-id (clean-up-csv-value business-id)
+                          ::t-service/name (clean-up-csv-value name)})
+                       (rest csv-data))]
     companies))
 
 (defn read-companies-csv! [e! file-input filename]
