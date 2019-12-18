@@ -699,6 +699,7 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))
+
     (GET "/admin/user-operators-by-business-id/:business-id" {{:keys [business-id]}
                                                               :params
                                                               user :user}
