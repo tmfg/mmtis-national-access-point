@@ -96,7 +96,9 @@
   :service-exception
   {:description "Poikkeuksen kuvaus"
    :from-date "Alkupvm"
-   :to-date "Loppupvm"}
+   :to-date "Loppupvm"
+   :service-hour-exceptions "Palveluaikojen poikkeukset"}
+
 
   ;; Passenger transportation fields
   :passenger-transportation

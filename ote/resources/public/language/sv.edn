@@ -92,12 +92,12 @@
    ;; Advance reservation
    :ote.db.transport-service/advance-reservation "Förhandsbokning"}
 
-
   ;; Service exception
   :service-exception
   {:description "Undantag, ingen tjänst"
    :from-date "Startdatum"
-   :to-date "Slutdatum"}
+   :to-date "Slutdatum"
+   :service-hour-exceptions "Undantag från servicetider"}
 
   ;; Passenger transportation fields
   :passenger-transportation

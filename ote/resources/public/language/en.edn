@@ -95,7 +95,9 @@
   :service-exception
   {:description "Exception description"
    :from-date "From date"
-   :to-date "To date"}
+   :to-date "To date"
+   :service-hour-exceptions "Exceptions to service hours"}
+
 
   ;; Passenger transportation fields
   :passenger-transportation
