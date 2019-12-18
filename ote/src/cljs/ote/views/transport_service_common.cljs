@@ -107,17 +107,28 @@
      :card? false
      :top-border true}
 
-    {:name service-url-field
-     :type :table
-     :prepare-for-save values/without-empty-rows
-     :table-fields [{:name ::t-service/url
-                     :type :string
-                     :disabled? in-validation?}
-                    {:name ::t-service/description
-                     :type :localized-text
-                     :disabled? in-validation?}]
-     :delete? true
-     :add-label (tr [:buttons :add-new-service-link])}))
+    (merge
+      {:name service-url-field
+       :type :div-table
+       :container-class "col-xs-12"
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/url
+                       :label (tr [:field-labels :transport-service ::t-service/url])
+                       :type :string
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-3 col-md-3"}
+                      {:name ::t-service/description
+                       :label (tr [:field-labels :transport-service ::t-service/description])
+                       :type :localized-text
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-7 col-md-7"}]}
+      (when-not in-validation?
+        {:inner-delete? true
+         :add-label (tr [:buttons :add-new-service-link])
+         :inner-delete-class "col-xs-12 col-sm-2 col-md-2"
+         :inner-delete-label (tr [:buttons :delete])}))))
 
 (defn- gtfs-viewer-link [{interface ::t-service/external-interface format ::t-service/format}]
   (when (seq format)
@@ -503,37 +514,50 @@
      ;; show-footer? - Take owner check away for now
      ;; But if service is in-validation? true, then do not show footer. It should be enabled first
      (when-not in-validation?
-       [:div.row
+       [:div
         (when (not (form/can-save? data))
-          [:div {:style {:margin "1em 0em 1em 0em"}}
+          [:div.row {:style {:margin "1em 0em 1em 0em"}}
            [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
-
-        (case service-state
-          :public [:span
-                   [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                          :disabled (not (form/can-save? data))}
-                    (tr [:buttons :save-and-validate])]
-                   [buttons/save-draft {:disabled name-missing?
-                                        :on-click #(do
-                                                     (.preventDefault %)
-                                                     (e! (ts-controller/->SaveTransportService schemas false)))}
-                    (tr [:buttons :back-to-draft])]]
-          :validation [:span
-                       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                              :disabled (not (form/can-save? data))}
-                        (tr [:buttons :save-and-validate])]
-                       [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                                            :disabled name-missing?}
-                        (tr [:buttons :back-to-draft])]]
-          :draft [:span
-                  [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                         :disabled (not (form/can-save? data))}
-                   (tr [:buttons :save-and-validate])]
-                  [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                                       :disabled name-missing?}
-                   (tr [:buttons :save-as-draft])]])
-        [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm))}
-         (tr [:buttons :discard])]])
+        [:div
+         (case service-state
+           :public [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                    [:div {:style {:margin-top "1rem"}}
+                     [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                            :disabled (not (form/can-save? data))}
+                      (tr [:buttons :save-and-validate])]]
+                    [:div {:style {:margin-top "1rem"}}
+                     [buttons/save-draft {:disabled name-missing?
+                                          :on-click #(do
+                                                       (.preventDefault %)
+                                                       (e! (ts-controller/->SaveTransportService schemas false)))}
+                      (tr [:buttons :back-to-draft])]]
+                    [:div {:style {:margin-top "1rem"}}
+                     [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm))}
+                      (tr [:buttons :discard])]]]
+           :validation [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                        [:div {:style {:margin-top "1rem"}}
+                         [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                                :disabled (not (form/can-save? data))}
+                          (tr [:buttons :save-and-validate])]]
+                        [:div {:style {:margin-top "1rem"}}
+                         [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                                              :disabled name-missing?}
+                          (tr [:buttons :back-to-draft])]]
+                        [:div {:style {:margin-top "1rem"}}
+                         [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm))}
+                          (tr [:buttons :discard])]]]
+           :draft [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                   [:div {:style {:margin-top "1rem"}}
+                    [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                           :disabled (not (form/can-save? data))}
+                     (tr [:buttons :save-and-validate])]]
+                   [:div {:style {:margin-top "1rem"}}
+                    [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                                         :disabled name-missing?}
+                     (tr [:buttons :save-as-draft])]]
+                   [:div {:style {:margin-top "1rem"}}
+                    [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm))}
+                     (tr [:buttons :discard])]]])]])
 
      (when show-validate-modal?
        [ui/dialog
@@ -637,7 +661,7 @@
            :add-label (tr [:buttons :add-new-service-hour])
            :inner-delete-label (tr [:buttons :delete-service-hours])}))
 
-      (form/subtitle "Palveluaikojen poikkeukset")
+      (form/subtitle (tr [:field-labels :service-exception :service-hour-exceptions]))
 
       (merge
         {:name ::t-service/service-exceptions
@@ -653,17 +677,19 @@
                         {:name ::t-service/from-date
                          :type :date-picker
                          :disabled? in-validation?
+                         :full-width? true
                          :label (tr* :from-date)
                          :element-id "service-exception-from-date"
                          :field-class "col-xs-6 col-sm-2 col-md-2"}
                         {:name ::t-service/to-date
                          :type :date-picker
                          :disabled? in-validation?
+                         :full-width? true
                          :label (tr* :to-date)
                          :element-id "service-exception-to-date"
                          :field-class "col-xs-6 col-sm-2 col-md-2"}]}
         (when-not in-validation?
-          { :inner-delete? true
+          {:inner-delete? true
            :inner-delete-label (tr [:buttons :delete-service-exceptions])
            :add-label (tr [:buttons :add-new-service-exception])}))
 
@@ -703,7 +729,7 @@
      :disabled? in-validation?
      :rows 1
      :full-width? true
-     :container-class "col-xs-12 col-sm-12 col-md-8"}
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     (form/subtitle (tr [:field-labels :transport-service ::t-service/available-from-and-to-title]))
 

@@ -90,6 +90,7 @@
     {:name ::t-service/guaranteed-accessibility-description
      :type :localized-text
      :disabled? in-validation?
+     :floatingLabelStyle {:line-height "1rem"}
      :rows 1
      :full-width? true
      :container-class "col-xs-12 col-sm-6 col-md-6"}
@@ -97,6 +98,7 @@
     {:name ::t-service/limited-accessibility-description
      :type :localized-text
      :disabled? in-validation?
+     :floatingLabelStyle {:line-height "1rem"}
      :rows 1
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true}
@@ -142,28 +144,37 @@
     :full-width? true
     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-   {:container-class "col-xs-12"
-    :name         ::t-service/price-classes
-    :type         :table
-    :prepare-for-save values/without-empty-rows
-    :table-fields [{:name ::t-service/name
-                    :type :string
-                    :disabled? in-validation?
-                    :label price-class-name-label
-                    :max-length 200}
-                   {:name ::t-service/price-per-unit
-                    :type :number
-                    :disabled? in-validation?
-                    :currency? true
-                    :style {:width "100px"}
-                    :input-style {:text-align "right" :padding-right "5px"}}
-                   {:name ::t-service/unit
-                    :type :string
-                    :disabled? in-validation?
-                    :style {:width "100px"}
-                    :max-length 128}]
-    :add-label (tr [:buttons :add-new-price-class])
-    :delete?      true}
+   (merge
+     {:container-class "col-xs-12"
+      :name ::t-service/price-classes
+      :type :div-table
+      :prepare-for-save values/without-empty-rows
+      :table-fields [{:name ::t-service/name
+                      :label price-class-name-label
+                      :type :string
+                      :disabled? in-validation?
+                      :field-class "col-xs-12 col-sm-8 col-md-4"
+                      :full-width? true
+                      :max-length 200}
+                     {:name ::t-service/price-per-unit
+                      :label (tr [:field-labels :passenger-transportation ::t-service/price-per-unit])
+                      :type :number
+                      :disabled? in-validation?
+                      :field-class "col-xs-12 col-sm-4 col-md-2"
+                      :full-width? true
+                      :currency? true}
+                     {:name ::t-service/unit
+                      :label (tr [:field-labels :passenger-transportation ::t-service/unit])
+                      :type :string
+                      :disabled? in-validation?
+                      :field-class "col-xs-12 col-sm-6 col-md-4"
+                      :full-width? true
+                      :max-length 128}]}
+     (when-not in-validation?
+       {:add-label (tr [:buttons :add-new-price-class])
+        :inner-delete? true
+        :inner-delete-class "col-xs-12 col-sm-6 col-md-2"
+        :inner-delete-label (tr [:buttons :delete])}))
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name        ::t-service/payment-methods

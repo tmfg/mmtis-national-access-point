@@ -30,9 +30,8 @@
   (form/group
     {:label (tr [:rentals-page :header-service-info])
      :columns 3
-     :layout :row
      :card? false
-     :top-border true}
+     :top-border false}
 
     {:type :info-toggle
      :name :pricing-group-info
@@ -42,23 +41,30 @@
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-   {:name ::t-service/price-classes
-    :type :table
-    :table-fields [{:name ::t-service/price-per-unit
-                    :type :number
-                    :disabled? in-validation?
-                    :currency? true
-                    :style {:width "100px"}
-                    :input-style {:text-align "right" :padding-right "5px"}
-                    :required? true}
+    (merge
+      {:name ::t-service/price-classes
+       :type :div-table
+       :container-class "col-xs-12 col-sm-12 col-md-12"
+       :table-fields [{:name ::t-service/price-per-unit
+                       :label (tr [:field-labels :rentals ::t-service/price-per-unit])
+                       :type :number
+                       :disabled? in-validation?
+                       :currency? true
+                       :style {:width "100px"}
+                       :input-style {:text-align "right" :padding-right "5px"}
+                       :field-class "col-xs-12 col-sm-4 col-md-4"
+                       :required? true}
 
-                   {:name ::t-service/unit
-                    :type :string
-                    :disabled? in-validation?
-                    :required? true
-                    :max-length 128}]
-    :delete? true
-    :add-label (tr [:buttons :add-new-price-class])}))
+                      {:name ::t-service/unit
+                       :label (tr [:field-labels :rentals ::t-service/unit])
+                       :type :string
+                       :disabled? in-validation?
+                       :field-class "col-xs-12 col-sm-4 col-md-4"
+                       :required? true
+                       :max-length 128}]}
+      (when-not in-validation?
+        {:delete? true
+         :add-label (tr [:buttons :add-new-price-class])}))))
 
 (defn price-classes [update-form! data in-validation?]
   (reagent/with-let [open? (reagent/atom false)]
@@ -83,30 +89,44 @@
 (defn vehicle-group [in-validation?]
   (form/group
     {:label (tr [:rentals-page :header-vehicles])
-     :columns 1
-     :layout :row
+     :columns 3
      :card? false
      :top-border true}
 
-   {:name ::t-service/vehicle-classes
-    :type :table
-    :table-fields [{:name ::t-service/vehicle-type
-                    :type :string
-                    :disabled? in-validation?}
-                   {:name ::t-service/license-required
-                    :type :string
-                    :disabled? in-validation?}
-                   {:name ::t-service/minimum-age
-                    :type :number
-                    :disabled? in-validation?}
-                   {:name :price-group
-                    :type :component
-                    :component (fn [{:keys [update-form! data]}]
-                                 [price-classes update-form! data in-validation?])}]
-    :delete? true
-    :add-label (tr [:buttons :add-new-vehicle])}
+    (merge
+      {:name ::t-service/vehicle-classes
+       :type :div-table
+       :add-divider? true
+       :table-fields [{:name ::t-service/vehicle-type
+                       :label (tr [:field-labels :rentals ::t-service/vehicle-type])
+                       :type :string
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-6 col-md-3"}
+                      {:name ::t-service/license-required
+                       :label (tr [:field-labels :rentals ::t-service/license-required])
+                       :type :string
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-6 col-md-3"}
+                      {:name ::t-service/minimum-age
+                       :label (tr [:field-labels :rentals ::t-service/minimum-age])
+                       :type :number
+                       :full-width? true
+                       :disabled? in-validation?
+                       :field-class "col-xs-12 col-sm-6 col-md-2"}
+                      {:name :price-group
+                       :type :component
+                       :field-class "col-xs-12 col-sm-6 col-md-2"
+                       :component (fn [{:keys [update-form! data]}]
+                                    [price-classes update-form! data in-validation?])}]}
+      (when-not in-validation?
+        {:inner-delete? true
+         :inner-delete-class "col-xs-12 col-sm-3 col-md-2"
+         :inner-delete-label (tr [:buttons :delete])
+         :add-label (tr [:buttons :add-new-vehicle])}))
 
-   {:name ::t-service/vehicle-price-url
+    {:name ::t-service/vehicle-price-url
     :type :string
     :disabled? in-validation?
     :full-width? true
@@ -181,36 +201,45 @@
   (form/group
     {:label (tr [:rentals-page :header-additional-services])
      :columns 3
-     :layout :row
      :card? false
      :top-border true}
 
-    {:name ::t-service/rental-additional-services
-     :type :table
-     :table-fields [{:name ::t-service/additional-service-type
-                     :type :selection
-                     :disabled? in-validation?
-                     :show-option (tr-key [:enums ::t-service/additional-services])
-                     :options t-service/additional-services
-                     :required? true}
+    (merge
+      {:name ::t-service/rental-additional-services
+       :type :div-table
+       :table-fields [{:name ::t-service/additional-service-type
+                       :label (tr [:field-labels :rentals ::t-service/additional-service-type])
+                       :type :selection
+                       :disabled? in-validation?
+                       :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :show-option (tr-key [:enums ::t-service/additional-services])
+                       :options t-service/additional-services
+                       :required? true}
 
-                    {:name ::t-service/additional-service-price
-                     :type :number
-                     :disabled? in-validation?
-                     :currency? true
-                     :style {:width "100px"}
-                     :input-style {:text-align "right" :padding-right "5px"}
-                     :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
-                     :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)
-                     :required? true}
+                      {:name ::t-service/additional-service-price
+                       :label (tr [:field-labels :rentals ::t-service/additional-service-price])
+                       :type :number
+                       :disabled? in-validation?
+                       :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :currency? true
+                       :style {:width "100px"}
+                       :input-style {:text-align "right" :padding-right "5px"}
+                       :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
+                       :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)
+                       :required? true}
 
-                    {:name ::t-service/additional-service-unit
-                     :type :string
-                     :disabled? in-validation?
-                     :read (comp ::t-service/unit ::t-service/additional-service-price)
-                     :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/unit] %2)}]
-     :delete? true
-     :add-label (tr [:buttons :add-new-additional-service])}))
+                      {:name ::t-service/additional-service-unit
+                       :label (tr [:field-labels :rentals ::t-service/additional-service-unit])
+                       :type :string
+                       :disabled? in-validation?
+                       :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :read (comp ::t-service/unit ::t-service/additional-service-price)
+                       :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/unit] %2)}]}
+      (when-not in-validation?
+        {:inner-delete? true
+         :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+         :inner-delete-label (tr [:buttons :delete])
+         :add-label (tr [:buttons :add-new-additional-service])}))))
 
 (defn luggage-restrictions-groups [in-validation?]
   (form/group

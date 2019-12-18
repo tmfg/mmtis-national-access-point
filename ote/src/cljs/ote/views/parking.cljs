@@ -22,9 +22,9 @@
 
 (defn pricing-group [e! in-validation?]
   (form/group
-    {:label   (tr [:parking-page :header-price-and-payment-methods])
+    {:label (tr [:parking-page :header-price-and-payment-methods])
      :columns 3
-     :layout  :row
+     :layout :row
      :card? false
      :top-border true}
 
@@ -36,49 +36,63 @@
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-    {:name         ::t-service/price-classes
-     :type         :table
-     :prepare-for-save values/without-empty-rows
-     :table-fields [{:name  ::t-service/name
-                     :type :string
-                     :disabled? in-validation?
-                     :label (tr [:field-labels :parking ::t-service/price-class-name])
-                     :required? true
-                     :max-length 200}
-                    {:name ::t-service/price-per-unit
-                     :type :number
-                     :disabled? in-validation?
-                     :currency? true
-                     :style {:width "100px"}
-                     :input-style {:text-align "right" :padding-right "5px"}
-                     :required? true}
-                    {:name ::t-service/unit
-                     :type :string
-                     :disabled? in-validation?
-                     :style {:width "100px"}
-                     :max-length 128}]
-     :add-label    (tr [:buttons :add-new-price-class])
-     :delete?      true}
+    (merge
+      {:name ::t-service/price-classes
+       :type :div-table
+       :container-class "col-xs-12"
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/name
+                       :label (tr [:field-labels :parking ::t-service/price-class-name])
+                       :type :string
+                       :disabled? in-validation?
+                       :required? true
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-3 col-md-3"
+                       :max-length 200}
+                      {:name ::t-service/price-per-unit
+                       :label (tr [:field-labels :parking ::t-service/price-per-unit])
+                       :type :number
+                       :disabled? in-validation?
+                       :currency? true
+                       :full-width? true
+                       ;:style {:width "100px"}
+                       ;:input-style {:text-align "right" :padding-right "5px"}
+                       :required? true
+                       :field-class "col-xs-12 col-sm-3 col-md-3"}
+                      {:name ::t-service/unit
+                       :label (tr [:field-labels :parking ::t-service/unit])
+                       :type :string
+                       :disabled? in-validation?
+                       :full-width? true
+                       ;:style {:width "100px"}
+                       :max-length 128
+                       :field-class "col-xs-12 col-sm-3 col-md-3"}]}
+      (when-not in-validation?
+        {:add-label (tr [:buttons :add-new-price-class])
+         :inner-delete? true
+         :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+         :inner-delete-label (tr [:buttons :delete])}))
 
     {:container-class "col-xs-12 col-sm-6 col-md-6"
-     :name            ::t-service/pricing-description
-     :type            :localized-text
-     :full-width?     true
-     :write           #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
-     :read            (comp ::t-service/description ::t-service/pricing)}
+     :name ::t-service/pricing-description
+     :type :localized-text
+     :full-width? true
+     :write #(assoc-in %1 [::t-service/pricing ::t-service/description] %2)
+     :read (comp ::t-service/description ::t-service/pricing)}
 
     {:container-class "col-xs-12 col-sm-6 col-md-6"
-     :name  ::t-service/pricing-url
-     :type  :string
+     :name ::t-service/pricing-url
+     :type :string
      :full-width? true
      :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
-     :read  (comp ::t-service/url ::t-service/pricing)}
+     :read (comp ::t-service/url ::t-service/pricing)}
 
     {:container-class "col-xs-12 col-sm-6 col-md-4"
-     :name            ::t-service/payment-methods
-     :type            :multiselect-selection
-     :show-option     (tr-key [:enums ::t-service/payment-methods])
-     :options         t-service/payment-methods
+     :name ::t-service/payment-methods
+     :type :multiselect-selection
+     :show-option (tr-key [:enums ::t-service/payment-methods])
+     :options t-service/payment-methods
+     :full-width? true
      :container-style {:padding-bottom "2rem"}}
 
     {:container-class "col-xs-12 col-sm-6 col-md-8"
@@ -102,68 +116,91 @@
        :card? false
        :top-border true}
 
-      {:name      ::t-service/service-hours
-       :type      :table
-       :prepare-for-save values/without-empty-rows
-       :table-fields
-                  [{:name              ::t-service/week-days
-                    :width             "40%"
-                    :type              :multiselect-selection
-                    :disabled? in-validation?
-                    :options           t-service/days
-                    :show-option       (tr-key [:enums ::t-service/day :full])
-                    :show-option-short (tr-key [:enums ::t-service/day :short])
-                    :required? true
-                    :is-empty? validation/empty-enum-dropdown?}
-                   {:name  ::t-service/all-day
-                    :width "10%"
-                    :type  :checkbox
-                    :disabled? in-validation?
-                    :write (fn [data all-day?]
-                             (merge data
-                                    {::t-service/all-day all-day?}
-                                    (if all-day?
-                                      {::t-service/from (time/->Time 0 0 nil)
-                                       ::t-service/to (time/->Time 24 0 nil)}
-                                      {::t-service/from nil
-                                       ::t-service/to nil})))}
+      (merge
 
-                   {:name         ::t-service/from
-                    :width        "25%"
-                    :type         :time
-                    :disabled? in-validation?
-                    :write        (write-time ::t-service/from)
-                    :required? true
-                    :is-empty? time/empty-time?}
-                   {:name         ::t-service/to
-                    :width        "25%"
-                    :type         :time
-                    :disabled? in-validation?
-                    :write        (write-time ::t-service/to)
-                    :required? true
-                    :is-empty? time/empty-time?}]
-       :delete?   true
-       :add-label (tr [:buttons :add-new-service-hour])}
+        {:name ::t-service/service-hours
+         :type :div-table
+         :container-class "col-xs-12"
+         :prepare-for-save values/without-empty-rows
+         :table-fields
+         [{:name ::t-service/week-days
+           :label (tr [:field-labels :service-exception ::t-service/week-days])
+           :type :multiselect-selection
+           :disabled? in-validation?
+           :options t-service/days
+           :show-option (tr-key [:enums ::t-service/day :full])
+           :show-option-short (tr-key [:enums ::t-service/day :short])
+           :required? true
+           :full-width? true
+           :is-empty? validation/empty-enum-dropdown?
+           :field-class "col-xs-12 col-sm-3 col-md-3"}
+          {:name ::t-service/all-day
+           :label (tr [:field-labels :parking ::t-service/all-day])
+           :type :checkbox
+           :disabled? in-validation?
+           :full-width? true
+           :field-class "col-xs-4 col-sm-2 col-md-2"
+           :write (fn [data all-day?]
+                    (merge data
+                           {::t-service/all-day all-day?}
+                           (if all-day?
+                             {::t-service/from (time/->Time 0 0 nil)
+                              ::t-service/to (time/->Time 24 0 nil)}
+                             {::t-service/from nil
+                              ::t-service/to nil})))}
 
-      {:name ::t-service/service-exceptions
-       :type :table
-       :prepare-for-save values/without-empty-rows
-       :table-fields [{:name ::t-service/description
-                       :label (tr* :description)
-                       :type :localized-text
-                       :disabled? in-validation?}
-                      {:name ::t-service/from-date
-                       :type :date-picker
-                       :disabled? in-validation?
-                       :label (tr* :from-date)}
-                      {:name ::t-service/to-date
-                       :type :date-picker
-                       :disabled? in-validation?
-                       :label (tr* :to-date)}]
-       :delete? true
-       :add-label (tr [:buttons :add-new-service-exception])}
+          {:name ::t-service/from
+           :label (tr [:field-labels :parking ::t-service/from])
+           :type :time
+           :disabled? in-validation?
+           :write (write-time ::t-service/from)
+           :required? true
+           :is-empty? time/empty-time?
+           :full-width? true
+           :field-class "col-xs-4 col-sm-2 col-md-2"}
+          {:name ::t-service/to
+           :label (tr [:field-labels :parking ::t-service/to])
+           :type :time
+           :disabled? in-validation?
+           :write (write-time ::t-service/to)
+           :required? true
+           :is-empty? time/empty-time?
+           :full-width? true
+           :field-class "col-xs-4 col-sm-2 col-md-2"}]}
+        (when-not in-validation?
+          {:inner-delete? true
+           :add-label (tr [:buttons :add-new-service-hour])
+           :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+           :inner-delete-label (tr [:buttons :delete])}))
 
-      ;;
+      (merge
+        {:name ::t-service/service-exceptions
+         :type :div-table
+         :container-class "col-xs-12"
+         :prepare-for-save values/without-empty-rows
+         :table-fields [{:name ::t-service/description
+                         :label (tr* :description)
+                         :type :localized-text
+                         :disabled? in-validation?
+                         :full-width? true
+                         :field-class "col-xs-12 col-sm-4 col-md-4"}
+                        {:name ::t-service/from-date
+                         :label (tr* :from-date)
+                         :type :date-picker
+                         :disabled? in-validation?
+                         :full-width? true
+                         :field-class "col-xs-12 col-sm-2 col-md-2"}
+                        {:name ::t-service/to-date
+                         :label (tr* :to-date)
+                         :type :date-picker
+                         :disabled? in-validation?
+                         :field-class "col-xs-12 col-sm-2 col-md-2"
+                         :full-width? true}]}
+        (when-not in-validation?
+          {:inner-delete? true
+           :add-label (tr [:buttons :add-new-service-exception])
+           :inner-delete-class "col-xs-12 col-sm-4 col-md-4"
+           :inner-delete-label (tr [:buttons :delete])}))
 
       {:name ::t-service/maximum-stay
        :type :interval
@@ -175,38 +212,50 @@
   (form/group
     {:label   (tr [:parking-page :header-facilities-and-capacities])
      :columns 3
-     :layout  :row
      :card? false
      :top-border true}
 
-    {:name         ::t-service/parking-capacities
-     :type         :table
-     :prepare-for-save values/without-empty-rows
-     :table-fields [{:name        ::t-service/parking-facility
-                     :type        :selection
-                     :disabled? in-validation?
-                     :show-option (tr-key [:enums ::t-service/parking-facility])
-                     :options     t-service/parking-facilities
-                     :required? true}
-                    {:name ::t-service/capacity :type :number
-                     :required? true}]
-     :add-label    (tr [:buttons :add-new-parking-capacity])
-     :delete?      true}))
+    (merge
+      {:name ::t-service/parking-capacities
+       :type :div-table
+       :container-class "col-xs-12"
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/parking-facility
+                       :label (tr [:field-labels :parking ::t-service/parking-facility])
+                       :type :selection
+                       :disabled? in-validation?
+                       :show-option (tr-key [:enums ::t-service/parking-facility])
+                       :options t-service/parking-facilities
+                       :required? true
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-5 col-md-5"}
+                      {:name ::t-service/capacity
+                       :label (tr [:field-labels :parking ::t-service/capacity])
+                       :type :number
+                       :disabled? in-validation?
+                       :required? true
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-5 col-md-5"}]}
+       (when-not in-validation?
+         {:add-label (tr [:buttons :add-new-parking-capacity])
+          :inner-delete? true
+          :inner-delete-class "col-xs-12 col-sm-2 col-md-2"
+          :inner-delete-label (tr [:buttons :delete])}))))
 
 (defn charging-points [e! in-validation?]
   (form/group
-    {:label   (tr [:parking-page :header-charging-points])
+    {:label (tr [:parking-page :header-charging-points])
      :columns 3
-     :layout  :row
+     :layout :row
      :card? false
      :top-border true}
 
-    {:name            ::t-service/charging-points
-     :rows            2
-     :type            :localized-text
+    {:name ::t-service/charging-points
+     :rows 1
+     :type :localized-text
      :disabled? in-validation?
-     :full-width?     true
-     :container-class "col-md-6"}))
+     :full-width? true
+     :container-class "col-xs-12 col-sm-12 col-md-12"}))
 
 (defn accessibility-group [in-validation?]
   (form/group
@@ -237,13 +286,13 @@
      :type :localized-text
      :disabled? in-validation?
      :rows 1
-     :container-class "col-md-6"
+     :container-class "col-xs-12 col-sm-12 col-md-6"
      :full-width? true}
 
     {:name ::t-service/accessibility-info-url
      :type :string
      :disabled? in-validation?
-     :container-class "col-md-5"
+     :container-class "col-xs-12 col-sm-12 col-md-6"
      :full-width? true
      :max-length 200}))
 

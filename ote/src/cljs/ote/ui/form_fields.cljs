@@ -127,7 +127,7 @@
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   on-focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
-                                  hint-text autocomplete disabled? element-id]
+                                  hint-text autocomplete disabled? element-id floatingLabelStyle]
                            :as   field} data]
   [text-field
    (merge
@@ -137,6 +137,7 @@
      {:name name
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
+      :floatingLabelStyle (when floatingLabelStyle floatingLabelStyle)
       :on-blur on-blur
       :on-focus on-focus
       :hint-text (or hint-text (placeholder field data) "")
@@ -593,7 +594,7 @@
 
 (def number-regex #"\d*([\.,]\d{0,2})?")
 
-(defmethod field :number [{:keys [disabled?] :as options}  data]
+(defmethod field :number [{:keys [disabled? full-width?] :as options}  data]
   ;; Number field contains internal state that has the current
   ;; typed in text (which may be an incompletely typed number).
   ;;
@@ -612,21 +613,30 @@
                     state))))
        :reagent-render
        (fn [{:keys [update! currency?] :as opts} data]
-         [:span [field (merge (assoc opts
-                                :type :string
-                                :regex number-regex
-                                :update! #(let [new-value (if (str/blank? %)
-                                                            nil
-                                                            (-> %
-                                                                (str/replace #"," ".")
-                                                                (js/parseFloat %)))]
-                                            (reset! state {:value new-value
-                                                           :txt %})
-                                            (update! new-value)))
-                              (when disabled?
-                                {:disabled true}))
-                 (:txt @state)]
-          (when currency? "€")])})))
+         [:div
+          [:span [field (merge (assoc opts
+                             :type :string
+                             :style (merge
+                                      {}
+                                      (when full-width?
+                                        {:width "92%"}))
+                             :regex number-regex
+                             :update! #(let [new-value (if (str/blank? %)
+                                                         nil
+                                                         (-> %
+                                                             (str/replace #"," ".")
+                                                             (js/parseFloat %)))]
+                                         (reset! state {:value new-value
+                                                        :txt %})
+                                         (update! new-value)))
+                           (when disabled?
+                             {:disabled true}))
+              (:txt @state)]]
+          (when currency?
+            [:span {:style {:position "relative"
+                            :padding 0
+                            :left "-15px"}}
+             "€"])])})))
 
 ;; Matches empty or any valid hour (0 (or 00) - 23)
 (def hour-regex #"^(^$|0?[0-9]|1[0-9]|2[0-3])$")
@@ -719,42 +729,48 @@
 (defmethod field :interval [{:keys [update! enabled-label disabled?] :as opts} data]
   (let [[unit amount] (or (normalize-interval data) [:hours 0])]
     [:div {:style {:width "100%" :padding-top "0.5em"}}
-     [ui/toggle {:label enabled-label
-                 :label-position "right"
-                 :toggled (not (nil? data))
-                 :on-toggle #(update!
-                              (if data
-                                nil
-                                (time/interval 0 :days)))}]
+     [:div.col-xs-12
+      [ui/toggle {:label enabled-label
+                  :label-position "right"
+                  :toggled (not (nil? data))
+                  :on-toggle #(update!
+                                (if data
+                                  nil
+                                  (time/interval 0 :days)))}]]
      (when-not (nil? data)
        [:div
-        [field (assoc opts
-                      :update! (fn [num]
-                                 (let [unit (or (::preferred-unit data) unit)]
-                                   (update!
-                                    (assoc (if (str/blank? num)
-                                             (time/interval 0 unit)
-                                             (time/interval (js/parseInt num) unit))
-                                           ::preferred-unit unit))))
-                      :hint-text (tr [:common-texts :time-unlimited])
-                      :type :string
-                      :disabled (if disabled? true false)
-                      :regex #"\d{0,4}"
-                      :style {:width 200}) amount]
-        [field (assoc opts
-                      :update! (fn [unit]
-                                 (assoc (update! (time/interval amount unit))
-                                        ::preferred-unit unit))
-                      :label (tr [:common-texts :time-unit])
-                      :name :maximum-stay-unit
-                      :type :selection
-                      :disabled (if disabled? true false)
-                      :show-option (tr-key [:common-texts :time-units])
-                      :options [:minutes :hours :days]
-                      :style {:width "150px"
-                              :position "relative"
-                              :top "15px"})
-         (or (::preferred-unit data) unit)]])]))
+        [:div.col-xs-12.col-sm-3.col-md-3 {:style {:margin-right "5px"}}
+         [field (assoc opts
+                  :update! (fn [num]
+                             (let [unit (or (::preferred-unit data) unit)]
+                               (update!
+                                 (assoc (if (str/blank? num)
+                                          (time/interval 0 unit)
+                                          (time/interval (js/parseInt num) unit))
+                                   ::preferred-unit unit))))
+                  :hint-text (tr [:common-texts :time-unlimited])
+                  :type :string
+                  :floatingLabelStyle {:line-height "1rem"}
+                  :disabled (if disabled? true false)
+                  :regex #"\d{0,4}"
+                  :full-width? true)
+          amount]]
+        [:div.col-xs-12.col-sm-3.col-md-3
+         [field (assoc opts
+                  :update! (fn [unit]
+                             (assoc (update! (time/interval amount unit))
+                               ::preferred-unit unit))
+                  :label (tr [:common-texts :time-unit])
+                  :name :maximum-stay-unit
+                  :type :selection
+                  :disabled (if disabled? true false)
+                  :show-option (tr-key [:common-texts :time-units])
+                  :options [:minutes :hours :days]
+                  :full-width? true
+                  :style {} #_ {:width "150px"
+                          :position "relative"
+                          :top "15px"})
+          (or (::preferred-unit data) unit)]]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]
@@ -809,7 +825,7 @@
                                :error-style style-base/required-element})
                             (when (not (nil? id))
                               {:id (str "date-picker-" id)}))]
-     (when show-clear?
+     (when (and show-clear? (not disabled?))
        [ui/icon-button {:on-click #(update! nil)
                         :disabled (not data)
                         :style {:width "16px"
@@ -881,8 +897,7 @@
                         value]
                        :else nil)]))
                 (when inner-delete?
-                  [:div {:class inner-delete-class
-                         :style {:padding-top "1rem" :padding-left "2rem"}}
+                  [:div {:class (str inner-delete-class " inner-delete-button")}
                    [buttons/delete-table-row {:on-click #(update! (vec (concat (when (pos? i)
                                                                                  (take i data))
                                                                                (drop (inc i) data))))}
