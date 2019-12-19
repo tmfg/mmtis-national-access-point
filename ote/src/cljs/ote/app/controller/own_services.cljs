@@ -91,9 +91,10 @@
 ; everywhere to determine which operator is selected for usage.
 (define-event InitOwnServices []
   {}
-  (if (nil? (:transport-operator app))
-    (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
-    app))
+  (let [app (assoc-in app [:admin :in-validation :validating] nil)]
+    (if (nil? (:transport-operator app))
+      (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
+      app)))
 
 (defmethod routes/on-navigate-event :own-services [_]
   (->InitOwnServices))

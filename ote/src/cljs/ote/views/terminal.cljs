@@ -1,27 +1,17 @@
 (ns ote.views.terminal
   "Required datas for port, station and terminal service"
-  (:require [reagent.core :as r]
-            [cljs-react-material-ui.reagent :as ui]
-            [cljs-react-material-ui.icons :as ic]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
+  (:require [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
-            [ote.views.place-search :as place-search]
-            [tuck.core :as tuck]
-            [ote.style.base :as style-base]
-            [ote.app.controller.transport-service :as ts]
+            [ote.ui.form :as form]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.views.transport-service-common :as ts-common]
-            [ote.style.form :as style-form]
-            [ote.ui.validation :as validation]))
+            [ote.style.form :as style-form]))
 
 (defn terminal-form-options [e! schemas in-validation? app]
   {:name->label (tr-key [:field-labels :terminal]
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service])
-   :update!     #(e! (ts/->EditTransportService %))
+   :update!     #(e! (ts-controller/->EditTransportService %))
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -141,7 +131,10 @@
      :container-style {:align-self "baseline"}}))
 
 (defn terminal [e! {form-data ::t-service/terminal  :as service} app]
-  (let [in-validation? (::t-service/validate form-data)
+  (let [validate (::t-service/validate form-data)
+        service-id (::t-service/id service)
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        in-validation? (ts-controller/in-readonly? validate admin-validating-id service-id)
                groups [(ts-common/transport-type ::t-service/terminal in-validation?)
                        (ts-common/name-group (tr [:terminal-page :header-service-info]) in-validation?)
                        (ts-common/contact-info-group in-validation?)

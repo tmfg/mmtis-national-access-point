@@ -3,7 +3,8 @@
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.front-page :as fp-controller]))
 
 ;; Validation
 (defrecord OpenConfirmPublishModal [id])
@@ -12,6 +13,7 @@
 (defrecord LoadValidationServicesResponse [response])
 (defrecord PublishService [id])
 (defrecord PublishResponse [response])
+(defrecord EditService [id])
 
 (defn- load-validation-services []
   (comm/get! "admin/validation-services"
@@ -31,13 +33,19 @@
   LoadValidationServices
   (process-event [_ app]
     (load-validation-services)
-    app)
+    app (assoc-in app [:admin :in-validation :validating] nil))
 
   LoadValidationServicesResponse
   (process-event [{response :response} app]
     (update-in app [:admin :in-validation] assoc
                :loading? false
                :results response))
+
+  EditService
+  (process-event [{id :id} app]
+    (routes/navigate! :edit-service {:id id})
+    (assoc-in app [:admin :in-validation :validating] id))
+
 
   PublishService
   (process-event [{id :id} app]
@@ -50,6 +58,7 @@
   PublishResponse
   (process-event [{response :response} app]
     ;; close modal and show success flash message
+   (routes/navigate! :admin)
     (load-validation-services)
     (-> app
         (assoc :flash-message "Palvelu julkaistu onnistuneesti.")

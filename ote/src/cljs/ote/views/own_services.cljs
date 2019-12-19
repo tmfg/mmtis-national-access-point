@@ -82,9 +82,9 @@
                   :display-row-checkbox false}
    (doall
      (map
-       (fn [{::t-service/keys [id type sub-type interface-types published validate name]
+       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name]
              ::modification/keys [created modified] :as row}]
-         (let [service-state (ts-controller/service-state validate published)]
+         (let [service-state (ts-controller/service-state validate re-edit published)]
            ^{:key id}
            [ui/table-row {:selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"

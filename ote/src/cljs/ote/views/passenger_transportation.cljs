@@ -4,13 +4,13 @@
              [ote.localization :refer [tr tr-key]]
              [ote.util.values :as values]
              [ote.ui.form :as form]
-             [ote.app.controller.transport-service :as ts]
+             [ote.app.controller.transport-service :as ts-controller]
              [ote.views.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn transportation-form-options [e! schemas in-validation? app]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
-   :update!     #(e! (ts/->EditTransportService %))
+   :update!     #(e! (ts-controller/->EditTransportService %))
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -208,7 +208,10 @@
     :read (comp ::t-service/url ::t-service/pricing)})))
 
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
-  (let [in-validation? (::t-service/validate form-data)
+  (let [validate (::t-service/validate form-data)
+        service-id (::t-service/id service)
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        in-validation? (ts-controller/in-readonly? validate admin-validating-id service-id)
         form-groups
              [(ts-common/transport-type (::t-service/sub-type service) in-validation?)
               (ts-common/name-group (tr [:passenger-transportation-page :header-service-info]) in-validation?)

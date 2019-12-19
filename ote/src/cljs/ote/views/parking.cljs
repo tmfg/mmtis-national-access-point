@@ -8,7 +8,7 @@
             [ote.style.form :as style-form]
             [ote.ui.validation :as validation]
             [ote.ui.form :as form]
-            [ote.app.controller.transport-service :as ts]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.views.transport-service-common :as ts-common]))
 
 (defn form-options [e! schemas in-validation? app]
@@ -16,7 +16,7 @@
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service]
                         [:field-labels])
-   :update!     #(e! (ts/->EditTransportService %))
+   :update!     #(e! (ts-controller/->EditTransportService %))
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -297,7 +297,10 @@
      :max-length 200}))
 
 (defn parking [e! {form-data ::t-service/parking :as service} app]
-  (let [in-validation? (::t-service/validate form-data)
+  (let [validate (::t-service/validate form-data)
+        service-id (::t-service/id service)
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        in-validation? (ts-controller/in-readonly? validate admin-validating-id service-id)
         groups [(ts-common/transport-type ::t-service/parking in-validation?)
                 (ts-common/name-group (tr [:parking-page :header-service-info]) in-validation?)
                 (ts-common/contact-info-group in-validation?)

@@ -240,7 +240,7 @@
   (process-event [_ app]
     (comm/post! "admin/transport-services"
                 {:query (get-in app [:admin :service-listing :service-filter])
-                :published-type (get-in app [:admin :service-listing :published-filter])}
+                 :published-type (get-in app [:admin :service-listing :published-filter])}
                 {:on-success (tuck/send-async! ->SearchServicesResponse)})
     (assoc-in app [:admin :service-listing :loading?] true))
 

@@ -9,11 +9,9 @@
             [ote.util.values :as values]
             [ote.style.dialog :as style-dialog]
             [ote.ui.form :as form]
-            [ote.ui.info :as info]
             [ote.ui.buttons :as buttons]
             [ote.app.controller.common :as common-c]
-            [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.common :as common-c]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.views.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
@@ -22,7 +20,7 @@
                         [:field-labels :transport-service]
                         [:field-labels :transport-service-common]
                         [:field-labels])
-   :update!     #(e! (ts/->EditTransportService %))
+   :update!     #(e! (ts-controller/->EditTransportService %))
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -403,7 +401,10 @@
      :full-width? true}))
 
 (defn rental [e! {form-data ::t-service/rentals :as service} app]
-  (let [in-validation? (::t-service/validate form-data)
+  (let [validate (::t-service/validate form-data)
+        service-id (::t-service/id service)
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        in-validation? (ts-controller/in-readonly? validate admin-validating-id service-id)
              groups [(ts-common/transport-type ::t-service/rentals in-validation?)
                      (ts-common/name-group (tr [:rentals-page :header-service-info]) in-validation?)
                      (ts-common/contact-info-group in-validation?)

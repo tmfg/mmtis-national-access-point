@@ -16,7 +16,8 @@
             [ote.app.routes :as routes]
             [ote.app.controller.place-search :as place-search]
             [ote.app.controller.front-page :as front-page]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.front-page :as fp-controller]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
@@ -97,6 +98,7 @@
     ::t-service/companies
     ::t-service/published
     ::t-service/validate
+    ::t-service/re-edit
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from
@@ -108,8 +110,6 @@
     :csv-count
     ::t-service/transport-type})
 
-
-
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
@@ -120,15 +120,11 @@
 (defrecord OpenTransportServicePage [id])
 (defrecord OpenTransportServiceTypePage [])
 
-
 (defrecord DeleteTransportService [id])
 (defrecord ConfirmDeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
 (defrecord FailedDeleteTransportServiceResponse [response])
-
-(defrecord PublishTransportService [transport-service-id])
-(defrecord PublishTransportServiceResponse [success? transport-service-id])
 
 (defrecord EditTransportService [form-data])
 (defrecord ConfirmSaveTransportService [schemas])
@@ -136,7 +132,7 @@
 (defrecord CancelSaveTransportService [])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord FailedTransportServiceResponse [response])
-(defrecord CancelTransportServiceForm [])
+(defrecord CancelTransportServiceForm [admin])
 
 (defrecord SelectServiceType [data])
 (defrecord SetNewServiceType [type])
@@ -150,6 +146,12 @@
 (defrecord FailedExternalInterfaceUrlResponse [])
 
 (defrecord AddImportedCompaniesToService [csv filename])
+
+(defrecord ToggleEditingDialog [])
+(defrecord ConfirmEditing [])
+(defrecord ReEditResponse [response])
+(defrecord BackToValidation [id])
+(defrecord BackToValidationResponse [response])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -308,6 +310,9 @@
                   service)]
     (assoc-in service [key ::t-service/contact-address ::common/country_code] country-code)))
 
+(defn toggle-edit-dialog [app]
+  (assoc-in app [:transport-service :edit-dialog] (not (get-in app [:transport-service :edit-dialog]))))
+
 (extend-protocol tuck/Event
 
   AddPriceClassRow
@@ -380,11 +385,11 @@
                     {:url url}
                     {:on-success (tuck/send-async! ->EnsureCsvFileResponse)
                      :on-failure (tuck/send-async! ->FailedCsvFileResponse)}))
-    (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
+      (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
 
   EnsureCsvFileResponse
   (process-event [{response :response} app]
-    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count]  response))
+    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response))
 
   FailedCsvFileResponse
   (process-event [{response :response} app]
@@ -456,26 +461,6 @@
     (set! (.-location js/window) (str "/ote/#/edit-service/" id))
     app)
 
-  PublishTransportService
-  (process-event [{:keys [transport-service-id]} app]
-    (comm/post! (str "transport-service/publish")
-                {:transport-service-id transport-service-id}
-                {:on-success (tuck/send-async! ->PublishTransportServiceResponse transport-service-id)})
-    app)
-
-  PublishTransportServiceResponse
-  (process-event [{success? :success? transport-service-id :transport-service-id :as e} app]
-
-    (if success?
-      (update app :transport-services
-              (fn [services]
-                (map (fn [{id ::t-service/id :as service}]
-                       (if (= id transport-service-id)
-                         (assoc service ::t-service/published? true)
-                         service))
-                     services)))
-      app))
-
   DeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
@@ -531,7 +516,8 @@
               (dissoc :transport-service-type-subtype
                       :select-transport-operator
                       :show-brokering-service-dialog?
-                      :show-confirm-save-dialog?)
+                      :show-confirm-save-dialog?
+                      :edit-dialog)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/validate? validate?
@@ -571,14 +557,19 @@
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
-    (let [key (t-service/service-key-by-type (::t-service/type ts))]
+    (let [key (t-service/service-key-by-type (::t-service/type ts))
+          unsaved-key (if (get-in app [:transport-service key ::t-service/re-edit])
+                        [:dialog :navigation-prompt :unsaved-validated-data]
+                        [:dialog :navigation-prompt :unsaved-data])]
       (-> app
           (update-in [:transport-service key] merge form-data)
-          (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
+          (assoc :before-unload-message unsaved-key))))
 
   CancelTransportServiceForm
-  (process-event [_ app]
-    (routes/navigate! :own-services)
+  (process-event [{admin :admin} app]
+    (if admin
+      (routes/navigate! :admin)
+      (routes/navigate! :own-services))
     app)
 
   SetNewServiceType
@@ -586,9 +577,50 @@
     ;; This is needed when directly loading a new service URL to set the type
     (let [sub-type (keyword (get-in app [:params :sub-type]))]
       (-> app
-        (assoc-in [:transport-service ::t-service/sub-type] sub-type)
-        (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type))
-        (pre-set-transport-type)))))
+          (assoc-in [:transport-service ::t-service/sub-type] sub-type)
+          (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type))
+          (pre-set-transport-type))))
+
+  ToggleEditingDialog
+  (process-event [_ app]
+    (toggle-edit-dialog app))
+
+  ReEditResponse
+  (process-event [{response :response} app]
+    ;; Assume that everything is ok because this requires 200 ok response
+    (let [sub-service (keyword (str "ote.db.transport-service/" (name (get-in app [:transport-service ::t-service/type]))))]
+      (-> app
+          (toggle-edit-dialog)
+          (assoc-in [:transport-service sub-service ::t-service/validate] nil)
+          (assoc-in [:transport-service sub-service ::t-service/re-edit] response)
+          (assoc :transport-service-loaded? true)
+          (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-validated-data])
+          (assoc :before-unload-fn (ote.app.controller.transport-service/->BackToValidation (get-in app [:transport-service ::t-service/id]))))))
+
+  ConfirmEditing
+  (process-event [_ app]
+    (comm/post! "transport-service/re-edit-service" {:id (get-in app [:transport-service ::t-service/id])}
+                {:on-success (tuck/send-async! ->ReEditResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc app :transport-service-loaded? false))
+
+  BackToValidationResponse
+  (process-event [{response :response} app]
+    (routes/navigate! :own-services)
+    (-> app
+        (dissoc :navigation-prompt-open?
+                :before-unload-message
+                :before-unload-fn
+                :navigation-confirm)
+        (assoc :transport-service-loaded? true)))
+
+  BackToValidation
+  (process-event [{id :id} app]
+    (comm/post! "transport-service/back-to-validation" {:id id}
+                {:on-success (tuck/send-async! ->BackToValidationResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc app :transport-service-loaded? false))
+  )
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the
@@ -651,8 +683,14 @@
               (e! (->AddImportedCompaniesToService csv filename)))))
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
 
-(defn service-state [validate published]
+(defn service-state [validate re-edit published]
   (cond
+    (some? re-edit) :re-edit
     (and (some? published) (nil? validate)) :public
-    (and (some? validate)) :validation
+    (some? validate) :validation
     :else :draft))
+
+(defn in-readonly? [in-validation? admin-validating-id service-id]
+  (and
+    in-validation?
+    (not= service-id admin-validating-id)))
