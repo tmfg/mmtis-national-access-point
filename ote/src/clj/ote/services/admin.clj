@@ -681,7 +681,7 @@
 
     (GET "/admin/validation-services" req
       (or (authorization-fail-response (get-in req [:user :user]))
-          (http/transit-response (list-validation-services db))))
+          (http/no-cache-transit-response (list-validation-services db))))
 
     (POST "/admin/publish-service" {:keys [body user]}
       (or (authorization-fail-response (:user user))

@@ -40,6 +40,7 @@
    :sub-type ::t-service/sub-type
    :published ::t-service/published
    :validate ::t-service/validate
+   :re-edit ::t-service/re-edit
    :created ::modification/created
    :modified ::modification/modified})
 
@@ -248,10 +249,16 @@
   "Add validate datetime when it is moved to validation. If not, remove validate? key."
   [data]
   (if (::t-service/validate? data)
+    ;; Move to validation
     (-> data
         (dissoc ::t-service/validate?)
-        (assoc ::t-service/validate (java.util.Date.)))
-    (dissoc data ::t-service/validate?)))
+        (assoc ::t-service/validate (java.util.Date.)
+               ::t-service/re-edit nil))
+    ;; Save as draft
+    (-> data
+        (dissoc ::t-service/validate?)
+        (assoc ::t-service/published nil)
+        (assoc ::t-service/re-edit nil))))
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
@@ -293,6 +300,39 @@
 
     ;; Return the stored transport-service
     transport-service))
+
+(defn- re-edit-service [db user service-id]
+  (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db
+                                                                                    ::t-service/transport-service
+                                                                                    #{::t-service/transport-operator-id}
+                                                                                    {::t-service/id service-id})))
+        current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
+    (authorization/with-transport-operator-check
+      db user service-operator-id
+      #(do
+         (specql/update! db ::t-service/transport-service
+                         {::t-service/re-edit current-timestamp
+                          ::t-service/validate nil}
+                         {::t-service/id service-id})
+         current-timestamp))))
+
+(defn back-to-validation
+  "User has possibility to take service back to editing state, but not continue with it. This fn will return
+  service to validation in those cases."
+  [db user service-id]
+  (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db
+                                                                                    ::t-service/transport-service
+                                                                                    #{::t-service/transport-operator-id}
+                                                                                    {::t-service/id service-id})))
+        current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
+    (authorization/with-transport-operator-check
+      db user service-operator-id
+      #(do
+         (specql/update! db ::t-service/transport-service
+                         {::t-service/re-edit nil
+                          ::t-service/validate current-timestamp}
+                         {::t-service/id service-id})
+         current-timestamp))))
 
 (defn- save-transport-service-handler
   "Process transport service save POST request. Checks that the transport operator id
@@ -387,7 +427,13 @@
     (POST "/transport-service/delete" {form-data :body
                                        user :user}
       (http/transit-response
-        (delete-transport-service! db user (:id (http/transit-request form-data)))))))
+        (delete-transport-service! db user (:id (http/transit-request form-data)))))
+
+    (POST "/transport-service/re-edit-service" {:keys [body user]}
+      (http/transit-response (re-edit-service db user (:id (http/transit-request body)))))
+
+    (POST "/transport-service/back-to-validation" {:keys [body user]}
+      (http/transit-response (back-to-validation db user (:id (http/transit-request body)))))))
 
 (defn- transport-service-routes
   "Unauthenticated routes"
