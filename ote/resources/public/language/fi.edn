@@ -367,6 +367,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-new-route "Lisää uusi merireitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
+  :discard-to-admin "Peruuta ja palaa hallintapaneeliin"
 
   :next "Jatka"
   :add-transport-service "Lisää uusi palvelu"
@@ -390,6 +391,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :transport-service-catalog "Liikkumispalvelukatalogi"
   :register-to-service "Rekisteröidy palveluun"
   :check-out-the-service "Tutustu tietoihin"
+  :continue-editing "Jatka tietojen muokkaamista"
   }
 
  ;; Database enumeration values
@@ -1158,9 +1160,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
-   :stay "Jää"
+   :stay "Palaa lomakkeelle"
    :leave "Poistu"
-   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"
+   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."
+   }
 
   :send-pre-notice
   {:title "Muutosilmoituksen lähettäminen"
@@ -1173,6 +1177,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Ei"
    :ok "Kyllä"}
+
+  :continue-editing
+  {:title "Jatka tietojen muokkaamista"
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
   }
 
  :operators

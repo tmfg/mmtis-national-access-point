@@ -366,6 +366,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :add-new-route "Add a new sea traffic route"
   :add-new-pre-notice "Add a new report of change"
   :discard "Cancel"
+  :discard-to-admin "Cancel and return to Administration panel"
 
   :next "Next"
   :add-transport-service "Add a new service"
@@ -389,6 +390,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :transport-service-catalog "Transport service catalog"
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
+  :continue-editing "Continue editing"
   }
 
  ;; Database enumeration values
@@ -1151,7 +1153,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   {:title "Confirm navigation"
    :stay "Stay on this page"
    :leave "Leave this page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"
+   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."}
 
   :send-pre-notice
   {:title "Submit change notification"
@@ -1164,6 +1167,10 @@ You can also draw the operating area or point to the map with drawing tools. You
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "No"
    :ok "Yes"}
+
+  :continue-editing
+  {:title "Jatka tietojen muokkaamista"
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta? Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
   }
 
  :operators

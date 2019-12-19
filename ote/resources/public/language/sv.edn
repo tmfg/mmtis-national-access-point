@@ -371,6 +371,7 @@
   :add-new-route "Lägg till ny sjörutt"
   :add-new-pre-notice "Nytt ändringsmeddelande"
   :discard "Ångra"
+  :discard-to-admin "Peruuta ja palaa hallintapaneeliin"
 
   :next "Fortsätt"
   :add-transport-service "Lägg till ny tjänst"
@@ -393,7 +394,9 @@
   :add-new-effective-date "Lägg till nytt datum"
   :transport-service-catalog "Tjänstekatalogen"
   :register-to-service "Registrering"
-  :check-out-the-service "Bekanta dig med informationen"}
+  :check-out-the-service "Bekanta dig med informationen"
+  :continue-editing "Jatka tietojen muokkaamista"
+  }
 
  ;; Database enumeration values
  :enums
@@ -1150,7 +1153,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   {:title "Vill du lämna denna sida"
    :stay "Stanna"
    :leave "Lämna"
-   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"
+   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."
+   }
 
   :send-pre-notice
   {:title "Skicka ändringsmeddelandet?"
@@ -1163,6 +1168,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Nej"
    :ok "Ja"}
+
+  :continue-editing
+  {:title "Jatka tietojen muokkaamista"
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta? Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
   }
 
  :operators
