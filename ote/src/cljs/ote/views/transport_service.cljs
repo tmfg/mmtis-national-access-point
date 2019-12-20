@@ -128,7 +128,7 @@
 
          [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
          (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
-           [:div {:style {:margin-bottom "0.5rem"}}
+           [:div {:style {:margin-bottom "1.5rem"}}
             [buttons/save {:on-click #(do
                                         (.preventDefault %)
                                         (e! (ts-controller/->ToggleEditingDialog)))}
