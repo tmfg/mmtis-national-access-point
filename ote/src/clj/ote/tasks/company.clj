@@ -14,7 +14,6 @@
 
 (defqueries "ote/tasks/company.sql")
 
-
 (defn update-one-csv! [db]
   (try
     (tx/with-transaction db
@@ -28,6 +27,12 @@
     (catch Exception e
       (log/warn "Error in updating company CSV file" e))))
 
+(defn re-edit-services-to-validation! [db]
+  (let [re-edit-services (fetch-re-edit-services db)]
+    (doall
+      (for [id re-edit-services]
+        (transport/back-to-validation db (:id id))))))
+
 (defrecord CompanyTasks []
   component/Lifecycle
   (start [{db :db :as this}]
@@ -37,7 +42,10 @@
                                      (store-daily-company-stats db)))
                          (chime-at (drop 1 (periodic-seq (t/now) (t/minutes 1)))
                                    (fn [_]
-                                     (#'update-one-csv! db)))]))
+                                     (#'update-one-csv! db)))
+                         (chime-at (drop 1 (periodic-seq (t/now) (t/minutes 1)))
+                                   (fn [_]
+                                     (#'re-edit-services-to-validation! db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))

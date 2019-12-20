@@ -525,6 +525,7 @@
   [e! {published ::t-service/published :as data} schemas in-validation? app]
   (let [name-missing? (str/blank? (::t-service/name data))
         service-id (get-in app [:transport-service ::t-service/id])
+        service-id (if (nil? service-id) 0 service-id)
         show-footer? (if service-id
                        (ts-controller/is-service-owner? app)
                        true)

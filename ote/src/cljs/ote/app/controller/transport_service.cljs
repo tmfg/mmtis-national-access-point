@@ -599,7 +599,7 @@
 
   ConfirmEditing
   (process-event [_ app]
-    (comm/post! "transport-service/re-edit-service" {:id (get-in app [:transport-service ::t-service/id])}
+    (comm/post! (str "transport-service/" (get-in app [:transport-service ::t-service/id]) "/re-edit-service" ) {}
                 {:on-success (tuck/send-async! ->ReEditResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
     (assoc app :transport-service-loaded? false))
@@ -616,11 +616,10 @@
 
   BackToValidation
   (process-event [{id :id} app]
-    (comm/post! "transport-service/back-to-validation" {:id id}
+    (comm/post! (str "transport-service/" id "/back-to-validation")  {}
                 {:on-success (tuck/send-async! ->BackToValidationResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
-    (assoc app :transport-service-loaded? false))
-  )
+    (assoc app :transport-service-loaded? false)))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

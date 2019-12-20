@@ -316,23 +316,23 @@
                          {::t-service/id service-id})
          current-timestamp))))
 
+(defn service-operator-id [db service-id]
+  (::t-service/transport-operator-id (first (specql/fetch db
+                                                          ::t-service/transport-service
+                                                          #{::t-service/transport-operator-id}
+                                                          {::t-service/id service-id}))))
+
 (defn back-to-validation
   "User has possibility to take service back to editing state, but not continue with it. This fn will return
   service to validation in those cases."
-  [db user service-id]
-  (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db
-                                                                                    ::t-service/transport-service
-                                                                                    #{::t-service/transport-operator-id}
-                                                                                    {::t-service/id service-id})))
-        current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
-    (authorization/with-transport-operator-check
-      db user service-operator-id
-      #(do
-         (specql/update! db ::t-service/transport-service
-                         {::t-service/re-edit nil
-                          ::t-service/validate current-timestamp}
-                         {::t-service/id service-id})
-         current-timestamp))))
+  [db service-id]
+  (let [current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
+    (do
+      (specql/update! db ::t-service/transport-service
+                      {::t-service/re-edit nil
+                       ::t-service/validate current-timestamp}
+                      {::t-service/id service-id})
+      current-timestamp)))
 
 (defn- save-transport-service-handler
   "Process transport service save POST request. Checks that the transport operator id
@@ -429,11 +429,19 @@
       (http/transit-response
         (delete-transport-service! db user (:id (http/transit-request form-data)))))
 
-    (POST "/transport-service/re-edit-service" {:keys [body user]}
-      (http/transit-response (re-edit-service db user (:id (http/transit-request body)))))
+    (POST "/transport-service/:service-id/re-edit-service" {{:keys [service-id]} :params
+                                                            user :user}
+      (let [service-id (Long/parseLong service-id)]
+        (http/transit-response (re-edit-service db user service-id))))
 
-    (POST "/transport-service/back-to-validation" {:keys [body user]}
-      (http/transit-response (back-to-validation db user (:id (http/transit-request body)))))))
+    (POST "/transport-service/:service-id/back-to-validation" {{:keys [service-id]} :params
+                                                               user :user}
+      (let [service-id (Long/parseLong service-id)
+            operator-id (service-operator-id db service-id)]
+        (http/transit-response
+          (authorization/with-transport-operator-check
+            db user operator-id
+            #(back-to-validation db service-id)))))))
 
 (defn- transport-service-routes
   "Unauthenticated routes"
