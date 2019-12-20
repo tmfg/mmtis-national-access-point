@@ -55,8 +55,6 @@
                        :disabled? in-validation?
                        :currency? true
                        :full-width? true
-                       ;:style {:width "100px"}
-                       ;:input-style {:text-align "right" :padding-right "5px"}
                        :required? true
                        :field-class "col-xs-12 col-sm-3 col-md-3"}
                       {:name ::t-service/unit
@@ -64,7 +62,6 @@
                        :type :string
                        :disabled? in-validation?
                        :full-width? true
-                       ;:style {:width "100px"}
                        :max-length 128
                        :field-class "col-xs-12 col-sm-3 col-md-3"}]}
       (when-not in-validation?
