@@ -39,7 +39,7 @@
                      (old event))))
            (aset chip "__backspace_monkey_patch" true)))))))
 
-(defn result-chips [e! results primary?]
+(defn result-chips [e! results primary? in-validation?]
   (r/create-class
     {:component-did-mount monkey-patch-chip-backspace
      :component-did-update monkey-patch-chip-backspace
@@ -49,16 +49,16 @@
         (for [{::places/keys [namefin type id] editing? :editing? :as result} (map :place results)]
           ^{:key id}
           [:span
-           [ui/chip {:ref id
-                     :style {:margin 4 :background-color (if primary? "green" "orange")}
-                     :labelStyle {:color "white" :font-weight "bold"}
-                     ;; Toggle edit mode when clicking (for hand drawn geometries)
-                     :on-click
-                     (if (and (= "drawn" type) (not editing?))
-                       #(e! (ps/->EditDrawnGeometryName id))
-                       (constantly false))
-
-                     :on-request-delete #(e! (ps/->RemovePlaceById id))}
+           [ui/chip (merge {:ref id
+                            :style {:margin 4 :background-color (if primary? "green" "orange")}
+                            :labelStyle {:color "white" :font-weight "bold"}}
+                           (when-not in-validation?
+                             {;; Toggle edit mode when clicking (for hand drawn geometries)
+                              :on-click
+                              (if (and (= "drawn" type) (not editing?))
+                                #(e! (ps/->EditDrawnGeometryName id))
+                                (constantly false))
+                              :on-request-delete #(e! (ps/->RemovePlaceById id))}))
             (if editing?
               [ui/text-field
                {:id (str "result-" namefin)
@@ -123,17 +123,7 @@
                              [ui/menu-item {:primary-text namefin}])})
               completions)))
 
-
-(def tooltip-icon
-  "A tooltip icon that shows balloon.css tooltip on hover."
-  (let [wrapped (common/tooltip-wrapper ic/action-help {:style {:margin-left 8}})]
-    (fn [opts]
-      [wrapped {:style {:width          16 :height 16
-                        :vertical-align "middle"
-                        :color          "gray"}}
-       opts])))
-
-(defn  place-search [e! place-search]
+(defn  place-search [e! place-search in-validation?]
   (let [{primary-results true
          secondary-results false} (group-by (comp ::places/primary? :place) (:results place-search))]
     [:div.place-search (stylefy/use-style (merge (style-base/flex-container "row")
@@ -142,59 +132,70 @@
                                ::stylefy/media {{:min-width (str width-xs "px")} {:width "30%"}}})
       [:div {:style {:font-weight "bold"}}
        [:span (tr [:place-search :primary-header])]
-       [:span [tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
+       [:span [common/tooltip-icon {:text (tr [:place-search :primary-tooltip])}]]]
 
-      [result-chips e! primary-results true]
-      [ui/auto-complete {:id :place-auto-complete-primary
-                         :name :place-auto-complete-primary
-                         :floating-label-text (tr [:place-search :place-auto-complete-primary])
-                         :filter (constantly true) ;; no filter, backend returns what we want
-                         :dataSource (completions (:completions place-search))
-                         :maxSearchResults 12
-                         :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
-                         :search-text (or (:primary-name place-search) "")
-                         :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}]
+      [result-chips e! primary-results true in-validation?]
+      (if in-validation?
+        [ui/text-field {:id :place-auto-complete-primary
+                        :name :place-auto-complete-primary
+                        :disabled true}]
+
+        [ui/auto-complete {:id :place-auto-complete-primary
+                           :name :place-auto-complete-primary
+                           :floating-label-text (tr [:place-search :place-auto-complete-primary])
+                           :filter (constantly true)        ;; no filter, backend returns what we want
+                           :dataSource (completions (:completions place-search))
+                           :maxSearchResults 12
+                           :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
+                           :search-text (or (:primary-name place-search) "")
+                           :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}])
       [:div {:style {:font-weight "bold" :margin-top "60px"}}
        [:span (tr [:place-search :secondary-header])]
-       [:span [tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
+       [:span [common/tooltip-icon {:text (tr [:place-search :secondary-tooltip])}]]]
 
       [result-chips e! secondary-results false]
-      [ui/auto-complete {:id :place-auto-complete-secondary
-                         :name :place-auto-complete-secondary
-                         :floating-label-text (tr [:place-search :place-auto-complete-secondary])
-                         :filter (constantly true) ;; no filter, backend returns what we want
-                         :dataSource (completions (:completions place-search))
-                         :maxSearchResults 12
-                         :on-update-input #(e! (ps/->SetSecondaryPlaceName %))
-                         :search-text (or (:secondary-name place-search) "")
-                         :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}]]
+      (if in-validation?
+        [ui/text-field {:id :place-auto-complete-secondary
+                        :name :place-auto-complete-secondary
+                        :disabled true}]
+
+        [ui/auto-complete {:id :place-auto-complete-secondary
+                           :name :place-auto-complete-secondary
+                           :floating-label-text (tr [:place-search :place-auto-complete-secondary])
+                           :filter (constantly true)        ;; no filter, backend returns what we want
+                           :dataSource (completions (:completions place-search))
+                           :maxSearchResults 12
+                           :on-update-input #(e! (ps/->SetSecondaryPlaceName %))
+                           :search-text (or (:secondary-name place-search) "")
+                           :on-new-request #(e! (ps/->AddPlace (aget % "id") false))}])]
 
      [:div (stylefy/use-style {:width "100%"
                                :z-index 99
                                ::stylefy/media {{:min-width (str width-xs "px")} {:width "70%"}}})
        [places-map e! (:results place-search) (:show? place-search)]
 
-      [:span
-       (if (:show? place-search)
-         [:span.hide-draw-buttons
-          [ui/flat-button {:id :hide-draw-tools
-                           :primary true
-                           :label (tr [:place-search :hide-draw-tools])
-                           :name :hide-draw-tools
-                           :on-click #(e! (ps/->SetDrawControl false nil))}]]
-         [:span.draw-buttons
-          [ui/flat-button {:id :draw-primary
-                           :primary true
-                           :label (tr [:place-search :draw-primary])
-                           :name :draw-primary
-                           :on-click #(e! (ps/->SetDrawControl true true))}]
-          [ui/flat-button {:id :draw-secondary
-                           :primary true
-                           :label (tr [:place-search :draw-secondary])
-                           :name :draw-secondary
-                           :on-click #(e! (ps/->SetDrawControl true false))}]])]]]))
+      (when-not in-validation?
+        [:span
+         (if (:show? place-search)
+           [:span.hide-draw-buttons
+            [ui/flat-button {:id :hide-draw-tools
+                             :primary true
+                             :label (tr [:place-search :hide-draw-tools])
+                             :name :hide-draw-tools
+                             :on-click #(e! (ps/->SetDrawControl false nil))}]]
+           [:span.draw-buttons
+            [ui/flat-button {:id :draw-primary
+                             :primary true
+                             :label (tr [:place-search :draw-primary])
+                             :name :draw-primary
+                             :on-click #(e! (ps/->SetDrawControl true true))}]
+            [ui/flat-button {:id :draw-secondary
+                             :primary true
+                             :label (tr [:place-search :draw-secondary])
+                             :name :draw-secondary
+                             :on-click #(e! (ps/->SetDrawControl true false))}]])])]]))
 
-(defn place-search-form-group [e! label name]
+(defn place-search-form-group [e! label name in-validation?]
   (let [empty-places? #(not-any? (comp ::places/primary? :place) (get-in % [:place-search :results]))]
     (form/group
      {:label label
@@ -220,4 +221,4 @@
                     ;; Meta-key helps to avoid map re-rendering.
                     ;; Component knows this way that same element is in use.
                     ^{:key "place-search"}
-                    [place-search e! (:place-search data)]])})))
+                    [place-search e! (:place-search data) in-validation?]])})))

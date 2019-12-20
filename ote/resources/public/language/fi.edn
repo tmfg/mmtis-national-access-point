@@ -96,7 +96,9 @@
   :service-exception
   {:description "Poikkeuksen kuvaus"
    :from-date "Alkupvm"
-   :to-date "Loppupvm"}
+   :to-date "Loppupvm"
+   :service-hour-exceptions "Palveluaikojen poikkeukset"}
+
 
   ;; Passenger transportation fields
   :passenger-transportation
@@ -213,8 +215,9 @@
    :ote.db.transport-service/type "Liikkumispalvelun tyyppi"
    :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
-   :ote.db.transport-service/published?-values {true "Julkaistu"
-                                                false "Ei julkaistu"}
+   :ote.db.transport-service/published?-values {:public "Julkaistu"
+                                                :validation "Odottaa tarkistusta"
+                                                :draft "Luonnos"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Viikonpäivät"
@@ -306,7 +309,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :description-why-contact-info "Palvelun yhteystiedoista julkaistaan julkisessa NAP-palvelukatalogissa ainoastaan verkkosivujen osoite."
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
-  :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :publish-missing-required "Et voi vielä siirtää palvelua tarkistukseen, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
   :trip-editor-no-calendar "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
@@ -351,6 +354,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :manage-access-rights "Hallinnoi käyttäjäoikeuksia"
 
   :save-and-publish "Tallenna ja julkaise"
+  :save-and-validate "Tallenna ja siirrä tarkistukseen"
+  :send "Lähetä"
   :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
   :save-updated "Tallenna päivitetyt tiedot"
@@ -362,6 +367,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :add-new-route "Lisää uusi merireitti"
   :add-new-pre-notice "Uusi muutosilmoitus"
   :discard "Peruuta"
+  :discard-to-admin "Peruuta ja palaa hallintapaneeliin"
 
   :next "Jatka"
   :add-transport-service "Lisää uusi palvelu"
@@ -385,6 +391,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :transport-service-catalog "Liikkumispalvelukatalogi"
   :register-to-service "Rekisteröidy palveluun"
   :check-out-the-service "Tutustu tietoihin"
+  :continue-editing "Jatka tietojen muokkaamista"
   }
 
  ;; Database enumeration values
@@ -600,7 +607,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :schedule-creation "Reitti- ja aikataulutietorajapintojen tuottaminen"
                      :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
                      :open-rae "Avaa Traficomin RAE-työkalu"
-                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"}
+                     :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"
+                     :service-in-validation-info "Palvelun tiedot ovat Traficomilla käsittelyssä ja ne julkaistaan mahdollisimman pian."}
 
  :transport-users-page {:username "Nimi"
                         :members "Jäsenet"
@@ -659,7 +667,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :table-header-service-name "Palvelun nimi"
   :table-header-service-url "Palvelun verkko-osoite"
-  :table-header-NAP-status "NAP tila"
+  :table-header-NAP-status "Palvelun tila"
   :table-header-modified "Muokattu"
   :table-header-created "Luotu"
   :table-header-actions "Toiminnot"
@@ -788,6 +796,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :header-charging-points "Latauspisteet"
   :header-service-hours "Palveluajat ja pysäköintiaika"}
 
+ :transport-services-common-page
+ {:validation-modal-header "Tietoa julkaisuprosessista"
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
@@ -1149,9 +1160,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
-   :stay "Jää"
+   :stay "Palaa lomakkeelle"
    :leave "Poistu"
-   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"}
+   :unsaved-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta?"
+   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."
+   }
 
   :send-pre-notice
   {:title "Muutosilmoituksen lähettäminen"
@@ -1164,6 +1177,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Ei"
    :ok "Kyllä"}
+
+  :continue-editing
+  {:title "Jatka tietojen muokkaamista"
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
   }
 
  :operators

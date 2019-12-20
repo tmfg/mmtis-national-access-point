@@ -127,7 +127,7 @@
 (defmethod field :string [{:keys [update! label name max-length min-length regex
                                   on-focus on-blur on-change form? error warning table? full-width?
                                   style input-style hint-style password? on-enter
-                                  hint-text autocomplete disabled? element-id]
+                                  hint-text autocomplete disabled? element-id floatingLabelStyle]
                            :as   field} data]
   [text-field
    (merge
@@ -137,6 +137,7 @@
      {:name name
       :floating-label-text (when-not table? label)
       :floating-label-fixed true
+      :floatingLabelStyle (when floatingLabelStyle floatingLabelStyle)
       :on-blur on-blur
       :on-focus on-focus
       :hint-text (or hint-text (placeholder field data) "")
@@ -271,7 +272,7 @@
 
 (def languages ["FI" "SV" "EN"])
 
-(defmethod field :localized-text [{:keys [update! div-table? table? is-empty? label name rows rows-max warning error full-width? style]
+(defmethod field :localized-text [{:keys [update! div-table? table? is-empty? label name rows rows-max warning error full-width? style disabled? floatingLabelStyle]
                                    :as   field} data]
   (r/with-let [selected-language (r/atom (first languages))]
     (let [data (or data [])
@@ -289,6 +290,7 @@
         (merge
           {:name name
            :floating-label-text (when-not table? label)
+           :floating-label-style (when floatingLabelStyle floatingLabelStyle)
            :floating-label-fixed true
            :hintText (placeholder field data)
            :on-change #(let [updated-language-data
@@ -305,6 +307,8 @@
            :multi-line true
            :rows rows
            :rows-max (or rows-max 200)}
+          (when disabled?
+            {:disabled true})
           (when error
             {:error-text (or error "")})
           (when full-width?
@@ -451,7 +455,7 @@
        (when list-style
          {:listStyle list-style}))]))
 
-(defn radio-selection [{:keys [update! label name show-option options error warning element-id] :as field}
+(defn radio-selection [{:keys [update! label name show-option options error warning element-id disabled?] :as field}
                        data]
   (let [option-idx (zipmap options (map str (range)))]
     [:div.radio (stylefy/use-style style-form-fields/radio-selection)
@@ -465,10 +469,13 @@
       (doall
        (map (fn [option]
               [ui/radio-button
-               {:id (str "radio-" name)
-                :label (show-option option)
-                :value (option-idx option)
-                :key (str "radio-" (option-idx option))}])
+               (merge
+                 {:id (str "radio-" name)
+                  :label (show-option option)
+                  :value (option-idx option)
+                  :key (str "radio-" (option-idx option))}
+                 (when disabled?
+                   {:disabled true}))])
             options))]
      (when (or error (string? warning))
        [:div
@@ -518,7 +525,7 @@
 
 (defmethod field :multiselect-selection
   [{:keys [update! table? label name style show-option show-option-short options form? error warning
-           auto-width? full-width? id active-tooltip max-height]
+           auto-width? full-width? id active-tooltip max-height disabled?]
     :as field}
    data]
   ;; Because material-ui selection value can't be an arbitrary JS object, use index
@@ -557,6 +564,8 @@
                                                              values))))}
                         (when auto-width?
                           {:auto-width true})
+                        (when disabled?
+                          {:disabled true})
                         (when full-width?
                           {:full-width true}))
                       ;; Add selected value to vector
@@ -585,7 +594,7 @@
 
 (def number-regex #"\d*([\.,]\d{0,2})?")
 
-(defmethod field :number [_  data]
+(defmethod field :number [{:keys [disabled? full-width?] :as options}  data]
   ;; Number field contains internal state that has the current
   ;; typed in text (which may be an incompletely typed number).
   ;;
@@ -594,18 +603,23 @@
         state (r/atom {:value data
                        :txt (fmt data)})]
     (r/create-class
-     {:component-will-receive-props
-      (fn [_ [_ _ new-value]]
-        (swap! state
-               (fn [{:keys [value txt] :as state}]
-                 (if (not= value new-value)
-                   {:value new-value
-                    :txt (fmt new-value)}
-                   state))))
-      :reagent-render
-      (fn [{:keys [update! currency?] :as opts} data]
-        [:span [field (assoc opts
+      {:component-will-receive-props
+       (fn [_ [_ _ new-value]]
+         (swap! state
+                (fn [{:keys [value txt] :as state}]
+                  (if (not= value new-value)
+                    {:value new-value
+                     :txt (fmt new-value)}
+                    state))))
+       :reagent-render
+       (fn [{:keys [update! currency?] :as opts} data]
+         [:div
+          [:span [field (merge (assoc opts
                              :type :string
+                             :style (merge
+                                      {}
+                                      (when full-width?
+                                        {:width "92%"}))
                              :regex number-regex
                              :update! #(let [new-value (if (str/blank? %)
                                                          nil
@@ -615,8 +629,14 @@
                                          (reset! state {:value new-value
                                                         :txt %})
                                          (update! new-value)))
-                (:txt @state)]
-         (when currency? "€")])})))
+                           (when disabled?
+                             {:disabled true}))
+              (:txt @state)]]
+          (when currency?
+            [:span {:style {:position "relative"
+                            :padding 0
+                            :left "-15px"}}
+             "€"])])})))
 
 ;; Matches empty or any valid hour (0 (or 00) - 23)
 (def hour-regex #"^(^$|0?[0-9]|1[0-9]|2[0-3])$")
@@ -627,7 +647,7 @@
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
 (defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning
-                                style input-style container-style] :as opts}
+                                style input-style container-style disabled?] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div {:style (merge style-base/inline-block container-style)}
    [field (merge
@@ -654,6 +674,8 @@
                                      :hours-text hour))))}
             (when (and required? (empty? data))
               {:warning true})
+            (when disabled?
+              {:disabled? true})
             (when (not hours)
               {:hint-text (tr [:common-texts :hours-placeholder])}))
     (if (not hours)
@@ -681,7 +703,9 @@
             (when (and required? (empty? data))
               {:warning true})
             (when (not minutes)
-              {:hint-text (tr [:common-texts :minutes-placeholder])}))
+              {:hint-text (tr [:common-texts :minutes-placeholder])})
+            (when disabled?
+              {:disabled? true}))
     (if (not minutes)
       ""
       (or minutes-text (gstr/format "%02d" minutes)))]
@@ -702,43 +726,51 @@
     days
     [:days days]))
 
-(defmethod field :interval [{:keys [update! enabled-label] :as opts} data]
+(defmethod field :interval [{:keys [update! enabled-label disabled?] :as opts} data]
   (let [[unit amount] (or (normalize-interval data) [:hours 0])]
     [:div {:style {:width "100%" :padding-top "0.5em"}}
-     [ui/toggle {:label enabled-label
-                 :label-position "right"
-                 :toggled (not (nil? data))
-                 :on-toggle #(update!
-                              (if data
-                                nil
-                                (time/interval 0 :days)))}]
+     [:div.col-xs-12
+      [ui/toggle {:label enabled-label
+                  :label-position "right"
+                  :toggled (not (nil? data))
+                  :on-toggle #(update!
+                                (if data
+                                  nil
+                                  (time/interval 0 :days)))}]]
      (when-not (nil? data)
        [:div
-        [field (assoc opts
-                      :update! (fn [num]
-                                 (let [unit (or (::preferred-unit data) unit)]
-                                   (update!
-                                    (assoc (if (str/blank? num)
-                                             (time/interval 0 unit)
-                                             (time/interval (js/parseInt num) unit))
-                                           ::preferred-unit unit))))
-                      :hint-text (tr [:common-texts :time-unlimited])
-                      :type :string
-                      :regex #"\d{0,4}"
-                      :style {:width 200}) amount]
-        [field (assoc opts
-                      :update! (fn [unit]
-                                 (assoc (update! (time/interval amount unit))
-                                        ::preferred-unit unit))
-                      :label (tr [:common-texts :time-unit])
-                      :name :maximum-stay-unit
-                      :type :selection
-                      :show-option (tr-key [:common-texts :time-units])
-                      :options [:minutes :hours :days]
-                      :style {:width "150px"
-                              :position "relative"
-                              :top "15px"})
-         (or (::preferred-unit data) unit)]])]))
+        [:div.col-xs-12.col-sm-3.col-md-3 {:style {:margin-right "5px"}}
+         [field (assoc opts
+                  :update! (fn [num]
+                             (let [unit (or (::preferred-unit data) unit)]
+                               (update!
+                                 (assoc (if (str/blank? num)
+                                          (time/interval 0 unit)
+                                          (time/interval (js/parseInt num) unit))
+                                   ::preferred-unit unit))))
+                  :hint-text (tr [:common-texts :time-unlimited])
+                  :type :string
+                  :floatingLabelStyle {:line-height "1rem"}
+                  :disabled (if disabled? true false)
+                  :regex #"\d{0,4}"
+                  :full-width? true)
+          amount]]
+        [:div.col-xs-12.col-sm-3.col-md-3
+         [field (assoc opts
+                  :update! (fn [unit]
+                             (assoc (update! (time/interval amount unit))
+                               ::preferred-unit unit))
+                  :label (tr [:common-texts :time-unit])
+                  :name :maximum-stay-unit
+                  :type :selection
+                  :disabled (if disabled? true false)
+                  :show-option (tr-key [:common-texts :time-units])
+                  :options [:minutes :hours :days]
+                  :full-width? true
+                  :style {} #_ {:width "150px"
+                          :position "relative"
+                          :top "15px"})
+          (or (::preferred-unit data) unit)]]])]))
 
 (defmethod field :time-picker [{:keys [update! ok-label cancel-label default-time] :as opts} data]
   (let [time-picker-time (if (= nil? data) default-time data)]
@@ -752,13 +784,18 @@
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
-                                       show-clear? hint-text id date-fields? disabled? element-id] :as opts} data]
+                                       show-clear? hint-text id date-fields? disabled? element-id full-width?] :as opts} data]
   (let [warning (when (and required? (not data))
                   (tr [:common-texts :required-field]))]
-    [:div (stylefy/use-style style-base/inline-block)
+    [:div {:style (merge
+                    style-base/inline-block
+                    (when full-width? {:width "100%"} ))}
      [ui/date-picker (merge {:id (if element-id element-id (str label))
-                             :style {:display "inline-block"}
-                             :text-field-style {:width "150px"}
+                             :style (merge
+                                      {:display "inline-block"}
+                                      (when full-width?
+                                        {:width "92%"}))
+                             :text-field-style (if full-width? {:width "100%"} {:width "150px"})
                              :hint-text (or hint-text "")
                              :floating-label-text (when-not table? label)
                              :floating-label-fixed true
@@ -773,7 +810,7 @@
                                                      (time/date-fields-only date)
                                                      date)))
                              :format-date time/format-date
-                             :disabled disabled?
+                             :disabled (if disabled? true false)
                              :ok-label (or ok-label (tr [:buttons :save]))
                              :cancel-label (or cancel-label (tr [:buttons :cancel]))
                              :locale (case @localization/selected-language
@@ -788,7 +825,7 @@
                                :error-style style-base/required-element})
                             (when (not (nil? id))
                               {:id (str "date-picker-" id)}))]
-     (when show-clear?
+     (when (and show-clear? (not disabled?))
        [ui/icon-button {:on-click #(update! nil)
                         :disabled (not data)
                         :style {:width "16px"
@@ -860,8 +897,7 @@
                         value]
                        :else nil)]))
                 (when inner-delete?
-                  [:div {:class inner-delete-class
-                         :style {:padding-top "1rem" :padding-left "2rem"}}
+                  [:div {:class (str inner-delete-class " inner-delete-button")}
                    [buttons/delete-table-row {:on-click #(update! (vec (concat (when (pos? i)
                                                                                  (take i data))
                                                                                (drop (inc i) data))))}
@@ -1001,10 +1037,11 @@
       {:label (when-not table? label)
        :checked (boolean checked?)
        :on-check #(update! (not checked?))
-       :disabled disabled?
        :style style}
       (when on-click
-        {:on-click #(on-click)}))]
+        {:on-click #(on-click)})
+      (when disabled?
+        {:disabled true}))]
    (when error
      (tr [:common-texts :required-field]))])
 
@@ -1021,7 +1058,7 @@
 (defmethod field :checkbox-group [{:keys
                                    [update! table? label show-option options
                                     help error warning header? option-enabled? option-addition
-                                    checkbox-group-style use-label-width?]} data]
+                                    checkbox-group-style use-label-width? disabled?]} data]
   ;; Options:
   ;; :header? Show or hide the header element above the checkbox-group. Default: true.
   ;; :option-enabled? Is option checkable. Default: true
@@ -1043,15 +1080,19 @@
              ^{:key i}
              [:div {:style {:display "flex" :padding-top "10px"}}
               [:span
-               [ui/checkbox {:id (str i "_" (str option))
-                             :label      (when-not table? (show-option option))
-                             :checked    checked?
-                             :disabled   (not (option-enabled? option))
-                             :labelStyle (merge label-style
-                                                (if (not (option-enabled? option))
-                                                  style-base/disabled-color
-                                                  {:color "rgb(33, 33, 33)"}))
-                             :on-check   #(update! ((if checked? disj conj) selected option))}]]
+               [ui/checkbox
+                (merge
+                  {:id (str i "_" (str option))
+                   :label (when-not table? (show-option option))
+                   :checked checked?
+                   :disabled (not (option-enabled? option))
+                   :labelStyle (merge label-style
+                                      (if (not (option-enabled? option))
+                                        style-base/disabled-color
+                                        {:color "rgb(33, 33, 33)"}))
+                   :on-check #(update! ((if checked? disj conj) selected option))}
+                  (when disabled?
+                    {:disabled true}))]]
               (when is-addition-valid
                 [:span {:style {:padding-left "20px"}} addition])]))
          options))
@@ -1198,7 +1239,7 @@
               :error-data error-data}
        companies]]]))
 
-(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given] :as opts}
+(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given disabled?] :as opts}
                                   {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
   (let [select-type #(update! (merge {::t-service/company-source %}
                                      ;; Remove csv file processing statuses if switching away from file import views
@@ -1216,22 +1257,30 @@
      [:div.row
       [ui/radio-button-group {:name           (str "brokerage-companies-selection")
                               :value-selected selected-type}
-       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-no-companies])
-                         :id       "radio-company-none"
-                         :value    "none"
-                         :on-click #(select-type :none)}]
-       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-url-companies])
-                         :id       "radio-company-csv-url"
-                         :value    "csv-url"
-                         :on-click #(select-type :csv-url)}]
-       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-csv-companies])
-                         :id       "radio-company-csv-file"
-                         :value    "csv-file"
-                         :on-click #(select-type :csv-file)}]
-       [ui/radio-button {:label    (tr [:passenger-transportation-page :radio-button-form-companies])
-                         :value    "form"
-                         :id       "radio-company-form"
-                         :on-click #(select-type :form)}]]
+       [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-no-companies])
+                                :id "radio-company-none"
+                                :value "none"
+                                :on-click #(select-type :none)}
+                               (when disabled?
+                                 {:disabled true}))]
+       [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-url-companies])
+                                :id "radio-company-csv-url"
+                                :value "csv-url"
+                                :on-click #(select-type :csv-url)}
+                               (when disabled?
+                                 {:disabled true}))]
+       [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-csv-companies])
+                                :id "radio-company-csv-file"
+                                :value "csv-file"
+                                :on-click #(select-type :csv-file)}
+                               (when disabled?
+                                 {:disabled true}))]
+       [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-form-companies])
+                                :value "form"
+                                :id "radio-company-form"
+                                :on-click #(select-type :form)}
+                               (when disabled?
+                                 {:disabled true}))]]
 
       (when-not (nil? data)
         (case company-source

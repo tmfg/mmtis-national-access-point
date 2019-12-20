@@ -32,15 +32,17 @@
 
 (def transport-services-column-keys
   {:id ::t-service/id
-    :transport-operator-id ::t-service/transport-operator-id
-    :name ::t-service/name
-    :transport-type ::t-service/transport-type
-    :interface-types ::t-service/interface-types
-    :type ::t-service/type
-    :sub-type ::t-service/sub-type
-    :published ::t-service/published
-    :created ::modification/created
-    :modified ::modification/modified})
+   :transport-operator-id ::t-service/transport-operator-id
+   :name ::t-service/name
+   :transport-type ::t-service/transport-type
+   :interface-types ::t-service/interface-types
+   :type ::t-service/type
+   :sub-type ::t-service/sub-type
+   :published ::t-service/published
+   :validate ::t-service/validate
+   :re-edit ::t-service/re-edit
+   :created ::modification/created
+   :modified ::modification/modified})
 
 (defn translate-pick-up-country [pick-up-locations country-list]
   (mapv
@@ -59,9 +61,9 @@
   (let [sub-type (::t-service/sub-type service)
         interface-types (::t-service/interface-types service)]
     (assoc service :has-errors?
-      (and
-        (= sub-type :schedule)
-        (not ((set interface-types) :route-and-schedule))))))
+                   (and
+                     (= sub-type :schedule)
+                     (not ((set interface-types) :route-and-schedule))))))
 
 (defn get-transport-services
   "Return Vector of transport-services"
@@ -113,7 +115,7 @@
          id))))
 
 (defn ensure-bigdec [value]
-  (when-not (nil? value ) (bigdec value)))
+  (when-not (nil? value) (bigdec value)))
 
 (defn- fix-price-classes
   "Frontend sends price classes prices as floating points. Convert them to bigdecimals before db insert."
@@ -192,7 +194,7 @@
 (defn- delete-external-companies
   "User might remove url from service, so we delete all service-companies from db"
   [db transport-service]
-    (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
+  (specql/delete! db ::t-service/service-company {::t-service/transport-service-id (::t-service/id transport-service)}))
 
 (defn save-external-companies
   "Service can contain an url that contains company names and business-id. Sevice can also contain an imported csv file
@@ -202,9 +204,9 @@
                                    {::t-service/transport-service-id (::t-service/id transport-service)}))
         companies (vec (:companies (external/check-csv {:url (::t-service/companies-csv-url transport-service)})))
         new-data (if (empty? current-data)
-                   {::t-service/companies            companies
+                   {::t-service/companies companies
                     ::t-service/transport-service-id (::t-service/id transport-service)
-                    ::t-service/source               "URL"}
+                    ::t-service/source "URL"}
                    (assoc current-data ::t-service/companies companies))]
 
     (external/save-companies db new-data)))
@@ -213,13 +215,13 @@
   "Companies can be added from url, csv or by hand in form. Clean up url if some other option is selected"
   [transport-service]
   (let [source (get transport-service ::t-service/company-source)]
-  (cond
-    (= :none source) (assoc transport-service ::t-service/companies-csv-url nil
-                                              ::t-service/companies {})
-    (= :form source) (assoc transport-service ::t-service/companies-csv-url nil)
-    (= :csv-file source) (assoc transport-service ::t-service/companies-csv-url nil)
-    (= :csv-url source) (assoc transport-service ::t-service/companies {})
-    :else transport-service)))
+    (cond
+      (= :none source) (assoc transport-service ::t-service/companies-csv-url nil
+                                                ::t-service/companies {})
+      (= :form source) (assoc transport-service ::t-service/companies-csv-url nil)
+      (= :csv-file source) (assoc transport-service ::t-service/companies-csv-url nil)
+      (= :csv-url source) (assoc transport-service ::t-service/companies {})
+      :else transport-service)))
 
 (defn- fetch-transport-service-external-interfaces [db id]
   (when id
@@ -243,16 +245,32 @@
                      true (dissoc ::t-service/published?))]
     data))
 
+(defn set-validate-time
+  "Add validate datetime when it is moved to validation. If not, remove validate? key."
+  [data]
+  (if (::t-service/validate? data)
+    ;; Move to validation
+    (-> data
+        (dissoc ::t-service/validate?)
+        (assoc ::t-service/validate (java.util.Date.)
+               ::t-service/re-edit nil))
+    ;; Save as draft
+    (-> data
+        (dissoc ::t-service/validate?)
+        (assoc ::t-service/published nil)
+        (assoc ::t-service/re-edit nil))))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [db user {places ::t-service/operation-area
-                       external-interfaces ::t-service/external-interfaces
-                       :as data}]
+            external-interfaces ::t-service/external-interfaces
+            :as data}]
   (let [service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
-                         (set-publish-time db)
+                         ;(set-publish-time db)
+                         (set-validate-time)
                          (dissoc ::t-service/external-interfaces
                                  ::t-service/service-company)
                          (maybe-clear-companies))
@@ -263,25 +281,58 @@
         ;; Store to OTE database
         transport-service
         (jdbc/with-db-transaction [db db]
-          (let [transport-service (upsert! db ::t-service/transport-service service-info)
-                transport-service-id (::t-service/id transport-service)]
+                                  (let [transport-service (upsert! db ::t-service/transport-service service-info)
+                                        transport-service-id (::t-service/id transport-service)]
 
-            ;; Save possible external interfaces
-            (save-external-interfaces db transport-service-id external-interfaces removed-resources)
+                                    ;; Save possible external interfaces
+                                    (save-external-interfaces db transport-service-id external-interfaces removed-resources)
 
-            ;; Save operation areas
-            (places/save-transport-service-operation-area! db transport-service-id places)
+                                    ;; Save operation areas
+                                    (places/save-transport-service-operation-area! db transport-service-id places)
 
-            ;; Save companies
-            (if (::t-service/companies-csv-url transport-service)
-              ;; Update companies
-              (save-external-companies db transport-service)
-              ;; If url is empty, delete remaining data
-              (delete-external-companies db transport-service))
-            transport-service))]
+                                    ;; Save companies
+                                    (if (::t-service/companies-csv-url transport-service)
+                                      ;; Update companies
+                                      (save-external-companies db transport-service)
+                                      ;; If url is empty, delete remaining data
+                                      (delete-external-companies db transport-service))
+                                    transport-service))]
 
     ;; Return the stored transport-service
     transport-service))
+
+(defn- re-edit-service [db user service-id]
+  (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db
+                                                                                    ::t-service/transport-service
+                                                                                    #{::t-service/transport-operator-id}
+                                                                                    {::t-service/id service-id})))
+        current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
+    (authorization/with-transport-operator-check
+      db user service-operator-id
+      #(do
+         (specql/update! db ::t-service/transport-service
+                         {::t-service/re-edit current-timestamp
+                          ::t-service/validate nil}
+                         {::t-service/id service-id})
+         current-timestamp))))
+
+(defn service-operator-id [db service-id]
+  (::t-service/transport-operator-id (first (specql/fetch db
+                                                          ::t-service/transport-service
+                                                          #{::t-service/transport-operator-id}
+                                                          {::t-service/id service-id}))))
+
+(defn back-to-validation
+  "User has possibility to take service back to editing state, but not continue with it. This fn will return
+  service to validation in those cases."
+  [db service-id]
+  (let [current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
+    (do
+      (specql/update! db ::t-service/transport-service
+                      {::t-service/re-edit nil
+                       ::t-service/validate current-timestamp}
+                      {::t-service/id service-id})
+      current-timestamp)))
 
 (defn- save-transport-service-handler
   "Process transport service save POST request. Checks that the transport operator id
@@ -289,10 +340,10 @@
   If authorization check succeeds, the transport service is saved to the database and optionally
   published to CKAN."
   [db user request]
-    (authorization/with-transport-operator-check
-      db user (::t-service/transport-operator-id request)
-      #(http/transit-response
-        (save-transport-service db user request))))
+  (authorization/with-transport-operator-check
+    db user (::t-service/transport-operator-id request)
+    #(http/transit-response
+       (save-transport-service db user request))))
 
 (defn- save-associated-operator
   "Save association between transport service and transport operator"
@@ -324,9 +375,9 @@
   (let [ts (first (fetch db ::t-service/transport-service
                          (apply disj
                                 (conj (specql/columns ::t-service/transport-service)
-                                    ;; join external interfaces
-                                    [::t-service/external-interfaces
-                                     (specql/columns ::t-service/external-interface-description)])
+                                      ;; join external interfaces
+                                      [::t-service/external-interfaces
+                                       (specql/columns ::t-service/external-interface-description)])
                                 transport-service-personal-columns)
                          {::t-service/id id}))]
     (if ts
@@ -342,8 +393,8 @@
 (defn ckan-group-id->group
   [db ckan-group-id]
   (first (specql/fetch db ::t-operator/group
-           (specql/columns ::t-operator/group)
-           {::t-operator/group-id ckan-group-id})))
+                       (specql/columns ::t-operator/group)
+                       {::t-operator/group-id ckan-group-id})))
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"
@@ -376,21 +427,35 @@
     (POST "/transport-service/delete" {form-data :body
                                        user :user}
       (http/transit-response
-        (delete-transport-service! db user (:id (http/transit-request form-data)))))))
+        (delete-transport-service! db user (:id (http/transit-request form-data)))))
+
+    (POST "/transport-service/:service-id/re-edit-service" {{:keys [service-id]} :params
+                                                            user :user}
+      (let [service-id (Long/parseLong service-id)]
+        (http/transit-response (re-edit-service db user service-id))))
+
+    (POST "/transport-service/:service-id/back-to-validation" {{:keys [service-id]} :params
+                                                               user :user}
+      (let [service-id (Long/parseLong service-id)
+            operator-id (service-operator-id db service-id)]
+        (http/transit-response
+          (authorization/with-transport-operator-check
+            db user operator-id
+            #(back-to-validation db service-id)))))))
 
 (defn- transport-service-routes
   "Unauthenticated routes"
   [db config]
   (routes
     (GET "/transport-service/:id"
-      {{:keys [id]}
-       :params
-       user :user
-       cookies :cookies}
+         {{:keys [id]}
+          :params
+          user :user
+          cookies :cookies}
       (let [id (Long/parseLong id)
             operator-id (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
-                                              #{::t-service/transport-operator-id}
-                                              {::t-service/id id})))]
+                                                                                #{::t-service/transport-operator-id}
+                                                                                {::t-service/id id})))]
         (if (or (authorization/admin? user) (authorization/is-author? db user operator-id))
           (all-data-transport-service config db id)
           (public-data-transport-service config db id))))))
@@ -400,8 +465,8 @@
   (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-      [(http/publish! http (transport-service-routes-auth db))
-       (http/publish! http {:authenticated? false} (transport-service-routes db config))]))
+           [(http/publish! http (transport-service-routes-auth db))
+            (http/publish! http {:authenticated? false} (transport-service-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]
       (s))

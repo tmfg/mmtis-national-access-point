@@ -17,12 +17,14 @@
 
 (defn rule-fields [calendar]
   (into [{:id "from-date"
-          :type  :date-picker :date-fields? true
+          :type  :date-picker
+          :date-fields? true
           :name  ::transit/from-date
           :label (tr [:route-wizard-page :route-calendar-from-date])
           :width "29%"}
          {:id "to-date"
-          :type  :date-picker :date-fields? true
+          :type  :date-picker
+          :date-fields? true
           :name  ::transit/to-date
           :label (tr [:route-wizard-page :route-calendar-to-date])
           :width "29%"}]

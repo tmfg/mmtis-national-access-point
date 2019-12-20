@@ -78,7 +78,7 @@
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-NAP])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5rem"}}
        (tr [:front-page :column-NAP])]]]
 
     [:div.row (stylefy/use-style style-front-page/row-media)
@@ -86,7 +86,7 @@
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-transport-services])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5rem"}}
        (tr [:front-page :column-transport-services])]]
      [:div.col-xs-12.col-sm-3.col-md-3 (stylefy/use-style style-front-page/large-icon-container)
       [icons/airport-shuttle style-front-page/large-font-icon]]]
@@ -98,7 +98,7 @@
       [:h2
        (stylefy/use-style style-front-page/h2)
        (tr [:front-page :title-essential-info])]
-      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5"}}
+      [:p {:style {:font-size "1em" :font-weight 400 :text-align "left" :line-height "1.5rem"}}
        (tr [:front-page :column-essential-info])]]]]
 
    [:div (stylefy/use-style style-front-page/lower-section)

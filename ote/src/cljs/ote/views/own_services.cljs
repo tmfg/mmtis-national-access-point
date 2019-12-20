@@ -1,41 +1,32 @@
 (ns ote.views.own-services
   (:require [clojure.string :as s]
-            [reagent.core :as reagent]
+            [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icons :as icons]
-            [ote.ui.common :refer [linkify]]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.warning_msg :as warning-msg]
-            [ote.app.controller.front-page :as fp]
-            [ote.app.controller.transport-service :as ts]
-            [ote.app.utils :as utils]
-            [ote.app.controller.transport-operator :as to]
-            [ote.app.controller.service-search :as ss]
-            [ote.app.controller.own-services :as os-controller]
-            [ote.views.transport-service :as transport-service]
-            [ote.db.common :as common]
-            [ote.ui.page :as page]
-            [ote.localization :refer [tr tr-key]]
+            [clojure.string :as str]
+            [stylefy.core :as stylefy]
+            [ote.db.modification :as modification]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.modification :as modification]
             [ote.time :as time]
-            [stylefy.core :as stylefy]
+            [ote.localization :refer [tr tr-key]]
+            [ote.app.utils :as utils]
+            [ote.ui.common :refer [linkify]]
+            [ote.ui.buttons :as buttons]
+            [ote.ui.warning_msg :as warning-msg]
+            [ote.ui.page :as page]
             [ote.style.base :as style-base]
             [ote.style.buttons :as style-buttons]
-            [ote.style.front-page :as style-front-page]
+            [ote.style.dialog :as style-dialog]
             [ote.theme.colors :as colors]
-            [reagent.core :as r]
             [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]
             [ote.ui.info :as info]
-            [ote.ui.list-header :as list-header]
-            [clojure.string :as str]
-            [ote.app.controller.front-page :as fp]
-            [ote.style.dialog :as style-dialog]))
+            [ote.app.controller.front-page :as fp-controller]
+            [ote.app.controller.own-services :as os-controller]
+            [ote.app.controller.transport-operator :as to-controller]
+            [ote.app.controller.transport-service :as ts-controller]
+            [ote.views.transport-service :as transport-service]
+            [ote.ui.common :as common]))
 
 (def ic-warning [ic/alert-warning {:style {:color colors/negative-button
                                            :margin-bottom "5px"}}])
@@ -44,12 +35,17 @@
                                  :keys [show-delete-modal?]
                                  :as service}]
   [:span
-   [ui/icon-button (merge {:href "#"
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (ts/->DeleteTransportService id)))}
-                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
-    [ic/action-delete]]
+   [:a (merge {:href "#"
+               :id (str "delete-service-button" id)
+               :on-click #(do
+                            (.preventDefault %)
+                            (e! (ts-controller/->DeleteTransportService id)))}
+              (stylefy/use-style style-base/gray-link-with-icon))
+    (ic/action-delete {:style {:width 24
+                               :height 24
+                               :margin-right "2px"
+                               :color colors/icon-gray}})
+    [:span {:style {:padding-top "4px"}} (tr [:buttons :delete])]]
    (when show-delete-modal?
      [ui/dialog
       {:open true
@@ -57,12 +53,12 @@
        :title (tr [:dialog :delete-transport-service :title])
        :actions [(r/as-element
                    [buttons/cancel
-                    {:on-click #(e! (ts/->CancelDeleteTransportService id))}
+                    {:on-click #(e! (ts-controller/->CancelDeleteTransportService id))}
                     (tr [:buttons :cancel])])
                  (r/as-element
                    [buttons/delete
                     {:icon (ic/action-delete-forever)
-                     :on-click #(e! (ts/->ConfirmDeleteTransportService id))}
+                     :on-click #(e! (ts-controller/->ConfirmDeleteTransportService id))}
                     (tr [:buttons :delete])])]}
       (tr [:dialog :delete-transport-service :confirm] {:name name})])])
 
@@ -86,42 +82,68 @@
                   :display-row-checkbox false}
    (doall
      (map
-       (fn [{::t-service/keys [id type sub-type interface-types published name]
+       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name]
              ::modification/keys [created modified] :as row}]
-         ^{:key id}
-         [ui/table-row {:selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
-          [ui/table-row-column
-           [:a (merge {:href (str "/#/edit-service/" id)
-                       :on-click #(do (.preventDefault %)
-                                      (e! (fp/->ChangePage :edit-service {:id id})))}
-                      (stylefy/use-sub-style style-base/basic-table :link)) name]]
-          [ui/table-row-column {:class "hidden-xs "}
-           (if (service-errors row)
-             [:span (stylefy/use-style style-base/icon-with-text)
-              (tr [:field-labels :transport-service ::t-service/published?-values (some? published)])
-              [ic/alert-warning {:style {:color colors/negative-button
-                                         :margin-left "0.5rem"
-                                         :margin-bottom "5px"}}]]
-             (tr [:field-labels :transport-service ::t-service/published?-values (some? published)]))]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui modified)]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "} (time/format-timestamp-for-ui created)]
-          [ui/table-row-column {:class "hidden-xs hidden-sm "}
-           (if published
-             (let [url (str "/export/geojson/" transport-operator-id "/" id)]
-               [linkify url
-                (tr [:own-services-page :open-geojson])
-                {:target "_blank"
-                 :style {:text-decoration "none"
-                         ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
-             [:span.draft
-              (tr [:field-labels :transport-service ::t-service/published?-values false])])]
-          [ui/table-row-column {:style {:padding-left "10px"}}
-           [ui/icon-button (merge {:href "#" :on-click #(do
-                                                          (.preventDefault %)
-                                                          (e! (fp/->ChangePage :edit-service {:id id})))}
-                             (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
-            [ic/content-create]]
-           [delete-service-action e! row]]])
+         (let [service-state (ts-controller/service-state validate re-edit published)]
+           ^{:key id}
+           [ui/table-row {:selectable false
+                          :display-border false
+                          :style {:border-bottom (str "1px solid" colors/gray650)
+                                  :overflow "visible"}}
+            [ui/table-row-column {:class "table-col-style-semi-wrap"
+                                  :style {:width "20%"}}
+             [:a (merge {:href (str "/#/edit-service/" id)
+                         :on-click #(do (.preventDefault %)
+                                        (e! (fp-controller/->ChangePage :edit-service {:id id})))}
+                        (stylefy/use-sub-style style-base/basic-table :link)) name]]
+            [ui/table-row-column {:class "hidden-xs table-col-style-semi-wrap"
+                                  :style {:overflow "visible"
+                                          :width "20%"}}
+             (cond
+               ;; Published but with errors
+               (service-errors row)
+               [:span (stylefy/use-style style-base/icon-with-text)
+                (tr [:field-labels :transport-service ::t-service/published?-values service-state])
+                [ic/alert-warning {:style {:color colors/negative-button
+                                           :margin-left "0.5rem"
+                                           :margin-bottom "5px"}}]]
+               ;; When state in validation
+               (= :validation service-state)
+               [:span (tr [:field-labels :transport-service ::t-service/published?-values service-state])
+                [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
+                                      :len "medium"
+                                      :pos "up"}]]
+               ;; Normal case
+               :else
+               (tr [:field-labels :transport-service ::t-service/published?-values service-state]))]
+            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "12%"}} (time/format-timestamp-for-ui modified)]
+            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "13%"}} (time/format-timestamp-for-ui created)]
+            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "15%"}}
+             (if published
+               (let [url (str "/export/geojson/" transport-operator-id "/" id)]
+                 [linkify url
+                  (tr [:own-services-page :open-geojson])
+                  {:target "_blank"
+                   :style {:text-decoration "none"
+                           ::stylefy/mode {:hover {:text-decoration "underline"}}}}])
+               [:span.draft
+                (tr [:field-labels :transport-service ::t-service/published?-values false])])]
+            [ui/table-row-column {:class "table-col-style-semi-wrap"
+                                  :style {:width "20%"
+                                          :padding-top "0.5rem"}}
+             [:a (merge {:href (str "#/edit-service/" id)
+                         :style {:padding-right "0.5rem"}
+                         :id (str "edit-service-button" id)
+                         :on-click #(do
+                                      (.preventDefault %)
+                                      (e! (fp-controller/->ChangePage :edit-service {:id id})))}
+                        (stylefy/use-style style-base/gray-link-with-icon))
+              (ic/content-create {:style {:width 24
+                                          :height 24
+                                          :margin-right "2px"
+                                          :color colors/icon-gray}})
+              [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
+             [delete-service-action e! row]]]))
        services))])
 
 (defn- route-error
@@ -177,16 +199,19 @@
       [:div.row (stylefy/use-style style-base/section-margin)
        [:div {:class "col-xs-12 col-md-12"}
         [:h4 section-label]
-        [ui/table (stylefy/use-style style-base/basic-table)
+        [ui/table {:style style-base/basic-table
+                   :wrapperStyle {:overflow "visible"}
+                   :bodyStyle {:overflow "visible"}}
          [ui/table-header {:adjust-for-checkbox false
-                           :display-select-all false}
+                           :display-select-all false
+                           :style {:overflow "visible"}}
           [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
-           [ui/table-header-column {:class "table-header"} (tr [:front-page :table-header-service-name])]
-           [ui/table-header-column {:class "hidden-xs table-header "} (tr [:front-page :table-header-NAP-status])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-modified])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header "} (tr [:front-page :table-header-created])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header"} (tr [:front-page :table-header-service-url])]
-           [ui/table-header-column {:class "table-header "} (tr [:front-page :table-header-actions])]]]
+           [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "20%"}} (tr [:front-page :table-header-service-name])]
+           [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "20%"}} (tr [:front-page :table-header-NAP-status])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "12%"}} (tr [:front-page :table-header-modified])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "13%"}} (tr [:front-page :table-header-created])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap" :style {:width "15%"}} (tr [:front-page :table-header-service-url])]
+           [ui/table-header-column {:class "table-header-semi-wrap " :style {:width "20%"}} (tr [:front-page :table-header-actions])]]]
 
          (transport-services-table-rows e! services transport-operator-id)]
         [:div {:style {:margin-top "2rem"}}
@@ -209,7 +234,7 @@
   (let [operator (:transport-operator state)
         operators (:transport-operators-with-services state)]
     (when (and (not (empty? operators))
-            (not (:new? operator)))
+               (not (:new? operator)))
       [:div.row {:style {:margin-bottom "2rem"
                          :margin-top "3rem"
                          :align-items "center"
@@ -223,18 +248,18 @@
           :name :select-transport-operator
           :type :selection
           :show-option #(::t-operator/name %)
-          :update! #(e! (to/->SelectOperator %))
-          :options (mapv to/take-operator-api-keys (mapv :transport-operator operators))
+          :update! #(e! (to-controller/->SelectOperator %))
+          :options (mapv to-controller/take-operator-api-keys (mapv :transport-operator operators))
           :auto-width? true
           :class-name "mui-select-button"}
-         (to/take-operator-api-keys operator)]]
+         (to-controller/take-operator-api-keys operator)]]
        [:div.col-sm-6.col-md-6
         [:a (merge {:id "btn-add-new-transport-operator"
                     :href "#/transport-operator"
                     :on-click #(do
                                  (.preventDefault %)
-                                 (e! (to/->CreateTransportOperator)))}
-              (stylefy/use-style style-buttons/outline-button))
+                                 (e! (to-controller/->CreateTransportOperator)))}
+                   (stylefy/use-style style-buttons/outline-button))
          (tr [:buttons :add-new-transport-operator])]]])))
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
@@ -248,8 +273,8 @@
                :id "new-service-button"
                :on-click #(do
                             (.preventDefault %)
-                            (e! (ts/->OpenTransportServiceTypePage)))}
-         (stylefy/use-style style-buttons/primary-button))
+                            (e! (ts-controller/->OpenTransportServiceTypePage)))}
+              (stylefy/use-style style-buttons/primary-button))
     (tr [:buttons :add-transport-service])]
    (if (and has-services? (not (empty? operator-services)))
      ;; TRUE -> Table for transport services
@@ -276,8 +301,8 @@
                  :id "edit-transport-operator-btn"
                  :on-click #(do
                               (.preventDefault %)
-                              (e! (fp/->ChangePage :transport-operator {:id id})))}
-           (stylefy/use-style style-base/blue-link-with-icon))
+                              (e! (fp-controller/->ChangePage :transport-operator {:id id})))}
+                (stylefy/use-style style-base/blue-link-with-icon))
       (ic/content-create {:style {:width 20
                                   :height 20
                                   :margin-right "0.5rem"
@@ -287,8 +312,8 @@
                  :id "operator-users-link"
                  :on-click #(do
                               (.preventDefault %)
-                              (e! (fp/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}
-           (stylefy/use-style style-base/blue-link-with-icon))
+                              (e! (fp-controller/->ChangePage :operator-users {:ckan-group-id ckan-group-id})))}
+                (stylefy/use-style style-base/blue-link-with-icon))
       (ic/social-person {:style {:width 20
                                  :height 20
                                  :margin-right "0.5rem"
@@ -423,8 +448,8 @@
    [:a (merge {:href "#/transport-operator"
                :on-click #(do
                             (.preventDefault %)
-                            (e! (to/->CreateTransportOperator)))}
-         (stylefy/use-style style-buttons/outline-button))
+                            (e! (to-controller/->CreateTransportOperator)))}
+              (stylefy/use-style style-buttons/outline-button))
     (tr [:buttons :add-new-transport-operator])]])
 
 (defn- no-operator
@@ -434,11 +459,11 @@
    [no-operator-texts e! state]])
 
 (defn own-services [e! state]
-  (e! (fp/->EnsureTransportOperator))
+  (e! (fp-controller/->EnsureTransportOperator))
 
   (fn [e! state]
     (if (and (:transport-operator-data-loaded? state)
-          (not (contains? state :transport-operators-with-services)))
+             (not (contains? state :transport-operators-with-services)))
       [no-operator e! state]
 
       ;; Get services by default from first organization
@@ -446,7 +471,7 @@
             has-services? (not (empty? (map #(get-in % [:transport-service-vector ::t-service/id]) state)))
             operator-services (some #(when (= (get-in state [:transport-operator ::t-operator/id]) (get-in % [:transport-operator ::t-operator/id]))
                                        %)
-                                (:transport-operators-with-services state))
+                                    (:transport-operators-with-services state))
             operator-services (if (empty? operator-services)
                                 (:transport-service-vector (first (:transport-operators-with-services state)))
                                 (:transport-service-vector state))]

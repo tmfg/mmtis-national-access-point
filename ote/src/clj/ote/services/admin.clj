@@ -553,6 +553,15 @@
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:error (str e)})})))
 
+(defn- list-validation-services [db]
+  (fetch-validation-services db ))
+
+(defn- publish-service [db service-id]
+  (specql/update! db ::t-service/transport-service
+                  {::t-service/published (java.sql.Timestamp. (System/currentTimeMillis))
+                   ::t-service/validate nil}
+                  {::t-service/id service-id}))
+
 (defn- admin-email
   [email-config db]
   (try
@@ -669,6 +678,14 @@
     (POST "/admin/netex" {:keys [body user]}
       (or (authorization-fail-response (:user user))
           (list-netex-conversions-response config db (http/transit-request body))))
+
+    (GET "/admin/validation-services" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (http/no-cache-transit-response (list-validation-services db))))
+
+    (POST "/admin/publish-service" {:keys [body user]}
+      (or (authorization-fail-response (:user user))
+          (http/transit-response (publish-service db (:id (http/transit-request body))))))
 
     (POST "/admin/transport-service/delete" {user :user form-data :body}
       (require-admin-user "random url that is not used" (:user user))
