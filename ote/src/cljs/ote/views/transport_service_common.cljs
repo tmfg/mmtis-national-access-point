@@ -597,7 +597,10 @@
                        true)
         service-state (ts-controller/service-state (::t-service/validate data) (::t-service/re-edit data) published)
         show-validate-modal? (get-in app [:transport-service :show-confirm-save-dialog?])
-        admin-validating-id (get-in app [:admin :in-validation :validating])]
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        cannot-be-saved-text (if (flags/enabled? :service-validation)
+                               (tr [:form-help :validate-missing-required])
+                               (tr [:form-help :publish-missing-required]))]
     [:div
      ;; Show brokering dialog
      [brokering-dialog e! app]
@@ -613,7 +616,7 @@
        [:div
         (when (not (form/can-save? data))
           [:div.row {:style {:margin "1em 0em 1em 0em"}}
-           [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+           [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} cannot-be-saved-text]])
         [:div
          (case service-state
            :public [render-public-state-buttons e! schemas data name-missing?]
