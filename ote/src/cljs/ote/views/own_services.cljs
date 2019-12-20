@@ -86,7 +86,10 @@
              ::modification/keys [created modified] :as row}]
          (let [service-state (ts-controller/service-state validate re-edit published)]
            ^{:key id}
-           [ui/table-row {:selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
+           [ui/table-row {:selectable false
+                          :display-border false
+                          :style {:border-bottom (str "1px solid" colors/gray650)
+                                  :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
                                   :style {:width "20%"}}
              [:a (merge {:href (str "/#/edit-service/" id)
@@ -196,9 +199,12 @@
       [:div.row (stylefy/use-style style-base/section-margin)
        [:div {:class "col-xs-12 col-md-12"}
         [:h4 section-label]
-        [ui/table (stylefy/use-style style-base/basic-table)
+        [ui/table {:style style-base/basic-table
+                   :wrapperStyle {:overflow "visible"}
+                   :bodyStyle {:overflow "visible"}}
          [ui/table-header {:adjust-for-checkbox false
-                           :display-select-all false}
+                           :display-select-all false
+                           :style {:overflow "visible"}}
           [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
            [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "20%"}} (tr [:front-page :table-header-service-name])]
            [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "20%"}} (tr [:front-page :table-header-NAP-status])]
