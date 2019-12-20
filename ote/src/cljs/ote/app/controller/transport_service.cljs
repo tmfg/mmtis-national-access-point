@@ -14,10 +14,10 @@
             [ote.ui.form :as form]
             [ote.ui.validation :as validation]
             [ote.app.routes :as routes]
-            [ote.app.controller.place-search :as place-search]
-            [ote.app.controller.front-page :as front-page]
             [ote.app.controller.common :refer [->ServerError]]
-            [ote.app.controller.front-page :as fp-controller]))
+            [ote.app.controller.flags :as flags]
+            [ote.app.controller.front-page :as fp-controller]
+            [ote.app.controller.place-search :as place-search]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
@@ -334,8 +334,7 @@
   (process-event [{data :data} app]
     (let [type (service-type-from-sub-type data)
           app (assoc-in app [:transport-service ::t-service/sub-type] data)
-          app (assoc-in app [:transport-service ::t-service/type] type)
-          ]
+          app (assoc-in app [:transport-service ::t-service/type] type)]
       app))
 
   NavigateToNewService
@@ -486,7 +485,7 @@
           app (assoc app :transport-service-vector filtered-map
                          :flash-message (tr [:common-texts :delete-service-success])
                          :services-changed? true)]
-      (front-page/get-transport-operator-data app)
+      (fp-controller/get-transport-operator-data app)
       app))
 
   FailedDeleteTransportServiceResponse
