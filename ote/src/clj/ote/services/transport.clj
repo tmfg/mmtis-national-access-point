@@ -1,22 +1,23 @@
 (ns ote.services.transport
   "Services for getting transport data from database"
   (:require [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
-            [specql.core :refer [fetch upsert! delete!] :as specql]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
-            [ote.util.db :as util]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
-            [ote.services.places :as places]
-            [ote.services.external :as external]
-            [ote.authorization :as authorization]
-            [jeesql.core :refer [defqueries]]
-            [ote.db.modification :as modification]
             [clojure.set :as set]
-            [ote.netex.netex_util :as netex-util])
+            [jeesql.core :refer [defqueries]]
+            [specql.core :refer [fetch upsert! delete!] :as specql]
+            [ote.components.http :as http]
+            [ote.util.feature :as feature]
+            [ote.db.common :as common]
+            [ote.db.modification :as modification]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
+            [ote.util.db :as util]
+            [ote.authorization :as authorization]
+            [ote.netex.netex_util :as netex-util]
+            [ote.services.places :as places]
+            [ote.services.external :as external])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -242,7 +243,10 @@
         data (cond-> data
                      publish? (assoc ::t-service/published publish-date)
                      (not publish?) (assoc ::t-service/published nil)
-                     true (dissoc ::t-service/published?))]
+                     true (dissoc ::t-service/published?)
+                     ;; Ensure that state is publish in every case after saving
+                     true (assoc ::t-service/validate nil)
+                     true (assoc ::t-service/re-edit nil))]
     data))
 
 (defn set-validate-time
@@ -262,15 +266,17 @@
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [db user {places ::t-service/operation-area
+  [config db user {places ::t-service/operation-area
             external-interfaces ::t-service/external-interfaces
             :as data}]
-  (let [service-info (-> data
+  (let [;; Validation is enabled via flag. Publish services if validation is not enabled
+        data (if (feature/feature-enabled? config :service-validation)
+               (set-validate-time data)
+               (set-publish-time data db))
+        service-info (-> data
                          (modification/with-modification-fields ::t-service/id user)
                          (dissoc ::t-service/operation-area)
                          floats-to-bigdec
-                         ;(set-publish-time db)
-                         (set-validate-time)
                          (dissoc ::t-service/external-interfaces
                                  ::t-service/service-company)
                          (maybe-clear-companies))
@@ -339,11 +345,11 @@
   in the service to be stored is in the set of allowed operators for the user.
   If authorization check succeeds, the transport service is saved to the database and optionally
   published to CKAN."
-  [db user request]
+  [config db user request]
   (authorization/with-transport-operator-check
     db user (::t-service/transport-operator-id request)
     #(http/transit-response
-       (save-transport-service db user request))))
+       (save-transport-service config db user request))))
 
 (defn- save-associated-operator
   "Save association between transport service and transport operator"
@@ -398,7 +404,7 @@
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"
-  [db]
+  [db config]
   (routes
 
     (POST "/transport-service/:service-id/associated-operators"
@@ -422,7 +428,7 @@
 
     (POST "/transport-service" {form-data :body
                                 user :user}
-      (save-transport-service-handler db user (http/transit-request form-data)))
+      (save-transport-service-handler config db user (http/transit-request form-data)))
 
     (POST "/transport-service/delete" {form-data :body
                                        user :user}
@@ -465,7 +471,7 @@
   (start [{:keys [db http] :as this}]
     (assoc
       this ::stop
-           [(http/publish! http (transport-service-routes-auth db))
+           [(http/publish! http (transport-service-routes-auth db config))
             (http/publish! http {:authenticated? false} (transport-service-routes db config))]))
   (stop [{stop ::stop :as this}]
     (doseq [s stop]

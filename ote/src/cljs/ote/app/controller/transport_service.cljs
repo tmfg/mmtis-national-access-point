@@ -313,6 +313,11 @@
 (defn toggle-edit-dialog [app]
   (assoc-in app [:transport-service :edit-dialog] (not (get-in app [:transport-service :edit-dialog]))))
 
+(defn validate-or-publish [service validate?]
+  (if (flags/enabled? :service-validation)
+    (assoc service ::t-service/validate? validate?)
+    (assoc service ::t-service/published? validate?)))
+
 (extend-protocol tuck/Event
 
   AddPriceClassRow
@@ -508,6 +513,8 @@
           operator-id (if (nil? (::t-service/transport-operator-id service))
                         (::t-operator/id operator)
                         (::t-service/transport-operator-id service))
+          ;; Service validation flag changes if service is saved as public or validate
+          service (validate-or-publish service validate?)
           service-data
           (-> service
               (update key (comp (partial form/prepare-for-save schemas)
@@ -519,8 +526,7 @@
                       :edit-dialog)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
-              (assoc ::t-service/validate? validate?
-                     ::t-service/transport-operator-id operator-id)
+              (assoc ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
               (update ::t-service/external-interfaces
                       (fn [d]
@@ -598,7 +604,7 @@
 
   ConfirmEditing
   (process-event [_ app]
-    (comm/post! (str "transport-service/" (get-in app [:transport-service ::t-service/id]) "/re-edit-service" ) {}
+    (comm/post! (str "transport-service/" (get-in app [:transport-service ::t-service/id]) "/re-edit-service") {}
                 {:on-success (tuck/send-async! ->ReEditResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
     (assoc app :transport-service-loaded? false))
@@ -615,7 +621,7 @@
 
   BackToValidation
   (process-event [{id :id} app]
-    (comm/post! (str "transport-service/" id "/back-to-validation")  {}
+    (comm/post! (str "transport-service/" id "/back-to-validation") {}
                 {:on-success (tuck/send-async! ->BackToValidationResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
     (assoc app :transport-service-loaded? false)))
@@ -682,13 +688,21 @@
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
 
 (defn service-state [validate re-edit published]
-  (cond
-    (some? re-edit) :re-edit
-    (and (some? published) (nil? validate)) :public
-    (some? validate) :validation
-    :else :draft))
+  (if (flags/enabled? :service-validation)
+    (cond
+      (some? re-edit) :re-edit
+      (and (some? published) (nil? validate)) :public
+      (some? validate) :validation
+      :else :draft)
+    (if (some? published)
+      :public
+      :draft)))
 
 (defn in-readonly? [in-validation? admin-validating-id service-id]
-  (and
-    in-validation?
-    (not= service-id admin-validating-id)))
+  (if (flags/enabled? :service-validation)
+    ;; If flag is enabled, there is a change that service is in readonly state
+    (and
+      in-validation?
+      (not= service-id admin-validating-id))
+    ;; If flag is not set service could not be in readonly state
+    false))
