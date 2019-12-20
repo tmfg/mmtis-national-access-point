@@ -61,7 +61,8 @@
                      :pre-notice
                      :gtfs-import
                      :ote-register
-                     :netex-conversion-automated}
+                     :netex-conversion-automated
+                     :service-validation}
 
  :no-gtfs-update-for-operators #{}
 
