@@ -214,7 +214,7 @@
    :ote.db.transport-service/sub-type "Transport service sub mode"
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Published"
-                                                :validation "Waiting validation"
+                                                :validation "Lähetetty julkaistavaksi"
                                                 :draft "Draft"}
 
    ;; Service hour fields
@@ -354,7 +354,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :manage-access-rights "Manage access rights"
 
   :save-and-publish "Save and publish"
-  :save-and-validate "Save and add to validation"
+  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
   :send "Send"
   :save-and-send "Save and send"
   :save-as-draft "Save a draft"
@@ -608,7 +608,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :if-no-interfaces "If you do not have any interfaces for route and timetable data, you can digitalize your transport service´s route and timetable data with the tools listed below."
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"
-                     :service-in-validation-info "Service is in validation in Traficom. It will be published as soon as possible."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Name"
                         :members "Members"
@@ -793,7 +793,8 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  :transport-services-common-page
  {:validation-modal-header "Validation process information"
-  :validation-modal-text "Service will be validated Mon - Fri 9 am to 3 pm. When service is validated it will be published to service catalog."}
+  :validation-modal-text "Service will be validated Mon - Fri 9 am to 3 pm. When service is validated it will be published to service catalog."
+  :validation-modal-link-text "Palvelun käytön ehdot"}
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
