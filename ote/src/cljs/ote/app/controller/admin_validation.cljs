@@ -1,5 +1,6 @@
 (ns ote.app.controller.admin-validation
   (:require [tuck.core :as tuck :refer-macros [define-event]]
+            [tuck.effect :as tuck-effect]
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
@@ -15,12 +16,29 @@
 (defrecord PublishResponse [response])
 (defrecord EditService [id])
 
+(def every-5min (* 1000 60 1))
+(defmethod tuck-effect/process-effect :every5min [e! {:keys [on-success on-failure]}]
+  (.setInterval js/window #(comm/get! "admin/validation-services"
+                                      {:on-success on-success
+                                       :on-failure on-failure})
+                every-5min))
+
 (defn- load-validation-services []
   (comm/get! "admin/validation-services"
              {:on-success (tuck/send-async! ->LoadValidationServicesResponse)
               :on-failure (tuck/send-async! ->ServerError)}))
 
 (extend-protocol tuck/Event
+
+  LoadValidationServices
+  (process-event [_ app]
+    (do
+      ;; Load services immediately
+      (load-validation-services)
+      ;; And start timer
+      (tuck/fx app {:tuck.effect/type :every5min
+                    :on-success (tuck/send-async! ->LoadValidationServicesResponse)
+                    :on-failure (tuck/send-async! ->ServerError)})))
 
   OpenConfirmPublishModal
   (process-event [{id :id} app]
@@ -29,11 +47,6 @@
   CloseConfirmPublishModal
   (process-event [_ app]
     (assoc-in app [:admin :in-validation :modal] nil))
-
-  LoadValidationServices
-  (process-event [_ app]
-    (load-validation-services)
-    app (assoc-in app [:admin :in-validation :validating] nil))
 
   LoadValidationServicesResponse
   (process-event [{response :response} app]
@@ -46,7 +59,6 @@
     (routes/navigate! :edit-service {:id id})
     (assoc-in app [:admin :in-validation :validating] id))
 
-
   PublishService
   (process-event [{id :id} app]
     ;; post id to publish route
@@ -58,7 +70,7 @@
   PublishResponse
   (process-event [{response :response} app]
     ;; close modal and show success flash message
-   (routes/navigate! :admin)
+    (routes/navigate! :admin)
     (load-validation-services)
     (-> app
         (assoc :flash-message "Palvelu julkaistu onnistuneesti.")

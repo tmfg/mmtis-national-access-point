@@ -675,7 +675,7 @@
                      [buttons/save
                       {:icon (ic/action-delete-forever)
                        :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
-                      (tr [:buttons :send])])]}
+                      (tr [:buttons :continue-editing])])]}
         (tr [:transport-services-common-page :validation-modal-text])])
 
      [open-publish-dialog e! app]]))
