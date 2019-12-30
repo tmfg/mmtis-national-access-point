@@ -217,7 +217,7 @@
    :ote.db.transport-service/sub-type "Kategori"
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Publicerad"
-                                                :validation "Päntar på publicering\n"
+                                                :validation "Lähetetty julkaistavaksi"
                                                 :draft "Utkast"}
 
    ;; Service hour fields
@@ -359,7 +359,7 @@
   :manage-access-rights "Hanterar användarrättigheter"
 
   :save-and-publish "Spara och publicera"
-  :save-and-validate "Spara och flytta för att granska"
+  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
   :send "Skicka"
   :save-as-draft "Spara utkast"
   :save-and-send "Spara och skicka"
@@ -610,7 +610,7 @@
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
                      :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
-                     :service-in-validation-info "Palvelun tiedot ovat Traficomilla käsittelyssä ja ne julkaistaan mahdollisimman pian."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"
@@ -796,7 +796,9 @@
 
  :transport-services-common-page
  {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."
+  :validation-modal-link-text "Palvelun käytön ehdot"
+  }
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"

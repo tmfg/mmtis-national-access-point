@@ -161,7 +161,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (ts-controller/->ConfirmEditing)))}
-                          (tr [:buttons :send])])]}
+                          (tr [:buttons :continue-editing])])]}
             (tr [:dialog :continue-editing :confirm])])]))))
 
 

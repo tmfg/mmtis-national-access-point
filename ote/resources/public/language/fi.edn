@@ -216,7 +216,7 @@
    :ote.db.transport-service/sub-type "Liikkumispalvelun alatyyppi"
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {:public "Julkaistu"
-                                                :validation "Odottaa tarkistusta"
+                                                :validation "Lähetetty julkaistavaksi"
                                                 :draft "Luonnos"}
 
    ;; Service hour fields
@@ -355,7 +355,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :manage-access-rights "Hallinnoi käyttäjäoikeuksia"
 
   :save-and-publish "Tallenna ja julkaise"
-  :save-and-validate "Tallenna ja siirrä tarkistukseen"
+  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
   :send "Lähetä"
   :save-and-send "Tallenna ja lähetä"
   :save-as-draft "Tallenna luonnoksena"
@@ -609,7 +609,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
                      :open-rae "Avaa Traficomin RAE-työkalu"
                      :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"
-                     :service-in-validation-info "Palvelun tiedot ovat Traficomilla käsittelyssä ja ne julkaistaan mahdollisimman pian."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Nimi"
                         :members "Jäsenet"
@@ -799,7 +799,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :transport-services-common-page
  {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."}
+  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
+  :validation-modal-link-text "Palvelun käytön ehdot"
+  }
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
