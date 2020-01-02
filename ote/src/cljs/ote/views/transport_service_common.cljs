@@ -745,6 +745,7 @@
               {:label (tr [:common-texts :start-time])})
             {:name ::t-service/from
              :label (tr [:field-labels :transport-service ::t-service/from])
+             :element-id "start-time"
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}
@@ -757,6 +758,7 @@
               {:label (tr [:common-texts :ending-time])})
             {:name ::t-service/to
              :label (tr [:field-labels :transport-service ::t-service/to])
+             :element-id "end-time"
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}

@@ -647,11 +647,11 @@
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
 (defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning
-                                style input-style container-style disabled?] :as opts}
+                                style input-style container-style disabled? row-number] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
   [:div {:style (merge style-base/inline-block container-style)}
    [field (merge
-            {:id (str "hours-" element-id)
+            {:element-id (str "hours-" element-id "-" row-number)
              :type :string
              :name "hours"
              :error (when error-hour
@@ -683,7 +683,7 @@
       (or hours-text (str hours)))]
    "."
    [field (merge
-            {:id (str "minutes-" element-id)
+            {:element-id (str "minutes-" element-id "-" row-number)
              :type :string
              :name "minutes"
              :error (when error-min
@@ -893,7 +893,8 @@
                                 (when missing?
                                   {:warning (tr [:common-texts :required-field])})
                                 (when field-error
-                                  {:error field-error}))
+                                  {:error field-error})
+                                {:row-number i})
                         value]
                        :else nil)]))
                 (when inner-delete?
