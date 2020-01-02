@@ -82,7 +82,7 @@
                   :display-row-checkbox false}
    (doall
      (map
-       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name]
+       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name has-child?]
              ::modification/keys [created modified] :as row}]
          (let [service-state (ts-controller/service-state validate re-edit published)]
            ^{:key id}
@@ -92,10 +92,12 @@
                                   :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
                                   :style {:width "20%"}}
-             [:a (merge {:href (str "/#/edit-service/" id)
-                         :on-click #(do (.preventDefault %)
-                                        (e! (fp-controller/->ChangePage :edit-service {:id id})))}
-                        (stylefy/use-sub-style style-base/basic-table :link)) name]]
+             (if has-child?
+               name
+               [:a (merge {:href (str "/#/edit-service/" id)
+                           :on-click #(do (.preventDefault %)
+                                          (e! (fp-controller/->ChangePage :edit-service {:id id})))}
+                          (stylefy/use-sub-style style-base/basic-table :link)) name])]
             [ui/table-row-column {:class "hidden-xs table-col-style-semi-wrap"
                                   :style {:overflow "visible"
                                           :width "20%"}}
@@ -130,20 +132,27 @@
                 (tr [:field-labels :transport-service ::t-service/published?-values false])])]
             [ui/table-row-column {:class "table-col-style-semi-wrap"
                                   :style {:width "20%"
+                                          :overflow "visible"
                                           :padding-top "0.5rem"}}
-             [:a (merge {:href (str "#/edit-service/" id)
-                         :style {:padding-right "0.5rem"}
-                         :id (str "edit-service-button" id)
-                         :on-click #(do
-                                      (.preventDefault %)
-                                      (e! (fp-controller/->ChangePage :edit-service {:id id})))}
-                        (stylefy/use-style style-base/gray-link-with-icon))
-              (ic/content-create {:style {:width 24
-                                          :height 24
-                                          :margin-right "2px"
-                                          :color colors/icon-gray}})
-              [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
-             [delete-service-action e! row]]]))
+             (if has-child?
+               [:span "Ei käytössä"
+                [common/tooltip-icon {:text (tr [:own-services-page :published-service-cannot-be-modified])
+                                      :len "medium"
+                                      :pos "up"}]]
+               [:span
+                [:a (merge {:href (str "#/edit-service/" id)
+                            :style {:padding-right "0.5rem"}
+                            :id (str "edit-service-button" id)
+                            :on-click #(do
+                                         (.preventDefault %)
+                                         (e! (fp-controller/->ChangePage :edit-service {:id id})))}
+                           (stylefy/use-style style-base/gray-link-with-icon))
+                 (ic/content-create {:style {:width 24
+                                             :height 24
+                                             :margin-right "2px"
+                                             :color colors/icon-gray}})
+                 [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
+                [delete-service-action e! row]])]]))
        services))])
 
 (defn- route-error
