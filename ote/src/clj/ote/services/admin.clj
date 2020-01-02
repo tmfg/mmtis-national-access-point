@@ -44,7 +44,8 @@
             [clj-time.format :as format]
             [clojure.set :as set]
             [specql.impl.registry :as specql-registry]
-            [specql.impl.composite :as composite])
+            [specql.impl.composite :as composite]
+            [ote.db.tx :as tx])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -260,8 +261,8 @@
   (mapv (fn [conv]
           (if (= :ok (keyword (:ote.db.netex/status conv)))
             (assoc conv :url (export-netex/file-download-url config
-                                                (:ote.db.transport-service/id conv)
-                                                (:ote.db.netex/id conv)))
+                                                             (:ote.db.transport-service/id conv)
+                                                             (:ote.db.netex/id conv)))
             conv))
         conversions))
 
@@ -554,13 +555,40 @@
        :body (clj->transit {:error (str e)})})))
 
 (defn- list-validation-services [db]
-  (fetch-validation-services db ))
+  (fetch-validation-services db))
 
-(defn- publish-service [db service-id]
-  (specql/update! db ::t-service/transport-service
-                  {::t-service/published (java.sql.Timestamp. (System/currentTimeMillis))
-                   ::t-service/validate nil}
-                  {::t-service/id service-id}))
+(defn- publish-service [db child-id]
+  (let [;; Get duplicated service data
+        service (first (specql/fetch db ::t-service/transport-service
+                                     (specql/columns ::t-service/transport-service)
+                                     {::t-service/id child-id}))
+        parent-id (::t-service/parent-id service)
+        ;; Replace service id with parent-id and update data -> original published service will be overwritten
+        service (-> service
+                    (assoc ::t-service/id parent-id)
+                    (assoc ::t-service/validate nil)
+                    (dissoc ::t-service/parent-id)
+                    (dissoc ::t-service/validate?)
+                    (assoc ::t-service/published (java.util.Date.))
+                    (assoc ::t-service/re-edit nil))]
+    (tx/with-transaction
+      db
+
+      ;; Update service data in database
+      (specql/upsert! db ::t-service/transport-service service)
+      (update-child-parent-interfaces db {:parent-id parent-id
+                                          :child-id child-id})
+
+      ;; Delete parents operation areas
+      (specql/delete! db ::t-service/operation_area {::t-service/transport-service-id parent-id})
+
+      ;; Convert childs operation areas to parents
+      (specql/update! db ::t-service/operation_area
+                      {::t-service/transport-service-id parent-id}
+                      {::t-service/transport-service-id child-id})
+
+      ;; Delete child - and its external-interfaces and places
+      (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
 
 (defn- admin-email
   [email-config db]

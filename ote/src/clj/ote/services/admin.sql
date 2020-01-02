@@ -206,3 +206,6 @@ SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
     WHERE s.validate IS NOT NULL
       AND s."transport-operator-id" = o.id
     ORDER BY s.validate ASC;
+
+-- name: update-child-parent-interfaces
+SELECT child_parent_interfaces(:parent-id::INTEGER, :child-id::INTEGER);
