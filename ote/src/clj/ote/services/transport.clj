@@ -39,6 +39,8 @@
    :interface-types ::t-service/interface-types
    :type ::t-service/type
    :sub-type ::t-service/sub-type
+   :parent-id ::t-service/parent-id
+   :has-child? ::t-service/has-child?
    :published ::t-service/published
    :validate ::t-service/validate
    :re-edit ::t-service/re-edit
@@ -252,60 +254,107 @@
 (defn set-validate-time
   "Add validate datetime when it is moved to validation. If not, remove validate? key."
   [data]
-  (if (::t-service/validate? data)
-    ;; Move to validation
-    (-> data
-        (dissoc ::t-service/validate?)
-        (assoc ::t-service/validate (java.util.Date.)
-               ::t-service/re-edit nil))
+  (cond
+    ;; Saving and moving service to validation
+    (::t-service/validate? data)
+    (let [;; If service already published, remove id, set old id as parent-id and let the save duplicate service data
+          service-id (::t-service/id data)
+          data (if (::t-service/published data)
+                 (-> data
+                     (dissoc ::t-service/id)                ;; When creating a copy id must be removed
+                     (dissoc ::t-service/published)         ;; When creating a copy the copy is not published
+                     (assoc ::t-service/parent-id service-id))
+                 data)]
+      ;; Move to validation
+      (-> data
+          (dissoc ::t-service/validate?)
+          (assoc ::t-service/validate (java.util.Date.)
+                 ::t-service/re-edit nil)))
+
     ;; Save as draft
+    :else
     (-> data
         (dissoc ::t-service/validate?)
         (assoc ::t-service/published nil)
         (assoc ::t-service/re-edit nil))))
 
+(defn service-has-child?
+  "When child service has parent-id pointing to given service it has child.
+  Ensure that service has id before calling this fn."
+  [db transport-service]
+  (or
+    (first (specql/fetch db ::t-service/transport-service
+                         #{::t-service/id}
+                         {::t-service/parent-id (::t-service/id transport-service)}))
+    nil))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [config db user {places ::t-service/operation-area
-            external-interfaces ::t-service/external-interfaces
-            :as data}]
-  (let [;; Validation is enabled via flag. Publish services if validation is not enabled
-        data (if (feature/feature-enabled? config :service-validation)
-               (set-validate-time data)
-               (set-publish-time data db))
-        service-info (-> data
-                         (modification/with-modification-fields ::t-service/id user)
-                         (dissoc ::t-service/operation-area)
-                         floats-to-bigdec
-                         (dissoc ::t-service/external-interfaces
-                                 ::t-service/service-company)
-                         (maybe-clear-companies))
+                   external-interfaces ::t-service/external-interfaces
+                   :as data}]
+  ;; When validation flag is enabled we cannot let users to update service data if it has child service in validation.
+  ;; So we need to check if validation flag is enabled and if parent-id is set for some other child service
+  (let [has-child? (if (and
+                         (feature/feature-enabled? config :service-validation)
+                         (::t-service/id data))
+                     (service-has-child? db data)
+                     false)]
 
-        resources-from-db (fetch-transport-service-external-interfaces db (::t-service/id data))
-        removed-resources (removable-resources resources-from-db external-interfaces)
+    (if has-child?
+      data
+      (let [original-service-id (::t-service/id data)
+            ;; Validation is enabled via flag. Publish services if validation is not enabled
+            data (if (feature/feature-enabled? config :service-validation)
+                   (set-validate-time data)
+                   (set-publish-time data db))
+            service-info (-> data
+                             (modification/with-modification-fields ::t-service/id user)
+                             (dissoc ::t-service/operation-area)
+                             floats-to-bigdec
+                             (dissoc ::t-service/external-interfaces
+                                     ::t-service/service-company)
+                             (maybe-clear-companies))
+            resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
+            removed-resources (removable-resources resources-from-db external-interfaces)
+            ;; Store to OTE database
+            transport-service
+            (jdbc/with-db-transaction
+              [db db]
+              (let [transport-service (upsert! db ::t-service/transport-service service-info)
+                    transport-service-id (::t-service/id transport-service)]
 
-        ;; Store to OTE database
-        transport-service
-        (jdbc/with-db-transaction [db db]
-                                  (let [transport-service (upsert! db ::t-service/transport-service service-info)
-                                        transport-service-id (::t-service/id transport-service)]
+                ;; Save possible external interfaces
+                (if (not= original-service-id transport-service-id)
+                  ;; Copy existing interfaces to new service
+                  (save-external-interfaces
+                    db transport-service-id (map
+                                              (fn [interface]
+                                                (-> interface
+                                                    (assoc ::t-service/transport-service-id transport-service-id)
+                                                    (dissoc ::t-service/id)))
+                                              external-interfaces)
+                    nil)
+                  (save-external-interfaces db transport-service-id external-interfaces removed-resources))
 
-                                    ;; Save possible external interfaces
-                                    (save-external-interfaces db transport-service-id external-interfaces removed-resources)
+                ;; Save operation areas
+                (if (not= original-service-id transport-service-id)
+                  ;; We need to duplicate those original places and add new ones if user has desided to do changes to them
+                  (do
+                    (places/save-transport-service-operation-area! db transport-service-id places)
+                    (places/duplicate-operation-area db original-service-id transport-service-id))
+                  (places/save-transport-service-operation-area! db transport-service-id places))
 
-                                    ;; Save operation areas
-                                    (places/save-transport-service-operation-area! db transport-service-id places)
+                ;; Save companies
+                (if (::t-service/companies-csv-url transport-service)
+                  ;; Update companies
+                  (save-external-companies db transport-service)
+                  ;; If url is empty, delete remaining data
+                  (delete-external-companies db transport-service))
+                transport-service))]
 
-                                    ;; Save companies
-                                    (if (::t-service/companies-csv-url transport-service)
-                                      ;; Update companies
-                                      (save-external-companies db transport-service)
-                                      ;; If url is empty, delete remaining data
-                                      (delete-external-companies db transport-service))
-                                    transport-service))]
-
-    ;; Return the stored transport-service
-    transport-service))
+        ;; Return the stored transport-service
+        transport-service))))
 
 (defn- re-edit-service [db user service-id]
   (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db

@@ -17,7 +17,7 @@ VALUES (:transport-service-id,
 -- name: fetch-operation-area-geojson
 SELECT id, "transport-service-id", ST_AsGeoJSON(location)
   FROM "operation_area"
- WHERE "transport-service-id" = :transport-service-id
+ WHERE "transport-service-id" = :transport-service-id;
 
 -- name: insert-geojson-for-transport-service<!
 -- return-keys: ["id"]
@@ -62,3 +62,9 @@ SELECT namefin as "ote.db.places/namefin", id as "ote.db.places/id", type as "ot
   WHEN 'continent' THEN 5
    END,
   namefin;
+
+-- name: copy-operation-area
+INSERT INTO operation_area ("transport-service-id", description, location, "primary?")
+ SELECT :new-service-id as "transport-service-id", oa.description, oa.location, oa."primary?"
+   FROM operation_area oa
+  WHERE oa."transport-service-id" = :old-service-id RETURNING id;

@@ -10,6 +10,11 @@ SELECT ts.id,
        ts."sub-type",
        ts."published",
        ts."validate",
+       ts."parent-id",
+       CASE WHEN (select service."parent-id" as "child-parent-id" FROM "transport-service" service WHERE service."parent-id" = ts.id)
+            IS NOT NULL THEN true
+           ELSE false
+       END as "has-child?",
        ts."created",
        ts."modified",
        ts."transport-type",

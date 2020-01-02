@@ -7,7 +7,6 @@
             [compojure.core :refer [routes GET]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [ote.geo :as geo]
             [ote.util.functor :refer [fmap]]
             [specql.core :as specql]
             [ote.db.places :as places]
@@ -76,6 +75,9 @@
                 #{::t-service/id ::t-service/description ::t-service/location-geojson
                   ::t-service/primary?}
                 {::t-service/transport-service-id transport-service-id}))
+
+(defn duplicate-operation-area [db old-service-id new-service-id]
+  (copy-operation-area db {:old-service-id old-service-id :new-service-id new-service-id}))
 
 (defrecord Places [sources]
   component/Lifecycle
