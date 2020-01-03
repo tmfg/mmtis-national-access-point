@@ -25,3 +25,6 @@ SELECT ts.id,
   FROM "transport-service" ts
  WHERE ts."transport-operator-id" in (:operator-ids)
  ORDER BY ts."type" DESC, ts.modified DESC NULLS LAST;
+
+-- name: update-child-parent-interfaces
+SELECT child_parent_interfaces(:parent-id::INTEGER, :child-id::INTEGER);

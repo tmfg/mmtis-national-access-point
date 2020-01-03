@@ -32,18 +32,19 @@
 (defn save-transport-service-operation-area!
   "Clear old place links and insert new links for the given transport service.
   Should be called within a transaction."
-  [db transport-service-id places]
+  [db transport-service-id places delete-existing?]
 
   (let [stored (into #{}
                      (comp (filter #(= (::places/type %) "stored"))
                            (map ::places/id))
                      places)]
     ;; Remove linked geometries, except drawn geometries that were not removed
-    (specql/delete! db ::t-service/operation_area
-                    (merge
-                     {::t-service/transport-service-id transport-service-id}
-                     (when-not (empty? stored)
-                       {::t-service/id (op/not (op/in stored))}))))
+    (when delete-existing?
+      (specql/delete! db ::t-service/operation_area
+                      (merge
+                        {::t-service/transport-service-id transport-service-id}
+                        (when-not (empty? stored)
+                          {::t-service/id (op/not (op/in stored))})))))
 
   (doseq [{::places/keys [id namefin type primary?] :as place} places]
     (case type
@@ -76,8 +77,18 @@
                   ::t-service/primary?}
                 {::t-service/transport-service-id transport-service-id}))
 
-(defn duplicate-operation-area [db old-service-id new-service-id]
-  (copy-operation-area db {:old-service-id old-service-id :new-service-id new-service-id}))
+(defn duplicate-operation-area [db old-service-id new-service-id places-from-ui]
+  (let [;; Places with int id are coming fron database
+        places-in-db (filter #(integer? (:ote.db.places/id %)) places-from-ui)
+        ;; Places with string id's are made by user in ui
+        created-places (filter #(not (integer? (:ote.db.places/id %))) places-from-ui)
+        ;; Copy all places that are stored in db to the new service
+        copied-places (copy-operation-area db {:old-service-id old-service-id :new-service-id new-service-id
+                                            :ids (map :ote.db.places/id places-in-db)})
+
+        ;; Save new places
+        new-places (save-transport-service-operation-area! db new-service-id created-places false)]
+    nil))
 
 (defrecord Places [sources]
   component/Lifecycle

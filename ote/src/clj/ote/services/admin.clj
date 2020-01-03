@@ -557,38 +557,19 @@
 (defn- list-validation-services [db]
   (fetch-validation-services db))
 
-(defn- publish-service [db child-id]
-  (let [;; Get duplicated service data
-        service (first (specql/fetch db ::t-service/transport-service
+(defn- publish-service [db service-id]
+  (let [service (first (specql/fetch db ::t-service/transport-service
                                      (specql/columns ::t-service/transport-service)
-                                     {::t-service/id child-id}))
-        parent-id (::t-service/parent-id service)
-        ;; Replace service id with parent-id and update data -> original published service will be overwritten
-        service (-> service
-                    (assoc ::t-service/id parent-id)
-                    (assoc ::t-service/validate nil)
-                    (dissoc ::t-service/parent-id)
-                    (dissoc ::t-service/validate?)
-                    (assoc ::t-service/published (java.util.Date.))
-                    (assoc ::t-service/re-edit nil))]
-    (tx/with-transaction
-      db
-
-      ;; Update service data in database
-      (specql/upsert! db ::t-service/transport-service service)
-      (update-child-parent-interfaces db {:parent-id parent-id
-                                          :child-id child-id})
-
-      ;; Delete parents operation areas
-      (specql/delete! db ::t-service/operation_area {::t-service/transport-service-id parent-id})
-
-      ;; Convert childs operation areas to parents
-      (specql/update! db ::t-service/operation_area
-                      {::t-service/transport-service-id parent-id}
-                      {::t-service/transport-service-id child-id})
-
-      ;; Delete child - and its external-interfaces and places
-      (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
+                                     {::t-service/id service-id}))]
+    (if (nil? (::t-service/parent-id service))  ;; if service has parent-id it is a child
+      ;; No child - publish only
+      (specql/update! db ::t-service/transport-service
+                      {::t-service/published (java.sql.Timestamp. (System/currentTimeMillis))
+                       ::t-service/validate nil
+                       ::t-service/re-edit nil}
+                      {::t-service/id service-id})
+      ;; Parent must be replaced with child
+      (transport/replace-parent-service-with-child db service-id true))))
 
 (defn- admin-email
   [email-config db]

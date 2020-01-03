@@ -67,4 +67,6 @@ SELECT namefin as "ote.db.places/namefin", id as "ote.db.places/id", type as "ot
 INSERT INTO operation_area ("transport-service-id", description, location, "primary?")
  SELECT :new-service-id as "transport-service-id", oa.description, oa.location, oa."primary?"
    FROM operation_area oa
-  WHERE oa."transport-service-id" = :old-service-id RETURNING id;
+  WHERE oa."transport-service-id" = :old-service-id
+    AND oa.id IN (:ids)
+    RETURNING id;

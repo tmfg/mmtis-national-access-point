@@ -17,7 +17,8 @@
             [ote.authorization :as authorization]
             [ote.netex.netex_util :as netex-util]
             [ote.services.places :as places]
-            [ote.services.external :as external])
+            [ote.services.external :as external]
+            [ote.db.tx :as tx])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -233,6 +234,39 @@
              ::t-service/license ::t-service/id}
            {::t-service/transport-service-id id})))
 
+(defn replace-parent-service-with-child [db child-id publish?]
+  (let [;; Get child service data
+        service (first (specql/fetch db ::t-service/transport-service
+                                     (specql/columns ::t-service/transport-service)
+                                     {::t-service/id child-id}))
+        parent-id (::t-service/parent-id service)
+        ;; Replace service id with parent-id and update data -> original published service will be overwritten
+        service (-> service
+                    (assoc ::t-service/id parent-id)
+                    (assoc ::t-service/validate nil)
+                    (dissoc ::t-service/parent-id)
+                    (dissoc ::t-service/validate?)
+                    (assoc ::t-service/published (when publish?
+                                                   (java.util.Date.)))
+                    (assoc ::t-service/re-edit nil))]
+    (tx/with-transaction
+      db
+      ;; Update service data in database
+      (specql/upsert! db ::t-service/transport-service service)
+      (update-child-parent-interfaces db {:parent-id parent-id
+                                          :child-id child-id})
+
+      ;; Delete parents operation areas
+      (specql/delete! db ::t-service/operation_area {::t-service/transport-service-id parent-id})
+
+      ;; Convert childs operation areas to parents
+      (specql/update! db ::t-service/operation_area
+                      {::t-service/transport-service-id parent-id}
+                      {::t-service/transport-service-id child-id})
+
+      ;; Delete child - and its external-interfaces and places
+      (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
+
 (defn- set-publish-time
   [data db]
   (let [publish? (::t-service/published? data)
@@ -303,7 +337,9 @@
 
     (if has-child?
       data
-      (let [original-service-id (::t-service/id data)
+      (let [;; Figure out if service is a child. Because if child is saved as a draft the parent will also get changed
+            is-child? (boolean (::t-service/parent-id data))
+            original-service-id (::t-service/id data)
             ;; Validation is enabled via flag. Publish services if validation is not enabled
             data (if (feature/feature-enabled? config :service-validation)
                    (set-validate-time data)
@@ -337,13 +373,12 @@
                     nil)
                   (save-external-interfaces db transport-service-id external-interfaces removed-resources))
 
-                ;; Save operation areas
+                ;; Save operation areas for duplicates and original services
                 (if (not= original-service-id transport-service-id)
-                  ;; We need to duplicate those original places and add new ones if user has desided to do changes to them
-                  (do
-                    (places/save-transport-service-operation-area! db transport-service-id places)
-                    (places/duplicate-operation-area db original-service-id transport-service-id))
-                  (places/save-transport-service-operation-area! db transport-service-id places))
+                  ;; We need to duplicate those original places and add new ones if user has decided to do changes to them
+                  (places/duplicate-operation-area db original-service-id transport-service-id places)
+                  ;; Save given places
+                  (places/save-transport-service-operation-area! db transport-service-id places true))
 
                 ;; Save companies
                 (if (::t-service/companies-csv-url transport-service)
@@ -352,6 +387,12 @@
                   ;; If url is empty, delete remaining data
                   (delete-external-companies db transport-service))
                 transport-service))]
+
+        ;; if service is a child and if it is saved as a draft then copy data to parent
+        (when (and
+              is-child?
+              (nil? (::t-service/validate data)))
+          (replace-parent-service-with-child db (::t-service/id data) false))
 
         ;; Return the stored transport-service
         transport-service))))
