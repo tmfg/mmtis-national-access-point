@@ -1,12 +1,14 @@
 (ns ote.app.controller.own-services
   "Own services controller"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
+            [tuck.effect :as tuck-effect]
             [ote.communication :as comm]
             [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
             [ote.util.url :as url-util]
             [ote.db.transport-operator :as t-operator]
-            [ote.app.routes :as routes]))
+            [ote.app.routes :as routes]
+            [ote.app.controller.login :as login]))
 
 (define-event SearchSuccess [result]
               {}
@@ -86,15 +88,35 @@
                   {:on-success (tuck/send-async! ->RemoveSelectionSuccess transport-operator-id service-id)})
                 app))
 
+(define-event LoadOperatorDataResponse [response]
+  {}
+  (login/update-transport-operator-data app response))
+
+(def every-5min (* 1000 60 1))
+
+;; Load transport operator data (and services) every five minutes to ensure that possibly published service is shown correctly.
+;; Services are published by admin
+(defmethod tuck-effect/process-effect :every5min [e! {:keys [on-success on-failure]}]
+  (do
+    (.setInterval js/window #(comm/post! "/transport-operator/data" {}
+                                        {:on-success on-success
+                                         :on-failure on-failure})
+                  every-5min)))
+
+
 ; Ensure that :transport-operator is not nil
 ; When user refreshes page our app-state removes data from :transport-operator key. That data is used
 ; everywhere to determine which operator is selected for usage.
 (define-event InitOwnServices []
   {}
-  (let [app (assoc-in app [:admin :in-validation :validating] nil)]
-    (if (nil? (:transport-operator app))
-      (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
-      app)))
+  (let [app (assoc-in app [:admin :in-validation :validating] nil)
+        app (if (nil? (:transport-operator app))
+              (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
+              app)]
+    (tuck/fx app
+             {:tuck.effect/type :every5min
+                  :on-success (tuck/send-async! ->LoadOperatorDataResponse)
+                  :on-failure (tuck/send-async! ->ServerError)})))
 
 (defmethod routes/on-navigate-event :own-services [_]
   (->InitOwnServices))
