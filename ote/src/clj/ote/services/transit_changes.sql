@@ -55,12 +55,12 @@ SELECT ts.id AS "transport-service-id",
           FROM gtfs_package p
          WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
          ORDER BY p.id DESC limit 1) as "max-date"
-FROM latest_transit_changes c
+FROM "transport-service" ts
+     LEFT JOIN latest_transit_changes c ON ts.id = c."transport-service-id"
      LEFT JOIN (SELECT distinct drc."transit-service-id", drc."transit-change-date", drc."different-week-date"
                   FROM "detected-route-change" drc
                  WHERE drc."different-week-date" >= CURRENT_DATE
                  ORDER BY drc."different-week-date" ASC) drc ON drc."transit-service-id" = c."transport-service-id" AND drc."transit-change-date" = c.date
-     JOIN "transport-service" ts ON ts.id = c."transport-service-id"
      JOIN "transport-operator" op ON ts."transport-operator-id" = op.id
      LEFT JOIN (SELECT DISTINCT ON (dch."transport-service-id") *
                   FROM "detected-change-history" dch
