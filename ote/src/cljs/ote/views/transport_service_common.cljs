@@ -600,7 +600,8 @@
         admin-validating-id (get-in app [:admin :in-validation :validating])
         cannot-be-saved-text (if (flags/enabled? :service-validation)
                                (tr [:form-help :validate-missing-required])
-                               (tr [:form-help :publish-missing-required]))]
+                               (tr [:form-help :publish-missing-required]))
+        admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))]
     [:div
      ;; Show brokering dialog
      [brokering-dialog e! app]
@@ -634,13 +635,13 @@
                           (tr [:buttons :discard])]]]
            :re-edit [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
                      [:div {:style {:margin-top "1rem"}}
-                      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                                           :disabled name-missing?}
-                       (tr [:buttons :back-to-draft])]]
-                     [:div {:style {:margin-top "1rem"}}
                       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
                                              :disabled (not (form/can-save? data))}
-                       (tr [:buttons :save-and-validate])]]]
+                       (tr [:buttons :save-and-validate])]]
+                     [:div {:style {:margin-top "1rem"}}
+                      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                                           :disabled name-missing?}
+                       (tr [:buttons :back-to-draft])]]]
            :draft [render-draft-state-buttons e! schemas data name-missing?])]]
        ;; admin is editing
        (and
@@ -652,9 +653,13 @@
           [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
                                  :disabled (not (form/can-save? data))}
            (tr [:buttons :save])]]
+
+         ;; Admin cannot publish service with modifications
          [:div {:style {:margin-top "1rem"}}
           [buttons/save-publish {:on-click #(e! (admin-validation/->OpenConfirmPublishModal service-id))
-                                 :disabled (not (form/can-save? data))}
+                                 :disabled (when (or
+                                                   (not (form/can-save? data))
+                                                   admin-unsaved-data) true)}
            (tr [:buttons :publish])]]
          [:div {:style {:margin-top "1rem"}}
           [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm true))}
@@ -745,6 +750,7 @@
               {:label (tr [:common-texts :start-time])})
             {:name ::t-service/from
              :label (tr [:field-labels :transport-service ::t-service/from])
+             :element-id "start-time"
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}
@@ -757,6 +763,7 @@
               {:label (tr [:common-texts :ending-time])})
             {:name ::t-service/to
              :label (tr [:field-labels :transport-service ::t-service/to])
+             :element-id "end-time"
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}

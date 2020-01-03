@@ -610,7 +610,9 @@
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
                      :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
+                     :not-in-use "Ei käytössä"
+                     :published-service-cannot-be-modified "Voit muokata vain julkaisua odottavaa palvelua."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"
