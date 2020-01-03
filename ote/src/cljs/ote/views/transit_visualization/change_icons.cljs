@@ -1,15 +1,14 @@
 (ns ote.views.transit-visualization.change_icons
   "Icons related to transit visualization."
-  (:require [reagent.core :as r]
+  (:require [clojure.string :as str]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
+            [ote.time :as time]
+            [ote.localization :refer [tr]]
             [ote.ui.icon_labeled :as icon-l]
             [ote.ui.icons :as ote-icons]
-            [clojure.string :as str]
             [ote.theme.colors :as colors]
-            [ote.localization :refer [tr]]
-            [ote.time :as time]
+            [ote.style.base :as style-base]
             [ote.style.transit-changes :as style]))
 
 ;; Utility methods
@@ -26,7 +25,7 @@
 (defn stop-seq-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
-     [ic/action-timeline {:style {:color colors/gray700}}]
+     [ic/action-timeline {:style {:color colors/icon-gray}}]
      [:span
       changes
       (when with-labels? " pysäkkimuutosta")]]))
@@ -34,7 +33,7 @@
 (defn stop-time-changes-icon [lower upper with-labels?]
   (let [changes (format-range lower upper)]
     [icon-l/icon-labeled
-     [ic/action-query-builder {:color colors/gray700}]
+     [ic/action-query-builder {:color colors/icon-gray}]
      [:span
       changes
       (when with-labels? " aikataulumuutosta")]]))
@@ -157,11 +156,12 @@
         [ic/content-remove-circle-outline {:color colors/remove-color}] nil]]
       [:div {:style {:flex "0.5"}}])]))
 
-(defn change-icons-for-trips
+(defn change-icons-for-header
   ([diff]
-   [change-icons-for-trips diff false])
+   [change-icons-for-header diff false])
   ([diff with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
+    (.log js/console "change-icons-for-header" (pr-str diff))
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
     [show-trip-sequences diff with-labels?]
@@ -193,6 +193,6 @@
 (defn date-comparison-icons [compare-data]
   (when (seq (:differences compare-data))
     [:div {:style {:padding "0.5rem 0rem 1rem 0rem"}}
-     [change-icons-for-trips (:differences compare-data) true]
+     [change-icons-for-header (:differences compare-data) true]
      [:div {:style {:padding-bottom "1rem"}}]
      (change-icons-for-dates compare-data)]))
