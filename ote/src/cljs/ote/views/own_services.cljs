@@ -135,7 +135,7 @@
                                           :overflow "visible"
                                           :padding-top "0.5rem"}}
              (if has-child?
-               [:span "Ei käytössä"
+               [:span (tr [:own-services-page :not-in-use])
                 [common/tooltip-icon {:text (tr [:own-services-page :published-service-cannot-be-modified])
                                       :len "medium"
                                       :pos "up"}]]
