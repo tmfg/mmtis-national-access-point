@@ -56,7 +56,6 @@
                 [:a {:href "#"
                      :on-click #(do
                                   (.preventDefault %)
-                                  (.log js/console "result" (pr-str result))
                                   (e! (admin-validation/->ShowDiffModal result)))}
                  (time/format-timestamp-for-ui validate)]]
                [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
@@ -72,11 +71,17 @@
                         [buttons/cancel
                          {:on-click #(e! (admin-validation/->CloseDiffModal))}
                          "Sulje"])]}
-           [:div {:style {:overflow "auto"
-                          :font-size "12px"}}
-            [:pre
-             (for [[x, y] (seq (:diff-child difference-service))]
-               [:div (str x " : " y)])]
-            [:pre
-             (for [[x, y] (seq (:diff-parent difference-service))]
-               [:div (str x " : " y)])]]])])]))
+           [:div
+
+            [:div.col-xs-6 {:style {:overflow "auto"
+                                    :font-size "10px"}}
+             [:pre
+              (for [[x, y] (seq (:diff-child difference-service))]
+                [:div [:span {:style {:font-size "8px"}} (str x)] [:span (str ": " y)]])]]
+
+            [:div.col-xs-6 {:style {:overflow "auto"
+                                    :font-size "10px"
+                                    :padding-left "5px"}}
+             [:pre
+              (for [[x, y] (seq (:diff-parent difference-service))]
+                [:div [:span {:style {:font-size "8px"}} (str x)] [:span (str ": " y)]])]]]])])]))
