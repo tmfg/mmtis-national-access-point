@@ -99,6 +99,7 @@
     ::t-service/published
     ::t-service/validate
     ::t-service/re-edit
+    ::t-service/parent-id
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from
@@ -687,12 +688,13 @@
               (e! (->AddImportedCompaniesToService csv filename)))))
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
 
-(defn service-state [validate re-edit published]
+(defn service-state [validate re-edit published is-child?]
   (if (flags/enabled? :service-validation)
     (cond
       (some? re-edit) :re-edit
-      (and (some? published) (nil? validate)) :public
-      (some? validate) :validation
+      (some? published) :public
+      (and (not is-child?) (some? validate)) :validation    ;; First time in validation
+      (and is-child? (some? validate)) :re-validation       ;; Service is already at least once validated
       :else :draft)
     (if (some? published)
       :public
