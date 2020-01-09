@@ -754,8 +754,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :radio-button-url-companies "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
   :radio-button-csv-companies "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
   :radio-button-form-companies "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
-  :service-is-in-validation "Palvelun tiedot ovat julkaistavana."
-  :published-service-is-in-validation "Palvelun muutetut tiedot ovat julkaistavana."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
   }
 
 
