@@ -7,7 +7,6 @@
   :admin "Admin"
   :monitor "Övervakning"}
 
-
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -122,7 +121,6 @@
    :ote.db.transport-service/pricing-url "Prissättning www-sidor"
    :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"}
 
-
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Inomhuskarta www-sidor"
@@ -130,8 +128,6 @@
    :ote.db.transport-service/description "Tjänstebeskriving"
    :ote.db.transport-service/information-service-accessibility "Information (tillgänglighet)"
    :ote.db.transport-service/accessibility "Tillgänglighet"
-
-
 
    ;; assistance_notification_requirement fields
    :ote.db.transport-service/hours-before "Tjänsten måste beställas (timmar) i förväg"
@@ -141,7 +137,6 @@
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
    :ote.db.transport-service/assistance-place-description "Assistanstjänsternas placering i terminalen/stationen"
    :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."}
-
 
   ;; Rental fields
   :rentals
@@ -207,7 +202,6 @@
    :ote.db.transport-service/maximum-stay "Max parkeringstid"
    :maximum-stay-limited "Parkeringstid begränsad"}
 
-
   :transport-service
   {:ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/additional-services "Övriga tjänster"
@@ -218,6 +212,8 @@
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Publicerad"
                                                 :validation "Lähetetty julkaistavaksi"
+                                                :re-validation "Muutokset lähetetty julkaistavaksi"
+                                                :re-edit "Uudelleen muokattavana"
                                                 :draft "Utkast"}
 
    ;; Service hour fields
@@ -233,7 +229,6 @@
    :ote.db.transport-service/available-to "Slutdatum"
    :ote.db.transport-service/available-from-nil "Genast"
    :ote.db.transport-service/available-to-nil "Tillsvidare"}
-
 
   ;; Common fields
   :ote.db.common/street "Adress"
@@ -757,7 +752,10 @@
   :radio-button-no-companies "Inga andra företag deltar i tillhandahållandet av denna tjänst."
   :radio-button-url-companies "Ange en web-adress för .csv-filen."
   :radio-button-csv-companies "Ladda upp .csv-filen."
-  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."}
+  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
+  }
 
  :rentals-page
  {:header-edit-rentals "Redigera uppgifterna gällande uthyrning"

@@ -98,7 +98,6 @@
    :to-date "To date"
    :service-hour-exceptions "Exceptions to service hours"}
 
-
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions "Luggage restrictions"
@@ -122,7 +121,6 @@
    :ote.db.transport-service/pricing-url "Price information WWW-address"
    :ote.db.transport-service/payment-method-description "Additional information about payment methods"}
 
-
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Indoor map"
@@ -130,7 +128,6 @@
    :ote.db.transport-service/description "Service description"
    :ote.db.transport-service/information-service-accessibility "Information service accessibility"
    :ote.db.transport-service/accessibility "Accessibility"
-
 
    ;; assistance_notification_requirement fields
    :ote.db.transport-service/hours-before "Service requires reservation (hours) before"
@@ -204,7 +201,6 @@
    :ote.db.transport-service/maximum-stay "Maximum duration for parking"
    :maximum-stay-limited "Duration for parking is limited"}
 
-
   :transport-service
   {:ote.db.transport-service/name "Service name"
    :ote.db.transport-service/additional-services "Additional services"
@@ -215,6 +211,8 @@
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Published"
                                                 :validation "Lähetetty julkaistavaksi"
+                                                :re-validation "Muutokset lähetetty julkaistavaksi"
+                                                :re-edit "Uudelleen muokattavana"
                                                 :draft "Draft"}
 
    ;; Service hour fields
@@ -753,6 +751,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :radio-button-url-companies "Enter a web address from which the company information can be found as a .csv file."
   :radio-button-csv-companies "Load a .csv file from your computer with the company information."
   :radio-button-form-companies "Add company information manually using the form."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
   }
 
 

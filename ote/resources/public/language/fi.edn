@@ -7,7 +7,6 @@
   :admin "Ylläpitopaneeli"
   :monitor "Valvontanäkymä"}
 
-
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -99,7 +98,6 @@
    :to-date "Loppupvm"
    :service-hour-exceptions "Palveluaikojen poikkeukset"}
 
-
   ;; Passenger transportation fields
   :passenger-transportation
   {:ote.db.transport-service/luggage-restrictions "Matkatavaroita koskevat rajoitukset"
@@ -123,7 +121,6 @@
    :ote.db.transport-service/pricing-url "Hinnoittelun verkkosivu"
    :ote.db.transport-service/payment-method-description "Maksutapojen lisätiedot"}
 
-
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Sisätilakartan osoitetiedot"
@@ -131,7 +128,6 @@
    :ote.db.transport-service/description "Palvelun kuvaus"
    :ote.db.transport-service/information-service-accessibility "Saavutettava viestintä"
    :ote.db.transport-service/accessibility "Saavutettavuus"
-
 
    ;; assistance_notification_requirement fields
    :ote.db.transport-service/hours-before "Palvelu on varattava (tuntia) ennen"
@@ -165,7 +161,6 @@
    :rentals-pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnoitteluperusteet taulukkoon."
    :ote.db.transport-service/vehicle-price-url "Ajoneuvot ja hintatiedot (WWW-osoite)"
    :ote.db.transport-service/pick-up-locations-url "Toimipisteiden tietojen web-osoite"}
-
 
   ;; Parking fields
   :parking
@@ -206,7 +201,6 @@
    :ote.db.transport-service/maximum-stay "Maksimi pysäköintiaika"
    :maximum-stay-limited "Pysäköintiaika rajoitettu"}
 
-
   :transport-service
   {:ote.db.transport-service/name "Palvelun nimi"
    :ote.db.transport-service/additional-services "Muut palvelut"
@@ -217,6 +211,8 @@
    :ote.db.transport-service/published? "NAP-tila"
    :ote.db.transport-service/published?-values {:public "Julkaistu"
                                                 :validation "Lähetetty julkaistavaksi"
+                                                :re-validation "Muutokset lähetetty julkaistavaksi"
+                                                :re-edit "Uudelleen muokattavana"
                                                 :draft "Luonnos"}
 
    ;; Service hour fields
@@ -758,6 +754,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :radio-button-url-companies "Ilmoita web-osoite, josta yritysten tiedot löytyvät csv-tiedostona."
   :radio-button-csv-companies "Lataa yritysten tiedot csv-tiedostona lomakkeelle."
   :radio-button-form-companies "Lisää yritysten tiedot lomakkeelle lomakkeen kenttien avulla."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
   }
 
 
@@ -1185,7 +1183,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
   :continue-editing
   {:title "Jatka tietojen muokkaamista"
-   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkaamista? Tällöin aiemmin lähettämääsi versiota ei julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi."}
   }
 
  :operators

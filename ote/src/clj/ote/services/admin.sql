@@ -201,7 +201,8 @@ SELECT n.id as "netex-conversion-id",
 ORDER BY n.modified DESC, n.created, ts.name;
 
 -- name: fetch-validation-services
-SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published, s.validate, s."transport-operator-id", o.name as "operator-name"
+SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
+       s.validate, s."transport-operator-id", o.name as "operator-name", s."re-edit", s."parent-id"
     FROM "transport-service" s, "transport-operator" o
     WHERE s.validate IS NOT NULL
       AND s."transport-operator-id" = o.id

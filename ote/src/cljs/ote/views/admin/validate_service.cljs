@@ -11,13 +11,16 @@
             [ote.app.controller.admin-validation :as admin-validation]
             [ote.app.controller.front-page :as fp]
             [reagent.core :as r]
-            [ote.style.dialog :as style-dialog]))
+            [ote.style.dialog :as style-dialog]
+            [cljs-react-material-ui.icons :as ic]))
 
 (defn page-controls [e! app]
   [:div])
 
 (defn validate-services [e! app]
-  (let [services (get-in app [:admin :in-validation :results])]
+  (let [services (get-in app [:admin :in-validation :results])
+        show-diff-modal? (get-in app [:admin :in-validation :show-diff-modal?])
+        difference-service (get-in app [:admin :in-validation :diff-service])]
     [:div.row
 
      (when services
@@ -50,6 +53,35 @@
                [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "15%"})
                 (tr [:enums :ote.db.transport-service/sub-type (keyword sub-type)])]
                [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
-                (time/format-timestamp-for-ui validate)]
+                [:a {:href "#"
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (admin-validation/->ShowDiffModal result)))}
+                 (time/format-timestamp-for-ui validate)]]
                [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
-                [:span (time/format-timestamp-for-ui created) [:br] (time/format-timestamp-for-ui modified)]]]))]]])]))
+                [:span (time/format-timestamp-for-ui created) [:br] (time/format-timestamp-for-ui modified)]]]))]]
+
+        ;; Show some kind of diff of changed data between services in published state and new validated state
+        (when show-diff-modal?
+          [ui/dialog
+           {:open true
+            :actionsContainerStyle style-dialog/dialog-action-container
+            :title "Alla hankalasti listattuna palveluiden eroja"
+            :actions [(r/as-element
+                        [buttons/cancel
+                         {:on-click #(e! (admin-validation/->CloseDiffModal))}
+                         "Sulje"])]}
+           [:div
+
+            [:div.col-xs-6 {:style {:overflow "auto"
+                                    :font-size "10px"}}
+             [:pre
+              (for [[x, y] (seq (:diff-child difference-service))]
+                [:div [:span {:style {:font-size "8px"}} (str x)] [:span (str ": " y)]])]]
+
+            [:div.col-xs-6 {:style {:overflow "auto"
+                                    :font-size "10px"
+                                    :padding-left "5px"}}
+             [:pre
+              (for [[x, y] (seq (:diff-parent difference-service))]
+                [:div [:span {:style {:font-size "8px"}} (str x)] [:span (str ": " y)]])]]]])])]))

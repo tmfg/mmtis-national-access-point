@@ -327,3 +327,12 @@
                   :margin-top "1rem"
                   :padding-bottom "2.5rem"
                   :padding-top "1rem"})
+
+(def notification-container {:border-top (str "4px solid " colors/purple-darker)
+                             :border-left (str "1px solid " colors/purple-darker)
+                             :border-right (str "1px solid " colors/purple-darker)
+                             :border-bottom (str "1px solid " colors/purple-darker)
+                             :color colors/purple-darker
+                             :padding "1rem"
+                             :margin-bottom "1rem"
+                             :font-weight 600})

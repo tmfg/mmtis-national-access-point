@@ -15,9 +15,11 @@
 (defrecord PublishService [id])
 (defrecord PublishResponse [response])
 (defrecord EditService [id])
+(defrecord ShowDiffModal [service])
+(defrecord CloseDiffModal [])
 
 (def every-5min (* 1000 60 1))
-(defmethod tuck-effect/process-effect :every5min [e! {:keys [on-success on-failure]}]
+(defmethod tuck-effect/process-effect :adminevery5min [e! {:keys [on-success on-failure]}]
   (.setInterval js/window #(comm/get! "admin/validation-services"
                                       {:on-success on-success
                                        :on-failure on-failure})
@@ -36,7 +38,7 @@
       ;; Load services immediately
       (load-validation-services)
       ;; And start timer
-      (tuck/fx app {:tuck.effect/type :every5min
+      (tuck/fx app {:tuck.effect/type :adminevery5min
                     :on-success (tuck/send-async! ->LoadValidationServicesResponse)
                     :on-failure (tuck/send-async! ->ServerError)})))
 
@@ -74,4 +76,16 @@
     (load-validation-services)
     (-> app
         (assoc :flash-message "Palvelu julkaistu onnistuneesti.")
-        (assoc-in [:admin :in-validation :modal] nil))))
+        (assoc-in [:admin :in-validation :modal] nil)))
+
+  ShowDiffModal
+  (process-event [{service :service} app]
+    (-> app
+        (assoc-in [:admin :in-validation :show-diff-modal?] true)
+        (assoc-in [:admin :in-validation :diff-service] service)))
+
+  CloseDiffModal
+  (process-event [_ app]
+    (-> app
+        (assoc-in [:admin :in-validation :show-diff-modal?] false)
+        (assoc-in [:admin :in-validation :diff-service] nil))))

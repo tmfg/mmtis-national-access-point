@@ -33,6 +33,7 @@
 (def white-basic "white")
 (def yellow-basic "#ddcc00")
 (def yellow-dark "#cfb800")
+(def purple-darker "#7000D0")
 
 (def add-color green-basic)
 (def icon-disabled gray550)

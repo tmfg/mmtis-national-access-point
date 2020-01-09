@@ -82,9 +82,9 @@
                   :display-row-checkbox false}
    (doall
      (map
-       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name has-child?]
+       (fn [{::t-service/keys [id type sub-type interface-types published validate re-edit name has-child? parent-id]
              ::modification/keys [created modified] :as row}]
-         (let [service-state (ts-controller/service-state validate re-edit published)]
+         (let [service-state (ts-controller/service-state validate re-edit published (not (nil? parent-id)))]
            ^{:key id}
            [ui/table-row {:selectable false
                           :display-border false
@@ -92,12 +92,10 @@
                                   :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
                                   :style {:width "20%"}}
-             (if has-child?
-               name
-               [:a (merge {:href (str "/#/edit-service/" id)
-                           :on-click #(do (.preventDefault %)
-                                          (e! (fp-controller/->ChangePage :edit-service {:id id})))}
-                          (stylefy/use-sub-style style-base/basic-table :link)) name])]
+             [:a (merge {:href (str "/#/edit-service/" id)
+                         :on-click #(do (.preventDefault %)
+                                        (e! (fp-controller/->ChangePage :edit-service {:id id})))}
+                        (stylefy/use-sub-style style-base/basic-table :link)) name]]
             [ui/table-row-column {:class "hidden-xs table-col-style-semi-wrap"
                                   :style {:overflow "visible"
                                           :width "20%"}}
@@ -110,7 +108,7 @@
                                            :margin-left "0.5rem"
                                            :margin-bottom "5px"}}]]
                ;; When state in validation
-               (= :validation service-state)
+               (or (= :validation service-state) (= :re-edit service-state))
                [:span (tr [:field-labels :transport-service ::t-service/published?-values service-state])
                 [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
                                       :len "medium"
@@ -153,7 +151,7 @@
                                              :color colors/icon-gray}})
                  [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
                 [delete-service-action e! row]])]]))
-       services))])
+       (filter #(false? (::t-service/has-child? %)) services)))])
 
 (defn- route-error
   [errors]
