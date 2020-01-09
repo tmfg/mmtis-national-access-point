@@ -85,15 +85,28 @@
                 add-error-data))
           modified-services)))
 
+(defn all-service-data [db id]
+  (first (fetch db ::t-service/transport-service
+                (conj (specql/columns ::t-service/transport-service)
+                      ;; join external interfaces
+                      [::t-service/external-interfaces
+                       (specql/columns ::t-service/external-interface-description)])
+                {::t-service/id id})))
+
+(defn- public-service-data [db id]
+  (first (fetch db ::t-service/transport-service
+                (apply disj
+                       (conj (specql/columns ::t-service/transport-service)
+                             ;; join external interfaces
+                             [::t-service/external-interfaces
+                              (specql/columns ::t-service/external-interface-description)])
+                       transport-service-personal-columns)
+                {::t-service/id id})))
+
 (defn all-data-transport-service
   "Get single transport service by id"
   [config db id]
-  (let [ts (first (fetch db ::t-service/transport-service
-                         (conj (specql/columns ::t-service/transport-service)
-                               ;; join external interfaces
-                               [::t-service/external-interfaces
-                                (specql/columns ::t-service/external-interface-description)])
-                         {::t-service/id id}))]
+  (let [ts (all-service-data db id)]
     (if ts
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
@@ -322,6 +335,14 @@
                          {::t-service/parent-id (::t-service/id transport-service)}))
     nil))
 
+(defn- ensure-created-time
+  "If service is a child then its created timestamp must be always parents created time. No exceptions here."
+  [service]
+  (let [created (if (::t-service/parent-id service)
+                  (::modification/created (public-service-data db (::t-service/parent-id service)))
+                  (::modification/created service))]
+    (assoc service ::modification/created created)))
+
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [config db user {places ::t-service/operation-area
@@ -350,7 +371,8 @@
                              floats-to-bigdec
                              (dissoc ::t-service/external-interfaces
                                      ::t-service/service-company)
-                             (maybe-clear-companies))
+                             (maybe-clear-companies)
+                             (ensure-created-time))
             resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
             removed-resources (removable-resources resources-from-db external-interfaces)
             ;; Store to OTE database
@@ -468,19 +490,11 @@
 (defn public-data-transport-service
   "Get single transport service by id"
   [config db id]
-  (let [ts (first (fetch db ::t-service/transport-service
-                         (apply disj
-                                (conj (specql/columns ::t-service/transport-service)
-                                      ;; join external interfaces
-                                      [::t-service/external-interfaces
-                                       (specql/columns ::t-service/external-interface-description)])
-                                transport-service-personal-columns)
-                         {::t-service/id id}))]
+  (let [ts (public-service-data db id)]
     (if ts
       (http/no-cache-transit-response
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
-
             vector
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
             first))
