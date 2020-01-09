@@ -96,7 +96,7 @@
 
 ;; Load transport operator data (and services) every five minutes to ensure that possibly published service is shown correctly.
 ;; Services are published by admin
-(defmethod tuck-effect/process-effect :every5min [e! {:keys [on-success on-failure]}]
+(defmethod tuck-effect/process-effect :serviceevery5min [e! {:keys [on-success on-failure]}]
   (do
     (.setInterval js/window #(comm/post! "/transport-operator/data" {}
                                          {:on-success on-success
@@ -114,7 +114,7 @@
               (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
               app)]
     (tuck/fx app
-             {:tuck.effect/type :every5min
+             {:tuck.effect/type :serviceevery5min
               :on-success (tuck/send-async! ->LoadOperatorDataResponse)
               :on-failure (tuck/send-async! ->ServerError)})))
 
