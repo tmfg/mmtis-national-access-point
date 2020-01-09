@@ -588,14 +588,14 @@
 
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published ::t-service/published :as data} schemas in-validation? app]
+  [e! {published ::t-service/published re-edit ::t-service/re-edit validate ::t-service/validate parent-id ::t-service/parent-id :as data} schemas in-validation? app]
   (let [name-missing? (str/blank? (::t-service/name data))
         service-id (get-in app [:transport-service ::t-service/id])
         service-id (if (nil? service-id) 0 service-id)
         show-footer? (if service-id
                        (ts-controller/is-service-owner? app)
                        true)
-        service-state (ts-controller/service-state (::t-service/validate data) (::t-service/re-edit data) published)
+        service-state (ts-controller/service-state validate re-edit published (not (nil? parent-id)))
         show-validate-modal? (get-in app [:transport-service :show-confirm-save-dialog?])
         admin-validating-id (get-in app [:admin :in-validation :validating])
         cannot-be-saved-text (if (flags/enabled? :service-validation)

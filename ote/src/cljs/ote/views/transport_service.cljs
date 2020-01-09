@@ -7,6 +7,8 @@
             [ote.db.transport-operator :as t-operator]
             [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
+            [ote.theme.colors :as colors]
+            [ote.style.base :as style-base]
             [ote.style.form :as style-form]
             [ote.style.dialog :as style-dialog]
             [ote.ui.buttons :as buttons]
@@ -122,13 +124,24 @@
             admin-validating-id (get-in app [:admin :in-validation :validating])
             service-id (get service ::t-service/id)
             in-validation? (get-in service [sub-service ::t-service/validate])
-            show-editing-dialog? (:edit-dialog service)]
+            service-state (ts-controller/service-state (get-in service [sub-service ::t-service/validate])
+                                                       (get-in service [sub-service ::t-service/re-edit])
+                                                       (get-in service [sub-service ::t-service/published])
+                                                       (not (nil? (get-in service [sub-service ::t-service/parent-id]))))
+            show-editing-dialog? (:edit-dialog service)
+            service-in-validation-text (if (= :re-validation service-state)
+                                         (tr [:passenger-transportation-page :published-service-is-in-validation])
+                                         (tr [:passenger-transportation-page :service-is-in-validation]))]
         [:div
          [ui-common/rotate-device-notice]
 
          [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
          (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
            [:div {:style {:margin-bottom "1.5rem"}}
+            [:div (stylefy/use-style style-base/notification-container)
+             [:div {:style {:display "inline-flex"}}
+              [ic/action-info {:style {:margin-right "1rem" :color colors/purple-darker}}]
+              [:div {:style {:padding-top "2px"}} service-in-validation-text]]]
             [buttons/save {:on-click #(do
                                         (.preventDefault %)
                                         (e! (ts-controller/->ToggleEditingDialog)))}
