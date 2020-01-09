@@ -752,7 +752,10 @@
   :radio-button-no-companies "Inga andra företag deltar i tillhandahållandet av denna tjänst."
   :radio-button-url-companies "Ange en web-adress för .csv-filen."
   :radio-button-csv-companies "Ladda upp .csv-filen."
-  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."}
+  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
+  }
 
  :rentals-page
  {:header-edit-rentals "Redigera uppgifterna gällande uthyrning"

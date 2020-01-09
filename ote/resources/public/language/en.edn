@@ -751,6 +751,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :radio-button-url-companies "Enter a web address from which the company information can be found as a .csv file."
   :radio-button-csv-companies "Load a .csv file from your computer with the company information."
   :radio-button-form-companies "Add company information manually using the form."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
   }
 
 
