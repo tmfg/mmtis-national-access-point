@@ -554,14 +554,40 @@
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:error (str e)})})))
 
+(defn prepare-for-diff [service]
+  (dissoc service
+          ::t-service/id
+          ::t-service/parent-id
+          ::t-service/validate
+          ::t-service/published
+          ::modification/modified
+          ::modification/created
+          ::t-service/re-edit))
+
+(defn- validation-differences [db minimal-service]
+  (let [service (prepare-for-diff (transport/all-service-data db (:id minimal-service)))
+        parent-service (prepare-for-diff (transport/all-service-data db (:parent-id minimal-service)))
+        service-diff (clojure.data/diff service parent-service)]
+    (assoc minimal-service :diff-child  (first service-diff)
+                           :diff-parent (second service-diff))))
+
 (defn- list-validation-services [db]
-  (fetch-validation-services db))
+  (let [services (fetch-validation-services db)
+        services (map
+                   (fn [s]
+                     (if (not (nil? (:parent-id s)))
+                       ;; If service has parent-id and re-edit diff values
+                       (validation-differences db s)
+                       ;; If service is validation in fist time, return service as it is
+                       s))
+                   services)]
+    services))
 
 (defn- publish-service [db service-id]
   (let [service (first (specql/fetch db ::t-service/transport-service
                                      (specql/columns ::t-service/transport-service)
                                      {::t-service/id service-id}))]
-    (if (nil? (::t-service/parent-id service))  ;; if service has parent-id it is a child
+    (if (nil? (::t-service/parent-id service))              ;; if service has parent-id it is a child
       ;; No child - publish only
       (specql/update! db ::t-service/transport-service
                       {::t-service/published (java.sql.Timestamp. (System/currentTimeMillis))
@@ -761,7 +787,6 @@
         user :user}
     (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db type))
-
 
   ^{:format :csv
     :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
