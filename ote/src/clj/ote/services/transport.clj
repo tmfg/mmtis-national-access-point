@@ -337,7 +337,7 @@
 
 (defn- ensure-created-time
   "If service is a child then its created timestamp must be always parents created time. No exceptions here."
-  [service]
+  [service db]
   (let [created (if (::t-service/parent-id service)
                   (::modification/created (public-service-data db (::t-service/parent-id service)))
                   (::modification/created service))]
@@ -372,7 +372,7 @@
                              (dissoc ::t-service/external-interfaces
                                      ::t-service/service-company)
                              (maybe-clear-companies)
-                             (ensure-created-time))
+                             (ensure-created-time db))
             resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
             removed-resources (removable-resources resources-from-db external-interfaces)
             ;; Store to OTE database

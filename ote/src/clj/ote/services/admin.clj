@@ -26,6 +26,7 @@
             [ote.util.db :as db-util]
             [clojure.string :as str]
             [clojure.data.csv :as csv]
+            [clojure.data :as data]
             [clojure.java.io :as io]
             [ring.util.io :as ring-io]
             [ote.components.service :refer [define-service-component]]
@@ -567,7 +568,7 @@
 (defn- validation-differences [db minimal-service]
   (let [service (prepare-for-diff (transport/all-service-data db (:id minimal-service)))
         parent-service (prepare-for-diff (transport/all-service-data db (:parent-id minimal-service)))
-        service-diff (clojure.data/diff service parent-service)]
+        service-diff (data/diff service parent-service)]
     (assoc minimal-service :diff-child  (first service-diff)
                            :diff-parent (second service-diff))))
 
