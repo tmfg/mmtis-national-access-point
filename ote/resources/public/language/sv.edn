@@ -914,6 +914,7 @@
   :header-authority-pre-notice-list "Meddelanden om ändring i regelbunden persontrafik"
   :no-pre-notices-for-operator "Den valda tjänsteproducenten har inte skapat några meddelanden om ändring i regelbunden persontrafik."
   :no-pre-notices-sent "Den valda tjänsteproducenten har inte skickat några meddelanden om ändring i regelbunden persontrafik till mundigheterna."
+  :pre-notice-drafts "Muutosilmoitusluonnokset"
   :sent-pre-notices "Skickade ändringsmeddelanden"
   :no-pre-notices "Inga ändringsmeddelanden"
   :only-for-authorities "Ändringsmeddelanden är endast för officiell användning."

@@ -755,7 +755,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
   }
 
-
  :rentals-page
  {:header-edit-rentals "Edit rental information"
   :header-new-rentals "Add information about vehicle rental services or commercial shared vehicle solutions"
@@ -914,6 +913,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-authority-pre-notice-list "Reports of change in regular scheduled passenger transport"
   :no-pre-notices-for-operator "The selected transport operator has not created any reports of change in regular scheduled passenger transport."
   :no-pre-notices-sent "The selected transport operator has not sent any reports of change in regular scheduled passenger transport."
+  :pre-notice-drafts "Draft reports of change"
   :sent-pre-notices "Sent reports of change"
   :no-pre-notices "No reports of change created"
   :only-for-authorities "Change notifications are for official use only."

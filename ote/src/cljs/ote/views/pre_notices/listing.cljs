@@ -85,6 +85,7 @@
                               :icon (ic/content-add)}]
            [t-operator-sel/transport-operator-selection e! app]]]
          [:div {:style {:margin-bottom "40px"}}
+          [:h3 (tr [:pre-notice-list-page :pre-notice-drafts])]
           [pre-notices-table e! pre-notices :draft]
           (when delete-pre-notice-dialog
             [ui/dialog
