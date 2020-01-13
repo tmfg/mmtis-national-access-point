@@ -2,6 +2,7 @@
   "Own services controller"
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [tuck.effect :as tuck-effect]
+            [ote.app.state :as state]
             [ote.communication :as comm]
             [ote.localization :as localization :refer [tr]]
             [ote.app.controller.common :refer [->ServerError]]
@@ -98,9 +99,11 @@
 ;; Services are published by admin
 (defmethod tuck-effect/process-effect :serviceevery5min [e! {:keys [on-success on-failure]}]
   (do
-    (.setInterval js/window #(comm/post! "/transport-operator/data" {}
-                                         {:on-success on-success
-                                          :on-failure on-failure})
+    (.setInterval js/window (fn [_]
+                              (when (= :own-services (:page @state/app))
+                                (comm/post! "/transport-operator/data" {}
+                                            {:on-success on-success
+                                             :on-failure on-failure})))
                   every-5min)))
 
 

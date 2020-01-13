@@ -1,6 +1,7 @@
 (ns ote.app.controller.admin-validation
   (:require [tuck.core :as tuck :refer-macros [define-event]]
             [tuck.effect :as tuck-effect]
+            [ote.app.state :as state]
             [ote.localization :refer [tr tr-key]]
             [ote.communication :as comm]
             [ote.app.routes :as routes]
@@ -20,9 +21,11 @@
 
 (def every-5min (* 1000 60 1))
 (defmethod tuck-effect/process-effect :adminevery5min [e! {:keys [on-success on-failure]}]
-  (.setInterval js/window #(comm/get! "admin/validation-services"
+  (.setInterval js/window (fn [_]
+                            (when (= :admin (:page @state/app))
+                              (comm/get! "admin/validation-services"
                                       {:on-success on-success
-                                       :on-failure on-failure})
+                                       :on-failure on-failure})))
                 every-5min))
 
 (defn- load-validation-services []
