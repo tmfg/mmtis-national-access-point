@@ -626,6 +626,11 @@
             (map (juxt :name :email)
                  (nap-users/list-authority-users db))))
 
+(defn- netex-interfaces-response [db]
+  (csv-data ["Rajapinnan osoite" "Palveluntuottajan nimi" "Palvelun nimi" "Palveluntuottajan email" "Käyttäjien email" "Rajapinnan muoto"]
+            (map (juxt :interface-url :top-name :service-name :operator-or-service-email :user-email :interface-format)
+                 (fetch-netex-interfaces-for-admin db))))
+
 (defn- send-pre-notice-email-response [db config]
   (log/debug "send-pre-notice-email-response")
   (pn/send-pre-notice-emails! db (:email config) (pn/pre-notice-recipient-emails (:pre-notices config)))
@@ -799,7 +804,13 @@
     :filename (str "toimivaltaiset-viranomaiset-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/tvv" {user :user}
     (or (authorization-fail-response (:user user))
-        (tvv-response db))))
+        (tvv-response db)))
+
+  ^{:format :csv
+    :filename (str "netex-rajapinnat-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/netex-interfaces" {user :user}
+    (or (authorization-fail-response (:user user))
+        (netex-interfaces-response db))))
 
 (define-service-component MonitorReport []
   {}
