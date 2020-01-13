@@ -916,7 +916,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :header-authority-pre-notice-list "Säännöllisen henkilöliikenteen muutosilmoitukset"
   :no-pre-notices-for-operator "Valittu palveluntuottaja ei ole luonut säännöllisen henkilöliikenteen muutosilmoituksia."
   :no-pre-notices-sent "Valittu palveluntuottaja ei ole lähettänyt säännöllisen henkilöliikenteen muutosilmoituksia."
-  :pre-notice-drafts "Muutosilmoitusluonnokset"
+  :pre-notice-drafts "Luonnokset"
   :sent-pre-notices "Lähetetyt muutosilmoitukset"
   :no-pre-notices "Ei muutosilmoituksia"
   :only-for-authorities "Muutosilmoitukset ovat vain viranomaiskäyttöön."
