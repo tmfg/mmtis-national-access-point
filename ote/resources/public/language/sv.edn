@@ -729,7 +729,7 @@
   :business-id-heading "FO-nummer:"
   :help-operator-edit-selection "I listan nedan ser du de namn som registrerats i YTJ-systemet. Välj de namn i listan du vill använda som tjänsteproducenter i NAP."
   :help-operator-contact-entry (:md "Kontaktuppgifterna nedan **gäller för samtliga namn och parallellnamn som är registrerade under detta FO-nummer**. Kontaktuppgifterna är hämtade ur YTJ-systemet och de kan inte ändras i NAP. Ifall uppgifterna är felaktiga eller bristfällga kan du göra ändringarna direkt i YTJ-systemet. Ändringarna du gjort i YTJ-systemet kommer sedan att synas på denna sida i NAP. Vad gäller tomma fält för kontaktuppgifter finns två alternativ. 1) Komplettera uppgifterna i YTJ-systemet, varefter de kommer att synas på denna sida i NAP (rekommenderas). 2) Fyll i uppgifterna direkt i fälten nedan (uppgifterna sparas då endast i NAP, inte i YTJ-systemet.)")
-  :help-operator-how-delete (:md "Du kan ta bort tjänsteproducentens uppgifter ur NAP genom att klicka på **Ta bort tjänsteproducent** -knappen. Borttagning är möjlig endast ifall det inte finns publicerade tjänster i NAP under ifrågavarande FO-nummer. Ta först bort eventuella tjänster på sidan **Egna tjänsteuppgifter**")
+  :help-operator-how-delete (:md "Du kan ta bort tjänsteproducentens uppgifter ur NAP genom att klicka på **Ta bort tjänsteproducent** -knappen. Borttagning är möjlig endast ifall det inte finns publicerade tjänster i NAP under tjänsteproducenten. Ta först bort eventuella tjänster på sidan **Egna tjänsteuppgifter**")
   :help-about-ytj-link-desc "Företags- och organisationsdatasystemet (FODS)"
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
