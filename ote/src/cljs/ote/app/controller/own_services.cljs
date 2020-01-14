@@ -94,11 +94,13 @@
   (login/update-transport-operator-data app response))
 
 (def every-5min (* 1000 60 1))
+(def is-service-running? (atom false))
 
 ;; Load transport operator data (and services) every five minutes to ensure that possibly published service is shown correctly.
 ;; Services are published by admin
-(defmethod tuck-effect/process-effect :serviceevery5min [e! {:keys [on-success on-failure]}]
-  (do
+(defmethod tuck-effect/process-effect :serviceRunEvery5min [e! {:keys [on-success on-failure]}]
+  (when (= false @is-service-running?)
+    (reset! is-service-running? true)
     (.setInterval js/window (fn [_]
                               (when (= :own-services (:page @state/app))
                                 (comm/post! "/transport-operator/data" {}
@@ -117,7 +119,7 @@
               (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
               app)]
     (tuck/fx app
-             {:tuck.effect/type :serviceevery5min
+             {:tuck.effect/type :serviceRunEvery5min
               :on-success (tuck/send-async! ->LoadOperatorDataResponse)
               :on-failure (tuck/send-async! ->ServerError)})))
 

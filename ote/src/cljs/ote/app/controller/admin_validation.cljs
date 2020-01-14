@@ -20,13 +20,15 @@
 (defrecord CloseDiffModal [])
 
 (def every-5min (* 1000 60 1))
-(defmethod tuck-effect/process-effect :adminevery5min [e! {:keys [on-success on-failure]}]
-  (.setInterval js/window (fn [_]
-                            (when (= :admin (:page @state/app))
-                              (comm/get! "admin/validation-services"
-                                      {:on-success on-success
-                                       :on-failure on-failure})))
-                every-5min))
+(def is-validation-running? (atom false))
+(defmethod tuck-effect/process-effect :adminEvery5min [e! {:keys [on-success on-failure]}]
+  (when (= false @is-validation-running?)
+    (.setInterval js/window (fn [_]
+                              (when (= :admin (:page @state/app))
+                                (comm/get! "admin/validation-services"
+                                           {:on-success on-success
+                                            :on-failure on-failure})))
+                  every-5min)))
 
 (defn- load-validation-services []
   (comm/get! "admin/validation-services"
@@ -41,7 +43,7 @@
       ;; Load services immediately
       (load-validation-services)
       ;; And start timer
-      (tuck/fx app {:tuck.effect/type :adminevery5min
+      (tuck/fx app {:tuck.effect/type :adminEvery5min
                     :on-success (tuck/send-async! ->LoadValidationServicesResponse)
                     :on-failure (tuck/send-async! ->ServerError)})))
 
