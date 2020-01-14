@@ -50,6 +50,7 @@
           :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
+ :csv {:bucket "napote-csv-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
                ;; :laundry_url "http://localhost:8080/"
                }
