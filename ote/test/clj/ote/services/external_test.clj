@@ -26,3 +26,19 @@
         csv-map (external-service/parse-response->csv data)
         company-count (count (:result csv-map))]
     (is (= company-count 4))))
+
+(deftest validate-company-csv-file-test
+  (let [csv-file (slurp (str "test/resources/csv/corrupted-company-csv.csv"))
+        data (csv/read-csv csv-file)
+        validation-warning (external-service/validate-company-csv-file data)]
+    (is (not (nil? validation-warning)))
+    (is (nil? (:corrupted-headers validation-warning)))
+    (is (not (nil? (:corrupted-data validation-warning))))))
+
+(deftest validate-company-header-csv-file-test
+  (let [csv-file (slurp (str "test/resources/csv/corrupted-company-csv-headers.csv"))
+        data (csv/read-csv csv-file)
+        validation-warning (external-service/validate-company-csv-file data)]
+    (is (not (nil? validation-warning)))
+    (is (not (nil? (:corrupted-headers validation-warning))))
+    (is (= 4 (count (:corrupted-data validation-warning))))))
