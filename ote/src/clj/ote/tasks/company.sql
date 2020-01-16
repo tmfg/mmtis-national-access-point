@@ -18,3 +18,8 @@ SELECT "companies-csv-url"
 UPDATE service_company
    SET updated = current_timestamp
  WHERE "transport-service-id" = :transport-service-id;
+
+-- name: fetch-re-edit-services
+SELECT id
+  FROM "transport-service" ts
+ WHERE ts."re-edit" < NOW() - interval '1 day';

@@ -1,4 +1,4 @@
-(defproject ote "1.4-SNAPSHOT"
+(defproject ote "0.1-SNAPSHOT"
   :dependencies [;; Clojure - Eclipse Public License 1.0
                  [org.clojure/clojure "1.10.1"]
                  ;; ClojureScript (clojure to js) - Eclipse Public License 1.0

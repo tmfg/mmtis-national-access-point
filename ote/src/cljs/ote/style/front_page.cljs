@@ -188,7 +188,7 @@
 (def lower-section-text {:text-align "center"
                          :font-size "1rem"
                          :font-weight 400
-                         :line-height "1.5"
+                         :line-height "1.5rem"
                          :min-height "95px"
                          :width "100%" ;; Required by IE11 for some odd reason (here be dragons!).
                          })

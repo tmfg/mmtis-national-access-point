@@ -26,6 +26,7 @@
             [ote.util.db :as db-util]
             [clojure.string :as str]
             [clojure.data.csv :as csv]
+            [clojure.data :as data]
             [clojure.java.io :as io]
             [ring.util.io :as ring-io]
             [ote.components.service :refer [define-service-component]]
@@ -44,7 +45,8 @@
             [clj-time.format :as format]
             [clojure.set :as set]
             [specql.impl.registry :as specql-registry]
-            [specql.impl.composite :as composite])
+            [specql.impl.composite :as composite]
+            [ote.db.tx :as tx])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -260,8 +262,8 @@
   (mapv (fn [conv]
           (if (= :ok (keyword (:ote.db.netex/status conv)))
             (assoc conv :url (export-netex/file-download-url config
-                                                (:ote.db.transport-service/id conv)
-                                                (:ote.db.netex/id conv)))
+                                                             (:ote.db.transport-service/id conv)
+                                                             (:ote.db.netex/id conv)))
             conv))
         conversions))
 
@@ -553,6 +555,49 @@
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:error (str e)})})))
 
+(defn prepare-for-diff [service]
+  (dissoc service
+          ::t-service/id
+          ::t-service/parent-id
+          ::t-service/validate
+          ::t-service/published
+          ::modification/modified
+          ::modification/created
+          ::t-service/re-edit))
+
+(defn- validation-differences [db minimal-service]
+  (let [service (prepare-for-diff (transport/all-service-data db (:id minimal-service)))
+        parent-service (prepare-for-diff (transport/all-service-data db (:parent-id minimal-service)))
+        service-diff (data/diff service parent-service)]
+    (assoc minimal-service :diff-child  (first service-diff)
+                           :diff-parent (second service-diff))))
+
+(defn- list-validation-services [db]
+  (let [services (fetch-validation-services db)
+        services (map
+                   (fn [s]
+                     (if (not (nil? (:parent-id s)))
+                       ;; If service has parent-id and re-edit diff values
+                       (validation-differences db s)
+                       ;; If service is validation in fist time, return service as it is
+                       s))
+                   services)]
+    services))
+
+(defn- publish-service [db service-id]
+  (let [service (first (specql/fetch db ::t-service/transport-service
+                                     (specql/columns ::t-service/transport-service)
+                                     {::t-service/id service-id}))]
+    (if (nil? (::t-service/parent-id service))              ;; if service has parent-id it is a child
+      ;; No child - publish only
+      (specql/update! db ::t-service/transport-service
+                      {::t-service/published (java.sql.Timestamp. (System/currentTimeMillis))
+                       ::t-service/validate nil
+                       ::t-service/re-edit nil}
+                      {::t-service/id service-id})
+      ;; Parent must be replaced with child
+      (transport/replace-parent-service-with-child db service-id true))))
+
 (defn- admin-email
   [email-config db]
   (try
@@ -580,6 +625,11 @@
   (csv-data ["Nimi" "Sähköposti"]
             (map (juxt :name :email)
                  (nap-users/list-authority-users db))))
+
+(defn- netex-interfaces-response [db]
+  (csv-data ["Rajapinnan osoite" "Palveluntuottajan nimi" "Palvelun nimi" "Palveluntuottajan email" "Palvelun email" "Käyttäjien email" "Rajapinnan muoto"]
+            (map (juxt :interface-url :top-name :service-name :operator-email :service-email :user-email :interface-format)
+                 (fetch-netex-interfaces-for-admin db))))
 
 (defn- send-pre-notice-email-response [db config]
   (log/debug "send-pre-notice-email-response")
@@ -670,6 +720,14 @@
       (or (authorization-fail-response (:user user))
           (list-netex-conversions-response config db (http/transit-request body))))
 
+    (GET "/admin/validation-services" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (http/no-cache-transit-response (list-validation-services db))))
+
+    (POST "/admin/publish-service" {:keys [body user]}
+      (or (authorization-fail-response (:user user))
+          (http/transit-response (publish-service db (:id (http/transit-request body))))))
+
     (POST "/admin/transport-service/delete" {user :user form-data :body}
       (require-admin-user "random url that is not used" (:user user))
       (http/transit-response
@@ -682,6 +740,7 @@
       (http/transit-response
         (delete-transport-operator! db user
                                     (:id (http/transit-request form-data)))))
+
     (GET "/admin/user-operators-by-business-id/:business-id" {{:keys [business-id]}
                                                               :params
                                                               user :user}
@@ -735,7 +794,6 @@
     (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db type))
 
-
   ^{:format :csv
     :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/port" {user :user}
@@ -746,7 +804,13 @@
     :filename (str "toimivaltaiset-viranomaiset-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/tvv" {user :user}
     (or (authorization-fail-response (:user user))
-        (tvv-response db))))
+        (tvv-response db)))
+
+  ^{:format :csv
+    :filename (str "netex-rajapinnat-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/netex-interfaces" {user :user}
+    (or (authorization-fail-response (:user user))
+        (netex-interfaces-response db))))
 
 (define-service-component MonitorReport []
   {}

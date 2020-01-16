@@ -7,7 +7,6 @@
   :admin "Admin"
   :monitor "Övervakning"}
 
-
  ;; Labels for database fields
  :field-labels
  {;; Transport operator fields
@@ -92,12 +91,12 @@
    ;; Advance reservation
    :ote.db.transport-service/advance-reservation "Förhandsbokning"}
 
-
   ;; Service exception
   :service-exception
   {:description "Undantag, ingen tjänst"
    :from-date "Startdatum"
-   :to-date "Slutdatum"}
+   :to-date "Slutdatum"
+   :service-hour-exceptions "Undantag från servicetider"}
 
   ;; Passenger transportation fields
   :passenger-transportation
@@ -122,7 +121,6 @@
    :ote.db.transport-service/pricing-url "Prissättning www-sidor"
    :ote.db.transport-service/payment-method-description "Betalssätt tilläggsinfo"}
 
-
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Inomhuskarta www-sidor"
@@ -130,8 +128,6 @@
    :ote.db.transport-service/description "Tjänstebeskriving"
    :ote.db.transport-service/information-service-accessibility "Information (tillgänglighet)"
    :ote.db.transport-service/accessibility "Tillgänglighet"
-
-
 
    ;; assistance_notification_requirement fields
    :ote.db.transport-service/hours-before "Tjänsten måste beställas (timmar) i förväg"
@@ -141,7 +137,6 @@
    :ote.db.transport-service/assistance-description "Beskriving av assistenstjänster"
    :ote.db.transport-service/assistance-place-description "Assistanstjänsternas placering i terminalen/stationen"
    :ote.db.transport-service/assistance-by-reservation "Assistanstjänsten bör beställas på förhand."}
-
 
   ;; Rental fields
   :rentals
@@ -207,7 +202,6 @@
    :ote.db.transport-service/maximum-stay "Max parkeringstid"
    :maximum-stay-limited "Parkeringstid begränsad"}
 
-
   :transport-service
   {:ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/additional-services "Övriga tjänster"
@@ -216,8 +210,11 @@
    :ote.db.transport-service/type "Tjänstetyp"
    :ote.db.transport-service/sub-type "Kategori"
    :ote.db.transport-service/published? "NAP-status"
-   :ote.db.transport-service/published?-values {true "Publicerad"
-                                                false "Ej publicerad"}
+   :ote.db.transport-service/published?-values {:public "Publicerad"
+                                                :validation "Lähetetty julkaistavaksi"
+                                                :re-validation "Muutokset lähetetty julkaistavaksi"
+                                                :re-edit "Uudelleen muokattavana"
+                                                :draft "Utkast"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Veckodagar"
@@ -232,7 +229,6 @@
    :ote.db.transport-service/available-to "Slutdatum"
    :ote.db.transport-service/available-from-nil "Genast"
    :ote.db.transport-service/available-to-nil "Tillsvidare"}
-
 
   ;; Common fields
   :ote.db.common/street "Adress"
@@ -315,6 +311,7 @@
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
+  :validate-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
   :trip-editor-no-calendar "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
@@ -357,6 +354,8 @@
   :manage-access-rights "Hanterar användarrättigheter"
 
   :save-and-publish "Spara och publicera"
+  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
+  :send "Skicka"
   :save-as-draft "Spara utkast"
   :save-and-send "Spara och skicka"
   :save-updated "Spara uppdaterad info"
@@ -368,6 +367,7 @@
   :add-new-route "Lägg till ny sjörutt"
   :add-new-pre-notice "Nytt ändringsmeddelande"
   :discard "Ångra"
+  :discard-to-admin "Peruuta ja palaa hallintapaneeliin"
 
   :next "Fortsätt"
   :add-transport-service "Lägg till ny tjänst"
@@ -390,7 +390,9 @@
   :add-new-effective-date "Lägg till nytt datum"
   :transport-service-catalog "Tjänstekatalogen"
   :register-to-service "Registrering"
-  :check-out-the-service "Bekanta dig med informationen"}
+  :check-out-the-service "Bekanta dig med informationen"
+  :continue-editing "Jatka tietojen muokkaamista"
+  }
 
  ;; Database enumeration values
  :enums
@@ -602,7 +604,10 @@
                      :schedule-creation "Skapa gränssnitt för rutt- och tidtabellsdata"
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
-                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"}
+                     :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
+                     :not-in-use "Ei käytössä"
+                     :published-service-cannot-be-modified "Voit muokata vain julkaisua odottavaa palvelua."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"
@@ -661,7 +666,7 @@
   :new-user? "Ny användare?"
   :table-header-service-name "Tjänstens namn"
   :table-header-service-url "Tjänstens www-adress"
-  :table-header-NAP-status "NAP status"
+  :table-header-NAP-status "Tjänstens status"
   :table-header-modified "Redigerat"
   :table-header-created "Skapat"
   :table-header-actions "Funktioner"
@@ -724,7 +729,7 @@
   :business-id-heading "FO-nummer:"
   :help-operator-edit-selection "I listan nedan ser du de namn som registrerats i YTJ-systemet. Välj de namn i listan du vill använda som tjänsteproducenter i NAP."
   :help-operator-contact-entry (:md "Kontaktuppgifterna nedan **gäller för samtliga namn och parallellnamn som är registrerade under detta FO-nummer**. Kontaktuppgifterna är hämtade ur YTJ-systemet och de kan inte ändras i NAP. Ifall uppgifterna är felaktiga eller bristfällga kan du göra ändringarna direkt i YTJ-systemet. Ändringarna du gjort i YTJ-systemet kommer sedan att synas på denna sida i NAP. Vad gäller tomma fält för kontaktuppgifter finns två alternativ. 1) Komplettera uppgifterna i YTJ-systemet, varefter de kommer att synas på denna sida i NAP (rekommenderas). 2) Fyll i uppgifterna direkt i fälten nedan (uppgifterna sparas då endast i NAP, inte i YTJ-systemet.)")
-  :help-operator-how-delete (:md "Du kan ta bort tjänsteproducentens uppgifter ur NAP genom att klicka på **Ta bort tjänsteproducent** -knappen. Borttagning är möjlig endast ifall det inte finns publicerade tjänster i NAP under ifrågavarande FO-nummer. Ta först bort eventuella tjänster på sidan **Egna tjänsteuppgifter**")
+  :help-operator-how-delete (:md "Du kan ta bort tjänsteproducentens uppgifter ur NAP genom att klicka på **Ta bort tjänsteproducent** -knappen. Borttagning är möjlig endast ifall det inte finns publicerade tjänster i NAP under tjänsteproducenten. Ta först bort eventuella tjänster på sidan **Egna tjänsteuppgifter**")
   :help-about-ytj-link-desc "Företags- och organisationsdatasystemet (FODS)"
   :help-about-ytj-link "https://www.ytj.fi/sv/index/mikaonytj.html"
   :help-ytj-contact-change-link-desc "Anmäl ändringar på nätet"
@@ -747,7 +752,10 @@
   :radio-button-no-companies "Inga andra företag deltar i tillhandahållandet av denna tjänst."
   :radio-button-url-companies "Ange en web-adress för .csv-filen."
   :radio-button-csv-companies "Ladda upp .csv-filen."
-  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."}
+  :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."
+  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
+  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
+  }
 
  :rentals-page
  {:header-edit-rentals "Redigera uppgifterna gällande uthyrning"
@@ -772,7 +780,6 @@
   :header-accessibility "Tillgänglihet"
   :header-checkboxlist-accessibility "Tillgänglighet"}
 
-
  :parking-page
  {:header-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
   :header-edit-parking "Redigera uppgifter om allmän kommersiell parkeringstjänst"
@@ -786,6 +793,12 @@
   :header-facilities-and-capacities "Parkeringsområden och antaler P-platser"
   :header-charging-points "Laddningspunkter"
   :header-service-hours "Tjänstens öppettider och parkeringstid"}
+
+ :transport-services-common-page
+ {:validation-modal-header "Tietoa julkaisuprosessista"
+  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."
+  :validation-modal-link-text "Palvelun käytön ehdot"
+  }
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
@@ -901,6 +914,7 @@
   :header-authority-pre-notice-list "Meddelanden om ändring i regelbunden persontrafik"
   :no-pre-notices-for-operator "Den valda tjänsteproducenten har inte skapat några meddelanden om ändring i regelbunden persontrafik."
   :no-pre-notices-sent "Den valda tjänsteproducenten har inte skickat några meddelanden om ändring i regelbunden persontrafik till mundigheterna."
+  :pre-notice-drafts "Utkast"
   :sent-pre-notices "Skickade ändringsmeddelanden"
   :no-pre-notices "Inga ändringsmeddelanden"
   :only-for-authorities "Ändringsmeddelanden är endast för officiell användning."
@@ -1154,7 +1168,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   {:title "Vill du lämna denna sida"
    :stay "Stanna"
    :leave "Lämna"
-   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"}
+   :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"
+   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."
+   }
 
   :send-pre-notice
   {:title "Skicka ändringsmeddelandet?"
@@ -1167,6 +1183,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "Nej"
    :ok "Ja"}
+
+  :continue-editing
+  {:title "Jatka tietojen muokkaamista"
+   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta? Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
   }
 
  :operators

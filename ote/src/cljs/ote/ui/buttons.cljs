@@ -29,6 +29,14 @@
                      (stylefy/use-style style-buttons/primary-button)))
     [ic/editor-publish {:style {:color "#FFFFFF" :margin-right "1rem"}}] [:span label]]])
 
+(defn save-publish-table-row [opts label]
+  [button-container
+   [:button (merge opts
+                   (if (:disabled opts)
+                     (stylefy/use-style style-buttons/disabled-button)
+                     (stylefy/use-style style-buttons/save-row-button)))
+    [ic/editor-publish {:style {:color "#FFFFFF" :margin-left "-10px"}}] [:span label]]])
+
 (defn save-draft [opts label]
   [button-container
    [:button (merge opts

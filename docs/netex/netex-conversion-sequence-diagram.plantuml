@@ -21,9 +21,9 @@ activate CONVERTER
 return Return changed gtfs.zip
 NAP -> CONVERTER : GTFS->NeTEx conversion
 activate CONVERTER
-CONVERTER->FJ: Call coverter using Firejail
+CONVERTER->FJ: Call converter using Firejail
 activate FJ
-FJ->CHOUETTE: invoke choutette.sh shell script (gtfs.zip, inputGtfs.json, outputNetex.json)
+FJ->CHOUETTE: Invoke choutette.sh shell script (gtfs.zip, inputGtfs.json, outputNetex.json)
 activate CHOUETTE
 return Return process exit info
 return Return process exit info

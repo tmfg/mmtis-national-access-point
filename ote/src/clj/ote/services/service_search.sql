@@ -42,6 +42,7 @@ SELECT COUNT(x."business-id")
 -- Finds operators by name and by business-id and services that have companies added as "operators.
 SELECT op.name as "operator", op."business-id" as "business-id"
   FROM "transport-operator" op
+       JOIN "transport-service" ts ON ts."transport-operator-id" = op.id AND ts.published IS NOT NULL
  WHERE ( op.name ILIKE :name OR op."business-id" = :businessid)
    AND op."deleted?" = FALSE
 UNION

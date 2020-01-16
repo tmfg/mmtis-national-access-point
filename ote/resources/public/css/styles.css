@@ -351,3 +351,21 @@ span.search-card-title {
     top: 0 !important;
     width: 40px !important;
 }
+
+@media screen and (max-width: 767px) {
+    .inner-delete-button {
+        padding-top: 1rem;
+    }
+}
+@media screen and (min-width: 767px) and (max-width: 991px) {
+    .inner-delete-button {
+        padding-left: 1rem;
+        padding-top: 1rem;
+    }
+}
+@media screen and (min-width: 991px) {
+    .inner-delete-button {
+        padding-left: 2rem;
+        padding-top: 1rem;
+    }
+}

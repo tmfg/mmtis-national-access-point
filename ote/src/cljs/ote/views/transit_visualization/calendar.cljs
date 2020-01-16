@@ -79,7 +79,7 @@
    [comparison-dates compare]
 
    (when (seq diff)
-     [tv-change-icons/change-icons-for-calendar diff true])])
+     [tv-change-icons/change-icons-for-header diff true])])
 
 ;; Ui
 (defn route-calendar [e! url-router-params

@@ -77,7 +77,7 @@
        (reset! state
                (select-keys app [:before-unload-message :navigation-prompt-open?])))}))
 
-(defn navigation-prompt [e! msg confirm]
+(defn navigation-prompt [e! msg confirm before-unload-fn]
   (let [msg (if (vector? msg)
               (tr msg)
               msg)
@@ -91,7 +91,7 @@
                                            :on-click #(e! (fp-controller/->StayOnPage))} (tr :stay)])
                           (r/as-element
                             [buttons/cancel {:id "btn-confirm-leave-page"
-                                             :on-click #(e! confirm)} (tr :leave)])]}
+                                             :on-click #(e! (or before-unload-fn confirm) )} (tr :leave)])]}
      msg]))
 
 (defn theme
@@ -110,6 +110,7 @@
               navigation-prompt-open? :navigation-prompt-open?
               navigation-confirm :navigation-confirm
               before-unload-message :before-unload-message
+              before-unload-fn :before-unload-fn
               :as app} content]
        [ui/mui-theme-provider
         {:mui-theme
@@ -145,5 +146,5 @@
                    [flash-message e! (or msg (tr [:common-texts :logged-in]))])
              content
              (when navigation-prompt-open?
-               [navigation-prompt e! before-unload-message navigation-confirm])
+               [navigation-prompt e! before-unload-message navigation-confirm before-unload-fn])
              [debug-state app]]])})))
