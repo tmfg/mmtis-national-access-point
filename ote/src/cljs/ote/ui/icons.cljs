@@ -17,6 +17,9 @@
 (defn outline-ballot []
   [:img {:src "/img/icons/outline-ballot-24px.svg"}])
 
+(defn outline-ballot-disabled []
+  [:img {:src "/img/icons/outline-ballot-disabled-24px.svg"}])
+
 (defn outline-add-box []
   [:img {:src "/img/icons/outline-add-box.svg"}])
 

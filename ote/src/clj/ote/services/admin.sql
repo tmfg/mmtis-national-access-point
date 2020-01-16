@@ -182,6 +182,36 @@ SELECT
           r.id, top.id, ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday
  ORDER BY r.id, "to-date" DESC;
 
+-- name: fetch-netex-interfaces-for-admin
+select TRIM((eid."external-interface").url) as "interface-url",
+       top.name as "top-name",
+       ts.name as "service-name",
+       array_to_string(eid."data-content", ',') as "interface-content",
+       TRIM(top.email) as "operator-email",
+       TRIM(ts."contact-email") as "service-email",
+       array_to_string(array_agg(u.email), '|') as "user-email",
+       eid.format[1] as "interface-format"
+FROM
+    "external-interface-description" eid,
+    "transport-service" ts,
+    "transport-operator" top,
+    "group" g,
+    "member" m,
+    "user" u
+WHERE ts.id = eid."transport-service-id"
+  AND top."ckan-group-id" = g.id
+  AND m.table_name = 'user'
+  AND m.state = 'active'
+  AND m.table_id = u.id
+  AND m.group_id = g.id
+  AND u.email NOT LIKE '%@matkahuolto.fi'
+  AND top.id = ts."transport-operator-id"
+  AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
+  AND 'route-and-schedule' = ANY(eid."data-content")
+GROUP BY top.name, ts.name, eid.format[1], eid."external-interface", eid."data-content", ts."contact-email", top.email;
+
+
+
 -- name: fetch-netex-conversions-for-admin
 SELECT n.id as "netex-conversion-id",
        n."external-interface-description-id",
@@ -199,3 +229,11 @@ SELECT n.id as "netex-conversion-id",
    AND top.id = ts."transport-operator-id"
    AND (:operator::TEXT IS NULL OR top.name ilike :operator)
 ORDER BY n.modified DESC, n.created, ts.name;
+
+-- name: fetch-validation-services
+SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
+       s.validate, s."transport-operator-id", o.name as "operator-name", s."re-edit", s."parent-id"
+    FROM "transport-service" s, "transport-operator" o
+    WHERE s.validate IS NOT NULL
+      AND s."transport-operator-id" = o.id
+    ORDER BY s.validate ASC;

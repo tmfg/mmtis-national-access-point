@@ -7,7 +7,6 @@
             [compojure.core :refer [routes GET]]
             [clojure.string :as str]
             [taoensso.timbre :as log]
-            [ote.geo :as geo]
             [ote.util.functor :refer [fmap]]
             [specql.core :as specql]
             [ote.db.places :as places]
@@ -26,30 +25,31 @@
 
 (defn place-by-id [db id]
   (first
-   (specql/fetch db ::places/places
-                 #{::places/namefin ::places/id ::places/type ::places/location}
-                 {::places/id id})))
+    (specql/fetch db ::places/places
+                  #{::places/namefin ::places/id ::places/type ::places/location}
+                  {::places/id id})))
 
 (defn save-transport-service-operation-area!
   "Clear old place links and insert new links for the given transport service.
   Should be called within a transaction."
-  [db transport-service-id places]
+  [db transport-service-id places delete-existing?]
 
   (let [stored (into #{}
                      (comp (filter #(= (::places/type %) "stored"))
                            (map ::places/id))
                      places)]
     ;; Remove linked geometries, except drawn geometries that were not removed
-    (specql/delete! db ::t-service/operation_area
-                    (merge
-                     {::t-service/transport-service-id transport-service-id}
-                     (when-not (empty? stored)
-                       {::t-service/id (op/not (op/in stored))}))))
+    (when delete-existing?
+      (specql/delete! db ::t-service/operation_area
+                      (merge
+                        {::t-service/transport-service-id transport-service-id}
+                        (when-not (empty? stored)
+                          {::t-service/id (op/not (op/in stored))})))))
 
   (doseq [{::places/keys [id namefin type primary?] :as place} places]
     (case type
       "drawn"
-      (let [{id :id} 
+      (let [{id :id}
             (insert-geojson-for-transport-service<! db {:transport-service-id transport-service-id
                                                         :name namefin
                                                         :geojson (:geojson place)
@@ -77,21 +77,34 @@
                   ::t-service/primary?}
                 {::t-service/transport-service-id transport-service-id}))
 
+(defn duplicate-operation-area [db old-service-id new-service-id places-from-ui]
+  (let [;; Places with int id are coming fron database
+        places-in-db (filter #(integer? (:ote.db.places/id %)) places-from-ui)
+        ;; Places with string id's are made by user in ui
+        created-places (filter #(not (integer? (:ote.db.places/id %))) places-from-ui)
+        ;; Copy all places that are stored in db to the new service
+        copied-places (copy-operation-area db {:old-service-id old-service-id :new-service-id new-service-id
+                                               :ids (map :ote.db.places/id places-in-db)})
+
+        ;; Save new places
+        new-places (save-transport-service-operation-area! db new-service-id created-places false)]
+    nil))
+
 (defrecord Places [sources]
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-           (http/publish!
-            http
-            {:authenticated? false}
-            (routes
-             (GET "/place-completions/:term" [term]
-                  (http/transit-response
-                   (place-completions db term)))
-             (GET "/place/:id" [id]
-                  {:status 200
-                   :headers {"Content-Type" "application/json"}
-                   :body (fetch-place-geojson-by-id db {:id id})})))))
+                (http/publish!
+                  http
+                  {:authenticated? false}
+                  (routes
+                    (GET "/place-completions/:term" [term]
+                      (http/transit-response
+                        (place-completions db term)))
+                    (GET "/place/:id" [id]
+                      {:status 200
+                       :headers {"Content-Type" "application/json"}
+                       :body (fetch-place-geojson-by-id db {:id id})})))))
 
   (stop [{stop ::stop :as this}]
     (stop)

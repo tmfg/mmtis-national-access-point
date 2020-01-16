@@ -1,34 +1,35 @@
 (ns ote.app.controller.transport-service
   "Transport operator controls "                            ;; FIXME: Move transport-service related stuff to other file
   (:require [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.communication :as comm]
-            [taoensso.timbre :as log]
             [clojure.string :as str]
+            [taoensso.timbre :as log]
             [testdouble.cljs.csv :as csv]
-            [ote.time :as time]
-            [ote.util.csv :as csv-util]
-            [ote.localization :refer [tr tr-key tr-tree]]
+            [ote.communication :as comm]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
+            [ote.time :as time]
+            [ote.util.csv :as csv-util]
+            [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
             [ote.ui.validation :as validation]
             [ote.app.routes :as routes]
-            [ote.app.controller.place-search :as place-search]
-            [ote.app.controller.front-page :as front-page]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.controller.flags :as flags]
+            [ote.app.controller.front-page :as fp-controller]
+            [ote.app.controller.place-search :as place-search]))
 
 (defn- pre-set-transport-type [app]
   (let [sub-type (get-in app [:transport-service ::t-service/sub-type])
         set-transport-type (fn [app service-type options]
-                                 (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
+                             (assoc-in app [:transport-service service-type ::t-service/transport-type] options))]
     (cond
       (= sub-type :taxi) (set-transport-type app ::t-service/passenger-transportation #{:road})
       (= sub-type :parking) (set-transport-type app ::t-service/parking #{:road})
       :else app)))
 
 (defn service-type-from-sub-type
-      "Returns service type keyword based on sub-type."
+  "Returns service type keyword based on sub-type."
   [type]
   (case type
     :taxi :passenger-transportation
@@ -64,9 +65,9 @@
   {}
   (let [type (get-in app [:transport-service ::t-service/type])
         type-key (t-service/service-key-by-type type)]
-  (-> app
-      (assoc-in [:transport-service :show-brokering-service-dialog?] false )
-      (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
+    (-> app
+        (assoc-in [:transport-service :show-brokering-service-dialog?] false)
+        (assoc-in [:transport-service type-key ::t-service/brokerage?] select-type))))
 
 ;;; Navigation hook events for new service creation and editing
 
@@ -84,7 +85,7 @@
 
 (defn new-transport-service [app]
   (pre-set-transport-type
-   (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})))
+    (update app :transport-service select-keys #{::t-service/type ::t-service/sub-type})))
 
 (def service-level-keys
   #{::t-service/contact-address
@@ -96,6 +97,9 @@
     ::t-service/operation-area
     ::t-service/companies
     ::t-service/published
+    ::t-service/validate
+    ::t-service/re-edit
+    ::t-service/parent-id
     ::t-service/brokerage?
     ::t-service/description
     ::t-service/available-from
@@ -107,8 +111,6 @@
     :csv-count
     ::t-service/transport-type})
 
-
-
 (defrecord AddPriceClassRow [])
 (defrecord AddServiceHourRow [])
 (defrecord RemovePriceClassRow [])
@@ -119,21 +121,19 @@
 (defrecord OpenTransportServicePage [id])
 (defrecord OpenTransportServiceTypePage [])
 
-
 (defrecord DeleteTransportService [id])
 (defrecord ConfirmDeleteTransportService [id])
 (defrecord CancelDeleteTransportService [id])
 (defrecord DeleteTransportServiceResponse [response])
 (defrecord FailedDeleteTransportServiceResponse [response])
 
-(defrecord PublishTransportService [transport-service-id])
-(defrecord PublishTransportServiceResponse [success? transport-service-id])
-
 (defrecord EditTransportService [form-data])
-(defrecord SaveTransportService [schemas publish?])
+(defrecord ConfirmSaveTransportService [schemas])
+(defrecord SaveTransportService [schemas validate?])
+(defrecord CancelSaveTransportService [])
 (defrecord SaveTransportServiceResponse [response])
 (defrecord FailedTransportServiceResponse [response])
-(defrecord CancelTransportServiceForm [])
+(defrecord CancelTransportServiceForm [admin])
 
 (defrecord SelectServiceType [data])
 (defrecord SetNewServiceType [type])
@@ -148,6 +148,12 @@
 
 (defrecord AddImportedCompaniesToService [csv filename])
 
+(defrecord ToggleEditingDialog [])
+(defrecord ConfirmEditing [])
+(defrecord ReEditResponse [response])
+(defrecord BackToValidation [id])
+(defrecord BackToValidationResponse [response])
+
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
 
@@ -160,9 +166,9 @@
                  services))))
 
 (defmulti transform-save-by-type
-  "Transform transport service before sending it to the server.
-  Dispatches on the type. By default, returns service as is."
-  ::t-service/type)
+          "Transform transport service before sending it to the server.
+          Dispatches on the type. By default, returns service as is."
+          ::t-service/type)
 
 (defmethod transform-save-by-type :rentals [service]
   (-> service
@@ -170,33 +176,33 @@
                  (fn [pick-up-locations]
                    (map (fn [{hours-and-exceptions ::t-service/service-hours-and-exceptions :as pick-up-location}]
                           (as-> pick-up-location loc
-                            (if-let [hours (::t-service/service-hours hours-and-exceptions)]
-                              (assoc loc ::t-service/service-hours hours)
-                              loc)
-                            (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
-                              (assoc loc ::t-service/service-exceptions exceptions)
-                              loc)
-                            (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
-                              (assoc loc ::t-service/service-hours-info info)
-                              loc)
-                            (dissoc loc ::t-service/service-hours-and-exceptions)))
+                                (if-let [hours (::t-service/service-hours hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-hours hours)
+                                  loc)
+                                (if-let [exceptions (::t-service/service-exceptions hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-exceptions exceptions)
+                                  loc)
+                                (if-let [info (::t-service/service-hours-info hours-and-exceptions)]
+                                  (assoc loc ::t-service/service-hours-info info)
+                                  loc)
+                                (dissoc loc ::t-service/service-hours-and-exceptions)))
                         pick-up-locations)))
       (update-in [::t-service/rentals ::t-service/vehicle-classes]
                  (fn [vehicle-classes]
                    (mapv (fn [{prices-and-units :price-group :as price-group}]
                            (as-> price-group price
-                             (if-let [prices (::t-service/price-classes prices-and-units)]
-                               (assoc price ::t-service/price-classes prices)
-                               price)
-                             (dissoc price :price-group)))
+                                 (if-let [prices (::t-service/price-classes prices-and-units)]
+                                   (assoc price ::t-service/price-classes prices)
+                                   price)
+                                 (dissoc price :price-group)))
                          vehicle-classes)))))
 
 (defmethod transform-save-by-type :default [service] service)
 
 (defmulti transform-edit-by-type
-  "Transform transport service for editing after receiving it from the server.
-  Dispatches on the type. By default, returns service as is."
-  ::t-service/type)
+          "Transform transport service for editing after receiving it from the server.
+          Dispatches on the type. By default, returns service as is."
+          ::t-service/type)
 
 (defmethod transform-edit-by-type :rentals [service]
   (-> service
@@ -229,27 +235,27 @@
 (defn- add-service-for-operator [app service]
   ;; Add service for currently selected transport operator and transport-operator-vector
   (as-> app app
-      (update app :transport-operators-with-services
-              (fn [operators-with-services]
-                (map (fn [operator-with-services]
-                       (if (= (get-in operator-with-services [:transport-operator ::t-operator/id])
-                              (::t-service/transport-operator-id service))
-                         (update operator-with-services :transport-service-vector
-                                 (fn [services]
-                                   (let [service-idx (first (keep-indexed (fn [i s]
-                                                                            (when (= (::t-service/id s)
-                                                                                     (::t-service/id service))
-                                                                              i)) services))]
-                                     (if service-idx
-                                       (assoc (vec services) service-idx service)
-                                       (conj (vec services) service)))))
-                         operator-with-services))
-                     operators-with-services)))
-      (assoc app :transport-service-vector
-                 (some #(when (= (get-in % [:transport-operator ::t-operator/id])
-                                 (get-in app [:transport-operator ::t-operator/id]))
-                          (:transport-service-vector %))
-                       (:transport-operators-with-services app)))))
+        (update app :transport-operators-with-services
+                (fn [operators-with-services]
+                  (map (fn [operator-with-services]
+                         (if (= (get-in operator-with-services [:transport-operator ::t-operator/id])
+                                (::t-service/transport-operator-id service))
+                           (update operator-with-services :transport-service-vector
+                                   (fn [services]
+                                     (let [service-idx (first (keep-indexed (fn [i s]
+                                                                              (when (= (::t-service/id s)
+                                                                                       (::t-service/id service))
+                                                                                i)) services))]
+                                       (if service-idx
+                                         (assoc (vec services) service-idx service)
+                                         (conj (vec services) service)))))
+                           operator-with-services))
+                       operators-with-services)))
+        (assoc app :transport-service-vector
+                   (some #(when (= (get-in % [:transport-operator ::t-operator/id])
+                                   (get-in app [:transport-operator ::t-operator/id]))
+                            (:transport-service-vector %))
+                         (:transport-operators-with-services app)))))
 
 (defn str-pul-cc->keyword-cc
   "DB stores country-codes as a string. Change pick-up country-code strings to keywords for ui."
@@ -305,6 +311,14 @@
                   service)]
     (assoc-in service [key ::t-service/contact-address ::common/country_code] country-code)))
 
+(defn toggle-edit-dialog [app]
+  (assoc-in app [:transport-service :edit-dialog] (not (get-in app [:transport-service :edit-dialog]))))
+
+(defn validate-or-publish [service validate?]
+  (if (flags/enabled? :service-validation)
+    (assoc service ::t-service/validate? validate?)
+    (assoc service ::t-service/published? validate?)))
+
 (extend-protocol tuck/Event
 
   AddPriceClassRow
@@ -326,8 +340,7 @@
   (process-event [{data :data} app]
     (let [type (service-type-from-sub-type data)
           app (assoc-in app [:transport-service ::t-service/sub-type] data)
-          app (assoc-in app [:transport-service ::t-service/type] type)
-          ]
+          app (assoc-in app [:transport-service ::t-service/type] type)]
       app))
 
   NavigateToNewService
@@ -377,11 +390,11 @@
                     {:url url}
                     {:on-success (tuck/send-async! ->EnsureCsvFileResponse)
                      :on-failure (tuck/send-async! ->FailedCsvFileResponse)}))
-    (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
+      (update-in app [:transport-service ::t-service/passenger-transportation] dissoc :csv-count)))
 
   EnsureCsvFileResponse
   (process-event [{response :response} app]
-    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count]  response))
+    (assoc-in app [:transport-service ::t-service/passenger-transportation :csv-count] response))
 
   FailedCsvFileResponse
   (process-event [{response :response} app]
@@ -453,37 +466,17 @@
     (set! (.-location js/window) (str "/ote/#/edit-service/" id))
     app)
 
-  PublishTransportService
-  (process-event [{:keys [transport-service-id]} app]
-    (comm/post! (str "transport-service/publish")
-                {:transport-service-id transport-service-id}
-                {:on-success (tuck/send-async! ->PublishTransportServiceResponse transport-service-id)})
-    app)
-
-  PublishTransportServiceResponse
-  (process-event [{success? :success? transport-service-id :transport-service-id :as e} app]
-
-    (if success?
-      (update app :transport-services
-              (fn [services]
-                (map (fn [{id ::t-service/id :as service}]
-                       (if (= id transport-service-id)
-                         (assoc service ::t-service/published? true)
-                         service))
-                     services)))
-      app))
-
   DeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
-     app id
-     assoc :show-delete-modal? true))
+      app id
+      assoc :show-delete-modal? true))
 
   CancelDeleteTransportService
   (process-event [{id :id} app]
     (update-service-by-id
-     app id
-     dissoc :show-delete-modal?))
+      app id
+      dissoc :show-delete-modal?))
 
   ConfirmDeleteTransportService
   (process-event [{id :id} app]
@@ -498,35 +491,47 @@
           app (assoc app :transport-service-vector filtered-map
                          :flash-message (tr [:common-texts :delete-service-success])
                          :services-changed? true)]
-      (front-page/get-transport-operator-data app)
+      (fp-controller/get-transport-operator-data app)
       app))
 
   FailedDeleteTransportServiceResponse
   (process-event [{response :response} app]
     (assoc app :flash-message-error (tr [:common-texts :delete-service-error])))
 
+  CancelSaveTransportService
+  (process-event [_ app]
+    ;; Close modal
+    (assoc-in app [:transport-service :show-confirm-save-dialog?] false))
+
+  ConfirmSaveTransportService
+  (process-event [{schemas :schemas} app]
+    (assoc-in app [:transport-service :show-confirm-save-dialog?] true))
+
   SaveTransportService
-  (process-event [{:keys [schemas publish?]} {service :transport-service
-                                              operator :transport-operator :as app}]
+  (process-event [{:keys [schemas validate?]} {service :transport-service
+                                               operator :transport-operator :as app}]
     (let [key (t-service/service-key-by-type (::t-service/type service))
           operator-id (if (nil? (::t-service/transport-operator-id service))
                         (::t-operator/id operator)
                         (::t-service/transport-operator-id service))
+          ;; Service validation flag changes if service is saved as public or validate
+          service (validate-or-publish service validate?)
           service-data
           (-> service
               (update key (comp (partial form/prepare-for-save schemas)
                                 form/without-form-metadata))
               (dissoc :transport-service-type-subtype
                       :select-transport-operator
-                      :show-brokering-service-dialog?)
+                      :show-brokering-service-dialog?
+                      :show-confirm-save-dialog?
+                      :edit-dialog)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
-              (assoc ::t-service/published? publish?
-                     ::t-service/transport-operator-id operator-id)
+              (assoc ::t-service/transport-operator-id operator-id)
               (update ::t-service/operation-area place-search/place-references)
               (update ::t-service/external-interfaces
-                       (fn [d]
-                         (mapv #(dissoc % :eif-validation-timeout) d)))
+                      (fn [d]
+                        (mapv #(dissoc % :eif-validation-timeout) d)))
               transform-save-by-type)]
       ;; Disable post if concurrent save event is in progress
       (if (not (:service-save-in-progress app))
@@ -543,13 +548,13 @@
     (let [app (add-service-for-operator
                 (assoc app :flash-message (tr [:common-texts :transport-service-saved]))
                 response)]
-    (routes/navigate! :own-services)
-    (-> app
-        (assoc :service-save-in-progress false
-               :services-changed? true)
-        (dissoc :transport-service
-                ;; Remove navigation prompt message only if save was successful.
-                :before-unload-message))))
+      (routes/navigate! :own-services)
+      (-> app
+          (assoc :service-save-in-progress false
+                 :services-changed? true)
+          (dissoc :transport-service
+                  ;; Remove navigation prompt message only if save was successful.
+                  :before-unload-message))))
 
   FailedTransportServiceResponse
   (process-event [{response :response} app]
@@ -558,14 +563,19 @@
 
   EditTransportService
   (process-event [{form-data :form-data} {ts :transport-service :as app}]
-    (let [key (t-service/service-key-by-type (::t-service/type ts))]
+    (let [key (t-service/service-key-by-type (::t-service/type ts))
+          unsaved-key (if (get-in app [:transport-service key ::t-service/re-edit])
+                        [:dialog :navigation-prompt :unsaved-validated-data]
+                        [:dialog :navigation-prompt :unsaved-data])]
       (-> app
           (update-in [:transport-service key] merge form-data)
-          (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-data]))))
+          (assoc :before-unload-message unsaved-key))))
 
   CancelTransportServiceForm
-  (process-event [_ app]
-    (routes/navigate! :own-services)
+  (process-event [{admin :admin} app]
+    (if admin
+      (routes/navigate! :admin)
+      (routes/navigate! :own-services))
     app)
 
   SetNewServiceType
@@ -573,9 +583,49 @@
     ;; This is needed when directly loading a new service URL to set the type
     (let [sub-type (keyword (get-in app [:params :sub-type]))]
       (-> app
-        (assoc-in [:transport-service ::t-service/sub-type] sub-type)
-        (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type))
-        (pre-set-transport-type)))))
+          (assoc-in [:transport-service ::t-service/sub-type] sub-type)
+          (assoc-in [:transport-service ::t-service/type] (service-type-from-sub-type sub-type))
+          (pre-set-transport-type))))
+
+  ToggleEditingDialog
+  (process-event [_ app]
+    (toggle-edit-dialog app))
+
+  ReEditResponse
+  (process-event [{response :response} app]
+    ;; Assume that everything is ok because this requires 200 ok response
+    (let [sub-service (keyword (str "ote.db.transport-service/" (name (get-in app [:transport-service ::t-service/type]))))]
+      (-> app
+          (toggle-edit-dialog)
+          (assoc-in [:transport-service sub-service ::t-service/validate] nil)
+          (assoc-in [:transport-service sub-service ::t-service/re-edit] response)
+          (assoc :transport-service-loaded? true)
+          (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-validated-data])
+          (assoc :before-unload-fn (ote.app.controller.transport-service/->BackToValidation (get-in app [:transport-service ::t-service/id]))))))
+
+  ConfirmEditing
+  (process-event [_ app]
+    (comm/post! (str "transport-service/" (get-in app [:transport-service ::t-service/id]) "/re-edit-service") {}
+                {:on-success (tuck/send-async! ->ReEditResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc app :transport-service-loaded? false))
+
+  BackToValidationResponse
+  (process-event [{response :response} app]
+    (routes/navigate! :own-services)
+    (-> app
+        (dissoc :navigation-prompt-open?
+                :before-unload-message
+                :before-unload-fn
+                :navigation-confirm)
+        (assoc :transport-service-loaded? true)))
+
+  BackToValidation
+  (process-event [{id :id} app]
+    (comm/post! (str "transport-service/" id "/back-to-validation") {}
+                {:on-success (tuck/send-async! ->BackToValidationResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc app :transport-service-loaded? false)))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the
@@ -583,10 +633,10 @@
   [service from]
   (reduce (fn [service key]
             (as-> service s
-              (if (contains? (get service from) key)
-                (assoc s key (get-in service [from key]))
-                s)
-              (update s from dissoc key)))
+                  (if (contains? (get service from) key)
+                    (assoc s key (get-in service [from key]))
+                    s)
+                  (update s from dissoc key)))
           service
           service-level-keys))
 
@@ -595,10 +645,10 @@
   [service to]
   (reduce (fn [service key]
             (as-> service s
-              (if (contains? service key)
-                (assoc-in s [to key] (get service key))
-                s)
-              (dissoc s key)))
+                  (if (contains? service key)
+                    (assoc-in s [to key] (get service key))
+                    s)
+                  (dissoc s key)))
           service
           service-level-keys))
 
@@ -623,9 +673,9 @@
   [csv-data]
   (let [headers (first csv-data)
         companies (map (fn [[business-id name]]
-           {::t-service/business-id (clean-up-csv-value business-id)
-            ::t-service/name        (clean-up-csv-value name)})
-         (rest csv-data))]
+                         {::t-service/business-id (clean-up-csv-value business-id)
+                          ::t-service/name (clean-up-csv-value name)})
+                       (rest csv-data))]
     companies))
 
 (defn read-companies-csv! [e! file-input filename]
@@ -637,3 +687,24 @@
                   csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator separator))]
               (e! (->AddImportedCompaniesToService csv filename)))))
     (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
+
+(defn service-state [validate re-edit published is-child?]
+  (if (flags/enabled? :service-validation)
+    (cond
+      (some? re-edit) :re-edit
+      (some? published) :public
+      (and (not is-child?) (some? validate)) :validation    ;; First time in validation
+      (and is-child? (some? validate)) :re-validation       ;; Service is already at least once validated
+      :else :draft)
+    (if (some? published)
+      :public
+      :draft)))
+
+(defn in-readonly? [in-validation? admin-validating-id service-id]
+  (if (flags/enabled? :service-validation)
+    ;; If flag is enabled, there is a change that service is in readonly state
+    (and
+      in-validation?
+      (not= service-id admin-validating-id))
+    ;; If flag is not set service could not be in readonly state
+    false))

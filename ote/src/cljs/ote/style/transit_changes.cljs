@@ -91,7 +91,7 @@
    :font-size "1.125rem"
    :font-family "Montserrat"
    :padding "0.875rem 0.875rem 0.875rem 0.625rem"
-   :line-height 2
+   :line-height "2rem"
    :font-weight "600"})
 
 (def infobox {:background-color "#FAFAFA"
@@ -116,7 +116,7 @@
 (def section-header
   {:padding "1rem"
    :background-color "#F0F0F0"
-   :line-height 1.5})
+   :line-height "1.5rem"})
 
 (def section-body
   {:padding-left "1.25rem"

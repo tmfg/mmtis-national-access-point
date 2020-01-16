@@ -1,26 +1,28 @@
 (ns ote.ui.main-header
   "Main header of the OTE app"
   (:require [reagent.core :as r]
+            [clojure.string :as str]
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.common :refer [linkify]]
-            [ote.views.transport-operator :as to]
-            [ote.views.front-page :as fp]
-            [ote.app.controller.front-page :as fp-controller]
-            [ote.views.footer :as footer]
-            [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
+            [ote.util.text :as text]
+            [ote.localization :refer [tr tr-key]]
+            [ote.localization :as localization]
+            [ote.app.localstorage :as localstorage]
+            [ote.app.routes :as routes]
+            [ote.app.utils :refer [user-logged-in?]]
+            [ote.ui.common :refer [linkify]]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
-            [ote.views.theme :refer [theme]]
-            [ote.app.controller.login :as login]
+            [ote.style.base :as base]
             [ote.app.controller.flags :as flags]
-            [clojure.string :as str]
-            [ote.localization :as localization]
-            [ote.util.text :as text]
-            [ote.app.utils :refer [user-logged-in?]]
-            [ote.app.routes :as routes]))
+            [ote.app.controller.login :as login]
+            [ote.app.controller.front-page :as fp-controller]
+            [ote.views.theme :refer [theme]]
+            [ote.views.footer :as footer]
+            [ote.views.front-page :as fp]
+            [ote.views.transport-operator :as to]))
 
 (defn header-scroll-sensor [is-scrolled? trigger-offset]
   (let [sensor-node (atom nil)
@@ -44,8 +46,8 @@
 (defn esc-press-listener [e! app]
   "Listens to keydown events on document. If esc is clicked call CloseHeaderMenus"
   (let [esc-press (fn [event]
-                      (if (= event.keyCode 27)
-                        (e! (fp-controller/->CloseHeaderMenus))))]
+                    (if (= event.keyCode 27)
+                      (e! (fp-controller/->CloseHeaderMenus))))]
     (r/create-class
       {:component-did-mount
        (fn [_]
@@ -73,12 +75,12 @@
   (let [header-open? (get-in app [:ote-service-flags :lang-menu-open])]
     [:div {:style (merge style-topnav/topnav-dropdown
                          (if header-open?
-                           {:opacity    1
+                           {:opacity 1
                             :visibility "visible"}
-                           {:opacity    0
+                           {:opacity 0
                             :visibility "hidden"
                             ;; Remove the element from normal document flow, by setting position absolute.
-                            :position   "absolute"}))}
+                            :position "absolute"}))}
      [:div.container
       [:div.row
        [:div.col-sm-4.col-md-4]
@@ -87,12 +89,12 @@
         [:ul (stylefy/use-style style-topnav/ul)
          (doall
            (for [[lang flag] footer/selectable-languages]
-             ^{:key (str "link_"(name lang) "_" flag)}
+             ^{:key (str "link_" (name lang) "_" flag)}
              [:li
               [:a (merge
                     (stylefy/use-style style-topnav/topnav-dropdown-link)
-                    {:key      lang
-                     :href     "#"
+                    {:key lang
+                     :href "#"
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (fp-controller/->OpenLangMenu))
@@ -104,12 +106,12 @@
     (let [header-open? (get-in app [:ote-service-flags :user-menu-open])]
       [:div {:style (merge style-topnav/topnav-dropdown
                            (if header-open?
-                             {:opacity    1
+                             {:opacity 1
                               :visibility "visible"}
-                             {:opacity    0
+                             {:opacity 0
                               :visibility "hidden"
                               ;; Remove the element from normal document flow, by setting position absolute.
-                              :position   "absolute"}))}
+                              :position "absolute"}))}
        [:div.container.user-menu
         [:div.row
          [:div.col-sm-2.col-md-4]
@@ -120,19 +122,19 @@
              [:li
               [:a (merge (stylefy/use-style
                            style-topnav/topnav-dropdown-link)
-                         {:href     "#/email-settings"
+                         {:href "#/email-settings"
                           :on-click #(e! (fp-controller/->OpenUserMenu))})
                (tr [:common-texts :navigation-email-notification-settings])]])
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
-                       {:href     "#/user"
+                       {:href "#/user"
                         :on-click #(e! (fp-controller/->OpenUserMenu))})
              (tr [:common-texts :user-menu-profile])]]
            [:li
             [:a (merge (stylefy/use-style
                          style-topnav/topnav-dropdown-link)
-                       {:href     "#"
+                       {:href "#"
                         :on-click #(do (.preventDefault %)
                                        (e! (fp-controller/->OpenUserMenu))
                                        (e! (login/->Logout)))})
@@ -269,6 +271,13 @@
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]])
 
+         (when (flags/enabled? :terms-of-service)
+           [:li
+            [linkify (tr [:common-texts :navigation-terms-of-service-url]) (tr [:common-texts :navigation-terms-of-service])
+             (merge (stylefy/use-style
+                      style-topnav/topnav-dropdown-link)
+                    {:target "_blank"})]])
+
          [:li
           [linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style
@@ -294,7 +303,7 @@
                   (if @is-scrolled?
                     {:padding-top "0px"}
                     {:padding-top "11px"}))
-         :href "#"
+         :href "/#/"
          :on-click #(do
                       (e! (fp-controller/->CloseHeaderMenus))
                       (routes/navigate! :front-page))}
@@ -302,14 +311,14 @@
                         style-topnav/logo
                         (when @is-scrolled?
                           style-topnav/logo-small))
-               :src   "img/icons/nap-logo.svg"}]]]
+               :src "img/icons/nap-logo.svg"}]]]
 
       (doall
         (for [{:keys [page label url]}
-              (filter some? [{:page  :services
+              (filter some? [{:page :services
                               :label [:common-texts :navigation-dataset]}
                              (when (user-logged-in? app)
-                               {:page  :own-services
+                               {:page :own-services
                                 :label [:common-texts :navigation-own-service-list]})])]
           ^{:key page}
           [:li.hidden-xs.hidden-sm
@@ -319,8 +328,9 @@
                 (merge style-topnav/desktop-link
                        (when @is-scrolled?
                          {:height "56px"})))
-              {:href (str "#/" (name page))
+              {:href (str "/#/" (name page))
                :on-click #(do
+                            (.preventDefault %)
                             (e! (fp-controller/->CloseHeaderMenus))
                             (routes/navigate! page))})
             [:div
@@ -336,8 +346,8 @@
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :lang-menu-open])
-          [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
-          [ic/action-language {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
+           [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
+           [ic/action-language {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
         [:span {:style {:color "#fff"}} (str/upper-case (name current-language))]]]
 
       [:li (stylefy/use-style style-topnav/li-right)
@@ -350,8 +360,8 @@
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
          (if (get-in app [:ote-service-flags :header-open])
-          [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
-          [ic/navigation-menu {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
+           [ic/navigation-close {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}]
+           [ic/navigation-menu {:style {:color "#fff" :height "24px" :width "30px" :top "5px"}}])]
         [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-general-menu])]]]
 
       (when (user-logged-in? app)
@@ -365,8 +375,8 @@
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                {:margin-top "7px"})}
            (if (get-in app [:ote-service-flags :user-menu-open])
-            [ic/navigation-close {:style {:color "#fff" :height "24px" :width "3px0" :top "5px"}}]
-            [ic/social-person {:style {:color "#fff" :height "2px4" :width "30px" :top "5px"}}])]
+             [ic/navigation-close {:style {:color "#fff" :height "24px" :width "3px0" :top "5px"}}]
+             [ic/social-person {:style {:color "#fff" :height "2px4" :width "30px" :top "5px"}}])]
           [:span.hidden-xs {:style {:color "#fff"}}
            (text/maybe-shorten-text-to 30
                                        (if (clojure.string/blank? (:name user))
@@ -397,18 +407,69 @@
                                  {:margin-top "0px"}))}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
-(defn top-nav [e! app is-scrolled?]
-  [:div
-   [header-scroll-sensor is-scrolled? -250]
-   [esc-press-listener e! app]
-   [:div (stylefy/use-style style-topnav/topnav-wrapper)
-    [:div
-     (stylefy/use-style (merge
-                          style-topnav/topnav-desktop
-                          (when @is-scrolled?
-                            {:height "56px" :line-height "56px"})))
-     [:div.container
-      [top-nav-links e! app is-scrolled?]]]
-    [top-nav-drop-down-menu e! app is-scrolled?]
-    [user-menu e! app]
-    [lang-menu e! app]]])
+(defn tos [e! app desktop?]
+  (let [page (:page app)
+        user (:user app)
+        user-logged-in? (not (nil? user))
+        show-tos? (not (or (= page :register)
+                           (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
+                           (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))]
+    (when show-tos?
+      [:div {:style
+             (merge
+               style-topnav/tos-container
+               (when-not desktop?
+                 {:padding "2px"}))}
+       [:div {:style {:display "inline-flex" :width "90%"}}
+        [ic/action-info {:style {:color "#FFFFFF"}}]
+        [:span (stylefy/use-style style-topnav/tos-texts)
+         (tr [:common-texts :agree-to-privacy-and-terms])
+         (linkify (tr [:common-texts :navigation-terms-of-service-url]) (str/lower-case (tr [:common-texts :navigation-terms-of-service])) {:style style-topnav/tos-toplink
+                                                                                                                                            :target "_blank"})
+         (tr [:common-texts :and])
+         (linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy-text]) {:style (merge style-topnav/tos-toplink
+                                                                                                                                      {:padding-right 0})
+                                                                                                                        :target "_blank"})
+         (tr [:common-texts :navigation-terms-and-cookies])]]
+       [:div {:style (merge
+                       {:width "20px" :float "right"}
+                       (when-not desktop?
+                         {:padding-top "10px"}))}
+        [:span {:on-click #(do
+                             (.preventDefault %)
+                             (e! (fp-controller/->CloseTermsAndPrivacy user)))}
+         [ic/navigation-close {:style {:color "#FFFFFF"}}]]]])))
+
+(defn top-nav [e! app is-scrolled? desktop?]
+  (let [user (:user app)
+        page (:page app)
+        user-logged-in? (not (nil? user))
+        show-tos? (not (or (= page :register)
+                           (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
+                           (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))]
+    [:div {:style (cond
+                    (and (= false @is-scrolled?) show-tos?)
+                    {:padding-bottom "3rem"}
+                    (and @is-scrolled? show-tos?)
+                    {:padding-bottom "2rem"}
+                    (and (and (= false) @is-scrolled?) (= false show-tos?))
+                    {:padding-bottom "0rem"}
+                    :else
+                    {:padding-bottom "0rem"})}
+     [:div
+      [header-scroll-sensor is-scrolled? -250]
+      [esc-press-listener e! app]
+      [:div (stylefy/use-style style-topnav/topnav-wrapper)
+       [:div
+        (stylefy/use-style (merge
+                             style-topnav/topnav-desktop
+                             (when @is-scrolled?
+                               {:height "56px" :line-height "56px"})))
+        [:div.container
+         [top-nav-links e! app is-scrolled?]]]
+
+       [top-nav-drop-down-menu e! app is-scrolled?]
+       [user-menu e! app]
+       [lang-menu e! app]
+       (when (flags/enabled? :terms-of-service)
+         [tos e! app desktop?])]]]))

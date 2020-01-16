@@ -72,6 +72,14 @@
           ::stylefy/mode {:hover negative-btn-hover-focus
                           :focus negative-btn-hover-focus}}))
 
+(def save-row-button
+  (merge row-button
+         {:color colors/negative-text
+          :border 0
+          :background-color colors/primary
+          ::stylefy/mode {:hover primary-btn-hover-focus
+                          :focus primary-btn-hover-focus}}))
+
 (def open-dialog-row-button
   (merge row-button
          {:color colors/negative-text

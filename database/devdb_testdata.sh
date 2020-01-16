@@ -6,7 +6,7 @@ set -e
 
 cd /database
 
-echo "Insert CKAN test data"
+echo "Insert test data"
 psql -h napotedb -U ckan napote -X -q -a -v ON_ERROR_STOP=1 --pset pager=off -f testdata-ckan.sql > /dev/null || true
 
 echo "Insert OTE test data"

@@ -9,5 +9,5 @@
    [:div (stylefy/use-style (merge style-base/icon-labeled-container wrapper-attrs))
     [:span (stylefy/use-style style-base/icon-labeled-icon)
      icon]
-    [:span {:style {:padding-right "0.5rem"}}
+    [:span {:style {:padding-right "0.5rem" :padding-bottom "0.3em"}}
      label]]))

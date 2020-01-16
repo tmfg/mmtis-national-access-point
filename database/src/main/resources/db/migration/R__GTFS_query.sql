@@ -152,6 +152,38 @@ SELECT r."route-short-name", r."route-long-name", trip."trip-headsign",
  GROUP BY r."route-short-name", r."route-long-name", trip."trip-headsign", r."route-hash-id"
 $$ LANGUAGE SQL STABLE;
 
+-- This is third installation of route-trips-for-date query. This takes route-hash-id as a parameter to filter out duplicate trips.
+CREATE OR REPLACE FUNCTION gtfs_route_trips_for_date(route_hash_id TEXT, package_ids INTEGER[], dt DATE)
+    RETURNS SETOF route_trips_for_date
+AS
+$$
+WITH route_trips AS (
+    SELECT DISTINCT ON (array_agg(ROW ("stop-times"."departure-time") ORDER BY "stop-times"."stop-sequence" ASC)) array_agg(ROW ("stop-times"."departure-time") ORDER BY "stop-times"."stop-sequence" ASC) as "deps",
+           t."package-id",
+           trip,
+           trip."trip-headsign"
+      FROM "detection-route" r
+             JOIN "gtfs-trip" t ON (t."package-id" = r."package-id" AND r."route-id" = t."route-id")
+             JOIN LATERAL unnest(t.trips) trip ON true
+             JOIN LATERAL unnest(trip."stop-times") "stop-times" ON true
+     WHERE r."package-id" = ANY(package_ids)
+       AND r."route-hash-id" = route_hash_id
+       AND ROW (r."package-id", t."service-id")::service_ref IN (SELECT * FROM gtfs_services_for_date(package_ids, dt))
+     GROUP BY t."service-id", t."package-id", trip, trip."trip-headsign"
+)
+SELECT r."route-short-name",
+       r."route-long-name",
+       rt."trip-headsign",
+       COUNT(rt.deps)::INTEGER AS trips,
+       array_agg(ROW (rt."package-id",rt.trip)::"gtfs-package-trip-info") as tripdata,
+       r."route-hash-id"
+ FROM "detection-route" r,
+      route_trips rt
+WHERE r."package-id" = ANY(package_ids)
+  AND r."route-hash-id" = route_hash_id
+GROUP BY rt."trip-headsign", r."route-short-name", r."route-long-name", r."route-hash-id"
+$$ LANGUAGE SQL STABLE;
+
 CREATE OR REPLACE FUNCTION gtfs_route_tripdata_for_date(
   package_ids INTEGER[],
   dt DATE,
@@ -289,7 +321,6 @@ SELECT string_agg(concat(EXTRACT(ISODOW FROM date),'=', gtfs_service_date_hash(s
   FROM week_dates;
 $$ LANGUAGE SQL STABLE;
 
-
 CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE)
 RETURNS VOID
 AS $$
@@ -302,7 +333,8 @@ BEGIN
     INTO route_hashes
     FROM (SELECT x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id",
                  string_agg(x.trip_times, ',' ORDER BY x.trip_times) as times
-            FROM (SELECT COALESCE(r."route-short-name", '') as "route-short-name",
+            FROM (SELECT DISTINCT ON (STRING_AGG(stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence")) STRING_AGG(stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence"),
+                         COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(r."trip-headsign",'') AS "trip-headsign",
                          string_agg(concat(s."stop-fuzzy-lat",'-',s."stop-fuzzy-lon",'@',stops."departure-time"), '->' ORDER BY stops."stop-sequence") as trip_times,
@@ -408,7 +440,6 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_service_route_week_hash(INTEGER,DATE,TEXT,TEXT,TEXT) IS
 E'Fetch the combined hash of the whole week''s days for the given route by date and service.';
 
-
 CREATE OR REPLACE FUNCTION gtfs_service_routes(service_id INTEGER)
 RETURNS SETOF RECORD
 AS $$
@@ -422,7 +453,6 @@ $$ LANGUAGE SQL STABLE;
 
 COMMENT ON FUNCTION gtfs_service_routes (INTEGER) IS
 E'Return all routes in packages for the given service. Returns set of (route-id, route-short-name, route-long-name, trip-headsign) tuples.';
-
 
 CREATE OR REPLACE FUNCTION gtfs_first_different_day(weekhash1 TEXT, weekhash2 TEXT)
 RETURNS INTEGER
