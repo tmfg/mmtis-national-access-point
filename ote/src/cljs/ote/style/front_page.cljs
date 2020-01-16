@@ -142,7 +142,7 @@
                                                                                                 :font-size "1.2rem"
                                                                                                 :font-weight "400"}}})
 
-(def third-column-text {:margin-bottom "40px"
+(def third-column-text {
                         :color "#c8c8c8"
                         :font-size "0.875rem"
                         :font-weight 300
@@ -150,7 +150,10 @@
                         :flex-align "center" ;; Old flex standard
                         :align-items "flex-start"
                         ::stylefy/vendors ["webkit" "moz" "ms"]
-                        ::stylefy/auto-prefix #{:box-align :align-items :flex-align}})
+                        ::stylefy/auto-prefix #{:box-align :align-items :flex-align}
+                        ::stylefy/media {
+                                         {:max-width (str width-xs "px")} {:margin-bottom "20px"}
+                                         {:min-width (str width-xs "px")} {:margin-bottom "40px"}}})
 
 (def lower-section {:display "flex"
                     :padding-top      "80px"
@@ -189,10 +192,6 @@
                          :min-height "95px"
                          :width "100%" ;; Required by IE11 for some odd reason (here be dragons!).
                          })
-
-(def footer-logo-ul {::stylefy/media {{:max-width (str width-xs "px")} {:display "flex"
-                                                                        :align-items "center"
-                                                                        :width "90px" }}})
 
 (def footer-logo {:width "160px"
                   ::stylefy/media {{:max-width (str width-xs "px")} {:width "90px" }}})

@@ -1067,8 +1067,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-route "Merenkulun reitti- ja aikataulueditori"
   :navigation-pre-notice "Säännöllisen henkilöliikenteen muutosilmoitus"
   :navigation-authority-pre-notices "Saapuneet muutosilmoitukset"
-  :navigation-privacy-policy "Tietosuoja"
+  :navigation-privacy-policy "Tietosuojaseloste"
+  :navigation-privacy-policy-text "tietosuojaselosteen"
+  :navigation-privacy-policy-text2 "tietosuojaselosteeseen"
   :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-of-service "Käyttöehdot"
+  :navigation-terms-of-service-text "Käyttöehdot"
+  :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/NAP-palvelun%20k%C3%A4ytt%C3%B6ehdot.pdf"
+  :navigation-terms-and-cookies ", mukaan lukien evästekäytännöt."
   :navigation-general-menu "Valikko"
   :navigation-for-developers "Ohjelmointirajapinta kehittäjille"
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
@@ -1147,6 +1153,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :no-operators "Ei palveluntuottajia"
   :country "Maa"
   :filling-info "Täyttöohje"
+  :and "ja"
+  :agree-to-privacy-and-terms "Käyttämällä NAP-sivustoa hyväksyt palvelun"
+  :have-read-services "Olen tutustunut NAP-palvelun "
+  :and-agree-service-terms " ja hyväksyn palvelun "
+  :of-service "."
   }
 
 

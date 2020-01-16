@@ -1060,8 +1060,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-route "Kartverktyg för sjötrafik"
   :navigation-pre-notice "Meddelande om ändring i regelbunden persontrafik"
   :navigation-authority-pre-notices "Inkomna ändringsmeddelanden"
-  :navigation-privacy-policy "Registerbeskrivning"
+  :navigation-privacy-policy "Dataskyddsbeskrivning"
+  :navigation-privacy-policy-text "dataskyddsbeskrivningen"
+  :navigation-privacy-policy-text2 "dataskyddsbeskrivningen"
   :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-terms-of-service "användarvillkoren"
+  :navigation-terms-of-service-text "Användarvillkor"
+  :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/NAP-palvelun%20k%C3%A4ytt%C3%B6ehdot.pdf"
+  :navigation-terms-and-cookies "för tjänsten, inklusive användningen av kakor (cookies)."
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
@@ -1140,6 +1146,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :no-operators "Inga tjänsteproducenter"
   :country "Land"
   :filling-info "Anvisning"
+  :and "och"
+  :agree-to-privacy-and-terms "Genom att använda NAP-webbplatsen godkänner du"
+  :have-read-services "Jag har läst "
+  :and-agree-service-terms " för NAP-tjänsten och godkänner "
+  :of-service " för tjänsten."
   }
 
 
