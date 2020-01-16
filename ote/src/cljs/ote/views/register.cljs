@@ -126,10 +126,13 @@
                 :required? true
                 :label [:div (tr [:common-texts :have-read-services])
                         (linkify (tr [:common-texts :navigation-privacy-policy-url])
-                                 (tr [:common-texts :navigation-privacy-policy-text2]) {:style base/base-link})
+                                 (tr [:common-texts :navigation-privacy-policy-text2])
+                                 {:target "_blank"
+                                  :style base/base-link})
                         (tr [:common-texts :and-agree-service-terms])
                         (linkify (tr [:common-texts :navigation-terms-of-service-url])
                                  (str/lower-case (str (tr [:common-texts :navigation-terms-of-service])))
-                                 {:style base/base-link})
+                                 {:target "_blank"
+                                  :style base/base-link})
                         (tr [:common-texts :of-service])]}))]
             form-data]]]]))))
