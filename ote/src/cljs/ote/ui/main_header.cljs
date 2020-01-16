@@ -271,6 +271,13 @@
                                       (e! (fp-controller/->ToggleRegistrationDialog)))})
               (tr [:common-texts :navigation-register])]]])
 
+         (when (flags/enabled? :terms-of-service)
+           [:li
+            [linkify (tr [:common-texts :navigation-terms-of-service-url]) (tr [:common-texts :navigation-terms-of-service])
+             (merge (stylefy/use-style
+                      style-topnav/topnav-dropdown-link)
+                    {:target "_blank"})]])
+
          [:li
           [linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy])
            (merge (stylefy/use-style
@@ -420,7 +427,7 @@
          (linkify (tr [:common-texts :navigation-terms-of-service-url]) (str/lower-case (tr [:common-texts :navigation-terms-of-service])) {:style style-topnav/tos-toplink
                                                                                                                                             :target "_blank"})
          (tr [:common-texts :and])
-         (linkify (tr [:common-texts :navigation-privacy-policy]) (tr [:common-texts :navigation-privacy-policy-text]) {:style (merge style-topnav/tos-toplink
+         (linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy-text]) {:style (merge style-topnav/tos-toplink
                                                                                                                                       {:padding-right 0})
                                                                                                                         :target "_blank"})
          (tr [:common-texts :navigation-terms-and-cookies])]]
@@ -464,4 +471,5 @@
        [top-nav-drop-down-menu e! app is-scrolled?]
        [user-menu e! app]
        [lang-menu e! app]
-       [tos e! app desktop?]]]]))
+       (when (flags/enabled? :terms-of-service)
+         [tos e! app desktop?])]]]))

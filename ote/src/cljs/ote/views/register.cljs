@@ -12,7 +12,8 @@
             [ote.ui.form :as form]
             [ote.ui.notification :as notification]
             [ote.ui.common :refer [linkify]]
-            [ote.app.controller.login :as lc]))
+            [ote.app.controller.login :as lc]
+            [ote.app.controller.flags :as flags]))
 
 (defn invitation-token-check
   [token-info]
@@ -28,7 +29,9 @@
        :type :success})))
 
 (defn- disable-due-tos? [data]
-  (not (:acceped-tos? data)))
+  (if (flags/enabled? :terms-of-service)
+    (not (:acceped-tos? data))
+    false))
 
 ;; PENDING:
 ;; This form has a new ":show-errors?" flag in the schemas that only
@@ -116,6 +119,7 @@
                 :on-blur #(edit! :confirm)
                 :show-errors? (@edited :confirm)
                 :should-update-check form/always-update}
+             (when (flags/enabled? :terms-of-service)
                {:element-id "accept-tof"
                 :name :acceped-tos?
                 :type :checkbox-register
@@ -125,7 +129,7 @@
                                  (tr [:common-texts :navigation-privacy-policy-text2]) {:style base/base-link})
                         (tr [:common-texts :and-agree-service-terms])
                         (linkify (tr [:common-texts :navigation-terms-of-service-url])
-                                 (str/lower-case (str (tr [:common-texts :navigation-terms-of-service]) ))
+                                 (str/lower-case (str (tr [:common-texts :navigation-terms-of-service])))
                                  {:style base/base-link})
-                        (tr [:common-texts :of-service])]})]
+                        (tr [:common-texts :of-service])]}))]
             form-data]]]]))))

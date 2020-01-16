@@ -37,19 +37,21 @@
         (do
           (let [user-id (str (UUID/randomUUID))
                 new-user (specql/insert! db ::user/user
-                                         {::user/id user-id
-                                          ::user/name user-id ;; Username not used anymore, use internal row id as placeholder just in case
-                                          ::user/fullname name
-                                          ::user/email email
-                                          ::user/password (encrypt/buddy->passlib (encrypt/encrypt password))
-                                          ::user/created (java.util.Date.)
-                                          ::user/state "active"
-                                          ::user/sysadmin false
-                                          ::user/email-confirmed? false
-                                          ::user/apikey (str (UUID/randomUUID))
-                                          ::user/activity_streams_email_notifications false
-                                          ::user/accepted-tos? acceped-tos?
-                                          ::user/seen-tos? acceped-tos?})]
+                                         (merge
+                                           {::user/id user-id
+                                            ::user/name user-id ;; Username not used anymore, use internal row id as placeholder just in case
+                                            ::user/fullname name
+                                            ::user/email email
+                                            ::user/password (encrypt/buddy->passlib (encrypt/encrypt password))
+                                            ::user/created (java.util.Date.)
+                                            ::user/state "active"
+                                            ::user/sysadmin false
+                                            ::user/email-confirmed? false
+                                            ::user/apikey (str (UUID/randomUUID))
+                                            ::user/activity_streams_email_notifications false}
+                                           (when (feature/feature-enabled? :terms-of-service)
+                                             {::user/accepted-tos? acceped-tos?
+                                              ::user/seen-tos? acceped-tos?})))]
             (when (and token group-info)                    ;; If the user doesn't have a token or group-info they can register, but aren't added to any group
               (transport-operator/create-member! db (::user/id new-user) (:ckan-group-id group-info))
               (specql/delete! db ::user/user-token
