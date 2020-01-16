@@ -627,8 +627,8 @@
                  (nap-users/list-authority-users db))))
 
 (defn- netex-interfaces-response [db]
-  (csv-data ["Rajapinnan osoite" "Palveluntuottajan nimi" "Palvelun nimi" "Palveluntuottajan email" "Käyttäjien email" "Rajapinnan muoto"]
-            (map (juxt :interface-url :top-name :service-name :operator-or-service-email :user-email :interface-format)
+  (csv-data ["Rajapinnan osoite" "Palveluntuottajan nimi" "Palvelun nimi" "Palveluntuottajan email" "Palvelun email" "Käyttäjien email" "Rajapinnan muoto"]
+            (map (juxt :interface-url :top-name :service-name :operator-email :service-email :user-email :interface-format)
                  (fetch-netex-interfaces-for-admin db))))
 
 (defn- send-pre-notice-email-response [db config]
