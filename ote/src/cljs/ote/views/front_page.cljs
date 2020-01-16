@@ -2,34 +2,17 @@
   "Front page for OTE service - Select service type and other basic functionalities"
   (:require [clojure.string :as s]
             [reagent.core :as reagent]
-            [cljs-react-material-ui.reagent :as ui]
+            [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
+            [stylefy.core :as stylefy]
+            [clojure.string :as str]
+            [ote.localization :refer [tr tr-key]]
+            [ote.style.front-page :as style-front-page]
             [ote.ui.icons :as icons]
             [ote.ui.common :refer [linkify]]
-            [ote.ui.form :as form]
-            [ote.ui.form-groups :as form-groups]
-            [ote.ui.buttons :as buttons]
-            [ote.app.controller.front-page :as fp]
-            [ote.app.controller.login :as login]
-            [ote.app.controller.transport-service :as ts]
-            [ote.app.controller.transport-operator :as to]
-            [ote.views.transport-service :as transport-service]
-            [ote.db.common :as common]
-            [ote.localization :refer [tr tr-key]]
-            [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.modification :as modification]
-            [ote.time :as time]
-            [stylefy.core :as stylefy]
-            [ote.style.base :as style-base]
-            [ote.style.front-page :as style-front-page]
-            [reagent.core :as r]
-            [ote.ui.form-fields :as form-fields]
-            [ote.ui.common :as ui-common]
-            [ote.views.transport-operator-selection :as t-operator-sel]
-            [ote.ui.list-header :as list-header]
-            [clojure.string :as str]
-            [ote.app.utils :refer [user-logged-in?]]))
+            [ote.app.utils :refer [user-logged-in?]]
+            [ote.app.controller.flags :as flags]
+            [ote.app.controller.front-page :as fp]))
 
 
 (let [host (.-host (.-location js/document))]
@@ -59,13 +42,19 @@
     [:div.container {:style {:padding-top "20px" }}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
-      [:div.row (stylefy/use-style style-front-page/hero-btn)
+      [:div.row (stylefy/use-style style-front-page/hero-btn-container)
        [:a {:on-click   #(do
                             (.preventDefault %)
                             (e! (fp/->ChangePage :services nil)))}
-       [:button (stylefy/use-style style-front-page/transport-service-btn)
+       [:button (stylefy/use-style style-front-page/hero-btn)
         [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-        (tr [:buttons :transport-service-catalog])]]]]]]
+        (tr [:buttons :transport-service-catalog])]]
+       (when (flags/enabled? :other-catalogs)
+         [:a {:href (tr [:buttons :other-access-points-url])
+              :target "_blank"}
+          [:button (stylefy/use-style style-front-page/hero-btn)
+           [:span [ic/action-open-in-new {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+           (tr [:buttons :other-access-points])]])]]]]
 
     (when test-env?
      [test-env-warning])

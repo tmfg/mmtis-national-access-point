@@ -63,7 +63,8 @@
                      :ote-register
                      :netex-conversion-automated
                      :service-validation
-                     :terms-of-service}
+                     :terms-of-service
+                     :other-catalogs}
 
  :no-gtfs-update-for-operators #{}
 
