@@ -187,7 +187,8 @@ select TRIM((eid."external-interface").url) as "interface-url",
        top.name as "top-name",
        ts.name as "service-name",
        array_to_string(eid."data-content", ',') as "interface-content",
-       coalesce(NULLIF(TRIM(ts."contact-email"),''), NULLIF(TRIM(top.email),'') ) as "operator-or-service-email",
+       TRIM(top.email) as "operator-email",
+       TRIM(ts."contact-email") as "service-email",
        array_to_string(array_agg(u.email), '|') as "user-email",
        eid.format[1] as "interface-format"
 FROM

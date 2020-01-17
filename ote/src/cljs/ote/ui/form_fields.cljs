@@ -1056,6 +1056,22 @@
      (checkbox-container update! table? label warning error style checked? disabled? on-click)]
     (checkbox-container update! table? label warning error style checked? disabled? on-click)))
 
+(defmethod field :checkbox-register [{:keys [update! label error style on-click]} checked?]
+  [:div.checkbox-group
+   [:div {:style {:display "flex" :padding-top "10px"}}
+    [:span
+     [ui/checkbox
+      (merge
+        {:label nil
+         :checked (boolean checked?)
+         :on-check #(update! (not checked?))
+         :style style}
+        (when on-click
+          {:on-click #(on-click)}))]]
+    [:span label]
+    (when error
+      (tr [:common-texts :required-field]))]])
+
 (defmethod field :checkbox-group [{:keys
                                    [update! table? label show-option options
                                     help error warning header? option-enabled? option-addition

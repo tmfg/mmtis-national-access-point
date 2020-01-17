@@ -5,6 +5,8 @@
            u.apikey as user_apikey,
            u.email as user_email,
            u.sysadmin as "user_admin?",
+           u."seen-tos?" as "user_seen-tos?",
+           u."accepted-tos?" as "user_accepted-tos?",
            g.id as group_id,
            g.name as group_name,
            g.title as group_title
