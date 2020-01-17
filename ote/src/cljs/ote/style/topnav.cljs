@@ -155,4 +155,5 @@
                    {:color "#FFFFFF"
                     :text-decoration "underline"
                     :padding-left "0.25rem"
-                    :padding-right "0.25rem"}))
+                    :padding-right "0.25rem"
+                    ::stylefy/mode {:hover {:color "#FFFFFF"}}}))

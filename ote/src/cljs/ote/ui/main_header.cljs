@@ -432,10 +432,11 @@
                                                                                                                         :target "_blank"})
          (tr [:common-texts :navigation-terms-and-cookies])]]
        [:div {:style (merge
-                       {:width "20px" :float "right"}
+                       {:width "10%" :float "right"}
                        (when-not desktop?
                          {:padding-top "10px"}))}
-        [:span {:on-click #(do
+        [:span  {:style {:float "right" :padding-right "10px"}
+                 :on-click #(do
                              (.preventDefault %)
                              (e! (fp-controller/->CloseTermsAndPrivacy user)))}
          [ic/navigation-close {:style {:color "#FFFFFF"}}]]]])))
