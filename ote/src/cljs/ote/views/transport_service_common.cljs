@@ -682,8 +682,8 @@
                        :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
                       (tr [:buttons :send])])]}
         [:span
-         (str (tr [:transport-services-common-page :validation-modal-text]) " ")
-         ;; TODO: Add link to terms of service when ready
+         (tr [:transport-services-common-page :validation-modal-text])
+         [:br]
          (linkify (tr [:common-texts :navigation-terms-of-service-url])
                   (tr [:transport-services-common-page :validation-modal-link-text])
                   {:target "_blank"})]])
