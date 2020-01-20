@@ -43,17 +43,20 @@
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
       [:div.row (stylefy/use-style style-front-page/hero-btn-container)
-       [:a {:on-click   #(do
-                            (.preventDefault %)
-                            (e! (fp/->ChangePage :services nil)))}
-       [:button (stylefy/use-style style-front-page/hero-btn)
-        [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-        (tr [:buttons :transport-service-catalog])]]
+       [:a {:style {:text-decoration "none"}
+            :href "/#/services"
+            :on-click #(do
+                         (.preventDefault %)
+                         (e! (fp/->ChangePage :services nil)))}
+        [:button (stylefy/use-style style-front-page/hero-btn)
+         [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
+         (tr [:buttons :transport-service-catalog])]]
        (when (flags/enabled? :other-catalogs)
-         [:a {:href (tr [:buttons :other-access-points-url])
+         [:a {:style {:text-decoration "none"}
+              :href (tr [:buttons :other-access-points-url])
               :target "_blank"}
           [:button (stylefy/use-style style-front-page/hero-btn)
-           [:span [ic/action-open-in-new {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+           [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
            (tr [:buttons :other-access-points])]])]]]]
 
     (when test-env?
