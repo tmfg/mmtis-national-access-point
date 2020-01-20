@@ -23,6 +23,7 @@
 (def is-validation-running? (atom false))
 (defmethod tuck-effect/process-effect :adminEvery5min [e! {:keys [on-success on-failure]}]
   (when (= false @is-validation-running?)
+    (reset! is-validation-running? true)
     (.setInterval js/window (fn [_]
                               (when (= :admin (:page @state/app))
                                 (comm/get! "admin/validation-services"
