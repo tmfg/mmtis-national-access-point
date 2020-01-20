@@ -682,11 +682,7 @@
                        :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
                       (tr [:buttons :send])])]}
         [:span
-         (tr [:transport-services-common-page :validation-modal-text])
-         [:br]
-         (linkify (tr [:common-texts :navigation-terms-of-service-url])
-                  (tr [:transport-services-common-page :validation-modal-link-text])
-                  {:target "_blank"})]])
+         (tr [:transport-services-common-page :validation-modal-text])]])
 
      [open-publish-dialog e! app]]))
 

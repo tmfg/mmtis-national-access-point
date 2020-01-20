@@ -62,6 +62,7 @@
 (def hero-btn (merge {:margin-top "1rem"
                       :margin-left "auto"
                       :margin-right "auto"
+                      :text-decoration "none"
                       ::stylefy/media {{:max-width (str width-xl "px")} {:margin-top "1rem"}
                                        {:max-width (str width-l "px")} {:margin-top "1rem"}
                                        {:max-width (str width-sm "px")} {:margin-top "0.5rem"}
