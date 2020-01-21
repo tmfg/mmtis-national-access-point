@@ -58,6 +58,6 @@
 (defn random-string
   "Do not use for long things. Password and similar will work ok."
   [n]
-  (let [chars (map char (range 33 127))
+  (let [chars (map char (concat (range 48 57) (range 65 90) (range 97 122)))
         password (take n (repeatedly #(rand-nth chars)))]
     (reduce str password)))
