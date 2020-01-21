@@ -584,7 +584,12 @@
                    services)]
     services))
 
-(defn- publish-service [db service-id]
+(defn- list-company-csvs [db]
+  (specql/fetch db ::t-service/transport-service-company-csv
+                (specql/columns ::t-service/transport-service-company-csv)
+                {}))
+
+(defn- publish-service [db config service-id]
   (let [service (first (specql/fetch db ::t-service/transport-service
                                      (specql/columns ::t-service/transport-service)
                                      {::t-service/id service-id}))]
@@ -596,7 +601,7 @@
                        ::t-service/re-edit nil}
                       {::t-service/id service-id})
       ;; Parent must be replaced with child
-      (transport/replace-parent-service-with-child db service-id true))))
+      (transport/replace-parent-service-with-child db (:bucket (:csv config)) service-id true))))
 
 (defn- admin-email
   [email-config db]
@@ -724,9 +729,13 @@
       (or (authorization-fail-response (get-in req [:user :user]))
           (http/no-cache-transit-response (list-validation-services db))))
 
+    (GET "/admin/company-csvs" req
+      (or (authorization-fail-response (get-in req [:user :user]))
+          (http/no-cache-transit-response (list-company-csvs db))))
+
     (POST "/admin/publish-service" {:keys [body user]}
       (or (authorization-fail-response (:user user))
-          (http/transit-response (publish-service db (:id (http/transit-request body))))))
+          (http/transit-response (publish-service db config (:id (http/transit-request body))))))
 
     (POST "/admin/transport-service/delete" {user :user form-data :body}
       (require-admin-user "random url that is not used" (:user user))

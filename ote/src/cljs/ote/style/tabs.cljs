@@ -8,7 +8,7 @@
           :font-size "1rem"
           :white-space "nowrap"
           :text-align "center"
-          :padding "10px 20px 10px 20px"
+          :padding "10px 15px 10px 15px"
           :width "100%"
           :border-bottom (str "3px solid" (color :grey300))
           ::stylefy/mode {:hover {:border-bottom "4px solid #1976d2"}}})
