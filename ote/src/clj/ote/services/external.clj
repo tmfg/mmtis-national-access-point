@@ -26,10 +26,10 @@
 
 (defn validate-company-csv-file
   "Return map of validation data. Create warning message if illegal chars are used. We can be sure that
-  company csv cannot contain other chars than [a-ö, A-Ö, 0-9, '.' ',', '-', ' ' ]"
+  company csv cannot contain other chars than [a-ö, A-Ö, 0-9, '.' ',', '-', ' ', '\"', '.']"
   [data]
-  (let [header-match #"[^a-öA-Ö -]+"
-        row-match #"[^a-öA-Ö0-9 -]+"
+  (let [header-match #"[^a-öA-Ö-\",\. ]+"
+        row-match #"[^a-öA-Ö0-9-\",\. ]+"
         headers (first data)
         corrupted-headers (keep #(re-find header-match %) headers)
         data-rows (rest data)
