@@ -38,8 +38,7 @@
 (deftest validate-company-csv-file2-test
   (let [csv-file (slurp (str "test/resources/csv/corrupted-company-csv2.csv"))
         data (csv/read-csv csv-file)
-        validation-warning (external-service/validate-company-csv-file data)
-        _ (println "validate-company-csv-file2-test :: validation-warning" (pr-str validation-warning))]
+        validation-warning (external-service/validate-company-csv-file data)]
     (is (not (nil? validation-warning)))
     (is (nil? (:corrupted-headers validation-warning)))
     (is (not (nil? (:corrupted-data validation-warning))))))

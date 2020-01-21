@@ -311,7 +311,7 @@
   "Allow admin to delete single transport service by id"
   [config db user {id :id}]
   (let [deleted-service (transport/all-data-transport-service config db id)
-        return (transport/delete-transport-service! db user id)
+        return (transport/delete-transport-service! db config user id)
         auditlog {::auditlog/event-type :delete-service
                   ::auditlog/event-attributes
                   [{::auditlog/name "transport-service-id", ::auditlog/value (str id)},
