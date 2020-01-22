@@ -520,6 +520,41 @@
 
      [:div "Julkaise painamalla julkaise"]]))
 
+(defn- open-cancel-revalidate-dialog [e! service-id]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:dialog :navigation-prompt :title])
+    :actions [; Leave form and change service state back to validation
+              (r/as-element
+                [buttons/cancel
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->BackToValidation service-id))}
+                 (tr [:dialog :navigation-prompt :leave])])
+              ; Return to form and do not cancel
+              (r/as-element
+                [buttons/save
+                 {:on-click #(e! (ts-controller/->CloseCancelReValidateModal))}
+                 (tr [:dialog :navigation-prompt :stay])])]}
+   [:span (tr [:dialog :navigation-prompt :unsaved-validated-data])]])
+
+(defn- open-validate-dialog [e! schemas]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:transport-services-common-page :validation-modal-header])
+    :actions [(r/as-element
+                [buttons/cancel
+                 {:on-click #(e! (ts-controller/->CancelSaveTransportService))}
+                 (tr [:buttons :cancel])])
+              (r/as-element
+                [buttons/save
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
+                 (tr [:buttons :send])])]}
+   [:span
+    (tr [:transport-services-common-page :validation-modal-text])]])
+
 (defn- render-public-state-buttons
   "If validate flag is enabled services must be saved in validate state. If not, mark them as public or draft."
   [e! schemas data name-missing?]
@@ -601,7 +636,13 @@
         cannot-be-saved-text (if (flags/enabled? :service-validation)
                                (tr [:form-help :validate-missing-required])
                                (tr [:form-help :publish-missing-required]))
-        admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))]
+        admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))
+        service-key (t-service/service-key-by-type (get-in app [:transport-service ::t-service/type]))
+        show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])
+        modified? (not
+                    (empty?
+                      (get-in app [:transport-service service-key :ote.ui.form/modified])))
+        ]
     [:div
      ;; Show brokering dialog
      [brokering-dialog e! app]
@@ -641,7 +682,12 @@
                      [:div {:style {:margin-top "1rem"}}
                       [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
                                            :disabled name-missing?}
-                       (tr [:buttons :back-to-draft])]]]
+                       (tr [:buttons :back-to-draft])]]
+                     [:div {:style {:margin-top "1rem"}}
+                      [buttons/cancel-with-icon {:on-click #(if modified?
+                                                              (e! (ts-controller/->OpenCancelRevalidateModal))
+                                                              (e! (ts-controller/->BackToValidation service-id)))}
+                       (tr [:buttons :discard])]]]
            :draft [render-draft-state-buttons e! schemas data name-missing?])]]
        ;; admin is editing
        (and
@@ -668,21 +714,10 @@
        :else nil)
 
      (when show-validate-modal?
-       [ui/dialog
-        {:open true
-         :actionsContainerStyle style-dialog/dialog-action-container
-         :title (tr [:transport-services-common-page :validation-modal-header])
-         :actions [(r/as-element
-                     [buttons/cancel
-                      {:on-click #(e! (ts-controller/->CancelSaveTransportService))}
-                      (tr [:buttons :cancel])])
-                   (r/as-element
-                     [buttons/save
-                      {:icon (ic/action-delete-forever)
-                       :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
-                      (tr [:buttons :send])])]}
-        [:span
-         (tr [:transport-services-common-page :validation-modal-text])]])
+       [open-validate-dialog e! schemas])
+
+     (when show-cancel-revalidate-modal?
+       [open-cancel-revalidate-dialog e! service-id])
 
      [open-publish-dialog e! app]]))
 

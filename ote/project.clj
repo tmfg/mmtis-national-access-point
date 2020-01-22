@@ -32,7 +32,8 @@
                  [specql "20180706"]
 
                  ;; http-kit HTTP server (and client) - Apache License Version 2.0.
-                 [http-kit "2.3.0"]
+                 [http-kit "2.4.0-alpha3"]                  ;; Fixes server loop error
+                 ;[http-kit "2.3.0"]
                  ;; Ring middleware for gzip compression. - MIT
                  [bk/ring-gzip "0.2.1"]
                  ;; Ring middleware that prevents CSRF attacks - MIT

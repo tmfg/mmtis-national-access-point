@@ -87,11 +87,11 @@
                 :open true
                 :actionsContainerStyle style-dialog/dialog-action-container
                 :actions [(r/as-element
-                            [buttons/save {:id "btn-confirm-stay-on-page"
-                                           :on-click #(e! (fp-controller/->StayOnPage))} (tr :stay)])
-                          (r/as-element
                             [buttons/cancel {:id "btn-confirm-leave-page"
-                                             :on-click #(e! (or before-unload-fn confirm) )} (tr :leave)])]}
+                                             :on-click #(e! (or before-unload-fn confirm) )} (tr :leave)])
+                          (r/as-element
+                            [buttons/save {:id "btn-confirm-stay-on-page"
+                                           :on-click #(e! (fp-controller/->StayOnPage))} (tr :stay)])]}
      msg]))
 
 (defn theme

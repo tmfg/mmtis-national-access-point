@@ -134,6 +134,8 @@
 (defrecord SaveTransportServiceResponse [response])
 (defrecord FailedTransportServiceResponse [response])
 (defrecord CancelTransportServiceForm [admin])
+(defrecord OpenCancelRevalidateModal [])
+(defrecord CloseCancelReValidateModal [])
 
 (defrecord SelectServiceType [data])
 (defrecord SetNewServiceType [type])
@@ -578,6 +580,14 @@
       (routes/navigate! :own-services))
     app)
 
+  OpenCancelRevalidateModal
+  (process-event [_ app]
+    (assoc-in app [:transport-service :show-cancel-revalidate-dialog?] true))
+
+  CloseCancelReValidateModal
+  (process-event [_ app]
+    (assoc-in app [:transport-service :show-cancel-revalidate-dialog?] false))
+
   SetNewServiceType
   (process-event [_ app]
     ;; This is needed when directly loading a new service URL to set the type
@@ -601,8 +611,10 @@
           (assoc-in [:transport-service sub-service ::t-service/re-edit] response)
           (assoc :transport-service-loaded? true)
           (assoc :before-unload-message [:dialog :navigation-prompt :unsaved-validated-data])
+          ;; Give entire function because otherwise the caller wont be able to use it
           (assoc :before-unload-fn (ote.app.controller.transport-service/->BackToValidation (get-in app [:transport-service ::t-service/id]))))))
 
+  ;; When service is in validation we need to enable editing for users.
   ConfirmEditing
   (process-event [_ app]
     (comm/post! (str "transport-service/" (get-in app [:transport-service ::t-service/id]) "/re-edit-service") {}
@@ -612,7 +624,14 @@
 
   BackToValidationResponse
   (process-event [{response :response} app]
+    ; In rare case, when user doesn't want to edit service which is in re-edit state, the state is
+    ; changed before and this will update own-service page service lists.
+    (comm/post! "/transport-operator/data" {}
+                {:on-success (tuck/send-async! ote.app.controller.own-services/->LoadOperatorDataResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+
     (routes/navigate! :own-services)
+
     (-> app
         (dissoc :navigation-prompt-open?
                 :before-unload-message
