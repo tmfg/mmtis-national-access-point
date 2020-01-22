@@ -114,7 +114,9 @@
 ; everywhere to determine which operator is selected for usage.
 (define-event InitOwnServices []
   {}
-  (let [app (assoc-in app [:admin :in-validation :validating] nil)
+  (let [
+        ;; Admin and user might be same account so clear admin settings when opening own-service page
+        app (assoc-in app [:admin :in-validation :validating] nil)
         app (if (nil? (:transport-operator app))
               (assoc app :transport-operator (:transport-operator (first (get app :transport-operators-with-services))))
               app)]
