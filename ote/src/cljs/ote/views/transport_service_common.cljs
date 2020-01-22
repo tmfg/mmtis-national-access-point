@@ -637,7 +637,12 @@
                                (tr [:form-help :validate-missing-required])
                                (tr [:form-help :publish-missing-required]))
         admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))
-        show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])]
+        service-key (t-service/service-key-by-type (get-in app [:transport-service ::t-service/type]))
+        show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])
+        modified? (not
+                    (empty?
+                      (get-in app [:transport-service service-key :ote.ui.form/modified])))
+        ]
     [:div
      ;; Show brokering dialog
      [brokering-dialog e! app]
@@ -679,7 +684,7 @@
                                            :disabled name-missing?}
                        (tr [:buttons :back-to-draft])]]
                      [:div {:style {:margin-top "1rem"}}
-                      [buttons/cancel-with-icon {:on-click #(if (:before-unload-message app)
+                      [buttons/cancel-with-icon {:on-click #(if modified?
                                                               (e! (ts-controller/->OpenCancelRevalidateModal))
                                                               (e! (ts-controller/->BackToValidation service-id)))}
                        (tr [:buttons :discard])]]]
