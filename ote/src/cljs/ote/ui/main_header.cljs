@@ -273,7 +273,7 @@
 
          (when (flags/enabled? :terms-of-service)
            [:li
-            [linkify (tr [:common-texts :navigation-terms-of-service-url]) (tr [:common-texts :navigation-terms-of-service])
+            [linkify (tr [:common-texts :navigation-terms-of-service-url]) (tr [:common-texts :navigation-terms-of-service-text])
              (merge (stylefy/use-style
                       style-topnav/topnav-dropdown-link)
                     {:target "_blank"})]])
