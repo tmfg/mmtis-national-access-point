@@ -1065,7 +1065,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-privacy-policy "Privacy Policy"
   :navigation-privacy-policy-text "privacy statement"
   :navigation-privacy-policy-text2 "the privacy statement"
-  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-privacy-policy-url "https://www.traficom.fi/en/traficom/privacy-policy/registers-and-data-resources"
   :navigation-terms-of-service "the terms and conditions"
   :navigation-terms-of-service-text "Terms and Conditions"
   :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/NAP-palvelun%20k%C3%A4ytt%C3%B6ehdot.pdf"
