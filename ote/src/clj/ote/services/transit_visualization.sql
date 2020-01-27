@@ -126,7 +126,7 @@ SELECT rs."package-id", rs."trip-id", rs."headsign" as headsign,
                    s."stop-lat", s."stop-lon",s."stop-fuzzy-lat", s."stop-fuzzy-lon")::gtfs_stoptime_display
                  ORDER BY rs."stop-sequence") AS "stoptimes"
   FROM route_stops as rs,
-       "gtfs-stop" s
+       (SELECT * FROM "gtfs-stop" s WHERE s."package-id" IN (select distinct rs."package-id" FROM route_stops rs)) s
  WHERE s."package-id" = rs."package-id"
    AND s."stop-id" = rs."stop-id"
  GROUP BY rs."package-id", rs."trip-id", rs.headsign;
