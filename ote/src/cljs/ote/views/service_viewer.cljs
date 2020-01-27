@@ -579,7 +579,12 @@
             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
              [common-ui/information-row-with-option (tr [:common-texts :start-time]) start-date true]]
             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]]
+             [common-ui/information-row-with-option (tr [:common-texts :ending-time]) end-date true]]]))]
+      [:div (stylefy/use-style service-viewer/info-row)
+       [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+        [information-row-with-selection
+         (tr [:field-labels :transport-service-common :ote.db.transport-service/service-hours-info])
+         (format-descriptions info) true]]]]
      [spacer]]))
 
 (defn- vehicle-and-price [title vehicle-classes vehicle-price-url]
@@ -857,7 +862,8 @@
 
 (defn service-view
   [e! {{to :transport-operator ts :transport-service} :service-view :as app-state}]
-  (let [service-sub-type (get ts ::t-service/sub-type)
+  (let [_ (change-lang-fn (string/upper-case (name @selected-language)))
+        service-sub-type (get ts ::t-service/sub-type)
         sub-type-key (svc/create-sub-type-key service-sub-type)
         interfaces (::t-service/external-interfaces ts)
         luggage-restrictions (get-in ts [sub-type-key ::t-service/luggage-restrictions])

@@ -68,9 +68,11 @@
                         :pricing pricing})
         service-hours-data (let [pt (sub-type-key result)
                                  service-hours (::t-service/service-hours pt)
-                                 service-exceptions  (::t-service/service-exceptions pt)]
+                                 service-exceptions  (::t-service/service-exceptions pt)
+                                 service-hours-info (::t-service/service-hours-info pt)]
                              {:service-hours service-hours
-                              :exceptions service-exceptions})]
+                              :exceptions service-exceptions
+                              :service-hours-info service-hours-info })]
     (-> app
         (assoc-in [:service-view :transport-service] result)
         (assoc-in [:service-view :transport-service :accessibility] accessibility-data)
