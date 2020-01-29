@@ -151,7 +151,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
           -- Join gtfs_package to get external-interface-description-id
           JOIN gtfs_package p ON p.id = package_id AND p."deleted?" = FALSE
           -- Join all date hashes for packages
-          JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+          JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh."transport-service-id" = :service-id AND dh.date = d.date)
           -- Join unnested per route hashes
           JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
          WHERE rh."route-hash-id" = :route-hash-id::VARCHAR) x

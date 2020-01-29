@@ -321,7 +321,7 @@ SELECT string_agg(concat(EXTRACT(ISODOW FROM date),'=', gtfs_service_date_hash(s
   FROM week_dates;
 $$ LANGUAGE SQL STABLE;
 
-CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE)
+CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE, transport_service_id INTEGER)
 RETURNS VOID
 AS $$
 DECLARE
@@ -354,22 +354,23 @@ BEGIN
       INTO date_hash
       FROM unnest(route_hashes) rh;
 
-    INSERT INTO "gtfs-date-hash" ("package-id", date, hash, "route-hashes", "created")
+    INSERT INTO "gtfs-date-hash" ("package-id", date, hash, "route-hashes", "created", "transport-service-id")
     VALUES (package_id, dt, date_hash, route_hashes, now())
     ON CONFLICT ("package-id", date) DO
     UPDATE SET "package-id" = package_id,
                date = dt,
                hash = date_hash,
                "route-hashes" = route_hashes,
-               modified = now();
+               modified = now(),
+               "transport-service-id" = transport_service_id;
 END
 $$ LANGUAGE plpgsql;
 
-COMMENT ON FUNCTION gtfs_package_date_hashes (INTEGER,DATE) IS
+COMMENT ON FUNCTION gtfs_package_date_hashes (INTEGER, DATE, INTEGER) IS
 E'Calculate and store per route and per day hashes for the given package for the given date.';
 
 -- Generate date hashes for given package
-CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes (package_id INTEGER) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes (package_id INTEGER, transport_service_id INTEGER) RETURNS VOID AS $$
 DECLARE
  row RECORD;
  allowed_range tsrange;
@@ -380,7 +381,7 @@ BEGIN
       SELECT * FROM gtfs_package_dates(package_id)
        WHERE allowed_range @> gtfs_package_dates::timestamp
   LOOP
-    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates);
+    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates, transport_service_id);
   END LOOP;
 END
 $$ LANGUAGE plpgsql;
@@ -389,7 +390,7 @@ COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
 
 -- Generate date hashes for future only - to speed up calculations
-CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER, transport_service_id INTEGER) RETURNS VOID AS $$
 DECLARE
  row RECORD;
  allowed_range tsrange;
@@ -400,7 +401,7 @@ BEGIN
       SELECT * FROM gtfs_package_dates(package_id)
        WHERE allowed_range @> gtfs_package_dates::timestamp
   LOOP
-    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates);
+    PERFORM gtfs_package_date_hashes(package_id, row.gtfs_package_dates, transport_service_id);
   END LOOP;
 END
 $$ LANGUAGE plpgsql;

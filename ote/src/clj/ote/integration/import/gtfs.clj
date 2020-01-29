@@ -168,7 +168,7 @@
       (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
 
       (log/info "Generating date hashes for package " package-id)
-      (generate-date-hashes db {:package-id package-id})
+      (generate-date-hashes db {:package-id package-id :transport-service-id service-id})
 
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})
