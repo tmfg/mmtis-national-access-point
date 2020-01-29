@@ -1060,8 +1060,10 @@
       (let [package-id (nth packages i)]
         #_(println "Generating" (inc i) "/" package-count " - " package-id)
         (if future
-          (generate-date-hashes-for-future db {:package-id (:package-id package-id) (:transport-service-id package-id)})
-          (generate-date-hashes db {:package-id (:package-id package-id) (:transport-service-id package-id)}))
+          (generate-date-hashes-for-future db {:package-id (:package-id package-id)
+                                               :transport-service-id (:transport-service-id package-id)})
+          (generate-date-hashes db {:package-id (:package-id package-id)
+                                    :transport-service-id (:transport-service-id package-id)}))
         (update-hash-recalculation db (inc i) recalculation-id))
       (log/info "Generation ready!"))
     (stop-hash-recalculation db recalculation-id)))
