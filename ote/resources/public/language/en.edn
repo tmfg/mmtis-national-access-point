@@ -608,9 +608,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :if-no-interfaces "If you do not have any interfaces for route and timetable data, you can digitalize your transport service´s route and timetable data with the tools listed below."
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
-                     :not-in-use "Not in use"
-                     :published-service-cannot-be-modified "Voit muokata vain julkaisua odottavaa palvelua."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Name"
                         :members "Members"
