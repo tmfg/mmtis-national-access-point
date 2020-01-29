@@ -321,6 +321,7 @@ SELECT string_agg(concat(EXTRACT(ISODOW FROM date),'=', gtfs_service_date_hash(s
   FROM week_dates;
 $$ LANGUAGE SQL STABLE;
 
+-- 29.1.2020 Added transport-service-id to speed up later queries
 CREATE OR REPLACE FUNCTION gtfs_package_date_hashes(package_id INTEGER, dt DATE, transport_service_id INTEGER)
 RETURNS VOID
 AS $$
@@ -355,7 +356,7 @@ BEGIN
       FROM unnest(route_hashes) rh;
 
     INSERT INTO "gtfs-date-hash" ("package-id", date, hash, "route-hashes", "created", "transport-service-id")
-    VALUES (package_id, dt, date_hash, route_hashes, now())
+    VALUES (package_id, dt, date_hash, route_hashes, now(), transport_service_id)
     ON CONFLICT ("package-id", date) DO
     UPDATE SET "package-id" = package_id,
                date = dt,
@@ -386,7 +387,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER) IS
+COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER, INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
 
 -- Generate date hashes for future only - to speed up calculations
