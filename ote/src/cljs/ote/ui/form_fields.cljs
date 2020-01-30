@@ -199,7 +199,6 @@
 
 (defmethod field :file [{:keys [label button-label name disabled? on-change error warning in-validation?] :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
-   (.log js/console " form-fields row 202 :file :: " in-validation?)
    (when-not in-validation?
      [:button (merge
                 (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
