@@ -21,6 +21,7 @@
                         [:field-labels :transport-service-common]
                         [:field-labels])
    :update!     #(e! (ts-controller/->EditTransportService %))
+   :use-container true
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -432,5 +433,5 @@
                                             in-validation?)
                      (pick-up-locations in-validation?)]
                      options (rental-form-options e! groups in-validation? app)]
-    [:div.row
+    [:div
      [form/form options groups form-data]]))
