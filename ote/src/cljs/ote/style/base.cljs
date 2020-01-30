@@ -98,14 +98,14 @@
 (def front-page-add-service {:border-right "1px solid grey"})
 (def basic-table (merge {:border (str "1px solid " colors/gray650)}
                         {::stylefy/sub-styles {:link {:text-decoration "none"
-                                                                   ::stylefy/mode {:visited {:text-decoration "none"}
-                                                                                   :hover {:text-decoration "underline"}}}}}))
+                                                      ::stylefy/mode {:visited {:text-decoration "none"}
+                                                                      :hover {:text-decoration "underline"}}}}}))
 
 (stylefy/class "table-header"
-  {:background-color (str colors/gray300 " !important")
-   :color (str colors/gray900 " !important")
-   :font-weight "bold !important"
-   :position "inherit !important"})
+               {:background-color (str colors/gray300 " !important")
+                :color (str colors/gray900 " !important")
+                :font-weight "bold !important"
+                :position "inherit !important"})
 
 (def table-header-wrap-map
   {:background-color (str colors/gray300 " !important")
@@ -118,7 +118,7 @@
    :padding-right "0 !important"})
 
 (stylefy/class "table-header-wrap"
-  table-header-wrap-map)
+               table-header-wrap-map)
 
 (stylefy/class "table-header-semi-wrap"
                (merge table-header-wrap-map
@@ -336,3 +336,13 @@
                              :padding "1rem"
                              :margin-bottom "1rem"
                              :font-weight 600})
+
+(def required-data-missing-container {:border-top (str "4px solid " colors/red-dark)
+                                      :border-left (str "1px solid " colors/red-dark)
+                                      :border-right (str "1px solid " colors/red-dark)
+                                      :border-bottom (str "1px solid " colors/red-dark)
+                                      :color colors/red-dark
+                                      :background-color colors/gray50
+                                      :padding "1rem"
+                                      :margin-bottom "1rem"
+                                      :font-weight 600})
