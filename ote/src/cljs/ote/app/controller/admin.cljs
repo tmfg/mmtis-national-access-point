@@ -17,11 +17,11 @@
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
-          (fn [results]
-            (map #(if (= (::t-service/id %) id)
-                    (apply update-fn % args)
-                    %)
-                 results))))
+             (fn [results]
+               (map #(if (= (::t-service/id %) id)
+                       (apply update-fn % args)
+                       %)
+                    results))))
 
 (defrecord UpdateUserFilter [user-filter])
 (defrecord UpdateServiceFilter [service-filter])
@@ -84,6 +84,8 @@
 ;; Company csv tab
 (defrecord FetchCompanyCsvs [])
 (defrecord FetchCompanyCsvsResponse [response])
+(defrecord OpenValidationWarningModal [warning])
+(defrecord CloseValidationWarningModal [])
 
 ;; Delete Transport Operator
 (defrecord OpenDeleteOperatorModal [id])
@@ -195,7 +197,7 @@
     app)
 
   OpenDeleteUserModalResponse
-  (process-event [{response :response id :id } app]
+  (process-event [{response :response id :id} app]
     (-> app
         (update-user-by-id
           id
@@ -230,7 +232,7 @@
 
   GetBusinessIdReport
   (process-event [_ app]
-    (comm/post! "admin/business-id-report"  {:business-id-filter (get-in app [:admin :business-id-report :business-id-filter])}
+    (comm/post! "admin/business-id-report" {:business-id-filter (get-in app [:admin :business-id-report :business-id-filter])}
                 {:on-success (tuck/send-async! ->GetBusinessIdReportResponse)})
     (assoc-in app [:admin :business-id-report :loading?] true))
 
@@ -401,9 +403,21 @@
   FetchCompanyCsvs
   (process-event [_ app]
     (comm/get! "admin/company-csvs"
-                {:on-success (tuck/send-async! ->FetchCompanyCsvsResponse)
-                 :on-failure (tuck/send-async! ->ServerError)})
+               {:on-success (tuck/send-async! ->FetchCompanyCsvsResponse)
+                :on-failure (tuck/send-async! ->ServerError)})
     (assoc-in app [:admin :company-csv :loading?] true))
+
+  OpenValidationWarningModal
+  (process-event [{warning :warning} app]
+    (-> app
+      (assoc-in [:admin :company-csv :validation-warning] warning)
+      (assoc-in [:admin :company-csv :open-validation-warning?] true)))
+
+  CloseValidationWarningModal
+  (process-event [_ app]
+    (-> app
+      (assoc-in [:admin :company-csv :validation-warning] nil)
+      (assoc-in [:admin :company-csv :open-validation-warning?] true)))
 
   DeleteTransportService
   (process-event [{id :id} app]
@@ -487,12 +501,12 @@
   EditTransportOperator
   (process-event [{business-id :business-id} app]
     (comm/get! (str "admin/user-operators-by-business-id/" business-id)
-                {:on-success (tuck/send-async! ->EditTransportOperatorResponse)
-                 :on-failure (tuck/send-async! ->ServerError)})
+               {:on-success (tuck/send-async! ->EditTransportOperatorResponse)
+                :on-failure (tuck/send-async! ->ServerError)})
     app)
 
   EditTransportOperatorResponse
-  (process-event [{response :response} app ]
+  (process-event [{response :response} app]
     (routes/navigate! :transport-operator {:id (::t-operator/id (:transport-operator (first response)))})
     (-> app
         ;; Clean up admins own services to enable operator deletion.
@@ -530,13 +544,13 @@
 (define-event DownloadInterfacesCSV []
   {:path [:admin :interface-list :results]}
   (->> (concat
-        [["Palveluntuottaja" "Sisältö" "Tyyppi" "Rajapinta" "Viimeisin käsittely"]]
-        (map (juxt :operator-name
-                   (comp #(str "\"" (format-interface-content-values %) "\"") :data-content)
-                   (comp #(str "\"" (str/join "," %) "\"") :format)
-                   :url
-                   (comp time/format-timestamp-for-ui :imported))
-             app))
+         [["Palveluntuottaja" "Sisältö" "Tyyppi" "Rajapinta" "Viimeisin käsittely"]]
+         (map (juxt :operator-name
+                    (comp #(str "\"" (format-interface-content-values %) "\"") :data-content)
+                    (comp #(str "\"" (str/join "," %) "\"") :format)
+                    :url
+                    (comp time/format-timestamp-for-ui :imported))
+              app))
        csv/write-csv
        (download-csv "rajapinnat.csv"))
   app)

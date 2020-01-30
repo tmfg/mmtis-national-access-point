@@ -585,9 +585,7 @@
     services))
 
 (defn- list-company-csvs [db]
-  (specql/fetch db ::t-service/transport-service-company-csv
-                (specql/columns ::t-service/transport-service-company-csv)
-                {}))
+  (fetch-service-company-csv-for-admin db))
 
 (defn- publish-service [db config service-id]
   (let [service (first (specql/fetch db ::t-service/transport-service

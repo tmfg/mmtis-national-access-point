@@ -64,9 +64,12 @@
                          #(and
                             (csv-util/valid-business-id? (::t-service/business-id %))
                             (not (empty? (::t-service/name %))))
-                         parsed-data)]
+                         parsed-data)
+        failed-count (if valid-header?
+                       (- (count parsed-data) (count validated-data))
+                       (count (rest csv-data)))]
     {:result validated-data
-     :failed-count (- (count parsed-data) (count validated-data))}))
+     :failed-count failed-count}))
 
 (defn save-companies
   "Save business-ids, company names to db"
