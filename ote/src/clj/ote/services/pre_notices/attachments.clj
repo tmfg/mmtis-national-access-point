@@ -183,7 +183,7 @@
           orig-filename (:filename uploaded-file)
           data (external/read-csv (slurp (:tempfile uploaded-file)))
           parsed-data (external/parse-response->csv data)
-          validation-warning (str/join (external/validate-company-csv-file data))
+          validation-warning (str (external/validate-company-csv-file data))
           data (merge
                  {::t-service/csv-file-name orig-filename
                   ::t-service/validation-warning (when (not (empty? validation-warning))
