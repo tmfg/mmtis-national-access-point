@@ -428,15 +428,15 @@
                                                                                                                                             :target "_blank"})
          (tr [:common-texts :and])
          (linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy-text]) {:style (merge style-topnav/tos-toplink
-                                                                                                                                      {:padding-right 0})
-                                                                                                                        :target "_blank"})
+                                                                                                                                          {:padding-right 0})
+                                                                                                                            :target "_blank"})
          (tr [:common-texts :navigation-terms-and-cookies])]]
        [:div {:style (merge
                        {:width "10%" :float "right"}
                        (when-not desktop?
                          {:padding-top "10px"}))}
-        [:span  {:style {:float "right" :padding-right "10px"}
-                 :on-click #(do
+        [:span {:style {:float "right" :padding-right "10px"}
+                :on-click #(do
                              (.preventDefault %)
                              (e! (fp-controller/->CloseTermsAndPrivacy user)))}
          [ic/navigation-close {:style {:color "#FFFFFF"}}]]]])))
@@ -445,9 +445,11 @@
   (let [user (:user app)
         page (:page app)
         user-logged-in? (not (nil? user))
-        show-tos? (not (or (= page :register)
-                           (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
-                           (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))]
+        show-tos? (if (flags/enabled? :terms-of-service)
+                    (not (or (= page :register)
+                             (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
+                             (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))
+                    false)]
     [:div {:style (cond
                     (and (= false @is-scrolled?) show-tos?)
                     {:padding-bottom "3rem"}
