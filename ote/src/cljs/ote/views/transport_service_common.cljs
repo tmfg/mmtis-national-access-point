@@ -331,7 +331,7 @@
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
-  [e! in-validation?]
+  [e! in-validation? service-id db-file-key]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/companies])
      :columns 3
@@ -351,10 +351,12 @@
      :write #(merge %1 %2)
      :type :company-source
      :disabled? in-validation?
+     :in-validation? in-validation?
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
      :on-file-selected (fn [evt filename]
-                         (ts-controller/read-companies-csv! e! (.-target evt) filename))
+                         (ts-controller/read-companies-csv! e! (.-target evt) service-id db-file-key))
+     :on-file-delete #(e! (ts-controller/->DeleteCompanyCsv db-file-key))
      :on-url-given #(e! (ts-controller/->EnsureCsvFile))
      :validate [(fn [data row]
                   (let [companies (::t-service/companies row)]

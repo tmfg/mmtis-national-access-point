@@ -150,6 +150,10 @@
           ::closed-groups
           :loading?
           :csv-count
+          :csv-failed-companies-count
+          :csv-valid-companies-count
+          :csv-valid?
+          :csv-imported?
           :map-controls
           :show-delete-dialog?
           :show-cancel-revalidate-dialog?

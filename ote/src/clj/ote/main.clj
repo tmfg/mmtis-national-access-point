@@ -67,7 +67,7 @@
    :transport-operator (component/using (transport-operator/->TransportOperator config) [:http :db :email])
    :external (component/using (external/->External (:nap config)) [:http :db])
    :routes (component/using (routes/->Routes (:nap config)) [:http :db])
-   :pre-notices (component/using (pre-notices/->PreNotices (:pre-notices config)) [:http :db])
+   :pre-notices (component/using (pre-notices/->PreNotices config) [:http :db])
    :transit-visualization (component/using (transit-visualization/->TransitVisualization) [:http :db])
    :transit-changes (component/using (transit-changes/->TransitChanges config) [:http :db])
    ;; Return localization information to frontend

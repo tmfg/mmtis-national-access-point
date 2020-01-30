@@ -331,8 +331,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :parsing-success ["Found  " :count " companies."]}
 
  :companies-csv
- {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."}
-
+ {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."
+  :parsing-success-rows ["File contains " :count " valid rows."]
+  :parsing-failed-rows ["File contains " :count " invalid rows. Fix invalid data and try to upload it again."]
+  }
 
  ;; Action buttons
  :buttons
@@ -660,7 +662,7 @@ You can also draw the operating area or point to the map with drawing tools. You
     "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
     "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
     "To digitize and publish a transport service login is required.")
-  :hero-title "Finnish national open transport service catalogue."
+  :hero-title "Finnish national open transport service catalog."
 
   :new-user? "New user?"
   :table-header-service-name "Service name"

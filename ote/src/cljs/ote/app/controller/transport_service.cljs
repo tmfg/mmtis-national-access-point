@@ -9,7 +9,6 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.common :as common]
             [ote.time :as time]
-            [ote.util.csv :as csv-util]
             [ote.localization :refer [tr tr-key tr-tree]]
             [ote.ui.form :as form]
             [ote.ui.validation :as validation]
@@ -108,7 +107,12 @@
     ::t-service/companies-csv-url
     ::t-service/company-source
     ::t-service/company-csv-filename
+    :db-file-key
     :csv-count
+    :csv-imported?
+    :csv-valid?
+    :csv-failed-companies-count
+    :csv-valid-companies-count
     ::t-service/transport-type})
 
 (defrecord AddPriceClassRow [])
@@ -148,7 +152,10 @@
 (defrecord EnsureExternalInterfaceUrlResponse [response url format])
 (defrecord FailedExternalInterfaceUrlResponse [])
 
-(defrecord AddImportedCompaniesToService [csv filename])
+(defrecord AddImportedCompaniesToService [transport-service-id db-file-key file-input])
+(defrecord UploadCSVResponse [response])
+(defrecord DeleteCompanyCsvResponse [response])
+(defrecord DeleteCompanyCsv [db-file-key])
 
 (defrecord ToggleEditingDialog [])
 (defrecord ConfirmEditing [])
@@ -444,23 +451,53 @@
   (process-event [{response :response} app]
     app)
 
-  AddImportedCompaniesToService
-  (process-event [{csv :csv filename :filename} app]
-    (let [valid? (not (some #(or (empty? (::t-service/name %))
-                                 (or (empty? (::t-service/business-id %))
-                                     (validation/validate-rule :business-id nil (::t-service/business-id %))))
-                            csv))]
+  UploadCSVResponse
+  (process-event [{response :response} app]
+    (let [valid? (if (> (:failed-count response) 0) false true)]
 
       (if valid?
         (update-in app [:transport-service ::t-service/passenger-transportation] assoc
-                   ::t-service/companies csv
-                   ::t-service/company-csv-filename filename
+                   ::t-service/companies (:companies response)
+                   ::t-service/company-csv-filename (:filename response)
                    :csv-imported? true
-                   :csv-valid? true)
+                   :csv-valid? true
+                   :csv-failed-companies-count 0
+                   :db-file-key (:db-file-key response))
         (update-in app [:transport-service ::t-service/passenger-transportation] assoc
-                   ::t-service/company-csv-filename filename
+                   ::t-service/company-csv-filename (:filename response)
                    :csv-imported? true
-                   :csv-valid? false))))
+                   :csv-valid? false
+                   :csv-valid-companies-count (count (:companies response))
+                   :csv-failed-companies-count (:failed-count response)
+                   :db-file-key (:db-file-key response)))))
+
+  DeleteCompanyCsvResponse
+  (process-event [{response :response} app]
+    (update-in app [:transport-service ::t-service/passenger-transportation]
+               #(-> %
+                    (dissoc :db-file-key
+                            :csv-valid?
+                            :csv-imported?
+                            :csv-failed-companies-count
+                            :csv-valid-companies-count)
+                    (assoc ::t-service/company-csv-filename nil
+                           :ote.db.transport-service/companies {}))))
+
+  DeleteCompanyCsv
+  (process-event [{db-file-key :db-file-key} app]
+    (comm/delete! (str "/transport-service/delete-csv") {:file-key db-file-key}
+                  {:on-success (tuck/send-async! ->DeleteCompanyCsvResponse)
+                   :on-failure (tuck/send-async! ->ServerError)})
+    app)
+
+  AddImportedCompaniesToService
+  (process-event [{transport-service-id :transport-service-id db-file-key :db-file-key file-input :file-input} app]
+    ;; Send csv file to back end to be parsed
+    (let [url (str "transport-service/upload-company-csv/" (or transport-service-id 0) "/" (or db-file-key "x"))]
+      (comm/upload! url file-input
+                    {:on-success (tuck/send-async! ->UploadCSVResponse)
+                     :on-failure (tuck/send-async! ->ServerError)})
+      app))
 
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
@@ -682,30 +719,8 @@
       true
       false)))
 
-(defn clean-up-csv-value [value]
-  (when-not (nil? value)
-    (str/trim
-      (str/replace value "\"" ""))))
-
-(defn parse-csv-response->company-map
-  "Convert given vector to maps of business-id and company names."
-  [csv-data]
-  (let [headers (first csv-data)
-        companies (map (fn [[business-id name]]
-                         {::t-service/business-id (clean-up-csv-value business-id)
-                          ::t-service/name (clean-up-csv-value name)})
-                       (rest csv-data))]
-    companies))
-
-(defn read-companies-csv! [e! file-input filename]
-  (let [fr (js/FileReader.)]
-    (set! (.-onload fr)
-          (fn [e]
-            (let [txt (-> e .-target .-result)
-                  separator (csv-util/csv-separator txt)
-                  csv (parse-csv-response->company-map (csv/read-csv txt :newline :lf :separator separator))]
-              (e! (->AddImportedCompaniesToService csv filename)))))
-    (.readAsText fr (aget (.-files file-input) 0) "UTF-8")))
+(defn read-companies-csv! [e! file-input transport-service-id db-file-key]
+  (e! (->AddImportedCompaniesToService transport-service-id db-file-key file-input)))
 
 (defn service-state [validate re-edit published is-child?]
   (if (flags/enabled? :service-validation)

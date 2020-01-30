@@ -1,6 +1,9 @@
 (ns ote.services.transport
   "Services for getting transport data from database"
-  (:require [com.stuartsierra.component :as component]
+  (:require [amazonica.aws.s3 :as s3]
+            [clojure.java.io :as io]
+            [ring.util.io :as ring-io]
+            [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET POST DELETE]]
             [taoensso.timbre :as log]
             [clojure.java.jdbc :as jdbc]
@@ -18,7 +21,8 @@
             [ote.netex.netex_util :as netex-util]
             [ote.services.places :as places]
             [ote.services.external :as external]
-            [ote.db.tx :as tx])
+            [ote.db.tx :as tx]
+            [ote.util.file :as file])
   (:import (java.util UUID)))
 
 (defqueries "ote/services/places.sql")
@@ -60,6 +64,17 @@
           p)))
     pick-up-locations))
 
+(defn- maybe-delete-company-csv-from-s3
+  "When e.g. service is deleted files tend to stay at s3 for nothing. So delete them if they exists."
+  [db bucket service-id]
+  (let [db-csv-row (first (specql/fetch db ::t-service/transport-service-company-csv
+                                        #{::t-service/id ::t-service/csv-file-name ::t-service/file-key}
+                                        {::t-service/transport-service-id service-id}))]
+    (when db-csv-row
+      (specql/delete! db ::t-service/transport-service-company-csv
+                      {::t-service/transport-service-id service-id})
+      (s3/delete-object bucket (::t-service/file-key db-csv-row)))))
+
 (defn add-error-data
   [service]
   (let [sub-type (::t-service/sub-type service)
@@ -86,12 +101,24 @@
           modified-services)))
 
 (defn all-service-data [db id]
-  (first (fetch db ::t-service/transport-service
-                (conj (specql/columns ::t-service/transport-service)
-                      ;; join external interfaces
-                      [::t-service/external-interfaces
-                       (specql/columns ::t-service/external-interface-description)])
-                {::t-service/id id})))
+  (let [ts (first (fetch db ::t-service/transport-service
+                         (conj (specql/columns ::t-service/transport-service)
+                               ;; join external interfaces
+                               [::t-service/external-interfaces
+                                (specql/columns ::t-service/external-interface-description)])
+                         {::t-service/id id}))
+
+        company-csv-file (first (fetch db ::t-service/transport-service-company-csv
+                                       (specql/columns ::t-service/transport-service-company-csv)
+                                       {::t-service/transport-service-id (::t-service/id ts)}))
+        ts (if company-csv-file
+             (assoc ts :db-file-key (::t-service/file-key company-csv-file)
+                       :csv-imported? true
+                       :csv-valid? (or (= (::t-service/failed-companies-count company-csv-file) 0) false)
+                       :csv-failed-companies-count (::t-service/failed-companies-count company-csv-file)
+                       :csv-valid-companies-count (::t-service/valid-companies-count company-csv-file))
+             ts)]
+    ts))
 
 (defn- public-service-data [db id]
   (first (fetch db ::t-service/transport-service
@@ -118,18 +145,29 @@
       {:status 404})))
 
 (defn delete-transport-service!
-  "Delete single transport service by id"
-  [db user id]
-  (let [{::t-service/keys [transport-operator-id]}
-        (first (specql/fetch db ::t-service/transport-service
-                             #{::t-service/transport-operator-id
-                               ::t-service/published}
-                             {::t-service/id id}))]
+  "Delete child and parent transport services by id"
+  [db config user service-id]
+  (let [bucket (get-in config [:csv :bucket])
+        service (first (specql/fetch db ::t-service/transport-service
+                                     #{::t-service/transport-operator-id ::t-service/parent-id}
+                                     {::t-service/id service-id}))
+        transport-operator-id (::t-service/transport-operator-id service)
+        parent-id (::t-service/parent-id service)]
     (authorization/with-transport-operator-check
       db user transport-operator-id
       #(do
-         (delete! db ::t-service/transport-service {::t-service/id id})
-         id))))
+         (when parent-id
+           ;; Delete parent company csv files
+           (maybe-delete-company-csv-from-s3 db bucket parent-id)
+
+           ;; Delete parent
+           (delete! db ::t-service/transport-service {::t-service/id parent-id}))
+         ;; Delete service company csv files
+         (maybe-delete-company-csv-from-s3 db bucket service-id)
+
+         ;; Delete service
+         (delete! db ::t-service/transport-service {::t-service/id service-id})
+         service-id))))
 
 (defn ensure-bigdec [value]
   (when-not (nil? value) (bigdec value)))
@@ -247,7 +285,7 @@
              ::t-service/license ::t-service/id}
            {::t-service/transport-service-id id})))
 
-(defn replace-parent-service-with-child [db child-id publish?]
+(defn replace-parent-service-with-child [db bucket child-id publish?]
   (let [;; Get child service data
         service (first (specql/fetch db ::t-service/transport-service
                                      (specql/columns ::t-service/transport-service)
@@ -272,10 +310,13 @@
       ;; Delete parents operation areas
       (specql/delete! db ::t-service/operation_area {::t-service/transport-service-id parent-id})
 
-      ;; Convert childs operation areas to parents
+      ;; Convert child's operation areas to parents
       (specql/update! db ::t-service/operation_area
                       {::t-service/transport-service-id parent-id}
                       {::t-service/transport-service-id child-id})
+
+      ;; Maybe delete company-csv from S3
+      (maybe-delete-company-csv-from-s3 db bucket child-id)
 
       ;; Delete child - and its external-interfaces and places
       (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
@@ -335,6 +376,47 @@
                          {::t-service/parent-id (::t-service/id transport-service)}))
     nil))
 
+(defn- maybe-copy-service-company-csv [db bucket transport-service-id original-service-id]
+  (let [original-csv-from-db (first (specql/fetch db ::t-service/transport-service-company-csv
+                                                  (specql/columns ::t-service/transport-service-company-csv)
+                                                  {::t-service/transport-service-id original-service-id}))
+        original-csv-from-s3 (when original-csv-from-db
+                               (s3/get-object bucket (::t-service/file-key original-csv-from-db)))
+        new-file-key (when original-csv-from-db
+                       (file/generate-s3-csv-key (::t-service/csv-file-name original-csv-from-db)))
+        new-csv-from-db (when original-csv-from-db
+                          (specql/insert! db ::t-service/transport-service-company-csv
+                                          (-> original-csv-from-db
+                                              (dissoc ::t-service/id)
+                                              (assoc ::t-service/transport-service-id transport-service-id
+                                                     ::t-service/file-key new-file-key))))
+        temp-file (when original-csv-from-s3
+                    (java.io.File/createTempFile "csv-tmp" ".csv"))
+        _ (when original-csv-from-s3
+            (io/copy (:input-stream original-csv-from-s3) temp-file))
+        new-to-s3 (when new-csv-from-db
+                    (s3/put-object bucket new-file-key temp-file))]
+    nil))
+
+(defn- save-service-company-csv
+  "New Service company csv's are stored in temp table. And if they are they need to stored to more permanent place."
+  [db transport-service-id bucket]
+  (let [temp-csv-row (first (specql/fetch db ::t-service/transport-service-company-csv-temp
+                                          (specql/columns ::t-service/transport-service-company-csv-temp)
+                                          {::t-service/transport-service-id transport-service-id}))
+        ;; Service may have company csv in permanent table. If so, delete it
+        permanent-csv (first (specql/fetch db ::t-service/transport-service-company-csv
+                                           (specql/columns ::t-service/transport-service-company-csv)
+                                           {::t-service/transport-service-id transport-service-id}))
+        _ (when permanent-csv
+            (maybe-delete-company-csv-from-s3 db bucket transport-service-id))]
+    (when temp-csv-row
+      ;; Save to permanent table
+      (specql/insert! db ::t-service/transport-service-company-csv (dissoc temp-csv-row ::t-service/id))
+      ;; Delete from temp table
+      (specql/delete! db ::t-service/transport-service-company-csv-temp
+                      {::t-service/file-key (::t-service/file-key temp-csv-row)}))))
+
 (defn- ensure-created-time
   "If service is a child then its created timestamp must be always parents created time. No exceptions here."
   [service db]
@@ -375,15 +457,31 @@
                              (ensure-created-time db))
             resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
             removed-resources (removable-resources resources-from-db external-interfaces)
+            csv-file-key (:db-file-key service-info) ;; Take csv id from temp table
+            service-info (dissoc service-info :db-file-key) ;; Remove csv id to make save to work
             ;; Store to OTE database
             transport-service
             (jdbc/with-db-transaction
               [db db]
               (let [transport-service (upsert! db ::t-service/transport-service service-info)
-                    transport-service-id (::t-service/id transport-service)]
+                    transport-service-id (::t-service/id transport-service)
+                    ;; Update transport-service-id only when saving service for the first time
+                    _ (when (and csv-file-key (nil? original-service-id))
+                        (specql/update! db ::t-service/transport-service-company-csv-temp
+                                        {::t-service/transport-service-id transport-service-id}
+                                        {::t-service/file-key csv-file-key}))]
+
+                ;; Copy possible company csv file to child service if needed
+                (if (and (not (nil? original-service-id))
+                         (not= original-service-id transport-service-id)) ;; child id is given
+                  (do
+                    (save-service-company-csv db original-service-id (get-in config [:csv :bucket]))
+                    (maybe-copy-service-company-csv db (get-in config [:csv :bucket]) transport-service-id original-service-id))
+                  (save-service-company-csv db transport-service-id (get-in config [:csv :bucket])))
 
                 ;; Save possible external interfaces
-                (if (not= original-service-id transport-service-id)
+                (if (and (not (nil? original-service-id))
+                         (not= original-service-id transport-service-id))
                   ;; Copy existing interfaces to new service
                   (save-external-interfaces
                     db transport-service-id (map
@@ -396,7 +494,8 @@
                   (save-external-interfaces db transport-service-id external-interfaces removed-resources))
 
                 ;; Save operation areas for duplicates and original services
-                (if (not= original-service-id transport-service-id)
+                (if (and (not (nil? original-service-id))
+                         (not= original-service-id transport-service-id))
                   ;; We need to duplicate those original places and add new ones if user has decided to do changes to them
                   (places/duplicate-operation-area db original-service-id transport-service-id places)
                   ;; Save given places
@@ -412,9 +511,9 @@
 
         ;; if service is a child and if it is saved as a draft then copy data to parent
         (when (and
-              is-child?
-              (nil? (::t-service/validate data)))
-          (replace-parent-service-with-child db (::t-service/id data) false))
+                is-child?
+                (nil? (::t-service/validate data)))
+          (replace-parent-service-with-child db (get-in config [:csv :bucket]) (::t-service/id data) false))
 
         ;; Return the stored transport-service
         transport-service))))
@@ -500,6 +599,77 @@
             first))
       {:status 404})))
 
+(defn return-company-csv-by-id
+  "CSV file can be returned to the user even if service is not saved to database. So we cannot rely on service id to check
+  if user has authorization to download it. Check the operator id and authorization if possible and use created-by if not."
+  [db config user file-key]
+  (let [bucket (get-in config [:csv :bucket])
+        csv-row (first (specql/fetch db ::t-service/transport-service-company-csv-temp
+                                     (specql/columns ::t-service/transport-service-company-csv-temp)
+                                     {::t-service/file-key file-key}))
+        csv-row (if csv-row
+                  csv-row
+                  (first (specql/fetch db ::t-service/transport-service-company-csv
+                                       (specql/columns ::t-service/transport-service-company-csv)
+                                       {::t-service/file-key file-key})))
+        transport-operator-id (when (not (nil? (::t-service/transport-service-id csv-row)))
+                                (::t-service/transport-operator-id (first (specql/fetch db ::t-service/transport-service
+                                                                                        #{::t-service/transport-operator-id}
+                                                                                        {::t-service/id (::t-service/transport-service-id csv-row)}))))
+        filename (::t-service/csv-file-name csv-row)
+        s3-file (when (or
+                        (= (:id (:user user)) (::t-service/created-by csv-row))
+                        (authorization/is-author? db user transport-operator-id))
+                  (s3/get-object bucket (::t-service/file-key csv-row)))]
+
+    ;; Change default headers and put file as a stream to body
+    ;; to enable downloading a file and not html plain text
+    (if-not s3-file
+      {:status 404
+       :body "No such file."}
+      {:status 200
+       :headers {"Content-Type" "text/csv; charset=UTF-8"
+                 "Content-Disposition" (str "attachment;" (when filename (str " filename=" filename)))}
+       :body (ring-io/piped-input-stream
+               (fn [out]
+                 (io/copy (:input-stream s3-file) out)))})))
+
+(defn- delete-company-csv
+  "Company csv can be in temp table and if it is we can only check for authentication if the user is the same as the
+  temp table has. If csv is already in permanent table, then we can check authentication normally."
+  [config db user form-data]
+  (let [file-key (:file-key form-data)
+        bucket (get-in config [:csv :bucket])
+        temp-csv (first (specql/fetch db ::t-service/transport-service-company-csv-temp
+                                      (specql/columns ::t-service/transport-service-company-csv-temp)
+                                      {::t-service/file-key file-key}))
+        permanent-csv (first (specql/fetch db ::t-service/transport-service-company-csv
+                                           (specql/columns ::t-service/transport-service-company-csv)
+                                           {::t-service/file-key file-key}))
+        operator-id (when permanent-csv
+                      (::t-service/transport-operator-id
+                        (first (specql/fetch db ::t-service/transport-service
+                                             #{::t-service/transport-operator-id}
+                                             {::t-service/id (::t-service/transport-service-id permanent-csv)}))))]
+    (if temp-csv
+      ;; Authenticate and delete temp-csv
+      (when (= (:id (:user user)) (::modification/created-by temp-csv))
+        ;; Same user, we can delete temp-csv
+        (s3/delete-object bucket (::t-service/file-key temp-csv))
+        (specql/delete! db ::t-service/transport-service-company-csv-temp
+                        {::t-service/file-key file-key})
+        ;; Return
+        file-key)
+      (when (and permanent-csv operator-id)
+        (authorization/with-transport-operator-check
+          db user operator-id
+          #(do
+             (s3/delete-object bucket (::t-service/file-key permanent-csv))
+             (specql/delete! db ::t-service/transport-service-company-csv
+                             {::t-service/file-key file-key})
+             ;; Return
+             file-key))))))
+
 (defn ckan-group-id->group
   [db ckan-group-id]
   (first (specql/fetch db ::t-operator/group
@@ -534,10 +704,26 @@
                                 user :user}
       (save-transport-service-handler config db user (http/transit-request form-data)))
 
+    ^{:format :csv}
+    (GET "/transport-service/company-csv/:file-key"
+         {{:keys [file-key]}
+          :params
+          user :user}
+      (return-company-csv-by-id db config user file-key))
+
+    (DELETE "/transport-service/delete-csv"
+            {{:keys [file-key]}
+             :params
+             user :user
+             form-data :body}
+      (let [form-data (http/transit-request form-data)]
+        (http/transit-response
+          (delete-company-csv config db user form-data))))
+
     (POST "/transport-service/delete" {form-data :body
                                        user :user}
       (http/transit-response
-        (delete-transport-service! db user (:id (http/transit-request form-data)))))
+        (delete-transport-service! db config user (:id (http/transit-request form-data)))))
 
     (POST "/transport-service/:service-id/re-edit-service" {{:keys [service-id]} :params
                                                             user :user}

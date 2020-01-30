@@ -81,6 +81,10 @@
 (defrecord SearchNetexConversions [])
 (defrecord SearchNetexConversionsResponse [response])
 
+;; Company csv tab
+(defrecord FetchCompanyCsvs [])
+(defrecord FetchCompanyCsvsResponse [response])
+
 ;; Delete Transport Operator
 (defrecord OpenDeleteOperatorModal [id])
 (defrecord CancelDeleteOperator [id])
@@ -387,6 +391,19 @@
     (update-in app [:admin :netex] assoc
                :loading? false
                :results response))
+
+  FetchCompanyCsvsResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :company-csv] assoc
+               :loading? false
+               :results response))
+
+  FetchCompanyCsvs
+  (process-event [_ app]
+    (comm/get! "admin/company-csvs"
+                {:on-success (tuck/send-async! ->FetchCompanyCsvsResponse)
+                 :on-failure (tuck/send-async! ->ServerError)})
+    (assoc-in app [:admin :company-csv :loading?] true))
 
   DeleteTransportService
   (process-event [{id :id} app]
