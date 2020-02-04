@@ -287,6 +287,7 @@
                                  :license "Uppge licens eller användarvillkor för gränssnittet. Ifall lämpligt alternativ saknas, fyll då i det själv."
                                  :external-service-description "Uppge sådan information som kan vara viktig för tjänsteutvecklare (t.ex. om licens). Du kan även uppge en webbadress med tilläggsuppgifter."
                                  :view-routes "Visa rutter"}
+  :external-interface-netex-info "Traficom kan konvertera uppgifter i detta avsnitt till ett annat format (t.ex. NeTEx) i enlighet med EU-lagstiftningens krav och tillhandahålla de konverterade uppgifterna för nedladdning i NAP-tjänsten parallellt med originalformatet. Datainnehållet ändras dock inte i samband med konverteringen."
   :RAE-link-text "RAE-verktyg"
   :SEA-ROUTE-link-text " Rutteditorn för sjötrafik"
   ;; FIXME: Partially Google translated: please improve
