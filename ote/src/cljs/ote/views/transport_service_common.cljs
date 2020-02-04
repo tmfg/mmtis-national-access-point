@@ -190,8 +190,12 @@
                        [:div
                         (tr [:form-help :external-interfaces-read-more :dialog-text])]]
                       (when (= :passenger-transportation type)
-                        [:div {:style {:margin-top "20px"}}
+                        [:div {:style {:margin-top "1rem"}}
                          [:b (tr [:form-help :external-interfaces-payment-systems])]])
+
+                      (when (flags/enabled? :netex-conversion-automated)
+                        [:div {:style {:margin-top "1rem"}} (tr [:form-help :external-interface-netex-info])])
+
                       [:div
                        [field-help (tr [:field-labels :transport-service-common ::t-service/data-content]) (tr [:form-help :external-interfaces-tooltips :data-content])]
                        [field-help (tr [:field-labels :transport-service-common ::t-service/format]) (tr [:form-help :external-interfaces-tooltips :format])]
