@@ -193,9 +193,6 @@
                         [:div {:style {:margin-top "1rem"}}
                          [:b (tr [:form-help :external-interfaces-payment-systems])]])
 
-                      (when (flags/enabled? :netex-conversion-automated)
-                        [:div {:style {:margin-top "1rem"}} (tr [:form-help :external-interface-netex-info])])
-
                       [:div
                        [field-help (tr [:field-labels :transport-service-common ::t-service/data-content]) (tr [:form-help :external-interfaces-tooltips :data-content])]
                        [field-help (tr [:field-labels :transport-service-common ::t-service/format]) (tr [:form-help :external-interfaces-tooltips :format])]
@@ -331,7 +328,15 @@
           {:add-label (tr [:buttons :add-external-interface])
            :inner-delete? true
            :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
-           :inner-delete-label (tr [:buttons :delete-interface])})))))
+           :inner-delete-label (tr [:buttons :delete-interface])}))
+
+      (when (flags/enabled? :netex-conversion-automated)
+
+        {:name :netex-info-text
+         :type :component
+         :full-width? true
+         :component (fn [_]
+                      [:div {:style {:margin-top "1rem"}} (tr [:form-help :external-interface-netex-info])])}))))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
