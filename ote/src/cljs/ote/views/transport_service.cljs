@@ -99,14 +99,14 @@
     :parking (tr [:parking-page :header-new-parking])))
 
 (defn- license-info []
-  [:p {:style {:padding-top "20px"
-               :padding-bottom "20px"}}
+  [:div.container {:style {:padding-top "20px"
+                           :padding-bottom "20px"}}
    (tr [:common-texts :nap-data-license])
    [ui-common/linkify (tr [:common-texts :nap-data-license-url]) (tr [:common-texts :nap-data-license-url-label]) {:target "_blank"}]
    "."])
 
 (defn edit-service [e! type {service :transport-service :as app}]
-  [:span
+  [:div
    [license-info]
    (case type
      :passenger-transportation [pt/passenger-transportation-info e! (:transport-service app) app]
@@ -134,27 +134,27 @@
                                          (tr [:passenger-transportation-page :service-is-in-validation]))]
         [:div
          [ui-common/rotate-device-notice]
-
-         [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
-         (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
-           [:div {:style {:margin-bottom "1.5rem"}}
-            [:div (stylefy/use-style style-base/notification-container)
-             [:div {:style {:display "inline-flex"}}
-              [ic/action-info {:style {:margin-right "1rem" :color colors/purple-darker}}]
-              [:div {:style {:padding-top "2px"}} service-in-validation-text]]]
-            [buttons/save {:on-click #(do
-                                        (.preventDefault %)
-                                        (e! (ts-controller/->ToggleEditingDialog)))}
-             (tr [:buttons :continue-editing])]])
-         ;; Passenger transport service has sub type, and here it is shown to users
-         (when (= :passenger-transportation (keyword (::t-service/type service)))
-           [:p (stylefy/use-style style-form/subheader)
-            (tr [:enums :ote.db.transport-service/sub-type
-                 (get-in app [:transport-service ::t-service/sub-type])])])
-         ;; Show service owner name only for service owners
-         (when (ts-controller/is-service-owner? app)
-           [:h2 {:style {:margin-top "-0.5rem"}}
-            (get-in app [:transport-operator ::t-operator/name])])
+         [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+          [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
+          (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
+            [:div {:style {:margin-bottom "1.5rem"}}
+             [:div (stylefy/use-style style-base/notification-container)
+              [:div {:style {:display "inline-flex"}}
+               [ic/action-info {:style {:margin-right "1rem" :color colors/purple-darker}}]
+               [:div {:style {:padding-top "2px"}} service-in-validation-text]]]
+             [buttons/save {:on-click #(do
+                                         (.preventDefault %)
+                                         (e! (ts-controller/->ToggleEditingDialog)))}
+              (tr [:buttons :continue-editing])]])
+          ;; Passenger transport service has sub type, and here it is shown to users
+          (when (= :passenger-transportation (keyword (::t-service/type service)))
+            [:p (stylefy/use-style style-form/subheader)
+             (tr [:enums :ote.db.transport-service/sub-type
+                  (get-in app [:transport-service ::t-service/sub-type])])])
+          ;; Show service owner name only for service owners
+          (when (ts-controller/is-service-owner? app)
+            [:h2 {:style {:margin-top "-0.5rem"}}
+             (get-in app [:transport-operator ::t-operator/name])])]
          ;; Render the form
          [edit-service e! (::t-service/type service) app]
          (when show-editing-dialog?
@@ -188,14 +188,14 @@
 
       [:div
        [ui-common/rotate-device-notice]
-
-       [:h1 new-header-text]
-       ;; Passenger transport service has sub type, and here it is shown to users
-       (when (= :passenger-transportation service-type)
-         [:p (stylefy/use-style style-form/subheader)
-          (tr [:enums :ote.db.transport-service/sub-type
-               (get-in app [:transport-service ::t-service/sub-type])])])
+       [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+        [:h1 new-header-text]
+        ;; Passenger transport service has sub type, and here it is shown to users
+        (when (= :passenger-transportation service-type)
+          [:p (stylefy/use-style style-form/subheader)
+           (tr [:enums :ote.db.transport-service/sub-type
+                (get-in app [:transport-service ::t-service/sub-type])])])
 
        [:div.row
-        [:h2 (get-in app [:transport-operator ::t-operator/name])]]
+        [:h2 (get-in app [:transport-operator ::t-operator/name])]]]
        [edit-service e! service-type app]])))

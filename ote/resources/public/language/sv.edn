@@ -312,7 +312,7 @@
   :pricing-info "Fyll i prisuppgifter och/eller prissättningsprinciper ifall det är ändamålsenligt.\nUppge www-adress ifall prissättningen beskrivs på en webbplats."
 
   :publish-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
-  :validate-missing-required "Tjänsten kunde inte sparas och publiceras eftersom obligatoriska uppgifter saknas eller uppgifterna tex. klockslagen är felaktiga. Kontrollera alla uppgifter och försök på nytt."
+  :validate-missing-required "Du kan ännu inte skicka tjänsten för publicering eftersom obligatoriska uppgifter saknas på blanketten. Fyll i uppgifterna i punkterna där det står \"Obligatorisk uppgift\"."
 
   :advance-reservation-info "Ange här om användning av tjänsten kräver förhandsbokning."
   :trip-editor-no-calendar "Fyll i denhär avgångens kördagar i trafikeringskalendern innan du lägger till flera avgångar på rutten. Samma kalender kopieras automatiskt till följande avgång. När du lagt till alla avgångar kan du ännu ta bort och lägga till dagar i de enskilda avgångarnas kalendrar."
@@ -608,9 +608,7 @@
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
                      :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
-                     :not-in-use "Ei käytössä"
-                     :published-service-cannot-be-modified "Voit muokata vain julkaisua odottavaa palvelua."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"

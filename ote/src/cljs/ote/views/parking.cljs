@@ -17,6 +17,7 @@
                         [:field-labels :transport-service]
                         [:field-labels])
    :update!     #(e! (ts-controller/->EditTransportService %))
+   :use-container true
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -327,7 +328,7 @@
                 (accessibility-group in-validation?)
                 (service-hours-group e! in-validation?)]
         options (form-options e! groups in-validation? app)]
-    [:div.row
+    [:div
      [form/form options groups (merge
                                  {:maximum-stay-unit :hours}
                                  form-data)]]))
