@@ -281,6 +281,7 @@
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
                                  :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."
                                  :view-routes "Katsele reittejä"}
+  :external-interface-netex-info "Traficom voi muuntaa tässä osiossa annettuja tietoja toiseen formaattiin (esim. NeTEx) EU-lainsäädännön vaatimusten mukaisesti ja tarjota formaattimuunnettuja tietoja NAP-palvelussa ladattavaksi alkuperäismuodon rinnalla. Tietosisältö ei kuitenkaan muutu formaattimuunnoksen yhteydessä."
   :RAE-link-text "Rae-työkalulla"
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"

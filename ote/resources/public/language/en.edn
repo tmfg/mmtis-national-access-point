@@ -282,6 +282,7 @@
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
                                  :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."
                                  :view-routes "View routes"}
+  :external-interface-netex-info "Traficom may convert data in this section to another format (e.g. NeTEx) in accordance with the requirements laid down in EU legislation and provide the converted data for downloading in the NAP service alongside the original format. However, the data content remains the same when converting the format."
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
