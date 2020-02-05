@@ -153,6 +153,7 @@
           :map-controls
           :show-delete-dialog?
           :show-cancel-revalidate-dialog?
+          :show-confirm-cancel-dialog?
           :disabled?))
 
 (defrecord ^:private Label [label])

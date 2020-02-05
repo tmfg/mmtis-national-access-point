@@ -212,7 +212,7 @@
    :ote.db.transport-service/published?-values {:public "Julkaistu"
                                                 :validation "Lähetetty julkaistavaksi"
                                                 :re-validation "Muutokset lähetetty julkaistavaksi"
-                                                :re-edit "Uudelleen muokattavana"
+                                                :re-edit "Muutokset lähetetty julkaistavaksi"
                                                 :draft "Luonnos"}
 
    ;; Service hour fields
@@ -799,9 +799,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :transport-services-common-page
  {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
-  :validation-modal-link-text "Palvelun käytön ehdot"
-  }
+  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
@@ -1172,7 +1170,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :title-base-view "Palveluntuottajan poistaminen"
    :confirm ["Haluatko varmasti poistaa palveluntuottajan: \"" :name "\" pysyvästi?"]}
 
-
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
    :stay "Palaa lomakkeelle"
@@ -1196,6 +1193,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :continue-editing
   {:title "Jatka tietojen muokkaamista"
    :confirm "Oletko varma, että haluat jatkaa tietojen muokkaamista? Tällöin aiemmin lähettämääsi versiota ei julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi."}
+
+  :change-to-draft
+  {:title "Oletko varma, että haluat muuttaa palvelun luonnokseksi?"
+   :body "Luonnostilassa olevan palvelun tiedot eivät näy julkisessa liikkumispalvelukatalogissa. Voit kuitenkin itse yhä tarkastella ja muokata palvelua."
+   :cancel-button "Ei, palaa takaisin lomakkeelle"
+   :ok-button "Kyllä, muuta palvelu luonnokseksi"
+   }
   }
 
  :operators

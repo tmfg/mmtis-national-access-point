@@ -211,9 +211,9 @@
    :ote.db.transport-service/sub-type "Kategori"
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Publicerad"
-                                                :validation "Lähetetty julkaistavaksi"
-                                                :re-validation "Muutokset lähetetty julkaistavaksi"
-                                                :re-edit "Uudelleen muokattavana"
+                                                :validation "Har skickats för publicering"
+                                                :re-validation "Ändringarna har skickats för publicering"
+                                                :re-edit "Ändringarna har skickats för publicering"
                                                 :draft "Utkast"}
 
    ;; Service hour fields
@@ -355,7 +355,7 @@
   :manage-access-rights "Hanterar användarrättigheter"
 
   :save-and-publish "Spara och publicera"
-  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
+  :save-and-validate "Spara och skicka till NAP för publicering"
   :send "Skicka"
   :save-as-draft "Spara utkast"
   :save-and-send "Spara och skicka"
@@ -394,7 +394,7 @@
   :other-access-points-url "https://www.traficom.fi/sv/transport/transportsystem/its"
   :register-to-service "Registrering"
   :check-out-the-service "Bekanta dig med informationen"
-  :continue-editing "Jatka tietojen muokkaamista"
+  :continue-editing "Fortsätt redigera uppgifter"
   }
 
  ;; Database enumeration values
@@ -608,7 +608,7 @@
                      :if-no-interfaces "Om du inte har några gränssnitt för rutt- och tidtabellsdata, kan du skapa sådana med hjälp av verktygen nedan"
                      :open-rae "Öppna Traficoms verktyg (RAE) för editering av rutter och tidtabeller"
                      :open-sea-rae "Öppna Kartverktyget för sjötrafik i NAP-tjänsten"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
+                     :service-in-validation-info "Tjänsteproducenten är själv ansvarig för uppgifterna som publicerats i tjänsten. Uppgifterna är i publiceringskön. Efter publiceringen syns uppgifterna i den offentliga tjänstekatalogen NAP."}
 
  :transport-users-page {:username "Namn"
                         :add-member "Lägg till medlem"
@@ -754,8 +754,8 @@
   :radio-button-url-companies "Ange en web-adress för .csv-filen."
   :radio-button-csv-companies "Ladda upp .csv-filen."
   :radio-button-form-companies "Lägg till uppgifter om företagen i formuläret."
-  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
-  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
+  :service-is-in-validation "Uppgifter om tjänsten har skickats för publicering."
+  :published-service-is-in-validation "Ändringarna i uppgifterna om tjänsten har skickats för publicering."
   }
 
  :rentals-page
@@ -796,10 +796,8 @@
   :header-service-hours "Tjänstens öppettider och parkeringstid"}
 
  :transport-services-common-page
- {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Tarkastettavaksi lähetetyn palvelun tiedot tarkistetaan arkisin klo 9-15. Tarkistuksen jälkeen palvelu julkaistaan ja tiedot ovat nähtävillä palvelukatalogissa."
-  :validation-modal-link-text "Palvelun käytön ehdot"
-  }
+ {:validation-modal-header "Information om publiceringsprocessen"
+  :validation-modal-text "Tjänsteproducenten är själv ansvarig för uppgifterna som publicerats i tjänsten. Uppgifterna flyttas till publiceringskön. Efter publiceringen syns uppgifterna i den offentliga tjänstekatalogen NAP."}
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
@@ -1170,7 +1168,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :stay "Stanna"
    :leave "Lämna"
    :unsaved-data "Blanketten innehåller uppgifter som inte sparats. Vill du trots allt lämna sidan?"
-   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."
+   :unsaved-validated-data "Blanketten innehåller uppgifter som inte har sparats. Är du säker på att du vill lämna sidan? Om du inte sparar uppgifterna, kommer den gamla versionen av tjänsten som du redigerade att återgå till Traficoms lista i väntan på publicering."
    }
 
   :send-pre-notice
@@ -1186,8 +1184,16 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
    :ok "Ja"}
 
   :continue-editing
-  {:title "Jatka tietojen muokkaamista"
-   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta? Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
+  {:title "Fortsätt redigera uppgifter"
+   :confirm "Är du säker på att du vill fortsätta redigera uppgifter? Då publiceras inte den version du skickade tidigare i NAP, utan uppgifterna om tjänsten skickas tillbaka till dig för redigering."
+   }
+
+  :change-to-draft
+  {:title "Är du säker på att du vill spara tjänsten som ett utkast?"
+   :body "Uppgifterna för en tjänst som sparats som utkast visas inte i den offentliga mobilitetstjänstekatalogen. Du kan dock själv fortfarande granska och redigera tjänsten."
+   :cancel-button "Nej, gå tillbaka till blanketten"
+   :ok-button "Ja, spara tjänsten som utkast"
+   }
   }
 
  :operators

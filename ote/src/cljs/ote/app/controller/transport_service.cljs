@@ -155,6 +155,8 @@
 (defrecord ReEditResponse [response])
 (defrecord BackToValidation [id])
 (defrecord BackToValidationResponse [response])
+(defrecord OpenChangeToDraftModal [])
+(defrecord CloseChangeToDraftModal [])
 
 (declare move-service-level-keys-from-form
          move-service-level-keys-to-form)
@@ -526,6 +528,7 @@
                       :select-transport-operator
                       :show-brokering-service-dialog?
                       :show-confirm-save-dialog?
+                      :show-confirm-cancel-dialog?
                       :edit-dialog)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
@@ -644,7 +647,15 @@
     (comm/post! (str "transport-service/" id "/back-to-validation") {}
                 {:on-success (tuck/send-async! ->BackToValidationResponse)
                  :on-failure (tuck/send-async! ->ServerError)})
-    (assoc app :transport-service-loaded? false)))
+    (assoc app :transport-service-loaded? false))
+
+  OpenChangeToDraftModal
+  (process-event [_ app]
+    (assoc-in app [:transport-service :show-confirm-cancel-dialog?] true))
+
+  CloseChangeToDraftModal
+  (process-event [_ app]
+    (assoc-in app [:transport-service :show-confirm-cancel-dialog?] false)))
 
 (defn move-service-level-keys-from-form
   "The form only sees the type specific level, move keys that are stored in the

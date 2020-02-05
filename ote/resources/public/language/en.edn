@@ -210,9 +210,9 @@
    :ote.db.transport-service/sub-type "Transport service sub mode"
    :ote.db.transport-service/published? "NAP-status"
    :ote.db.transport-service/published?-values {:public "Published"
-                                                :validation "Lähetetty julkaistavaksi"
-                                                :re-validation "Muutokset lähetetty julkaistavaksi"
-                                                :re-edit "Uudelleen muokattavana"
+                                                :validation "Submitted for publication"
+                                                :re-validation "Changes submitted for publication"
+                                                :re-edit "Changes submitted for publication"
                                                 :draft "Draft"}
 
    ;; Service hour fields
@@ -353,7 +353,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :manage-access-rights "Manage access rights"
 
   :save-and-publish "Save and publish"
-  :save-and-validate "Tallenna ja lähetä NAP:iin julkaisua varten"
+  :save-and-validate "Save and submit to NAP for publication"
   :send "Send"
   :save-and-send "Save and send"
   :save-as-draft "Save a draft"
@@ -392,7 +392,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :other-access-points-url "https://www.traficom.fi/en/transport/transport-system/its"
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
-  :continue-editing "Continue editing"
+  :continue-editing "Continue modifying the information"
   }
 
  ;; Database enumeration values
@@ -609,7 +609,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :if-no-interfaces "If you do not have any interfaces for route and timetable data, you can digitalize your transport service´s route and timetable data with the tools listed below."
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
                      :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
+                     :service-in-validation-info "The service provider is responsible for the information published in the service. The information is currently in the publication queue. After publication, the information is accessible in the public NAP service catalogue. "}
 
  :transport-users-page {:username "Name"
                         :members "Members"
@@ -752,8 +752,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :radio-button-url-companies "Enter a web address from which the company information can be found as a .csv file."
   :radio-button-csv-companies "Load a .csv file from your computer with the company information."
   :radio-button-form-companies "Add company information manually using the form."
-  :service-is-in-validation "Palvelun tiedot on lähetetty julkaistavaksi."
-  :published-service-is-in-validation "Palvelun tietojen muutokset on lähetetty julkaistavaksi."
+  :service-is-in-validation "Service information have been submitted for publication."
+  :published-service-is-in-validation "Changes made to service information have been submitted for publication."
   }
 
  :rentals-page
@@ -794,9 +794,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-service-hours "Service hours and maximum parking time"}
 
  :transport-services-common-page
- {:validation-modal-header "Validation process information"
-  :validation-modal-text "Service will be validated Mon - Fri 9 am to 3 pm. When service is validated it will be published to service catalog."
-  :validation-modal-link-text "Palvelun käytön ehdot"}
+ {:validation-modal-header "Information on the publication process"
+  :validation-modal-text "The service provider is responsible for the information published in the service. The information is transferred to the publication queue. After publication, the information is accessible in the public NAP service catalogue."}
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
@@ -1170,7 +1169,8 @@ You can also draw the operating area or point to the map with drawing tools. You
    :stay "Stay on this page"
    :leave "Leave this page"
    :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"
-   :unsaved-validated-data "Lomakkeella on tallentamattomia tietoja, haluatko varmasti siirtyä pois sivulta? Mikäli et tallenna tietoja, vanha muokkaamasi versio palvelusta palautuu Traficomin listalle odottamaan julkaisua."}
+   :unsaved-validated-data "The form contains unsaved information. Are you sure you want to leave the page? If you do not save the information, the old version of the service is returned to Traficom’s list for publication."
+   }
 
   :send-pre-notice
   {:title "Submit change notification"
@@ -1185,8 +1185,15 @@ You can also draw the operating area or point to the map with drawing tools. You
    :ok "Yes"}
 
   :continue-editing
-  {:title "Jatka tietojen muokkaamista"
-   :confirm "Oletko varma, että haluat jatkaa tietojen muokkausta? Tällöin aiemmin lähettämääsi versiota ei tarkasteta ja julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi ja lähetettäväksi."}
+  {:title "Continue modifying the information"
+   :confirm "Are you sure you want to continue modifying the information? In that case, the previously submitted version will not be published in the NAP service, but the service information is returned to you for modification."}
+
+  :change-to-draft
+  {:title "Are you sure you want to change service status to draft?"
+   :body "Information pertaining to services marked as drafts is not visible in the public transport service catalogue. However, you can still view and modify the service."
+   :cancel-button "No, return to the form"
+   :ok-button "Yes, change service status to draft"
+   }
   }
 
  :operators

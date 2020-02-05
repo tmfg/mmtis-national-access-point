@@ -529,6 +529,24 @@
 
      [:div "Julkaise painamalla julkaise"]]))
 
+(defn- open-confirm-cancel-dialog [e! schemas]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:dialog :change-to-draft :title])
+    :actions [; Leave form and change service state back to validation
+              (r/as-element
+                [buttons/cancel
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->SaveTransportService schemas false))}
+                 (tr [:dialog :change-to-draft :ok-button])])
+              ; Return to form and do not cancel
+              (r/as-element
+                [buttons/save
+                 {:on-click #(e! (ts-controller/->CloseChangeToDraftModal))}
+                 (tr [:dialog :change-to-draft :cancel-button])])]}
+   [:span (tr [:dialog :change-to-draft :body]) ]])
+
 (defn- open-cancel-revalidate-dialog [e! service-id]
   [ui/dialog
    {:open true
@@ -578,7 +596,7 @@
       [buttons/save-draft {:disabled name-missing?
                            :on-click #(do
                                         (.preventDefault %)
-                                        (e! (ts-controller/->SaveTransportService schemas false)))}
+                                        (e! (ts-controller/->OpenChangeToDraftModal)))}
        (tr [:buttons :back-to-draft])]]
      [:div {:style {:margin-top "1rem"}}
       [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
@@ -648,6 +666,7 @@
         admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))
         service-key (t-service/service-key-by-type (get-in app [:transport-service ::t-service/type]))
         show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])
+        show-confirm-cancel-dialog? (get-in app [:transport-service :show-confirm-cancel-dialog?])
         modified? (not
                     (empty?
                       (get-in app [:transport-service service-key :ote.ui.form/modified])))]
@@ -680,7 +699,7 @@
                                                  :disabled (not (form/can-save? data))}
                            (tr [:buttons :save-and-validate])]]
                          [:div {:style {:margin-top "1rem"}}
-                          [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                          [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
                                                :disabled name-missing?}
                            (tr [:buttons :back-to-draft])]]
                          [:div {:style {:margin-top "1rem"}}
@@ -692,7 +711,7 @@
                                               :disabled (not (form/can-save? data))}
                         (tr [:buttons :save-and-validate])]]
                       [:div {:style {:margin-top "1rem"}}
-                       [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                       [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
                                             :disabled name-missing?}
                         (tr [:buttons :back-to-draft])]]
                       [:div {:style {:margin-top "1rem"}}
@@ -730,6 +749,9 @@
 
      (when show-cancel-revalidate-modal?
        [open-cancel-revalidate-dialog e! service-id])
+
+     (when show-confirm-cancel-dialog?
+       [open-confirm-cancel-dialog e! schemas])
 
      [open-publish-dialog e! app]]))
 
