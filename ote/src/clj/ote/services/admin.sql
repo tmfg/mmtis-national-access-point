@@ -236,7 +236,7 @@ select ts.name as "joined-service",
        tstop.name as "operator",
        tstop.id as "operator-id",
        tstop."business-id" as "operator-business-id",
-       top.name as "joined-operator-business-id",
+       top.name as "joined-operator",
        top."business-id" as "joined-operator-business-id",
        aso.timestamp::DATE as "joined-date",
        top.id as "joined-operator-id"
