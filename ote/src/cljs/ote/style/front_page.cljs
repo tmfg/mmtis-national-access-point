@@ -13,10 +13,10 @@
                                 {:max-width (str width-l "px")} {:background "url(/img/hero-1600.png)"}
                                 {:max-width (str width-sm "px")} {:background "url(/img/hero-1080.png)"
                                                                   :background-size "cover"
-                                                                  :height "400px"}
+                                                                  :height "450px"}
                                 {:max-width (str width-xs "px")} {:background "url(/img/hero-800.png)"
                                                                   :background-size "cover"
-                                                                  :height "350px"}}})
+                                                                  :height "400px"}}})
 
 (def hero-btn-container {:padding-top "0.5rem"
                          ::stylefy/media {{:max-width (str width-xl "px")} {:padding-top "0.5rem"}
@@ -96,7 +96,7 @@
 
 (def front-page-h1 {:position "static"
                     :display "flex"
-                    :padding-top "40px"
+                    :padding-top "2rem"
                     :box-orient "vertical"                  ;; Old flex standard
                     :box-direction "normal"                 ;; Old flex standard
                     :flex-direction "column"
@@ -124,8 +124,9 @@
                                                                                          :font-weight "400"}}})
 
 (def front-page-hero-text {:display "block"
-                           :margin-top "3rem"
-                           :align-items "center"
+                           :margin-top "2.5rem"
+                           :height "100px"
+                           :align-items "cexnter"
                            :font-family "Montserrat, sans-serif"
                            :color "#fafafa"
                            :font-size "2.25rem"
