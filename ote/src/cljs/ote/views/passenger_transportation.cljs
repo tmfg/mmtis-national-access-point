@@ -11,6 +11,7 @@
 (defn transportation-form-options [e! schemas in-validation? app]
   {:name->label (tr-key [:field-labels :passenger-transportation] [:field-labels :transport-service-common] [:field-labels :transport-service])
    :update!     #(e! (ts-controller/->EditTransportService %))
+   :use-container true
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -240,5 +241,5 @@
               (pricing-group (get service ::t-service/sub-type) in-validation?)
               (ts-common/service-hours-group "passenger-transportation" false in-validation?)]
              form-options (transportation-form-options e! form-groups in-validation? app)]
-    [:div.row
+    [:div
      [form/form form-options form-groups form-data]]))

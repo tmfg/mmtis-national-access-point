@@ -161,7 +161,6 @@
    [change-icons-for-header diff false])
   ([diff with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
-    (.log js/console "change-icons-for-header" (pr-str diff))
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
     [show-trip-sequences diff with-labels?]

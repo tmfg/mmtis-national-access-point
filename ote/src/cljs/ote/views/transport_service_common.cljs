@@ -190,8 +190,9 @@
                        [:div
                         (tr [:form-help :external-interfaces-read-more :dialog-text])]]
                       (when (= :passenger-transportation type)
-                        [:div {:style {:margin-top "20px"}}
+                        [:div {:style {:margin-top "1rem"}}
                          [:b (tr [:form-help :external-interfaces-payment-systems])]])
+
                       [:div
                        [field-help (tr [:field-labels :transport-service-common ::t-service/data-content]) (tr [:form-help :external-interfaces-tooltips :data-content])]
                        [field-help (tr [:field-labels :transport-service-common ::t-service/format]) (tr [:form-help :external-interfaces-tooltips :format])]
@@ -327,7 +328,15 @@
           {:add-label (tr [:buttons :add-external-interface])
            :inner-delete? true
            :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
-           :inner-delete-label (tr [:buttons :delete-interface])})))))
+           :inner-delete-label (tr [:buttons :delete-interface])}))
+
+      (when (flags/enabled? :netex-conversion-automated)
+
+        {:name :netex-info-text
+         :type :component
+         :full-width? true
+         :component (fn [_]
+                      [:div {:style {:margin-top "1rem"}} (tr [:form-help :external-interface-netex-info])])}))))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
@@ -520,6 +529,24 @@
 
      [:div "Julkaise painamalla julkaise"]]))
 
+(defn- open-confirm-cancel-dialog [e! schemas]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:dialog :change-to-draft :title])
+    :actions [; Leave form and change service state back to validation
+              (r/as-element
+                [buttons/cancel
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->SaveTransportService schemas false))}
+                 (tr [:dialog :change-to-draft :ok-button])])
+              ; Return to form and do not cancel
+              (r/as-element
+                [buttons/save
+                 {:on-click #(e! (ts-controller/->CloseChangeToDraftModal))}
+                 (tr [:dialog :change-to-draft :cancel-button])])]}
+   [:span (tr [:dialog :change-to-draft :body]) ]])
+
 (defn- open-cancel-revalidate-dialog [e! service-id]
   [ui/dialog
    {:open true
@@ -562,15 +589,15 @@
     ;; Flag enabled
     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
      [:div {:style {:margin-top "1rem"}}
-      [buttons/save-draft {:disabled name-missing?
-                           :on-click #(do
-                                        (.preventDefault %)
-                                        (e! (ts-controller/->SaveTransportService schemas false)))}
-       (tr [:buttons :back-to-draft])]]
-     [:div {:style {:margin-top "1rem"}}
       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
                              :disabled (not (form/can-save? data))}
        (tr [:buttons :save-and-validate])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:disabled name-missing?
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts-controller/->OpenChangeToDraftModal)))}
+       (tr [:buttons :back-to-draft])]]
      [:div {:style {:margin-top "1rem"}}
       [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
        (tr [:buttons :discard])]]]
@@ -578,15 +605,15 @@
     ;; Flag not enabled - save as draft or publish
     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
      [:div {:style {:margin-top "1rem"}}
+      [buttons/save-publish {:on-click #(e! (ts-controller/->SaveTransportService schemas true))
+                             :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-publish])]]
+     [:div {:style {:margin-top "1rem"}}
       [buttons/save-draft {:disabled name-missing?
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (ts-controller/->SaveTransportService schemas false)))}
        (tr [:buttons :back-to-draft])]]
-     [:div {:style {:margin-top "1rem"}}
-      [buttons/save-publish {:on-click #(e! (ts-controller/->SaveTransportService schemas true))
-                             :disabled (not (form/can-save? data))}
-       (tr [:buttons :save-and-publish])]]
      [:div {:style {:margin-top "1rem"}}
       [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
        (tr [:buttons :discard])]]]))
@@ -596,13 +623,13 @@
     ;; Flag enabled, let user move services to validate
     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
      [:div {:style {:margin-top "1rem"}}
-      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                           :disabled name-missing?}
-       (tr [:buttons :save-as-draft])]]
-     [:div {:style {:margin-top "1rem"}}
       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
                              :disabled (not (form/can-save? data))}
        (tr [:buttons :save-and-validate])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                           :disabled name-missing?}
+       (tr [:buttons :save-as-draft])]]
      [:div {:style {:margin-top "1rem"}}
       [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
        (tr [:buttons :discard])]]]
@@ -610,13 +637,13 @@
     ;; Flag is not enabled, so no chance to move service to validate
     [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
      [:div {:style {:margin-top "1rem"}}
-      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                           :disabled name-missing?}
-       (tr [:buttons :save-as-draft])]]
-     [:div {:style {:margin-top "1rem"}}
       [buttons/save-publish {:on-click #(e! (ts-controller/->SaveTransportService schemas true))
                              :disabled (not (form/can-save? data))}
        (tr [:buttons :save-and-publish])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                           :disabled name-missing?}
+       (tr [:buttons :save-as-draft])]]
      [:div {:style {:margin-top "1rem"}}
       [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
        (tr [:buttons :discard])]]]))
@@ -639,85 +666,92 @@
         admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))
         service-key (t-service/service-key-by-type (get-in app [:transport-service ::t-service/type]))
         show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])
+        show-confirm-cancel-dialog? (get-in app [:transport-service :show-confirm-cancel-dialog?])
         modified? (not
                     (empty?
-                      (get-in app [:transport-service service-key :ote.ui.form/modified])))
-        ]
-    [:div
-     ;; Show brokering dialog
-     [brokering-dialog e! app]
+                      (get-in app [:transport-service service-key :ote.ui.form/modified])))]
+    [:div (stylefy/use-style style-base/form-footer)
+     [:div.container
 
-     ;; show-footer? - Take owner check away for now
-     ;; If service is in-validation? (true), then do not show footer. It should be enabled first
-     ;; But if service is-invalidation? (true) and admin validating points to same service, then show publish button only
-     ;; And if :service-validation flag is not enabled, show buttons always
-     (cond
-       ;; service owner is editing
-       (or (not (flags/enabled? :service-validation))
-           (and (nil? in-validation?) (not= service-id admin-validating-id)))
-       [:div
-        (when (not (form/can-save? data))
-          [:div.row {:style {:margin "1em 0em 1em 0em"}}
-           [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} cannot-be-saved-text]])
+      ;; Show brokering dialog
+      [brokering-dialog e! app]
+
+      ;; show-footer? - Take owner check away for now
+      ;; If service is in-validation? (true), then do not show footer. It should be enabled first
+      ;; But if service is-invalidation? (true) and admin validating points to same service, then show publish button only
+      ;; And if :service-validation flag is not enabled, show buttons always
+      (cond
+        ;; service owner is editing
+        (or (not (flags/enabled? :service-validation))
+            (and (nil? in-validation?) (not= service-id admin-validating-id)))
         [:div
-         (case service-state
-           :public [render-public-state-buttons e! schemas data name-missing?]
-           :validation [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
-                        [:div {:style {:margin-top "1rem"}}
-                         [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                                              :disabled name-missing?}
-                          (tr [:buttons :back-to-draft])]]
-                        [:div {:style {:margin-top "1rem"}}
-                         [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                                :disabled (not (form/can-save? data))}
-                          (tr [:buttons :save-and-validate])]]
-                        [:div {:style {:margin-top "1rem"}}
-                         [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
-                          (tr [:buttons :discard])]]]
-           :re-edit [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
-                     [:div {:style {:margin-top "1rem"}}
-                      [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                             :disabled (not (form/can-save? data))}
-                       (tr [:buttons :save-and-validate])]]
-                     [:div {:style {:margin-top "1rem"}}
-                      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
-                                           :disabled name-missing?}
-                       (tr [:buttons :back-to-draft])]]
-                     [:div {:style {:margin-top "1rem"}}
-                      [buttons/cancel-with-icon {:on-click #(if modified?
-                                                              (e! (ts-controller/->OpenCancelRevalidateModal))
-                                                              (e! (ts-controller/->BackToValidation service-id)))}
-                       (tr [:buttons :discard])]]]
-           :draft [render-draft-state-buttons e! schemas data name-missing?])]]
-       ;; admin is editing
-       (and
-         (= false in-validation?)
-         (= service-id admin-validating-id))
-       [:div
-        [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
-         [:div {:style {:margin-top "1rem"}}
-          [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
-                                 :disabled (not (form/can-save? data))}
-           (tr [:buttons :save])]]
+         (when (not (form/can-save? data))
+           [:div (stylefy/use-style style-base/required-data-missing-container)
+            [:div {:style {:display "inline-flex"}}
+             [ic/alert-warning {:style {:margin-right "1rem" :color colors/red-dark}}]
+             [:div {:style {:padding-top "2px"}} cannot-be-saved-text]]])
+         [:div
+          (case service-state
+            :public [render-public-state-buttons e! schemas data name-missing?]
+            :validation [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                                 :disabled (not (form/can-save? data))}
+                           (tr [:buttons :save-and-validate])]]
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
+                                               :disabled name-missing?}
+                           (tr [:buttons :back-to-draft])]]
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+                           (tr [:buttons :discard])]]]
+            :re-edit [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                              :disabled (not (form/can-save? data))}
+                        (tr [:buttons :save-and-validate])]]
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
+                                            :disabled name-missing?}
+                        (tr [:buttons :back-to-draft])]]
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/cancel-with-icon {:on-click #(if modified?
+                                                               (e! (ts-controller/->OpenCancelRevalidateModal))
+                                                               (e! (ts-controller/->BackToValidation service-id)))}
+                        (tr [:buttons :discard])]]]
+            :draft [render-draft-state-buttons e! schemas data name-missing?])]]
+        ;; admin is editing
+        (and
+          (= false in-validation?)
+          (= service-id admin-validating-id))
+        [:div
+         [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                  :disabled (not (form/can-save? data))}
+            (tr [:buttons :save])]]
 
-         ;; Admin cannot publish service with modifications
-         [:div {:style {:margin-top "1rem"}}
-          [buttons/save-publish {:on-click #(e! (admin-validation/->OpenConfirmPublishModal service-id))
-                                 :disabled (when (or
-                                                   (not (form/can-save? data))
-                                                   admin-unsaved-data) true)}
-           (tr [:buttons :publish])]]
-         [:div {:style {:margin-top "1rem"}}
-          [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm true))}
-           (tr [:buttons :discard-to-admin])]]]]
-       ;; In other cases - don't show any buttons
-       :else nil)
+          ;; Admin cannot publish service with modifications
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/save-publish {:on-click #(e! (admin-validation/->OpenConfirmPublishModal service-id))
+                                  :disabled (when (or
+                                                    (not (form/can-save? data))
+                                                    admin-unsaved-data) true)}
+            (tr [:buttons :publish])]]
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm true))}
+            (tr [:buttons :discard-to-admin])]]]]
+        ;; In other cases - don't show any buttons
+        :else nil)]
 
      (when show-validate-modal?
        [open-validate-dialog e! schemas])
 
      (when show-cancel-revalidate-modal?
        [open-cancel-revalidate-dialog e! service-id])
+
+     (when show-confirm-cancel-dialog?
+       [open-confirm-cancel-dialog e! schemas])
 
      [open-publish-dialog e! app]]))
 
