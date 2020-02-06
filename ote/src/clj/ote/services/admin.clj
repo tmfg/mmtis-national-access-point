@@ -631,6 +631,11 @@
             (map (juxt :interface-url :top-name :service-name :operator-email :service-email :user-email :interface-format)
                  (fetch-netex-interfaces-for-admin db))))
 
+(defn- associated-companies-response [db]
+  (csv-data ["Liittyi palveluun" "Palvelun id" "Palveluntuottaja" "Palveluntuottajan id" "Palveluntuottajan y-tunnus" "Liittynyt palveluntuottaja" "Liittynyt palveluntuottaja y-tunnus" "Liittyi" "Liittyneen palveluntuottajan id"]
+            (map (juxt :joined-service :service-id :operator :operator-id :operator-business-id :joined-operator :joined-operator-business-id :joined-date :joined-operator-id)
+                 (fetch-associated-companies-for-admin db))))
+
 (defn- send-pre-notice-email-response [db config]
   (log/debug "send-pre-notice-email-response")
   (pn/send-pre-notice-emails! db (:email config) (pn/pre-notice-recipient-emails (:pre-notices config)))
@@ -810,7 +815,13 @@
     :filename (str "netex-rajapinnat-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/netex-interfaces" {user :user}
     (or (authorization-fail-response (:user user))
-        (netex-interfaces-response db))))
+        (netex-interfaces-response db)))
+
+  ^{:format :csv
+    :filename (str "liittyneet-yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/associated-companies" {user :user}
+    (or (authorization-fail-response (:user user))
+        (associated-companies-response db))))
 
 (define-service-component MonitorReport []
   {}

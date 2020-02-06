@@ -230,6 +230,21 @@ SELECT n.id as "netex-conversion-id",
    AND (:operator::TEXT IS NULL OR top.name ilike :operator)
 ORDER BY n.modified DESC, n.created, ts.name;
 
+-- name: fetch-associated-companies-for-admin
+select ts.name as "joined-service",
+       ts.id as "service-id",
+       tstop.name as "operator",
+       tstop.id as "operator-id",
+       tstop."business-id" as "operator-business-id",
+       top.name as "joined-operator-business-id",
+       top."business-id" as "joined-operator-business-id",
+       aso.timestamp::DATE as "joined-date",
+       top.id as "joined-operator-id"
+from "associated-service-operators" aso
+         join "transport-operator" top on top.id = aso."operator-id"
+         join "transport-service" ts on ts.id = aso."service-id"
+         join "transport-operator" tstop on tstop.id = ts."transport-operator-id";
+
 -- name: fetch-validation-services
 SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
        s.validate, s."transport-operator-id", o.name as "operator-name", s."re-edit", s."parent-id"
