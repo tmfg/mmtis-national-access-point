@@ -61,15 +61,16 @@
 
 (defn cap-number [n]
   [:div (use-style style/change-icon-value)
-   (if (> n 500)
-     "500+"
-     (str n))])
+   (cond
+     (> n 500) "500+"
+     (= n 0) [:span {:style {:color colors/icon-disabled}} n]
+     :else (str n))])
 
 (defn change-icons [{:keys [added-routes removed-routes changed-routes no-traffic-routes]}]
   [:div.transit-change-icons (stylefy/use-style style/transit-changes-icon-row-container)
    [:div {:style {:width "25%"}}
     [ic/content-add-circle-outline {:color (if (= 0 added-routes)
-                                             colors/icon-gray
+                                             colors/icon-disabled
                                              colors/add-color)}]
     (cap-number added-routes)]
    [:div {:style {:width "25%"}}
@@ -79,7 +80,10 @@
     (cap-number removed-routes)]
 
    [:div {:style {:width "25%"}}
-    [ui-icons/outline-ballot] (cap-number changed-routes)]
+    (if (= 0 changed-routes)
+      [ui-icons/outline-ballot-disabled]
+      [ui-icons/outline-ballot])
+    (cap-number changed-routes)]
 
    [:div {:style {:width "25%"}}
     [ic/av-not-interested {:color (if (= 0 no-traffic-routes)
@@ -123,7 +127,7 @@
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
     [:span
      (cond
-       interfaces-has-errors?
+       (and (false? no-interfaces?) interfaces-has-errors?)
        [:div
         [ic/alert-error {:style {:color "CC0000"}}]
         [:div (use-style style/change-icon-value)

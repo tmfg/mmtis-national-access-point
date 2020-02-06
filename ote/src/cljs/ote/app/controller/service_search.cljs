@@ -52,11 +52,11 @@
    (when text
      {:text text})
    (when-not (empty? st)
-     {:sub_types (str/join "," (map (comp name :value) st))})
+     {:sub_types (str/join "," (map #(name %) st))})
    (when-not (empty? tt)
-     {:transport_types (str/join "," (map (comp name :value) tt))})
+     {:transport_types (str/join "," (map #(name %) tt))})
    (when-not (empty? dc)
-     {:data_content (str/join "," (map :value dc))})
+     {:data_content (str/join "," (map #(name %) dc))})
    (when (and limit offset)
      {:limit limit
       :offset offset})))

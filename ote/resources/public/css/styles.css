@@ -64,7 +64,34 @@ h5 {
     color: #323232;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 480px) {
+    h1 {
+        font-weight: 500;
+        font-size: 1.5rem;
+        line-height: 1.25;
+        color: rgb(50,50,50);
+    }
+    h2 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.25;
+        color: rgb(50,50,50);
+    }
+    h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        line-height: 1.5;
+        color: rgb(50,50,50);
+    }
+    h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.5;
+        color: rgb(50,50,50);
+    }
+}
+
+@media (max-width: 767px) and (min-width: 480px) {
     h1 {
         font-weight: 500;
         font-size: 2rem;
@@ -323,4 +350,22 @@ span.search-card-title {
     height: auto !important;
     top: 0 !important;
     width: 40px !important;
+}
+
+@media screen and (max-width: 767px) {
+    .inner-delete-button {
+        padding-top: 1rem;
+    }
+}
+@media screen and (min-width: 767px) and (max-width: 991px) {
+    .inner-delete-button {
+        padding-left: 1rem;
+        padding-top: 1rem;
+    }
+}
+@media screen and (min-width: 991px) {
+    .inner-delete-button {
+        padding-left: 2rem;
+        padding-top: 1rem;
+    }
 }

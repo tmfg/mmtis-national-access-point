@@ -1,12 +1,13 @@
 (ns ote.app.controller.front-page
-  (:require [tuck.core :as tuck :refer-macros [define-event]]
+  (:require [reagent.core :as r]
+            [tuck.core :as tuck :refer-macros [define-event]]
             [ote.communication :as comm]
+            [ote.localization :as localization :refer [tr]]
             [ote.app.routes :as routes]
+            [ote.app.localstorage :as localstorage]
             [ote.app.controller.login :as login]
             [ote.app.controller.flags :as flags]
-            [ote.localization :as localization :refer [tr]]
-            [reagent.core :as r]))
-
+            [ote.app.controller.common :refer [->ServerError]]))
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page params])
@@ -31,6 +32,8 @@
 
 (defrecord ClearFlashMessage [])
 
+(defrecord CloseTermsAndPrivacy [user])
+(defrecord CloseTermsAndPrivacyResponse [response email])
 
 
 (defn navigate [event {:keys [before-unload-message navigation-prompt-open?] :as app} navigate-fn]
@@ -179,7 +182,25 @@
 
   ClearFlashMessage
   (process-event [_ app]
-    (dissoc app :flash-message :flash-message-error)))
+    (dissoc app :flash-message :flash-message-error))
+
+  CloseTermsAndPrivacyResponse
+  (process-event [{response :response email :email} app]
+    (localstorage/add-item! (keyword (str email "-tos-ok")) true)
+    (routes/navigate! (:page app))
+    (assoc-in app [:user :tos-ok] true))
+
+  CloseTermsAndPrivacy
+  (process-event [{user :user} app]
+    (if (nil? user)
+      (do
+        (localstorage/add-item! :tos-ok true)
+        (routes/navigate! (:page app)))
+      (do
+        (comm/post! "register/tos" {:user-email (:email user)}
+                    {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
+                     :on-failure (tuck/send-async! ->ServerError)})))
+    (assoc app :tos-ok true)))
 
 (define-event ToggleAddMemberDialog []
   {:path [:show-add-member-dialog?]

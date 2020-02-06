@@ -7,30 +7,31 @@
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [ote.time :as time]
-            [ote.db.transport-service :as t-service]
-            [ote.db.common :as common]
             [ote.localization :refer [tr tr-key tr-tree]]
             [ote.util.values :as values]
+            [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
             [ote.theme.colors :as colors]
-            [ote.ui.form :as form]
-            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
-            [ote.ui.buttons :as buttons]
-            [ote.ui.validation :as validation]
-            [ote.ui.form-fields :as form-fields]
             [ote.style.form :as style-form]
             [ote.style.dialog :as style-dialog]
             [ote.style.base :as style-base]
-            [ote.app.controller.transport-service :as ts]
+            [ote.ui.buttons :as buttons]
+            [ote.ui.common :refer [linkify dialog tooltip-wrapper]]
+            [ote.ui.form :as form]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.info :as info]
+            [ote.ui.validation :as validation]
+            [ote.app.controller.common :as common-c]
+            [ote.app.controller.transport-service :as ts-controller]
             [ote.app.controller.flags :as flags]
             [ote.views.place-search :as place-search]
-            [ote.app.controller.common :as common-c]
             [ote.views.place-search :as place-search]
-            [ote.ui.info :as info]))
+            [ote.app.controller.admin-validation :as admin-validation]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
    Form displays header text and selection list by radio button group."
-  []
+  [in-validation?]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/advance-reservation])
      :columns 3
@@ -48,6 +49,7 @@
 
     {:name ::t-service/advance-reservation
      :type :selection
+     :disabled? in-validation?
      :show-option (tr-key [:enums ::t-service/advance-reservation])
      :options t-service/advance-reservation
      :radio? true
@@ -56,64 +58,78 @@
 
 (defn service-url
   "Creates a form group for service url that creates two form elements url and localized text area"
-  ([element-id label service-url-field] (service-url element-id label service-url-field nil))
-  ([element-id label service-url-field info-message]
-   (apply
-     form/group
-     {:label label
-      :layout :row
-      :columns 2
-      :card? false
-      :top-border true}
+  [element-id label service-url-field info-message in-validation?]
+  (apply
+    form/group
+    {:label label
+     :layout :row
+     :columns 2
+     :card? false
+     :top-border true}
 
-     (concat
-       (when info-message
-         [{:type :info-toggle
-           :name :service-url-info
-           :label (tr [:common-texts :filling-info])
-           :body [:div info-message]
-           :default-state false
-           :full-width? true
-           :container-class "col-xs-12 col-sm-12 col-md-12"}])
+    (concat
+      (when info-message
+        [{:type :info-toggle
+          :name :service-url-info
+          :label (tr [:common-texts :filling-info])
+          :body [:div info-message]
+          :default-state false
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-12"}])
 
-       [{:class "set-bottom"
-         :element-id element-id
-         :name ::t-service/url
-         :type :string
-         :read (comp ::t-service/url service-url-field)
-         :write (fn [data url]
-                  (assoc-in data [service-url-field ::t-service/url] url))
-         :full-width? true
-         :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-         :max-length 200}
+      [{:class "set-bottom"
+        :element-id element-id
+        :name ::t-service/url
+        :type :string
+        :disabled? in-validation?
+        :read (comp ::t-service/url service-url-field)
+        :write (fn [data url]
+                 (assoc-in data [service-url-field ::t-service/url] url))
+        :full-width? true
+        :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+        :max-length 200}
 
-        {:name ::t-service/description
-         :type :localized-text
-         :rows 1
-         :read (comp ::t-service/description service-url-field)
-         :write (fn [data desc]
-                  (assoc-in data [service-url-field ::t-service/description] desc))
-         :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-         :full-width? true}]))))
+       {:name ::t-service/description
+        :type :localized-text
+        :disabled? in-validation?
+        :rows 1
+        :read (comp ::t-service/description service-url-field)
+        :write (fn [data desc]
+                 (assoc-in data [service-url-field ::t-service/description] desc))
+        :container-class "col-xs-12 col-sm-12 col-md-6 col-lg-6"
+        :full-width? true}])))
 
 (defn service-urls
   "Creates a table for additional service urls."
-  [label service-url-field]
+  [label service-url-field in-validation?]
   (form/group
     {:label label
      :columns 3
      :card? false
      :top-border true}
 
-    {:name service-url-field
-     :type :table
-     :prepare-for-save values/without-empty-rows
-     :table-fields [{:name ::t-service/url
-                     :type :string}
-                    {:name ::t-service/description
-                     :type :localized-text}]
-     :delete? true
-     :add-label (tr [:buttons :add-new-service-link])}))
+    (merge
+      {:name service-url-field
+       :type :div-table
+       :container-class "col-xs-12"
+       :prepare-for-save values/without-empty-rows
+       :table-fields [{:name ::t-service/url
+                       :label (tr [:field-labels :transport-service ::t-service/url])
+                       :type :string
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-3 col-md-3"}
+                      {:name ::t-service/description
+                       :label (tr [:field-labels :transport-service ::t-service/description])
+                       :type :localized-text
+                       :disabled? in-validation?
+                       :full-width? true
+                       :field-class "col-xs-12 col-sm-7 col-md-7"}]}
+      (when-not in-validation?
+        {:inner-delete? true
+         :add-label (tr [:buttons :add-new-service-link])
+         :inner-delete-class "col-xs-12 col-sm-2 col-md-2"
+         :inner-delete-label (tr [:buttons :delete])}))))
 
 (defn- gtfs-viewer-link [{interface ::t-service/external-interface format ::t-service/format}]
   (when (seq format)
@@ -131,12 +147,12 @@
 
 (defn external-interfaces
   "Creates a form group for external services. Displays help texts conditionally by transport operator type."
-  [& [e! type sub-type transport-type]]
+  [& [e! type sub-type transport-type in-validation?]]
   (let [type (or type :other)
         transport-type (set transport-type)
         field-help (fn [label help-text]
                      [:div {:style {:padding-top "1rem"}}
-                      [:strong {:padding-right "1rem"}
+                      [:strong {:style {:padding-right "1rem"}}
                        (str label ": ")]
                       [:span help-text]])]
 
@@ -174,8 +190,9 @@
                        [:div
                         (tr [:form-help :external-interfaces-read-more :dialog-text])]]
                       (when (= :passenger-transportation type)
-                        [:div {:style {:margin-top "20px"}}
+                        [:div {:style {:margin-top "1rem"}}
                          [:b (tr [:form-help :external-interfaces-payment-systems])]])
+
                       [:div
                        [field-help (tr [:field-labels :transport-service-common ::t-service/data-content]) (tr [:form-help :external-interfaces-tooltips :data-content])]
                        [field-help (tr [:field-labels :transport-service-common ::t-service/format]) (tr [:form-help :external-interfaces-tooltips :format])]
@@ -183,120 +200,147 @@
                        [field-help (tr [:field-labels :transport-service-common ::t-service/external-service-description]) (tr [:form-help :external-interfaces-tooltips :external-service-description])]
                        [field-help (tr [:field-labels :transport-service-common ::t-service/license]) (tr [:form-help :external-interfaces-tooltips :license])]]]
                      {:default-open? false}])}
+      (merge
+        {:name ::t-service/external-interfaces
+         :type :div-table
+         :prepare-for-save values/without-empty-rows
+         :table-fields [{:name ::t-service/data-content
+                         :type :multiselect-selection
+                         :disabled? in-validation?
+                         :label (tr [:field-labels :transport-service-common ::t-service/data-content])
+                         :field-class "col-xs-12 col-sm-3 col-md-3"
+                         :full-width? true
+                         :options t-service/interface-data-contents
+                         :show-option (tr-key [:enums ::t-service/interface-data-content])
+                         :required? true
+                         :is-empty? validation/empty-enum-dropdown?}
+                        (if in-validation?
+                          {:name ::t-service/format
+                           :type :string
+                           :disabled? in-validation?
+                           :label (tr [:field-labels :transport-service-common ::t-service/format])
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
+                           :full-width? true}
+                          {:name ::t-service/format
+                           :type :autocomplete
+                           :open-on-focus? true
+                           :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
+                           :max-results 10
+                           :label (tr [:field-labels :transport-service-common ::t-service/format])
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
+                           :full-width? true
+                           :required? true
+                           ;; Wrap value with vector to support current type of format field in the database.
+                           :write (fn [row val]
+                                    (let [{eif ::t-service/external-interface} row]
+                                      ;; validate external interface again, if changing format.
+                                      ;; Invoke event asynchronously so that the value will be update before sending the
+                                      ;; validation request to prevent stuttering user interface.
+                                      (.setTimeout
+                                        js/window
+                                        #(e! (ts-controller/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
+                                      (assoc row ::t-service/format #{val})))
+                           :read #(first (get-in % [::t-service/format]))})
+                        {:name ::t-service/external-service-url
+                         :type :component
+                         :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
+                         :field-class "col-xs-12 col-sm-6 col-md-6"
+                         :read #(identity %)
+                         :write (fn [row val]
+                                  (assoc-in row [::t-service/external-interface ::t-service/url] val))
+                         :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
+                                           :as row} :data
+                                          update-form! :update-form!
+                                          row-number :row-number}]
 
-      {:name ::t-service/external-interfaces
-       :type :div-table
-       :prepare-for-save values/without-empty-rows
-       :table-fields [{:name ::t-service/data-content
-                       :type :multiselect-selection
-                       :label (tr [:field-labels :transport-service-common ::t-service/data-content])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :options t-service/interface-data-contents
-                       :show-option (tr-key [:enums ::t-service/interface-data-content])
-                       :required? true
-                       :is-empty? validation/empty-enum-dropdown?}
-                      {:name ::t-service/format
-                       :type :autocomplete
-                       :open-on-focus? true
-                       :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
-                       :max-results 10
-                       :label (tr [:field-labels :transport-service-common ::t-service/format])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :required? true
-                       ;; Wrap value with vector to support current type of format field in the database.
-                       :write (fn [row val]
-                                (let [{eif ::t-service/external-interface} row]
-                                  ;; validate external interface again, if changing format.
-                                  ;; Invoke event asynchronously so that the value will be update before sending the
-                                  ;; validation request to prevent stuttering user interface.
-                                  (.setTimeout
-                                    js/window
-                                    #(e! (ts/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
-                                  (assoc row ::t-service/format #{val})))
-                       :read #(first (get-in % [::t-service/format]))}
-                      {:name ::t-service/external-service-url
-                       :type :component
-                       :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                       :field-class "col-xs-6 col-sm-6 col-md-6"
-                       :read #(identity %)
-                       :write (fn [row val]
-                                (assoc-in row [::t-service/external-interface ::t-service/url] val))
-                       :component (fn [{{external-interface ::t-service/external-interface format ::t-service/format
-                                         :as row} :data
-                                        update-form! :update-form!
-                                        row-number :row-number}]
+                                      [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
+                                       [form-fields/field
+                                        (merge
+                                          {:name ::t-service/external-service-url
+                                           :type :string
+                                           :disabled? in-validation?
+                                           :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
+                                           :required? true
+                                           :full-width? true
+                                           :update! #(update-form! %)
+                                           :on-blur (fn [e]
+                                                      (e! (ts-controller/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format))))
+                                           :max-length 200}
+                                          ;; For first row: If there is data in other fields, show this required field warning
+                                          ;; For other rows, if this required field is missing, show the warning.
+                                          (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
+                                                    (and (> row-number 0) (empty? (::t-service/url external-interface))))
+                                            {:warning (tr [:common-texts :required-field])}))
+                                        (::t-service/url external-interface)]
 
-                                    [:div (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
-                                     [form-fields/field
-                                      (merge
-                                        {:name ::t-service/external-service-url
-                                         :type :string
-                                         :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
-                                         :required? true
-                                         :full-width? true
-                                         :update! #(update-form! %)
-                                         :on-blur (fn [e]
-                                                    (e! (ts/->EnsureExternalInterfaceUrl (-> e .-target .-value) (first format))))
-                                         :max-length 200}
-                                        ;; For first row: If there is data in other fields, show this required field warning
-                                        ;; For other rows, if this required field is missing, show the warning.
-                                        (when (or (and (= row-number 0) (seq row) (empty? (::t-service/url external-interface)))
-                                                  (and (> row-number 0) (empty? (::t-service/url external-interface))))
-                                          {:warning (tr [:common-texts :required-field])}))
-                                      (::t-service/url external-interface)]
+                                       [:span {:style {:width "30%" :margin-left "0.5rem" :padding-top "1.5rem"}}
+                                        (let [url-status (get-in external-interface [:url-status :status])
+                                              url-error (get-in external-interface [:url-status :error])]
+                                          (if-not url-status
+                                            [gtfs-viewer-link row]
 
-                                     [:span {:style {:width "30%" :margin-left "0.5rem" :padding-top "1.5rem"}}
-                                      (let [url-status (get-in external-interface [:url-status :status])
-                                            url-error (get-in external-interface [:url-status :error])]
-                                        (if-not url-status
-                                          [gtfs-viewer-link row]
+                                            (if (= :success url-status)
+                                              [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
+                                               [(tooltip-wrapper ic/action-done)
+                                                {:style (merge style-base/icon-small
+                                                               {:color "green"
+                                                                :position "relative"
+                                                                :top "15px"})}
+                                                {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
+                                               [gtfs-viewer-link row]]
+                                              [:span [(tooltip-wrapper ic/alert-warning)
+                                                      {:style (merge style-base/icon-small
+                                                                     {:color "cccc00"
+                                                                      :position "relative"
+                                                                      :top "15px"})}
 
-                                          (if (= :success url-status)
-                                            [:span (stylefy/use-style {:display "flex" :flex-flow "row nowrap"})
-                                             [(tooltip-wrapper ic/action-done)
-                                              {:style (merge style-base/icon-small
-                                                             {:color "green"
-                                                              :position "relative"
-                                                              :top "15px"})}
-                                              {:text (tr [:field-labels :transport-service-common :external-interfaces-ok])}]
-                                             [gtfs-viewer-link row]]
-                                            [:span [(tooltip-wrapper ic/alert-warning)
-                                                    {:style (merge style-base/icon-small
-                                                                   {:color "cccc00"
-                                                                    :position "relative"
-                                                                    :top "15px"})}
+                                                      {:text (tr [:field-labels :transport-service-common
+                                                                  (if (= :zip-validation-failed url-error)
+                                                                    :external-interfaces-validation-error
+                                                                    :external-interfaces-warning)])}]])))]])}
 
-                                                    {:text (tr [:field-labels :transport-service-common
-                                                                (if (= :zip-validation-failed url-error)
-                                                                  :external-interfaces-validation-error
-                                                                  :external-interfaces-warning)])}]])))]])}
+                        {:name ::t-service/external-service-description
+                         :type :localized-text
+                         :disabled? in-validation?
+                         :label (tr [:field-labels :transport-service-common ::t-service/external-service-description])
+                         :field-class "col-xs-12 col-sm-6 col-md-6"
+                         :full-width? true
+                         :read (comp ::t-service/description ::t-service/external-interface)
+                         :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
+                         :required? false}
+                        (if in-validation?
+                          {:name ::t-service/license
+                           :type :string
+                           :disabled? in-validation?
+                           :read (fn [val] (get val ::t-service/license))
+                           :label (tr [:field-labels :transport-service-common ::t-service/license])
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
+                           :full-width? true}
+                          {:name ::t-service/license
+                           :type :autocomplete
+                           :open-on-focus? true
+                           :label (tr [:field-labels :transport-service-common ::t-service/license])
+                           :field-class "col-xs-12 col-sm-3 col-md-3"
+                           :full-width? true
+                           :suggestions (tr-tree [:licenses :external-interfaces])
+                           :max-results 10})]}
+        (when-not in-validation?
+          {:add-label (tr [:buttons :add-external-interface])
+           :inner-delete? true
+           :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+           :inner-delete-label (tr [:buttons :delete-interface])}))
 
-                      {:name ::t-service/external-service-description
-                       :type :localized-text
-                       :label (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-                       :field-class "col-xs-6 col-sm-6 col-md-6"
-                       :full-width? true
-                       :read (comp ::t-service/description ::t-service/external-interface)
-                       :write #(assoc-in %1 [::t-service/external-interface ::t-service/description] %2)
-                       :required? false}
-                      {:name ::t-service/license
-                       :type :autocomplete
-                       :open-on-focus? true
-                       :label (tr [:field-labels :transport-service-common ::t-service/license])
-                       :field-class "col-xs-6 col-sm-3 col-md-3"
-                       :full-width? true
-                       :suggestions (tr-tree [:licenses :external-interfaces])
-                       :max-results 10}]
-       :add-label (tr [:buttons :add-external-interface])
-       :inner-delete? true
-       :inner-delete-class "col-xs-6 col-sm-3 col-md-3"
-       :inner-delete-label (tr [:buttons :delete-interface])})))
+      (when (flags/enabled? :netex-conversion-automated)
+
+        {:name :netex-info-text
+         :type :component
+         :full-width? true
+         :component (fn [_]
+                      [:div {:style {:margin-top "1rem"}} (tr [:form-help :external-interface-netex-info])])}))))
 
 (defn companies-group
   "Creates a form group for companies. A parent company can list its companies."
-  [e!]
+  [e! in-validation?]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/companies])
      :columns 3
@@ -315,11 +359,12 @@
      :read identity
      :write #(merge %1 %2)
      :type :company-source
+     :disabled? in-validation?
      :enabled-label (tr [:field-labels :parking :maximum-stay-limited])
      :container-style style-form/full-width
      :on-file-selected (fn [evt filename]
-                         (ts/read-companies-csv! e! (.-target evt) filename))
-     :on-url-given #(e! (ts/->EnsureCsvFile))
+                         (ts-controller/read-companies-csv! e! (.-target evt) filename))
+     :on-url-given #(e! (ts-controller/->EnsureCsvFile))
      :validate [(fn [data row]
                   (let [companies (::t-service/companies row)]
                     (case (::t-service/company-source data)
@@ -333,7 +378,7 @@
 
 (defn brokerage-group
   "Creates a form group for brokerage selection."
-  [e!]
+  [e! in-validation?]
   (form/group
     {:label (tr [:passenger-transportation-page :header-brokerage])
      :columns 3
@@ -345,9 +390,10 @@
                      :help-link-text (tr [:form-help :brokerage-link])
                      :help-link "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"}
      :type :checkbox
-     :on-click #(e! (ts/->ShowBrokeringServiceDialog))}))
+     :disabled? in-validation?
+     :on-click #(e! (ts-controller/->ShowBrokeringServiceDialog))}))
 
-(defn contact-info-group []
+(defn contact-info-group [in-validation?]
   (form/group
     {:label (tr [:passenger-transportation-page :header-contact-details])
      :columns 3
@@ -365,6 +411,7 @@
 
     {:name ::common/street
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/street ::t-service/contact-address)
@@ -375,6 +422,7 @@
 
     {:name ::common/postal_code
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/postal_code ::t-service/contact-address)
@@ -385,6 +433,7 @@
 
     {:name ::common/post_office
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :read (comp ::common/post_office ::t-service/contact-address)
@@ -397,6 +446,7 @@
      :label (tr [:common-texts :country])
      :name :country
      :type :selection
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :style {:margin-bottom "2rem"}
      :full-width? true
@@ -408,98 +458,311 @@
 
     {:name ::t-service/contact-email
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :max-length 200}
 
     {:name ::t-service/contact-phone
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :max-length 16
      :full-width? true}
 
     {:name ::t-service/homepage
      :type :string
+     :disabled? in-validation?
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true
      :max-length 200}))
 
+(defn- brokering-dialog [e! app]
+  (when (get-in app [:transport-service :show-brokering-service-dialog?])
+    [ui/dialog
+     {:id "brokering-service-dialog"
+      :open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title (tr [:dialog :brokering-service :title])
+      :actions [
+                (r/as-element
+                  [ui/flat-button
+                   {:id "confirm-brokering-service"
+                    :label (tr [:dialog :brokering-service :ok])
+                    :secondary true
+                    :primary true
+                    :on-click #(e! (ts-controller/->SelectBrokeringService true))}])
+                (r/as-element
+                  [ui/raised-button
+                   {:label (tr [:dialog :brokering-service :cancel])
+                    :primary true
+                    :on-click #(e! (ts-controller/->SelectBrokeringService false))}])]}
+     [:p (tr [:dialog :brokering-service :body])]
+     [:div
+      (linkify (tr [:dialog :brokering-service :link-url])
+               [:span (stylefy/use-style style-base/blue-link-with-icon)
+                (ic/content-create {:style {:width 20
+                                            :height 20
+                                            :margin-right "0.5rem"
+                                            :color colors/primary}})
+                (tr [:dialog :brokering-service :link-text])]
+               {:target "_blank" :style {:text-decoration "none"}})]]))
+
+(defn- open-publish-dialog [e! app]
+  (when (get-in app [:admin :in-validation :modal])
+    [ui/dialog
+     {:open true
+      :actionsContainerStyle style-dialog/dialog-action-container
+      :title "Oletko varma, että haluat julkaista palvelun"
+      :actions [(r/as-element
+                  [buttons/cancel
+                   {:on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-validation/->CloseConfirmPublishModal)))}
+                   (tr [:buttons :cancel])])
+                (r/as-element
+                  [buttons/save
+                   {:on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-validation/->PublishService (get-in app [:admin :in-validation :modal]))))}
+                   (tr [:buttons :publish])])]}
+
+     [:div "Julkaise painamalla julkaise"]]))
+
+(defn- open-confirm-cancel-dialog [e! schemas]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:dialog :change-to-draft :title])
+    :actions [; Leave form and change service state back to validation
+              (r/as-element
+                [buttons/cancel
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->SaveTransportService schemas false))}
+                 (tr [:dialog :change-to-draft :ok-button])])
+              ; Return to form and do not cancel
+              (r/as-element
+                [buttons/save
+                 {:on-click #(e! (ts-controller/->CloseChangeToDraftModal))}
+                 (tr [:dialog :change-to-draft :cancel-button])])]}
+   [:span (tr [:dialog :change-to-draft :body]) ]])
+
+(defn- open-cancel-revalidate-dialog [e! service-id]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:dialog :navigation-prompt :title])
+    :actions [; Leave form and change service state back to validation
+              (r/as-element
+                [buttons/cancel
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->BackToValidation service-id))}
+                 (tr [:dialog :navigation-prompt :leave])])
+              ; Return to form and do not cancel
+              (r/as-element
+                [buttons/save
+                 {:on-click #(e! (ts-controller/->CloseCancelReValidateModal))}
+                 (tr [:dialog :navigation-prompt :stay])])]}
+   [:span (tr [:dialog :navigation-prompt :unsaved-validated-data])]])
+
+(defn- open-validate-dialog [e! schemas]
+  [ui/dialog
+   {:open true
+    :actionsContainerStyle style-dialog/dialog-action-container
+    :title (tr [:transport-services-common-page :validation-modal-header])
+    :actions [(r/as-element
+                [buttons/cancel
+                 {:on-click #(e! (ts-controller/->CancelSaveTransportService))}
+                 (tr [:buttons :cancel])])
+              (r/as-element
+                [buttons/save
+                 {:icon (ic/action-delete-forever)
+                  :on-click #(e! (ts-controller/->SaveTransportService schemas true))}
+                 (tr [:buttons :send])])]}
+   [:span
+    (tr [:transport-services-common-page :validation-modal-text])]])
+
+(defn- render-public-state-buttons
+  "If validate flag is enabled services must be saved in validate state. If not, mark them as public or draft."
+  [e! schemas data name-missing?]
+  (if (flags/enabled? :service-validation)
+    ;; Flag enabled
+    [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                             :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-validate])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:disabled name-missing?
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts-controller/->OpenChangeToDraftModal)))}
+       (tr [:buttons :back-to-draft])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+       (tr [:buttons :discard])]]]
+
+    ;; Flag not enabled - save as draft or publish
+    [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-publish {:on-click #(e! (ts-controller/->SaveTransportService schemas true))
+                             :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-publish])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:disabled name-missing?
+                           :on-click #(do
+                                        (.preventDefault %)
+                                        (e! (ts-controller/->SaveTransportService schemas false)))}
+       (tr [:buttons :back-to-draft])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+       (tr [:buttons :discard])]]]))
+
+(defn- render-draft-state-buttons [e! schemas data name-missing?]
+  (if (flags/enabled? :service-validation)
+    ;; Flag enabled, let user move services to validate
+    [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                             :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-validate])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                           :disabled name-missing?}
+       (tr [:buttons :save-as-draft])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+       (tr [:buttons :discard])]]]
+
+    ;; Flag is not enabled, so no chance to move service to validate
+    [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-publish {:on-click #(e! (ts-controller/->SaveTransportService schemas true))
+                             :disabled (not (form/can-save? data))}
+       (tr [:buttons :save-and-publish])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/save-draft {:on-click #(e! (ts-controller/->SaveTransportService schemas false))
+                           :disabled name-missing?}
+       (tr [:buttons :save-as-draft])]]
+     [:div {:style {:margin-top "1rem"}}
+      [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+       (tr [:buttons :discard])]]]))
+
 (defn footer
   "Transport service form -footer element. All transport service form should be using this function."
-  [e! {published ::t-service/published :as data} schemas app]
+  [e! {published ::t-service/published re-edit ::t-service/re-edit validate ::t-service/validate parent-id ::t-service/parent-id :as data} schemas in-validation? app]
   (let [name-missing? (str/blank? (::t-service/name data))
-        show-footer? (if (get-in app [:transport-service ::t-service/id])
-                       (ts/is-service-owner? app)
+        service-id (get-in app [:transport-service ::t-service/id])
+        service-id (if (nil? service-id) 0 service-id)
+        show-footer? (if service-id
+                       (ts-controller/is-service-owner? app)
                        true)
-        published? (not (nil? published))]
-    [:div
-     ;; Show brokering dialog
-     (when (get-in app [:transport-service :show-brokering-service-dialog?])
-       [ui/dialog
-        {:id "brokering-service-dialog"
-         :open true
-         :actionsContainerStyle style-dialog/dialog-action-container
-         :title (tr [:dialog :brokering-service :title])
-         :actions [
-                   (r/as-element
-                     [ui/flat-button
-                      {:id "confirm-brokering-service"
-                       :label (tr [:dialog :brokering-service :ok])
-                       :secondary true
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService true))}])
-                   (r/as-element
-                     [ui/raised-button
-                      {:label (tr [:dialog :brokering-service :cancel])
-                       :primary true
-                       :on-click #(e! (ts/->SelectBrokeringService false))}])]}
-        [:p (tr [:dialog :brokering-service :body])]
+        service-state (ts-controller/service-state validate re-edit published (not (nil? parent-id)))
+        show-validate-modal? (get-in app [:transport-service :show-confirm-save-dialog?])
+        admin-validating-id (get-in app [:admin :in-validation :validating])
+        cannot-be-saved-text (if (flags/enabled? :service-validation)
+                               (tr [:form-help :validate-missing-required])
+                               (tr [:form-help :publish-missing-required]))
+        admin-unsaved-data (some #{:unsaved-data} (:before-unload-message app))
+        service-key (t-service/service-key-by-type (get-in app [:transport-service ::t-service/type]))
+        show-cancel-revalidate-modal? (get-in app [:transport-service :show-cancel-revalidate-dialog?])
+        show-confirm-cancel-dialog? (get-in app [:transport-service :show-confirm-cancel-dialog?])
+        modified? (not
+                    (empty?
+                      (get-in app [:transport-service service-key :ote.ui.form/modified])))]
+    [:div (stylefy/use-style style-base/form-footer)
+     [:div.container
+
+      ;; Show brokering dialog
+      [brokering-dialog e! app]
+
+      ;; show-footer? - Take owner check away for now
+      ;; If service is in-validation? (true), then do not show footer. It should be enabled first
+      ;; But if service is-invalidation? (true) and admin validating points to same service, then show publish button only
+      ;; And if :service-validation flag is not enabled, show buttons always
+      (cond
+        ;; service owner is editing
+        (or (not (flags/enabled? :service-validation))
+            (and (nil? in-validation?) (not= service-id admin-validating-id)))
         [:div
-         (linkify (tr [:dialog :brokering-service :link-url])
-                  [:span (stylefy/use-style style-base/blue-link-with-icon)
-                   (ic/content-create {:style {:width 20
-                                               :height 20
-                                               :margin-right "0.5rem"
-                                               :color colors/primary}})
-                   (tr [:dialog :brokering-service :link-text])]
-                  {:target "_blank" :style {:text-decoration "none"}})]])
+         (when (not (form/can-save? data))
+           [:div (stylefy/use-style style-base/required-data-missing-container)
+            [:div {:style {:display "inline-flex"}}
+             [ic/alert-warning {:style {:margin-right "1rem" :color colors/red-dark}}]
+             [:div {:style {:padding-top "2px"}} cannot-be-saved-text]]])
+         [:div
+          (case service-state
+            :public [render-public-state-buttons e! schemas data name-missing?]
+            :validation [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                                 :disabled (not (form/can-save? data))}
+                           (tr [:buttons :save-and-validate])]]
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
+                                               :disabled name-missing?}
+                           (tr [:buttons :back-to-draft])]]
+                         [:div {:style {:margin-top "1rem"}}
+                          [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm false))}
+                           (tr [:buttons :discard])]]]
+            :re-edit [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                              :disabled (not (form/can-save? data))}
+                        (tr [:buttons :save-and-validate])]]
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/save-draft {:on-click #(e! (ts-controller/->OpenChangeToDraftModal))
+                                            :disabled name-missing?}
+                        (tr [:buttons :back-to-draft])]]
+                      [:div {:style {:margin-top "1rem"}}
+                       [buttons/cancel-with-icon {:on-click #(if modified?
+                                                               (e! (ts-controller/->OpenCancelRevalidateModal))
+                                                               (e! (ts-controller/->BackToValidation service-id)))}
+                        (tr [:buttons :discard])]]]
+            :draft [render-draft-state-buttons e! schemas data name-missing?])]]
+        ;; admin is editing
+        (and
+          (= false in-validation?)
+          (= service-id admin-validating-id))
+        [:div
+         [:div {:style {:display "flex" :flex-direction "row" :flex-wrap "wrap"}}
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/save-publish {:on-click #(e! (ts-controller/->ConfirmSaveTransportService schemas))
+                                  :disabled (not (form/can-save? data))}
+            (tr [:buttons :save])]]
 
-     ;show-footer? - Take owner check away for now
-     (when true
-       [:div.row
-        (when (not (form/can-save? data))
-          [:div {:style {:margin "1em 0em 1em 0em"}}
-           [:span {:style {:color "#be0000" :padding-bottom "0.6em"}} (tr [:form-help :publish-missing-required])]])
+          ;; Admin cannot publish service with modifications
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/save-publish {:on-click #(e! (admin-validation/->OpenConfirmPublishModal service-id))
+                                  :disabled (when (or
+                                                    (not (form/can-save? data))
+                                                    admin-unsaved-data) true)}
+            (tr [:buttons :publish])]]
+          [:div {:style {:margin-top "1rem"}}
+           [buttons/cancel-with-icon {:on-click #(e! (ts-controller/->CancelTransportServiceForm true))}
+            (tr [:buttons :discard-to-admin])]]]]
+        ;; In other cases - don't show any buttons
+        :else nil)]
 
-        (if published?
-          ;; True
-          [:span
-           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
-                          :disabled (not (form/can-save? data))}
-            (tr [:buttons :save-updated])]
-           [buttons/save-draft {:disabled name-missing?
-                          :on-click #(do
-                                       (.preventDefault %)
-                                       (e! (ts/->SaveTransportService schemas false)))}
-            (tr [:buttons :back-to-draft])]]
-          ;; False
-          [:span
-           [buttons/save-publish {:on-click #(e! (ts/->SaveTransportService schemas true))
-                          :disabled (not (form/can-save? data))}
-            (tr [:buttons :save-and-publish])]
-           [buttons/save-draft {:on-click #(e! (ts/->SaveTransportService schemas false))
-                          :disabled name-missing?}
-            (tr [:buttons :save-as-draft])]])
-        [buttons/cancel-with-icon {:on-click #(e! (ts/->CancelTransportServiceForm))}
-         (tr [:buttons :discard])]])]))
+     (when show-validate-modal?
+       [open-validate-dialog e! schemas])
 
-(defn place-search-group [e! key]
+     (when show-cancel-revalidate-modal?
+       [open-cancel-revalidate-dialog e! service-id])
+
+     (when show-confirm-cancel-dialog?
+       [open-confirm-cancel-dialog e! schemas])
+
+     [open-publish-dialog e! app]]))
+
+(defn place-search-group [e! key in-validation?]
   (place-search/place-search-form-group
     (tuck/wrap-path e! :transport-service key ::t-service/operation-area)
     (tr [:field-labels :transport-service-common ::t-service/operation-area])
-    ::t-service/operation-area))
+    ::t-service/operation-area
+    in-validation?))
 
-(defn service-hours-group [service-type sub-component?]
+(defn service-hours-group [service-type sub-component? in-validation?]
   (let [tr* (tr-key [:field-labels :service-exception])
         write-time (fn [key]
                      (fn [{all-day? ::t-service/all-day :as data} time]
@@ -516,96 +779,110 @@
         (when (= false sub-component?)
           {:top-border true}))
 
-      {:name ::t-service/service-hours
-       :id "service-hours-div-table"
-       :type :div-table
-       :div-class "col-xs-6 col-sm-4 col-md-2"
-       :inner-delete? true
-       :add-label (tr [:buttons :add-new-service-hour])
-       :inner-delete-label (tr [:buttons :delete-service-hours])
-       :prepare-for-save values/without-empty-rows
-       :table-fields
-       [{:name ::t-service/week-days
-         :label (tr [:field-labels :transport-service ::t-service/week-days])
-         :type :multiselect-selection
-         :field-class "col-xs-6 col-sm-4 col-md-4"
-         :options t-service/days
-         :show-option (tr-key [:enums ::t-service/day :full])
-         :show-option-short (tr-key [:enums ::t-service/day :short])
-         :required? true
-         :full-width? true
-         :is-empty? validation/empty-enum-dropdown?}
-        {:name ::t-service/all-day
-         :label (tr [:field-labels :transport-service ::t-service/all-day])
-         :type :checkbox
-         :style {:padding-top "2.5rem"}
-         :field-class "col-xs-6 col-sm-2 col-md-2"
-         :write (fn [data all-day?]
-                  (merge data
-                         {::t-service/all-day all-day?}
-                         (if all-day?
-                           {::t-service/from (time/->Time 0 0 nil)
-                            ::t-service/to (time/->Time 24 0 nil)}
-                           {::t-service/from nil
-                            ::t-service/to nil})))}
-
-        (merge
-          (when (= "passenger-transportation" service-type)
-            {:label (tr [:common-texts :start-time])})
-          {:name ::t-service/from
-           :label (tr [:field-labels :transport-service ::t-service/from])
-           :type :time
-           :container-style {:padding-top "1.5rem"}
-           :field-class "col-xs-6 col-sm-2 col-md-2"
-           :write (write-time ::t-service/from)
+      (merge
+        {:name ::t-service/service-hours
+         :id "service-hours-div-table"
+         :type :div-table
+         :div-class "col-xs-6 col-sm-4 col-md-2"
+         :prepare-for-save values/without-empty-rows
+         :table-fields
+         [{:name ::t-service/week-days
+           :label (tr [:field-labels :transport-service ::t-service/week-days])
+           :type :multiselect-selection
+           :disabled? in-validation?
+           :field-class "col-xs-6 col-sm-4 col-md-4"
+           :options t-service/days
+           :show-option (tr-key [:enums ::t-service/day :full])
+           :show-option-short (tr-key [:enums ::t-service/day :short])
            :required? true
-           :is-empty? time/empty-time?})
-        (merge
-          (when (= "passenger-transportation" service-type)
-            {:label (tr [:common-texts :ending-time])})
-          {:name ::t-service/to
-           :label (tr [:field-labels :transport-service ::t-service/to])
-           :type :time
-           :container-style {:padding-top "1.5rem"}
+           :full-width? true
+           :is-empty? validation/empty-enum-dropdown?}
+          {:name ::t-service/all-day
+           :label (tr [:field-labels :transport-service ::t-service/all-day])
+           :type :checkbox
+           :disabled? in-validation?
+           :style {:padding-top "2.5rem"}
            :field-class "col-xs-6 col-sm-2 col-md-2"
-           :write (write-time ::t-service/to)
-           :required? true
-           :is-empty? time/empty-time?})]}
+           :write (fn [data all-day?]
+                    (merge data
+                           {::t-service/all-day all-day?}
+                           (if all-day?
+                             {::t-service/from (time/->Time 0 0 nil)
+                              ::t-service/to (time/->Time 24 0 nil)}
+                             {::t-service/from nil
+                              ::t-service/to nil})))}
 
-      (form/subtitle "Palveluaikojen poikkeukset")
+          (merge
+            (when (= "passenger-transportation" service-type)
+              {:label (tr [:common-texts :start-time])})
+            {:name ::t-service/from
+             :label (tr [:field-labels :transport-service ::t-service/from])
+             :element-id "start-time"
+             :type :time
+             :disabled? in-validation?
+             :container-style {:padding-top "1.5rem"}
+             :field-class "col-xs-6 col-sm-2 col-md-2"
+             :write (write-time ::t-service/from)
+             :required? true
+             :is-empty? time/empty-time?})
+          (merge
+            (when (= "passenger-transportation" service-type)
+              {:label (tr [:common-texts :ending-time])})
+            {:name ::t-service/to
+             :label (tr [:field-labels :transport-service ::t-service/to])
+             :element-id "end-time"
+             :type :time
+             :disabled? in-validation?
+             :container-style {:padding-top "1.5rem"}
+             :field-class "col-xs-6 col-sm-2 col-md-2"
+             :write (write-time ::t-service/to)
+             :required? true
+             :is-empty? time/empty-time?})]}
+        (when-not in-validation?
+          {:inner-delete? true
+           :add-label (tr [:buttons :add-new-service-hour])
+           :inner-delete-label (tr [:buttons :delete-service-hours])}))
 
-      {:name ::t-service/service-exceptions
-       :type :div-table
-       :inner-delete? true
-       :inner-delete-label (tr [:buttons :delete-service-exceptions])
-       :add-label (tr [:buttons :add-new-service-exception])
-       :div-class "col-xs-6 col-sm-2 col-md-2"
-       :prepare-for-save values/without-empty-rows
-       :table-fields [{:name ::t-service/description
-                       :label (tr* :description)
-                       :type :localized-text
-                       :full-width? true
-                       :field-class "col-xs-12 col-sm-6 col-md-6"}
-                      {:name ::t-service/from-date
-                       ;:label (tr [:field-labels :service-exception :t-service/from-date])
-                       :type :date-picker
-                       :label (tr* :from-date)
-                       :element-id "service-exception-from-date"
-                       :field-class "col-xs-6 col-sm-2 col-md-2"}
-                      {:name ::t-service/to-date
-                       ;:label (tr [:field-labels :service-exception :t-service/to-date])
-                       :type :date-picker
-                       :label (tr* :to-date)
-                       :element-id "service-exception-to-date"
-                       :field-class "col-xs-6 col-sm-2 col-md-2"}]}
+      (form/subtitle (tr [:field-labels :service-exception :service-hour-exceptions]))
+
+      (merge
+        {:name ::t-service/service-exceptions
+         :type :div-table
+         :div-class "col-xs-6 col-sm-2 col-md-2"
+         :prepare-for-save values/without-empty-rows
+         :table-fields [{:name ::t-service/description
+                         :label (tr* :description)
+                         :type :localized-text
+                         :disabled? in-validation?
+                         :full-width? true
+                         :field-class "col-xs-12 col-sm-6 col-md-6"}
+                        {:name ::t-service/from-date
+                         :type :date-picker
+                         :disabled? in-validation?
+                         :full-width? true
+                         :label (tr* :from-date)
+                         :element-id "service-exception-from-date"
+                         :field-class "col-xs-6 col-sm-2 col-md-2"}
+                        {:name ::t-service/to-date
+                         :type :date-picker
+                         :disabled? in-validation?
+                         :full-width? true
+                         :label (tr* :to-date)
+                         :element-id "service-exception-to-date"
+                         :field-class "col-xs-6 col-sm-2 col-md-2"}]}
+        (when-not in-validation?
+          {:inner-delete? true
+           :inner-delete-label (tr [:buttons :delete-service-exceptions])
+           :add-label (tr [:buttons :add-new-service-exception])}))
 
       {:name ::t-service/service-hours-info
        :label (tr [:field-labels :transport-service-common ::t-service/service-hours-info])
        :type :localized-text
+       :disabled? in-validation?
        :full-width? true
        :container-class "col-xs-12"})))
 
-(defn name-group [label]
+(defn name-group [label in-validation?]
   (form/group
     {:label label
      :columns 3
@@ -621,9 +898,9 @@
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-12"}
 
-
     {:name ::t-service/name
      :type :string
+     :disabled? in-validation?
      :full-width? true
      :container-class "col-xs-12 col-sm-12 col-md-6"
      :required? true
@@ -631,9 +908,10 @@
 
     {:name ::t-service/description
      :type :localized-text
-     :rows 2
+     :disabled? in-validation?
+     :rows 1
      :full-width? true
-     :container-class "col-xs-12 col-sm-12 col-md-8"}
+     :container-class "col-xs-12 col-sm-12 col-md-12"}
 
     (form/subtitle (tr [:field-labels :transport-service ::t-service/available-from-and-to-title]))
 
@@ -647,17 +925,20 @@
 
     {:name ::t-service/available-from
      :type :date-picker
+     :disabled? in-validation?
      :show-clear? true
+     :full-width? true
      :hint-text (tr [:field-labels :transport-service ::t-service/available-from-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}
-
     {:name ::t-service/available-to
      :type :date-picker
+     :disabled? in-validation?
      :show-clear? true
+     :full-width? true
      :hint-text (tr [:field-labels :transport-service ::t-service/available-to-nil])
      :container-class "col-xs-12 col-sm-6 col-md-3"}))
 
-(defn transport-type [sub-type]
+(defn transport-type [sub-type in-validation?]
   (form/group
     {:label (tr [:field-labels :transport-service-common ::t-service/transport-type])
      :columns 3
@@ -676,6 +957,7 @@
 
     {:name ::t-service/transport-type
      :type :checkbox-group
+     :disabled? in-validation?
      :container-class "col-md-12"
      :header? false
      :required? true
@@ -690,5 +972,5 @@
   ;; To set transport service form dirty when adding / removing places using the place-search component,
   ;; we'll have to manually trigger EditTransportService event with empty data.
   #(do
-     (e! (ts/->EditTransportService {}))
+     (e! (ts-controller/->EditTransportService {}))
      (e! %)))

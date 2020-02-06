@@ -1,5 +1,7 @@
 (ns ote.style.topnav
-  (:require [stylefy.core :as stylefy]))
+  (:require [stylefy.core :as stylefy]
+            [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
+            [ote.style.base :as base]))
 
 (def topnav-wrapper {:position "fixed"
                      :width "100%"
@@ -131,3 +133,27 @@
 (def gray-info-text {:color "lightgray"
                      :font-size "0.875rem"
                      :padding-bottom "10px"})
+
+(def tos-container {:z-index 1001
+                    ;:position "fixed"
+                    :height "50px"
+                    :width "100%"
+                    :background-color "#0029b8"
+                    :padding "12px"
+                    :color "#FFFFFF"
+                    :font-size "0.875rem"
+                    :line-height "0.875rem"})
+
+(def tos-texts {:padding-left "0.5rem"
+                ::stylefy/media {{:max-width (str width-xl "px")} {:padding-top "6px"}
+                                 {:max-width (str width-l "px")}  {:padding-top "6px"}
+                                 {:max-width (str width-sm "px")} {:padding-top "4px"}
+                                 {:max-width (str width-xs "px")} {:padding-top "1px"}}})
+
+(def tos-toplink (merge
+                   base/base-link
+                   {:color "#FFFFFF"
+                    :text-decoration "underline"
+                    :padding-left "0.25rem"
+                    :padding-right "0.25rem"
+                    ::stylefy/mode {:hover {:color "#FFFFFF"}}}))

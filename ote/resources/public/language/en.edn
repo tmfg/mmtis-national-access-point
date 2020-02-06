@@ -95,7 +95,8 @@
   :service-exception
   {:description "Exception description"
    :from-date "From date"
-   :to-date "To date"}
+   :to-date "To date"
+   :service-hour-exceptions "Exceptions to service hours"}
 
   ;; Passenger transportation fields
   :passenger-transportation
@@ -120,7 +121,6 @@
    :ote.db.transport-service/pricing-url "Price information WWW-address"
    :ote.db.transport-service/payment-method-description "Additional information about payment methods"}
 
-
   ;; Terminal fields
   :terminal
   {:ote.db.transport-service/indoor-map "Indoor map"
@@ -128,7 +128,6 @@
    :ote.db.transport-service/description "Service description"
    :ote.db.transport-service/information-service-accessibility "Information service accessibility"
    :ote.db.transport-service/accessibility "Accessibility"
-
 
    ;; assistance_notification_requirement fields
    :ote.db.transport-service/hours-before "Service requires reservation (hours) before"
@@ -202,7 +201,6 @@
    :ote.db.transport-service/maximum-stay "Maximum duration for parking"
    :maximum-stay-limited "Duration for parking is limited"}
 
-
   :transport-service
   {:ote.db.transport-service/name "Service name"
    :ote.db.transport-service/additional-services "Additional services"
@@ -211,8 +209,11 @@
    :ote.db.transport-service/type "Transport service mode"
    :ote.db.transport-service/sub-type "Transport service sub mode"
    :ote.db.transport-service/published? "NAP-status"
-   :ote.db.transport-service/published?-values {true "Published"
-                                                false "Not published"}
+   :ote.db.transport-service/published?-values {:public "Published"
+                                                :validation "Submitted for publication"
+                                                :re-validation "Changes submitted for publication"
+                                                :re-edit "Changes submitted for publication"
+                                                :draft "Draft"}
 
    ;; Service hour fields
    :ote.db.transport-service/week-days "Day of the week"
@@ -281,6 +282,7 @@
                                  :license "Specify which license or terms of use apply to your interface. If the list does not have the license you use, you can add it by writing it in."
                                  :external-service-description "Specify additional information about the interface that may be useful for developers (e.g. about license). You may add a web-address that contains further information."
                                  :view-routes "View routes"}
+  :external-interface-netex-info "Traficom may convert data in this section to another format (e.g. NeTEx) in accordance with the requirements laid down in EU legislation and provide the converted data for downloading in the NAP service alongside the original format. However, the data content remains the same when converting the format."
 
   :RAE-link-text "RAE-software"
   :SEA-ROUTE-link-text "Sea traffic route and timetable editor"
@@ -306,6 +308,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :pricing-info "Fill in price information and/or the basis for pricing in to the table.\nIf the table is not suitable for price announcment, you can tell about pricing in the field \"price determination\". \nIf all the price information is already in a website (WWW), you can simpy just fill in the WWW-address into the field \"Price information WWW-address\"."
 
   :publish-missing-required "You cannot publish the service because you have not filled all the required fields. Fill in required information to the fields with an announcement \"Information required\"."
+  :validate-missing-required "You can’t yet submit the service for publication because the form is missing essential information. Please complete any items marked with \"Information required\"."
 
   :advance-reservation-info "Here you can inform advance reservation requiremets of your service."
   :trip-editor-no-calendar "Add driving days for the first departure before creating new ones. The driving days given for the first departure will be copied also to the following ones. When you have created all the departures, you can modify the driving days of each departure in their own driving days calendar."
@@ -350,6 +353,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :manage-access-rights "Manage access rights"
 
   :save-and-publish "Save and publish"
+  :save-and-validate "Save and submit to NAP for publication"
+  :send "Send"
   :save-and-send "Save and send"
   :save-as-draft "Save a draft"
   :save-updated "Save updated information"
@@ -361,6 +366,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :add-new-route "Add a new sea traffic route"
   :add-new-pre-notice "Add a new report of change"
   :discard "Cancel"
+  :discard-to-admin "Cancel and return to Administration panel"
 
   :next "Next"
   :add-transport-service "Add a new service"
@@ -381,9 +387,12 @@ You can also draw the operating area or point to the map with drawing tools. You
   :route-calendar-clear "Clear calendar"
   :back-to-draft "Change back to draft"
   :add-new-effective-date "Add a new change date"
-  :transport-service-catalog "Transport service catalog"
+  :transport-service-catalog "Explore the service catalogue"
+  :other-access-points "Other access points"
+  :other-access-points-url "https://www.traficom.fi/en/transport/transport-system/its"
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
+  :continue-editing "Continue modifying the information"
   }
 
  ;; Database enumeration values
@@ -599,7 +608,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                      :schedule-creation "Creating interfaces for route and timetable data"
                      :if-no-interfaces "If you do not have any interfaces for route and timetable data, you can digitalize your transport service´s route and timetable data with the tools listed below."
                      :open-rae "Open Traficom’s route and timetable editor (RAE)"
-                     :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"}
+                     :open-sea-rae "Open the Sea traffic route and timetable editor in the NAP service"
+                     :service-in-validation-info "The service provider is responsible for the information published in the service. The information is currently in the publication queue. After publication, the information is accessible in the public NAP service catalogue. "}
 
  :transport-users-page {:username "Name"
                         :members "Members"
@@ -649,12 +659,12 @@ You can also draw the operating area or point to the map with drawing tools. You
     "On the [Transport service catalog](/#/services) page you can browse and search published machine readable interfaces.\n\n"
     "On the [Transport operators](/#/operators) page you can find all the organizations who have registed in NAP.\n\n"
     "To digitize and publish a transport service login is required.")
-  :hero-title "Finnish national open transport service catalog."
+  :hero-title "Finnish national open transport service catalogue."
 
   :new-user? "New user?"
   :table-header-service-name "Service name"
   :table-header-service-url "Service WWW-address"
-  :table-header-NAP-status "NAP-status"
+  :table-header-NAP-status "Service status"
   :table-header-modified "Modified"
   :table-header-created "Created"
   :table-header-actions "Functions"
@@ -742,8 +752,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :radio-button-url-companies "Enter a web address from which the company information can be found as a .csv file."
   :radio-button-csv-companies "Load a .csv file from your computer with the company information."
   :radio-button-form-companies "Add company information manually using the form."
+  :service-is-in-validation "Service information have been submitted for publication."
+  :published-service-is-in-validation "Changes made to service information have been submitted for publication."
   }
-
 
  :rentals-page
  {:header-edit-rentals "Edit rental information"
@@ -768,7 +779,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-accessibility "Accessibility and information service accessibility"
   :header-checkboxlist-accessibility "Accessibility"}
 
-
  :parking-page
  {:header-new-parking "Add information about general commercial parking"
   :header-edit-parking "Edit information about general commercial parking"
@@ -782,6 +792,10 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-facilities-and-capacities "Parking capacity"
   :header-charging-points "Charging points"
   :header-service-hours "Service hours and maximum parking time"}
+
+ :transport-services-common-page
+ {:validation-modal-header "Information on the publication process"
+  :validation-modal-text "The service provider is responsible for the information published in the service. The information is transferred to the publication queue. After publication, the information is accessible in the public NAP service catalogue."}
 
  :route-list-page
  {:header-route-list "Own sea traffic route and timetable information"
@@ -899,6 +913,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :header-authority-pre-notice-list "Reports of change in regular scheduled passenger transport"
   :no-pre-notices-for-operator "The selected transport operator has not created any reports of change in regular scheduled passenger transport."
   :no-pre-notices-sent "The selected transport operator has not sent any reports of change in regular scheduled passenger transport."
+  :pre-notice-drafts "Drafts"
   :sent-pre-notices "Sent reports of change"
   :no-pre-notices "No reports of change created"
   :only-for-authorities "Change notifications are for official use only."
@@ -1046,7 +1061,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-pre-notice "Report changes in regular scheduled passenger transport"
   :navigation-authority-pre-notices "Saapuneet ilmoitukset"
   :navigation-privacy-policy "Privacy Policy"
-  :navigation-privacy-policy-url "https://www.traficom.fi/fi/traficom/tietosuoja-traficomissa/rekisterit-ja-tietosuojaselosteet"
+  :navigation-privacy-policy-text "privacy statement"
+  :navigation-privacy-policy-text2 "the privacy statement"
+  :navigation-privacy-policy-url "https://www.traficom.fi/en/traficom/privacy-policy/registers-and-data-resources"
+  :navigation-terms-of-service "the terms and conditions"
+  :navigation-terms-of-service-text "Terms and Conditions"
+  :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/Terms%20of%20Service%20for%20the%20NAP%20service.pdf"
+  :navigation-terms-and-cookies " of the service, including the use of cookies."
   :navigation-general-menu "Menu"
   :navigation-for-developers "API for developers"
   :navigation-email-notification-settings "Email notification settings"
@@ -1061,7 +1082,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
   :data-not-found "Information is not found."
-  :required-field "Required field"
+  :required-field "Information required"
   :required-field-missing "Mandatory data missing"
   :invalid-business-id "The business ID has to be in the form of: 7 numbers, hyphen and a check number."
   :invalid-foreign-business-id "A non-Finnish Business ID must be minimum 2 and maximum 32 characters."
@@ -1125,6 +1146,11 @@ You can also draw the operating area or point to the map with drawing tools. You
   :no-operators "No transport operators"
   :country "Country"
   :filling-info "Filling instructions"
+  :and "and"
+  :agree-to-privacy-and-terms "By using the NAP website you accept"
+  :have-read-services "I have read "
+  :and-agree-service-terms " of the NAP service and accept "
+  :of-service " of the service."
   }
 
 
@@ -1142,7 +1168,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   {:title "Confirm navigation"
    :stay "Stay on this page"
    :leave "Leave this page"
-   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"}
+   :unsaved-data "Form contains unsaved data. Do you really want to leave this page?"
+   :unsaved-validated-data "The form contains unsaved information. Are you sure you want to leave the page? If you do not save the information, the old version of the service is returned to Traficom’s list for publication."
+   }
 
   :send-pre-notice
   {:title "Submit change notification"
@@ -1155,6 +1183,17 @@ You can also draw the operating area or point to the map with drawing tools. You
    :link-url "https://www.traficom.fi/fi/asioi-kanssamme/ilmoittaudu-valitys-ja-yhdistamispalveluntarjoajaksi"
    :cancel "No"
    :ok "Yes"}
+
+  :continue-editing
+  {:title "Continue modifying the information"
+   :confirm "Are you sure you want to continue modifying the information? In that case, the previously submitted version will not be published in the NAP service, but the service information is returned to you for modification."}
+
+  :change-to-draft
+  {:title "Are you sure you want to change service status to draft?"
+   :body "Information pertaining to services marked as drafts is not visible in the public transport service catalogue. However, you can still view and modify the service."
+   :cancel-button "No, return to the form"
+   :ok-button "Yes, change service status to draft"
+   }
   }
 
  :operators

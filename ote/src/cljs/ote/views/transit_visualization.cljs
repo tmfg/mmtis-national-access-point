@@ -393,7 +393,7 @@
      [:div
       (when (seq (:differences compare))
         [:div {:style {:padding-top "0.5rem"}}
-         [tv-change-icons/change-icons-for-trips compare true]
+         [tv-change-icons/change-icons-for-header (:differences compare) true]
          [:div {:style {:padding-bottom "1rem"}}]
          [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
       [:div.route-trips
@@ -485,7 +485,7 @@
        [:div
         (when (seq (:differences compare))
           [:div {:style {:padding-top "0.5rem"}}
-           [tv-change-icons/change-icons-for-stops compare true]
+           [tv-change-icons/change-icons-for-stops (:differences compare) true]
            [:div {:style {:padding-bottom "1rem"}}]
            [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
 

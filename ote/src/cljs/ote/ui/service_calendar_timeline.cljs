@@ -10,8 +10,8 @@
             [ote.time :as time]
             [cljs-react-material-ui.icons :as ic]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]
-            [goog.events.MouseWheelHandler.EventType :as MEventType]))
+            [goog.events.EventType :as EventType])
+  (:import [goog.events EventType]))
 
 (defn month-days [year month]
   (let [first-date (t/first-day-of-the-month year month)
@@ -39,7 +39,6 @@
 (defn- month-name [month]
   (let [lang (.get (goog.net.Cookies. js/document) "finap_lang" "fi")]
     (.toLocaleString (doto (js/Date.) (.setMonth (- month 1))) lang #js {:month "short"})))
-
 
 (defn svg-bars [items offset bar-width handle-val bar-style]
   [:g
@@ -112,11 +111,9 @@
          (fn [day]
            (:background-color (day-style day false)))])]]))
 
-
-
 (defn- listen-scroll [el handler]
   ;; MouseWheelHandler allows us to catch scroll events in a consistent manner on various platforms.
-  (events/listen (events/MouseWheelHandler. el) MEventType/MOUSEWHEEL handler el))
+  (events/listen (EventType.MOUSEWHEEL. el) EventType.MOUSEWHEEL handler el))
 
 (defn- listen-mouse-up [el handler]
   (events/listen el EventType/MOUSEUP handler el))
