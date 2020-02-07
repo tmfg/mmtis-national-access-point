@@ -39,27 +39,29 @@
   [e! {user :user :as app}]
   [:div
    [:div.hero (stylefy/use-style style-front-page/hero-img)
-    [:div.container {:style {:padding-top "20px"}}
+    [:div {:style {:padding-top "20px"}}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
      [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])]
      [:div.row (stylefy/use-style style-front-page/hero-btn-container)
-      [:a {:style {:text-decoration "none"}
-           :href "/#/services"
-           :on-click #(do
-                        (.preventDefault %)
-                        (e! (fp/->ChangePage :services nil)))}
-       [:button (stylefy/use-style style-front-page/hero-btn)
-        [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
-        (tr [:buttons :transport-service-catalog])]]
+      [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto"}}
+       [:a {:style {:text-decoration "none"}
+            :href "/#/services"
+            :on-click #(do
+                         (.preventDefault %)
+                         (e! (fp/->ChangePage :services nil)))}
+        [:button (stylefy/use-style style-front-page/hero-btn)
+         [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
+         (tr [:buttons :transport-service-catalog])]]]
       (when (flags/enabled? :other-catalogs)
-        [:a {:style {:text-decoration "none"}
-             :href (tr [:buttons :other-access-points-url])
-             :target "_blank"}
-         [:button {:style (merge
-                            style-front-page/hero-btn
-                            {:margin-top "1.5rem"})}
-          [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
-          (tr [:buttons :other-access-points])]])]]]
+        [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto"}}
+         [:a {:style {:text-decoration "none"}
+              :href (tr [:buttons :other-access-points-url])
+              :target "_blank"}
+          [:button {:style (merge
+                             style-front-page/hero-btn
+                             {:margin-top "1.5rem"})}
+           [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
+           (tr [:buttons :other-access-points])]]])]]]
 
    (when test-env?
      [test-env-warning])
