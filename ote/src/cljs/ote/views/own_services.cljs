@@ -216,7 +216,7 @@
         [:h4 section-label]
         [ui/table {:style style-base/basic-table
                    :wrapperStyle {:overflow "visible"}
-                   :bodyStyle {:overflow "visible"}}
+                   :body-style {:overflow "visible !important" :overflow-x "visible" :overflow-y "visible"}}
          [ui/table-header {:adjust-for-checkbox false
                            :display-select-all false
                            :style {:overflow "visible"}}
