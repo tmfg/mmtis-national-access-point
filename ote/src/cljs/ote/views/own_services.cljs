@@ -91,34 +91,47 @@
                           :style {:border-bottom (str "1px solid" colors/gray650)
                                   :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
-                                  :style {:width "20%"}}
+                                  :style {:width "25%"}}
              [:a (merge {:href (str "/#/edit-service/" id)
                          :on-click #(do (.preventDefault %)
                                         (e! (fp-controller/->ChangePage :edit-service {:id id})))}
                         (stylefy/use-sub-style style-base/basic-table :link)) name]]
             [ui/table-row-column {:class "hidden-xs table-col-style-semi-wrap"
                                   :style {:overflow "visible"
-                                          :width "20%"}}
+                                          :width "25%"}}
              (cond
-               ;; Published but with errors
-               (service-errors row)
+               ;; Published or draft but with errors
+               (and (or (= :published service-state) (= :draft service-state)) (service-errors row))
                [:span (stylefy/use-style style-base/icon-with-text)
                 (tr [:field-labels :transport-service ::t-service/published?-values service-state])
                 [ic/alert-warning {:style {:color colors/negative-button
                                            :margin-left "0.5rem"
                                            :margin-bottom "5px"}}]]
-               ;; When state in validation
-               (or (= :validation service-state) (= :re-edit service-state) (= :re-validation service-state))
+               ;; When state in validation but no errors
+               (and (= false (service-errors row))
+                    (or (= :validation service-state) (= :re-edit service-state) (= :re-validation service-state)))
                [:span (tr [:field-labels :transport-service ::t-service/published?-values service-state])
+                [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
+                                      :len "medium"
+                                      :pos "up"}]]
+
+               ;; When state in validation with errors
+               (and (service-errors row)
+                 (or (= :validation service-state) (= :re-edit service-state) (= :re-validation service-state)))
+               [:span (stylefy/use-style style-base/icon-with-text)
+                (tr [:field-labels :transport-service ::t-service/published?-values service-state])
+                [ic/alert-warning {:style {:color colors/negative-button
+                                              :margin-left "0.5rem"
+                                              :margin-bottom "5px"}}]
                 [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
                                       :len "medium"
                                       :pos "up"}]]
                ;; Normal case
                :else
                (tr [:field-labels :transport-service ::t-service/published?-values service-state]))]
-            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "12%"}} (time/format-timestamp-for-ui modified)]
-            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "13%"}} (time/format-timestamp-for-ui created)]
-            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "15%"}}
+            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "15%"}} (time/format-timestamp-for-ui modified)]
+            [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "15%"}} (time/format-timestamp-for-ui created)]
+           #_  [ui/table-row-column {:class "hidden-xs hidden-sm table-col-style-semi-wrap" :style {:width "15%"}}
              (if published
                (let [url (str "/export/geojson/" transport-operator-id "/" id)]
                  [linkify url
@@ -208,11 +221,11 @@
                            :display-select-all false
                            :style {:overflow "visible"}}
           [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
-           [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "20%"}} (tr [:front-page :table-header-service-name])]
-           [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "20%"}} (tr [:front-page :table-header-NAP-status])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "12%"}} (tr [:front-page :table-header-modified])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "13%"}} (tr [:front-page :table-header-created])]
-           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap" :style {:width "15%"}} (tr [:front-page :table-header-service-url])]
+           [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "25%" :overflow "visible"}} (tr [:front-page :table-header-service-name])]
+           [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "25%" :overflow "visible"}} (tr [:front-page :table-header-NAP-status])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "15%"}} (tr [:front-page :table-header-modified])]
+           [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "15%"}} (tr [:front-page :table-header-created])]
+           #_ [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap" :style {:width "15%"}} (tr [:front-page :table-header-service-url])]
            [ui/table-header-column {:class "table-header-semi-wrap " :style {:width "20%"}} (tr [:front-page :table-header-actions])]]]
 
          (transport-services-table-rows e! services transport-operator-id)]
