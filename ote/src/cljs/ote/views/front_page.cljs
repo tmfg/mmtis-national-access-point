@@ -53,13 +53,11 @@
          [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
          (tr [:buttons :transport-service-catalog])]]]
       (when (flags/enabled? :other-catalogs)
-        [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto"}}
+        [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto" :margin-top "1.5rem"}}
          [:a {:style {:text-decoration "none"}
               :href (tr [:buttons :other-access-points-url])
               :target "_blank"}
-          [:button {:style (merge
-                             style-front-page/hero-btn
-                             {:margin-top "1.5rem"})}
+          [:button (stylefy/use-style style-front-page/hero-btn)
            [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
            (tr [:buttons :other-access-points])]]])]]]
 
