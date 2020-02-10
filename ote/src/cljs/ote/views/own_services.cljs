@@ -91,14 +91,14 @@
                           :style {:border-bottom (str "1px solid" colors/gray650)
                                   :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
-                                  :style {:width "25%"}}
+                                  :style {:width "23%"}}
              [:a (merge {:href (str "/#/edit-service/" id)
                          :on-click #(do (.preventDefault %)
                                         (e! (fp-controller/->ChangePage :edit-service {:id id})))}
                         (stylefy/use-sub-style style-base/basic-table :link)) name]]
             [ui/table-row-column {:class "hidden-xs table-col-style-semi-wrap"
                                   :style {:overflow "visible"
-                                          :width "25%"}}
+                                          :width "27%"}}
              (cond
                ;; Published or draft but with errors
                (and (or (= :published service-state) (= :draft service-state)) (service-errors row))
@@ -226,8 +226,8 @@
                            :display-select-all false
                            :style {:overflow "visible"}}
           [ui/table-row {:selectable false :style {:border-bottom (str "1px solid" colors/gray650)}}
-           [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "25%" :overflow "visible"}} (tr [:front-page :table-header-service-name])]
-           [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "25%" :overflow "visible"}} (tr [:front-page :table-header-NAP-status])]
+           [ui/table-header-column {:class "table-header-semi-wrap" :style {:width "23%" :overflow "visible"}} (tr [:front-page :table-header-service-name])]
+           [ui/table-header-column {:class "hidden-xs table-header-semi-wrap " :style {:width "27%" :overflow "visible"}} (tr [:front-page :table-header-NAP-status])]
            [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "15%"}} (tr [:front-page :table-header-modified])]
            [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap " :style {:width "15%"}} (tr [:front-page :table-header-created])]
            #_ [ui/table-header-column {:class "hidden-xs hidden-sm table-header-semi-wrap" :style {:width "15%"}} (tr [:front-page :table-header-service-url])]
