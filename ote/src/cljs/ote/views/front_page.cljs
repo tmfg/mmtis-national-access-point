@@ -39,10 +39,11 @@
   [e! {user :user :as app}]
   [:div
    [:div.hero (stylefy/use-style style-front-page/hero-img)
-    [:div.container {:style {:padding-top "20px" }}
+    [:div {:style {:padding-top "20px"}}
      [:h1 (stylefy/use-style style-front-page/front-page-h1) "NAP"]
-     [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])
-      [:div.row (stylefy/use-style style-front-page/hero-btn-container)
+     [:div (stylefy/use-style style-front-page/front-page-hero-text) (tr [:front-page :hero-title])]
+     [:div.row (stylefy/use-style style-front-page/hero-btn-container)
+      [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto"}}
        [:a {:style {:text-decoration "none"}
             :href "/#/services"
             :on-click #(do
@@ -50,16 +51,17 @@
                          (e! (fp/->ChangePage :services nil)))}
         [:button (stylefy/use-style style-front-page/hero-btn)
          [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
-         (tr [:buttons :transport-service-catalog])]]
-       (when (flags/enabled? :other-catalogs)
+         (tr [:buttons :transport-service-catalog])]]]
+      (when (flags/enabled? :other-catalogs)
+        [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto" :margin-top "1.5rem"}}
          [:a {:style {:text-decoration "none"}
               :href (tr [:buttons :other-access-points-url])
               :target "_blank"}
           [:button (stylefy/use-style style-front-page/hero-btn)
            [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
-           (tr [:buttons :other-access-points])]])]]]]
+           (tr [:buttons :other-access-points])]]])]]]
 
-    (when test-env?
+   (when test-env?
      [test-env-warning])
 
    [:div.container
@@ -104,7 +106,7 @@
 
        [:div {:style {:padding-top "20px"}}
         (if (not (user-logged-in? app))
-          [:a {:style    {:text-decoration "none"}
+          [:a {:style {:text-decoration "none"}
                :on-click #(do
                             (.preventDefault %)
                             (e! (fp/->ToggleRegistrationDialog)))}
@@ -112,8 +114,8 @@
             [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
             (tr [:buttons :register-to-service])]]
           [:div (stylefy/use-style style-front-page/front-page-button-disabled)
-            [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-            (tr [:buttons :register-to-service])])]]]
+           [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+           (tr [:buttons :register-to-service])])]]]
 
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)

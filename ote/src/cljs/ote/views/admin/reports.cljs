@@ -19,5 +19,6 @@
     [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
     [linkify "/admin/reports/port" "Satama-aineisto csv"]
     [linkify "/admin/reports/tvv" "Toimivaltaiset viranomaiset"]
-    [linkify "/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]]])
+    [linkify "/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
+    [linkify "/admin/reports/associated-companies" "Liittyneet yritykset"]]])
 

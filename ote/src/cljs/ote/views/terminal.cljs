@@ -12,6 +12,7 @@
                         [:field-labels :transport-service-common]
                         [:field-labels :transport-service])
    :update!     #(e! (ts-controller/->EditTransportService %))
+   :use-container true
    :footer-fn   (fn [data]
                   [ts-common/footer e! data schemas in-validation? app])})
 
@@ -149,5 +150,5 @@
                        (assistance-service-group in-validation?)
                        (accessibility-and-other-services-group in-validation?)]
                options (terminal-form-options e! groups in-validation? app)]
-    [:div.row
+    [:div
       [form/form options groups form-data]]))

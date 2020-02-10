@@ -212,7 +212,7 @@
    :ote.db.transport-service/published?-values {:public "Julkaistu"
                                                 :validation "Lähetetty julkaistavaksi"
                                                 :re-validation "Muutokset lähetetty julkaistavaksi"
-                                                :re-edit "Uudelleen muokattavana"
+                                                :re-edit "Muutokset lähetetty julkaistavaksi"
                                                 :draft "Luonnos"}
 
    ;; Service hour fields
@@ -281,6 +281,7 @@
                                  :license "Kerro, minkä lisenssin tai käyttöehtojen mukaisesti rajapintasi on julkaistu. Jos listalla ei ole käyttämääsi lisenssiä, voit lisätä sen kirjoittamalla."
                                  :external-service-description "Kerro lisätietoja rajapintaasi liittyen, joista voisi olla hyötyä kehittäjille (esim. lisenssistä). Voit lisätä tähän kenttään myös web-osoitteen, josta lisätiedot löytyvät."
                                  :view-routes "Katsele reittejä"}
+  :external-interface-netex-info "Traficom voi muuntaa tässä osiossa annettuja tietoja toiseen formaattiin (esim. NeTEx) EU-lainsäädännön vaatimusten mukaisesti ja tarjota formaattimuunnettuja tietoja NAP-palvelussa ladattavaksi alkuperäismuodon rinnalla. Tietosisältö ei kuitenkaan muutu formaattimuunnoksen yhteydessä."
   :RAE-link-text "Rae-työkalulla"
   :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
@@ -306,7 +307,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :pricing-info "Lisää ennalta määritellyt hintatiedot ja/tai hinnan muodostumisen periaatteet taulukkoon.\nMikäli taulukko ei sovellu tietojen ilmoittamiseen, voi kertoa palvelun hinnoista hinnoittelun kuvaus –kentässä.\nMikäli hintatiedot löytyvät kattavasti joltakin verkkosivulta, riittää pelkän verkko-osoitteen kirjoittaminen Hinnoittelun verkkosivu –kenttään."
 
   :publish-missing-required "Et voi vielä julkaista palvelua, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-  :validate-missing-required "Et voi vielä siirtää palvelua tarkistukseen, sillä lomakkeella on täyttämättä vaadittuja olennaisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
+  :validate-missing-required "Et voi vielä lähettää palvelua julkaistavaksi, sillä lomakkeelta puuttuu pakollisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
 
   :advance-reservation-info "Ilmoita tässä osiossa liittyykö liikkumispalveluusi ennakkovarausmahdollisuuksia tai -vaatimuksia."
   :trip-editor-no-calendar "Lisää tämän vuoron kulkupäivät ennen kuin lisäät reitille muita vuoroja. Samat kulkupäivät kopioituvat myös seuraavalle vuorolle.\nKun olet lisännyt kaikki vuorot, voit vielä poistaa ja lisätä kulkupäiviä kalentereihin vuorokohtaisesti."
@@ -609,9 +610,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                      :if-no-interfaces "Mikäli sinulla ei ole reitti- ja aikataulutietorajapintoja, voit tuottaa niitä alla listattujen työkalujen avulla."
                      :open-rae "Avaa Traficomin RAE-työkalu"
                      :open-sea-rae "Avaa NAP:in Merenkulun reitti- ja aikataulueditori"
-                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
-                     :not-in-use "Ei käytössä"
-                     :published-service-cannot-be-modified "Voit muokata vain julkaisua odottavaa palvelua."}
+                     :service-in-validation-info "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot ovat julkaisujonossa. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :transport-users-page {:username "Nimi"
                         :members "Jäsenet"
@@ -802,9 +801,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :transport-services-common-page
  {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
-  :validation-modal-link-text "Palvelun käytön ehdot"
-  }
+  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
@@ -905,7 +902,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen liikennöitävät viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä kulkupäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
   :save-success "Reitin tallennus onnistui."
   :save-failure "Reitin tallennus epäonnistui"
-  :publish-missing-required "Et voi vielä julkaista reittiä, sillä lomakkeella on täyttämättä vaadittuja tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\" tai \"Tietoja täyttämättä\"."
+  :publish-missing-required "Et voi vielä lähettää palvelua julkaistavaksi, sillä lomakkeelta puuttuu pakollisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
   :show-draw-tools "Muokkaa pysähtymispaikkoja"
   :hide-draw-tools "Lopeta muokkaus"
   :data-missing "Tietoja täyttämättä"
@@ -1175,7 +1172,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
    :title-base-view "Palveluntuottajan poistaminen"
    :confirm ["Haluatko varmasti poistaa palveluntuottajan: \"" :name "\" pysyvästi?"]}
 
-
   :navigation-prompt
   {:title "Sivulta poistumisen varmistus"
    :stay "Palaa lomakkeelle"
@@ -1199,6 +1195,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :continue-editing
   {:title "Jatka tietojen muokkaamista"
    :confirm "Oletko varma, että haluat jatkaa tietojen muokkaamista? Tällöin aiemmin lähettämääsi versiota ei julkaista NAP:ssa, vaan palvelun tiedot palautuvat sinulle muokattavaksi."}
+
+  :change-to-draft
+  {:title "Oletko varma, että haluat muuttaa palvelun luonnokseksi?"
+   :body "Luonnostilassa olevan palvelun tiedot eivät näy julkisessa liikkumispalvelukatalogissa. Voit kuitenkin itse yhä tarkastella ja muokata palvelua."
+   :cancel-button "Ei, palaa takaisin lomakkeelle"
+   :ok-button "Kyllä, muuta palvelu luonnokseksi"
+   }
   }
 
  :operators
