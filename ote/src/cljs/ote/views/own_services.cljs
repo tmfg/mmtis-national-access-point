@@ -102,7 +102,9 @@
              (cond
                ;; Published or draft but with errors
                (and (or (= :published service-state) (= :draft service-state)) (service-errors row))
-               [:span (stylefy/use-style style-base/icon-with-text)
+               [:span {:style (merge
+                                style-base/icon-with-text
+                                {:padding-top "2px"})}
                 (tr [:field-labels :transport-service ::t-service/published?-values service-state])
                 [ic/alert-warning {:style {:color colors/negative-button
                                            :margin-left "0.5rem"
@@ -120,12 +122,15 @@
                  (or (= :validation service-state) (= :re-edit service-state) (= :re-validation service-state)))
                [:span (stylefy/use-style style-base/icon-with-text)
                 (tr [:field-labels :transport-service ::t-service/published?-values service-state])
-                [ic/alert-warning {:style {:color colors/negative-button
-                                              :margin-left "0.5rem"
-                                              :margin-bottom "5px"}}]
                 [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
                                       :len "medium"
-                                      :pos "up"}]]
+                                      :pos "up"}]
+                [:span {:style (merge
+                                 style-base/icon-with-text
+                                 {:padding-top "2px"})}
+                 [ic/alert-warning {:style {:color colors/negative-button
+                                            :margin-left "0.5rem"
+                                            :margin-bottom "5px"}}]]]
                ;; Normal case
                :else
                (tr [:field-labels :transport-service ::t-service/published?-values service-state]))]
