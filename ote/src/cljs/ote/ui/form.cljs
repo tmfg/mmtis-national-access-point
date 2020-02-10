@@ -151,7 +151,6 @@
           :loading?
           :csv-count
           :csv-failed-companies-count
-          :csv-valid-companies-count
           :csv-valid?
           :csv-imported?
           :map-controls

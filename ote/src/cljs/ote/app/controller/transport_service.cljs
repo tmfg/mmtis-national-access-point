@@ -467,9 +467,9 @@
                    :db-file-key (:db-file-key response))
         (update-in app [:transport-service ::t-service/passenger-transportation] assoc
                    ::t-service/company-csv-filename (:filename response)
+                   ::t-service/companies {}
                    :csv-imported? true
                    :csv-valid? false
-                   :csv-valid-companies-count (count (:companies response))
                    :csv-failed-companies-count (:failed-count response)
                    :db-file-key (:db-file-key response)))))
 

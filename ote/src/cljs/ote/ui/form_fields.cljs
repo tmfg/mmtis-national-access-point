@@ -1245,16 +1245,9 @@
            valid? (:csv-valid? data)]
        (when-not (nil? imported?)
          (cond
-           (and imported? valid?) [:span {:style {:color "green"}} (tr [:csv :parsing-success]
+           (and imported? valid?) [:span {:style {:color "green"}} (tr [:companies-csv :parsing-success-rows]
                                                                        {:count (count (::t-service/companies data))})]
-           (and imported? (not valid?)) [:div
-                                         [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
-                                         [:br]
-                                         (when (> (:csv-valid-companies-count data) 0)
-                                           [:span {:style {:color "green"}}
-                                            (tr [:companies-csv :parsing-success-rows] {:count (:csv-valid-companies-count data)})
-                                            [:br]])
-                                         [:span {:style {:color "red"}} (tr [:companies-csv :parsing-failed-rows] {:count (:csv-failed-companies-count data)}) ]]
+           (and imported? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
 
            (not imported?) [:span {:style {:color "red"}} (tr [:csv :csv-parse-failed])])))]]])
 
