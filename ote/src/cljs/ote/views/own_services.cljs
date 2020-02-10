@@ -108,7 +108,7 @@
                                            :margin-left "0.5rem"
                                            :margin-bottom "5px"}}]]
                ;; When state in validation but no errors
-               (and (= false (service-errors row))
+               (and (= nil (service-errors row))
                     (or (= :validation service-state) (= :re-edit service-state) (= :re-validation service-state)))
                [:span (tr [:field-labels :transport-service ::t-service/published?-values service-state])
                 [common/tooltip-icon {:text (tr [:own-services-page :service-in-validation-info])
