@@ -208,7 +208,8 @@
         {:status :success
          :count (count (:result parsed-data))
          :failed-count (:failed-count parsed-data)
-         :companies (:result parsed-data)
+         :companies (when (= 0 (:failed-count parsed-data))
+                      (:result parsed-data))
          :filename orig-filename
          :db-file-key (::t-service/file-key db-row)}
         200))
