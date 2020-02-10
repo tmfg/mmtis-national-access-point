@@ -331,10 +331,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :parsing-success ["Antamastasi tiedostosta löydettiin  " :count " yritystä."]}
 
  :companies-csv
- {:invalid "CSV tiedostosta puuttuu y-tunnuksia tai yritysten nimiä tai se sisältää virheellisiä y-tunnuksia."
-  :parsing-success-rows ["Tiedostossa on " :count " ehjää riviä."]
-  :parsing-failed-rows ["Tiedostossa on " :count " virheellistä riviä. Korjaa virheet ja lataa tiedosto uudestaan."]
-  }
+ {:invalid "Antamasi tiedoston lataus epäonnistui. Tarkista yritysten nimien ja Y-tunnusten oikeellisuus. Tarkista myös, että antamasi tiedosto on samassa muodossa kuin esimerkkitiedosto, jonka voit ladata yllä olevasta linkistä."
+  :parsing-success-rows ["Antamasi tiedoston lataus onnistui. Tiedostosta löydettiin " :count " yritystä."]}
 
  ;; Action buttons
  :buttons

@@ -332,10 +332,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :parsing-success ["Found  " :count " companies."]}
 
  :companies-csv
- {:invalid "Imported CSV file is missing business IDs or business names or it might contain invalid business IDs."
-  :parsing-success-rows ["File contains " :count " valid rows."]
-  :parsing-failed-rows ["File contains " :count " invalid rows. Fix invalid data and try to upload it again."]
-  }
+ {:invalid "Your file could not be uploaded. Please check that the company names and business IDs are correct. Check also that the file has the same format as the example file which you can download via the link above."
+  :parsing-success-rows ["Your file was successfully uploaded. " :count " companies were found in the file."]}
 
  ;; Action buttons
  :buttons

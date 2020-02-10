@@ -335,10 +335,8 @@
   :parsing-success ["I listan hittades " :count " företag."]}
 
  :companies-csv
- {:invalid "CSV-filen är bristfällig eller innehåller fel."
-  :parsing-success-rows ["Filen innehåller " :count " giltiga rader."]
-  :parsing-failed-rows ["Filen innehåller " :count " ogiltiga rader. Fixa ogiltiga data och försök att ladda upp dem igen."]
-  }
+ {:invalid "Det gick inte att ladda upp din fil. Kontrollera att företagens namn och FO-nummer är korrekta. Kontrollera även att din fil har samma format som exempelfilen som du kan ladda ner via länken ovan."
+  :parsing-success-rows ["Uppladdningen av din fil lyckades. Det hittades " :count " företag i filen."]}
 
  ;; Action buttons
  :buttons
