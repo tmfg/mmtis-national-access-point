@@ -254,7 +254,7 @@ SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
     ORDER BY s.validate ASC;
 
 -- name: fetch-service-company-csv-for-admin
-SELECT ts.published,
+SELECT ts.published, ts.name as "service-name",
        c.id, c."transport-service-id", c."file-key", c."csv-file-name", c.created, c."validation-warning", c."failed-companies-count", c."valid-companies-count"
   FROM
        "transport_service_company_csv" c,
