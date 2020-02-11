@@ -417,7 +417,7 @@
   (process-event [_ app]
     (-> app
       (assoc-in [:admin :company-csv :validation-warning] nil)
-      (assoc-in [:admin :company-csv :open-validation-warning?] true)))
+      (assoc-in [:admin :company-csv :open-validation-warning?] false)))
 
   DeleteTransportService
   (process-event [{id :id} app]
