@@ -45,7 +45,8 @@
                 [ui/table-header-column {:class "table-header-wrap" :style {:width "11%"}} "Ladattu"]]]
               [ui/table-body {:display-row-checkbox false}
                (doall
-                 (for [{:keys [id service-name file-key csv-file-name validation-warning created failed-companies-count valid-companies-count] :as r} csv-files]
+                 (for [{:keys [id service-name file-key csv-file-name validation-warning created failed-companies-count valid-companies-count] :as r} csv-files
+                       :let [warning (cljs.reader/read-string validation-warning)]]
                    ^{:key id}
                    [ui/table-row {:selectable false}
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "20%"})
@@ -55,11 +56,11 @@
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "20%"})
                      (linkify (str "transport-service/company-csv/" file-key) csv-file-name {:target "_blank"})]
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "15%"})
-                     (when validation-warning
-                       (.log js/console "warning-text 1" (:corrupted-headers warning-text))
-                       (.log js/console "warning-text 2" warning-text)
-                       [:button {:on-click #(e! (admin/->OpenValidationWarningModal validation-warning))}
-                        "Tiedostossa vaarallisia merkkejä."])]
+                     (when (or (:corrupted-headers warning) (:corrupted-data warning))
+                       [ote.ui.buttons/open-dialog-row
+
+                        {:on-click #(e! (admin/->OpenValidationWarningModal validation-warning))}
+                        "Tarkista tiedosto!"])]
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "7%"})
                      valid-companies-count]
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "7%"})
@@ -72,16 +73,21 @@
              {:open true
               :actionsContainerStyle style-dialog/dialog-action-container
               :title "Vaarallisia merkkejä löydetty csv tiedostosta"
+              :autoScrollBodyContent true
               :actions [(r/as-element
                           [ui/flat-button
-                           {:label (tr [:buttons :cancel])
+                           {:label (tr [:buttons :close])
                             :primary true
                             :on-click #(do
                                          (.preventDefault %)
                                          (e! (admin/->CloseValidationWarningModal)))}])]}
 
              [:div
-              [:div "Headerissä havaitut haitalliset merkit " (str (:corrupted-headers warning-text))]
-              [:div "Yrityslistauksessa havaitut haitalliset merkit "]
+              [:div [:strong "Headerissä havaitut haitalliset merkit: "]
+               (for [header (:corrupted-headers warning-text)]
+                 ^{:key (str "header-map" (rand-int 9999))}
+                 [:div header])]
+              [:div [:strong "Yrityslistauksessa havaitut haitalliset merkit: "]]
               (for [row-map (:corrupted-data warning-text)]
+                ^{:key (str "row-map" (rand-int 9999))}
                 [:div "Rivi: " (:row row-map) " Virheellinen data: " (:error row-map)])]])]))}))
