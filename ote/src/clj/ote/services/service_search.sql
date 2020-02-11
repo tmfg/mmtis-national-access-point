@@ -21,12 +21,8 @@ SELECT type."sub-type", COALESCE(count.count, 0) AS count
 -- row-fn: :id
 SELECT id FROM "transport-service"
  WHERE published IS NOT NULL
- ORDER BY COALESCE(modified, created) DESC, name ASC
+ ORDER BY published DESC, name ASC
  LIMIT 1000;
-
--- name: search
--- Search for transport services by name, operation area or subtype
-SELECT t.id, t.name, t.type, t."sub-type",
 
 -- name: total-service-count
 -- single?: true
