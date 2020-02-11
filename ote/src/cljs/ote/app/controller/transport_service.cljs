@@ -566,7 +566,11 @@
                       :show-brokering-service-dialog?
                       :show-confirm-save-dialog?
                       :show-confirm-cancel-dialog?
-                      :edit-dialog)
+                      :edit-dialog
+                      :csv-failed-companies-count
+                      :csv-imported?
+                      :csv-valid-companies-count
+                      :csv-valid?)
               (keyword-cc->str-cc)
               (move-service-level-keys-from-form key)
               (assoc ::t-service/transport-operator-id operator-id)
