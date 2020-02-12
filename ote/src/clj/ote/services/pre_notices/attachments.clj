@@ -89,7 +89,7 @@
                        ".jpg" "image/jpeg2jpeg"
                        ".jpeg" "image/jpeg2jpeg"}
           orig-filename (:filename uploaded-file)
-          converted-filename orig-filename ;; we don't convert between formats in our case so keep filename
+          converted-filename orig-filename                  ;; we don't convert between formats in our case so keep filename
           orig-suffix (fn-suffix orig-filename)
           laundry-url (:laundry-url config)
           converted-file (when laundry-url
@@ -104,16 +104,16 @@
                                   (modification/with-modification-timestamp-and-user
                                     {::transit/attachment-file-name converted-filename}
                                     ::transit/id user)))]
-      
+
 
       (s3/put-object bucket (generate-file-key (::transit/id file) orig-filename)
-                     (:tempfile uploaded-file))      
+                     (:tempfile uploaded-file))
       (if (and converted-filename converted-file file2 (> (.length converted-file) 0))
-        (do 
+        (do
           (s3/put-object bucket (generate-file-key (::transit/id file2) converted-filename)
                          converted-file)
           (log/debug "returning converted id to client")
-          (http/transit-response file2))        
+          (http/transit-response file2))
         ;; else
         (do
           (if laundry-url
@@ -135,29 +135,29 @@
         (or (authorization/admin? user)
             (users/is-transit-authority-user? db {:user-id (authorization/user-id user)}))]
     (first
-     (specql/fetch db ::transit/pre-notice-attachment
-                   #{::transit/id ::transit/attachment-file-name}
-                   (op/and
-                    {::transit/id pre-notice-attachment-id}
-                    (when-not can-view-all-attachments?
-                      {::modification/created-by (authorization/user-id user)}))))))
+      (specql/fetch db ::transit/pre-notice-attachment
+                    #{::transit/id ::transit/attachment-file-name}
+                    (op/and
+                      {::transit/id pre-notice-attachment-id}
+                      (when-not can-view-all-attachments?
+                        {::modification/created-by (authorization/user-id user)}))))))
 
 (defn download-attachment [db {bucket :bucket :as config} {user :user :as req}]
   (let [attachment (attachment-info db user (Long/parseLong (get-in req [:params :id])))
         s3-file (when attachment
                   (s3/get-object bucket (generate-file-key
-                                         (::transit/id attachment)
-                                         (::transit/attachment-file-name attachment))))]
+                                          (::transit/id attachment)
+                                          (::transit/attachment-file-name attachment))))]
     (if-not s3-file
       {:status 404
        :body "No such attachment"}
       {:status 200
        :body (ring-io/piped-input-stream
-              (fn [out]
-                (io/copy (:input-stream s3-file) out)))})))
+               (fn [out]
+                 (io/copy (:input-stream s3-file) out)))})))
 
 (defn delete-from-s3 [db {bucket :bucket :as config} attachments]
-  (doseq [{id ::transit/id file-name ::transit/attachment-file-name}  attachments]
+  (doseq [{id ::transit/id file-name ::transit/attachment-file-name} attachments]
     (s3/delete-object bucket (generate-file-key id file-name))))
 
 (defn attachment-routes [db config]
