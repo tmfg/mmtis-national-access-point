@@ -312,6 +312,8 @@
   (log/debug "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db id)
+        package-count (fetch-count-service-packages db {:service-id ts-id})
+        _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count))
         response (load-transit-interface-url interface-type db id url last-import-date
                                              (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
@@ -325,7 +327,7 @@
         (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
           (let [package (specql/insert! db :gtfs/package
                                         {:gtfs/sha256 new-gtfs-hash
-                                         :gtfs/first_package (nil? latest-package)
+                                         :gtfs/first_package (= 0 package-count)
                                          :gtfs/transport-operator-id operator-id
                                          :gtfs/transport-service-id ts-id
                                          :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
