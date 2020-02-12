@@ -174,7 +174,7 @@ Negative return value is an invalid match"
   (let [options (if (and offset limit)
                   {:specql.core/offset offset
                    :specql.core/limit limit
-                   :specql.core/order-by :ote.db.modification/created
+                   :specql.core/order-by ::t-service/published
                    :specql.core/order-direction :desc}
                   {})]
     (specql/fetch db ::t-service/transport-service-search-result
