@@ -312,8 +312,8 @@
   (log/debug "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db id)
-        package-count (fetch-count-service-packages db {:service-id ts-id})
-        _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count))
+        package-count (:package-count (fetch-count-service-packages db {:service-id ts-id}))
+        _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
         response (load-transit-interface-url interface-type db id url last-import-date
                                              (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
