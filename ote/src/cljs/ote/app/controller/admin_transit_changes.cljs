@@ -77,6 +77,22 @@
   {}
   (update-in app [:admin :transit-changes :route-hash-values] merge values))
 
+(define-event ServiceInterfacesResponse [response]
+  {}
+  (assoc-in app [:admin :transit-changes :upload-gtfs :interfaces] response))
+
+(define-event GetServiceInterfaces []
+  {}
+  ;; If user gives service-id we need to fetch interfaces related to that service
+  (comm/get! (str "admin/service-interfaces/" (get-in app [:admin :transit-changes :upload-gtfs :service-id]))
+             {:on-success (tuck/send-async! ->ServiceInterfacesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
+(define-event UpdateInterfaceServiceId [service-id]
+  {}
+  (assoc-in app [:admin :transit-changes :upload-gtfs :service-id] service-id))
+
 (define-event UpdateUploadValues [values]
   {}
   (update-in app [:admin :transit-changes :upload-gtfs] merge values))
@@ -84,7 +100,7 @@
 (define-event ForceDetectTransitChanges []
   {}
   (comm/post! "/transit-changes/force-detect/" nil
-              {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+              {:timeout (* 60000 7)                         ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
                :on-success #(.log js/console %)})
   app)
 
@@ -102,7 +118,7 @@
     ;; When service-id is not given, do not try to start detection
     (when service-id
       (comm/post! (str "transit-changes/force-detect/" service-id) nil
-                  {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+                  {:timeout (* 60000 7)                     ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
                    :on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))
 
@@ -124,7 +140,7 @@
   {}
   (let [service-id (get-in app [:admin :transit-changes :single-download-gtfs-service-id])]
     (comm/post! (str "/transit-changes/force-interface-import/" service-id) nil
-                {:timeout (* 60000 7) ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+                {:timeout (* 60000 7)                       ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
                  :on-success (tuck/send-async! ->ForceInterfaceImportForGivenServiceSuccess)
                  :on-failure (tuck/send-async! ->ForceInterfaceImportForGivenServiceFailure)})
     app))
@@ -154,10 +170,12 @@
   {}
   (let [filename (.-name (first (array-seq (.-files input-html-element))))
         service-id (get-in app [:admin :transit-changes :upload-gtfs :service-id])
+        interface-id (::t-service/id (get-in app [:admin :transit-changes :upload-gtfs :interface-id]))
         date (get-in app [:admin :transit-changes :upload-gtfs :date])]
     (if (re-matches #".*\.(zip)" filename)
       (do
-        (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" date) input-html-element
+        (.log js/console "service-id " (pr-str service-id) "interface-id" (pr-str interface-id))
+        (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" interface-id "/" date) input-html-element
                       {:on-success (tuck/send-async! ->UploadResponse)
                        :on-failure (tuck/send-async! ->ServerError)})
         app)
@@ -238,7 +256,7 @@
 
 (define-event SendPreNoticeFailure [response]
   {}
-  (assoc-in app [:admin :pre-notice  :pre-notice-notify-send] response))
+  (assoc-in app [:admin :pre-notice :pre-notice-notify-send] response))
 
 (define-event SendPreNotices []
   {}
