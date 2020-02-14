@@ -104,3 +104,14 @@ FROM "detected-route-change" c
 WHERE c."transit-change-date" = :date
   AND c."transit-service-id" = :service-id
   AND c."different-week-date" >= CURRENT_DATE;
+
+
+-- name: fetch-gtfs-interface-for-service
+-- Currently only in admin panel gtfs packages can be uploaded to server using a form.
+-- We need to match package with interface so return possible interfaces.
+SELECT i.id, i."transport-service-id", (i."external-interface").url as url, i.format, i."data-content"
+  FROM "external-interface-description" i
+ WHERE ('GTFS' = ANY(i.format))
+   AND 'route-and-schedule' = ANY(i."data-content")
+   AND i."transport-service-id" = :service-id
+ ORDER BY id DESC;

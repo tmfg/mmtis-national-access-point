@@ -244,6 +244,8 @@
                :as req}
           (admin/require-admin-user "/transit-changes/upload-gtfs/:service-id/:date" (:user user))
           (do
-            (transit-changes/upload-gtfs db (Long/parseLong service-id) date req)
-            (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [(Long/parseLong service-id)])
-            (http/transit-response "OK")))))))
+            (let [upload-response (transit-changes/upload-gtfs db (Long/parseLong service-id) date req)
+                  _ (when (= (:status upload-response) 200)
+                      (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [(Long/parseLong service-id)]))]
+              (http/transit-response (:body upload-response) (:status upload-response)))))))))
+

@@ -77,20 +77,25 @@
                                                                   db ::t-service/transport-service
                                                                   #{::t-service/transport-operator-id}
                                                                   {::t-service/id service-id})))
-          interface (first (specql/fetch db ::t-service/external-interface-description
-                                         #{::t-service/id ::t-service/external-interface}
-                                         {::t-service/transport-service-id service-id}))
-          interface-id (::t-service/id interface)
-          interface-url (get-in interface [::t-service/external-interface ::t-service/url])
-          latest-package (import/interface-latest-package db interface-id)
-          package (specql/insert! db :gtfs/package
-                                  {:gtfs/first_package                     (nil? latest-package)
-                                   :gtfs/transport-operator-id             operator-id
-                                   :gtfs/transport-service-id              service-id
-                                   :gtfs/created                           (time/date-string->inst-date date)
-                                   :gtfs/external-interface-description-id interface-id})
-          result (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url)]
-      "OK")
+          interface (first (fetch-gtfs-interface-for-service db {:service-id service-id}))
+          interface-id (:id interface)
+          interface-url (:url interface)
+          latest-package (when interface-id
+                           (import/interface-latest-package db interface-id))
+          package (when latest-package
+                    (specql/insert! db :gtfs/package
+                                    {:gtfs/first_package (nil? latest-package)
+                                     :gtfs/transport-operator-id operator-id
+                                     :gtfs/transport-service-id service-id
+                                     :gtfs/created (time/date-string->inst-date date)
+                                     :gtfs/external-interface-description-id interface-id}))
+          result (when package
+                   (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url))]
+      (if package
+        {:status 200
+         :body   "OK"}
+        {:status 400
+         :body   "Invalid service or interface."}))
     (catch Exception e
       (let [msg (.getMessage e)]
         (log/error "upload-gtfs ERROR" msg)
