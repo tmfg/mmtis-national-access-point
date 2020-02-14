@@ -28,24 +28,24 @@
     {:days-with-traffic #{}
      :day->hash {}}
     (let [days (set/rename-keys
-                (into {}
-                      (map #(let [[day hash] (str/split % #"=")]
-                              [day hash]))
-                      (str/split weekhash #","))
-                (zipmap (map str (range 1 8)) time/week-days))]
+                 (into {}
+                       (map #(let [[day hash] (str/split % #"=")]
+                               [day hash]))
+                       (str/split weekhash #","))
+                 (zipmap (map str (range 1 8)) time/week-days))]
       {:days-with-traffic (into #{}
                                 (comp
-                                 (map (fn [[day traffic]]
-                                        (when-not (str/blank? traffic)
-                                          day)))
-                                 (remove nil?))
+                                  (map (fn [[day traffic]]
+                                         (when-not (str/blank? traffic)
+                                           day)))
+                                  (remove nil?))
                                 (seq days))
        :day->hash days})))
 
 (defn describe-week-difference [difference]
   (assoc difference
-         :current-week-traffic (parse-weekhash (:current-weekhash difference))
-         :different-week-traffic (parse-weekhash (:different-weekhash difference))))
+    :current-week-traffic (parse-weekhash (:current-weekhash difference))
+    :different-week-traffic (parse-weekhash (:different-weekhash difference))))
 
 (defn list-current-changes [db]
   {:finnish-regions (specql/fetch db ::places/finnish-regions #{::places/numero ::places/nimi} {})
@@ -125,8 +125,8 @@
         (list-current-changes db)))
 
   (GET "/transit-changes/hash-calculation/" {user :user :as request}
-       (when (authorization/admin? user)
-         (http/transit-response (detection/hash-recalculations db))))
+    (when (authorization/admin? user)
+      (http/transit-response (detection/hash-recalculations db))))
 
   (DELETE "/transit-changes/hash-calculation" {user :user :as request}
     (when (authorization/admin? user)
@@ -166,8 +166,8 @@
   ;; Calculate route-hash-id for given service-id and package-count
   (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
     (when (authorization/admin? user)
-        (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
-        "OK"))
+      (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
+      "OK"))
 
   ;; Load services and their route-hash-id-type
   (GET "/transit-changes/load-services-with-route-hash-id" req
@@ -176,16 +176,16 @@
 
   ;; Force change detection for all services
   (POST "/transit-changes/force-detect/" req
-        (when (authorization/admin? (:user req))
-          (gtfs-tasks/detect-new-changes-task db (time/now) true)
-          "OK"))
+    (when (authorization/admin? (:user req))
+      (gtfs-tasks/detect-new-changes-task db (time/now) true)
+      "OK"))
 
   ;; Force change detection for single service
   (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
                                                      user :user}
-        (when (authorization/admin? user)
-          (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
-          "OK"))
+    (when (authorization/admin? user)
+      (gtfs-tasks/detect-new-changes-task db (time/now) true [(Long/parseLong service-id)])
+      "OK"))
 
   ;; Force gtfs package download for given service
   (POST "/transit-changes/force-interface-import/:service-id" {{:keys [service-id]} :params

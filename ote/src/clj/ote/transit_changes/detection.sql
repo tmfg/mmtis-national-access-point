@@ -7,12 +7,13 @@ WITH dates AS (
 SELECT x.date AS DATE, string_agg(x.hash,' ' ORDER BY x.eid asc) AS hash, x."route-hash-id" AS "route-hash-id"
 FROM (
        SELECT d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign",
-              COALESCE(rh."route-hash-id", :route-hash-id) as "route-hash-id", p."external-interface-description-id" as eid,
-              string_agg(rh.hash::text, ' ' ORDER BY p."external-interface-description-id" ASC) as hash
+              COALESCE(rh."route-hash-id", :route-hash-id) as "route-hash-id", e.id as eid,
+              string_agg(rh.hash::text, ' ' ORDER BY e.id ASC) as hash
          FROM dates d
               LEFT JOIN "gtfs-date-hash" dh ON (dh.date = d.date AND dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
               -- Join gtfs_package to get external-interface-description-id
               LEFT JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
+              JOIN "external-interface-description" e ON e.id = p."external-interface-description-id"
               LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON rh."route-hash-id" = :route-hash-id
         GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id" , eid
         ORDER BY d.date) x
