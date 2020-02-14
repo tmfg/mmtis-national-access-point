@@ -58,7 +58,7 @@
      [:div {:style {:flex "1"}}
       [icon-l/icon-labeled
        [ote-icons/outline-add-box-gray]
-       [:span added-trips]]])
+       nil]])
 
    (if (and removed-trips (pos? removed-trips))
      [:div {:style {:flex "1"}}
