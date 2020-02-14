@@ -170,13 +170,13 @@
           (upload-attachment db config req))
         (GET "/pre-notice/attachment/:id" req
           (download-attachment db config req))
-        (POST "/transit-changes/upload-gtfs/:service-id/:date"
-              {{:keys [service-id date]} :params
+        (POST "/transit-changes/upload-gtfs/:service-id/:interface-id/:date"
+              {{:keys [service-id interface-id date]} :params
                user :user
                :as req}
           (admin/require-admin-user "/transit-changes/upload-gtfs/:service-id/:date" (:user user))
           (do
-            (let [upload-response (transit-changes/upload-gtfs db (Long/parseLong service-id) date req)
+            (let [upload-response (transit-changes/upload-gtfs db (Long/parseLong service-id) (Long/parseLong interface-id) date req)
                   _ (when (= (:status upload-response) 200)
                       (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [(Long/parseLong service-id)]))]
               (http/transit-response (:body upload-response) (:status upload-response)))))))))

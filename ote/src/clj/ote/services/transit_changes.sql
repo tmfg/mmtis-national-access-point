@@ -111,7 +111,7 @@ WHERE c."transit-change-date" = :date
 -- We need to match package with interface so return possible interfaces.
 SELECT i.id, i."transport-service-id", (i."external-interface").url as url, i.format, i."data-content"
   FROM "external-interface-description" i
- WHERE ('GTFS' = ANY(i.format))
+ WHERE (('GTFS' = ANY(i.format)) OR ('Kalkati.net' = ANY(i.format)))
    AND 'route-and-schedule' = ANY(i."data-content")
-   AND i."transport-service-id" = :service-id
+   AND i."transport-service-id" = :service-id AND i.id = :interface-id
  ORDER BY id DESC;

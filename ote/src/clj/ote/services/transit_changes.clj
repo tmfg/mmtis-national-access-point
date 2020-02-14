@@ -67,7 +67,7 @@
 (defn upload-gtfs
   "Upload gtfs file, parse and calculate date hashes. Set package created column to the date that is given to
   simulate production situation where package is handled at given day."
-  [db service-id date req]
+  [db service-id interface-id date req]
   (try
     (let [uploaded-file (get-in req [:multipart-params "file"])
           _ (assert (and (:filename uploaded-file)
@@ -77,14 +77,13 @@
                                                                   db ::t-service/transport-service
                                                                   #{::t-service/transport-operator-id}
                                                                   {::t-service/id service-id})))
-          interface (first (fetch-gtfs-interface-for-service db {:service-id service-id}))
-          interface-id (:id interface)
+          interface (first (fetch-gtfs-interface-for-service db {:interface-id interface-id
+                                                                 :service-id service-id}))
           interface-url (:url interface)
-          latest-package (when interface-id
-                           (import/interface-latest-package db interface-id))
-          package (when latest-package
+          package-count (:package-count (first (fetch-count-service-packages db {:service-id service-id})))
+          package (when interface-id
                     (specql/insert! db :gtfs/package
-                                    {:gtfs/first_package (nil? latest-package)
+                                    {:gtfs/first_package (= 0 package-count)
                                      :gtfs/transport-operator-id operator-id
                                      :gtfs/transport-service-id service-id
                                      :gtfs/created (time/date-string->inst-date date)
@@ -92,19 +91,28 @@
           result (when package
                    (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url))]
       (if package
-        {:status 200
-         :body   "OK"}
-        {:status 400
-         :body   "Invalid service or interface."}))
-    (catch Exception e
-      (let [msg (.getMessage e)]
-        (log/error "upload-gtfs ERROR" msg)
-        (case msg
-          "Invalid file type"
-          {:status 422
-           :body   "Invalid file type."}
-          {:status 500
-           :body   msg})))))
+        (do
+          ;; Mark interface download a success
+          (specql/insert! db ::t-service/external-interface-download-status
+                          {::t-service/external-interface-description-id interface-id
+                           ::t-service/download-status :success
+                           ::t-service/package-id (:gtfs/id package)
+                           ::t-service/url interface-url
+                           ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+
+      {:status 200
+       :body "OK"})
+    {:status 400
+     :body "Invalid service or interface."}))
+(catch Exception e
+  (let [msg (.getMessage e)]
+    (log/error "upload-gtfs ERROR" msg)
+    (case msg
+      "Invalid file type"
+      {:status 422
+       :body "Invalid file type."}
+      {:status 500
+       :body msg}))) ) )
 
 (defn services-with-route-hash-id [db]
   (fetch-services-with-route-hash-id db))
