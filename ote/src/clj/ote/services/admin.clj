@@ -639,6 +639,11 @@
             (map (juxt :joined-service :service-id :operator :operator-id :operator-business-id :joined-operator :joined-operator-business-id :joined-date :joined-operator-id)
                  (fetch-associated-companies-for-admin db))))
 
+(defn- admin-get-service-interfaces [db service-id]
+  (specql/fetch db ::t-service/external-interface-description
+                (specql/columns ::t-service/external-interface-description)
+                {::t-service/transport-service-id service-id}))
+
 (defn- send-pre-notice-email-response [db config]
   (log/debug "send-pre-notice-email-response")
   (pn/send-pre-notice-emails! db (:email config) (pn/pre-notice-recipient-emails (:pre-notices config)))
@@ -745,6 +750,13 @@
       (http/transit-response
         (admin-delete-transport-service!
           config db user (http/transit-request form-data))))
+
+    (GET "/admin/service-interfaces/:service-id"{{:keys [service-id]}
+                                                                   :params
+                                                                   user :user}
+      (require-admin-user "random url that is not used" (:user user))
+      (http/transit-response
+        (admin-get-service-interfaces db (Long/parseLong service-id))))
 
     (POST "/admin/business-id-report" req (admin-service "business-id-report" req db #'business-id-report))
 

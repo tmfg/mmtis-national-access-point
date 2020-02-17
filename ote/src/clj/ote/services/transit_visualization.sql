@@ -117,6 +117,7 @@ WITH route_stops as (
        JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
        JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
+ GROUP BY stoptime."departure-time", stoptime."arrival-time", stoptime."stop-sequence", stoptime."stop-id", trip."package-id", trip.trip
 )
 SELECT rs."package-id", rs."trip-id", rs."headsign" as headsign,
        array_agg(ROW(rs."stop-sequence",

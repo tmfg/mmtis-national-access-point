@@ -1,25 +1,25 @@
 (ns ote.views.admin.detected-changes
   "Helper methods to help test and configure automatic traffic changes detection"
   (:require [cljs-react-material-ui.reagent :as ui]
-            [ote.app.controller.admin-transit-changes :as admin-transit-changes]
-            [ote.localization :refer [tr tr-key]]
-            [ote.ui.common :refer [linkify]]
-            [cljs-react-material-ui.icons :as ic]
             [reagent.core :as r]
+            [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
+            [ote.localization :refer [tr tr-key]]
+            [cljs-time.core :as t]
+            [ote.time :as time]
+            [ote.db.transport-service :as t-service]
             [ote.style.base :as style-base]
             [ote.style.admin :as style-admin]
-            [cljs-time.core :as t]
-            [ote.ui.form :as form]
-            [ote.ui.tabs :as tabs]
             [ote.style.buttons :as button-styles]
-            [ote.ui.form-fields :as form-fields]
             [ote.ui.buttons :as buttons]
+            [ote.ui.common :refer [linkify]]
             [ote.ui.common :as common]
+            [ote.ui.form :as form]
+            [ote.ui.form-fields :as form-fields]
+            [ote.ui.tabs :as tabs]
             [ote.ui.info :as info]
-            [ote.time :as time]
-            [ote.theme.colors :as colors]
-            [ote.ui.notification :as notification]))
+            [ote.ui.notification :as notification]
+            [ote.app.controller.admin-transit-changes :as admin-transit-changes]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -349,37 +349,58 @@
        "Lataa uusi CSV"]]]]])
 
 (defn upload-gtfs [e! app-state]
-  [:div
-    [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
-    [form/form
-     {:update!   #(e! (admin-transit-changes/->UpdateUploadValues %))}
-     [(form/group
-        {:label   ""
-         :columns 3
-         :layout  :raw
-         :card?   false}
+  (let [service-id (get-in app-state [:admin :transit-changes :upload-gtfs :service-id])
+        interfaces (get-in app-state [:admin :transit-changes :upload-gtfs :interfaces])]
+    [:div.col-xs-12.col-md-6
+     [:h4 "Lataa palvelulle gtfs tiedosto tietylle päivälle"]
 
-        {:name      :service-id
-         :type      :string
-         :label     "Palvelun id"
-         :hint-text "Palvelun id"}
-        {:name      :date
-         :type      :string
-         :label     "Latauspäivä"
-         :hint-text "2018-12-12"}
-        {:name         :attachments
-         :type         :table
-         :add-label    "Ladattava tiedosto"
-         :table-fields [{:name      :attachment-file-name
-                         :type      :string
-                         :disabled? true}
+     [form-fields/field
+      {:name :service-id
+       :type :string
+       :label "Palvelun id"
+       :hint-text "Palvelun id"
+       :update! #(e! (admin-transit-changes/->UpdateInterfaceServiceId %))}
+      service-id]
+     [:button {:on-click #(e! (admin-transit-changes/->GetServiceInterfaces))}
+      "Hae rajapinnat"]
 
-                        {:name               :attachment-file
-                         :button-label       "Lataa"
-                         :type               :file-and-delete
-                         :allowed-file-types [".zip"]
-                         :on-change          #(e! (admin-transit-changes/->UploadAttachment (.-target %)))}]})]
-     (get-in app-state [:admin :transit-changes :upload-gtfs])]])
+     (if interfaces
+       [form/form
+        {:update! #(e! (admin-transit-changes/->UpdateUploadValues %))}
+        [(form/group
+           {:label ""
+            :columns 3
+            :layout :raw
+            :card? false}
+
+           {:name :interface-id
+            :type :selection
+            :label "Valitse palvelun rajapinta"
+            :show-option #(str (get-in % [:ote.db.transport-service/external-interface ::t-service/url]) " :: "
+                               (get-in % [::t-service/format]))
+            :options interfaces
+            :should-update-check form/always-update
+            :full-width? true}
+
+           {:name :date
+            :type :string
+            :label "Latauspäivä"
+            :hint-text "2018-12-12"}
+
+           {:name :attachments
+            :type :table
+            :add-label "Ladattava tiedosto"
+            :table-fields [{:name :attachment-file-name
+                            :type :string
+                            :disabled? true}
+
+                           {:name :attachment-file
+                            :button-label "Lataa"
+                            :type :file-and-delete
+                            :allowed-file-types [".zip"]
+                            :on-change #(e! (admin-transit-changes/->UploadAttachment (.-target %)))}]})]
+        (get-in app-state [:admin :transit-changes :upload-gtfs])]
+       [:div "Anna sellaisen palvelun id, jolla on rajapintoja"])]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class

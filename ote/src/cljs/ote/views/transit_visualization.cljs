@@ -680,7 +680,7 @@
       (doall
         (for [p latests-packages]
           ^{:key (str "latest-package-id-" (:id p))}
-          [pkg p false]))]
+          [pkg p true]))]
      (when (seq previous-packages)
        [:div
         [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
