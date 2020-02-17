@@ -197,13 +197,14 @@
                           {:disabled true}))
        [ic/action-delete]])))
 
-(defmethod field :file [{:keys [label button-label name disabled? on-change error warning] :as field} data]
+(defmethod field :file [{:keys [label button-label name disabled? on-change error warning in-validation?] :as field} data]
   [:div (stylefy/use-style style-form-fields/file-button-wrapper)
-   [:button (merge
-              (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
-              (when disabled?
-                {:disabled true}))
-    (if-not (empty? label) label button-label)]
+   (when-not in-validation?
+     [:button (merge
+                (stylefy/use-sub-style style-form-fields/file-button-wrapper :button)
+                (when disabled?
+                  {:disabled true}))
+      (if-not (empty? label) label button-label)])
    [:input
     (merge (stylefy/use-sub-style
              style-form-fields/file-button-wrapper :file-input)
@@ -218,7 +219,7 @@
             ;; Hack to hide file input tooltip on different browsers.
             ;; String with space -> hide title on Chrome, FireFox and some other browsers. Not 100% reliable.
             :title " "}
-           (when disabled?
+           (when (or disabled? in-validation?)
              {:disabled true}))]
    (when (or error (string? warning))
      [:div (stylefy/use-style style-base/required-element)
@@ -1174,7 +1175,7 @@
     (ote.ui.common/linkify "/ote/csv/palveluyritykset.csv"  (tr [:form-help :csv-file-example]) {:target "_blank"})]])
 
 
-(defn company-csv-url-input [update! on-url-given companies-csv-url {data :csv-count}]
+(defn company-csv-url-input [update! on-url-given companies-csv-url {data :csv-count} in-validation?]
   [:div
    [:div.row (stylefy/use-style style-base/divider)]
    [:div.row
@@ -1187,7 +1188,8 @@
              :on-blur         on-url-given
              :update!         #(update! {::t-service/companies-csv-url %})
              :container-class "col-xs-12 col-sm-6 col-md-6"
-             :type            :string}
+             :type            :string
+             :disabled in-validation?}
       companies-csv-url]]]
 
    (let [success? (= :success (:status data))
@@ -1203,43 +1205,66 @@
                                    (tr [:csv (get-in data [:csv-count :error])])]
          :else [:span])))])
 
-(defn company-csv-file-input [on-file-selected data]
+(defn company-csv-file-input [on-file-selected on-file-delete data in-validation?]
   [:div
    [:div.row (stylefy/use-style style-base/divider)]
    [:div.row
     (csv-help-text)
-    [:div.row {:style {:padding-top "20px"}}
-     [field {:name      ::t-service/csv-file
-             :type      :file
-             :label     (if (get data ::t-service/company-csv-filename)
-                          (tr [:buttons :update-csv])
-                          (tr [:buttons :upload-csv]))
-             :accept    ".csv"
-             :on-change on-file-selected}]]
+    (when-not in-validation?
+      [:div.row {:style {:padding-top "20px"}}
+       [field {:name ::t-service/csv-file
+               :type :file
+               :label (if (get data ::t-service/company-csv-filename)
+                        (tr [:buttons :update-csv])
+                        (tr [:buttons :upload-csv]))
+               :accept ".csv"
+               :on-change on-file-selected}]])
     (when (get data ::t-service/company-csv-filename)
-      [:div.row {:style {:padding-top "20px"}} (get data ::t-service/company-csv-filename)])
+      [:div.row {:style {:padding-top "20px"}}
+       ;; File link is shown only if the csv is valid (all rows are correct)
+       (if (and
+             (get data :db-file-key)
+             (:csv-valid? data)
+             (not in-validation?))
+         [:div
+          (common/linkify (str "transport-service/company-csv/" (get data :db-file-key)) (get data ::t-service/company-csv-filename) {:target "_blank"})
+          [ui/icon-button {:on-click on-file-delete
+                           :style {:width "24px"
+                                   :height "24px"
+                                   :position "relative"
+                                   :padding 0
+                                   :left "15px"
+                                   :top "7px"}
+                           :icon-style {:width "24px"
+                                        :height "24px"}}
+           [ic/action-delete {:style {:width "24px" :height "24px"}}]]]
+
+         (get data ::t-service/company-csv-filename))])
     [:div.row {:style {:padding-top "20px"}}
      (let [imported? (:csv-imported? data)
            valid? (:csv-valid? data)]
        (when-not (nil? imported?)
          (cond
-           (and imported? valid?) [:span {:style {:color "green"}} (tr [:csv :parsing-success]
-                                                                       {:count (count (get data ::t-service/companies))})]
+           (and imported? valid?) [:span {:style {:color "green"}} (tr [:companies-csv :parsing-success-rows]
+                                                                       {:count (count (::t-service/companies data))})]
            (and imported? (not valid?)) [:span {:style {:color "red"}} (tr [:companies-csv :invalid])]
+
            (not imported?) [:span {:style {:color "red"}} (tr [:csv :csv-parse-failed])])))]]])
 
-(defn company-input-fields [update! companies data]
+(defn company-input-fields [update! companies data in-validation?]
   (let [table-fields [{:name ::t-service/name
                        :type :string
                        :label (tr [:field-labels :transport-service-common ::t-service/company-name])
-                       :required? true}
+                       :required? true
+                       :disabled in-validation?}
 
                       {:name ::t-service/business-id
                        :type :string
                        :label (tr [:field-labels :transport-service-common ::t-service/business-id])
                        :validate [[:business-id]]
                        :required? true
-                       :regex #"\d{0,7}(-\d?)?"}]
+                       :regex #"\d{0,7}(-\d?)?"
+                       :disabled in-validation?}]
         error-data (validation/validate-table companies table-fields)]
     [:div.row
      [:div.row (stylefy/use-style style-base/divider)]
@@ -1256,7 +1281,7 @@
               :error-data error-data}
        companies]]]))
 
-(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-url-given disabled?] :as opts}
+(defmethod field :company-source [{:keys [update! enabled-label on-file-selected on-file-delete on-url-given disabled? in-validation?] :as opts}
                                   {::t-service/keys [company-source companies companies-csv-url passenger-transportation] :as data}]
   (let [select-type #(update! (merge {::t-service/company-source %}
                                      ;; Remove csv file processing statuses if switching away from file import views
@@ -1272,39 +1297,39 @@
      [:div.row
       [:h3 (tr [:passenger-transportation-page :header-select-company-list-type])]]
      [:div.row
-      [ui/radio-button-group {:name           (str "brokerage-companies-selection")
+      [ui/radio-button-group {:name (str "brokerage-companies-selection")
                               :value-selected selected-type}
        [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-no-companies])
                                 :id "radio-company-none"
                                 :value "none"
                                 :on-click #(select-type :none)}
-                               (when disabled?
+                               (when (or disabled? in-validation?)
                                  {:disabled true}))]
        [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-url-companies])
                                 :id "radio-company-csv-url"
                                 :value "csv-url"
                                 :on-click #(select-type :csv-url)}
-                               (when disabled?
+                               (when (or disabled? in-validation?)
                                  {:disabled true}))]
        [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-csv-companies])
                                 :id "radio-company-csv-file"
                                 :value "csv-file"
                                 :on-click #(select-type :csv-file)}
-                               (when disabled?
+                               (when (or disabled? in-validation?)
                                  {:disabled true}))]
        [ui/radio-button (merge {:label (tr [:passenger-transportation-page :radio-button-form-companies])
                                 :value "form"
                                 :id "radio-company-form"
                                 :on-click #(select-type :form)}
-                               (when disabled?
+                               (when (or disabled? in-validation?)
                                  {:disabled true}))]]
 
       (when-not (nil? data)
         (case company-source
           :none [:div.row " "]
-          :csv-url [company-csv-url-input update! on-url-given companies-csv-url data]
-          :csv-file [company-csv-file-input on-file-selected data]
-          :form [company-input-fields update! companies data]
+          :csv-url [company-csv-url-input update! on-url-given companies-csv-url data in-validation?]
+          :csv-file [company-csv-file-input on-file-selected on-file-delete data in-validation?]
+          :form [company-input-fields update! companies data in-validation?]
           ;; default
           ""))]]))
 

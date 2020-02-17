@@ -16,7 +16,7 @@
     (assoc this ::stop-published-routes
            [(or (some->> (pre-notices-attachments/attachment-routes db config)
                          (http/publish! http)) :not-published)
-            (http/publish! http (pre-notices-operator/operator-pre-notices-routes db config))
+            (http/publish! http (pre-notices-operator/operator-pre-notices-routes db (:pre-notices config)))
             (http/publish! http (pre-notices-authority/authority-pre-notices-routes db))]))
 
   (stop [{stop-published-routes ::stop-published-routes :as this}]

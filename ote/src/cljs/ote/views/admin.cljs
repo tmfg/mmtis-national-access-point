@@ -22,7 +22,8 @@
             [ote.views.admin.service-list :as service-list]
             [ote.views.admin.validate-service :as validate-view]
             [ote.views.admin.sea-routes :as sea-routes]
-            [ote.views.admin.netex :as netex]))
+            [ote.views.admin.netex :as netex]
+            [ote.views.admin.company-csv :as companycsv]))
 
 (def id-filter-type [:operators :services :ALL])
 
@@ -317,6 +318,7 @@
               {:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
+              {:label "Yritys csv:t" :value "companycsv"}
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}
@@ -348,6 +350,8 @@
          [service-list/service-list-page-controls e! app])
        (when (= "businessid" selected-tab)
          [business-id-page-controls e! app])
+       (when (= "companycsv" selected-tab)
+         [companycsv/page-controls e! app])
        (when (= "operators" selected-tab)
          [operator-page-controls e! app])
        (when (= "sea-routes" selected-tab)
@@ -360,6 +364,7 @@
         "users" [users/user-listing e! app]
         "services" [service-list/service-listing e! app]
         "businessid" [business-id-report e! app]
+        "companycsv" [companycsv/company-csv-list e! app]
         "operators" [operator-list e! app]
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
