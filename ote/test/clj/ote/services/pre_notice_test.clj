@@ -11,7 +11,7 @@
 (t/use-fixtures :each
                 (system-fixture
                   :pre-notices (component/using (pre-notices/->PreNotices
-                                                  (:pre-notices (read-string (slurp "config.edn")))) [:http :db])))
+                                                  (read-string (slurp "config.edn"))) [:http :db])))
 
 (defn- notice-count [notice-list type]
   (count (filter (fn [x]

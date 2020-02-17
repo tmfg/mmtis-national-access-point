@@ -54,3 +54,10 @@
   "Encrypt raw password. Returns buddy formatted password hash."
   [password]
   (hashers/derive password {:alg :pbkdf2+sha512}))
+
+(defn random-string
+  "Do not use for long things. Password and similar will work ok."
+  [n]
+  (let [chars (map char (concat (range 48 57) (range 65 90) (range 97 122)))
+        password (take n (repeatedly #(rand-nth chars)))]
+    (reduce str password)))

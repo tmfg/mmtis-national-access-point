@@ -24,6 +24,31 @@
                   url)
                #" " "%20"))
 
+(defn validate-company-csv-file
+  "Return map of validation data. Create warning message if illegal chars are used. We can be sure that
+  company csv cannot contain other chars than [a-ö, A-Ö, 0-9, '.' ',', '-', ' ', '\"', '.']"
+  [data]
+  (let [header-match #"[^a-öA-Ö-\",\. ]+"
+        row-match #"[^a-öA-Ö0-9-\",\. ]+"
+        headers (first data)
+        corrupted-headers (keep #(re-find header-match %) headers)
+        data-rows (rest data)
+        corrupted-data (keep-indexed
+                         (fn [index row]
+                           (let [result (re-find
+                                          row-match
+                                          (str/join row))]
+                             (when result
+                               {:row (inc index)            ;; add one because headers are skipped and row number would be off by 1
+                                :error result})))  ;; Join vector to string
+                         data-rows)]
+    (when (or corrupted-headers corrupted-data))
+    (merge {}
+           (when (not (empty? corrupted-headers))
+             {:corrupted-headers corrupted-headers})
+           (when (not (empty? corrupted-data))
+             {:corrupted-data corrupted-data}))))
+
 (defn parse-response->csv
   "Convert given vector to map where map key is given in the first line of csv file."
   [csv-data]
@@ -35,9 +60,16 @@
                                {::t-service/business-id business-id
                                 ::t-service/name name}))
                             (rest csv-data)))
-        validated-data (filter #(and (csv-util/valid-business-id? (::t-service/business-id %)) (not (empty? (::t-service/name %)))) parsed-data)]
+        validated-data (filter
+                         #(and
+                            (csv-util/valid-business-id? (::t-service/business-id %))
+                            (not (empty? (::t-service/name %))))
+                         parsed-data)
+        failed-count (if valid-header?
+                       (- (count parsed-data) (count validated-data))
+                       (count (rest csv-data)))]
     {:result validated-data
-     :failed-count (- (count parsed-data) (count validated-data))}))
+     :failed-count failed-count}))
 
 (defn save-companies
   "Save business-ids, company names to db"
@@ -45,7 +77,7 @@
    (let [data (modification/with-modification-fields data ::t-service/id)]
     (specql/upsert! db ::t-service/service-company data)))
 
-(defn- read-csv
+(defn read-csv
   "Read CSV from input stream. Guesses the separator from the first line."
   [input]
   (let [separator (csv-util/csv-separator input)]

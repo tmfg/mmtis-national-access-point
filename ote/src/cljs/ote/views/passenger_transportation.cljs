@@ -211,13 +211,14 @@
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
   (let [validate (::t-service/validate form-data)
         service-id (::t-service/id service)
+        db-file-key (:db-file-key form-data)
         admin-validating-id (get-in app [:admin :in-validation :validating])
         in-validation? (ts-controller/in-readonly? validate admin-validating-id service-id)
         form-groups
              [(ts-common/transport-type (::t-service/sub-type service) in-validation?)
               (ts-common/name-group (tr [:passenger-transportation-page :header-service-info]) in-validation?)
               (ts-common/contact-info-group in-validation?)
-              (ts-common/companies-group e! in-validation?)
+              (ts-common/companies-group e! in-validation? service-id db-file-key)
               (ts-common/brokerage-group e! in-validation?)
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation in-validation?)
               (ts-common/external-interfaces e!
