@@ -130,7 +130,7 @@
                                                    ::t-service/transport-service-id test-service-id}))
         store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" interface-id
                                         my-intercept-fn)
-        current-start-date (time/days-from (time/beginning-of-week now) -7) ;; oli -7
+        current-start-date (time/days-from (time/beginning-of-week now) -7)
         route-query-params {:service-id test-service-id
                             :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day
                             :end-date (joda-datetime->inst (time/days-from now 30))
