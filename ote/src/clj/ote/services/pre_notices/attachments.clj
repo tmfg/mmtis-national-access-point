@@ -38,12 +38,14 @@
   (str id "_" filename))
 
 (defn validate-file-type [{:keys [tempfile filename]} allowed-mime-types]
-  (let [path (.toPath tempfile)
+  (let [_ (println "validate-file-type :: (.toPath tempfile)" (pr-str (.toPath tempfile)))
+        path (.toPath tempfile)
         ;; In Mac os x mime types are not handled very well in java 1.8. So we try to probeContentType and if
         ;; it fails then we try to guessContentTypeFromName
         content-mime (or (Files/probeContentType path)
                          (URLConnection/guessContentTypeFromName filename)
-                         (contentTypeFromFilename filename))]
+                         (contentTypeFromFilename filename))
+        _ (println "validate-file-type :: content-mime" (pr-str content-mime))]
 
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
@@ -231,13 +233,16 @@
       (routes
         (POST "/pre-notice/upload" req
           (upload-attachment db (:pre-notices config) req))
+
         (GET "/pre-notice/attachment/:id" req
           (download-attachment db (:pre-notices config) req))
+
         (POST "/transport-service/upload-company-csv/:service-id/:db-file-key" {{:keys [service-id db-file-key]} :params
                                                                                 user :user :as req}
           (let [service-id (when (and service-id (> (Long/parseLong service-id) 0)) (Long/parseLong service-id))
                 db-file-key (when (not= "x" db-file-key) db-file-key)]
             (upload-transport-service-csv db (:csv config) service-id db-file-key req)))
+
         (POST "/transit-changes/upload-gtfs/:service-id/:interface-id/:date"
               {{:keys [service-id interface-id date]} :params
                user :user

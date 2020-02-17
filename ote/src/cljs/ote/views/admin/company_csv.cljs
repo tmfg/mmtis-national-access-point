@@ -36,7 +36,8 @@
                                 :display-select-all false}
 
                [ui/table-row
-                [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Palvelu"]
+                [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Palvelun id"]
+                [ui/table-header-column {:class "table-header-wrap" :style {:width "15%"}} "Palvelu"]
                 [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "S3 tiedostoavain"]
                 [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Tiedoston nimi"]
                 [ui/table-header-column {:class "table-header-wrap" :style {:width "15%"}} "Validointivaroitukset"]
@@ -45,11 +46,13 @@
                 [ui/table-header-column {:class "table-header-wrap" :style {:width "11%"}} "Ladattu"]]]
               [ui/table-body {:display-row-checkbox false}
                (doall
-                 (for [{:keys [id service-name file-key csv-file-name validation-warning created failed-companies-count valid-companies-count] :as r} csv-files
+                 (for [{:keys [id transport-service-id service-name file-key csv-file-name validation-warning created failed-companies-count valid-companies-count] :as r} csv-files
                        :let [warning (cljs.reader/read-string validation-warning)]]
                    ^{:key id}
                    [ui/table-row {:selectable false}
-                    [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "20%"})
+                    [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "5%"})
+                     transport-service-id]
+                    [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "15%"})
                      service-name]
                     [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "20%"})
                      file-key]

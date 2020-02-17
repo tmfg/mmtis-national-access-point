@@ -112,7 +112,6 @@
     :csv-imported?
     :csv-valid?
     :csv-failed-companies-count
-    :csv-valid-companies-count
     ::t-service/transport-type})
 
 (defrecord AddPriceClassRow [])
@@ -494,7 +493,7 @@
 
   AddImportedCompaniesToService
   (process-event [{transport-service-id :transport-service-id db-file-key :db-file-key file-input :file-input} app]
-    ;; Send csv file to back end to be parsed
+    ;; Send csv file to server to parse its content
     (let [url (str "transport-service/upload-company-csv/" (or transport-service-id 0) "/" (or db-file-key "x"))]
       (comm/upload! url file-input
                     {:on-success (tuck/send-async! ->UploadCSVResponse)
