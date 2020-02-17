@@ -26,7 +26,7 @@
            (java.net URLConnection)))
 
 (def pre-notice-allowed-mime-types #{"application/pdf" "image/jpeg" "image/png"})
-(def service-allowed-mime-types #{"csv"})
+(def service-allowed-mime-types #{"csv" "text/csv" "text/plain"}) ;; add text/plain because different java versions tend to get different mime types for csv's
 
 (defn- contentTypeFromFilename
   "This is not reliable but it is used in csv case. probeContentType and guessContentTypeFromName fn
