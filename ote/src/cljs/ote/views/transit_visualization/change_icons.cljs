@@ -107,7 +107,6 @@
 
 (defn- show-added-trips [diff with-labels?]
   [:div {:style {:flex "1"}}
-   (.log js/console "change-icons :: show-added-trips :: diff " (pr-str diff))
    [icon-l/icon-labeled
     [ote-icons/outline-add-box {:color (if (= zero? (:added-trips diff))
                                          colors/icon-disabled
