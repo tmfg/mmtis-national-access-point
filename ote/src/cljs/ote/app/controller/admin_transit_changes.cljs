@@ -174,7 +174,6 @@
         date (get-in app [:admin :transit-changes :upload-gtfs :date])]
     (if (re-matches #".*\.(zip)" filename)
       (do
-        (.log js/console "service-id " (pr-str service-id) "interface-id" (pr-str interface-id))
         (comm/upload! (str "transit-changes/upload-gtfs/" service-id "/" interface-id "/" date) input-html-element
                       {:on-success (tuck/send-async! ->UploadResponse)
                        :on-failure (tuck/send-async! ->ServerError)})
