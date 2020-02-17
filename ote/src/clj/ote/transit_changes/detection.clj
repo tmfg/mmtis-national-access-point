@@ -649,14 +649,15 @@
         ;; When traffic is ending there isn't traffic at date2-trips vector. So calculate only ending trips.
         removed-trip-count (if (and (nil? combined-trips) (pos-int? (count date1-trips)))
                              (count date1-trips)
-                             0)]
+                             0)
+        trip-changes (map (fn [[l r]]
+                            (transit-changes/trip-stop-differences l r))
+                          changed)]
     {:starting-week-date starting-week-date
      :different-week-date different-week-date
      :added-trips (if combined-trips (count added) added-trip-count)
      :removed-trips (if combined-trips (count removed) removed-trip-count)
-     :trip-changes (map (fn [[l r]]
-                          (transit-changes/trip-stop-differences l r))
-                        changed)}))
+     :trip-changes trip-changes}))
 
 (defn compare-route-days [db service-id route-hash-id
                           {:keys [starting-week starting-week-hash

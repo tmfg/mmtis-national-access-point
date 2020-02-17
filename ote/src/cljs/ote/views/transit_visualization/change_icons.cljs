@@ -1,4 +1,4 @@
-(ns ote.views.transit-visualization.change_icons
+(ns ote.views.transit-visualization.change-icons
   "Icons related to transit visualization."
   (:require [clojure.string :as str]
             [cljs-react-material-ui.icons :as ic]
@@ -107,11 +107,12 @@
 
 (defn- show-added-trips [diff with-labels?]
   [:div {:style {:flex "1"}}
+   (.log js/console "change-icons :: show-added-trips :: diff " (pr-str diff))
    [icon-l/icon-labeled
     [ote-icons/outline-add-box {:color (if (= zero? (:added-trips diff))
                                          colors/icon-disabled
                                          colors/add-color)}]
-    [:span (or (:added-trips diff)
+    [:span (or (:added-trips diff) (:gtfs/added-trips diff)
                0)
      (when with-labels? " lisättyä vuoroa")]]])
 
@@ -121,7 +122,7 @@
     [ote-icons/outline-indeterminate-checkbox {:color (if (= zero? (:removed-trips diff))
                                                         colors/icon-disabled
                                                         colors/remove-color)}]
-    [:span (or (:removed-trips diff)
+    [:span (or (:removed-trips diff) (:gtfs/removed-trips diff)
                0)
      (when with-labels? " poistettua vuoroa")]]])
 
