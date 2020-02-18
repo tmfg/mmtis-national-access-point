@@ -277,7 +277,7 @@
      :email (:user_email new-member)}))
 
 (defn invite-new-user [email-config db requester operator user-email authority?]
-  (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 1))
+  (let [expiration-date (time/sql-date (.plusDays (java.time.LocalDate/now) 62)) ;; Expiration date increased from 1 to 62 to allow users to join even if invite is send on their summer holiday
         token (UUID/randomUUID)
         inserted-token (specql/insert! db ::user/user-token
                                        {::user/user-email user-email
