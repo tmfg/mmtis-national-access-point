@@ -1,4 +1,4 @@
-(ns ote.views.transport-service-common
+(ns ote.views.transport-service.transport-service-common
   "View parts that are common to all transport service forms."
   (:require [clojure.string :as str]
             [tuck.core :as tuck]

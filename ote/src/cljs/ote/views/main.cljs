@@ -11,7 +11,8 @@
             [ote.app.controller.front-page :as fp-controller]
             [ote.views.transport-operator :as to]
             [ote.views.front-page :as fp]
-            [ote.views.transport-service :as t-service]
+            [ote.views.transport-service.transport-service :as t-service]
+            [ote.views.transport-service.service-type :as service-type]
             [ote.views.footer :as footer]
             [ote.views.theme :refer [theme]]
             [ote.views.service-search :as service-search]
@@ -110,7 +111,7 @@
                     :user-edit [user-edit/edit-user e! app]
                     :front-page [fp/front-page e! app]
                     :own-services [os/own-services e! app]
-                    :transport-service [t-service/select-service-type e! app]
+                    :transport-service [service-type/select-service-type e! app]
                     :transport-operator [to/operator e! app]
                     :operator-users [ou/manage-access e! app]
                     ;; Routes for the service form, one for editing an existing one by id

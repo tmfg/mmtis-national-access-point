@@ -1,11 +1,11 @@
- (ns ote.views.passenger-transportation
+ (ns ote.views.transport-service.passenger-transportation
   "Required datas for passenger transportation provider"
    (:require [ote.db.transport-service :as t-service]
              [ote.localization :refer [tr tr-key]]
              [ote.util.values :as values]
              [ote.ui.form :as form]
              [ote.app.controller.transport-service :as ts-controller]
-             [ote.views.transport-service-common :as ts-common])
+             [ote.views.transport-service.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn transportation-form-options [e! schemas in-validation? app]
