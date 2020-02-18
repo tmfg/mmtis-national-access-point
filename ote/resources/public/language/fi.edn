@@ -229,7 +229,6 @@
    :ote.db.transport-service/available-from-nil "Heti"
    :ote.db.transport-service/available-to-nil "Toistaiseksi"}
 
-
   ;; Common fields
   :ote.db.common/street "Katuosoite"
   :ote.db.common/post_office "Postitoimipaikka"
@@ -740,7 +739,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   }
 
  :passenger-transportation-page
- {:header-new-passenger-transportation "Lisää uusi henkilöiden kuljetuspalvelu"
+ {:header-new-passenger-transportation "Henkilöiden kuljetuspalvelun lisääminen"
   :header-edit-passenger-transportation "Muokkaa henkilöiden kuljetuspalvelua"
   :header-service-info "Palvelun perustiedot"
   :header-restrictions "Matkatavaroita koskevat rajoitukset"
@@ -761,7 +760,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :rentals-page
  {:header-edit-rentals "Muokkaa vuokraukseen liittyvät tiedot"
-  :header-new-rentals "Lisää ajoneuvojen vuokrauspalveluihin tai kaupallisiin yhteiskäyttöpalveluihin liittyvät tiedot"
+  :header-new-rentals "Vuokrauspalvelun lisääminen"
   :header-service-info "Palvelun perustiedot"
   :header-rental-service "Täydennä vuokraukseen liittyvät tiedot."
   :header-usage-area "Maarajoitukset"
@@ -776,7 +775,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :terminal-page
  {:header-service-info "Palvelun perustiedot"
   :header-contact-details "Palvelun yhteystiedot"
-  :header-new-terminal "Lisää satamaan, asemaan tai terminaaliin liittyvän palvelun tiedot"
+  :header-new-terminal "Sataman, aseman tai terminaalin lisääminen"
   :header-edit-terminal "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
   :header-assistance "Avustuspalveluiden tiedot"
   :header-accessibility "Palvelun saavutettavuus ja esteettömyys"
@@ -784,7 +783,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
 
  :parking-page
- {:header-new-parking "Lisää yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+ {:header-new-parking "Pysäköintipalvelun lisääminen"
   :header-edit-parking "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
   :header-service-info "Palvelun perustiedot"
   :header-contact-details "Palvelun yhteystiedot"
@@ -799,7 +798,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :transport-services-common-page
  {:validation-modal-header "Tietoa julkaisuprosessista"
-  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."}
+  :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
+  :title-transport-operator "Palveluntuottaja"
+  :service-sub-type "Liikkumispalvelun tyyppi"
+  :edit-service-header "Muokkaa palvelua"
+  :service "Palvelu"}
 
  :route-list-page
  {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"

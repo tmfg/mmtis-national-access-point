@@ -798,7 +798,11 @@
 
  :transport-services-common-page
  {:validation-modal-header "Information om publiceringsprocessen"
-  :validation-modal-text "Tjänsteproducenten är själv ansvarig för uppgifterna som publicerats i tjänsten. Uppgifterna flyttas till publiceringskön. Efter publiceringen syns uppgifterna i den offentliga tjänstekatalogen NAP."}
+  :validation-modal-text "Tjänsteproducenten är själv ansvarig för uppgifterna som publicerats i tjänsten. Uppgifterna flyttas till publiceringskön. Efter publiceringen syns uppgifterna i den offentliga tjänstekatalogen NAP."
+  :title-transport-operator "Tjänsteproducent"
+  :service-sub-type "Tjänstetyp"
+  :edit-service-header "Redigera tjänsten"
+  :service "Tjänsten"}
 
  :route-list-page
  {:header-route-list "Egna rutt- och tidtabellsuppgifter om sjötrafiken"
