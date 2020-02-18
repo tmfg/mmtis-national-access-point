@@ -1,4 +1,4 @@
-(ns ote.views.parking
+(ns ote.views.transport-service.parking
   "Required data input fields for parking services"
   (:require [reagent.core :as r]
             [ote.db.transport-service :as t-service]
@@ -9,7 +9,7 @@
             [ote.ui.validation :as validation]
             [ote.ui.form :as form]
             [ote.app.controller.transport-service :as ts-controller]
-            [ote.views.transport-service-common :as ts-common]))
+            [ote.views.transport-service.transport-service-common :as ts-common]))
 
 (defn form-options [e! schemas in-validation? app]
   {:name->label (tr-key [:field-labels :parking]

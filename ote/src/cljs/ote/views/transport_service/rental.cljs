@@ -1,4 +1,4 @@
-(ns ote.views.rental
+(ns ote.views.transport-service.rental
   "Vuokrauspalvelujen jatkotietojen lomakenäkymä - Laajentaa perustietonäkymää vain
   Vuokraus- ja yhteiskäyttöpalveluille"
   (:require [reagent.core :as reagent]
@@ -12,7 +12,7 @@
             [ote.ui.buttons :as buttons]
             [ote.app.controller.common :as common-c]
             [ote.app.controller.transport-service :as ts-controller]
-            [ote.views.transport-service-common :as ts-common])
+            [ote.views.transport-service.transport-service-common :as ts-common])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn rental-form-options [e! schemas in-validation? app]

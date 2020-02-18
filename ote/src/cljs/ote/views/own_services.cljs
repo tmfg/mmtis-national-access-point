@@ -25,7 +25,8 @@
             [ote.app.controller.own-services :as os-controller]
             [ote.app.controller.transport-operator :as to-controller]
             [ote.app.controller.transport-service :as ts-controller]
-            [ote.views.transport-service :as transport-service]
+            [ote.views.transport-service.transport-service :as transport-service]
+            [ote.views.transport-service.service-type :as service-type]
             [ote.ui.common :as common]))
 
 (def ic-warning [ic/alert-warning {:style {:color colors/negative-button
@@ -499,6 +500,6 @@
          (if has-services?
            [operator-info-container e! has-services? operator-services state]
            ;; Render service type selection page if no services added
-           [transport-service/select-service-type e! state])]))))
+           [service-type/select-service-type e! state])]))))
 
 

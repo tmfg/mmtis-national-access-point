@@ -1,10 +1,10 @@
-(ns ote.views.terminal
+(ns ote.views.transport-service.terminal
   "Required datas for port, station and terminal service"
   (:require [ote.localization :refer [tr tr-key]]
             [ote.db.transport-service :as t-service]
             [ote.ui.form :as form]
             [ote.app.controller.transport-service :as ts-controller]
-            [ote.views.transport-service-common :as ts-common]
+            [ote.views.transport-service.transport-service-common :as ts-common]
             [ote.style.form :as style-form]))
 
 (defn terminal-form-options [e! schemas in-validation? app]

@@ -1,4 +1,4 @@
-(ns ote.views.transport-service
+(ns ote.views.transport-service.transport-service
   "Transport service related functionality"
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.icons :as ic]
@@ -18,78 +18,10 @@
             [ote.ui.common :as ui-common]
             [ote.app.controller.transport-service :as ts-controller]
             [ote.app.controller.transport-operator :as to]
-            [ote.views.passenger-transportation :as pt]
-            [ote.views.terminal :as terminal]
-            [ote.views.parking :as parking]
-            [ote.views.rental :as rental]))
-
-(def modified-transport-service-types
-  ;; Create order for service type selection dropdown
-  [:taxi
-   :request
-   :schedule
-   :terminal
-   :rentals
-   :parking])
-
-(defn select-service-type [e! {:keys [transport-operator transport-service] :as state}]
-  (let [disabled? (or (nil? (::t-service/sub-type transport-service))
-                      (nil? (::t-operator/id transport-operator)))]
-    [:div.row
-     [:div {:class "col-sx-12 col-md-12"}
-      [:div
-       [:h1 (tr [:select-service-type-page :title-required-data])]]
-      [:div.row
-       [info/info-toggle
-        (tr [:common-texts :instructions])
-        [:span
-         [:p (tr [:select-service-type-page :transport-service-type-selection-help-text])]
-         [:p (tr [:select-service-type-page :transport-service-type-brokerage-help-text])]
-         [:p {:style {:font-style "italic"}}
-          (tr [:select-service-type-page :transport-service-type-selection-help-example])]]
-        {:default-open? false}]]
-
-      [:div.row
-       [:div
-        [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-         [form-fields/field
-
-          {:label (tr [:field-labels :transport-service-type-subtype])
-           :name ::t-service/sub-type
-           :type :selection
-           :update! #(e! (ts-controller/->SelectServiceType %))
-           :show-option (tr-key [:enums ::t-service/sub-type])
-           :options modified-transport-service-types
-           :auto-width? true}
-
-          (::t-service/sub-type transport-service)]]
-
-        [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-         [form-fields/field
-          {:label (tr [:field-labels :select-transport-operator])
-           :name :select-transport-operator
-           :type :selection
-           :update! #(e! (to/->SelectOperator %))
-           :show-option ::t-operator/name
-           :options (mapv :transport-operator (:transport-operators-with-services state))
-           :auto-width? true}
-
-          transport-operator]]]]
-      [:div.row
-       [:div {:class "col-sx-12 col-sm-4 col-md-4"}
-        [ui/raised-button {:id "own-service-next-btn"
-                           :style {:margin-top "20px"}
-                           :label (tr [:buttons :next])
-                           :on-click #(e! (ts-controller/->NavigateToNewService))
-                           :primary true
-                           :disabled disabled?}]]]]]))
-
-(defn edit-service-header-text [service-type]
-  (case service-type
-    :passenger-transportation (tr [:passenger-transportation-page :header-edit-passenger-transportation])
-    :terminal (tr [:terminal-page :header-edit-terminal])
-    :rentals (tr [:rentals-page :header-edit-rentals])
-    :parking (tr [:parking-page :header-edit-parking])))
+            [ote.views.transport-service.passenger-transportation :as pt]
+            [ote.views.transport-service.terminal :as terminal]
+            [ote.views.transport-service.parking :as parking]
+            [ote.views.transport-service.rental :as rental]))
 
 (defn new-service-header-text [service-type]
   (case service-type
@@ -99,8 +31,8 @@
     :parking (tr [:parking-page :header-new-parking])))
 
 (defn- license-info []
-  [:div.container {:style {:padding-top "20px"
-                           :padding-bottom "20px"}}
+  [:div.container {:style {:margin-top "2rem"
+                           :padding-bottom "1.5rem"}}
    (tr [:common-texts :nap-data-license])
    [ui-common/linkify (tr [:common-texts :nap-data-license-url]) (tr [:common-texts :nap-data-license-url-label]) {:target "_blank"}]
    "."])
@@ -121,6 +53,8 @@
     ;; This will prevent page render with "wrong" or "empty" transport-service data
     (when (= (get-in app [:params :id]) (str (get-in app [:transport-service ::t-service/id])))
       (let [sub-service (keyword (str "ote.db.transport-service/" (name (::t-service/type service))))
+            service-type (get-in app [:transport-service ::t-service/type])
+            service-sub-type (get-in app [:transport-service ::t-service/sub-type])
             admin-validating-id (get-in app [:admin :in-validation :validating])
             service-id (get service ::t-service/id)
             in-validation? (get-in service [sub-service ::t-service/validate])
@@ -131,11 +65,12 @@
             show-editing-dialog? (:edit-dialog service)
             service-in-validation-text (if (= :re-validation service-state)
                                          (tr [:passenger-transportation-page :published-service-is-in-validation])
-                                         (tr [:passenger-transportation-page :service-is-in-validation]))]
+                                         (tr [:passenger-transportation-page :service-is-in-validation]))
+            operator-name (get-in app [:transport-operator ::t-operator/name])]
         [:div
          [ui-common/rotate-device-notice]
          [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
-          [:h1 (edit-service-header-text (keyword (::t-service/type service)))]
+          [:h1 (tr [:transport-services-common-page :edit-service-header])]
           (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
             [:div {:style {:margin-bottom "1.5rem"}}
              [:div (stylefy/use-style style-base/notification-container)
@@ -146,15 +81,16 @@
                                          (.preventDefault %)
                                          (e! (ts-controller/->ToggleEditingDialog)))}
               (tr [:buttons :continue-editing])]])
-          ;; Passenger transport service has sub type, and here it is shown to users
-          (when (= :passenger-transportation (keyword (::t-service/type service)))
-            [:p (stylefy/use-style style-form/subheader)
-             (tr [:enums :ote.db.transport-service/sub-type
-                  (get-in app [:transport-service ::t-service/sub-type])])])
-          ;; Show service owner name only for service owners
-          (when (ts-controller/is-service-owner? app)
-            [:h2 {:style {:margin-top "-0.5rem"}}
-             (get-in app [:transport-operator ::t-operator/name])])]
+
+          (when (not (empty? (::t-service/name (sub-service service))))
+            [:h3 (str (tr [:transport-services-common-page :service]) ": " (::t-service/name (sub-service service)))])
+          [:div {:style {:padding-top "1rem"}}
+           [:div [:strong (str (tr [:transport-services-common-page :title-transport-operator]) ": ")] operator-name]
+           ;; Passenger transport service has sub type - show it
+           (when (= :passenger-transportation service-type)
+             [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")]
+              (tr [:enums :ote.db.transport-service/sub-type
+                   service-sub-type])])]]
          ;; Render the form
          [edit-service e! (::t-service/type service) app]
          (when show-editing-dialog?
@@ -184,18 +120,17 @@
   (when (get-in app [:transport-service ::t-service/type])
     (let [service-sub-type (get-in app [:transport-service ::t-service/sub-type])
           service-type (get-in app [:transport-service ::t-service/type])
-          new-header-text (new-service-header-text service-type)]
+          new-header-text (new-service-header-text service-type)
+          operator-name (get-in app [:transport-operator ::t-operator/name])]
 
       [:div
        [ui-common/rotate-device-notice]
        [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
         [:h1 new-header-text]
-        ;; Passenger transport service has sub type, and here it is shown to users
-        (when (= :passenger-transportation service-type)
-          [:p (stylefy/use-style style-form/subheader)
-           (tr [:enums :ote.db.transport-service/sub-type
-                (get-in app [:transport-service ::t-service/sub-type])])])
-
-       [:div.row
-        [:h2 (get-in app [:transport-operator ::t-operator/name])]]]
+        [:div {:style {:padding-top "1rem"}}
+         [:div [:strong (str (tr [:transport-services-common-page :title-transport-operator]) ": ")] operator-name]
+         ;; Passenger transport service has sub type - show it
+         (when (= :passenger-transportation service-type)
+           [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")] (tr [:enums :ote.db.transport-service/sub-type
+                                                                                                    service-sub-type])])]]
        [edit-service e! service-type app]])))
