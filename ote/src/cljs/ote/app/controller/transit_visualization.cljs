@@ -146,16 +146,6 @@
         (dissoc :routes-for-dates-loading?))
     app))
 
-(define-event LoadInfoResponse [info]
-  {:path [:transit-visualization]}
-  (assoc app :operator-name (::t-operator/name info)))
-
-(define-event LoadInfo [operator-id]
-  {:path [:transit-visualization]}
-  (comm/get! (str "transit-visualization/info/" operator-id)
-             {:on-success (tuck/send-async! ->LoadInfoResponse)})
-  app)
-
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
   (assoc app :mode mode))
