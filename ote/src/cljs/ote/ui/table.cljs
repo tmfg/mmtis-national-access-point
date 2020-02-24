@@ -1,5 +1,5 @@
 (ns ote.ui.table
-  "Simple Material UI data table"
+  "Simple Material UI data table and more simple html table"
   (:require [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [ote.ui.common :as common]
@@ -60,7 +60,7 @@
          (map-indexed
            (fn [i {:keys [name width tooltip tooltip-pos tooltip-len]}]
              ;; Note, add i to key if name is not enough, for now avoiding index because it's not optimal for react rendering
-             ^{:key (str table-id "-hdr-col-" name )}
+             ^{:key (str table-id "-hdr-col-" name)}
              [ui/table-header-column {:style
                                       (merge
                                         (when width
@@ -124,3 +124,30 @@
                           :else (str value))]))
                    headers))])
             rows)))]]))
+
+(defn html-table
+  "Headers are a simple vector [text,text,text].
+  Rows are a mapv  [{:on-click xxx :data},{:on-click xxx :data}]"
+  [headers rows]
+  (let [row-index (r/atom 0)]
+    [:table.nap-table
+     [:thead
+      [:tr
+       (doall
+         (for [h headers]
+           ^{:key (str "html-table-header" h)}
+           [:th h]))]]
+     [:tbody
+      (doall
+        (for [row rows
+              :let [data (:data row)
+                    on-click (:on-click row)
+                    _ (swap! row-index inc)
+                    column-inx (r/atom 0)]]
+          ^{:key (str @row-index "-html-table-row" data)}
+          [:tr {:on-click on-click}
+           (doall
+             (for [column data
+                   :let [_ (swap! column-inx inc)]]
+               ^{:key (str @column-inx "-row-column-" column)}
+               [:td column]))]))]]))

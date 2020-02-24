@@ -369,3 +369,52 @@ span.search-card-title {
         padding-top: 1rem;
     }
 }
+
+/* Nap table - Width 100%*/
+.nap-table {
+    width: 100%;
+}
+/* Set header styles*/
+.nap-table > thead > tr > th {
+    text-align: left;
+    padding: 5px 10px 5px 10px;
+    background-color: #e1e1e1;
+    font-weight: bold;
+    font-size: 1.25rem;
+    height: 56px;
+    text-overflow: ellipsis;
+    color: rgb(33, 33, 33);
+    overflow: visible;
+    overflow-wrap: break-word;
+
+}
+/* Set row styles */
+.nap-table > thead > tr {
+    border-bottom: 1px solid #969696;
+}
+.nap-table > tbody > tr {
+    border-bottom: 1px solid #969696;
+}
+
+/* Set row column styles */
+.nap-table > tbody > tr > td {
+    padding: 5px 10px 5px 10px;
+    height: 48px;
+    font-size: 0.85rem;
+    color: rgb(33, 33, 33);
+    overflow: visible;
+    text-overflow: ellipsis;
+    overflow-wrap: break-word;
+}
+/**/
+/* Odd even row colors */
+.nap-table > tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+.nap-table > tbody tr:nth-child(odd) {
+    background-color: #f0f0f0;
+}
+.nap-table > tbody > tr:hover {
+    background-color: #e1e1e1;
+    cursor: pointer;
+}
