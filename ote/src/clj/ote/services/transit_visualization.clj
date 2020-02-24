@@ -130,7 +130,13 @@
            :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
                                                     #{:gtfs/route-hash-id-type}
                                                     {:gtfs/transport-service-id service-id}))
-           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})})))
+           :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})
+           :transit-changes (specql/fetch db :gtfs/transit-changes
+                                          (specql/columns :gtfs/transit-changes)
+                                          {:gtfs/transport-service-id service-id}
+                                          {:specql.core/order-by :gtfs/date
+                                           :specql.core/order-direction :desc
+                                           :specql.core/limit 50})})))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"

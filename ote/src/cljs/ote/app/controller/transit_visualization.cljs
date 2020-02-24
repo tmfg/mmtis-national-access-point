@@ -487,6 +487,7 @@
                  :changes-route-no-change (sorted-route-changes true changes)
                  :changes-route-filtered (sorted-route-changes false changes)
                  :gtfs-package-info (:gtfs-package-info response)
+                 :transit-changes (:transit-changes response)
                  :route-hash-id-type (:route-hash-id-type response)
                  :selected-route route
                  :detection-date detection-date)))))
@@ -601,3 +602,8 @@
   ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
   (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
   (update app :all-route-changes-checkbox not))
+
+(define-event ToggleTransitChangesModal []
+  {:path [:transit-visualization :show-transit-changes-modal?]
+   :app show?}
+  (not show?))
