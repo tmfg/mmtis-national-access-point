@@ -2,27 +2,28 @@
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
-            [ote.ui.icon_labeled :as icon-l]
-            [stylefy.core :as stylefy]
-            [ote.style.transit-changes :as style]
-            [ote.style.base :as style-base]
-            [ote.app.controller.transit-visualization :as tv]
-            [ote.time :as time]
             [cljs-react-material-ui.reagent :as ui]
-            [ote.ui.table :as table]
-            [ote.db.transport-service :as t-service]
-            [ote.localization :refer [tr]]
-            [ote.ui.leaflet :as leaflet]
             [clojure.string :as str]
+            [ote.time :as time]
+            [stylefy.core :as stylefy]
+            [ote.app.routes :as routes]
+            [ote.localization :refer [tr]]
+            [ote.db.transport-service :as t-service]
+            [ote.ui.table :as table]
+            [ote.ui.leaflet :as leaflet]
+            [ote.ui.icon_labeled :as icon-l]
             [ote.ui.page :as page]
             [ote.ui.scroll :as scroll]
             [ote.ui.common :as common]
             [ote.ui.form-fields :as form-fields]
+            [ote.ui.circular_progress :as prog]
+            [ote.style.base :as style-base]
+            [ote.style.transit-changes :as style]
+            [ote.app.controller.transit-visualization :as tv]
             [ote.views.transit-visualization.calendar :as tv-calendar]
             [ote.views.transit-visualization.change-utilities :as tv-utilities]
             [ote.views.transit-visualization.change-icons :as tv-change-icons]
-            [ote.ui.circular_progress :as prog]
-            [ote.app.routes :as routes]))
+            [ote.views.transit-visualization.gtfs-package-info :as gpi]))
 
 (set! *warn-on-infer* true)
 
@@ -76,19 +77,19 @@
           popup-html (str "Pysäkki: " (first (str/split stop-name #"\|\|")))
           ^Function my-layer (aget layer "setOffset")]
       (if stop-name
-      ;; This features is a stop marker
-      (do
-        ;; Add trip-name for every stop marker to find them when the trip whom they belong to is hidden.
-        (aset (aget layer "feature" "properties") "trip-name" trip-name)
-        ;; Add icon for every stop marker
-        (aset (aget layer "options") "icon"
-              (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
-                               :iconSize #js [w h]
-                               :iconAnchor #js [(int (/ w 2)) (int (/ h 2))]}))
-        ;; Add popup
-        (.bindPopup layer popup-html))
-      ;; This feature has no name, it is the route line, apply pixel offset
-      (.call my-layer layer offset)))))
+        ;; This features is a stop marker
+        (do
+          ;; Add trip-name for every stop marker to find them when the trip whom they belong to is hidden.
+          (aset (aget layer "feature" "properties") "trip-name" trip-name)
+          ;; Add icon for every stop marker
+          (aset (aget layer "options") "icon"
+                (js/L.icon #js {:iconUrl (str js/document.location.protocol "//" js/document.location.host "/img/stop_map_marker.svg")
+                                :iconSize #js [w h]
+                                :iconAnchor #js [(int (/ w 2)) (int (/ h 2))]}))
+          ;; Add popup
+          (.bindPopup layer popup-html))
+        ;; This feature has no name, it is the route line, apply pixel offset
+        (.call my-layer layer offset)))))
 
 (defn update-marker-visibility [this show-atom removed-route-layers]
   (let [^js/L.map m (aget this "refs" "leaflet" "leafletElement")
@@ -121,10 +122,10 @@
                                 ""
                                 "hidden"))))
 
-                      (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
-                        (when-not (show routename)
-                          ;; This is a layer for a routeline that should be removed
-                          (swap! removed-route-layers update routename conj layer)))))
+                    (when-let [routename (some-> layer (aget "feature") (aget "properties") (aget "routename"))]
+                      (when-not (show routename)
+                        ;; This is a layer for a routeline that should be removed
+                        (swap! removed-route-layers update routename conj layer)))))
 
     ;; Remove layers that were added to removed-route-layers
     (doseq [[_ layers] @removed-route-layers]
@@ -137,13 +138,13 @@
     [:tr [:th {:width "75%"} "Pysäkki"] [:th {:width "25%"} "Lähtöaika"]]]
    [:tbody
     (map-indexed
-     (fn [i stoptime]
-       (let [[stop time] (str/split stoptime #"@")]
-         ^{:key (str "stop-listing-" i)}
-         [:tr
-          [:td stop]
-          [:td time]]))
-     (str/split stops #"->"))]])
+      (fn [i stoptime]
+        (let [[stop time] (str/split stoptime #"@")]
+          ^{:key (str "stop-listing-" i)}
+          [:tr
+           [:td stop]
+           [:td time]]))
+      (str/split stops #"->"))]])
 
 (defn short-trip-description [{:keys [trip-headsign stops]}]
   (let [stops (mapv #(zipmap [:stop-name :time] (str/split % #"@"))
@@ -292,7 +293,7 @@
                          (and (< 0 route-count) (> 10 route-count)) (* 54 route-count) ; 1 - 10
                          (= 0 route-count) 100
                          :else 500)
-                       "px"); 10+
+                       "px")                                ; 10+
         no-rows-message (if (and
                               (= 0 route-count)
                               (pos-int? no-change-routes-count))
@@ -355,7 +356,7 @@
                     [:span
                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
                      [:div (stylefy/use-style {:color "gray"})
-                      (str  "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
+                      (str "(" (time/format-timestamp->date-for-ui different-week-date) ")")]]))}
        {:name "Muutosten yhteenveto" :width "40%"
         :read identity
         :col-style style-base/table-col-style-wrap
@@ -644,59 +645,7 @@
     [:div
      [selected-route-map e! date->hash hash->color compare]]]])
 
-(defn gtfs-package-info [e! open-sections packages service-id]
-  (let [grouped-packages (group-by :interface-url packages)
-        group-keys (keys grouped-packages)
-        latests-packages (mapv
-                           (fn [k]
-                             (first (get grouped-packages k)))
-                           group-keys)
-        previous-packages (apply concat
-                                 (mapv (fn [k]
-                                         (when-not (empty? (rest (get grouped-packages k)))
-                                           (rest (get grouped-packages k))))
-                                       group-keys))
-        open? (get open-sections :gtfs-package-info false)
-        pkg (fn [{:keys [created min-date max-date interface-url download-status]} show-link?]
-              (when created
-                [:div.gtfs-package (stylefy/use-style (style-base/flex-container "row"))
-                 [:span interface-url " Ladattu NAPiin "
-                  (if show-link?
-                    (common/linkify
-                      (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all/")
-                      (str (time/format-timestamp-for-ui created)))
-                    (str (time/format-timestamp-for-ui created)))] ". "
-                 "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
-                 (case download-status
-                   "success" [:div {:style {:flex "1"}} " "]
-                   "failure" [:div {:title "Aineiston tiedoissa virheitä. Aineistoa ei voitu ladata NAP:iin."
-                                    :style {:flex "1"}} 
-                                    [ic/alert-warning {:style style/gtfs-package-info-icons}]]
-                   nil " "
-                   :default " ")]))]
-    [:div (stylefy/use-style style/infobox)
-     [:div (stylefy/use-style style/infobox-text)
-      [:b "Viimeisin aineisto"]
-      (doall
-        (for [p latests-packages]
-          ^{:key (str "latest-package-id-" (:id p))}
-          [pkg p true]))]
-     (when (seq previous-packages)
-       [:div
-        [common/linkify "#" "Näytä tiedot myös aiemmista aineistoista"
-         {:icon (if open?
-                  [ic/navigation-expand-less]
-                  [ic/navigation-expand-more])
-          :on-click (fn [^SyntheticMouseEvent event]
-                      (.preventDefault event)
-                      (e! (tv/->ToggleSection :gtfs-package-info)))
-          :style style/infobox-more-link}]
-        (when open?
-          [:div
-           (doall
-            (for [{id :id :as p} previous-packages]
-              ^{:key (str "gtfs-package-info-" id)}
-              [pkg p true]))])])]))
+
 
 (defn transit-visualization [e! {{:keys [hash->color date->hash service-info changes-route-no-change changes-all
                                          changes-route-filtered selected-route compare open-sections route-hash-id-type
@@ -721,7 +670,7 @@
        [:div
         [:h2 (:transport-service-name service-info) " (" (:transport-operator-name service-info) ")"]
 
-        [gtfs-package-info e! open-sections (:gtfs-package-info transit-visualization) (:transport-service-id service-info)]
+        [gpi/gtfs-package-info e! open-sections transit-visualization (:transport-service-id service-info)]
 
         ;; Route listing with number of changes
         (tr [:transit-visualization-page :route-description])
