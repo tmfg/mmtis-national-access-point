@@ -80,9 +80,13 @@
     (log/info "Found " (count package-ids) " For service " service-id)
 
     (dotimes [i (count package-ids)]
-      (let [package-id (nth package-ids i)]
+      (let [package-id (nth package-ids i)
+            package (first (specql/fetch db :gtfs/package
+                                         (specql/columns :gtfs/package)
+                                         {:gtfs/id package-id}))
+            from-date (time/format-date-iso-8601 (:gtfs/created package))]
         (log/info "Generating hashes for package " package-id "  (service " service-id ")")
-        (generate-date-hashes db {:package-id package-id :transport-service-id service-id})
+        (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date from-date})
         (update-hash-recalculation db (inc i) recalculation-id)
         (log/info "Generation ready! (package " package-id " service " service-id ")")))
     (stop-hash-recalculation db recalculation-id)))
@@ -1058,13 +1062,14 @@
         recalculation-id (when packages
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (dotimes [i (count packages)]
-      (let [package-id (nth packages i)]
+      (let [p (nth packages i)]
         #_(println "Generating" (inc i) "/" package-count " - " package-id)
         (if future
-          (generate-date-hashes-for-future db {:package-id (:package-id package-id)
-                                               :transport-service-id (:transport-service-id package-id)})
-          (generate-date-hashes db {:package-id (:package-id package-id)
-                                    :transport-service-id (:transport-service-id package-id)}))
+          (generate-date-hashes-for-future db {:package-id (:package-id p)
+                                               :transport-service-id (:transport-service-id p)
+                                               :from-date (time/format-date-iso-8601 (:created p))})
+          (generate-date-hashes db {:package-id (:package-id p)
+                                    :transport-service-id (:transport-service-id p)}))
         (update-hash-recalculation db (inc i) recalculation-id))
       (log/info "Generation ready!"))
     (stop-hash-recalculation db recalculation-id)))

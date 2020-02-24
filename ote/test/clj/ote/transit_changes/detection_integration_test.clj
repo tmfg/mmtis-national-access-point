@@ -84,7 +84,7 @@
            (time/date-fields ld))))
 
 (defn store-gtfs-helper
-  [gtfs-bytes db operator-id ts-id last-import-date license interface-id intercept-fn]
+  [gtfs-bytes db operator-id ts-id last-import-date license interface-id intercept-fn import-date]
   (let [_ (specql/delete! db :gtfs/package
                           {:gtfs/transport-service-id ts-id}) ; Clean up database
         filename (gtfs-import/gtfs-file-name operator-id ts-id)
@@ -103,7 +103,7 @@
                                      :gtfs/license license
                                      :gtfs/external-interface-description-id interface-id})]
         ;; Parse gtfs package and save it to database.
-        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil)))))
+        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil import-date)))))
 
 (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)
@@ -129,7 +129,7 @@
                                                    ::t-service/license "CC BY 4.0"
                                                    ::t-service/transport-service-id test-service-id}))
         store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" interface-id
-                                        my-intercept-fn)
+                                        my-intercept-fn current-date)
         current-start-date (time/days-from (time/beginning-of-week now) -7)
         route-query-params {:service-id test-service-id
                             :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day

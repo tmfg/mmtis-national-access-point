@@ -133,7 +133,7 @@
           (recur (inc i) ps))))))
 
 
-(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn interface-url]
+(defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn interface-url import-date]
   ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
   (let [stop-times-file (File/createTempFile (str "stop-times-" package-id "-") ".txt")]
@@ -168,7 +168,7 @@
       (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
 
       (log/info "Generating date hashes for package " package-id " service: " service-id)
-      (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id})
+      (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date import-date})
 
       (log/info "Generating finnish regions and envelope for package " package-id)
       (gtfs-set-package-geometry db {:package-id package-id})
@@ -206,7 +206,7 @@
                     (.toByteArray out)))]
       (println "**************************** START test-hsl-gtfs *********************")
       (println "GTFS zip has " (int (/ (count bytes) (* 1024 1024))) " megabytes")
-      (save-gtfs-to-db db bytes 1 1 1 nil nil)
+      (save-gtfs-to-db db bytes 1 1 1 nil nil (java.util.Date.))
       (println "******************* test-hsl-gtfs end *********************"))))
 
 (defn- load-interface-url [db interface-id url last-import-date saved-etag force-download?]
@@ -226,7 +226,6 @@
 
 (defmulti validate-interface-zip-package
           (fn [type _] type))
-
 
 (defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
   (let [file-list (list-zip byte-array-input)]
@@ -339,7 +338,7 @@
                              filename (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
-              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url)
+              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
               ;; Mark interface download a success
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id

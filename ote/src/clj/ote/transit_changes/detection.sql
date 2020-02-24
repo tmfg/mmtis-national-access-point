@@ -59,7 +59,7 @@ SELECT t."package-id", trip."trip-id",
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER, :transport-service-id::INTEGER);
 
 -- name: generate-date-hashes-for-future
-SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER, :transport-service-id::INTEGER);
+SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER, :transport-service-id::INTEGER, :from-date::DATE);
 
 -- name: fetch-services-packages
 SELECT p.id as "package-id"

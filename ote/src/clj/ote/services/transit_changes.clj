@@ -89,7 +89,7 @@
                                      :gtfs/created (time/date-string->inst-date date)
                                      :gtfs/external-interface-description-id interface-id}))
           result (when package
-                   (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url))]
+                   (import/save-gtfs-to-db db (to-byte-array (:tempfile uploaded-file)) (:gtfs/id package) interface-id service-id nil interface-url date))]
       (if package
         (do
           ;; Mark interface download a success
