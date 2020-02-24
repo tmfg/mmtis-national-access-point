@@ -17,7 +17,6 @@ FROM (
               LEFT JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
               JOIN "external-interface-description" e ON e.id = p."external-interface-description-id"
               LEFT JOIN LATERAL unnest(dh."route-hashes") AS rh ON rh."route-hash-id" = :route-hash-id
-        WHERE dh.date >= p.created::DATE
         GROUP BY d.date, rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id" , eid
         ORDER BY d.date) x
 GROUP BY x.date, x."route-hash-id";
