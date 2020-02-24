@@ -392,13 +392,13 @@ COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER, INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
 
 -- Generate date hashes for future only - to speed up calculations
-CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER, transport_service_id INTEGER) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER, transport_service_id INTEGER, start_date DATE) RETURNS VOID AS $$
 DECLARE
  row RECORD;
  allowed_range tsrange;
 BEGIN
-  allowed_range := tsrange(CURRENT_DATE - '1 day'::interval,
-                           CURRENT_DATE + '1 year'::interval);
+  allowed_range := tsrange(start_date - '1 day'::interval,
+                           start_date + '1 year'::interval);
   FOR row IN
       SELECT * FROM gtfs_package_dates(package_id)
        WHERE allowed_range @> gtfs_package_dates::timestamp
