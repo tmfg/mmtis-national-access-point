@@ -1,4 +1,4 @@
-(ns ote.views.admin
+(ns ote.views.admin.admin
   "Admin panel views. Note this has a limited set of users and is not
   currently localized, all UI text is in Finnish."
   (:require [cljs-react-material-ui.reagent :as ui]
@@ -318,7 +318,7 @@
               {:label "Käyttäjä" :value "users"}
               {:label "Palvelut" :value "services"}
               {:label "Y-tunnus raportti" :value "businessid"}
-              {:label "Yritys csv:t" :value "companycsv"}
+              ;;{:label "Yritys csv:t" :value "companycsv"} - Stop copying csv:s to s3
               {:label "Palveluntuottajat" :value "operators"}
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}
@@ -350,8 +350,7 @@
          [service-list/service-list-page-controls e! app])
        (when (= "businessid" selected-tab)
          [business-id-page-controls e! app])
-       (when (= "companycsv" selected-tab)
-         [companycsv/page-controls e! app])
+       ;; (when (= "companycsv" selected-tab) [companycsv/page-controls e! app]) - Take csv file upload functionality off for now
        (when (= "operators" selected-tab)
          [operator-page-controls e! app])
        (when (= "sea-routes" selected-tab)
@@ -364,7 +363,7 @@
         "users" [users/user-listing e! app]
         "services" [service-list/service-listing e! app]
         "businessid" [business-id-report e! app]
-        "companycsv" [companycsv/company-csv-list e! app]
+        ;; "companycsv" [companycsv/company-csv-list e! app] - Take csv file upload functionality off for now
         "operators" [operator-list e! app]
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
