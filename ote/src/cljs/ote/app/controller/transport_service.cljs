@@ -121,6 +121,7 @@
 
 (defrecord ModifyTransportService [id])
 (defrecord ModifyTransportServiceResponse [response])
+(defrecord GetTransportOperatorResponse [response])
 (defrecord OpenTransportServicePage [id])
 (defrecord OpenTransportServiceTypePage [])
 
@@ -388,9 +389,18 @@
                                          (map :transport-operator)
                                          (filter #(= (::t-operator/id %)
                                                      (::t-service/transport-operator-id response)))
-                                         first))
+                                         first)
+                :service-operator nil)
           app (str-cc->keyword-cc app (:transport-service app))]
+
+      ;; Get operator data
+      (comm/get! (str "t-operator/" (get-in app [:transport-service ::t-service/transport-operator-id]))
+                 {:on-success (tuck/send-async! ->GetTransportOperatorResponse)})
       app))
+
+  GetTransportOperatorResponse
+  (process-event [{response :response} app]
+    (assoc app :service-operator response))
 
   EnsureCsvFile
   (process-event [_ app]

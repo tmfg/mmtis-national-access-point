@@ -189,9 +189,11 @@
   (let [to (first (fetch db ::t-operator/transport-operator
                          (specql/columns ::t-operator/transport-operator)
                          {::t-operator/id id}))
-        to (assoc to ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
-                                                         db {:id (::t-operator/ckan-group-id to)})
-                                                       ""))]
+        to (-> to
+               (dissoc :ote.db.transport-operator/deleted?)
+               (assoc ::t-operator/ckan-description (or (fetch-transport-operator-ckan-description
+                                                          db {:id (::t-operator/ckan-group-id to)})
+                                                        "")))]
     (if to
       (http/no-cache-transit-response to)
       {:status 404})))

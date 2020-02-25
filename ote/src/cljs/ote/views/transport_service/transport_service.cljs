@@ -66,7 +66,7 @@
             service-in-validation-text (if (= :re-validation service-state)
                                          (tr [:passenger-transportation-page :published-service-is-in-validation])
                                          (tr [:passenger-transportation-page :service-is-in-validation]))
-            operator-name (get-in app [:transport-operator ::t-operator/name])]
+            operator-name (get-in app [:service-operator ::t-operator/name])]
         [:div
          [ui-common/rotate-device-notice]
          [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
