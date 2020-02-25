@@ -146,16 +146,6 @@
         (dissoc :routes-for-dates-loading?))
     app))
 
-(define-event LoadInfoResponse [info]
-  {:path [:transit-visualization]}
-  (assoc app :operator-name (::t-operator/name info)))
-
-(define-event LoadInfo [operator-id]
-  {:path [:transit-visualization]}
-  (comm/get! (str "transit-visualization/info/" operator-id)
-             {:on-success (tuck/send-async! ->LoadInfoResponse)})
-  app)
-
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
   (assoc app :mode mode))
@@ -497,6 +487,7 @@
                  :changes-route-no-change (sorted-route-changes true changes)
                  :changes-route-filtered (sorted-route-changes false changes)
                  :gtfs-package-info (:gtfs-package-info response)
+                 :transit-changes (:transit-changes response)
                  :route-hash-id-type (:route-hash-id-type response)
                  :selected-route route
                  :detection-date detection-date)))))
@@ -611,3 +602,8 @@
   ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
   (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
   (update app :all-route-changes-checkbox not))
+
+(define-event ToggleTransitChangesModal []
+  {:path [:transit-visualization :show-transit-changes-modal?]
+   :app show?}
+  (not show?))

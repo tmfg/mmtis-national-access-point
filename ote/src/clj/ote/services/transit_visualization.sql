@@ -133,7 +133,7 @@ SELECT rs."package-id", rs."trip-id", rs."headsign" as headsign,
  GROUP BY rs."package-id", rs."trip-id", rs.headsign;
 
 -- name: fetch-date-hashes-for-route-with-route-hash-id
--- Fetch the date/hash pairs for a given route using route-hash-id which isn't used for all services
+-- Fetch the date/hash pairs for a given route using detection-date, service-id and route-hash-id
 WITH dates AS (
   -- Calculate a series of dates from beginning of last year
   -- to the end of the next year.
@@ -148,13 +148,15 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
           FROM dates d
                -- Join all date hashes to packages
                JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_detection_date(:service-id::INTEGER, d.date, :detection-date::DATE))
-                                            AND dh."transport-service-id" = :service-id
-                                            AND dh.date = d.date)
+                                                AND dh.date = d.date
+                                                AND dh."transport-service-id" = :service-id)
                -- Join gtfs_package to get external-interface-description-id
-               JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
+               JOIN gtfs_package p ON p.id = dh."package-id"
                -- Join unnested per route hashes
                JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
-         WHERE rh."route-hash-id" = :route-hash-id::VARCHAR) x
+         WHERE rh."route-hash-id" = :route-hash-id::VARCHAR
+           -- Get traffic (date-hashes) dates for the package download date and after that
+           AND dh.date >= p.created::DATE) x
  GROUP BY x.date, x.e_id;
 
 

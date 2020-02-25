@@ -212,7 +212,7 @@ SELECT array_agg(x.id)
           FROM gtfs_package p
          WHERE "transport-service-id" = service_id
            AND p."deleted?" = FALSE
-           AND ( p.created::DATE <= dt OR p.first_package = TRUE)
+           AND p.created::DATE <= dt
          ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
@@ -307,6 +307,7 @@ AS $$
 SELECT string_agg(h.hash::TEXT,' ' ORDER BY h."package-id")
   FROM "gtfs-date-hash" h
  WHERE h.date = dt
+   AND h."transport-service-id" = service_id
    AND h."package-id" = ANY(gtfs_service_packages_for_date(service_id, dt))
 $$ LANGUAGE SQL STABLE;
 
@@ -391,13 +392,14 @@ COMMENT ON FUNCTION gtfs_generate_date_hashes (INTEGER, INTEGER) IS
 E'Calculate and store per route and per day hashes for every day in the given package.';
 
 -- Generate date hashes for future only - to speed up calculations
-CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER, transport_service_id INTEGER) RETURNS VOID AS $$
+-- Only to future = three weeks in the past
+CREATE OR REPLACE FUNCTION gtfs_generate_date_hashes_for_future(package_id INTEGER, transport_service_id INTEGER, start_date DATE) RETURNS VOID AS $$
 DECLARE
  row RECORD;
  allowed_range tsrange;
 BEGIN
-  allowed_range := tsrange(CURRENT_DATE - '1 day'::interval,
-                           CURRENT_DATE + '1 year'::interval);
+  allowed_range := tsrange(start_date - '35 day'::interval,
+                           start_date + '1 year'::interval);
   FOR row IN
       SELECT * FROM gtfs_package_dates(package_id)
        WHERE allowed_range @> gtfs_package_dates::timestamp
@@ -420,6 +422,7 @@ SELECT string_agg(rh.hash::TEXT,' ' ORDER BY h."package-id")
         COALESCE(rh."route-long-name",'') = COALESCE(route_long_name,'') AND
         COALESCE(rh."trip-headsign",'') = COALESCE(trip_headsign,''))
  WHERE h.date = dt
+   AND h."transport-service-id" = service_id
    AND h."package-id" = ANY(gtfs_service_packages_for_date(service_id, dt))
 $$ LANGUAGE SQL STABLE;
 
@@ -550,11 +553,10 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        MAX(d.date) AS "max-date",
        COALESCE(rh."route-hash-id", '') AS "route-hash-id"
   FROM dates d
-  -- Join packages for each date
-  JOIN LATERAL unnest(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
-    AS ps (package_id) ON TRUE
   -- Join all date hashes for packages
-  JOIN "gtfs-date-hash" dh ON (dh."package-id" = package_id AND dh.date = d.date)
+  JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
+                                    AND dh."transport-service-id" = service_id
+                                    AND dh.date = d.date)
   -- Join unnested per route hashes
   JOIN LATERAL unnest(dh."route-hashes") rh ON TRUE
  WHERE rh.hash IS NOT NULL
