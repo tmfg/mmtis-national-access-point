@@ -38,7 +38,7 @@
 
 (defn get-transport-operator
   [db where-parameter]
-  (let [where  (merge  {::t-operator/deleted? false} where-parameter)
+  (let [where (merge {::t-operator/deleted? false} where-parameter)
         operator (first (fetch db ::t-operator/transport-operator
                                (specql/columns ::t-operator/transport-operator)
                                where {::specql/limit 1}))
@@ -71,12 +71,12 @@
 
 (defn create-member! [db user-id group-id]
   (specql/insert! db ::user/member
-                  {::user/id         (str (UUID/randomUUID))
-                   ::user/table_id   user-id
-                   ::user/group_id   group-id
+                  {::user/id (str (UUID/randomUUID))
+                   ::user/table_id user-id
+                   ::user/group_id group-id
                    ::user/table_name "user"
-                   ::user/capacity   "admin"
-                   ::user/state      "active"}))
+                   ::user/capacity "admin"
+                   ::user/state "active"}))
 
 (defn- give-permissions!
   "Takes `op` operator and `user` and pairs user to organization in db using the member table. Sets role (Capacity) to 'admin'"
@@ -84,13 +84,13 @@
   {:pre [(some? op) (some? (::t-operator/name op))]}
   (let [user-id (get-in user [:user :id])
         group (specql/insert! db ::t-operator/group
-                              {::t-operator/group-id        (str (UUID/randomUUID))
-                               ::t-operator/group-name      (str "transport-operator-" (::t-operator/id op))
-                               ::t-operator/title           (::t-operator/name op)
-                               ::t-operator/description     (or (::t-operator/ckan-description op) "")
-                               ::t-operator/created         (java.util.Date.)
-                               ::t-operator/state           "active"
-                               ::t-operator/type            "organization"
+                              {::t-operator/group-id (str (UUID/randomUUID))
+                               ::t-operator/group-name (str "transport-operator-" (::t-operator/id op))
+                               ::t-operator/title (::t-operator/name op)
+                               ::t-operator/description (or (::t-operator/ckan-description op) "")
+                               ::t-operator/created (java.util.Date.)
+                               ::t-operator/state "active"
+                               ::t-operator/type "organization"
                                ::t-operator/approval_status "approved"
                                ::t-operator/is_organization true})
         member (create-member! db user-id (:ote.db.transport-operator/group-id group))
@@ -110,7 +110,7 @@
   {:pre [(coll? op)
          (and (some? (::t-operator/ckan-group-id op)) (string? (::t-operator/ckan-group-id op)))]}
   (let [count (update! db ::t-operator/group
-                       {::t-operator/title       (::t-operator/name op)
+                       {::t-operator/title (::t-operator/name op)
                         ::t-operator/description (or (::t-operator/ckan-description op) "")}
                        {::t-operator/group-id (::t-operator/ckan-group-id op)})]
     (when (not= 1 count) (log/error (prn-str "update-group!: updating groups, expected 1 but got number of records=" count)))
@@ -314,7 +314,7 @@
       (catch Exception e
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
-(defn manage-adding-users-to-operator [email db requester operator form-data ]
+(defn manage-adding-users-to-operator [email db requester operator form-data]
   (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
         new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id (::t-operator/group-id operator)
@@ -473,7 +473,7 @@
           (get-user-transport-operators-with-services db (:groups user) (:user user))))
 
       (POST "/transport-operator" {form-data :body
-                                   user      :user}
+                                   user :user}
         (let [form-data (http/transit-request form-data)
               form-data (-> form-data
                             (update ::t-operator/foreign-business-id? true?)
@@ -482,7 +482,7 @@
             (save-transport-operator config db user form-data))))
 
       (POST "/transport-operator/delete" {form-data :body
-                                          user      :user}
+                                          user :user}
         (http/transit-response
           (delete-transport-operator! nap-config db user
                                       (:id (http/transit-request form-data))))))))
