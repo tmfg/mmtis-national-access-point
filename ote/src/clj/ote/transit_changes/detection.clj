@@ -80,9 +80,13 @@
     (log/info "Found " (count package-ids) " For service " service-id)
 
     (dotimes [i (count package-ids)]
-      (let [package-id (nth package-ids i)]
+      (let [package-id (nth package-ids i)
+            package (first (specql/fetch db :gtfs/package
+                                         (specql/columns :gtfs/package)
+                                         {:gtfs/id package-id}))
+            from-date (time/format-date-iso-8601 (:gtfs/created package))]
         (log/info "Generating hashes for package " package-id "  (service " service-id ")")
-        (generate-date-hashes db {:package-id package-id :transport-service-id service-id})
+        (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date from-date})
         (update-hash-recalculation db (inc i) recalculation-id)
         (log/info "Generation ready! (package " package-id " service " service-id ")")))
     (stop-hash-recalculation db recalculation-id)))
@@ -979,9 +983,10 @@
   Output: ::detected-route-changes-for-services-coll"
   (let [route-hash-id-type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        service-routes (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
-        all-routes (map-by-route-key service-routes route-hash-id-type)
+        service-routes-for-3-years (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
+        all-routes (map-by-route-key service-routes-for-3-years route-hash-id-type)
         all-route-keys (set (keys all-routes))
+
         route-hashes (sort-by :date
                               (apply concat
                                      (mapv (fn [route-key]
@@ -1058,13 +1063,14 @@
         recalculation-id (when packages
                            (:gtfs/recalculation-id (start-hash-recalculation db package-count user)))]
     (dotimes [i (count packages)]
-      (let [package-id (nth packages i)]
+      (let [p (nth packages i)]
         #_(println "Generating" (inc i) "/" package-count " - " package-id)
         (if future
-          (generate-date-hashes-for-future db {:package-id (:package-id package-id)
-                                               :transport-service-id (:transport-service-id package-id)})
-          (generate-date-hashes db {:package-id (:package-id package-id)
-                                    :transport-service-id (:transport-service-id package-id)}))
+          (generate-date-hashes-for-future db {:package-id (:package-id p)
+                                               :transport-service-id (:transport-service-id p)
+                                               :from-date (time/format-date-iso-8601 (:created p))})
+          (generate-date-hashes db {:package-id (:package-id p)
+                                    :transport-service-id (:transport-service-id p)}))
         (update-hash-recalculation db (inc i) recalculation-id))
       (log/info "Generation ready!"))
     (stop-hash-recalculation db recalculation-id)))

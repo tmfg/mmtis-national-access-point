@@ -65,7 +65,7 @@
        :date diff-date})))
 
 (defn select-first-trip
-  "When route is selected first trip needs to be selected as well. Set selected-trip-pair and combined-stop-sequence."
+  "When route is selected first trip needs to be selected as well from trip list. Set selected-trip-pair and combined-stop-sequence."
   [transit-visualization]
   (let [trip-pair (first (get-in transit-visualization [:compare :combined-trips]))]
     (-> transit-visualization
@@ -145,16 +145,6 @@
         (assoc :routes routes)
         (dissoc :routes-for-dates-loading?))
     app))
-
-(define-event LoadInfoResponse [info]
-  {:path [:transit-visualization]}
-  (assoc app :operator-name (::t-operator/name info)))
-
-(define-event LoadInfo [operator-id]
-  {:path [:transit-visualization]}
-  (comm/get! (str "transit-visualization/info/" operator-id)
-             {:on-success (tuck/send-async! ->LoadInfoResponse)})
-  app)
 
 (define-event SetHighlightMode [mode]
   {:path [:transit-visualization :highlight]}
@@ -259,8 +249,21 @@
     ;; No need to render trips and stops while they are not ready
     (if (and (not (:route-trips-for-date1-loading? app))
              (not (:route-trips-for-date2-loading? app)))
+      ;; Select first trip from trip list
       (select-first-trip app)
       app)))
+
+(define-event RouteDifferencesResponse [response]
+  {}
+  (-> app
+      (assoc :flash-message "Reitin muutokset ladattu.")
+      (assoc-in [:transit-visualization :route-differences-loading?] false)
+      (assoc-in [:transit-visualization :compare :differences] response)))
+
+(defn- remove-date2-keys [coll]
+  (assoc coll :date2 nil
+              :date2-trips nil
+              :date2-route-lines nil))
 
 (defn fetch-trip-data-for-dates [{:keys [compare] :as t-vis} service-id route date1 date2]
   (doseq [date [date1 date2]
@@ -281,6 +284,16 @@
                {:params params
                 :on-success (tuck/send-async! ->RouteTripsForDateResponse date)
                 :on-failure (tuck/send-async! ->ServerError)}))
+
+  ;; Get differences for change
+  (comm/get! (str "transit-visualization/" service-id "/route-differences")
+             {:params {:date1 (time/format-date-iso-8601 date1)
+                       :date2 (time/format-date-iso-8601 date2)
+                       :route-hash-id (ensure-route-hash-id route)}
+
+              :on-success (tuck/send-async! ->RouteDifferencesResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+
   (assoc t-vis :compare
                (assoc compare
                  :show-route-lines {}
@@ -375,18 +388,6 @@
                                                                 (cycle hash-colors
                                                                        ;; FIXME: after all colors are consumed, add some pattern style
                                                                        ))))))
-
-(define-event RouteDifferencesResponse [response]
-  {}
-  (-> app
-      (assoc :flash-message "Reitin muutokset ladattu.")
-      (assoc-in [:transit-visualization :route-differences-loading?] false)
-      (assoc-in [:transit-visualization :compare :differences] response)))
-
-(defn- remove-date2-keys [coll]
-  (assoc coll :date2 nil
-              :date2-trips nil
-              :date2-route-lines nil))
 
 (define-event SelectDatesForComparison [date]
   {}
@@ -486,6 +487,7 @@
                  :changes-route-no-change (sorted-route-changes true changes)
                  :changes-route-filtered (sorted-route-changes false changes)
                  :gtfs-package-info (:gtfs-package-info response)
+                 :transit-changes (:transit-changes response)
                  :route-hash-id-type (:route-hash-id-type response)
                  :selected-route route
                  :detection-date detection-date)))))
@@ -600,3 +602,8 @@
   ;; Thus disabling of UI components must happen before table model change because otherwise table rendering delays those as well.
   (.setTimeout js/window #(e! (->InitiateRouteModelUpdate)) 0)
   (update app :all-route-changes-checkbox not))
+
+(define-event ToggleTransitChangesModal []
+  {:path [:transit-visualization :show-transit-changes-modal?]
+   :app show?}
+  (not show?))

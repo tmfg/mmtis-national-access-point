@@ -10,7 +10,9 @@ FROM (
               COALESCE(rh."route-hash-id", :route-hash-id) as "route-hash-id", e.id as eid,
               string_agg(rh.hash::text, ' ' ORDER BY e.id ASC) as hash
          FROM dates d
-              LEFT JOIN "gtfs-date-hash" dh ON (dh.date = d.date AND dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
+              LEFT JOIN "gtfs-date-hash" dh ON (dh."transport-service-id" = :service-id::INTEGER
+                                                    AND dh.date = d.date
+                                                    AND dh."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)))
               -- Join gtfs_package to get external-interface-description-id
               LEFT JOIN gtfs_package p ON p.id = dh."package-id" AND p."deleted?" = FALSE
               JOIN "external-interface-description" e ON e.id = p."external-interface-description-id"
@@ -56,7 +58,7 @@ SELECT t."package-id", trip."trip-id",
 SELECT gtfs_generate_date_hashes(:package-id::INTEGER, :transport-service-id::INTEGER);
 
 -- name: generate-date-hashes-for-future
-SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER, :transport-service-id::INTEGER);
+SELECT gtfs_generate_date_hashes_for_future(:package-id::INTEGER, :transport-service-id::INTEGER, :from-date::DATE);
 
 -- name: fetch-services-packages
 SELECT p.id as "package-id"
