@@ -38,14 +38,12 @@
   (str id "_" filename))
 
 (defn validate-file-type [{:keys [tempfile filename]} allowed-mime-types]
-  (let [_ (println "validate-file-type :: (.toPath tempfile)" (pr-str (.toPath tempfile)))
-        path (.toPath tempfile)
+  (let [path (.toPath tempfile)
         ;; In Mac os x mime types are not handled very well in java 1.8. So we try to probeContentType and if
         ;; it fails then we try to guessContentTypeFromName
         content-mime (or (Files/probeContentType path)
                          (URLConnection/guessContentTypeFromName filename)
-                         (contentTypeFromFilename filename))
-        _ (println "validate-file-type :: content-mime" (pr-str content-mime))]
+                         (contentTypeFromFilename filename))]
 
     (when-not (allowed-mime-types content-mime)
       (throw (ex-info "Invalid file type" {:file-type content-mime})))))
@@ -185,11 +183,10 @@
           orig-filename (:filename uploaded-file)
           data (external/read-csv (slurp (:tempfile uploaded-file)))
           parsed-data (external/parse-response->csv data)
-          validation-warning (str (external/validate-company-csv-file data))
+          ;;validation-warning (str (external/validate-company-csv-file data)) - Stop validating csv files
           data (merge
                  {::t-service/csv-file-name orig-filename
-                  ::t-service/validation-warning (when (not (empty? validation-warning))
-                                                   validation-warning)
+                  ;; ::t-service/validation-warning (when (not (empty? validation-warning)) validation-warning) - Stop validating csv files
                   ::t-service/failed-companies-count (:failed-count parsed-data)
                   ::t-service/valid-companies-count (count (:result parsed-data))
                   ::modification/created-by (get-in user [:user :id])
@@ -198,12 +195,14 @@
                    {::t-service/transport-service-id service-id})
                  (when db-file-key
                    {::t-service/file-key db-file-key}))
-          s3-file-key (file/generate-s3-csv-key orig-filename)
+          ;; s3-file-key (file/generate-s3-csv-key orig-filename) - Stop copying csv to s3
           db-row (specql/upsert! db
                                  ::t-service/transport-service-company-csv-temp
-                                 (assoc data ::t-service/file-key s3-file-key))
-          s3file-response (s3/put-object bucket s3-file-key
-                                         (:tempfile uploaded-file))]
+                                 data
+                                 ;;(assoc data ::t-service/file-key s3-file-key)
+                                 )
+          ;; s3file-response (s3/put-object bucket s3-file-key (:tempfile uploaded-file))  - Stop copying csv to s3
+          ]
 
       ;; response to client application
       (http/transit-response
@@ -237,12 +236,14 @@
         (GET "/pre-notice/attachment/:id" req
           (download-attachment db (:pre-notices config) req))
 
+        ;; Upload company csv file from service view
         (POST "/transport-service/upload-company-csv/:service-id/:db-file-key" {{:keys [service-id db-file-key]} :params
                                                                                 user :user :as req}
           (let [service-id (when (and service-id (> (Long/parseLong service-id) 0)) (Long/parseLong service-id))
                 db-file-key (when (not= "x" db-file-key) db-file-key)]
             (upload-transport-service-csv db (:csv config) service-id db-file-key req)))
 
+        ;; Upload gtfs package from admin panel
         (POST "/transit-changes/upload-gtfs/:service-id/:interface-id/:date"
               {{:keys [service-id interface-id date]} :params
                user :user

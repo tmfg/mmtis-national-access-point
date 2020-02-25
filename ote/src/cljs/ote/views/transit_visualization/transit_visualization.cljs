@@ -1,4 +1,4 @@
-(ns ote.views.transit-visualization
+(ns ote.views.transit-visualization.transit-visualization
   "Visualization of transit data (GTFS)."
   (:require [reagent.core :as r]
             [cljs-react-material-ui.icons :as ic]
