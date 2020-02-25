@@ -398,7 +398,7 @@ DECLARE
  row RECORD;
  allowed_range tsrange;
 BEGIN
-  allowed_range := tsrange(start_date - '21 day'::interval,
+  allowed_range := tsrange(start_date - '35 day'::interval,
                            start_date + '1 year'::interval);
   FOR row IN
       SELECT * FROM gtfs_package_dates(package_id)

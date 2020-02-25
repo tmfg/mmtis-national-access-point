@@ -148,8 +148,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
           FROM dates d
                -- Join all date hashes to packages
                JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_detection_date(:service-id::INTEGER, d.date, :detection-date::DATE))
-                                            AND dh."transport-service-id" = :service-id
-                                            AND dh.date = d.date)
+                                            AND dh."transport-service-id" = :service-id)
                -- Join gtfs_package to get external-interface-description-id
                JOIN gtfs_package p ON p.id = dh."package-id"
                -- Join unnested per route hashes

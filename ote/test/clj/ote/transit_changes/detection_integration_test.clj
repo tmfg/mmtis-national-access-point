@@ -85,8 +85,7 @@
 
 (defn store-gtfs-helper
   [gtfs-bytes db operator-id ts-id last-import-date license interface-id intercept-fn import-date]
-  (let [_ (println "store-gtfs-helper :: import-date " (pr-str import-date))
-        _ (specql/delete! db :gtfs/package
+  (let [_ (specql/delete! db :gtfs/package
                           {:gtfs/transport-service-id ts-id}) ; Clean up database
         filename (gtfs-import/gtfs-file-name operator-id ts-id)
         new-etag nil]
@@ -99,12 +98,12 @@
                                      ;; :gtfs/first_package (nil? latest-package) ;; true -> will load past weeks
                                      :gtfs/transport-operator-id operator-id
                                      :gtfs/transport-service-id ts-id
-                                     :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                     :gtfs/created (java.sql.Timestamp. (clj-time.coerce/to-long import-date))
                                      :gtfs/etag new-etag
                                      :gtfs/license license
                                      :gtfs/external-interface-description-id interface-id})]
         ;; Parse gtfs package and save it to database.
-        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil import-date)))))
+        (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil (time/format-date-iso-8601 import-date))))))
 
 (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)
@@ -112,7 +111,8 @@
         gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
         gtfs-zip-bytes (slurp-bytes gtfs-zip-path)
         orig-date #inst "2019-02-15"
-        current-date (.plusDays (clj-time.core/now) -15)
+        date-for-rewrite (.plusDays (clj-time.core/now) -15)
+        date-for-date-hashes (.plusDays (clj-time.core/now) -70)
         now (time/now)
         my-intercept-fn (fn gtfs-data-intercept-fn [file-type file-data]
                           ;; (println "hello from intercept fn, type" file-type)
@@ -120,7 +120,7 @@
                             (rewrite-calendar file-data orig-date
                                               (fn calendar-filter-fn [row]
                                                 (contains? #{"11" "22"} (:gtfs/service-id row)))
-                                              current-date)
+                                              date-for-rewrite)
                             file-data))
         interface-id (::t-service/id (specql/insert! db ::t-service/external-interface-description
                                                   {::t-service/external-interface {::t-service/description {}
@@ -130,7 +130,7 @@
                                                    ::t-service/license "CC BY 4.0"
                                                    ::t-service/transport-service-id test-service-id}))
         store-result (store-gtfs-helper gtfs-zip-bytes db test-operator-id test-service-id #inst "2012-12-12" "Joku lisenssi" interface-id
-                                        my-intercept-fn (time/format-date-iso-8601 current-date))
+                                        my-intercept-fn date-for-date-hashes)
         current-start-date (time/days-from (time/beginning-of-week now) -7)
         route-query-params {:service-id test-service-id
                             :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day
