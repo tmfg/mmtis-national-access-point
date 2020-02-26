@@ -5,6 +5,13 @@
   serial: 1
   max_fail_percentage: 1
   become: true
+  vars:
+    java_download_url: https://download.java.net/java/GA/jdk13.0.2/d4173c853231432d94f001e99d882ca7/8/GPL/openjdk-13.0.2_linux-x64_bin.tar.gz
+    java_download_folder: /opt
+    java_version_path: jdk-13.0.2
+    download_version: jdk-13
+    java_name: "{{download_folder}}/{{java_version_path}}"
+    java_archive: "{{download_folder}}/{{download_version}}_linux_x64.tar.gz"
   tasks:
     - include: tasks/napote_group_and_user.yml
     - include: tasks/ote.yml
