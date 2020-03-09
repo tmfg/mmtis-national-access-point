@@ -1,4 +1,4 @@
-(ns ote.views.transit-changes
+(ns ote.views.transit-visualization.transit-changes
   "Transit changes view. Shows when regular route based traffic schedules
   change with links to detailed view (transit visualization)"
   (:require [reagent.core :as r]

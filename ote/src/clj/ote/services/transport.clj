@@ -67,7 +67,9 @@
 (defn- maybe-delete-company-csv-from-s3
   "When e.g. service is deleted files tend to stay at s3 for nothing. So delete them if they exists."
   [db bucket service-id]
-  (let [db-csv-row (first (specql/fetch db ::t-service/transport-service-company-csv
+  ;; Company csv s3 copy is stopped for now
+  false
+  #_ (let [db-csv-row (first (specql/fetch db ::t-service/transport-service-company-csv
                                         #{::t-service/id ::t-service/csv-file-name ::t-service/file-key}
                                         {::t-service/transport-service-id service-id}))]
     (when db-csv-row
@@ -380,22 +382,19 @@
   (let [original-csv-from-db (first (specql/fetch db ::t-service/transport-service-company-csv
                                                   (specql/columns ::t-service/transport-service-company-csv)
                                                   {::t-service/transport-service-id original-service-id}))
-        original-csv-from-s3 (when original-csv-from-db
-                               (s3/get-object bucket (::t-service/file-key original-csv-from-db)))
-        new-file-key (when original-csv-from-db
-                       (file/generate-s3-csv-key (::t-service/csv-file-name original-csv-from-db)))
+        ;; original-csv-from-s3 (when original-csv-from-db (s3/get-object bucket (::t-service/file-key original-csv-from-db))) - Stop copying csv to s3
+        ;; new-file-key (when original-csv-from-db (file/generate-s3-csv-key (::t-service/csv-file-name original-csv-from-db))) - Stop copying csv to s3
         new-csv-from-db (when original-csv-from-db
                           (specql/insert! db ::t-service/transport-service-company-csv
                                           (-> original-csv-from-db
                                               (dissoc ::t-service/id)
                                               (assoc ::t-service/transport-service-id transport-service-id
-                                                     ::t-service/file-key new-file-key))))
-        temp-file (when original-csv-from-s3
-                    (java.io.File/createTempFile "csv-tmp" ".csv"))
-        _ (when original-csv-from-s3
-            (io/copy (:input-stream original-csv-from-s3) temp-file))
-        new-to-s3 (when new-csv-from-db
-                    (s3/put-object bucket new-file-key temp-file))]
+                                                     ;::t-service/file-key new-file-key  - Stop copying csv to s3
+                                                     ))))
+        ;;temp-file (when original-csv-from-s3 (java.io.File/createTempFile "csv-tmp" ".csv"))
+        ;;_ (when original-csv-from-s3 (io/copy (:input-stream original-csv-from-s3) temp-file))
+        ;;new-to-s3 (when new-csv-from-db (s3/put-object bucket new-file-key temp-file))
+        ]
     nil))
 
 (defn- save-service-company-csv
