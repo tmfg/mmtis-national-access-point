@@ -798,7 +798,6 @@ You can also draw the operating area or point to the map with drawing tools. You
   :validation-modal-text "The service provider is responsible for the information published in the service. The information is transferred to the publication queue. After publication, the information is accessible in the public NAP service catalogue."
   :title-transport-operator "Transport operator"
   :service-sub-type "Transport service mode"
-  :edit-service-header "Edit service"
   :service "Service"}
 
  :route-list-page
