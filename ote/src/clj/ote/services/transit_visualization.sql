@@ -181,7 +181,7 @@ SELECT p.id, p.created,
   FROM gtfs_package p
   JOIN LATERAL gtfs_package_date_range(p.id) as dr (daterange) ON TRUE
   JOIN "external-interface-description" eid ON p."external-interface-description-id" = eid.id
-  LEFT JOIN "external-interface-download-status" id ON id."external-interface-description-id" = eid.id AND id."package-id" = p.id
+  LEFT JOIN "external-interface-download-status" id ON id."transport-service-id" = :service-id AND id."package-id" = p.id
  WHERE p."transport-service-id" = :service-id AND p."deleted?" = FALSE
  ORDER BY p.created DESC;
 

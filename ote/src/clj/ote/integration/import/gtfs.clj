@@ -209,13 +209,14 @@
       (save-gtfs-to-db db bytes 1 1 1 nil nil (java.util.Date.))
       (println "******************* test-hsl-gtfs end *********************"))))
 
-(defn- load-interface-url [db interface-id url last-import-date saved-etag force-download?]
+(defn- load-interface-url [db interface-id service-id url last-import-date saved-etag force-download?]
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
       (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
       (specql/insert! db ::t-service/external-interface-download-status
                       {::t-service/external-interface-description-id interface-id
+                       ::t-service/transport-service-id service-id
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Error when loading gtfs package from url "
                                                        url ": "
@@ -258,10 +259,10 @@
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
           Returns a response map or nil if it has not been modified."
-          (fn [type _ _ _ _ _ _] type))
+          (fn [type _ _ _ _ _ _ _] type))
 
-(defmethod load-transit-interface-url :gtfs [type db interface-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
+(defmethod load-transit-interface-url :gtfs [type db interface-id service-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
@@ -274,8 +275,8 @@
       ;; Return nil response in case of error
       nil)))
 
-(defmethod load-transit-interface-url :kalkati [type db interface-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id url last-import-date saved-etag force-download?)]
+(defmethod load-transit-interface-url :kalkati [type db interface-id service-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
@@ -313,7 +314,7 @@
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
         _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
-        response (load-transit-interface-url interface-type db id url last-import-date
+        response (load-transit-interface-url interface-type db id ts-id url last-import-date
                                              (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
