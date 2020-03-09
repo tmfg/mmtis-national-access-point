@@ -759,8 +759,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   }
 
  :rentals-page
- {:header-edit-rentals "Muokkaa vuokraukseen liittyvät tiedot"
-  :header-new-rentals "Vuokrauspalvelun lisääminen"
+ {:header-new-rentals "Liikkumispalvelun lisääminen"
+  :header-edit-rentals "Muokkaa liikkumispalvelua"
   :header-service-info "Palvelun perustiedot"
   :header-rental-service "Täydennä vuokraukseen liittyvät tiedot."
   :header-usage-area "Maarajoitukset"
@@ -775,16 +775,16 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  :terminal-page
  {:header-service-info "Palvelun perustiedot"
   :header-contact-details "Palvelun yhteystiedot"
-  :header-new-terminal "Sataman, aseman tai terminaalin lisääminen"
-  :header-edit-terminal "Muokkaa Satamaan, Asemaan tai Terminaaliin liittyvän palvelun tietoja"
+  :header-new-terminal "Liikkumispalvelun lisääminen"
+  :header-edit-terminal "Muokkaa liikkumispalvelua"
   :header-assistance "Avustuspalveluiden tiedot"
   :header-accessibility "Palvelun saavutettavuus ja esteettömyys"
   :header-checkboxlist-accessibility "Esteettömyys"}
 
 
  :parking-page
- {:header-new-parking "Pysäköintipalvelun lisääminen"
-  :header-edit-parking "Muokkaa yleiseen kaupalliseen pysäköintiin liittyvän palvelun tiedot"
+ {:header-new-parking "Liikkumispalvelun lisääminen"
+  :header-edit-parking "Muokkaa liikkumispalvelua"
   :header-service-info "Palvelun perustiedot"
   :header-contact-details "Palvelun yhteystiedot"
   :header-payment-methods "Maksutavat"
@@ -801,7 +801,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :validation-modal-text "Palveluntuottaja vastaa itse palveluun julkaistuista tiedoista. Tiedot siirtyvät julkaisujonoon. Julkaisun jälkeen tiedot näkyvät julkisessa NAP-palvelukatalogissa."
   :title-transport-operator "Palveluntuottaja"
   :service-sub-type "Liikkumispalvelun tyyppi"
-  :edit-service-header "Muokkaa palvelua"
   :service "Palvelu"}
 
  :route-list-page

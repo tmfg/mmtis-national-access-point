@@ -30,6 +30,13 @@
     :rentals (tr [:rentals-page :header-new-rentals])
     :parking (tr [:parking-page :header-new-parking])))
 
+(defn edit-service-header-text [service-type]
+  (case service-type
+    :passenger-transportation (tr [:passenger-transportation-page :header-edit-passenger-transportation])
+    :terminal (tr [:terminal-page :header-edit-terminal])
+    :rentals (tr [:rentals-page :header-edit-rentals])
+    :parking (tr [:parking-page :header-edit-parking])))
+
 (defn- license-info []
   [:div.container {:style {:margin-top "2rem"
                            :padding-bottom "1.5rem"}}
@@ -66,11 +73,12 @@
             service-in-validation-text (if (= :re-validation service-state)
                                          (tr [:passenger-transportation-page :published-service-is-in-validation])
                                          (tr [:passenger-transportation-page :service-is-in-validation]))
-            operator-name (get-in app [:service-operator ::t-operator/name])]
+            operator-name (get-in app [:service-operator ::t-operator/name])
+            edit-header-text (edit-service-header-text service-type)]
         [:div
          [ui-common/rotate-device-notice]
          [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
-          [:h1 (tr [:transport-services-common-page :edit-service-header])]
+          [:h1 edit-header-text]
           (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
             [:div {:style {:margin-bottom "1.5rem"}}
              [:div (stylefy/use-style style-base/notification-container)
@@ -86,11 +94,9 @@
             [:h3 (str (tr [:transport-services-common-page :service]) ": " (::t-service/name (sub-service service)))])
           [:div {:style {:padding-top "1rem"}}
            [:div [:strong (str (tr [:transport-services-common-page :title-transport-operator]) ": ")] operator-name]
-           ;; Passenger transport service has sub type - show it
-           (when (= :passenger-transportation service-type)
-             [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")]
-              (tr [:enums :ote.db.transport-service/sub-type
-                   service-sub-type])])]]
+           [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")]
+            (tr [:enums :ote.db.transport-service/sub-type
+                 service-sub-type])]]]
          ;; Render the form
          [edit-service e! (::t-service/type service) app]
          (when show-editing-dialog?
@@ -129,8 +135,6 @@
         [:h1 new-header-text]
         [:div {:style {:padding-top "1rem"}}
          [:div [:strong (str (tr [:transport-services-common-page :title-transport-operator]) ": ")] operator-name]
-         ;; Passenger transport service has sub type - show it
-         (when (= :passenger-transportation service-type)
-           [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")] (tr [:enums :ote.db.transport-service/sub-type
-                                                                                                    service-sub-type])])]]
+         [:div [:strong (str (tr [:transport-services-common-page :service-sub-type]) ": ")] (tr [:enums :ote.db.transport-service/sub-type
+                                                                                                  service-sub-type])]]]
        [edit-service e! service-type app]])))
