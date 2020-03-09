@@ -737,8 +737,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   }
 
  :passenger-transportation-page
- {:header-new-passenger-transportation "Add a new transport service"
-  :header-edit-passenger-transportation "Edit transport service"
+ {:header-new-passenger-transportation "Add a new passenger transport service"
+  :header-edit-passenger-transportation "Edit passenger transport service"
   :header-service-info "Service information"
   :header-restrictions "Luggage restrictions"
   :header-contact-details "Contact information"
@@ -757,8 +757,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   }
 
  :rentals-page
- {:header-edit-rentals "Edit rental information"
-  :header-new-rentals "Add information about vehicle rental services or commercial shared vehicle solutions"
+ {:header-edit-rentals "Edit transport service"
+  :header-new-rentals "Add a new transport service"
   :header-service-info "Service information"
   :header-rental-service "Fill in information about rental service."
   :header-usage-area "Usage area restrictions (country limitations)"
@@ -773,15 +773,15 @@ You can also draw the operating area or point to the map with drawing tools. You
  :terminal-page
  {:header-service-info "Service information"
   :header-contact-details "Contact information"
-  :header-new-terminal "Add information about station, port or other terminal"
-  :header-edit-terminal "Edit information about station, port or other terminal"
+  :header-new-terminal "Add a new transport service"
+  :header-edit-terminal "Edit transport service"
   :header-assistance "Assistance service information"
   :header-accessibility "Accessibility and information service accessibility"
   :header-checkboxlist-accessibility "Accessibility"}
 
  :parking-page
- {:header-new-parking "Add information about general commercial parking"
-  :header-edit-parking "Edit information about general commercial parking"
+ {:header-new-parking "Add a new transport service"
+  :header-edit-parking "Edit transport service"
   :header-service-info "Service information"
   :header-contact-details "Contact information"
   :header-payment-methods "Accepted payment methods"
