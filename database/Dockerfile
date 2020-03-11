@@ -2,6 +2,7 @@ FROM ubuntu:bionic
 
 # Install dependencies
 RUN apt-get update
+RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-recommends tzdata postgresql-10 postgresql-10-postgis-2.4 postgresql-10-postgis-2.4-scripts postgresql-contrib-10 maven
 
 # Configure pg to listen network

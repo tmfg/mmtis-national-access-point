@@ -760,8 +760,8 @@
   }
 
  :rentals-page
- {:header-edit-rentals "Redigera uppgifterna gällande uthyrning"
-  :header-new-rentals "Lägg till uppgifter gällande färdmedelsuthyrning eller kommersiella samanvändningstjänster"
+ {:header-edit-rentals "Redigera mobilitetstjänst"
+  :header-new-rentals "Lägg till mobilitetstjänst"
   :header-service-info "Tjänstens basinformation"
   :header-rental-service "Komplettera uppgifterna gällande uthyrning."
   :header-usage-area "Landbegränsning"
@@ -776,15 +776,15 @@
  :terminal-page
  {:header-service-info "Tjänstens basinfo"
   :header-contact-details "Tjänstens kontaktuppgifter"
-  :header-new-terminal "Lägg till uppgifter om hamn, station eller övrig terminal"
-  :header-edit-terminal "Redigera uppgifter om hamn, station eller övrig terminal"
+  :header-new-terminal "Lägg till mobilitetstjänst"
+  :header-edit-terminal "Redigera mobilitetstjänst"
   :header-assistance "Information on assistanstjänst"
   :header-accessibility "Tillgänglihet"
   :header-checkboxlist-accessibility "Tillgänglighet"}
 
  :parking-page
- {:header-new-parking "Lägg till uppgifter om allmän kommersiell parkeringstjänst"
-  :header-edit-parking "Redigera uppgifter om allmän kommersiell parkeringstjänst"
+ {:header-new-parking "Lägg till mobilitetstjänst"
+  :header-edit-parking "Redigera mobilitetstjänst"
   :header-service-info "Tjänstens basinfo"
   :header-contact-details "Tjänstens kontaktuppgifter"
   :header-payment-methods "Betalsätt"
@@ -801,7 +801,6 @@
   :validation-modal-text "Tjänsteproducenten är själv ansvarig för uppgifterna som publicerats i tjänsten. Uppgifterna flyttas till publiceringskön. Efter publiceringen syns uppgifterna i den offentliga tjänstekatalogen NAP."
   :title-transport-operator "Tjänsteproducent"
   :service-sub-type "Tjänstetyp"
-  :edit-service-header "Redigera tjänsten"
   :service "Tjänsten"}
 
  :route-list-page
