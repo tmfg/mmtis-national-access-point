@@ -177,6 +177,7 @@
         (log/warn "Error in save-gtfs-to-db" e)
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
+                         ::t-service/transport-service-id service-id
                          ::t-service/download-status :failure
                          ::t-service/package-id package-id
                          ::t-service/url interface-url
@@ -243,7 +244,7 @@
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
 
-(defn check-interface-zip [type db interface-id url byte-array-data]
+(defn check-interface-zip [type db interface-id url byte-array-data service-id]
   (try
     (validate-interface-zip-package type byte-array-data)
 
@@ -251,6 +252,7 @@
       (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
       (specql/insert! db ::t-service/external-interface-download-status
                       {::t-service/external-interface-description-id interface-id
+                       ::t-service/transport-service-id service-id
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
                        ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
@@ -265,7 +267,7 @@
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
+        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         response
 
         ;; Return nil response in case of error
@@ -279,7 +281,7 @@
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)))
+        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         (update response :body kalkati-to-gtfs/convert-bytes)
 
         ;; Return nil response in case of error
@@ -343,6 +345,7 @@
               ;; Mark interface download a success
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id
+                               ::t-service/transport-service-id ts-id
                                ::t-service/download-status :success
                                ::t-service/package-id (:gtfs/id package)
                                ::t-service/url url

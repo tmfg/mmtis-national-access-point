@@ -95,6 +95,7 @@
           ;; Mark interface download a success
           (specql/insert! db ::t-service/external-interface-download-status
                           {::t-service/external-interface-description-id interface-id
+                           ::t-service/transport-service-id service-id
                            ::t-service/download-status :success
                            ::t-service/package-id (:gtfs/id package)
                            ::t-service/url interface-url
