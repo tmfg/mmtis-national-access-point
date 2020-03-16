@@ -235,8 +235,7 @@
          routes)
        (catch #?(:cljs js/Object :clj Exception) e
          (.printStackTrace e)
-         (log/warn "Error generating GTFS file content for stop-times" e))
-       )))
+         (log/warn "Error generating GTFS file content for stop-times" e)))))
 
 #?(:clj
    (defn sea-routes-gtfs
@@ -249,11 +248,7 @@
                                routes)
            trips (sea-trips-txt routes)
            trips-txt (map #(dissoc % :stoptimes) trips)
-           ;_ (println "sea-routes-gtfs :: trips" (pr-str (map #(dissoc % ::transit/departure-time ::transit/arrival-time) trips)))
-           ;_ (println "sea-routes-gtfs :: trips-txt" (pr-str trips-txt))
-           stop-times-txt (sea-stop-times-txt routes trips)
-           ;_ (println "sea-routes-gtfs :: stop-times-txt" (pr-str stop-times-txt))
-           ]
+           stop-times-txt (sea-stop-times-txt routes trips)]
        (try
          [{:name "agency.txt"
            :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt transport-operator))}
