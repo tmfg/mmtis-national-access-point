@@ -147,7 +147,8 @@
                              :gtfs/trip-id (str route-id "_" i "_" calendar-index)
                              :gtfs/service-id (or service-id 0)
 
-                             ;; Testing what happens if stoptimes are added here and removed later
+                             ;; Add stoptimes to enable adding them to stoptimes file. They are
+                             ;; removed later from this trip-txt vector
                              :stoptimes (:ote.db.transit/stop-times trip)
                              }))
                         (nth services service-calendar-idx))))
