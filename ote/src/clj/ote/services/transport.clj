@@ -12,7 +12,6 @@
             [specql.core :refer [fetch upsert! delete!] :as specql]
             [ote.components.http :as http]
             [ote.util.feature :as feature]
-            [ote.db.common :as common]
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
@@ -22,8 +21,8 @@
             [ote.services.places :as places]
             [ote.services.external :as external]
             [ote.db.tx :as tx]
-            [ote.util.file :as file])
-  (:import (java.util UUID)))
+            ;[ote.util.file :as file] - CSV s3 copy is not used currently
+            ))
 
 (defqueries "ote/services/places.sql")
 (defqueries "ote/services/transport.sql")
@@ -51,18 +50,6 @@
    :re-edit ::t-service/re-edit
    :created ::modification/created
    :modified ::modification/modified})
-
-(defn translate-pick-up-country [pick-up-locations country-list]
-  (mapv
-    (fn [p]
-      (let [pick-up-country-code (get-in p [::t-service/pick-up-address ::common/country_code])
-            country (some #(when (= pick-up-country-code (::common/country_code %))
-                             (::common/value %))
-                          country-list)]
-        (if (some? country)
-          (assoc-in p [::t-service/pick-up-address :country] country)
-          p)))
-    pick-up-locations))
 
 (defn- maybe-delete-company-csv-from-s3
   "When e.g. service is deleted files tend to stay at s3 for nothing. So delete them if they exists."
@@ -204,17 +191,6 @@
         update-rental-price-classes)
     service))
 
-(defn mark-package-as-deleted
-  "When external interface is deleted (when it is deleted or service is deleted) we don't want to
-  remove all gtfs data that we have aquired. So we only mark gtfs_packages.deleted = TRUE for those packages and
-  remove the interface url."
-  [db external-interface-description-id]
-
-  ;; set all found packages as deleted
-  (specql/update! db :gtfs/package
-                  {:gtfs/deleted? true}
-                  {:gtfs/external-interface-description-id external-interface-description-id}))
-
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removed-resources]
@@ -223,12 +199,9 @@
 
     ;; Delete removed services from OTE db
     (doseq [{id ::t-service/id} removed-resources]
-      ;; Mark possible gtfs_packages to removed and then remove interface
-      (mark-package-as-deleted db id)
-      ;; Delete from external-interface-download-status
-      (specql/delete! db ::t-service/external-interface-download-status
-                      {::t-service/external-interface-description-id id})
       ;; Delete from external-interface-description
+      ;; We do not delete packages that might be downloaded from this interface
+      ;; We also do not delete interface download history. It should be available in transit visualization
       (specql/delete! db ::t-service/external-interface-description
                       {::t-service/id id}))
 

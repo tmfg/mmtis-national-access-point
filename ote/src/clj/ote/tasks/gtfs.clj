@@ -74,7 +74,10 @@
          interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
                      (update interface :data-content PgArray->vec)
                      interface)
-         force-download? (integer? service-id)]
+         force-download? (integer? service-id)
+         used-service-id (if service-id
+                           service-id
+                           (:ts-id interface))]
      (if interface
        (try
          (if-let [conversion-meta (import-gtfs/download-and-store-transit-package
@@ -94,7 +97,7 @@
 
         (catch Exception e
           (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
-      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " service-id)))))
+      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id)))))
 
 (def night-hours #{0 1 2 3 4})
 

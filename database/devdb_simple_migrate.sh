@@ -13,3 +13,5 @@ done
 
 echo "Connection established!"
 mvn flyway:migrate
+cd -
+docker run -v $DIR:/database -v -it --network docker_napote --link napotedb:postgres --rm postgres sh /database/devdb_rewrite_db_template.sh

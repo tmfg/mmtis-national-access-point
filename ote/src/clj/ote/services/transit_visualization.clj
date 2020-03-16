@@ -7,7 +7,6 @@
             [ote.components.service :refer [define-service-component]]
             [specql.core :as specql]
             [clojure.string :as str]
-            [taoensso.timbre :as log]
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [ote.util.fn :refer [flip]]
@@ -17,6 +16,14 @@
             [ote.authorization :as authorization]))
 
 (defqueries "ote/services/transit_visualization.sql")
+;; Testing to declare jeesql functions to make clj-kondo work better
+(declare fetch-date-hashes-for-route-with-route-hash-id)
+(declare fetch-route-trips-by-hash-and-date)
+(declare fetch-service-info)
+(declare detected-service-change-by-date)
+(declare detected-route-changes-by-date)
+(declare fetch-gtfs-packages-for-service)
+(declare fetch-route-trip-info-by-name-and-date)
 
 (defn- parse-stops [stops]
   (mapv (fn [stop]
@@ -138,6 +145,7 @@
                                            :specql.core/order-direction :desc
                                            :specql.core/limit 50})})))
 
+  
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
