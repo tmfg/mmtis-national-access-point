@@ -19,7 +19,7 @@
     (tx/with-transaction db
       (when-let [ts (first (select-company-csv-for-update db))]
         (let [url (fetch-company-csv-url db ts)]
-          (log/debug "Update CSV for " (:transport-service-id ts) " at URL: " url)
+          (log/info "Update CSV for service: " (:transport-service-id ts) " at URL: " url )
           (transport/save-external-companies
            db {::t-service/id (:transport-service-id ts)
                ::t-service/companies-csv-url url})
