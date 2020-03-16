@@ -179,7 +179,6 @@
            (.isFile (io/file chouette-report-filepath)))
     (let [action_report (:action_report (cheshire/parse-string (slurp (str chouette-report-filepath)) keyword))
           result (:result action_report)
-          _ (println "chouette-report-ok? :: action_report " (pr-str action_report))
           error-files (->> action_report
                            :files
                            (filter #(= "NOK" (:status %)))
