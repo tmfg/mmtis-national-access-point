@@ -18,7 +18,7 @@
      [url transport-operator]
      (try
        (do
-         (log/info "Check if agency url contains a protocol" url)
+         (log/info "Checking if agency url contains a protocol ... " url)
          (clojure.java.io/as-url url))
        (catch Exception e
          (log/warn "Malformed url:" url e "transport-operator-id:" (::t-operator/id transport-operator))
@@ -43,7 +43,7 @@
   (for [[id {::transit/keys [name location stop-type]}] stops]
     {:gtfs/stop-id id
      :gtfs/stop-name (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
-                                                      :clj localization/*language*) name)
+                                                                :clj  localization/*language*) name)
      :gtfs/stop-lat (.-y (.getGeometry location))
      :gtfs/stop-lon (.-x (.getGeometry location))}))
 
@@ -75,28 +75,28 @@
   "Returns GTFS services with removed dates"
   [services dates]
   (reduce
-   (fn [services date]
-     (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
-           removed-date (time/date-fields->date df)]
-       (mapv
-        (fn [{rule-dates :rule-dates :as service}]
-          (if (rule-dates df)
-            (update service :removed-dates (fnil conj #{}) removed-date)
-            service))
-        services)))
-   services dates))
+    (fn [services date]
+      (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
+            removed-date (time/date-fields->date df)]
+        (mapv
+          (fn [{rule-dates :rule-dates :as service}]
+            (if (rule-dates df)
+              (update service :removed-dates (fnil conj #{}) removed-date)
+              service))
+          services)))
+    services dates))
 
 (defn- services-with-added-dates
   "Returns GTFS services with added dates"
   [services dates]
   (reduce
-   (fn [services date]
-     (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
-           service-idx (or
-                         (index-of #(not ((or (:rule-dates %) #{}) df)) services)
-                         0)]
-       (update-in services [service-idx :added-dates] (fnil conj #{}) (time/date-fields->date df))))
-   services dates))
+    (fn [services date]
+      (let [df (select-keys (time/date-fields date) #{::time/year ::time/month ::time/date})
+            service-idx (or
+                          (index-of #(not ((or (:rule-dates %) #{}) df)) services)
+                          0)]
+        (update-in services [service-idx :added-dates] (fnil conj #{}) (time/date-fields->date df))))
+    services dates))
 
 (defn route-services
   "Generate GTFS services from service calendars. One service calendar can be
@@ -131,46 +131,60 @@
         (services-with-added-dates service-added-dates))))
 
 (defn- sea-trips-txt [routes]
-  (mapcat
-   (fn [{::transit/keys [route-id trips]
-         services :services :as route}]
-     (reduce concat
-             (map-indexed
-              (fn [i {::transit/keys [service-calendar-idx]}]
-                (for [{service-id :gtfs/service-id} (nth services service-calendar-idx)]
-                  {:gtfs/route-id route-id
-                   :gtfs/trip-id (str route-id "_" i)
-                   :gtfs/service-id (or service-id 0)}))
-              trips)))
-   routes))
+  (try
+    (mapcat
+      (fn [{::transit/keys [route-id trips]
+            services :services :as route}]
+        (reduce concat
+                (map-indexed
+                  (fn [i {::transit/keys [service-calendar-idx] :as trip}]
+                    (let []
+                      (map-indexed
+                        (fn [calendar-index {service-id :gtfs/service-id}]
+                          (let [
+                                ]
+                            {:gtfs/route-id route-id
+                             :gtfs/trip-id (str route-id "_" i "_" calendar-index)
+                             :gtfs/service-id (or service-id 0)
+
+                             ;; Add stoptimes to enable adding them to stoptimes file. They are
+                             ;; removed later from this trip-txt vector
+                             :stoptimes (:ote.db.transit/stop-times trip)
+                             }))
+                        (nth services service-calendar-idx))))
+                  trips)))
+      routes)
+    (catch #?(:cljs js/Object :clj Exception) e
+      (.printStackTrace e)
+      (log/warn "Error generating GTFS file content for trips" e))))
 
 (defn- calendar-txt [routes]
   (mapcat
-   (fn [{services :services}]
-     (mapcat #(for [service %]
-                (select-keys service gtfs-spec/calendar-txt-fields)) services))
-   routes))
+    (fn [{services :services}]
+      (mapcat #(for [service %]
+                 (select-keys service gtfs-spec/calendar-txt-fields)) services))
+    routes))
 
 (defn- calendar-dates-txt [routes]
   (mapcat
-   (fn [{services :services}]
-     (mapcat
-      (fn [services]
-        (mapcat (fn [{service-id :gtfs/service-id
-                      :keys [added-dates removed-dates]
-                      :as s}]
-                  (concat
-                   (for [d added-dates]
-                     {:gtfs/service-id (or service-id 0)
-                      :gtfs/date d
-                      :gtfs/exception-type "1"})
-                   (for [d removed-dates]
-                     {:gtfs/service-id (or service-id 0)
-                      :gtfs/date d
-                      :gtfs/exception-type "2"})))
-                services))
-      services))
-   routes))
+    (fn [{services :services}]
+      (mapcat
+        (fn [services]
+          (mapcat (fn [{service-id :gtfs/service-id
+                        :keys [added-dates removed-dates]
+                        :as s}]
+                    (concat
+                      (for [d added-dates]
+                        {:gtfs/service-id (or service-id 0)
+                         :gtfs/date d
+                         :gtfs/exception-type "1"})
+                      (for [d removed-dates]
+                        {:gtfs/service-id (or service-id 0)
+                         :gtfs/date d
+                         :gtfs/exception-type "2"})))
+                  services))
+        services))
+    routes))
 
 (defn- stopping-type
   "GTFS pickup/drop off type for a database stopping-type enum value."
@@ -183,26 +197,45 @@
     ;; Defaults to regular
     "0"))
 
+(defn stop-code [key idx stops]
+  (try
+    (key (nth stops idx))
+    (catch #?(:cljs js/Error
+              :clj Exception) e
+      (println "stop-code :: Error e" (pr-str e))
+      "")))
+
+(defn get-routes-own-trips [trips route-id]
+  (let [routes-trips (keep (fn [trip]
+                             (if (= route-id (:gtfs/route-id trip))
+                               trip
+                               nil))
+                           trips)]
+    routes-trips))
+
 #?(:clj
-   (defn- sea-stop-times-txt [routes]
-     (mapcat
-       (fn [{::transit/keys [route-id trips stops]}]
-         (reduce
-           concat
-           (map-indexed
-             (fn [i {stop-times ::transit/stop-times :as trip}]
-               (for [{::transit/keys [arrival-time departure-time
-                                      pickup-type drop-off-type]
-                      idx            :idx} (index-key :idx identity stop-times)]
-                 {:gtfs/trip-id (str route-id "_" i)
-                  :gtfs/stop-id (::transit/code (nth stops idx))
-                  :gtfs/arrival-time (time/format-interval-as-time (or arrival-time departure-time))
-                  :gtfs/departure-time (time/format-interval-as-time (or departure-time arrival-time))
-                  :gtfs/pickup-type (stopping-type pickup-type)
-                  :gtfs/drop-off-type (stopping-type drop-off-type)
-                  :gtfs/stop-sequence idx}))
-             trips)))
-       routes)))
+   (defn- sea-stop-times-txt [routes trips]
+     (try
+       (mapcat
+         (fn [{::transit/keys [route-id stops]}]
+           (reduce
+             concat
+             (map-indexed
+               (fn [i {stop-times :stoptimes :as trip}]
+                 (for [{::transit/keys [arrival-time departure-time
+                                        pickup-type drop-off-type stop-idx]} stop-times]
+                   {:gtfs/trip-id (:gtfs/trip-id trip)
+                    :gtfs/stop-id (stop-code ::transit/code stop-idx stops)
+                    :gtfs/arrival-time (time/format-interval-as-time (or arrival-time departure-time))
+                    :gtfs/departure-time (time/format-interval-as-time (or departure-time arrival-time))
+                    :gtfs/pickup-type (stopping-type pickup-type)
+                    :gtfs/drop-off-type (stopping-type drop-off-type)
+                    :gtfs/stop-sequence stop-idx}))
+               (get-routes-own-trips trips route-id))))
+         routes)
+       (catch #?(:cljs js/Object :clj Exception) e
+         (.printStackTrace e)
+         (log/warn "Error generating GTFS file content for stop-times" e)))))
 
 #?(:clj
    (defn sea-routes-gtfs
@@ -212,7 +245,10 @@
            stops-by-code (into {}
                                (comp (mapcat ::transit/stops)
                                      (map (juxt ::transit/code identity)))
-                               routes)]
+                               routes)
+           trips (sea-trips-txt routes)
+           trips-txt (map #(dissoc % :stoptimes) trips)
+           stop-times-txt (sea-stop-times-txt routes trips)]
        (try
          [{:name "agency.txt"
            :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt transport-operator))}
@@ -220,15 +256,13 @@
            :data (gtfs-parse/unparse-gtfs-file :gtfs/stops-txt (stops-txt stops-by-code))}
           {:name "stop_times.txt"
            :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt
-                                               (sea-stop-times-txt routes))}
+                                               stop-times-txt)}
           {:name "routes.txt"
            :data (gtfs-parse/unparse-gtfs-file
                    :gtfs/routes-txt
                    (sea-routes-txt (::t-operator/id transport-operator) routes))}
           {:name "trips.txt"
-           :data (gtfs-parse/unparse-gtfs-file
-                   :gtfs/trips-txt
-                   (sea-trips-txt routes))}
+           :data (gtfs-parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
           {:name "calendar.txt"
            :data (gtfs-parse/unparse-gtfs-file
                    :gtfs/calendar-txt

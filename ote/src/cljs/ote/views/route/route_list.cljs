@@ -82,7 +82,7 @@
            ^{:key (str "route-" i)}
            [ui/table-row {:key (str "route-" i) :selectable false :display-border false :style {:border-bottom (str "1px solid" colors/gray650)}}
             [ui/table-row-column {:style {:width "18%"}}
-             [:a {:href "#"
+             [:a {:href (str "/#/edit-route/" route-id)
                   :on-click #(do
                                (.preventDefault %)
                                (e! (fp/->ChangePage :edit-route {:id route-id})))} (t-service/localized-text-with-fallback @selected-language name)]]

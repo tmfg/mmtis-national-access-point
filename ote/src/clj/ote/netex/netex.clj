@@ -199,19 +199,25 @@
   Return: On success string defining filesystem path to output file, on failure nil"
   [{:keys [exit err] :as ex-info}                           ; Conversion command exit info
    {:keys [conversion-work-path]}                           ; Ote netex config
-   {:keys [work-dir input-report-file output-report-file]}  ; Ote chouette config
+   {:keys [work-dir input-report-file output-report-file validation-report-file]}  ; Ote chouette config
    output-filepath
    chouette-cmd]
-  (if (and (= 0 exit)
-           ;(str/blank? err) Let conversion return something
-           (chouette-report-ok? (str conversion-work-path work-dir input-report-file))
-           (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
-           (.exists (io/file output-filepath)))
-    (do
-      (post-process-netex output-filepath)
-      output-filepath)
-    (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
-        nil)))
+  (let [;; Uncomment these for debugging
+        ;_ (println "input-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir input-report-file)) keyword)))
+        ;_ (println "output-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir output-report-file)) keyword)))
+        ;_ (println "validation-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir validation-report-file)) keyword)))
+        ]
+
+    (if (and (= 0 exit)
+             ;(str/blank? err) Let conversion return something
+             (chouette-report-ok? (str conversion-work-path work-dir input-report-file))
+             (chouette-report-ok? (str conversion-work-path work-dir output-report-file))
+             (.exists (io/file output-filepath)))
+      (do
+        (post-process-netex output-filepath)
+        output-filepath)
+      (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
+          nil))))
 
 (defn gtfs->netex!
   "Return: On success string defining filesystem path to output netex archive, on failure nil"
