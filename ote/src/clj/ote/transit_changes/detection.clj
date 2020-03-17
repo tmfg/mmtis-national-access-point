@@ -988,7 +988,7 @@
         all-route-keys (set (keys all-routes))
 
         route-hashes (sort-by :date
-                              (apply concat
+                                (apply concat
                                      (mapv (fn [route-key]
                                              (let [query-params (merge {:route-hash-id route-key} route-query-params)]
                                                (service-route-hashes-for-date-range db query-params)))

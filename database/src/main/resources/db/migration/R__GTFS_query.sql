@@ -204,13 +204,15 @@ SELECT array_agg(ROW(t."package-id",trip)::"gtfs-package-trip-info") as tripdata
    AND COALESCE(trip."trip-headsign",'') = COALESCE(trip_headsign,'');
 $$ LANGUAGE SQL STABLE;
 
+-- Returns list of packages for service_id and date. This doesn't take into account if the interface where the package
+-- is downloaded is deleted or not. So this can be used to get history data.
 CREATE OR REPLACE FUNCTION gtfs_service_packages_for_date(service_id INTEGER, dt DATE)
 RETURNS INTEGER[]
 AS $$
 SELECT array_agg(x.id)
   FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
           FROM gtfs_package p
-         WHERE "transport-service-id" = service_id
+         WHERE p."transport-service-id" = service_id
            AND p."deleted?" = FALSE
            AND p.created::DATE <= dt
          ORDER BY "external-interface-description-id", created DESC) x
@@ -223,10 +225,26 @@ AS $$
 SELECT array_agg(x.id)
 FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
       FROM gtfs_package p
-      WHERE "transport-service-id" = service_id
+      WHERE p."transport-service-id" = service_id
         AND p."deleted?" = FALSE
         AND p.created::DATE <= dt
         AND p.created::DATE <= detection_date
+      ORDER BY "external-interface-description-id", created DESC) x
+$$ LANGUAGE SQL STABLE;
+
+-- Returns list of packages for service_id and date. Used in change detection to make sure that only those
+-- packages are returned which interface is still present. We do not want to return packages that are downloaded
+-- from interface that is removed when making change detection.
+CREATE OR REPLACE FUNCTION gtfs_packages_for_detection(service_id INTEGER, dt DATE)
+    RETURNS INTEGER[]
+AS $$
+SELECT array_agg(x.id)
+FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
+      FROM gtfs_package p
+       JOIN "external-interface-description" e ON e.id = p."external-interface-description-id"
+      WHERE p."transport-service-id" = service_id
+        AND p."deleted?" = FALSE
+        AND p.created::DATE <= dt
       ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
@@ -535,7 +553,7 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_route_next_different_week(INTEGER,TEXT,TEXT,TEXT) IS
 E'Returns the next different week for the given service and route.';
 
-CREATE OR REPLACE FUNCTION gtfs_service_routes_with_daterange(service_id INTEGER)
+CREATE OR REPLACE FUNCTION gtfs_routes_for_change_detection(service_id INTEGER)
 RETURNS SETOF gtfs_route_with_daterange AS $$
 WITH dates AS (
   -- Calculate a series of dates from beginning of last year
@@ -554,7 +572,7 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-hash-id", '') AS "route-hash-id"
   FROM dates d
   -- Join all date hashes for packages
-  JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
+  JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_packages_for_detection(service_id::INTEGER, d.date))
                                     AND dh."transport-service-id" = service_id
                                     AND dh.date = d.date)
   -- Join unnested per route hashes
