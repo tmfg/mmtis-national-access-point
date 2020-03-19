@@ -18,7 +18,7 @@
             [ote.config.transit-changes-config :as config-tc]
             [ote.netex.netex :as netex]
             [ote.util.db :refer [PgArray->vec]])
-  (:import (org.joda.time DateTimeZone)))
+  (:import (org.joda.time DateTimeZone DateTime)))
 
 (defqueries "ote/tasks/gtfs.sql")
 (defqueries "ote/services/transit_changes.sql")
@@ -106,13 +106,17 @@
 
 ;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task (:db ote.main/ote) (time/now) true [1289])`
 (defn detect-new-changes-task
-  ([db detection-date force?]
+  ([db ^DateTime detection-date force?]
    (detect-new-changes-task db detection-date force? nil))
-  ([db detection-date force? service-ids]
+  ([db ^DateTime detection-date force? service-ids]
    (let [lock-time-in-seconds (if force?
                                 1
                                 1800)
-         today detection-date                               ;; Today is the default but detection may be run "in the past" if admin wants to
+         ;; Today is the default but detection may be run "in the past" if admin wants to
+         ;; detection-date is org joda datetime
+         ;; Historic detections must use even deleted interfaces, so we need to indentify if the detection date is in the past
+         detection-date-in-the-past? (.isBefore (.toLocalDate detection-date) (.toLocalDate (time/now)))
+
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
          ;; Date in future up to where traffic should be analysed
@@ -120,7 +124,7 @@
 
          ;; Convert to LocalDate instances
          [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
-                                          [start-date end-date today])]
+                                          [start-date end-date detection-date])]
      (lock/try-with-lock
        db "gtfs-nightly-changes" lock-time-in-seconds
        (let [;; run detection only for given services or all
@@ -137,8 +141,8 @@
                                    :start-date start-date
                                    :end-date end-date}]
                  (detection/update-transit-changes!
-                   db today service-id
-                   (detection/service-package-ids-for-date-range db query-params)
+                   db detection-date service-id
+                   (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past?)
                    (detection/detect-route-changes-for-service db query-params)))
                (catch Exception e
                  (log/warn e "Change detection failed for service " service-id)))
