@@ -1,17 +1,17 @@
 (ns ote.transit-changes.detection
   "Detect changes in transit traffic patterns.
   Interfaces with stored GTFS transit data."
-  (:require [ote.transit-changes :as transit-changes :refer [week=]]
-            [ote.time :as time]
-            [jeesql.core :refer [defqueries]]
-            [taoensso.timbre :as log]
-            [specql.core :as specql]
+  (:require [specql.core :as specql]
             [clojure.spec.alpha :as spec]
+            [jeesql.core :refer [defqueries]]
             [specql.op :as op]
+            [taoensso.timbre :as log]
             [ote.db.user :as user]
+            [ote.db.tx :as tx]
+            [ote.transit-changes :as transit-changes :refer [week=]]
+            [ote.time :as time]
             [ote.util.collections :refer [map-by count-matching]]
             [ote.tasks.util :as task-util]
-            [ote.db.tx :as tx]
             [ote.transit-changes.change-history :as change-history]
             [ote.config.transit-changes-config :as config-tc])
   (:import (java.time LocalDate)
@@ -962,9 +962,10 @@
   "Input: route-list-with-week-hashes = sequence of routes with their traffic weeks
   Output: Sequence of change-maps, each describing a traffic change of a route or ongoing traffic without changes."
   [^LocalDate analysis-date all-routes route-list-with-week-hashes]
-  (vec (mapcat
-         #(route-change-maps % all-routes analysis-date)
-         route-list-with-week-hashes)))
+  (let [_ (println "detect-changes-for-all-routes :: analysis-date" (pr-str analysis-date))]
+    (vec (mapcat
+           #(route-change-maps % all-routes analysis-date)
+           route-list-with-week-hashes))))
 
 (defn traffic-week-maps->change-maps
   "Input: analysis-date = date when analysis is run
@@ -978,7 +979,8 @@
 
 (spec/fdef detect-route-changes-for-service
            :ret ::detected-route-changes-for-services-coll)
-(defn detect-route-changes-for-service [db {:keys [service-id ignore-holidays?] :as route-query-params}]
+(defn detect-route-changes-for-service [db {:keys [service-id ignore-holidays?] :as route-query-params}
+                                        ^java.time.LocalDate analysis-date]
   "Input: Takes service-id,
   fetches and analyzes packages for the service and produces a collection of structures, each of which describes
   if a route has traffic or changes/no-traffic/ending-traffic, during a time period defined in the analysis logic.
@@ -1000,7 +1002,7 @@
                                      route-hashes
                                      (override-holidays db route-hashes))
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys) ;; Format: ({:date routes(=hashes)})
-        analysis-date (java.time.LocalDate/now)]
+        ]
     (try
       #_(def *rd routes-by-date)
       {:all-routes all-routes

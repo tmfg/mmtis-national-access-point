@@ -3,21 +3,21 @@
   (:require [chime :refer [chime-at]]
             [clj-time.core :as t]
             [clj-time.periodic :refer [periodic-seq]]
-            [ote.util.feature :as feature]
             [com.stuartsierra.component :as component]
             [jeesql.core :refer [defqueries]]
-            [ote.db.tx :as tx]
-            [ote.db.transport-service :as t-service]
-            [ote.integration.import.gtfs :as import-gtfs]
             [taoensso.timbre :as log]
             [specql.core :as specql]
-            [ote.time :as time]
-            [ote.tasks.util :refer [daily-at timezone]]
+            [ote.db.tx :as tx]
+            [ote.db.transport-service :as t-service]
             [ote.db.lock :as lock]
+            [ote.util.db :refer [PgArray->vec]]
+            [ote.util.feature :as feature]
+            [ote.tasks.util :as tasks-util]
+            [ote.integration.import.gtfs :as import-gtfs]
+            [ote.time :as time]
             [ote.transit-changes.detection :as detection]
             [ote.config.transit-changes-config :as config-tc]
-            [ote.netex.netex :as netex]
-            [ote.util.db :refer [PgArray->vec]])
+            [ote.netex.netex :as netex])
   (:import (org.joda.time DateTimeZone DateTime)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -102,7 +102,7 @@
 (def night-hours #{0 1 2 3 4})
 
 (defn night-time? [dt]
-  (-> dt (t/to-time-zone timezone) time/date-fields ::time/hours night-hours boolean))
+  (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours night-hours boolean))
 
 ;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task (:db ote.main/ote) (time/now) true [1289])`
 (defn detect-new-changes-task
@@ -143,7 +143,7 @@
                  (detection/update-transit-changes!
                    db detection-date service-id
                    (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past?)
-                   (detection/detect-route-changes-for-service db query-params)))
+                   (detection/detect-route-changes-for-service db query-params (tasks-util/joda-datetime-to-java-time-local-date detection-date))))
                (catch Exception e
                  (log/warn e "Change detection failed for service " service-id)))
              (log/info "Detection completed for service: " service-id))))))))
@@ -187,10 +187,10 @@ different-week-date value and skip all expired changes."
                    (drop 1 (periodic-seq (t/now) (t/minutes 1))))
            (fn [_]
              (#'update-one-gtfs! config db true)))
-         (chime-at (daily-at 5 15)
+         (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task db (time/now) false)))
-         (chime-at (daily-at 0 15)
+         (chime-at (tasks-util/daily-at 0 15)
                    (fn [_]
                      (recalculate-detected-changes-count db)))]
         (do
