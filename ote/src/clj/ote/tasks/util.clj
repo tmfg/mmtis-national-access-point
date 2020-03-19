@@ -30,10 +30,17 @@
         joda-date-year (.getYear joda-local-date)]
     (str joda-date-year "-" joda-date-month "-" joda-date-dayOfMonth)))
 
+(defn joda-datetime-to-java-time-local-date
+  "Format joda datetime to java.time.localdate"
+  [^org.joda.time.DateTime joda-datetime]
+  (java-time.local/local-date (joda-local-date-to-str (.toLocalDate joda-datetime))))
+
 (defn joda-local-date-to-java-time-local-date
   "Format joda local date to java.time.localdate"
   [^org.joda.time.LocalDate joda-local-date]
   (java-time.local/local-date (joda-local-date-to-str joda-local-date)))
 
-(defn joda-local-date-to-inst [^org.joda.time.LocalDate joda-local-date]
+(defn joda-local-date-to-inst
+  "Format joda-localdate to java datetime inst"
+  [^org.joda.time.LocalDate joda-local-date]
   (time/date-string->inst-date (joda-local-date-to-str joda-local-date)))

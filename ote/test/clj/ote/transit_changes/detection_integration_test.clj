@@ -136,7 +136,7 @@
                             :start-date (joda-datetime->inst (time/days-from current-start-date -63)) ; Keep monday as week start day
                             :end-date (joda-datetime->inst (time/days-from now 30))
                             :ignore-holidays? true}
-        detection-result (detection/detect-route-changes-for-service db route-query-params)
+        detection-result (detection/detect-route-changes-for-service db route-query-params (java.time.LocalDate/now))
         changes (->> detection-result
                      :route-changes
                      (filter :changes))
