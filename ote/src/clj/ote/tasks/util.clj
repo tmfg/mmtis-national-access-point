@@ -1,7 +1,10 @@
 (ns ote.tasks.util
   (:require [clj-time.core :as t]
-            [clj-time.periodic :refer [periodic-seq]])
-  (:import (org.joda.time DateTimeZone)))
+            [clj-time.periodic :refer [periodic-seq]]
+            [java-time :as java-time]
+            [ote.time :as time])
+  (:import (org.joda.time DateTimeZone)
+           (java.time LocalDate)))
 
 (defonce timezone (DateTimeZone/forID "Europe/Helsinki"))
 
@@ -14,3 +17,23 @@
                     (t/plus first-time (t/days 1))
                     first-time)
                   (t/days 1))))
+
+(defn joda-local-date-to-str [^org.joda.time.LocalDate joda-local-date]
+  (let [joda-date-dayOfMonth (.getDayOfMonth joda-local-date)
+        joda-date-dayOfMonth (if (= 1 (count (str joda-date-dayOfMonth)))
+                          (str "0" joda-date-dayOfMonth)
+                          joda-date-dayOfMonth)
+        joda-date-month (.getMonthOfYear joda-local-date)
+        joda-date-month (if (= 1 (count (str joda-date-month)))
+                          (str "0" joda-date-month)
+                          joda-date-month)
+        joda-date-year (.getYear joda-local-date)]
+    (str joda-date-year "-" joda-date-month "-" joda-date-dayOfMonth)))
+
+(defn joda-local-date-to-java-time-local-date
+  "Format joda local date to java.time.localdate"
+  [^org.joda.time.LocalDate joda-local-date]
+  (java-time.local/local-date (joda-local-date-to-str joda-local-date)))
+
+(defn joda-local-date-to-inst [^org.joda.time.LocalDate joda-local-date]
+  (time/date-string->inst-date (joda-local-date-to-str joda-local-date)))

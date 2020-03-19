@@ -14,7 +14,8 @@
             [ote.db.tx :as tx]
             [ote.transit-changes.change-history :as change-history]
             [ote.config.transit-changes-config :as config-tc])
-  (:import (java.time LocalDate DayOfWeek)))
+  (:import (java.time LocalDate)
+           (org.joda.time DateTime)))
 
 (def settings-tc (config-tc/config))
 
@@ -732,7 +733,7 @@
 (defn transform-route-change
   "Transform a detected route change into a database 'gtfs-route-change-info' type."
   [all-routes
-   {:keys [route-key change-date change-type changes] :as route-change} route-changes-all]
+   {:keys [route-key change-date change-type changes] :as route-change} route-changes-all ^LocalDate analysis-date]
   (spec/assert ::detected-route-changes-for-services-coll route-changes-all)
   (let [route-info (first (filter #(= route-key (:route-hash-id %))
                                   (map second all-routes)))
@@ -778,7 +779,7 @@
                                 {:gtfs/change-type :removed
                                  ;; For a removed route, the change-date is the day after traffic stops
                                  ;; BUT: If removed? is identified and route ends before current date, set change date as nil so we won't analyze this anymore.
-                                 :gtfs/change-date (if (.isBefore change-date (java.time.LocalDate/now))
+                                 :gtfs/change-date (if (.isBefore change-date (task-util/joda-local-date-to-java-time-local-date analysis-date))
                                                      nil
                                                      (time/sql-date change-date))
                                  :gtfs/different-week-date (time/sql-date change-date)
@@ -820,14 +821,14 @@
                               :gtfs/created-date (java.util.Date.)}
                              r)))))
 
-(defn update-transit-changes! [db analysis-date service-id package-ids {:keys [all-routes route-changes]}]
+(defn update-transit-changes! [db ^DateTime analysis-date service-id package-ids {:keys [all-routes route-changes]}]
   {:pre [(some? analysis-date)
          (or (zero? service-id)
              (pos? service-id))]}
   (tx/with-transaction
     db
     (let [route-change-infos (map (fn [detection-result]
-                                    (transform-route-change all-routes detection-result route-changes))
+                                    (transform-route-change all-routes detection-result route-changes (.toLocalDate analysis-date)))
                                   route-changes)
           change-infos-group (group-by :gtfs/change-type route-change-infos)
           earliest-route-change (first (drop-while (fn [{:gtfs/keys [change-date]}]
@@ -836,11 +837,12 @@
                                                          (date-in-the-past? (.toLocalDate change-date))))
                                                    (sort-by :gtfs/change-date route-change-infos)))
           ;; Set change date to future (every 2 weeks at monday) - This is the day when changes are detected for next time
-          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) (:detection-interval-service-days settings-tc))))
+          new-change-date (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate analysis-date)) (:detection-interval-service-days settings-tc))))
+          new-change-date-old (time/sql-date (time/native->date (.plusDays (time/beginning-of-week (.toLocalDate (time/now))) (:detection-interval-service-days settings-tc))))
           transit-chg-res (specql/upsert! db :gtfs/transit-changes
                                           #{:gtfs/transport-service-id :gtfs/date}
                                           {:gtfs/transport-service-id service-id
-                                           :gtfs/date analysis-date
+                                           :gtfs/date (task-util/joda-local-date-to-inst (.toLocalDate analysis-date))
                                            :gtfs/change-date new-change-date
                                            :gtfs/different-week-date (:gtfs/different-week-date earliest-route-change)
                                            :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
@@ -852,8 +854,8 @@
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]
-      (update-route-changes! db (time/sql-date analysis-date) service-id route-change-infos)
-      (change-history/update-change-history db (time/sql-date analysis-date) service-id package-ids route-change-infos))))
+      (update-route-changes! db (time/sql-date (task-util/joda-local-date-to-java-time-local-date (.toLocalDate analysis-date))) service-id route-change-infos)
+      (change-history/update-change-history db (time/sql-date (task-util/joda-local-date-to-java-time-local-date (.toLocalDate analysis-date))) service-id package-ids route-change-infos))))
 
 (defn override-holidays [db date-route-hashes]
   (map (fn [row]
@@ -988,7 +990,7 @@
         all-route-keys (set (keys all-routes))
 
         route-hashes (sort-by :date
-                              (apply concat
+                                (apply concat
                                      (mapv (fn [route-key]
                                              (let [query-params (merge {:route-hash-id route-key} route-query-params)]
                                                (service-route-hashes-for-date-range db query-params)))
@@ -1020,8 +1022,10 @@
         headsign (:gtfs/trip-headsign x)]
     (str short "-" long "-" headsign)))
 
-(defn service-package-ids-for-date-range [db query-params]
-  (mapv :id (service-packages-for-date-range db query-params)))
+(defn service-package-ids-for-date-range [db query-params detection-date-in-the-past?]
+  (if detection-date-in-the-past?
+    (mapv :id (service-packages-for-detection-date db query-params))
+    (mapv :id (service-packages-for-date-range db query-params))))
 
 ;; This is only for local development
 ;; Add route-hash-id for all routes in gtfs-transit-changes table in column route-hashes.
