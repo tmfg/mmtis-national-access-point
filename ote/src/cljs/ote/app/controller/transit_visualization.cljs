@@ -76,14 +76,17 @@
 
 (defn future-changes
   "Filter routes changes that are in the future. (or no changes)"
-  [detection-date changes]
-  (let [detection-date (time/parse-date-iso-8601 detection-date)]
+  [filter-date changes]
+  (let [detection-date (when (not (nil? filter-date))
+                         (time/parse-date-iso-8601 filter-date))]
     (filter
       (fn [{:keys [different-week-date]}]
         (or (nil? different-week-date)
-            (not (t/before?
-                   (time/native->date-time different-week-date)
-                   detection-date))))
+            (if (not (nil? filter-date))
+              (not (t/before?
+                     (time/native->date-time different-week-date)
+                     detection-date))
+              false)))
       changes)))
 
 (defn count-changes [key coll]
@@ -473,10 +476,14 @@
         detection-date date
         date-filter (if (= (name :now) scope)
                       (time/now-iso-date-str)
-                      detection-date)
-        changes (future-changes date-filter (:route-changes response))
+                      nil)
+        changes (if (not (nil? date-filter))
+                  (future-changes date-filter (:route-changes response))
+                  (:route-changes response))
         changes-all (sort-by :different-week-date < changes)
-        route (url-params->change router-params changes-all)]
+        route (url-params->change router-params changes-all)
+        all-routes (sorted-route-changes true changes)
+        changed-routes (sorted-route-changes false changes)]
 
     (-> (fetch-change-details app router-params route)
         (assoc :transit-visualization
@@ -484,8 +491,8 @@
                  :service-changes-for-date-loading? false
                  :service-info (:service-info response)
                  :changes-all changes-all
-                 :changes-route-no-change (sorted-route-changes true changes)
-                 :changes-route-filtered (sorted-route-changes false changes)
+                 :changes-route-no-change all-routes
+                 :changes-route-filtered changed-routes
                  :gtfs-package-info (:gtfs-package-info response)
                  :transit-changes (:transit-changes response)
                  :route-hash-id-type (:route-hash-id-type response)

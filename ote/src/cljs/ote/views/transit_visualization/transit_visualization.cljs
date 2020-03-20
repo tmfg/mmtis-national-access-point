@@ -284,9 +284,12 @@
                             :route-short-name :route-long-name
                             :count})
 
-(defn changed-routes-list [e! url-router-params route-changes no-change-routes selected-route route-hash-id-type]
-  (let [route-count (count route-changes)
-        no-change-routes-count (count no-change-routes)
+(defn changed-routes-list [e! url-router-params all-route-changes-display? all-routes filtered-routes selected-route route-hash-id-type]
+  (let [route-changes (if all-route-changes-display?
+                        all-routes
+                        filtered-routes)
+        route-count (count route-changes)
+        no-change-routes-count (- (count all-routes) (count filtered-routes))
         table-height (str
                        (cond
                          ;; 54: 50 (row height) + 4 (2px outline on both sides)
@@ -352,7 +355,7 @@
         :col-style style-base/table-col-style-wrap
         :format (fn [different-week-date]
                   (if-not different-week-date
-                    [icon-l/icon-labeled [ic/navigation-check] "Ei muutoksia"]
+                    [icon-l/icon-labeled [ic/navigation-check {:style {:width "16px"}}] "Ei muutoksia"]
                     [:span
                      (str (time/days-until different-week-date) " " (tr [:common-texts :time-days-abbr]))
                      [:div (stylefy/use-style {:color "gray"})
@@ -363,7 +366,8 @@
         :format (fn [grouped-route-data]
                   [tv-change-icons/route-change-icons grouped-route-data])}]
 
-      route-changes] e!
+      route-changes]
+     [:div "Reittejä, joissa muutoksia: " route-count " Reittejä, joissa ei muutoksia: " no-change-routes-count]
      [:div {:id "route-calendar-anchor"}]]))
 
 (defn format-stop-name [stop-name]
@@ -652,10 +656,7 @@
                                          all-route-changes-display? all-route-changes-checkbox]
                                   :as transit-visualization} :transit-visualization
                                  url-router-params :params}]
-  (let [routes (if all-route-changes-display?
-                 changes-route-no-change
-                 changes-route-filtered)
-        route-name (if (service-is-using-headsign route-hash-id-type)
+  (let [route-name (if (service-is-using-headsign route-hash-id-type)
                      (str (:route-short-name selected-route) " "
                           (:route-long-name selected-route)
                           " (" (:trip-headsign selected-route) ")")
@@ -686,7 +687,7 @@
            ;; Thus different key for checkbox allows triggering checkbox disabling logic first and table changes only after that.
            all-route-changes-checkbox]]]
 
-        [changed-routes-list e! url-router-params routes changes-route-no-change selected-route route-hash-id-type]]]
+        [changed-routes-list e! url-router-params all-route-changes-display? changes-route-no-change changes-route-filtered selected-route route-hash-id-type]]]
 
       (when selected-route
         [:div.transit-visualization-route.container
