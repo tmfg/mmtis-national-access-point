@@ -1,44 +1,43 @@
 (ns ote.views.gtfs-viewer
   "GTFS viewer"
-  (:require [ote.app.controller.gtfs-viewer :as gc]
+  (:require [clojure.string :as str]
             [reagent.core :as r]
             [cljs-react-material-ui.reagent :as ui]
+            [stylefy.core :refer [use-style]]
             [ote.gtfs.query :as gq]
-            [clojure.string :as str]
+            [ote.time :as time]
             [ote.ui.table :as table]
             [ote.ui.leaflet :as leaflet]
-            [ote.time :as time]
             [ote.style.base :as style-base]
-            [stylefy.core :refer [use-style]]))
+            [ote.app.controller.gtfs-viewer :as gc]))
 
 (defn routes-table [e! {:gtfs/keys [agency-txt routes-txt trips-txt]
-                        selected-route :selected-route}]
+                        selected-route :selected-route :as gtfs}]
   (let [agency-by-id (into {} (map (juxt :gtfs/agency-id identity)) agency-txt)
         trips-by-route (group-by :gtfs/route-id trips-txt)]
-    [table/table {:height "200px"
-                  :name->label #(case %
-                                  :agency "Liikennöitsijä"
-                                  :name "Linja"
-                                  :trips "Vuoroja")
-                  :key-fn :gtfs/route-id
-                  :row-selected? #(= (:route selected-route) %)
-                  :on-select #(when (seq %)
-                                (e! (gc/->SelectRoute (first %))))}
-     [{:name :agency
-       :read (comp :gtfs/agency-name agency-by-id :gtfs/agency-id)}
-      {:name :name
-       :read (fn [{:gtfs/keys [route-short-name route-long-name]}]
-               [:span [:b route-short-name] " " route-long-name])}
-      {:name :trips
-       :read #(count (trips-by-route (:gtfs/route-id %)))}]
-     routes-txt]))
+    [:div {:style {:height "300px" :overflow "auto"}}
+     [table/html-table
+      (vector "Liikennöitsijä" "Linja" "Vuoroja")
+      (mapv
+        (fn [c]
+          (let [;;route-trips (trips-by-route (:gtfs/route-id c))
+                route-trips (gq/route-trips gtfs (:gtfs/route-id c))
+                _ (.log js/console "route-trips " (count route-trips) (pr-str route-trips))]
+            {:on-click #(e! (gc/->SelectRoute c))
+             :data (vector
+                     (str (:gtfs/agency-name (agency-by-id (:gtfs/agency-id c)))) #_(comp :gtfs/agency-name agency-by-id (:gtfs/agency-id c))
+                     (str (:gtfs/route-short-name c) " " (:gtfs/route-long-name c))
+                     (count route-trips))}))
+        routes-txt)]]))
 
 (defn stop-popup [stop-id name {:gtfs/keys [stop-times-txt]}]
-  (let [stop-times (for [{arr :gtfs/arrival-time
+  (let [_ (.log js/console "stop-times-txt " (pr-str stop-times-txt))
+        stop-times (for [{arr :gtfs/arrival-time
                           dep :gtfs/departure-time :as st} stop-times-txt
                          :when (and (= (:gtfs/stop-id st) stop-id)
                                     (or arr dep))]
-                     (or arr dep))]
+                     (or arr dep))
+        _ (.log js/console "stop-popup :: stop-times" (pr-str stop-times))]
     [:div
      [:b name]
      [:ul
@@ -48,7 +47,7 @@
                           [:ellipsis]
                           (reverse (take 3 (reverse stop-times))))
                   stop-times)
-             :let [time (time/format-time st)]]
+             :let [time st]]
          (if (= :ellipsis st)
            ^{:key "ellipsis"}
            [:ul "\u22ee"]
