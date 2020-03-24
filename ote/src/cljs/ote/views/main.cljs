@@ -61,7 +61,10 @@
     (fn [page]
       [:span])}))
 
-(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices :own-services :admin :services :edit-route :new-route :routes :new-notice :edit-pre-notice :edit-service :new-service})
+(def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices
+                  :own-services :admin :services :edit-route :new-route :routes
+                  :new-notice :edit-pre-notice :edit-service :new-service
+                  :view-gtfs})
 
 (defn ote-application
   "OTE application main view"
