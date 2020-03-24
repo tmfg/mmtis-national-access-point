@@ -1381,7 +1381,13 @@ You can also draw the operating area or point to the map with drawing tools. You
   :password-changed "Password changed successfully"}
 
  :gtfs-viewer
- {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."}
+ {:gtfs-load-failed "Unfortunately, it is not possible to view route information for this service on the map as the processing of timetables and routes file failed."
+  :gtfs-routes "Routes"
+  :gtfs-agency "Transport operator"
+  :gtfs-route "Line"
+  :gtfs-trips "Trips"
+  :gtfs-map "Map"
+  :gtfs-routes-and-time-tables "Route and timetable information"}
 
  :error-landing
  {:resource-not-found "Sorry, selected functionality was not found!"
