@@ -1383,7 +1383,13 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :password-changed "Lösenordet har ändrats"}
 
  :gtfs-viewer
- {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."}
+ {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."
+  :gtfs-routes "Reitit"
+  :gtfs-agency "Liikennöitsijä"
+  :gtfs-route "Linja"
+  :gtfs-trips "Vuoroja"
+  :gtfs-map "Kartta"
+  :gtfs-routes-and-time-tables "Reitti- ja aikataulutiedot"}
 
  :error-landing
  {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"

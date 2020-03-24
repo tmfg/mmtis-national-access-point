@@ -1390,7 +1390,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :password-changed "Salasana vaihdettu"}
 
  :gtfs-viewer
- {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."}
+ {:gtfs-load-failed "Valitettavasti tämän palvelun reittitietoja ei ole mahdollista tarkastella kartalla, sillä reitti- ja aikataulutiedoston käsittely epäonnistui."
+  :gtfs-routes "Reitit"
+  :gtfs-agency "Liikennöitsijä"
+  :gtfs-route "Linja"
+  :gtfs-trips "Vuoroja"
+  :gtfs-map "Kartta"
+  :gtfs-routes-and-time-tables "Reitti- ja aikataulutiedot"}
 
  :error-landing
  {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"
