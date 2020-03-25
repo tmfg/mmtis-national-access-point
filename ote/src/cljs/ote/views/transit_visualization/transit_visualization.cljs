@@ -367,7 +367,7 @@
                   [tv-change-icons/route-change-icons grouped-route-data])}]
 
       route-changes]
-     [:div "Reittejä, joissa muutoksia: " route-count " Reittejä, joissa ei muutoksia: " no-change-routes-count]
+     #_ [:div "Reittejä, joissa muutoksia: " route-count " Reittejä, joissa ei muutoksia: " no-change-routes-count]
      [:div {:id "route-calendar-anchor"}]]))
 
 (defn format-stop-name [stop-name]
