@@ -17,9 +17,11 @@
 
 (defn routes-table [e! {:gtfs/keys [agency-txt routes-txt] :as gtfs}]
   (let [agency-by-id (into {} (map (juxt :gtfs/agency-id identity)) agency-txt)]
-    [:div.route-section {:style (dissoc style/section :padding-bottom)}
+    [:div.route-section {:style (merge
+                                  {:margin-top "2rem"}
+                                  (dissoc style/section :padding-bottom))}
      [:div.route-section-title (stylefy/use-style style/section-title) (tr [:gtfs-viewer :gtfs-routes])]
-     [:div {:style {:max-height "250px" :overflow "auto"}}
+     [:div
       [table/html-table
        (vector (tr [:gtfs-viewer :gtfs-agency]) (tr [:gtfs-viewer :gtfs-route]) (tr [:gtfs-viewer :gtfs-trips]))
        (mapv
@@ -30,7 +32,10 @@
                       (str (:gtfs/agency-name (agency-by-id (:gtfs/agency-id c)))) #_(comp :gtfs/agency-name agency-by-id (:gtfs/agency-id c))
                       (str (:gtfs/route-short-name c) " " (:gtfs/route-long-name c))
                       (count route-trips))}))
-         routes-txt)]]]))
+         routes-txt)
+       {:fixed-header true
+        :max-height-px 250
+        :overflow "auto"}]]]))
 
 (defn stop-popup [stop-id name {:gtfs/keys [stop-times-txt]}]
   (let [stop-times (for [{arr :gtfs/arrival-time
@@ -75,7 +80,9 @@
               (fn [i {:keys [positions color]}]
                 ^{:key i}
                 [leaflet/Polyline {:positions positions
-                                   :color color}])
+                                   :color (if color
+                                            color
+                                            "#8c4799")}])
               (:lines selected-route)))
 
           ;; Show marker for all stops
@@ -88,8 +95,9 @@
                [leaflet/Marker
                 {:position [stop-lat stop-lon]
                  :title stop-name
-                 :icon (js/L.divIcon #js {:className "route-stop-icon"})}]
-               [leaflet/Popup {}
+                 :icon (js/L.divIcon #js {:className "route-stop-icon"
+                                          :iconSize  #js [7 7]})}]
+               #_ [leaflet/Popup {}
                 [stop-popup stop-id stop-name gtfs]]]))
 
           (doall

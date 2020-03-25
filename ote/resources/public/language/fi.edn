@@ -1396,7 +1396,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :gtfs-route "Linja"
   :gtfs-trips "Vuoroja"
   :gtfs-map "Kartta"
-  :gtfs-routes-and-time-tables "Reitti- ja aikataulutiedot"}
+  :gtfs-routes-and-time-tables "Reitti- ja pysäkkitiedot"}
 
  :error-landing
  {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"

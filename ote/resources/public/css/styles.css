@@ -298,8 +298,8 @@ span.search-card-title {
 
 .route-stop-icon {
     border-style: solid;
-    border-color: blue;
-    border-radius: 6px;
+    border-color: #8c4799;
+    border-radius: 4px;
 }
 
 .route-bearing {

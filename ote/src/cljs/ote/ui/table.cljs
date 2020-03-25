@@ -127,27 +127,48 @@
 
 (defn html-table
   "Headers are a simple vector [text,text,text].
-  Rows are a mapv  [{:on-click xxx :data},{:on-click xxx :data}]"
-  [headers rows]
+  Add rows as a mapv e.g. [{:on-click xxx :data},{:on-click xxx :data}]
+  Available options are currently related only to fixed header: #{:max-height-px :fixed-header :overflow}"
+  [headers rows options]
   (let [row-index (r/atom 0)]
-    [:table.nap-table
-     [:thead
-      [:tr
-       (doall
-         (for [h headers]
-           ^{:key (str "html-table-header" h)}
-           [:th h]))]]
-     [:tbody
-      (doall
-        (for [row rows
-              :let [data (:data row)
-                    on-click (:on-click row)
-                    _ (swap! row-index inc)
-                    column-inx (r/atom 0)]]
-          ^{:key (str @row-index "-html-table-row" data)}
-          [:tr {:on-click on-click}
+    [:div {:style
+           (merge
+             (when (:max-height-px options) {:max-height (str (:max-height-px options) "px")}))}
+     ;; Create separate table for sticky headers
+     (when (:fixed-header options)
+       [:table.nap-table
+        [:thead
+         [:tr
+          (doall
+            (for [h headers]
+              ^{:key (str "html-table-header" h)}
+              [:th h]))]]])
+     ;; When sticky headers are not needed, create only one table
+     [:div {:style
+            {:max-height (str (- (:max-height-px options) 68))
+             :overflow (:overflow options)}}
+
+      [:table.nap-table (when (:overflow options) {:style
+                                                   {:max-height (:max-height options)
+                                                    :overflow (:overflow options)}})
+       (when-not (:fixed-header options)
+         [:thead
+          [:tr
            (doall
-             (for [column data
-                   :let [_ (swap! column-inx inc)]]
-               ^{:key (str @column-inx "-row-column-" column)}
-               [:td column]))]))]]))
+             (for [h headers]
+               ^{:key (str "html-table-header" h)}
+               [:th h]))]])
+       [:tbody
+        (doall
+          (for [row rows
+                :let [data (:data row)
+                      on-click (:on-click row)
+                      _ (swap! row-index inc)
+                      column-inx (r/atom 0)]]
+            ^{:key (str @row-index "-html-table-row" data)}
+            [:tr {:on-click on-click}
+             (doall
+               (for [column data
+                     :let [_ (swap! column-inx inc)]]
+                 ^{:key (str @column-inx "-row-column-" column)}
+                 [:td column]))]))]]]]))
