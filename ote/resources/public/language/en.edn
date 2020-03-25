@@ -1387,7 +1387,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :gtfs-route "Line"
   :gtfs-trips "Trips"
   :gtfs-map "Map"
-  :gtfs-routes-and-time-tables "Route and timetable information"}
+  :gtfs-routes-and-time-tables "Route and stop sequence information"}
 
  :error-landing
  {:resource-not-found "Sorry, selected functionality was not found!"
