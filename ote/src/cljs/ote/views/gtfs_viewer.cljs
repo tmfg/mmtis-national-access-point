@@ -46,26 +46,8 @@
         :overflow "auto"}]]]))
 
 (defn stop-popup [stop-id name {:gtfs/keys [stop-times-txt]}]
-  (let [stop-times (for [{arr :gtfs/arrival-time
-                          dep :gtfs/departure-time :as st} stop-times-txt
-                         :when (and (= (:gtfs/stop-id st) stop-id)
-                                    (or arr dep))]
-                     (or arr dep))]
-    [:div
-     [:b name]
-     [:ul
-      (doall
-        (for [st (if (> (count stop-times) 6)
-                   (concat (take 3 stop-times)
-                           [:ellipsis]
-                           (reverse (take 3 (reverse stop-times))))
-                   stop-times)
-              :let [time st]]
-          (if (= :ellipsis st)
-            ^{:key "ellipsis"}
-            [:ul "\u22ee"]
-            ^{:key time}
-            [:ul time])))]]))
+  [:div
+   [:b name]])
 
 (defn trips-map [_ _]
   (r/create-class
@@ -104,8 +86,8 @@
                 {:position [stop-lat stop-lon]
                  :title stop-name
                  :icon (js/L.divIcon #js {:className "route-stop-icon"
-                                          :iconSize  #js [7 7]})}]
-               #_ [leaflet/Popup {}
+                                          :iconSize  #js [11 11]})}]
+                [leaflet/Popup {}
                 [stop-popup stop-id stop-name gtfs]]]))
 
           (doall
