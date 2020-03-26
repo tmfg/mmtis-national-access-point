@@ -125,6 +125,7 @@
                    headers))])
             rows)))]]))
 
+(defonce selected-table-row (r/atom 0))
 (defn html-table
   "Headers are a simple vector [text,text,text].
   Add rows as a mapv e.g. [{:on-click xxx :data},{:on-click xxx :data}]
@@ -176,9 +177,17 @@
                       _ (swap! row-index inc)
                       column-inx (r/atom 0)]]
             ^{:key (str @row-index "-html-table-row" data)}
-            [:tr {:data-value @row-index
-                  :data @row-index
-                  :on-click on-click}
+            [:tr
+             {:style (merge {:color "yellow"} (when
+                                                (= (str @selected-table-row) (str @row-index))
+                                                {:outline (str "solid 3px " colors/primary-dark)
+                                                 :outline-offset "-3px"}))
+              :data-value @row-index
+              :data @row-index
+              :on-click (fn [event]
+                          (let [new-index (.getAttribute (-> event .-currentTarget) "data-value")]
+                            (reset! selected-table-row new-index)
+                            (on-click)))}
              (doall
                (for [column data
                      :let [_ (swap! column-inx inc)
