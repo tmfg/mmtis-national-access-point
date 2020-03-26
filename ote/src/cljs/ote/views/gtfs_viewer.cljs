@@ -23,15 +23,23 @@
      [:div.route-section-title (stylefy/use-style style/section-title) (tr [:gtfs-viewer :gtfs-routes])]
      [:div
       [table/html-table
-       (vector (tr [:gtfs-viewer :gtfs-agency]) (tr [:gtfs-viewer :gtfs-route]) (tr [:gtfs-viewer :gtfs-trips]))
+       (vector {:text (tr [:gtfs-viewer :gtfs-agency])
+                :width "37%"}
+               {:text (tr [:gtfs-viewer :gtfs-route])
+                :width "53%"}
+               {:text (tr [:gtfs-viewer :gtfs-trips])
+                :width "10%"})
        (mapv
          (fn [c]
            (let [route-trips (gq/route-trips gtfs (:gtfs/route-id c))]
              {:on-click #(e! (gc/->SelectRoute c))
               :data (vector
-                      (str (:gtfs/agency-name (agency-by-id (:gtfs/agency-id c)))) #_(comp :gtfs/agency-name agency-by-id (:gtfs/agency-id c))
-                      (str (:gtfs/route-short-name c) " " (:gtfs/route-long-name c))
-                      (count route-trips))}))
+                      {:text (str (:gtfs/agency-name (agency-by-id (:gtfs/agency-id c))))
+                       :width "37%"}
+                      {:text (str (:gtfs/route-short-name c) " " (:gtfs/route-long-name c))
+                       :width "55%"}
+                      {:text (count route-trips)
+                       :width "8%"})}))
          routes-txt)
        {:fixed-header true
         :max-height-px 250

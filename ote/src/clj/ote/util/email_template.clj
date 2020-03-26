@@ -162,7 +162,7 @@
      [:div.whiteBackground.spacing-left-right
       [:a {:href (str (environment/base-url))}
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
-              :widht "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
+              :width "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
 
       body]
 

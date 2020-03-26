@@ -140,12 +140,17 @@
         [:thead
          [:tr
           (doall
-            (for [h headers]
+            (for [h headers
+                  :let [width (when (map? h)
+                                (:width h))
+                        text (if (string? h)
+                               h
+                               (:text h))]]
               ^{:key (str "html-table-header" h)}
-              [:th h]))]]])
+              [:th (when width {:style {:width width}}) text]))]]])
      ;; When sticky headers are not needed, create only one table
      [:div {:style
-            {:max-height (str (- (:max-height-px options) 68))
+            {:max-height (str (- (:max-height-px options) 58) "px")
              :overflow (:overflow options)}}
 
       [:table.nap-table (when (:overflow options) {:style
@@ -155,9 +160,14 @@
          [:thead
           [:tr
            (doall
-             (for [h headers]
-               ^{:key (str "html-table-header" h)}
-               [:th h]))]])
+             (for [h headers
+                   :let [width (when (map? h)
+                                 (:width h))
+                         text (if (string? h)
+                                h
+                                (:text h))]]
+               ^{:key (str "html-table-header" text)}
+               [:th (when width {:style {:width width}}) text]))]])
        [:tbody
         (doall
           (for [row rows
@@ -166,9 +176,16 @@
                       _ (swap! row-index inc)
                       column-inx (r/atom 0)]]
             ^{:key (str @row-index "-html-table-row" data)}
-            [:tr {:on-click on-click}
+            [:tr {:data-value @row-index
+                  :data @row-index
+                  :on-click on-click}
              (doall
                (for [column data
-                     :let [_ (swap! column-inx inc)]]
-                 ^{:key (str @column-inx "-row-column-" column)}
-                 [:td column]))]))]]]]))
+                     :let [_ (swap! column-inx inc)
+                           width (when (map? column)
+                                   (:width column))
+                           text (if (string? column)
+                                  column
+                                  (:text column))]]
+                 ^{:key (str @column-inx "-row-column-" text)}
+                 [:td (when width {:style {:width width}}) text]))]))]]]]))
