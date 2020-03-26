@@ -987,7 +987,9 @@
   Output: ::detected-route-changes-for-services-coll"
   (let [route-hash-id-type (db-route-detection-type db service-id)
         ;; Generate "key" for all routes. By default it will be a vector ["<route-short-name>" "<route-long-name" "trip-headsign"]
-        service-routes-for-3-years (sort-by :route-hash-id (service-routes-with-date-range db {:service-id service-id}))
+        service-routes-for-3-years (sort-by :route-hash-id
+                                            (service-routes-with-date-range db {:service-id service-id
+                                                                                :detection-date analysis-date}))
         all-routes (map-by-route-key service-routes-for-3-years route-hash-id-type)
         all-route-keys (set (keys all-routes))
 

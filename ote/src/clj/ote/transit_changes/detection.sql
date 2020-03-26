@@ -40,7 +40,7 @@ SELECT DISTINCT pids.id
        JOIN LATERAL unnest(gtfs_packages_for_detection(:service-id::INTEGER, d.date)) pids (id) ON TRUE;
 
 -- name: service-routes-with-date-range
-SELECT * FROM gtfs_routes_for_change_detection(:service-id::INTEGER);
+SELECT * FROM gtfs_routes_for_change_detection(:service-id::INTEGER, :detection-date::DATE);
 
 -- name: fetch-route-trips-for-date
 WITH routes AS (
