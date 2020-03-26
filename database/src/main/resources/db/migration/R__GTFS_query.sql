@@ -553,7 +553,7 @@ $$ LANGUAGE SQL STABLE;
 COMMENT ON FUNCTION gtfs_route_next_different_week(INTEGER,TEXT,TEXT,TEXT) IS
 E'Returns the next different week for the given service and route.';
 
-CREATE OR REPLACE FUNCTION gtfs_routes_for_change_detection(service_id INTEGER)
+CREATE OR REPLACE FUNCTION gtfs_routes_for_change_detection(service_id INTEGER, detection_date DATE)
 RETURNS SETOF gtfs_route_with_daterange AS $$
 WITH dates AS (
   -- Calculate a series of dates from beginning of last year
@@ -582,7 +582,7 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
   AND rh."route-hash-id" != ''
  GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id"
  -- Remove routes that do not have traffic anymore
- HAVING MAX(d.date) >= current_date;
+ HAVING MAX(d.date) >= detection_date;
 $$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION calculate_route_hash_id_using_headsign(package_id INTEGER)
