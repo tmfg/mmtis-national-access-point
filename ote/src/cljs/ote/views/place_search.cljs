@@ -148,6 +148,7 @@
                            :maxSearchResults 12
                            :on-update-input #(e! (ps/->SetPrimaryPlaceName %))
                            :search-text (or (:primary-name place-search) "")
+                           :menu-style {:max-height "400px" :overflow "auto"}
                            :on-new-request #(e! (ps/->AddPlace (aget % "id") true))}])
       [:div {:style {:font-weight "bold" :margin-top "60px"}}
        [:span (tr [:place-search :secondary-header])]

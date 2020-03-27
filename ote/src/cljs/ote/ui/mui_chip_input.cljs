@@ -31,6 +31,7 @@
                     :inputStyle {:margin-top "12px"
                                  :margin-bottom "14px"}
                     :listStyle {:width "auto"}
+                    :menu-style {:max-height "400px" :overflow "auto"}
                     :chipContainerStyle {:margin-top "6px"}})
 
 (def chip-input* (r/adapt-react-class (aget js/window "MaterialUIChipInput")))
