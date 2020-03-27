@@ -42,11 +42,11 @@ SELECT ts.id AS "transport-service-id",
                   WHERE eid."transport-service-id" = ts.id
                     AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
                     AND 'route-and-schedule' = ANY(eid."data-content")) AS "no-interfaces?",
-       NOT EXISTS(SELECT id
-                  FROM "external-interface-description" eid
-                  WHERE eid."transport-service-id" = ts.id
+       NOT EXISTS(SELECT eid.id
+                  FROM "external-interface-description" eid, "external-interface-download-status" eids
+                  WHERE eid."transport-service-id" = ts.id and eids."external-interface-description-id" = eid.id
                     AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
-                    AND 'route-and-schedule' = ANY(eid."data-content") AND eid."gtfs-imported" IS NOT NULL) AS "no-interfaces-imported?",
+                    AND 'route-and-schedule' = ANY(eid."data-content")) AS "no-interfaces-imported?",
        (SELECT string_agg(fr, ',')
         FROM gtfs_package p
                JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
