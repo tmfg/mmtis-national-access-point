@@ -193,8 +193,8 @@
                      :let [_ (swap! column-inx inc)
                            width (when (map? column)
                                    (:width column))
-                           text (if (string? column)
-                                  column
-                                  (:text column))]]
+                           text (if (map? column)
+                                  (:text column)
+                                  column)]]
                  ^{:key (str @column-inx "-row-column-" text)}
                  [:td (when width {:style {:width width}}) text]))]))]]]]))
