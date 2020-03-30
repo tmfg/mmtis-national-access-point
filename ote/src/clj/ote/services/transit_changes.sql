@@ -15,10 +15,10 @@ SELECT ts.id AS "transport-service-id",
        ts."commercial-traffic?" AS "commercial?",
        ts.name AS "transport-service-name",
        op.name AS "transport-operator-name",
-       c."added-routes" as "added-routes",
-       c."removed-routes" as "removed-routes",
-       c."no-traffic-routes" as "no-traffic-routes",
-       c."changed-routes" as "changed-routes",
+       c."current-added-routes" as "added-routes",
+       c."current-removed-routes" as "removed-routes",
+       c."current-no-traffic-routes" as "no-traffic-routes",
+       c."current-changed-routes" as "changed-routes",
        CURRENT_DATE as "current-date",
        c."change-date",
        c."date",
@@ -73,7 +73,7 @@ WHERE 'road' = ANY(ts."transport-type")
   AND ts.published IS NOT NULL
 -- Group so that each group represents a distinct change date, allows summing up changes in SELECT section of this query
 GROUP BY ts.id, c."date", op.name, c."change-date", c."package-ids", c."different-week-date", "sent-emails"."email-sent",
-         c."added-routes", c."removed-routes", c."no-traffic-routes", c."changed-routes"
+         c."current-added-routes", c."current-removed-routes", c."current-no-traffic-routes", c."current-changed-routes"
 
 ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC,
          op.name ASC;
