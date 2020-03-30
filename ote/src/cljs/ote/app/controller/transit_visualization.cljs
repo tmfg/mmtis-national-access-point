@@ -10,7 +10,9 @@
             [ote.transit-changes :as tcu]
             [clojure.string :as str]
             [ote.app.controller.common :refer [->ServerError]]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [clojure.set :as set]
+            [reagent.core :as r]))
 
 (defn ensure-route-hash-id
   "Some older detected route changes might not contain route-hash-id key, so ensure that one is found."
@@ -64,14 +66,44 @@
       {:days (t/in-days (t/interval dt diff-date))
        :date diff-date})))
 
+(defn- stop-sequence-changes [combined-stop-sequence]
+  (let [date1-nil-count (r/atom 0)
+        date2-nil-count (r/atom 0)
+        changed-stops (keep
+                        (fn [stop]
+                          (let [_ (when (nil? (:gtfs/departure-time-date1 stop)) (swap! date1-nil-count inc))
+                                _ (when (nil? (:gtfs/departure-time-date2 stop)) (swap! date2-nil-count inc))]
+                            (if (or (nil? (:gtfs/departure-time-date1 stop))
+                                    (nil? (:gtfs/departure-time-date2 stop)))
+                              stop
+                              nil)))
+                        combined-stop-sequence)
+        sequence-changes-count (if (or (and (= @date1-nil-count (count combined-stop-sequence)) (= @date1-nil-count (count changed-stops)))
+                                       (and (= @date2-nil-count (count combined-stop-sequence)) (= @date2-nil-count (count changed-stops))))
+                                 0
+                                 (count changed-stops))]
+    sequence-changes-count))
+
+(defn- different-stop-times [combined-stop-sequence]
+  (reduce (fn [chg stop]
+            (let [date1 (:gtfs/departure-time-date1 stop)
+                  date2 (:gtfs/departure-time-date2 stop)]
+              (if (and date1 date2 (not= date1 date2))
+                (inc chg)
+                chg)))
+          0 combined-stop-sequence))
+
 (defn select-first-trip
   "When route is selected first trip needs to be selected as well from trip list. Set selected-trip-pair and combined-stop-sequence."
   [transit-visualization]
-  (let [trip-pair (first (get-in transit-visualization [:compare :combined-trips]))]
+  (let [trip-pair (first (get-in transit-visualization [:compare :combined-trips]))
+        combined-stop-sequence (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair)
+        stop-differences {:stop-seq-changes (stop-sequence-changes combined-stop-sequence)
+                          :stop-time-changes (different-stop-times combined-stop-sequence)}]
     (-> transit-visualization
+        (assoc-in [:compare :stop-differences] stop-differences)
         (assoc-in [:compare :selected-trip-pair] trip-pair)
-        (assoc-in [:compare :combined-stop-sequence]
-                  (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
+        (assoc-in [:compare :combined-stop-sequence] combined-stop-sequence)
         (assoc-in [:open-sections :trip-stop-sequence] true))))
 
 (defn future-changes
@@ -525,6 +557,7 @@
       ;; cond resolves new app state based on url changes. Move into a function if assocs get complicated in future.
       ;; Each case MUST RETURN AN APP STATE, please
       (cond
+        ;; If date or service changes
         (or (not= date (:date params-previous))
             (not= service-id (:service-id params-previous)))
         (fetch-changed-routes-list app params-new)
@@ -533,7 +566,8 @@
         (str/blank? route-hash-id)
         (assoc-in app [:transit-visualization :selected-route] nil)
 
-        ;; Use-case: selection of route-hash-id changes. E.g. via user selection or browser history navigation
+        ;; Use-case: selection of route-hash-id changes or if different change is selected from calendar change list
+        ;; E.g. via user selection or browser history navigation
         (or (not= route-hash-id (:route-hash-id params-previous))
             (not= change-id (:change-id params-previous)))
         (fetch-change-details app
@@ -589,11 +623,14 @@
 
 (define-event SelectTripPair [trip-pair]
   {}
-  (-> app
-      (assoc-in [:transit-visualization :compare :selected-trip-pair] trip-pair)
-      (assoc-in [:transit-visualization :compare :combined-stop-sequence]
-                (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair))
-      (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true)))
+  (let [combined-stop-sequence (tcu/combined-stop-sequence (:first-common-stop (first trip-pair)) trip-pair)
+        stop-differences {:stop-seq-changes (stop-sequence-changes combined-stop-sequence)
+                          :stop-time-changes (different-stop-times combined-stop-sequence)}]
+    (-> app
+        (assoc-in [:transit-visualization :compare :stop-differences] stop-differences)
+        (assoc-in [:transit-visualization :compare :selected-trip-pair] trip-pair)
+        (assoc-in [:transit-visualization :compare :combined-stop-sequence] combined-stop-sequence)
+        (assoc-in [:transit-visualization :open-sections :trip-stop-sequence] true))))
 
 (define-event ToggleShowRouteLine [routename]
   {:path [:transit-visualization :compare :show-route-lines]}

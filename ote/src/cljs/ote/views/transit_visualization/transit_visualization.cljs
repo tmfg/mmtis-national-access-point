@@ -468,7 +468,7 @@
              :col-style style-base/table-col-style-wrap}]
            trips]])]]]))
 
-(defn trip-stop-sequence [e! open-sections {:keys [combined-stop-sequence selected-trip-pair] :as compare}]
+(defn trip-stop-sequence [e! open-sections {:keys [combined-stop-sequence selected-trip-pair stop-differences] :as compare}]
   (let [date1-first-stop (first (:stoptimes (first (:selected-trip-pair compare))))
         date1-last-stop (last (:stoptimes (first (:selected-trip-pair compare))))
         date2-first-stop (first (:stoptimes (second (:selected-trip-pair compare))))
@@ -488,9 +488,9 @@
           (time/format-date (:date2 compare)) " ).")
      (let [second-stops-empty? (empty? (:stoptimes (second selected-trip-pair)))]
        [:div
-        (when (seq (:differences compare))
+        (when (seq stop-differences)
           [:div {:style {:padding-top "0.5rem"}}
-           [tv-change-icons/change-icons-for-stops (:differences compare) true]
+           [tv-change-icons/change-icons-for-stops stop-differences true]
            [:div {:style {:padding-bottom "1rem"}}]
            [tv-change-icons/change-icons-for-dates compare date1-label date2-label]])
 

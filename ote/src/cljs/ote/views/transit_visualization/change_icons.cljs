@@ -129,9 +129,13 @@
   [:div {:style {:flex "1"}}
    [stop-seq-changes-icon (:trip-stop-sequence-changes-lower diff) (:trip-stop-sequence-changes-upper diff) with-labels?]])
 
-(defn- show-stop-times [diff with-labels?]
+(defn- show-stop-times-general [diff with-labels?]
   [:div {:style {:flex "1"}}
    [stop-time-changes-icon (:trip-stop-time-changes-lower diff) (:trip-stop-time-changes-upper diff) with-labels?]])
+
+(defn- show-stop-times-stops [stop-time-changes with-labels?]
+  [:div {:style {:flex "1"}}
+   [stop-time-changes-icon stop-time-changes nil with-labels?]])
 
 (defn change-icons-for-calendar
   ([diff]
@@ -142,7 +146,7 @@
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
     [show-trip-sequences diff with-labels?]
-    [show-stop-times diff with-labels?]
+    [show-stop-times-general diff with-labels?]
 
     (if (str/includes? (str change-type) "no-traffic")
       [:div {:style {:flex "0.5"} :title (tr [:transit-changes :no-traffic])}
@@ -164,18 +168,18 @@
     [show-added-trips diff with-labels?]
     [show-removed-trips diff with-labels?]
     [show-trip-sequences diff with-labels?]
-    [show-stop-times diff with-labels?]]))
+    [show-stop-times-general diff with-labels?]]))
 
 (defn change-icons-for-stops
-  ([diff]
-   [change-icons-for-stops diff false])
-  ([{:keys [trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper] :as diff} with-labels?]
+  ([stop-differences]
+   [change-icons-for-stops stop-differences false])
+  ([{:keys [stop-seq-changes stop-time-changes] :as diff} with-labels?]
    [:div (stylefy/use-style (style-base/flex-container "row"))
     ;; show-trip-sequences not used here because of needed custom layout
     [:div {:style {:flex 1}}
-     [stop-seq-changes-icon trip-stop-sequence-changes-lower trip-stop-sequence-changes-upper with-labels?]]
+     [stop-seq-changes-icon stop-seq-changes nil with-labels?]]
     [:div {:style {:flex 3}}
-     [show-stop-times diff with-labels?]]]))
+     [show-stop-times-stops stop-time-changes with-labels?]]]))
 
 (defn change-icons-for-dates
   ([compare-data]
