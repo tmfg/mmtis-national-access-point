@@ -128,11 +128,6 @@
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
     [:span
      (cond
-       (and (false? no-interfaces?) interfaces-has-errors?)
-       [:div
-        [ic/alert-error {:style {:color "CC0000"}}]
-        [:div (use-style style/change-icon-value)
-         "Virheitä rajapinnoissa"]]
        no-interfaces?
        [:div
         [ic/alert-warning {:style {:color "CCCC00"}}]
@@ -143,6 +138,11 @@
         [ic/action-info]
         [:div (use-style style/change-icon-value)
          "Rajapintoja ei vielä käsitelty"]]
+       (and (false? no-interfaces?) interfaces-has-errors?)
+       [:div
+        [ic/alert-error {:style {:color "CC0000"}}]
+        [:div (use-style style/change-icon-value)
+         "Virheitä rajapinnoissa"]]
        (= 0 (+ added-routes changed-routes removed-routes no-traffic-routes))
        [:div
         [ic/navigation-check]
