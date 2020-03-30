@@ -167,13 +167,14 @@ different-week-date value and skip all expired changes."
 
         (log/info (inc i) "/" (count upcoming-changes) " Recalculating detected change amounts (by change type) for service " (:transport-service-id change-row) " detection date " (:date change-row))
         ;; Update sinle transit-change (change-row)
-        (specql/update! db :gtfs/transit-changes
-                        {:gtfs/removed-routes (count (group-by :route-hash-id (:removed grouped-changes)))
-                         :gtfs/added-routes (count (group-by :route-hash-id (:added grouped-changes)))
-                         :gtfs/changed-routes (count (group-by :route-hash-id (:changed grouped-changes)))
-                         :gtfs/no-traffic-routes (count (group-by :route-hash-id (:no-traffic grouped-changes)))}
-                        {:gtfs/date (:date change-row)
-                         :gtfs/transport-service-id (:transport-service-id change-row)})))
+        (when (not (nil? (:date change-row)))
+          (specql/update! db :gtfs/transit-changes
+                          {:gtfs/current-removed-routes (count (group-by :route-hash-id (:removed grouped-changes)))
+                           :gtfs/current-added-routes (count (group-by :route-hash-id (:added grouped-changes)))
+                           :gtfs/current-changed-routes (count (group-by :route-hash-id (:changed grouped-changes)))
+                           :gtfs/current-no-traffic-routes (count (group-by :route-hash-id (:no-traffic grouped-changes)))}
+                          {:gtfs/date (:date change-row)
+                           :gtfs/transport-service-id (:transport-service-id change-row)}))))
     (log/info "Detected change count recalculation ready!")))
 
 (defrecord GtfsTasks [at config]
