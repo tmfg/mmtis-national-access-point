@@ -69,15 +69,15 @@
 (defn- stop-sequence-changes [combined-stop-sequence]
   (let [date1-nil-count (r/atom 0)
         date2-nil-count (r/atom 0)
-        changed-stops (keep
-                        (fn [stop]
-                          (let [_ (when (nil? (:gtfs/departure-time-date1 stop)) (swap! date1-nil-count inc))
-                                _ (when (nil? (:gtfs/departure-time-date2 stop)) (swap! date2-nil-count inc))]
-                            (if (or (nil? (:gtfs/departure-time-date1 stop))
-                                    (nil? (:gtfs/departure-time-date2 stop)))
-                              stop
-                              nil)))
-                        combined-stop-sequence)
+        changed-stops (doall (keep
+                               (fn [stop]
+                                 (let [_ (when (nil? (:gtfs/departure-time-date1 stop)) (swap! date1-nil-count inc))
+                                       _ (when (nil? (:gtfs/departure-time-date2 stop)) (swap! date2-nil-count inc))]
+                                   (if (or (nil? (:gtfs/departure-time-date1 stop))
+                                           (nil? (:gtfs/departure-time-date2 stop)))
+                                     stop
+                                     nil)))
+                               combined-stop-sequence))
         sequence-changes-count (if (or (and (= @date1-nil-count (count combined-stop-sequence)) (= @date1-nil-count (count changed-stops)))
                                        (and (= @date2-nil-count (count combined-stop-sequence)) (= @date2-nil-count (count changed-stops))))
                                  0

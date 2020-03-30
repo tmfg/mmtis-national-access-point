@@ -123,7 +123,8 @@
                          :update! #(e! (tc/->ToggleShowContractTraffic))}
       show-contract-traffic]]]])
 
-(defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week] :as row}]
+(defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week
+                                   added-routes changed-routes removed-routes no-traffic-routes] :as row}]
   (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
     [:span
      (cond
@@ -142,7 +143,7 @@
         [ic/action-info]
         [:div (use-style style/change-icon-value)
          "Rajapintoja ei vielä käsitelty"]]
-       (not changes?)
+       (= 0 (+ added-routes changed-routes removed-routes no-traffic-routes))
        [:div
         [ic/navigation-check]
         [:div (use-style style/change-icon-value)
