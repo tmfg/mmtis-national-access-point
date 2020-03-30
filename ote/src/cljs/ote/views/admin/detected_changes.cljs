@@ -209,7 +209,13 @@
    [day-hash-button-element e!
     "Selvitä tuotannon päiväyksiin liittyvää formatointiongelmaa"
     "Logita päiväykset"
-    #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]])
+    #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]
+
+   [:br]
+   [day-hash-button-element e!
+    "Käynnistä yöllinen muutostunnistusten gtfs-transit-changes siivous, koska muutokset voivat vanhentua kalenteripäivien edetessä ja muutosten jäädessä historiaan."
+    "Siivoa vanhat muutostunnistukset"
+    #(e! (admin-transit-changes/->CleanupOldTransitChanges))]])
 
 (defn route-id [e! app-state recalc?]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]

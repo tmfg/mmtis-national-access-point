@@ -848,9 +848,13 @@
                                            :gtfs/current-week-date (:gtfs/current-week-date earliest-route-change)
 
                                            :gtfs/removed-routes (count (group-by :gtfs/route-hash-id (:removed change-infos-group)))
+                                           :gtfs/current-removed-routes (count (group-by :gtfs/route-hash-id (:removed change-infos-group)))
                                            :gtfs/added-routes (count (group-by :gtfs/route-hash-id (:added change-infos-group)))
+                                           :gtfs/current-added-routes (count (group-by :gtfs/route-hash-id (:added change-infos-group)))
                                            :gtfs/changed-routes (count (group-by :gtfs/route-hash-id (:changed change-infos-group)))
+                                           :gtfs/current-changed-routes (count (group-by :gtfs/route-hash-id (:changed change-infos-group)))
                                            :gtfs/no-traffic-routes (count (group-by :gtfs/route-hash-id (:no-traffic change-infos-group)))
+                                           :gtfs/current-no-traffic-routes (count (group-by :gtfs/route-hash-id (:no-traffic change-infos-group)))
 
                                            :gtfs/package-ids package-ids
                                            :gtfs/created (java.util.Date.)})]

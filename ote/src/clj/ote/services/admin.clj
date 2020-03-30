@@ -1,14 +1,29 @@
 (ns ote.services.admin
   "Backend services for admin functionality."
-  (:require [ote.components.http :as http]
+  (:require [clojure.data.csv :as csv]
+            [clojure.data :as data]
+            [clojure.java.io :as io]
+            [clojure.set :as set]
+            [clojure.spec.alpha :as spec]
+            [clojure.string :as str]
+            [clj-http.client :as http-client]
+            [ring.util.io :as ring-io]
             [com.stuartsierra.component :as component]
+            [specql.impl.composite :as composite]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
+            [specql.impl.registry :as specql-registry]
             [specql.op :as op]
+            [clj-time.core :as t]
+            [clj-time.format :as format]
             [taoensso.timbre :as log]
+            [hiccup.core :refer [html]]
+            [compojure.core :refer [routes GET POST DELETE]]
+            [cheshire.core :as cheshire]
+            [ote.components.http :as http]
             [ote.util.csv :as csv-util]
+            [ote.db.tx :as tx]
             [ote.db.gtfs :as gtfs]
             [ote.transit :refer [clj->transit]]
-            [compojure.core :refer [routes GET POST DELETE]]
             [jeesql.core :refer [defqueries]]
             [ote.nap.users :as nap-users]
             [specql.core :as specql]
@@ -21,32 +36,18 @@
             [ote.integration.export.netex :as export-netex]
             [ote.services.transport :as transport]
             [ote.services.operators :as operators]
-            [cheshire.core :as cheshire]
             [ote.authorization :as authorization]
             [ote.util.db :as db-util]
-            [clojure.string :as str]
-            [clojure.data.csv :as csv]
-            [clojure.data :as data]
-            [clojure.java.io :as io]
-            [ring.util.io :as ring-io]
             [ote.components.service :refer [define-service-component]]
             [ote.localization :as localization :refer [tr]]
-            [clj-time.core :as t]
             [ote.time :as time]
-            [clj-http.client :as http-client]
             [ote.services.external :as external]
             [ote.tasks.pre-notices :as pn]
-            [hiccup.core :refer [html]]
+            [ote.tasks.gtfs :as task-gtfs]
             [ote.email :as email]
-            [clojure.spec.alpha :as spec]
             [ote.util.collections :as ote-coll]
             [ote.util.email-template :as email-template]
-            [ote.services.users :as srv-users]
-            [clj-time.format :as format]
-            [clojure.set :as set]
-            [specql.impl.registry :as specql-registry]
-            [specql.impl.composite :as composite]
-            [ote.db.tx :as tx])
+            [ote.services.users :as srv-users])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -788,6 +789,10 @@
     (GET "/admin/general-troubleshooting-log" req
       (require-admin-user "general-troubleshooting-log" (:user (:user req)))
       (log-different-date-formations (:user (:user req))))
+
+    (POST "/admin/recalculate-detected-changes-count" req
+      (require-admin-user "recalculate-detected-changes-count" (:user (:user req)))
+      (task-gtfs/recalculate-detected-changes-count db))
 
     (GET "/admin/pre-notices/notify" req
       (or (authorization-fail-response (get-in req [:user :user]))
