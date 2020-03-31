@@ -1384,12 +1384,12 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :gtfs-viewer
  {:gtfs-load-failed "Tyvärr är det inte möjligt att visa ruttinformation för den här tjänsten på kartan, eftersom behandlingen av tidtabeller och ruttfil misslyckades."
-  :gtfs-routes "Reitit"
-  :gtfs-agency "Liikennöitsijä"
-  :gtfs-route "Linja"
-  :gtfs-trips "Vuoroja"
-  :gtfs-map "Kartta"
-  :gtfs-routes-and-time-tables "Reitti- ja aikataulutiedot"}
+  :gtfs-routes "Rutter"
+  :gtfs-agency "Trafikidkare"
+  :gtfs-route "Linje"
+  :gtfs-trips "Avgångar"
+  :gtfs-map "Map"
+  :gtfs-routes-and-time-tables "Rutt- och hållplatsinformation"}
 
  :error-landing
  {:resource-not-found "Pahoittelut - valitsemaasi toimintoa ei löytynyt!"
