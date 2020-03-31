@@ -25,7 +25,7 @@
                  ;; HicariCP jdbc driver - Apache 2.0
                  [com.zaxxer/HikariCP "3.4.1"]
                  ;; A low-level Clojure wrapper for JDBC-based access to databases. - Eclipse Public License 1.0
-                 [org.clojure/java.jdbc "0.7.1"]
+                 [org.clojure/java.jdbc "0.7.11"]
                  ;; A Clojure library for using SQL - Eclipse Public License 1.0
                  [webjure/jeesql "0.4.7"]
                  ;; A library for simple PostgreSQL queries with namespaced keys. - MIT
