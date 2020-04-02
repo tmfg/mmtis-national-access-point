@@ -820,6 +820,8 @@
             {:name ::t-service/from
              :label (tr [:field-labels :transport-service ::t-service/from])
              :element-id "start-time"
+             :wrapper-style style-form/input-element-wrapper-div
+             :label-style style-form/input-element-label
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}
@@ -833,6 +835,8 @@
             {:name ::t-service/to
              :label (tr [:field-labels :transport-service ::t-service/to])
              :element-id "end-time"
+             :wrapper-style style-form/input-element-wrapper-div
+             :label-style style-form/input-element-label
              :type :time
              :disabled? in-validation?
              :container-style {:padding-top "1.5rem"}
