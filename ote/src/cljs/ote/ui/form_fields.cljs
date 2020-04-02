@@ -648,71 +648,73 @@
 (def minute-regex #"^(^$|0?[0-9]|[1-5][0-9])$")
 
 (defmethod field :time [{:keys [update! element-id error-hour error-min on-blur required? unrestricted-hours? warning
-                                style input-style container-style disabled? row-number] :as opts}
+                                style input-style container-style disabled? row-number label label-style wrapper-style] :as opts}
                         {:keys [hours hours-text minutes minutes-text] :as data}]
-  [:div {:style (merge style-base/inline-block container-style)}
-   [field (merge
-            {:element-id (str "hours-" element-id "-" row-number)
-             :type :string
-             :name "hours"
-             :error (when error-hour
-                      (error-hour data))
-             :error-text false
-             :regex (if unrestricted-hours?
-                      unrestricted-hour-regex
-                      hour-regex)
-             :style (merge {:width "30px"} style)
-             :input-style (merge {:text-align "right"}
-                                 input-style)
-             :hint-style {:position "absolute" :right "0"}
-             :on-blur (when on-blur
-                        on-blur)
-             :update! (fn [hour]
-                        (let [h (if (str/blank? hour)
-                                  nil
-                                  (js/parseInt hour))]
-                          (update! (assoc (time/->Time h minutes nil)
-                                     :hours-text hour))))}
-            (when (and required? (empty? data))
-              {:warning true})
-            (when disabled?
-              {:disabled? true})
-            (when (not hours)
-              {:hint-text (tr [:common-texts :hours-placeholder])}))
-    (if (not hours)
-      ""
-      (or hours-text (str hours)))]
-   "."
-   [field (merge
-            {:element-id (str "minutes-" element-id "-" row-number)
-             :type :string
-             :name "minutes"
-             :error (when error-min
-                      (error-min data))
-             :error-text false
-             :regex minute-regex
-             :style (merge {:width "30px"} style)
-             :input-style input-style
-             :on-blur (when on-blur
-                        on-blur)
-             :update! (fn [minute]
-                        (let [m (if (str/blank? minute)
-                                  nil
-                                  (js/parseInt minute))]
-                          (update! (assoc (time/->Time hours m nil)
-                                     :minutes-text minute))))}
-            (when (and required? (empty? data))
-              {:warning true})
-            (when (not minutes)
-              {:hint-text (tr [:common-texts :minutes-placeholder])})
-            (when disabled?
-              {:disabled? true}))
-    (if (not minutes)
-      ""
-      (or minutes-text (gstr/format "%02d" minutes)))]
+  [:div {:style wrapper-style}
+   [:label {:style label-style} label]
+   [:div {:style (merge style-base/inline-block container-style)}
+    [field (merge
+             {:element-id (str "hours-" element-id "-" row-number)
+              :type :string
+              :name "hours"
+              :error (when error-hour
+                       (error-hour data))
+              :error-text false
+              :regex (if unrestricted-hours?
+                       unrestricted-hour-regex
+                       hour-regex)
+              :style (merge {:width "30px"} style)
+              :input-style (merge {:text-align "right"}
+                                  input-style)
+              :hint-style {:position "absolute" :right "0"}
+              :on-blur (when on-blur
+                         on-blur)
+              :update! (fn [hour]
+                         (let [h (if (str/blank? hour)
+                                   nil
+                                   (js/parseInt hour))]
+                           (update! (assoc (time/->Time h minutes nil)
+                                      :hours-text hour))))}
+             (when (and required? (empty? data))
+               {:warning true})
+             (when disabled?
+               {:disabled? true})
+             (when (not hours)
+               {:hint-text (tr [:common-texts :hours-placeholder])}))
+     (if (not hours)
+       ""
+       (or hours-text (str hours)))]
+    "."
+    [field (merge
+             {:element-id (str "minutes-" element-id "-" row-number)
+              :type :string
+              :name "minutes"
+              :error (when error-min
+                       (error-min data))
+              :error-text false
+              :regex minute-regex
+              :style (merge {:width "30px"} style)
+              :input-style input-style
+              :on-blur (when on-blur
+                         on-blur)
+              :update! (fn [minute]
+                         (let [m (if (str/blank? minute)
+                                   nil
+                                   (js/parseInt minute))]
+                           (update! (assoc (time/->Time hours m nil)
+                                      :minutes-text minute))))}
+             (when (and required? (empty? data))
+               {:warning true})
+             (when (not minutes)
+               {:hint-text (tr [:common-texts :minutes-placeholder])})
+             (when disabled?
+               {:disabled? true}))
+     (if (not minutes)
+       ""
+       (or minutes-text (gstr/format "%02d" minutes)))]
 
-   (when warning
-     [:div (stylefy/use-style style-base/error-element) warning])])
+    (when warning
+      [:div (stylefy/use-style style-base/error-element) warning])]])
 
 (def time-unit-order [:minutes :hours :days])
 
