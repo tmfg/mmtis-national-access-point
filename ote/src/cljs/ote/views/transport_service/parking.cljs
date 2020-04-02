@@ -122,7 +122,7 @@
          :prepare-for-save values/without-empty-rows
          :table-fields
          [{:name ::t-service/week-days
-           :label (tr [:field-labels :service-exception ::t-service/week-days])
+           :label (tr [:field-labels :transport-service ::t-service/week-days])
            :type :multiselect-selection
            :disabled? in-validation?
            :options t-service/days
@@ -131,13 +131,14 @@
            :required? true
            :full-width? true
            :is-empty? validation/empty-enum-dropdown?
-           :field-class "col-xs-12 col-sm-3 col-md-3"}
+           :field-class "col-xs-6 col-sm-4 col-md-4"}
           {:name ::t-service/all-day
            :label (tr [:field-labels :parking ::t-service/all-day])
            :type :checkbox
            :disabled? in-validation?
            :full-width? true
-           :field-class "col-xs-4 col-sm-2 col-md-2"
+           :style {:padding-top "2.5rem"}
+           :field-class "col-xs-6 col-sm-2 col-md-2"
            :write (fn [data all-day?]
                     (merge data
                            {::t-service/all-day all-day?}
@@ -149,26 +150,32 @@
 
           {:name ::t-service/from
            :label (tr [:field-labels :parking ::t-service/from])
+           :wrapper-style style-form/input-element-wrapper-div
+           :label-style style-form/input-element-label
            :type :time
            :disabled? in-validation?
            :write (write-time ::t-service/from)
            :required? true
            :is-empty? time/empty-time?
            :full-width? true
-           :field-class "col-xs-4 col-sm-2 col-md-2"}
+           :container-style {:padding-top "1.5rem"}
+           :field-class "col-xs-6 col-sm-2 col-md-2"}
           {:name ::t-service/to
            :label (tr [:field-labels :parking ::t-service/to])
+           :wrapper-style style-form/input-element-wrapper-div
+           :label-style style-form/input-element-label
            :type :time
            :disabled? in-validation?
            :write (write-time ::t-service/to)
            :required? true
            :is-empty? time/empty-time?
            :full-width? true
-           :field-class "col-xs-4 col-sm-2 col-md-2"}]}
+           :container-style {:padding-top "1.5rem"}
+           :field-class "col-xs-6 col-sm-2 col-md-2"}]}
         (when-not in-validation?
           {:inner-delete? true
            :add-label (tr [:buttons :add-new-service-hour])
-           :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+           ;:inner-delete-class "col-xs-12 col-sm-3 col-md-3"
            :inner-delete-label (tr [:buttons :delete])}))
 
       (merge
