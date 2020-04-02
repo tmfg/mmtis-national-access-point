@@ -110,7 +110,7 @@
          :error :url-parse-failed
          :http-status (:status response)}))
     (catch Exception e
-      (log/warn "CSV check failed due to Exception in HTTP connection" e)
+      (log/warn (str "CSV check failed due to Exception in HTTP connection in url " (get url-data :url)) e)
       {:status :failed
        :error :url-parse-failed})))
 
