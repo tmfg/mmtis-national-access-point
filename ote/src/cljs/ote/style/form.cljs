@@ -66,3 +66,24 @@
 
 (def action-control-section-margin {:margin-top "2rem"})
 
+(def input-element-wrapper-div {:width "100%"
+                                :height "72px"
+                                :display "inline-block"
+                                :position "relative"
+                                :background-color "transparent"
+                                :font-family "Roboto, sans-serif"
+                                :transition " height 200ms cubic-bezier (0.23, 1, 0.32, 1) 0ms"
+                                :cursor "auto"})
+
+(def input-element-label {:position "absolute"
+                          :font-size "12px"
+                          :line-height "22px"
+                          :top "18px"
+                          :transition "all 450ms cubic-bezier (0.23, 1, 0.32, 1) 0ms"
+                          :z-index 1
+                          :transform "scale (0.75) translate (0px, -28px)"
+                          :transform-origin "left top"
+                          :pointer-events "none"
+                          :user-select "none"
+                          :color "rgb (33, 33, 33)"})
+
