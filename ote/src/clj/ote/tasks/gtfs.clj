@@ -50,8 +50,11 @@
 
 (defn fetch-given-gtfs-interface!
   "Get gtfs package data from database for given service."
-  [db service-id]
-  (let [interface (first (select-gtfs-url-for-service db {:service-id service-id}))]
+  [db service-id interface-id]
+  (let [interface (if (nil? interface-id)
+                    (first (select-gtfs-url-for-service db {:service-id service-id}))
+                    (first (select-gtfs-url-for-interface db {:service-id service-id
+                                                              :interface-id interface-id})))]
     (when interface
       (mark-gtfs-package-imported! db interface))
     interface))
@@ -63,13 +66,13 @@
   content, downloads and stores the content.
   Return: on success nil, on failure a string containing error details."
   ([config db upload-s3?]
-   (update-one-gtfs! config db upload-s3? nil))
-  ([config db upload-s3? service-id]
+   (update-one-gtfs! config db upload-s3? nil nil))
+  ([config db upload-s3? service-id interface-id]
   ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
    (let [;; Load next gtfs package or package that is related to given service-id
          interface (if service-id
-                     (fetch-given-gtfs-interface! db service-id)
+                     (fetch-given-gtfs-interface! db service-id interface-id)
                      (fetch-next-gtfs-interface! db config))
          interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
                      (update interface :data-content PgArray->vec)

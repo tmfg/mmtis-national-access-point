@@ -106,7 +106,16 @@
 
 (define-event SetSingleDetectionServiceId [service-id]
   {}
-  (assoc-in app [:admin :transit-changes :single-detection-service-id] service-id))
+  (-> app
+    (assoc-in [:admin :transit-changes :upload-gtfs :service-id] service-id)
+    (assoc-in [:admin :transit-changes :single-detection-service-id] service-id)))
+
+(define-event SetSingleDownloadGtfsInterfaceId [interface]
+  {}
+  (let [interface-id (::t-service/id interface)]
+    (-> app
+        (assoc-in [:admin :transit-changes :single-download-gtfs-interface] interface)
+        (assoc-in [:admin :transit-changes :single-download-gtfs-interface-id] interface-id))))
 
 (define-event SetSingleDownloadGtfsServiceId [service-id]
   {}
@@ -138,8 +147,9 @@
 
 (define-event ForceInterfaceImportForGivenService []
   {}
-  (let [service-id (get-in app [:admin :transit-changes :single-download-gtfs-service-id])]
-    (comm/post! (str "/transit-changes/force-interface-import/" service-id) nil
+  (let [service-id (get-in app [:admin :transit-changes :single-download-gtfs-service-id])
+        interface-id (get-in app [:admin :transit-changes :single-download-gtfs-interface-id])]
+    (comm/post! (str "/transit-changes/force-interface-import/" service-id "/" interface-id) nil
                 {:timeout (* 60000 7)                       ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
                  :on-success (tuck/send-async! ->ForceInterfaceImportForGivenServiceSuccess)
                  :on-failure (tuck/send-async! ->ForceInterfaceImportForGivenServiceFailure)})
