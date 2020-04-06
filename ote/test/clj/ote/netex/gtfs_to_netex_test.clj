@@ -64,9 +64,9 @@
                          :external-interface-description-id 1}
         res (sut/gtfs->netex! conversion-meta
                               config-netex)]
-    (when (is (not (str/blank? res))
+    (when (is (not (str/blank? (:output-filepath res)))
               "Conversion function should return a path to created netex archive")
-      (test-are-zips-same res
+      (test-are-zips-same (:output-filepath res)
                           test-reference-netex-filepath
                           full-compare-netex-names))
 
