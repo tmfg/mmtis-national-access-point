@@ -220,6 +220,8 @@ SELECT n.id as "netex-conversion-id",
        n.status,
        n.created,
        n.modified,
+       n."validation-file-error",
+       n."input-file-error",
        top.name as "operator-name",
        ts.name as "service-name"
   FROM "netex-conversion" n,

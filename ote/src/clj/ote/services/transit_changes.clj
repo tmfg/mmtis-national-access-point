@@ -189,10 +189,12 @@
       "OK"))
 
   ;; Force gtfs package download for given service
-  (POST "/transit-changes/force-interface-import/:service-id" {{:keys [service-id]} :params
+  (POST "/transit-changes/force-interface-import/:service-id/:interface-id" {{:keys [service-id interface-id]} :params
                                                                user :user}
     (if (authorization/admin? user)
-      (if-let [result-error (gtfs-tasks/update-one-gtfs! config db true (Long/parseLong service-id))]
+      (if-let [result-error (gtfs-tasks/update-one-gtfs! config db true
+                                                         (Long/parseLong service-id)
+                                                         (Long/parseLong interface-id))]
         (http/transit-response result-error 409)
         (http/transit-response nil 200))
       (http/transit-response nil 401))))

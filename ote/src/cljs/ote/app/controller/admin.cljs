@@ -80,6 +80,7 @@
 (defrecord UpdateNetexFilters [filter])
 (defrecord SearchNetexConversions [])
 (defrecord SearchNetexConversionsResponse [response])
+(defrecord DownloadNetexErrors [type row])
 
 ;; Company csv tab
 (defrecord FetchCompanyCsvs [])
@@ -393,6 +394,23 @@
     (update-in app [:admin :netex] assoc
                :loading? false
                :results response))
+
+  DownloadNetexErrors
+  (process-event [{type :type row :row} app]
+    (let [filename (if (= "input" type)
+                     "input.json"
+                     "validation.json")
+          content (if (= type "input")
+                    (:ote.db.netex/input-file-error row)
+                    (:ote.db.netex/validation-file-error row))
+          data-blob (js/Blob. #js [content] #js {:type "application/json"})
+          link (.createElement js/document "a")]
+      (set! (.-href link) (.createObjectURL js/URL data-blob))
+      (.setAttribute link "download" filename)
+      (.appendChild (.-body js/document) link)
+      (.click link)
+      (.removeChild (.-body js/document) link))
+    app)
 
   FetchCompanyCsvsResponse
   (process-event [{response :response} app]

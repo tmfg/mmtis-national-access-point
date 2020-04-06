@@ -202,11 +202,8 @@
    {:keys [work-dir input-report-file output-report-file validation-report-file]}  ; Ote chouette config
    output-filepath
    chouette-cmd]
-  (let [;; Uncomment these for debugging
-        ;_ (println "input-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir input-report-file)) keyword)))
-        ;_ (println "output-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir output-report-file)) keyword)))
-        ;_ (println "validation-report-file " (pr-str (cheshire/parse-string (slurp (str conversion-work-path work-dir validation-report-file)) keyword)))
-        ]
+  (let [input-json (cheshire/generate-string (cheshire/parse-string (slurp (str conversion-work-path work-dir input-report-file)) keyword))
+        validation-json (cheshire/generate-string (cheshire/parse-string (slurp (str conversion-work-path work-dir validation-report-file)) keyword))]
 
     (if (and (= 0 exit)
              ;(str/blank? err) Let conversion return something
@@ -215,9 +212,15 @@
              (.exists (io/file output-filepath)))
       (do
         (post-process-netex output-filepath)
-        output-filepath)
-      (do (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
-          nil))))
+        {:output-filepath output-filepath
+         :input-report-file nil
+         :validation-report-file nil})
+      (do
+        ;; Store input and validation files to db
+        (log/warn "Netex conversion chouette error, command exit info = " ex-info ", tried = " chouette-cmd)
+        {:output-filepath nil
+         :input-report-file input-json
+         :validation-report-file validation-json}))))
 
 (defn gtfs->netex!
   "Return: On success string defining filesystem path to output netex archive, on failure nil"
@@ -292,7 +295,7 @@
 (defn set-conversion-status!
   "Resolves operation result based on input args and updates status to db.
   Return: On successful conversion true, on failure false"
-  [{:keys [netex-filepath s3-filename]}
+  [{:keys [netex-filepath s3-filename input-report-file validation-report-file]}
    db
    {:keys [service-id external-interface-description-id external-interface-data-content] :as conversion-meta}]
   (let [result (if (clojure.string/blank? netex-filepath)
@@ -309,7 +312,9 @@
                      ::netex/filename (or s3-filename "")
                      ::netex/modified (java.util.Date.)
                      ::netex/status result
-                     ::netex/data-content (set (mapv keyword external-interface-data-content))})
+                     ::netex/data-content (set (mapv keyword external-interface-data-content))
+                     ::netex/input-file-error input-report-file
+                     ::netex/validation-file-error validation-report-file})
     (= :ok result)))
 
 (defn gtfs->netex-and-set-status!
@@ -321,9 +326,12 @@
   ;; invocation result. Even though created netex file is lost if s3 upload is skipped.
   (let [gtfs-file (pre-process-gtfsfile (:gtfs-file conversion-meta))
         conversion-meta (assoc conversion-meta :gtfs-file gtfs-file)
+        conversion-result (gtfs->netex! conversion-meta config-netex)
         meta (try
                (as-> (assoc conversion-meta
-                       :netex-filepath (gtfs->netex! conversion-meta config-netex)) meta
+                       :netex-filepath (:output-filepath conversion-result)
+                       :input-report-file (:input-report-file conversion-result)
+                       :validation-report-file (:validation-report-file conversion-result)) meta
                      (assoc meta
                        :s3-filename (upload-s3 (:netex-filepath meta) config-netex)))
                (catch Exception e
