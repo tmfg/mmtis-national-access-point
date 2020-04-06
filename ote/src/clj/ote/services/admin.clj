@@ -61,6 +61,8 @@
    :status ::netex/status
    :modified ::netex/modified
    :created ::netex/created
+   :input-file-error ::netex/input-file-error
+   :validation-file-error ::netex/validation-file-error
    :operator-name ::t-operator/name
    :service-name ::t-service/name})
 
