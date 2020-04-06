@@ -93,157 +93,150 @@
   (let [single-download-service-id (get-in app-state [:admin :transit-changes :single-download-gtfs-service-id])
         service-interfaces (get-in app-state [:admin :transit-changes :upload-gtfs :interfaces])
         selected-interface (get-in app-state [:admin :transit-changes :single-download-gtfs-interface])]
-   [:div (stylefy/use-style (style-base/flex-container "column"))
+    [:div (stylefy/use-style (style-base/flex-container "column"))
 
-    [:h3 "Rajapintoihin kohdistuvat toimenpiteet"]
-    [:div
-     [:div (stylefy/use-style style-admin/detection-info-text)
-      "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
-      Tätä nappia painamalla voidaan pakottaa lataus annetulle palvelulle."]
-     [:div (stylefy/use-style style-admin/detection-button-container)
-      #_ [ui/text-field
-       {:id "download-gtfs-service-id"
-        :name "download-gtfs-service-name"
-        :floating-label-text "Palvelun id"
-        :value (get-in app-state [:admin :transit-changes :single-download-gtfs-service-id])
-        :on-change #(do
-                      (.preventDefault %)
-                      (e! (admin-transit-changes/->UpdateInterfaceServiceId %2))
-                      (e! (admin-transit-changes/->SetSingleDownloadGtfsServiceId %2)))}
-       single-download-service-id]
-      [form-fields/field
-       {:name :service-id
-        :type :string
-        :label "Palvelun id"
-        :hint-text "Palvelun id"
-        :update! #(do
-                    (e! (admin-transit-changes/->SetSingleDownloadGtfsServiceId %))
-                    (e! (admin-transit-changes/->UpdateInterfaceServiceId %)))}
-       single-download-service-id]
-      [:button {:on-click #(e! (admin-transit-changes/->GetServiceInterfaces))}
-       "Hae rajapinnat"]
-      [form-fields/field
-       {:name :interface-id
-        :type :selection
-        :label "Valitse palvelun rajapinta"
-        :show-option #(str (get-in % [:ote.db.transport-service/external-interface ::t-service/url]) " :: "
-                           (get-in % [::t-service/format]))
-        :options service-interfaces
-        :update! #(do
-                    (e! (admin-transit-changes/->SetSingleDownloadGtfsInterfaceId %)))
-        :full-width? true}
-       selected-interface]
-
-      [:a (merge (stylefy/use-style (merge style-admin/detection-button-with-input button-styles/primary-button))
-                 {:id "force-import"
-                  :href "#"
-                  :on-click #(do
-                               (.preventDefault %)
-                               (e! (admin-transit-changes/->ForceInterfaceImportForGivenService)))
-                  :icon (ic/content-filter-list)})
-       [:span "Lataa palvelun rajapintaan kuuluva gtfs paketti"]]]]
-
-    (when-let [response (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])]
-      [:div (stylefy/use-style style-admin/detection-info-text)
-       [notification/notification {:type (:status response)} (:msg response)]])
-
-    [:h3 "Muutostunnistuksen käynnistys"]
-    [:div
+     [:h3 "Rajapintoihin kohdistuvat toimenpiteet"]
      [:div
       [:div (stylefy/use-style style-admin/detection-info-text)
-       "Pakota muutostunnistus kaikkille palveluille. Tämä vie noin 3 minuuttia."]
+       "Palvelun rajapinnoille annetaan url, josta gtfs/kalkati paketit voidaan ladata. Paketit ladataan öisin 00 - 04 välissä.
+       Tätä nappia painamalla voidaan pakottaa lataus annetulle palvelulle."]
       [:div (stylefy/use-style style-admin/detection-button-container)
-       [:a (merge (stylefy/use-style button-styles/primary-button)
-                  {:id "force-detect-transit-changes"
-                   :href "#"
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (admin-transit-changes/->ForceDetectTransitChanges)))
-                   :icon (ic/content-filter-list)})
-        [:span "Käynnistä muutostunnistus"]]]]
+       [:div.row
+
+        [:div.col-xs-6
+         [form-fields/field
+          {:name :service-id
+           :type :string
+           :label "Palvelun id"
+           :hint-text "Palvelun id"
+           :update! #(do
+                       (e! (admin-transit-changes/->SetSingleDownloadGtfsServiceId %))
+                       (e! (admin-transit-changes/->UpdateInterfaceServiceId %)))}
+          single-download-service-id]
+         [:button {:on-click #(e! (admin-transit-changes/->GetServiceInterfaces))}
+          "Hae rajapinnat"]
+         [form-fields/field
+          {:name :interface-id
+           :type :selection
+           :label "Valitse palvelun rajapinta"
+           :show-option #(str (get-in % [:ote.db.transport-service/external-interface ::t-service/url]) " :: "
+                              (get-in % [::t-service/format]))
+           :options service-interfaces
+           :update! #(do
+                       (e! (admin-transit-changes/->SetSingleDownloadGtfsInterfaceId %)))
+           :full-width? false}
+          selected-interface]]
+        [:div.col-xs-6
+         [:a (merge (stylefy/use-style (merge style-admin/detection-button-with-input button-styles/primary-button))
+                    {:id "force-import"
+                     :href "#"
+                     :on-click #(do
+                                  (.preventDefault %)
+                                  (e! (admin-transit-changes/->ForceInterfaceImportForGivenService)))
+                     :icon (ic/content-filter-list)})
+          [:span "Lataa palvelun rajapintaan kuuluva gtfs paketti"]]]]]]
+
+     (when-let [response (get-in app-state [:admin :transit-changes :single-download-gtfs-service-response])]
+       [:div (stylefy/use-style style-admin/detection-info-text)
+        [notification/notification {:type (:status response)} (:msg response)]])
+
+     [:h3 "Muutostunnistuksen käynnistys"]
+     [:div
+      [:div
+       [:div (stylefy/use-style style-admin/detection-info-text)
+        "Pakota muutostunnistus kaikkille palveluille. Tämä vie noin 3 minuuttia."]
+       [:div (stylefy/use-style style-admin/detection-button-container)
+        [:a (merge (stylefy/use-style button-styles/primary-button)
+                   {:id "force-detect-transit-changes"
+                    :href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-transit-changes/->ForceDetectTransitChanges)))
+                    :icon (ic/content-filter-list)})
+         [:span "Käynnistä muutostunnistus"]]]]
+      [:br]
+      [:div
+       [:div (stylefy/use-style style-admin/detection-info-text)
+        "Käynnistä muutostunnistus vain yhdelle palvelulle. Anna kenttään palvelun id.
+        Löydät palvelun id:n omat palvelutiedot sivun kautta tai muutostunnistuksen visualisointisivun url:stä."]
+       [:div (stylefy/use-style style-admin/detection-button-container)
+        [ui/text-field
+         {:id "detection-service-id"
+          :name "detection-service-name"
+          :floating-label-text "Palvelun id"
+          :value (get-in app-state [:admin :transit-changes :single-detection-service-id])
+          :on-change #(do
+                        (.preventDefault %)
+                        (e! (admin-transit-changes/->SetSingleDetectionServiceId %2)))}]
+        [:a (merge (stylefy/use-style (merge button-styles/primary-button style-admin/detection-button-with-input))
+                   {:id "detect-changes-for-given-service"
+                    :href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-transit-changes/->DetectChangesForGivenService)))
+                    :icon (ic/content-filter-list)})
+         [:span "Muutostunnitus yhdelle palvelulle"]]]]]
+
+     [:hr {:style {:width "100%" :margin "4em 0 1em 0"}}]
+
+     [:h2 "Päivätiivisteet - käytä vain jos tiedät mitä olet tekemässä"]
+     [day-hash-button-element e!
+      "Laske kuukausittaiset päivätiivisteet tulevaisuuden osalta. Tämä vie noin tunnin. Laskenta jättää sopimusliikenteet huomoimatta."
+      "Laske päivätiivisteet kuukausittain tulevaisuuteen"
+      #(e! (admin-transit-changes/->CalculateDayHash "month" "true"))]
+
      [:br]
-     [:div
-      [:div (stylefy/use-style style-admin/detection-info-text)
-       "Käynnistä muutostunnistus vain yhdelle palvelulle. Anna kenttään palvelun id.
-       Löydät palvelun id:n omat palvelutiedot sivun kautta tai muutostunnistuksen visualisointisivun url:stä."]
-      [:div (stylefy/use-style style-admin/detection-button-container)
-       [ui/text-field
-        {:id "detection-service-id"
-         :name "detection-service-name"
-         :floating-label-text "Palvelun id"
-         :value (get-in app-state [:admin :transit-changes :single-detection-service-id])
-         :on-change #(do
-                       (.preventDefault %)
-                       (e! (admin-transit-changes/->SetSingleDetectionServiceId %2)))}]
-       [:a (merge (stylefy/use-style (merge button-styles/primary-button style-admin/detection-button-with-input))
-                  {:id "detect-changes-for-given-service"
-                   :href "#"
-                   :on-click #(do
-                                (.preventDefault %)
-                                (e! (admin-transit-changes/->DetectChangesForGivenService)))
-                   :icon (ic/content-filter-list)})
-        [:span "Muutostunnitus yhdelle palvelulle"]]]]]
+     [day-hash-button-element e!
+      "Laske kaikki päivätiivisteet tulevaisuuden osalta. Tämä vie noin 15 tuntia. Laskenta jättää sopimusliikenteet huomioimatta."
+      "Laske kaikki päivätiivisteet tulevaisuuteen"
+      #(e! (admin-transit-changes/->CalculateDayHash "day" "true"))]
 
-    [:hr {:style {:width "100%" :margin "4em 0 1em 0"}}]
+     [:br]
+     [day-hash-button-element e!
+      "Kaikkien päivätiivisteiden laskenta vie kauan. Tuotannossa arviolta 24h+. Tämä laskenta ottaa jokaiselta
+      palvelulta vain kuukauden viimeisimmän paketin ja laskee sille päivätiivisteet. Tämä vähentää laskentaa käytettyä aikaa.
+      Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h. Laskenta jättää sopimusliikenteet huomioimatta."
+      "Laske päivätiivisteet kuukausittain uusiksi"
+      #(e! (admin-transit-changes/->CalculateDayHash "month" "false"))]
 
-    [:h2 "Päivätiivisteet - käytä vain jos tiedät mitä olet tekemässä"]
-    [day-hash-button-element e!
-     "Laske kuukausittaiset päivätiivisteet tulevaisuuden osalta. Tämä vie noin tunnin. Laskenta jättää sopimusliikenteet huomoimatta."
-     "Laske päivätiivisteet kuukausittain tulevaisuuteen"
-     #(e! (admin-transit-changes/->CalculateDayHash "month" "true"))]
+     [:br]
+     [day-hash-button-element e!
+      "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+. Laskenta ei ota huomioon sopimusliikennettä.
+        Oletko varma, että haluat käynnistää laskennan?"
+      "Laske kaikki päivätiivisteet uusiksi"
+      #(e! (admin-transit-changes/->CalculateDayHash "day" "false"))]
 
-    [:br]
-    [day-hash-button-element e!
-     "Laske kaikki päivätiivisteet tulevaisuuden osalta. Tämä vie noin 15 tuntia. Laskenta jättää sopimusliikenteet huomioimatta."
-     "Laske kaikki päivätiivisteet tulevaisuuteen"
-     #(e! (admin-transit-changes/->CalculateDayHash "day" "true"))]
+     [:br]
+     [day-hash-button-element e!
+      "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
+      "Laske sopimusliikenteelle päivätiivisteet"
+      #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]
 
-    [:br]
-    [day-hash-button-element e!
-     "Kaikkien päivätiivisteiden laskenta vie kauan. Tuotannossa arviolta 24h+. Tämä laskenta ottaa jokaiselta
-     palvelulta vain kuukauden viimeisimmän paketin ja laskee sille päivätiivisteet. Tämä vähentää laskentaa käytettyä aikaa.
-     Kun käynnistät tämän laskennan joudut odottamaan arviolta 1-3h. Laskenta jättää sopimusliikenteet huomioimatta."
-     "Laske päivätiivisteet kuukausittain uusiksi"
-     #(e! (admin-transit-changes/->CalculateDayHash "month" "false"))]
+     [:br]
+     [day-hash-button-element e!
+      "Käynnistä uusi muutosilmoitusten sähköposti-ilmoituksen lähetys. Operaatio ei lähetä edellistä sähköpostia uudestaan,
+      vaan koostaa uudet ilmoitukset, lähettää ne, sekä päivittää lähetyshistorian.
+      Lähetettyjä ilmoituksia ei siis lähetetä uudestaan seuraavalla ajastetulla tai käsin käynnistetyllä ajolla."
+      "Käynnistä muutosilmoitusten lähetys"
+      #(e! (admin-transit-changes/->SendPreNotices))]
+     [:div (stylefy/use-style style-admin/detection-info-text)
+      (when-let [resp (get-in admin [:pre-notice :pre-notice-notify-send])]
+        [notification/notification
+         (if (= :success resp)
+           {:type :success :text (str "Mahdolliset muutosilmoitusten sähköpostit lähetetty")}
+           {:type :error :text (str "Mahdollisten muutosilmoitusten sähköpostien lähettäminen ei onnistunut. Virhetietoja: " resp)})])]
 
-    [:br]
-    [day-hash-button-element e!
-     "Laske kaikille paketeille päivätiivisteet uusiksi. Tämä laskenta ottaa tuotannossa arviolta 24h+. Laskenta ei ota huomioon sopimusliikennettä.
-       Oletko varma, että haluat käynnistää laskennan?"
-     "Laske kaikki päivätiivisteet uusiksi"
-     #(e! (admin-transit-changes/->CalculateDayHash "day" "false"))]
+     [:br]
+     [day-hash-button-element e!
+      "Selvitä tuotannon päiväyksiin liittyvää formatointiongelmaa"
+      "Logita päiväykset"
+      #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]
 
-    [:br]
-    [day-hash-button-element e!
-     "Laske sopimusliikenteelle kaikki päivätiivisteet uusiksi. Laskenta ei ota huomioon kaupallista liikennettä."
-     "Laske sopimusliikenteelle päivätiivisteet"
-     #(e! (admin-transit-changes/->CalculateDayHash "contract" "false"))]
-
-    [:br]
-    [day-hash-button-element e!
-     "Käynnistä uusi muutosilmoitusten sähköposti-ilmoituksen lähetys. Operaatio ei lähetä edellistä sähköpostia uudestaan,
-     vaan koostaa uudet ilmoitukset, lähettää ne, sekä päivittää lähetyshistorian.
-     Lähetettyjä ilmoituksia ei siis lähetetä uudestaan seuraavalla ajastetulla tai käsin käynnistetyllä ajolla."
-     "Käynnistä muutosilmoitusten lähetys"
-     #(e! (admin-transit-changes/->SendPreNotices))]
-    [:div (stylefy/use-style style-admin/detection-info-text)
-     (when-let [resp (get-in admin [:pre-notice :pre-notice-notify-send])]
-       [notification/notification
-        (if (= :success resp)
-          {:type :success :text (str "Mahdolliset muutosilmoitusten sähköpostit lähetetty")}
-          {:type :error :text (str "Mahdollisten muutosilmoitusten sähköpostien lähettäminen ei onnistunut. Virhetietoja: " resp)})])]
-
-    [:br]
-    [day-hash-button-element e!
-     "Selvitä tuotannon päiväyksiin liittyvää formatointiongelmaa"
-     "Logita päiväykset"
-     #(e! (admin-transit-changes/->GeneralTroubleshootingLog))]
-
-    [:br]
-    [day-hash-button-element e!
-     "Käynnistä yöllinen muutostunnistusten gtfs-transit-changes siivous, koska muutokset voivat vanhentua kalenteripäivien edetessä ja muutosten jäädessä historiaan."
-     "Siivoa vanhat muutostunnistukset"
-     #(e! (admin-transit-changes/->CleanupOldTransitChanges))]]))
+     [:br]
+     [day-hash-button-element e!
+      "Käynnistä yöllinen muutostunnistusten gtfs-transit-changes siivous, koska muutokset voivat vanhentua kalenteripäivien edetessä ja muutosten jäädessä historiaan."
+      "Siivoa vanhat muutostunnistukset"
+      #(e! (admin-transit-changes/->CleanupOldTransitChanges))]]))
 
 (defn route-id [e! app-state recalc?]
   (let [services (get-in app-state [:admin :transit-changes :route-hash-services])]
@@ -316,19 +309,19 @@
      [:div
       [:br]
       [buttons/save
-       {:id       "load-services"
+       {:id "load-services"
         :on-click #(do
                      (.preventDefault %)
                      (e! (admin-transit-changes/->LoadRouteHashServices)))
-        :primary  true
-        :icon     (ic/content-report)}
+        :primary true
+        :icon (ic/content-report)}
        "Lataa palvelut, joilla reitintunnistusmuutos"]
 
       [:br]
 
       [ui/table {:selectable false}
        [ui/table-header {:adjust-for-checkbox false
-                         :display-select-all  false}
+                         :display-select-all false}
         [ui/table-row
          [ui/table-header-column "Palveluntuottaja"]
          [ui/table-header-column "Palvelun id"]
