@@ -368,6 +368,6 @@
         "interfaces" [interfaces/interface-list e! app]
         "reports" [report-view/reports  e! app]
         "sea-routes" [sea-routes/sea-routes e! app]
-        "netex" [netex/netex app]
+        "netex" [netex/netex e! app]
         ;;default
         [validate-view/validate-services e! app])]]))
