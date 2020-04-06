@@ -1,19 +1,32 @@
-FROM ubuntu:bionic
+FROM ubuntu:disco
 
+# Install wget to get signing key
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install apt-utils before other installs
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils gnupg gnupg1 gnupg2
+
+# Create /etc/apt/sources.list.d/pgdg.list
+CMD echo 'deb http://apt.postgresql.org/pub/repos/apt/ disco-pgdg main' >> /etc/apt/sources.list.d/pgdg.list
+
+# Import the repository signing key, and update the package lists
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 # Install dependencies
 RUN apt-get update
-RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-recommends tzdata postgresql-10 postgresql-10-postgis-2.4 postgresql-10-postgis-2.4-scripts postgresql-contrib-10 maven
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-recommends tzdata postgresql-11 postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts postgresql-contrib-11 maven
 
 # Configure pg to listen network
-RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/10/main/postgresql.conf
-RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/10/main/postgresql.conf
-RUN echo "local all all trust" > /etc/postgresql/10/main/pg_hba.conf
-RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/10/main/pg_hba.conf
+RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/11/main/postgresql.conf
+RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/11/main/postgresql.conf
+RUN echo "local all all trust" > /etc/postgresql/11/main/pg_hba.conf
+RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/11/main/pg_hba.conf
 
 # Configure fsync and full page writes off
-RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/10/main/postgresql.conf
-RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/10/main/postgresql.conf
+RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/11/main/postgresql.conf
+RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/11/main/postgresql.conf
 
 # Create database
 RUN service postgresql restart && \
@@ -49,18 +62,8 @@ RUN rm -R /tmp/src
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
 
-## SetUp EntryPoint ##
-# COPY ./entrypoint.sh /
-
-# CHMOD
-# RUN chmod +x /entrypoint.sh
-
-
-# ENTRYPOINT ["./entrypoint.sh"]
-
-
 EXPOSE 5432
 
 USER postgres
 
-CMD service postgresql start && tail -F /var/log/postgresql/postgresql-10-main.log
+CMD service postgresql start && tail -F /var/log/postgresql/postgresql-11-main.log
