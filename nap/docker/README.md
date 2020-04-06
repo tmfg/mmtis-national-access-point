@@ -35,13 +35,13 @@ First time build everything
 Start all dockers  
 `docker-compose up`
 
-If napotedb gives error remove 'old' version  
-`docker rm napotedb`
+If napotedb11 gives error remove 'old' version  
+`docker rm napotedb11`
 
-If db migrate is needed stop napotedb  
-`docker-compose rm -s napotedb`
+If db migrate is needed stop napotedb11  
+`docker-compose rm -s napotedb11`
 
-Restart napotedb  
+Restart napotedb11  
 `docker-compose up`
 
 Migrate latest db changes in `mmtis-national-access-point/database`  

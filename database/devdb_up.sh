@@ -4,7 +4,7 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-IMAGE=${1:-solita/napotedb}
+IMAGE=${1:-solita/napotedb11}
 
 if ! docker images | grep $IMAGE >> /dev/null; then
     echo "Image" $IMAGE "cannot be found. Trying to pull it again."
@@ -15,7 +15,7 @@ if ! docker images | grep $IMAGE >> /dev/null; then
     echo ""
 fi
 
-docker run -p 5432:5432 --name napotedb -dit $IMAGE 1> /dev/null
+docker run -p 5432:5432 --name napotedb11 -dit $IMAGE 1> /dev/null
 
 echo "Starting Docker image" $IMAGE
 echo ""

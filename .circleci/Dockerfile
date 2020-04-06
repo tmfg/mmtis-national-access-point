@@ -40,7 +40,7 @@ RUN apt-get install --no-install-recommends -y apt-transport-https  && \
     node -v && npm -v && \
     npm i -g npx
 
-# Install postgres-client to controll napotedb within our container
+# Install postgres-client to controll napotedb11 within our container
 RUN apt-get install -y --no-install-recommends postgresql-client maven
 
 # Install extra packages (for our CI scripts)

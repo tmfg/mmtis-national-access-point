@@ -1,4 +1,4 @@
 #!/bin/sh
 
-echo "Remove napotedb Docker container"
-docker rm -f napotedb 1> /dev/null
+echo "Remove napotedb11 Docker container"
+docker rm -f napotedb11 1> /dev/null
