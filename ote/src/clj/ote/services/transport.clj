@@ -404,7 +404,9 @@
                    :as data}]
   ;; When validation flag is enabled we cannot let users to update service data if it has child service in validation.
   ;; So we need to check if validation flag is enabled and if parent-id is set for some other child service
-  (let [has-child? (if (and
+  (let [user-id (get-in user [:user :id])
+        now (java.sql.Timestamp. (System/currentTimeMillis))
+        has-child? (if (and
                          (feature/feature-enabled? config :service-validation)
                          (::t-service/id data))
                      (service-has-child? db data)
@@ -419,7 +421,15 @@
             data (if (feature/feature-enabled? config :service-validation)
                    (set-validate-time data)
                    (set-publish-time data db))
+            ;; Force modification timestamp for child - even when admin modifies data, user-id will be saved
+            data (if (::t-service/parent-id data)
+                   (assoc data
+                     ::modification/modified now
+                     ::modification/modified-by user-id)
+                   data)
             service-info (-> data
+                             ;; Modification timestamp is set only if service is changed as a draft. When creating other changes
+                             ;; validation process prevents modified timestamp to be set
                              (modification/with-modification-fields ::t-service/id user)
                              (dissoc ::t-service/operation-area)
                              floats-to-bigdec
