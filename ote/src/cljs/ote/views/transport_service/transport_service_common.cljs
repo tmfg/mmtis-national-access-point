@@ -815,8 +815,6 @@
                               ::t-service/to nil})))}
 
           (merge
-            (when (= "passenger-transportation" service-type)
-              {:label (tr [:common-texts :start-time])})
             {:name ::t-service/from
              :label (tr [:field-labels :transport-service ::t-service/from])
              :element-id "start-time"
@@ -828,10 +826,10 @@
              :field-class "col-xs-6 col-sm-2 col-md-2"
              :write (write-time ::t-service/from)
              :required? true
-             :is-empty? time/empty-time?})
-          (merge
+             :is-empty? time/empty-time?}
             (when (= "passenger-transportation" service-type)
-              {:label (tr [:common-texts :ending-time])})
+              {:label (tr [:common-texts :start-time])}))
+          (merge
             {:name ::t-service/to
              :label (tr [:field-labels :transport-service ::t-service/to])
              :element-id "end-time"
@@ -843,7 +841,9 @@
              :field-class "col-xs-6 col-sm-2 col-md-2"
              :write (write-time ::t-service/to)
              :required? true
-             :is-empty? time/empty-time?})]}
+             :is-empty? time/empty-time?}
+            (when (= "passenger-transportation" service-type)
+              {:label (tr [:common-texts :ending-time])}))]}
         (when-not in-validation?
           {:inner-delete? true
            :add-label (tr [:buttons :add-new-service-hour])
