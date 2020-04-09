@@ -289,6 +289,7 @@
                         all-routes
                         filtered-routes)
         route-count (count route-changes)
+        filtered-route-count (count filtered-routes)
         no-change-routes-count (- (count all-routes) (count filtered-routes))
         table-height (str
                        (cond
@@ -367,7 +368,7 @@
                   [tv-change-icons/route-change-icons grouped-route-data])}]
 
       route-changes]
-     [:div {:style {:padding-top "1rem" :font-size "0.85rem"}} "Reittejä, joissa muutoksia: " route-count " kpl. Reittejä, joissa ei muutoksia: " no-change-routes-count " kpl."]
+     [:div {:style {:padding-top "1rem" :font-size "0.85rem"}} "Reittejä, joissa muutoksia: " filtered-route-count " kpl. Reittejä, joissa ei muutoksia: " no-change-routes-count " kpl."]
      [:div {:id "route-calendar-anchor"}]]))
 
 (defn format-stop-name [stop-name]
