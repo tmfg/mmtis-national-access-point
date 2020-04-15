@@ -40,6 +40,7 @@
 
 #?(:cljs
    (defn format-timestamp->date-for-ui [dt]
+     ;; dt is #inst = goog.date.UtcDateTime
      (if (nil? dt)
        " " ;: if nil - print empty string
        (->> dt
