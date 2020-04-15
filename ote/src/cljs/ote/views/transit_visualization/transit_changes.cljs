@@ -57,7 +57,7 @@
      [:span {:style {:margin-left "0.3rem"}} " Viimeisimmät havaitut muutokset"]]]])
 
 (def change-keys #{:added-routes :removed-routes :changed-routes :no-traffic-routes :changes?
-                   :interfaces-has-errors? :no-interfaces? :no-interfaces-imported?})
+                   :interfaces-has-errors? :no-interfaces? :no-interfaces-imported? :max-date})
 
 (defn cap-number [n]
   [:div (use-style style/change-icon-value)
@@ -123,9 +123,11 @@
                          :update! #(e! (tc/->ToggleShowContractTraffic))}
       show-contract-traffic]]]])
 
-(defn- change-description [{:keys [changes? interfaces-has-errors? no-interfaces? no-interfaces-imported? next-different-week
-                                   added-routes changed-routes removed-routes no-traffic-routes] :as row}]
-  (let [{:keys [current-week-traffic different-week-traffic]} next-different-week]
+(defn- change-description [{:keys [interfaces-has-errors? no-interfaces? no-interfaces-imported?
+                                   added-routes changed-routes removed-routes no-traffic-routes max-date] :as row}]
+  (let [max-date-in-the-past? (if (> (.getTime (t/now)) (.getTime (time/js-date->goog-date max-date)))
+                                true
+                                false)]
     [:span
      (cond
        no-interfaces?
@@ -143,27 +145,17 @@
         [ic/alert-error {:style {:color "CC0000"}}]
         [:div (use-style style/change-icon-value)
          "Virheitä rajapinnoissa"]]
-       (= 0 (+ added-routes changed-routes removed-routes no-traffic-routes))
+       (and (not max-date-in-the-past?)
+            (= 0 (+ added-routes changed-routes removed-routes no-traffic-routes)))
        [:div
         [ic/navigation-check]
         [:div (use-style style/change-icon-value)
          "Ei muutoksia"]]
-
-       ;; FIXME: lisää mahdollinen liikenteen päättyminen / alkaminen
-
-       #_(and (not (empty? (:days-with-traffic current-week-traffic)))
-              (empty? (:days-with-traffic different-week-traffic)))
-       #_[:div
-          [ic/communication-business {:color colors/remove-color}]
-          [:div (use-style style/change-icon-value)
-           "Mahdollinen liikenteen päättyminen"]]
-
-       #_(and (empty? (:days-with-traffic current-week-traffic))
-              (not (empty? (:days-with-traffic different-week-traffic))))
-       #_[:div
-          [ic/communication-business {:color colors/add-color}] ;; FIXME: Seems that there is no domain_disabled icon available in our MUI version
-          [:div (use-style style/change-icon-value)
-           "Mahdollinen liikenteen alkaminen"]]
+       max-date-in-the-past?
+       [:div
+        [ic/content-remove-circle-outline {:color colors/remove-color}]
+        [:div (use-style style/change-icon-value)
+         (str "Liikenne päättynyt " (time/format-timestamp->date-for-ui max-date))]]
        :default
        [change-icons row])]))
 
