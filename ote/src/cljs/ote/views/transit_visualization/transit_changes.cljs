@@ -125,7 +125,7 @@
 
 (defn- change-description [{:keys [interfaces-has-errors? no-interfaces? no-interfaces-imported?
                                    added-routes changed-routes removed-routes no-traffic-routes max-date] :as row}]
-  (let [max-date-in-the-past? (if (> (.getTime (t/now)) (.getTime (time/js-date->goog-date max-date)))
+  (let [max-date-in-the-past? (if (and max-date (> (.getTime (t/now)) (.getTime (time/js-date->goog-date max-date))))
                                 true
                                 false)]
     [:span
