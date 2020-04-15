@@ -688,7 +688,8 @@
    [common-ui/information-row-with-option (tr [:field-labels :rentals :ote.db.transport-service/pick-up-locations-url]) url true]
    (doall
      (for [row data
-           :let [service-hours-info (get row ::t-service/service-hours-info)
+           :let [pick-up-type (tr [:enums ::t-service/pick-up-type (::t-service/pick-up-type row)])
+                 service-hours-info (get row ::t-service/service-hours-info)
                  service-exceptions (get row ::t-service/service-exceptions)
                  street (get-in row [::t-service/pick-up-address :ote.db.common/street])
                  post-office (get-in row [::t-service/pick-up-address :ote.db.common/post_office])
@@ -699,19 +700,25 @@
                                (tr-tree [:country-list]))]]
        ^{:key (str row)}
        [:div
-        [:h4 (string/upper-case (::t-service/pick-up-name row))]
+        [info-sections-3-cols
+         (string/upper-case (::t-service/pick-up-name row))
+         [common-ui/information-row-with-option (tr [:field-labels :rentals ::t-service/pick-up-type]) pick-up-type true]
+         nil
+         nil]
+
         ; Address
         [:div (stylefy/use-style service-viewer/info-row)
          [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
           [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/street]) street true]]
          [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/postal_code]) post-code true]]]
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/postal_code]) post-code true]]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/post_office]) post-office true]]]
         [:div (stylefy/use-style service-viewer/info-row)
          [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
-          [common-ui/information-row-with-option (tr [:field-labels :ote.db.common/post_office]) post-office true]]
-         [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-          [common-ui/information-row-with-option (tr [:common-texts :country]) country true]]]
-
+          [common-ui/information-row-with-option (tr [:common-texts :country]) country true]]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)]
+         [:div (stylefy/use-sub-style service-viewer/info-seqment :right)]]
 
         ; Service hours
         (doall
