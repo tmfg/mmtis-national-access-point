@@ -244,7 +244,7 @@ FROM (SELECT DISTINCT ON ("external-interface-description-id") p.id
        JOIN "external-interface-description" e ON e.id = p."external-interface-description-id"
       WHERE p."transport-service-id" = service_id
         AND p."deleted?" = FALSE
-        AND p.created::DATE - interval '1 day' <= dt
+        AND p.created::DATE <= dt 
       ORDER BY "external-interface-description-id", created DESC) x
 $$ LANGUAGE SQL STABLE;
 
@@ -353,7 +353,7 @@ BEGIN
     INTO route_hashes
     FROM (SELECT x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id",
                  string_agg(x.trip_times, ',' ORDER BY x.trip_times) as times
-            FROM (SELECT DISTINCT ON (STRING_AGG(r."trip-headsign" || stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence")) STRING_AGG(r."trip-headsign" || stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence"),
+            FROM (SELECT DISTINCT ON (STRING_AGG(stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence")) STRING_AGG(stops."departure-time"::TEXT,',' ORDER BY stops."stop-sequence"),
                          COALESCE(r."route-short-name", '') as "route-short-name",
                          COALESCE(r."route-long-name", '') as "route-long-name",
                          COALESCE(r."trip-headsign",'') AS "trip-headsign",
@@ -366,7 +366,7 @@ BEGIN
                     JOIN "gtfs-stop" s ON (s."package-id" = t."package-id" AND stops."stop-id" = s."stop-id")
                    WHERE t."package-id" = package_id
                      AND t."service-id" IN (SELECT gtfs_services_for_date(package_id, dt))
-                   GROUP BY r."route-short-name", r."route-long-name", r."trip-headsign", "route-hash-id", stops."trip-id") x
+                   GROUP BY "route-short-name", "route-long-name", r."trip-headsign", "route-hash-id", stops."trip-id") x
     GROUP BY x."route-short-name", x."route-long-name", x."trip-headsign", x."route-hash-id") d;
 
 
