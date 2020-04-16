@@ -48,6 +48,27 @@
                             color: #FFFFFF !important;"}
       text]]]])
 
+(defn- blue-border-button [link text]
+  [:table {:style "background-color: #fff;" :cellpadding "16"}
+   [:tr
+    [:td {:align "center"
+          :valign "middle"
+          :class "mcnBorderButtonContent"
+          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px; color: #0066CC;"}
+     [:a.mcnBorderButton {:title text
+                    :href link
+                    :target "_blank"
+                    :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+                            font-size: 16px;
+                            font-weight: normal;
+                            letter-spacing: normal;
+                            line-height: 25px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                            color: #0066CC; !important;"}
+      text]]]])
+
 (defn- html-divider-border
   [width]
   (let [width (if width
@@ -138,8 +159,10 @@
      .whiteBackground {background-color:#FFFFFF}
      .grayBackground {background-color:#EFEFEF}
      .mcnButtonContent {background-color:#0066CC;padding:15px;}
+     .mcnBorderButtonContent {background-color:#FFFFFF;padding:15px;border:2px solid #0066CC;color:#0066CC;}
      .footer {font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;}
      a.mcnButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
+     a.mcnBorderButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #0066CC !important;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
      .change-link:visited {color: #663366;}
@@ -215,7 +238,7 @@
           (for [n pre-notices]
             (pre-notice-row n)))
         [:br]
-        (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
+        (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
 
      (when (seq detected-changes)
        [:div {:style "background-color:#FFFFFF"}
@@ -236,7 +259,7 @@
             {:class "tg-lusz" :width "25%" :label "Muutokset"}]
            (detected-change-row detected-changes))
          [:br]]
-        (blue-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+        (blue-border-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
      (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
@@ -257,7 +280,7 @@
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
       [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
-     (blue-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
+     (blue-border-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
      (html-divider-border "100%")]))
 
@@ -277,7 +300,7 @@
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua alkaa tarkastelemaan muutosilmoituksia, "
       [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
-     (blue-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
+     (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
      [:br]
      [:br]]))
 
@@ -298,7 +321,7 @@
         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
        [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinun ei tarvitse tehdä mitään."]
        [:br]
-       (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       (blue-border-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
 
        (html-divider-border "100%")])))
 
@@ -318,7 +341,7 @@
        [:br]
        [:p "Mikäli olet saanut kutsun vahingossa, sinun ei tarvitse tehdä mitään."]
        [:br]
-       (blue-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       (blue-border-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
        [:br]
        [:br]])))
 
@@ -330,7 +353,7 @@
      [:br]
      [:p (tr [:email-templates :email-verification :if-not-registered])]
      [:br]
-     (blue-button (str (environment/base-url) "#/confirm-email/" token) (tr [:email-templates :email-verification :verify-email]))
+     (blue-border-button (str (environment/base-url) "#/confirm-email/" token) (tr [:email-templates :email-verification :verify-email]))
      (html-divider-border "100%")]))
 
 (defn reset-password [title token user]
@@ -347,7 +370,7 @@
                   [:p (tr [:email-templates :password-reset :body2]) [:strong (str " " (tr [:email-templates :password-reset :link-text]))] (tr [:email-templates :password-reset :body3])]
                   [:br]
 
-                  (blue-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
+                  (blue-border-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
                   [:br]
                   [:p (tr [:email-templates :password-reset :body4])]
                   [:p (tr [:email-templates :password-reset :body5])]
