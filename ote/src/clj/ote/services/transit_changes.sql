@@ -51,10 +51,20 @@ SELECT ts.id AS "transport-service-id",
         FROM gtfs_package p
                JOIN LATERAL unnest(p."finnish-regions") fr ON TRUE
         WHERE id = ANY(c."package-ids")) AS "finnish-regions",
-       (SELECT (upper(gtfs_package_date_range(p.id)))::date
-          FROM gtfs_package p
-         WHERE p."transport-service-id" = ts.id AND p."deleted?" = FALSE
-         ORDER BY p.id DESC limit 1) as "max-date"
+       (WITH interfaces AS (
+           select distinct on (e.id)
+               p.id as "package-id", e.id as "interface-id", p.created as ladattu
+           from
+               "external-interface-description" e
+                   inner join
+               gtfs_package p on p."external-interface-description-id" = e.id
+           WHERE e."transport-service-id" = ts.id
+           order by e.id, p.id desc
+       )
+        SELECT (upper(gtfs_package_date_range(e."package-id")))::date as max_date
+        FROM interfaces e
+        ORDER BY max_date DESC
+        LIMIT 1) as "max-date"
 FROM "transport-service" ts
      LEFT JOIN latest_transit_changes c ON ts.id = c."transport-service-id"
      LEFT JOIN (SELECT distinct drc."transit-service-id", drc."transit-change-date", drc."different-week-date"
@@ -75,7 +85,7 @@ WHERE 'road' = ANY(ts."transport-type")
 GROUP BY ts.id, c."date", op.name, c."change-date", c."package-ids", c."different-week-date", "sent-emails"."email-sent",
          c."current-added-routes", c."current-removed-routes", c."current-no-traffic-routes", c."current-changed-routes"
 
-ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC,
+ORDER BY "different-week-date" ASC, "interfaces-has-errors?" DESC, "no-interfaces?" DESC, "no-interfaces-imported?" ASC, "max-date" ASC,
          op.name ASC;
 
 -- name: calculate-routes-route-hashes-using-headsign
