@@ -572,7 +572,7 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-hash-id", '') AS "route-hash-id"
   FROM dates d
   -- Join all date hashes for packages
-  JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_packages_for_detection(service_id::INTEGER, d.date))
+  JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_date(service_id::INTEGER, d.date))
                                     AND dh."transport-service-id" = service_id
                                     AND dh.date = d.date)
   -- Join unnested per route hashes
