@@ -635,7 +635,7 @@
 (defn- netex-interfaces-response [db]
   (csv-data ["Rajapinnan osoite" "Palveluntuottajan nimi" "Palvelun nimi" "Palveluntuottajan email" "Palvelun email" "Käyttäjien email" "Rajapinnan muoto"]
             (map (juxt :interface-url :top-name :service-name :operator-email :service-email :user-email :interface-format)
-                 (fetch-netex-interfaces-for-admin db))))
+                 (fetch-successfull-netex-conversion-interfaces-for-admin db))))
 
 (defn- associated-companies-response [db]
   (csv-data ["Liittyi palveluun" "Palvelun id" "Palveluntuottaja" "Palveluntuottajan id" "Palveluntuottajan y-tunnus" "Liittynyt palveluntuottaja" "Liittynyt palveluntuottaja y-tunnus" "Liittyi" "Liittyneen palveluntuottajan id"]

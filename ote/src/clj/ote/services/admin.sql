@@ -182,7 +182,8 @@ SELECT
           r.id, top.id, ru.sunday, ru.monday, ru.tuesday, ru. wednesday, ru.thursday, ru.friday, ru.saturday
  ORDER BY r.id, "to-date" DESC;
 
--- name: fetch-netex-interfaces-for-admin
+-- name: fetch-successfull-netex-conversion-interfaces-for-admin
+-- Get interfaces that converts gtfs/kalkati to netex successfully.
 select TRIM((eid."external-interface").url) as "interface-url",
        top.name as "top-name",
        ts.name as "service-name",
@@ -194,11 +195,14 @@ select TRIM((eid."external-interface").url) as "interface-url",
 FROM
     "external-interface-description" eid,
     "transport-service" ts,
+    "netex-conversion" n,
     "transport-operator" top,
     "group" g,
     "member" m,
     "user" u
 WHERE ts.id = eid."transport-service-id"
+  AND n."transport-service-id" = ts.id
+  AND n.status = 'ok'
   AND ts.published IS NOT NULL
   AND top."ckan-group-id" = g.id
   AND m.table_name = 'user'
