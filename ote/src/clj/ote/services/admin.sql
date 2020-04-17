@@ -199,6 +199,7 @@ FROM
     "member" m,
     "user" u
 WHERE ts.id = eid."transport-service-id"
+  AND ts.published IS NOT NULL
   AND top."ckan-group-id" = g.id
   AND m.table_name = 'user'
   AND m.state = 'active'
