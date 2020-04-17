@@ -239,4 +239,52 @@ SELECT count(ac."sub-type") as sum,
  GROUP BY tertile, ac."sub-type"
  ORDER BY tertile, ac."sub-type";
 
+-- name: fetch-successfull-netex-conversion-interfaces-for-admin-with-max-date
+-- Get interfaces that converts gtfs/kalkati to netex successfully and add traffic last date
+-- This same query is in admin.sql without the max_date parameter - this is done because of last prod and smaller risks.
+WITH interfaces AS (
+    SELECT DISTINCT ON (e.id) e.id as "interface-id",
+                              p.created as ladattu,
+                              p.id as "package-id",
+                              e."transport-service-id",
+                              e."external-interface",
+                              e."data-content",
+                              e.format,
+                              (upper(gtfs_package_date_range(p.id)))::date as max_date
+      FROM "external-interface-description" e
+           INNER JOIN gtfs_package p on p."external-interface-description-id" = e.id
+     WHERE ('GTFS' = ANY (e.format) OR 'Kalkati.net' = ANY (e.format))
+       AND 'route-and-schedule' = ANY (e."data-content")
+     ORDER BY e.id, p.id desc
+)
+SELECT TRIM((eid."external-interface").url) as "interface-url",
+       to_char(eid.max_date, 'DD.MM.YYYY') as "max-date",
+       top.name as "top-name",
+       ts.name as "service-name",
+       array_to_string(eid."data-content", ',') as "interface-content",
+       TRIM(top.email) as "operator-email",
+       TRIM(ts."contact-email") as "service-email",
+       array_to_string(array_agg(u.email), '|') as "user-email",
+       eid.format[1] as "interface-format"
+  FROM interfaces eid,
+       "transport-service" ts,
+       "netex-conversion" n,
+       "transport-operator" top,
+       "group" g,
+       "member" m,
+       "user" u
+ WHERE ts.id = eid."transport-service-id"
+   AND n."transport-service-id" = ts.id
+   AND n.status = 'ok'
+   AND ts.published IS NOT NULL
+   AND top."ckan-group-id" = g.id
+   AND m.table_name = 'user'
+   AND m.state = 'active'
+   AND m.table_id = u.id
+   AND m.group_id = g.id
+   AND u.email NOT LIKE '%@matkahuolto.fi'
+   AND top.id = ts."transport-operator-id"
+ GROUP BY top.name, ts.name, eid.format[1], eid."external-interface", eid."data-content", ts."contact-email", top.email,
+       eid.max_date
+ ORDER BY eid.max_date ASC;
 
