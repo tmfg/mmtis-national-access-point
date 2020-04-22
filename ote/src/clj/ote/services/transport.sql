@@ -28,3 +28,10 @@ SELECT ts.id,
 
 -- name: update-child-parent-interfaces
 SELECT child_parent_interfaces(:parent-id::INTEGER, :child-id::INTEGER);
+
+-- name: update-old-package-interface-ids!
+UPDATE gtfs_package p SET "external-interface-description-id" = :new-interface-id WHERE p."transport-service-id" = :service-id AND p."external-interface-description-id" NOT IN (:ids);
+
+-- name: select-old-packages
+select * from gtfs_package p WHERE p."transport-service-id" = :service-id AND p."external-interface-description-id" NOT IN (:ids);
+
