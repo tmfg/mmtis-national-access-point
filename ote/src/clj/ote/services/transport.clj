@@ -260,6 +260,37 @@
              ::t-service/license ::t-service/id}
            {::t-service/transport-service-id id})))
 
+(defn- update-child-parent-download-status [db parent-id child-id]
+  (let [child-interface-id-list (specql/fetch db ::t-service/external-interface-description
+                                              (specql/columns ::t-service/external-interface-description)
+                                              {::t-service/transport-service-id child-id})
+        ;; Update download-history interface-id:s to new ids.
+        id-list (doall
+                  (map
+                    (fn [row]
+                      (let [url (::t-service/url (::t-service/external-interface row))
+                            original-id (::t-service/id (first (specql/fetch db ::t-service/external-interface-description
+                                                                             (specql/columns ::t-service/external-interface-description)
+                                                                             {::t-service/transport-service-id parent-id
+                                                                              ::t-service/external-interface {::t-service/url url}})))
+                            ;; Update download history
+                            _ (specql/update! db ::t-service/external-interface-download-status
+                                              {::t-service/external-interface-description-id (::t-service/id row)}
+                                              {::t-service/transport-service-id parent-id
+                                               ::t-service/url url})
+                            ;; Update packages
+                            _ (specql/update! db :gtfs/package
+                                              {:gtfs/external-interface-description-id (::t-service/id row)}
+                                              {:gtfs/transport-service-id parent-id
+                                               :gtfs/external-interface-description-id original-id})]
+                        (::t-service/id row)))
+                    child-interface-id-list))
+        ids (mapv #(::t-service/id %) child-interface-id-list)
+        _ (update-old-package-interface-ids! db {:new-interface-id (first id-list) ;; It doesnt matter to which interface those old packages point, because the history is stored in history table and the
+                                                 ;; interface-id is critical for change detection. Change detection gets unique packages based on interface id. If we don't rewrite those we get corrupted change detection results
+                                                 :service-id parent-id
+                                                 :ids ids})]))
+
 (defn replace-parent-service-with-child [db bucket child-id publish?]
   (let [;; Get child service data
         service (first (specql/fetch db ::t-service/transport-service
@@ -278,6 +309,7 @@
     (tx/with-transaction
       db
       ;; Update service data in database
+      (update-child-parent-download-status db parent-id child-id)
       (specql/upsert! db ::t-service/transport-service service)
       (update-child-parent-interfaces db {:parent-id parent-id
                                           :child-id child-id})
@@ -439,7 +471,7 @@
                              (ensure-created-time db))
             resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
             removed-resources (removable-resources resources-from-db external-interfaces)
-            csv-file-key (:db-file-key service-info) ;; Take csv id from temp table
+            csv-file-key (:db-file-key service-info)        ;; Take csv id from temp table
             service-info (dissoc service-info :db-file-key) ;; Remove csv id to make save to work
             ;; Store to OTE database
             transport-service
