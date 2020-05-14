@@ -566,7 +566,7 @@ WITH dates AS (
 )
 SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
        COALESCE(rh."route-long-name",'') AS "route-long-name",
-       COALESCE(rh."trip-headsign", '') AS "trip-headsign",
+       (array_agg(rh."trip-headsign"))[1] AS "trip-headsign",
        MIN(d.date) AS "min-date",
        MAX(d.date) AS "max-date",
        COALESCE(rh."route-hash-id", '') AS "route-hash-id"
@@ -580,7 +580,7 @@ SELECT COALESCE(rh."route-short-name",'') AS "route-short-name",
  WHERE rh.hash IS NOT NULL
   AND rh."route-hash-id" IS NOT NULL
   AND rh."route-hash-id" != ''
- GROUP BY rh."route-short-name", rh."route-long-name", rh."trip-headsign", rh."route-hash-id"
+ GROUP BY rh."route-short-name", rh."route-long-name", rh."route-hash-id"
  -- Remove routes that do not have traffic anymore
  HAVING MAX(d.date) >= detection_date;
 $$ LANGUAGE SQL STABLE;
