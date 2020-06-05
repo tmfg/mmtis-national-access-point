@@ -10,6 +10,7 @@
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [ote.util.fn :refer [flip]]
+            [ote.util.db :as util-db]
             [ote.transit-changes.detection :as detection]
             [clojure.set :as set]
             [digest]
@@ -39,26 +40,26 @@
   "Formatting trips route-line to line geometry that indicates where busses drive. Stops are formatted to Points with
   location coordinates and properties like stop name."
   [{:keys [route-line departures stops trip-id] :as foo}]
-    (let [all-stops (parse-stops stops)
-          first-stop (first all-stops)
-          last-stop (last all-stops)
-          stop-location-hash (digest/sha-256 (str/join "-" (map (juxt :lat :lon) all-stops)))]
-      {:stop-location-hash stop-location-hash
-       :route-line {:type "Feature"
-                    :properties {:departures (mapv time/format-interval-as-time (.getArray departures))
-                                 :routename (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}
-                    :geometry (cheshire/decode route-line keyword)
+  (let [all-stops (parse-stops stops)
+        first-stop (first all-stops)
+        last-stop (last all-stops)
+        stop-location-hash (digest/sha-256 (str/join "-" (map (juxt :lat :lon) all-stops)))]
+    {:stop-location-hash stop-location-hash
+     :route-line {:type "Feature"
+                  :properties {:departures (mapv time/format-interval-as-time (.getArray departures))
+                               :routename (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}
+                  :geometry (cheshire/decode route-line keyword)
 
-                    :stops (map
-                             (fn [stop]
-                               (let [[lon lat name trip-id] (str/split stop #";")]
-                                 {:type "Point"
-                                  :coordinates [(Double/parseDouble lon)
-                                                (Double/parseDouble lat)]
-                                  :properties {"stopname" name
-                                               "trip-name" (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}}))
-                             (when-not (str/blank? stops)
-                               (str/split stops #"\|\|")))}}))
+                  :stops (map
+                           (fn [stop]
+                             (let [[lon lat name trip-id] (str/split stop #";")]
+                               {:type "Point"
+                                :coordinates [(Double/parseDouble lon)
+                                              (Double/parseDouble lat)]
+                                :properties {"stopname" name
+                                             "trip-name" (str (:stop-name first-stop) " \u2192 " (:stop-name last-stop) "|| (" stop-location-hash ")")}}))
+                           (when-not (str/blank? stops)
+                             (str/split stops #"\|\|")))}}))
 
 (defn trip-lines
   "Modify trip list (trips) to distinct routes using :stop-location-hash"
@@ -95,9 +96,11 @@
                         :element-type :gtfs/stoptime-display}
                        string))))
 
-(defn trip-differences-for-dates [db service-id date1 date2 route-hash-id]
-  (let [date1-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date1))
-        date2-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date2))
+(defn trip-differences-for-dates [db service-id date1 date2 route-hash-id detection-date]
+  "Get trip differences for dates using detection date. Detection-date is essential, because it affects
+  the packages where trip data is fetched"
+  (let [date1-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date1) detection-date)
+        date2-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date2) detection-date)
         result (detection/compare-selected-trips date1-trips date2-trips
                                                    (time/parse-date-iso-8601 date1)
                                                    (time/parse-date-iso-8601 date2))
@@ -143,9 +146,16 @@
                                           {:gtfs/transport-service-id service-id}
                                           {:specql.core/order-by :gtfs/date
                                            :specql.core/order-direction :desc
-                                           :specql.core/limit 50})})))
+                                           :specql.core/limit 50})
+           :used-packages (:gtfs/package-ids (first (specql/fetch db :gtfs/transit-changes
+                                                                  #{:gtfs/package-ids}
+                                                                  {:gtfs/transport-service-id service-id
+                                                                   :gtfs/date (time/iso-8601-date->sql-date date)}
+                                                                  {:specql.core/order-by :gtfs/date
+                                                                   :specql.core/order-direction :desc
+                                                                   :specql.core/limit 1})))})))
 
-  
+
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
@@ -158,7 +168,7 @@
   ^{:unauthenticated false}
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
-        {:strs [date route-hash-id]} :query-params
+        {:strs [date used-packages route-hash-id]} :query-params
         user :user}
     (or (authorization/transit-authority-authorization-response user)
         (http/geojson-response
@@ -169,13 +179,14 @@
                            db
                            {:service-id (Long/parseLong service-id)
                             :date (time/parse-date-iso-8601 date)
+                            :used-packages (util-db/str-vec->str used-packages)
                             :route-hash-id route-hash-id}))}
             {:key-fn name}))))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
-        {:strs [date short-name long-name headsign route-hash-id]} :query-params
+        {:strs [date used-packages route-hash-id]} :query-params
         user :user}
     (or (authorization/transit-authority-authorization-response user)
         (into []
@@ -184,12 +195,13 @@
                 db
                 {:service-id (Long/parseLong service-id)
                  :date (time/parse-date-iso-8601 date)
+                 :used-packages (util-db/str-vec->str used-packages)
                  :route-hash-id route-hash-id}))))
 
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
-        {:strs [date1 date2 short-name long-name headsign route-hash-id]} :query-params
+        {:strs [date1 date2 used-packages detection-date route-hash-id]} :query-params
         user :user}
     (or (authorization/transit-authority-authorization-response user)
-        (trip-differences-for-dates db service-id date1 date2 route-hash-id))))
+        (trip-differences-for-dates db service-id date1 date2 route-hash-id detection-date))))
