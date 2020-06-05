@@ -114,8 +114,8 @@
                  [org.clojure/data.zip "0.1.3"]
 
                  ;; GeoTools - LGPL
-                 [org.geotools/gt-epsg-wkt "20.0"]
-                 [org.geotools/gt-geometry "20.0"]
+                 [org.geotools/gt-epsg-wkt "20.1"]
+                 [org.geotools/gt-geometry "20.1"]
 
                  ;; Data/file formats and file handling
                  ;; JSON - MIT
@@ -150,8 +150,8 @@
                                   [webjure/json-schema "0.7.4"]]
                    :test-paths ["test/clj"]}}
 
-  :repositories [["osgeo" "https://download.osgeo.org/webdav/geotools/"]
-                 ["boundlessgeo" "https://repo.boundlessgeo.com/main/"]]
+  :repositories [["osgeo-release" "https://repo.osgeo.org/repository/release/"]
+                 ["osgeo" "https://download.osgeo.org/webdav/geotools/"]]
   :plugins [;; Automatically compile your ClojureScript code into Javascript - Eclipse Public License 1.0
             [lein-cljsbuild "1.1.7"]
             ;; Figwheel builds your ClojureScript code and hot loads it into the browser - Eclipse Public License 1.0
