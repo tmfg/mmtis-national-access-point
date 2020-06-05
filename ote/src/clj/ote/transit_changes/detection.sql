@@ -59,7 +59,7 @@ SELECT t."package-id", trip."trip-id",
   JOIN "gtfs-stop" stop ON (stop."package-id" = r."package-id" AND stop."stop-id" = stoptime."stop-id")
  WHERE ROW(r."package-id", t."service-id")::service_ref IN
        (SELECT * FROM gtfs_services_for_date(
-        (SELECT gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE)), :date::DATE))
+        (SELECT gtfs_service_packages_for_detection_date(:service-id::INTEGER, :date::DATE, :detection-date::DATE)), :date::DATE))
    AND r."route-hash-id" = :route-hash-id
  ORDER BY p."external-interface-description-id", t."package-id", trip."trip-id", stoptime."stop-sequence";
 
