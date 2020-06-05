@@ -300,9 +300,11 @@
               :date2-trips nil
               :date2-route-lines nil))
 
-(defn fetch-trip-data-for-dates [{:keys [compare] :as t-vis} service-id route date1 date2]
+(defn fetch-trip-data-for-dates [{:keys [compare used-packages detection-date] :as t-vis} service-id route date1 date2]
   (doseq [date [date1 date2]
           :let [params (merge {:date (time/format-date-iso-8601 date)
+                               :used-packages used-packages
+                               :detection-date detection-date
                                :route-hash-id (ensure-route-hash-id route)}
                               (when-let [short (:gtfs/route-short-name route)]
                                 {:short-name short})
@@ -324,7 +326,9 @@
   (comm/get! (str "transit-visualization/" service-id "/route-differences")
              {:params {:date1 (time/format-date-iso-8601 date1)
                        :date2 (time/format-date-iso-8601 date2)
-                       :route-hash-id (ensure-route-hash-id route)}
+                       :route-hash-id (ensure-route-hash-id route)
+                       :used-packages used-packages
+                       :detection-date detection-date}
 
               :on-success (tuck/send-async! ->RouteDifferencesResponse)
               :on-failure (tuck/send-async! ->ServerError)})
@@ -372,6 +376,7 @@
 (define-event RouteCalendarDatesResponse [response route]
   {}
   (let [service-id (get-in app [:params :service-id])
+        detection-date (get-in app [:transit-visualization :detection-date])
         current-week-date (or (:current-week-date (:changes (:transit-visualization app)))
                               (t/now))
         ;; Use dates in route, or default to current week date and 7 days after that.
@@ -426,7 +431,8 @@
 
 (define-event SelectDatesForComparison [date]
   {}
-  (let [service-id (get-in app [:params :service-id])
+  (let [detection-date (get-in app [:transit-visualization :detection-date])
+        service-id (get-in app [:params :service-id])
         date1 (get-in app [:transit-visualization :compare :date1])
         date2 (get-in app [:transit-visualization :compare :date2])
         route (get-in app [:transit-visualization :selected-route])
@@ -529,7 +535,8 @@
                  :transit-changes (:transit-changes response)
                  :route-hash-id-type (:route-hash-id-type response)
                  :selected-route route
-                 :detection-date detection-date)))))
+                 :detection-date detection-date
+                 :used-packages (:used-packages response))))))
 
 (defn- fetch-changed-routes-list [app {:keys [service-id date] :as url-router-params}]
   (comm/get! (str "transit-visualization/" service-id "/" date)
