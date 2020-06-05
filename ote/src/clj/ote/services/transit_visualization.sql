@@ -99,9 +99,8 @@ SELECT ST_AsGeoJSON(COALESCE(
           JOIN "gtfs-stop" stop ON (r."package-id" = stop."package-id" AND stoptime."stop-id" = stop."stop-id" AND stoptime."stop-id" = stop."stop-id")
          WHERE COALESCE(:route-hash-id::VARCHAR,'') = COALESCE(r."route-hash-id",'')
            AND ROW(r."package-id", t."service-id")::service_ref IN
-               (SELECT * FROM gtfs_services_for_date(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE),
-                          :date::DATE))
-           AND r."package-id" = ANY(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE))
+               (SELECT * FROM gtfs_services_for_date(:used-packages::INT[],:date::DATE))
+           AND r."package-id" = ANY(:used-packages::INT[])
          GROUP BY trip."shape-id", r."package-id", trip."trip-id", trip."trip-headsign") x
  -- Group same route lines to single row (aggregate departures to array)
  GROUP BY "route-line", "shape-id", "package-id", "trip-id", headsign;
@@ -113,7 +112,7 @@ WITH route_stops as (
         (trip.trip)."trip-headsign" as headsign, stoptime."stop-id" as "stop-id",
         stoptime."arrival-time" as "arrival-time", stoptime."departure-time" as "departure-time",
         stoptime."stop-sequence" as "stop-sequence"
-  FROM gtfs_route_trips_for_date(:route-hash-id, gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::date) rt
+  FROM gtfs_route_trips_for_date(:route-hash-id,:used-packages::INTEGER[], :date::DATE) rt
        JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
        JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
@@ -192,7 +191,7 @@ WHERE c."transport-service-id" = :service-id
   AND c.date = :date::DATE;
 
 -- name: detected-route-changes-by-date
--- Fetch changes for service joinin detected-route-change table and detected-change-history table.
+-- Fetch changes for service joining detected-route-change table and detected-change-history table.
 SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
        c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
        c."trip-stop-time-changes-lower", c."trip-stop-time-changes-upper", c."current-week-date",

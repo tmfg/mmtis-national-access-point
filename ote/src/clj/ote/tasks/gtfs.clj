@@ -10,7 +10,7 @@
             [ote.db.tx :as tx]
             [ote.db.transport-service :as t-service]
             [ote.db.lock :as lock]
-            [ote.util.db :refer [PgArray->vec]]
+            [ote.util.db :as util-db]
             [ote.util.feature :as feature]
             [ote.tasks.util :as tasks-util]
             [ote.integration.import.gtfs :as import-gtfs]
@@ -75,7 +75,7 @@
                      (fetch-given-gtfs-interface! db service-id interface-id)
                      (fetch-next-gtfs-interface! db config))
          interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
-                     (update interface :data-content PgArray->vec)
+                     (update interface :data-content  util-db/PgArray->vec)
                      interface)
          force-download? (integer? service-id)
          used-service-id (if service-id
