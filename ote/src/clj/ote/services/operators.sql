@@ -3,7 +3,7 @@ SELECT t."transport-operator-id" as id, COUNT(t.id) AS services
   FROM "transport-service" t
  WHERE t."transport-operator-id" IN (:operators) AND
        t.published IS NOT NULL
-GROUP BY t."transport-operator-id"
+GROUP BY t."transport-operator-id";
 
 -- name: count-matching-operators
 -- single?: true
