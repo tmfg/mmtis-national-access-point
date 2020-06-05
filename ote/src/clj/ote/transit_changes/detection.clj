@@ -616,12 +616,13 @@
           (route-differences route-weeks-nt-keyed)
           (create-no-change route-key)))))
 
-(defn route-trips-for-date [db service-id route-hash-id date]
+(defn route-trips-for-date [db service-id route-hash-id date detection-date]
   (vec
     (for [trip-stops (partition-by (juxt :package-id :trip-id)
                                    (fetch-route-trips-for-date db {:service-id service-id
                                                                    :route-hash-id route-hash-id
-                                                                   :date date}))
+                                                                   :date date
+                                                                   :detection-date detection-date}))
           :let [package-id (:package-id (first trip-stops))
                 trip-id (:trip-id (first trip-stops))]]
       {:gtfs/package-id package-id
@@ -664,28 +665,18 @@
      :removed-trips (if combined-trips (count removed) removed-trip-count)
      :trip-changes trip-changes}))
 
-(defn compare-route-days [db service-id route-hash-id
-                          {:keys [starting-week starting-week-hash
-                                  different-week different-week-hash] :as r}]
-  (let [first-different-day (transit-changes/first-different-day starting-week-hash
-                                                                 different-week-hash)
-        starting-week-date (.plusDays (:beginning-of-week starting-week) first-different-day)
-        different-week-date (.plusDays (:beginning-of-week different-week) first-different-day)
-        date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
-        date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
-    (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date)))
-
-(defn compare-route-days-all-changes-for-week [db service-id route-hash-id
+(defn compare-route-days-all-changes-for-week [db service-id route-hash-id detection-date
                                                {:keys [starting-week starting-week-hash
                                                        different-week different-week-hash] :as r}]
   (let [changed-days (transit-changes/changed-days-of-week starting-week-hash different-week-hash)]
     (for [ix changed-days
           :let [starting-week-date (.plusDays (:beginning-of-week starting-week) ix)
                 different-week-date (.plusDays (:beginning-of-week different-week) ix)
-                date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date)
-                date2-trips (route-trips-for-date db service-id route-hash-id different-week-date)]
+                date1-trips (route-trips-for-date db service-id route-hash-id starting-week-date detection-date)
+                date2-trips (route-trips-for-date db service-id route-hash-id different-week-date detection-date)
+                comp-result (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date)]
           :when (number? ix)]
-      (compare-selected-trips date1-trips date2-trips starting-week-date different-week-date))))
+      comp-result)))
 
 (defn- expand-day-changes
   "Input: coll of maps each describing a week with traffic changes.
@@ -704,14 +695,27 @@
 
 (defn route-day-changes
   "Takes a collection of routes and adds day change comparison details for those weeks which have :different-week"
-  [db service-id routes]
+  [db service-id detection-date routes]
   (let [route-day-changes
         (mapv (fn [{diff :different-week route-key :route-key :as detection-result}]
                 (if diff                                    ;; If a different week was found, do detailed trip analysis
                   (assoc detection-result
-                    :changes (compare-route-days-all-changes-for-week db service-id route-key detection-result))
+                    :changes (compare-route-days-all-changes-for-week db service-id route-key detection-date detection-result))
                   detection-result))
-              routes)]
+              routes)
+        ;; When using multiple interfaces and multiple packages it is possible to get same date-hash twice in week-hash
+        ;; So the detection thinks that there is something changed in those weeks and it tries to find out what the difference is
+        ;; But there isn't any differences. So we get empty detections.
+        ;; We filter them outt here
+        route-day-changes (remove (fn [val]
+                                    (let [first-change (first (:changes val))]
+                                      (when (and
+                                              (= 0 (:added-trips first-change))
+                                              (= 0 (:removed-trips first-change))
+                                              (= {:stop-time-changes 0, :stop-seq-changes 0} (first (:trip-changes first-change)))
+                                              )
+                                        val)))
+                                  route-day-changes)]
     (vec (expand-day-changes route-day-changes))))
 
 (defn- date-in-the-past? [^LocalDate date]
@@ -1018,7 +1022,7 @@
                            (combine-weeks)
                            (traffic-week-maps->change-maps analysis-date all-routes)
                            ; Fetch detailed day details
-                           (route-day-changes db service-id))]
+                           (route-day-changes db service-id analysis-date))]
          (spec/assert ::detected-route-changes-for-services-coll new-data)
          new-data)}
       (catch Exception e
