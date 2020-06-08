@@ -432,6 +432,7 @@
 (define-event SelectDatesForComparison [date]
   {}
   (let [detection-date (get-in app [:transit-visualization :detection-date])
+        used-packages (get-in app [:transit-visualization :used-packages])
         service-id (get-in app [:params :service-id])
         date1 (get-in app [:transit-visualization :compare :date1])
         date2 (get-in app [:transit-visualization :compare :date2])
@@ -453,7 +454,9 @@
         (comm/get! (str "transit-visualization/" service-id "/route-differences")
                    {:params {:date1 (time/format-date-iso-8601 earlier-date)
                              :date2 (time/format-date-iso-8601 later-date)
-                             :route-hash-id (ensure-route-hash-id route)}
+                             :route-hash-id (ensure-route-hash-id route)
+                             :used-packages used-packages
+                             :detection-date detection-date}
 
                     :on-success (tuck/send-async! ->RouteDifferencesResponse)
                     :on-failure (tuck/send-async! ->ServerError)})
