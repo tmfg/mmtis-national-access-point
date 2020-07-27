@@ -553,7 +553,7 @@
          :body (clj->transit {:status (:status response)
                               :response (str response)})}))
     (catch Exception e
-      (log/warn "Exception csv error: " e)
+      (log/warn "Exception csv validation failure: " e)
       {:status 500
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:error (str e)})})))
