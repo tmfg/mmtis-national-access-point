@@ -614,7 +614,7 @@
                     state))))
        :reagent-render
        (fn [{:keys [update! currency?] :as opts} data]
-         [:div
+         [:div {:style {:position "relative"}}
           [:span [field (merge (assoc opts
                              :type :string
                              :style (merge
@@ -634,9 +634,8 @@
                              {:disabled true}))
               (:txt @state)]]
           (when currency?
-            [:span {:style {:position "relative"
-                            :padding 0
-                            :left "-15px"}}
+            [:span {:style {:position "absolute"
+                            :top "38px"}}
              "€"])])})))
 
 ;; Matches empty or any valid hour (0 (or 00) - 23)

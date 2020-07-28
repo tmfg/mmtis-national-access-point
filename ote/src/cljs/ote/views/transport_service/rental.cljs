@@ -27,8 +27,7 @@
 
 (defn price-group [in-validation?]
   (form/group
-    {:label (tr [:rentals-page :header-service-info])
-     :columns 3
+    {:columns 3
      :card? false
      :top-border false}
 
@@ -49,27 +48,29 @@
                        :type :number
                        :disabled? in-validation?
                        :currency? true
-                       :style {:width "100px"}
+                       :full-width? true
                        :input-style {:text-align "right" :padding-right "5px"}
-                       :field-class "col-xs-12 col-sm-4 col-md-4"
+                       :field-class "col-xs-12 col-sm-3 col-md-3"
                        :required? true}
 
                       {:name ::t-service/unit
                        :label (tr [:field-labels :rentals ::t-service/unit])
                        :type :string
                        :disabled? in-validation?
-                       :field-class "col-xs-12 col-sm-4 col-md-4"
+                       :field-class "col-xs-12 col-sm-7 col-md-7"
                        :required? true
-                       :max-length 128}]}
+                       :max-length 128
+                       :full-width? true}]}
       (when-not in-validation?
-        {:delete? true
+        {:inner-delete? true
+         :inner-delete-label (tr [:buttons :delete])
          :add-label (tr [:buttons :add-new-price-class])}))))
 
 (defn price-classes [update-form! data in-validation?]
   (reagent/with-let [open? (reagent/atom false)]
     [:div
-     [ui/flat-button {:label (tr [:rentals-page :open-rental-prices])
-                      :on-click #(reset! open? true)}]
+     [buttons/open-dialog-row {:on-click #(reset! open? true)}
+      (tr [:rentals-page :open-rental-prices])]
      [ui/dialog
       {:open @open?
        :actionsContainerStyle style-dialog/dialog-action-container
@@ -78,12 +79,13 @@
        :actions [(reagent/as-element
                    [ui/flat-button {:label (tr [:buttons :close])
                                     :on-click #(reset! open? false)}])]}
-      [form/form {:update! update-form!
-                  :name->label (tr-key [:field-labels :rentals]
-                                       [:field-labels :transport-service]
-                                       [:field-labels])}
-       [(assoc-in (price-group in-validation?) [:options :card?] false)]
-       data]]]))
+      [:div {:style {:padding-top "1.5rem"}}
+       [form/form {:update! update-form!
+                   :name->label (tr-key [:field-labels :rentals]
+                                        [:field-labels :transport-service]
+                                        [:field-labels])}
+        [(assoc-in (price-group in-validation?) [:options :card?] false)]
+        data]]]]))
 
 (defn vehicle-group [in-validation?]
   (form/group
@@ -211,6 +213,7 @@
                        :type :selection
                        :disabled? in-validation?
                        :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :full-width? true
                        :show-option (tr-key [:enums ::t-service/additional-services])
                        :options t-service/additional-services
                        :required? true}
@@ -219,9 +222,9 @@
                        :label (tr [:field-labels :rentals ::t-service/additional-service-price])
                        :type :number
                        :disabled? in-validation?
-                       :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :field-class "col-xs-12 col-sm-6 col-md-2"
                        :currency? true
-                       :style {:width "100px"}
+                       :full-width? true
                        :input-style {:text-align "right" :padding-right "5px"}
                        :read (comp ::t-service/price-per-unit ::t-service/additional-service-price)
                        :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/price-per-unit] %2)
@@ -231,12 +234,13 @@
                        :label (tr [:field-labels :rentals ::t-service/additional-service-unit])
                        :type :string
                        :disabled? in-validation?
-                       :field-class "col-xs-12 col-sm-6 col-md-3"
+                       :field-class "col-xs-12 col-sm-6 col-md-5"
+                       :full-width? true
                        :read (comp ::t-service/unit ::t-service/additional-service-price)
                        :write #(assoc-in %1 [::t-service/additional-service-price ::t-service/unit] %2)}]}
       (when-not in-validation?
         {:inner-delete? true
-         :inner-delete-class "col-xs-12 col-sm-3 col-md-3"
+         :inner-delete-class "col-xs-12 col-sm-3 col-md-1"
          :inner-delete-label (tr [:buttons :delete])
          :add-label (tr [:buttons :add-new-additional-service])}))))
 
