@@ -142,10 +142,12 @@
              (try
                (let [query-params {:service-id service-id
                                    :start-date start-date
-                                   :end-date end-date}]
+                                   :end-date end-date}
+                     _ (log/info "Detecting :: query-params" (pr-str query-params))
+                     packages-for-detection (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past?)]
                  (detection/update-transit-changes!
                    db detection-date service-id
-                   (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past?)
+                   packages-for-detection
                    (detection/detect-route-changes-for-service db query-params (tasks-util/joda-datetime-to-java-time-local-date detection-date))))
                (catch Exception e
                  (log/warn e "Change detection failed for service " service-id)))

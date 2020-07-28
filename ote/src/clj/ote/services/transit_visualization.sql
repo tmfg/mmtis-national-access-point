@@ -112,7 +112,7 @@ WITH route_stops as (
         (trip.trip)."trip-headsign" as headsign, stoptime."stop-id" as "stop-id",
         stoptime."arrival-time" as "arrival-time", stoptime."departure-time" as "departure-time",
         stoptime."stop-sequence" as "stop-sequence"
-  FROM gtfs_route_trips_for_date(:route-hash-id,:used-packages::INTEGER[], :date::DATE) rt
+  FROM gtfs_route_trips_for_date(:route-hash-id,gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::DATE) rt
        JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
        JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
