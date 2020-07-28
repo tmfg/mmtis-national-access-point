@@ -99,8 +99,8 @@
 (defn trip-differences-for-dates [db service-id date1 date2 route-hash-id detection-date]
   "Get trip differences for dates using detection date. Detection-date is essential, because it affects
   the packages where trip data is fetched"
-  (let [date1-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date1) detection-date)
-        date2-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date2) detection-date)
+  (let [date1-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date1) detection-date false)
+        date2-trips (detection/route-trips-for-date db service-id route-hash-id (time/parse-date-iso-8601 date2) detection-date false)
         result (detection/compare-selected-trips date1-trips date2-trips
                                                    (time/parse-date-iso-8601 date1)
                                                    (time/parse-date-iso-8601 date2))
