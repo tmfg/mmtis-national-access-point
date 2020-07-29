@@ -68,7 +68,7 @@
 
 (defn price-classes [update-form! data in-validation?]
   (reagent/with-let [open? (reagent/atom false)]
-    [:div
+    [:div {:style {:padding-top "1rem"}}
      [buttons/open-dialog-row {:on-click #(reset! open? true)}
       (tr [:rentals-page :open-rental-prices])]
      [ui/dialog
