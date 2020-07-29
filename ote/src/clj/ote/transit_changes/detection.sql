@@ -67,7 +67,7 @@ SELECT t."package-id", trip."trip-id",
 WITH routes AS (
     SELECT DISTINCT ON (dr."route-id") dr."route-id", id, "package-id", "route-hash-id"
     FROM "detection-route" dr
-    WHERE dr."package-id" in (SELECT unnest(gtfs_service_packages_for_date(:service-id::INTEGER, :date::DATE)))
+    WHERE dr."package-id" in (SELECT unnest(gtfs_service_packages_for_detection_date(:service-id::INTEGER, :date::DATE,:detection-date::DATE)))
 )
 SELECT t."package-id", trip."trip-id",
        stoptime."stop-id", stoptime."departure-time", stoptime."stop-sequence",
