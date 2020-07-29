@@ -35,3 +35,8 @@ UPDATE gtfs_package p SET "external-interface-description-id" = :new-interface-i
 -- name: select-old-packages
 select * from gtfs_package p WHERE p."transport-service-id" = :service-id AND p."external-interface-description-id" NOT IN (:ids);
 
+-- name: fetch-child-service-interfaces
+SELECT e.id, (e."external-interface").url as url
+  FROM "external-interface-description" e
+ WHERE e."transport-service-id" = :service-id
+   AND 'route-and-schedule' = ANY(e."data-content");

@@ -10,6 +10,7 @@
             [clojure.set :as set]
             [jeesql.core :refer [defqueries]]
             [specql.core :refer [fetch upsert! delete!] :as specql]
+            [specql.op :as op]
             [ote.components.http :as http]
             [ote.util.feature :as feature]
             [ote.db.modification :as modification]
@@ -261,29 +262,27 @@
            {::t-service/transport-service-id id})))
 
 (defn- update-child-parent-download-status [db parent-id child-id]
-  (let [child-interface-id-list (specql/fetch db ::t-service/external-interface-description
-                                              (specql/columns ::t-service/external-interface-description)
-                                              {::t-service/transport-service-id child-id})
-        ;; Update download-history interface-id:s to new ids.
+  (let [child-interface-id-list (fetch-child-service-interfaces db {:service-id child-id})
+       ;; Update download-history interface-id:s to new ids.
         id-list (doall
                   (map
                     (fn [row]
-                      (let [url (::t-service/url (::t-service/external-interface row))
+                      (let [url (:url row)
                             original-id (::t-service/id (first (specql/fetch db ::t-service/external-interface-description
                                                                              (specql/columns ::t-service/external-interface-description)
                                                                              {::t-service/transport-service-id parent-id
                                                                               ::t-service/external-interface {::t-service/url url}})))
                             ;; Update download history
                             _ (specql/update! db ::t-service/external-interface-download-status
-                                              {::t-service/external-interface-description-id (::t-service/id row)}
+                                              {::t-service/external-interface-description-id (:id row)}
                                               {::t-service/transport-service-id parent-id
                                                ::t-service/url url})
                             ;; Update packages
                             _ (specql/update! db :gtfs/package
-                                              {:gtfs/external-interface-description-id (::t-service/id row)}
+                                              {:gtfs/external-interface-description-id (:id row)}
                                               {:gtfs/transport-service-id parent-id
                                                :gtfs/external-interface-description-id original-id})]
-                        (::t-service/id row)))
+                        (:id row)))
                     child-interface-id-list))
         ids (mapv #(::t-service/id %) child-interface-id-list)
         _ (update-old-package-interface-ids! db {:new-interface-id (first id-list) ;; It doesnt matter to which interface those old packages point, because the history is stored in history table and the
