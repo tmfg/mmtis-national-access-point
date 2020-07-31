@@ -268,10 +268,7 @@
                   (map
                     (fn [row]
                       (let [url (:url row)
-                            original-id (::t-service/id (first (specql/fetch db ::t-service/external-interface-description
-                                                                             (specql/columns ::t-service/external-interface-description)
-                                                                             {::t-service/transport-service-id parent-id
-                                                                              ::t-service/external-interface {::t-service/url url}})))
+                            orig-interface-id (:original-interface-id row)
                             ;; Update download history
                             _ (specql/update! db ::t-service/external-interface-download-status
                                               {::t-service/external-interface-description-id (:id row)}
@@ -281,7 +278,7 @@
                             _ (specql/update! db :gtfs/package
                                               {:gtfs/external-interface-description-id (:id row)}
                                               {:gtfs/transport-service-id parent-id
-                                               :gtfs/external-interface-description-id original-id})]
+                                               :gtfs/external-interface-description-id orig-interface-id})]
                         (:id row)))
                     child-interface-id-list))
         ids (mapv #(::t-service/id %) child-interface-id-list)
@@ -501,6 +498,9 @@
                                               (fn [interface]
                                                 (-> interface
                                                     (assoc ::t-service/transport-service-id transport-service-id)
+                                                    ;; Save original id
+                                                    (assoc ::t-service/original-interface-id (::t-service/id interface))
+                                                    ;; Remove id so it can be saved to new service with different id
                                                     (dissoc ::t-service/id)))
                                               external-interfaces)
                     nil)
