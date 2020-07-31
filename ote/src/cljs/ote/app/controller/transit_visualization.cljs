@@ -394,11 +394,10 @@
                   (not (nil? (get (:calendar response) (str (time/date-to-str-date (time/now)))))))
                 (time/now)
 
-                ;; No-traffic route, return current day when the no-traffic start is in the past
-                (and
-                  (= :no-traffic (:change-type route))
-                  (t/after? (time/now) date1))
-                (time/now)
+                ;; No-traffic route, return previous day
+                ;; 31.7.2020 Was current day if no-traffic started in the past
+                (= :no-traffic (:change-type route))
+                date1
 
                 :else
                 date1)
