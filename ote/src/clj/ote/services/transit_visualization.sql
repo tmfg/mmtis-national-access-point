@@ -198,6 +198,6 @@ SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-h
        c."different-week-date", c."change-date", c."created-date",
        h."email-sent" >= (SELECT MAX("email-sent") FROM "detected-change-history") AS "recent-change?"
   FROM "detected-route-change" c
-       LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key" AND h."different-week-date" >= :date
+       LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key"
  WHERE c."transit-change-date" = :date
    AND c."transit-service-id" = :service-id;
