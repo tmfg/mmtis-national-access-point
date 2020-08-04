@@ -123,11 +123,11 @@
          ;; Start from the beginning of last week
          start-date (time/days-from (time/beginning-of-week detection-date) -7)
          ;; Date in future up to where traffic should be analysed
-         end-date (time/days-from start-date (:detection-window-days (config-tc/config)))
+         end-date (time/days-from start-date  (:detection-window-days (config-tc/config)))
 
          ;; Convert to LocalDate instances
-         [start-date end-date today] (map (comp time/date-fields->date time/date-fields)
-                                          [start-date end-date detection-date])]
+         [start-date end-date today query-detection-date] (map (comp time/date-fields->date time/date-fields)
+                                          [start-date end-date detection-date detection-date])]
      (lock/try-with-lock
        db "gtfs-nightly-changes" lock-time-in-seconds
        (let [;; run detection only for given services or all
@@ -144,7 +144,7 @@
                                    :start-date start-date
                                    :end-date end-date}
                      _ (log/info "Detecting :: query-params" (pr-str query-params))
-                     packages-for-detection (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past?)]
+                     packages-for-detection (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past? query-detection-date)]
                  (detection/update-transit-changes!
                    db detection-date service-id
                    packages-for-detection

@@ -1039,9 +1039,10 @@
         headsign (:gtfs/trip-headsign x)]
     (str short "-" long "-" headsign)))
 
-(defn service-package-ids-for-date-range [db query-params detection-date-in-the-past?]
+(defn service-package-ids-for-date-range [db query-params detection-date-in-the-past? detection-date]
   (if detection-date-in-the-past?
-    (mapv :id (service-packages-for-detection-date db query-params))
+    (mapv :id (service-packages-for-detection-date db (merge {:detection-date detection-date}
+                                                             query-params)))
     (mapv :id (service-packages-for-date-range db query-params))))
 
 ;; This is only for local development
