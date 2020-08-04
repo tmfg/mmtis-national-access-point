@@ -155,7 +155,7 @@
                                                                    :specql.core/order-direction :desc
                                                                    :specql.core/limit 1})))})))
 
-
+  ;; Colors and hashes for calendar
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route"
        {{:keys [service-id]} :params
@@ -186,7 +186,7 @@
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
-        {:strs [date used-packages route-hash-id]} :query-params
+        {:strs [date used-packages route-hash-id detection-date]} :query-params
         user :user}
     (or (authorization/transit-authority-authorization-response user)
         (into []
@@ -196,6 +196,7 @@
                 {:service-id (Long/parseLong service-id)
                  :date (time/parse-date-iso-8601 date)
                  :used-packages (util-db/str-vec->str used-packages)
+                 :detection-date detection-date
                  :route-hash-id route-hash-id}))))
 
   ^{:unauthenticated false :format :transit}

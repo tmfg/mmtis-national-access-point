@@ -112,7 +112,7 @@ WITH route_stops as (
         (trip.trip)."trip-headsign" as headsign, stoptime."stop-id" as "stop-id",
         stoptime."arrival-time" as "arrival-time", stoptime."departure-time" as "departure-time",
         stoptime."stop-sequence" as "stop-sequence"
-  FROM gtfs_route_trips_for_date(:route-hash-id,gtfs_service_packages_for_date(:service-id::INTEGER, :date::date), :date::DATE) rt
+  FROM gtfs_route_trips_for_date(:route-hash-id,gtfs_service_packages_for_detection_date(:service-id::INTEGER, :date::date, :detection-date::DATE), :date::DATE) rt
        JOIN LATERAL unnest(rt.tripdata) trip ON TRUE
        JOIN LATERAL unnest((trip.trip)."stop-times") stoptime ON TRUE
  WHERE rt."route-hash-id" = :route-hash-id
@@ -143,7 +143,8 @@ WITH dates AS (
             '1 day'::interval) AS g(ts)
 )
 SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
-  FROM (SELECT d.date, dh."package-id", rh.hash::text, p."external-interface-description-id" as e_id
+  FROM (SELECT DISTINCT ON (concat(d.date, rh.hash)) concat(d.date, rh.hash) as ddd ,
+      d.date, dh."package-id", rh.hash::text, p."external-interface-description-id" as e_id
           FROM dates d
                -- Join all date hashes to packages
                JOIN "gtfs-date-hash" dh ON (dh."package-id" = ANY(gtfs_service_packages_for_detection_date(:service-id::INTEGER, d.date, :detection-date::DATE))
@@ -156,7 +157,7 @@ SELECT x.date::text, string_agg(x.hash,' ' ORDER BY x.e_id asc) as hash
          WHERE rh."route-hash-id" = :route-hash-id::VARCHAR
            -- Get traffic (date-hashes) dates for the package download date and after that
            AND dh.date >= p.created::DATE) x
- GROUP BY x.date, x.e_id;
+ GROUP BY x.date;
 
 
 -- name: fetch-service-info
