@@ -712,16 +712,19 @@
         ;; So the detection thinks that there is something changed in those weeks and it tries to find out what the difference is
         ;; But there isn't any differences. So we get empty detections.
         ;; We filter them out here
-        route-day-changes (remove (fn [val]
-                                    (let [first-change (first (:changes val))]
-                                      (when (and
-                                              (= 0 (:added-trips first-change))
-                                              (= 0 (:removed-trips first-change))
-                                              (= {:stop-time-changes 0, :stop-seq-changes 0} (first (:trip-changes first-change)))
-                                              )
-                                        val)))
-                                  route-day-changes)]
-    (vec (expand-day-changes route-day-changes))))
+        route-day-changes-clean (mapv (fn [val]
+                                        (let [first-change (first (:changes val))]
+                                          (if (and
+                                                (= 0 (:added-trips first-change))
+                                                (= 0 (:removed-trips first-change))
+                                                (= {:stop-time-changes 0, :stop-seq-changes 0} (first (:trip-changes first-change))))
+                                            (-> val
+                                                (assoc :change-type :no-change)
+                                                (dissoc :changes :starting-week-hash :starting-week
+                                                        :different-week-hash :different-week))
+                                            val)))
+                                      route-day-changes)]
+    (vec (expand-day-changes route-day-changes-clean))))
 
 (defn- date-in-the-past? [^LocalDate date]
   (and date
@@ -1019,7 +1022,9 @@
         routes-by-date (routes-by-date route-hashes-with-holidays all-route-keys) ;; Format: ({:date routes(=hashes)})
         ]
     (try
-      #_(def *rd routes-by-date)
+      #_ (def *rd routes-by-date)
+      #_ (def *analysis-date analysis-date)
+      #_ (def *all-routes all-routes)
       {:all-routes all-routes
        :route-changes
        (let [new-data (->> routes-by-date
