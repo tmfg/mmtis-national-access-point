@@ -2,10 +2,12 @@
 SELECT store_daily_company_stats();
 
 -- name: select-company-csv-for-update
-SELECT "transport-service-id" FROM service_company
- WHERE updated < (current_timestamp - '1 day'::interval)
-   AND source = 'URL'
-ORDER BY updated ASC LIMIT 1
+SELECT "transport-service-id" FROM service_company sc, "transport-service" ts
+ WHERE sc.updated < (current_timestamp - '1 day'::interval)
+   AND ts.id = sc."transport-service-id"
+   AND ts.published IS NOT NULL
+   AND sc.source = 'URL'
+ORDER BY sc.updated ASC LIMIT 1
  FOR UPDATE SKIP LOCKED;
 
 -- name: fetch-company-csv-url
