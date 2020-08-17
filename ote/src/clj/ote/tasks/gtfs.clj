@@ -112,9 +112,9 @@
 
 ;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task (:db ote.main/ote) (time/now) true [1289])`
 (defn detect-new-changes-task
-  ([db ^DateTime detection-date force?]
-   (detect-new-changes-task db detection-date force? nil))
-  ([db ^DateTime detection-date force? service-ids]
+  ([config db ^DateTime detection-date force?]
+   (detect-new-changes-task config db detection-date force? nil))
+  ([config db ^DateTime detection-date force? service-ids]
    (let [lock-time-in-seconds (if force?
                                 1
                                 1800)
@@ -200,7 +200,7 @@ different-week-date value and skip all expired changes."
              (#'update-one-gtfs! config db true)))
          (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
-                     (detect-new-changes-task db (time/now) false)))
+                     (detect-new-changes-task config db (time/now) false)))
          (chime-at (tasks-util/daily-at 0 15)
                    (fn [_]
                      (recalculate-detected-changes-count db)))]

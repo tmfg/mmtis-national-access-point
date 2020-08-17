@@ -269,5 +269,5 @@
           (do
             (let [upload-response (transit-changes/upload-gtfs db (Long/parseLong service-id) (Long/parseLong interface-id) date req)
                   _ (when (= (:status upload-response) 200)
-                      (gtfs-tasks/detect-new-changes-task db (time/date-string->date-time date) true [(Long/parseLong service-id)]))]
+                      (gtfs-tasks/detect-new-changes-task config db (time/date-string->date-time date) true [(Long/parseLong service-id)]))]
               (http/transit-response (:body upload-response) (:status upload-response)))))))))
