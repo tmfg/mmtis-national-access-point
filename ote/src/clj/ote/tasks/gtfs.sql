@@ -40,8 +40,11 @@ WHERE ts.published IS NOT NULL
 
 -- name: services-for-nightly-change-detection
 SELECT ts.id
-  FROM "transport-service" ts
+  FROM "transport-service" ts,
+       "transport-operator" top
  WHERE ts."sub-type" = 'schedule'
+   AND ts."transport-operator-id" = top.id
+   AND top.id NOT IN (:blacklist)
    AND EXISTS(SELECT id
                 FROM "external-interface-description" eid
                WHERE ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))

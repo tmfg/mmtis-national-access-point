@@ -37,12 +37,15 @@
                   {::t-service/gtfs-imported (java.sql.Timestamp. (System/currentTimeMillis))}
                   {::t-service/id (:id interface)})) ;; external-interface-description.id, not service id.
 
+(defn- get-blacklisted-operators [config]
+  {:blacklist (if (empty? (:no-gtfs-update-for-operators config))
+                #{-1}         ;; this is needed for postgres NOT IN conditional
+                (:no-gtfs-update-for-operators config))})
+
 (defn fetch-next-gtfs-interface! [db config]
   (tx/with-transaction
     db
-    (let [blacklisted-operators {:blacklist (if (empty? (:no-gtfs-update-for-operators config))
-                                              #{-1}         ;; this is needed for postgres NOT IN conditional
-                                              (:no-gtfs-update-for-operators config))}
+    (let [blacklisted-operators (get-blacklisted-operators config)
           interface (first (select-gtfs-urls-update db blacklisted-operators))]
       (when interface
        (mark-gtfs-package-imported! db interface))
@@ -133,7 +136,9 @@
        (let [;; run detection only for given services or all
              service-ids (if service-ids
                            service-ids
-                           (mapv :id (services-for-nightly-change-detection db {:force force?})))
+                           (mapv :id (services-for-nightly-change-detection db
+                                                                            (merge (get-blacklisted-operators config)
+                                                                                   {:force force?}))))
              service-count (count service-ids)]
          (log/info "Detect transit changes for " (count service-ids) " services.")
          (dotimes [i (count service-ids)]
