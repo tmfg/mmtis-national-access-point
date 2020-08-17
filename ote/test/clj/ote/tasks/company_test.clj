@@ -35,7 +35,7 @@
     " WHERE \"transport-service-id\" = " id
     ") x")))
 
-(deftest csv-is-updated
+(deftest csv-is-updated-test
   (with-http-resource
     "companies" ".csv"
     (fn [file url]
@@ -55,11 +55,9 @@
         (is (= test-companies (fetch-companies id)))
 
         ;; write new CSV data
-        (let [test-companies (conj test-companies
-                                   {:business-id "6666667-8" :name "devilish inc"})]
-          (spit file (company-csv test-companies))
-          (sql-execute! "UPDATE service_company"
-                        "   SET updated = updated - '2 days'::interval"
-                        " WHERE \"transport-service-id\" = " id)
-          (update-one-csv! (:db *ote*))
-          (is (= test-companies (fetch-companies id))))))))
+        (spit file (company-csv test-companies))
+        (sql-execute! "UPDATE service_company"
+                      "   SET updated = updated - '2 days'::interval"
+                      " WHERE \"transport-service-id\" = " id)
+        (update-one-csv! (:db *ote*))
+        (is (= test-companies (fetch-companies id)))))))
