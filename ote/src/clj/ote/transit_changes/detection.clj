@@ -1046,9 +1046,13 @@
 
 (defn service-package-ids-for-date-range [db query-params detection-date-in-the-past? detection-date]
   (if detection-date-in-the-past?
-    (mapv :id (service-packages-for-detection-date db (merge {:detection-date detection-date}
-                                                             query-params)))
-    (mapv :id (service-packages-for-date-range db query-params))))
+    (do
+      (log/info "Getting package-ids for service. Using query that returns packages from deleted interface also.")
+      (mapv :id (service-packages-for-date-range db query-params)))
+    (do
+      (log/info "Getting package-ids for service. Using query that is optimated for newest detection date.")
+      (mapv :id (service-packages-for-detection-date db (merge {:detection-date detection-date}
+                                                               query-params))))))
 
 ;; This is only for local development
 ;; Add route-hash-id for all routes in gtfs-transit-changes table in column route-hashes.

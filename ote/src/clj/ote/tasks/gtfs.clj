@@ -120,7 +120,7 @@
                                 1800)
          ;; Today is the default but detection may be run "in the past" if admin wants to
          ;; detection-date is org joda datetime
-         ;; Historic detections must use even deleted interfaces, so we need to indentify if the detection date is in the past
+         ;; Historic detections must use even deleted interfaces, so we need to identify if the detection date is in the past
          detection-date-in-the-past? (.isBefore (.toLocalDate detection-date) (.toLocalDate (time/now)))
 
          ;; Start from the beginning of last week
