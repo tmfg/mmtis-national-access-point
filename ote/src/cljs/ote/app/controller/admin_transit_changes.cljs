@@ -110,6 +110,11 @@
     (assoc-in [:admin :transit-changes :upload-gtfs :service-id] service-id)
     (assoc-in [:admin :transit-changes :single-detection-service-id] service-id)))
 
+(define-event SetSingleDetectionDate [date]
+  {}
+  (-> app
+      (assoc-in [:admin :transit-changes :single-detection-date] date)))
+
 (define-event SetSingleDownloadGtfsInterfaceId [interface]
   {}
   (let [interface-id (::t-service/id interface)]
@@ -127,6 +132,17 @@
     ;; When service-id is not given, do not try to start detection
     (when service-id
       (comm/post! (str "transit-changes/force-detect/" service-id) nil
+                  {:timeout (* 60000 7)                     ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
+                   :on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
+    app))
+
+(define-event DetectChangesForGivenServiceAndDate []
+  {}
+  (let [service-id (get-in app [:admin :transit-changes :single-detection-service-id])
+        detection-date (get-in app [:admin :transit-changes :single-detection-date])]
+    ;; When service-id or date is not given, do not try to start detection
+    (when (and service-id detection-date)
+      (comm/post! (str "transit-changes/force-detect-for-date/" service-id "/" detection-date) nil
                   {:timeout (* 60000 7)                     ;; Set timeout to 7 minutes to prevent mystical errors with large gtfs packages
                    :on-success (tuck/send-async! ->SetSingleDetectionServiceId service-id)}))
     app))

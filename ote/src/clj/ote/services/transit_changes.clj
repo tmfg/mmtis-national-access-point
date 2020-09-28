@@ -188,6 +188,14 @@
       (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)])
       "OK"))
 
+  ;; Force change detection for single service
+  (POST "/transit-changes/force-detect-for-date/:service-id/:detection-date" {{:keys [service-id detection-date]} :params
+                                                     user :user}
+    (let [detection-date (time/date-string->date-time detection-date)]
+      (when (authorization/admin? user)
+        (gtfs-tasks/detect-new-changes-task config db detection-date true [(Long/parseLong service-id)])
+        "OK")))
+
   ;; Force gtfs package download for given service
   (POST "/transit-changes/force-interface-import/:service-id/:interface-id" {{:keys [service-id interface-id]} :params
                                                                user :user}

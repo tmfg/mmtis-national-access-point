@@ -177,6 +177,50 @@
                     :icon (ic/content-filter-list)})
          [:span "Muutostunnitus yhdelle palvelulle"]]]]]
 
+     [:h3 "Muutostunnistuksen käynnistys tiettynä päivänä"]
+     [:div
+      [:div
+       [:div (stylefy/use-style style-admin/detection-info-text)
+        "Pakota muutostunnistus kaikkille palveluille. Tämä vie noin 3 minuuttia."]
+       [:div (stylefy/use-style style-admin/detection-button-container)
+        [:a (merge (stylefy/use-style button-styles/primary-button)
+                   {:id "force-detect-transit-changes"
+                    :href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-transit-changes/->ForceDetectTransitChanges)))
+                    :icon (ic/content-filter-list)})
+         [:span "Käynnistä muutostunnistus"]]]]
+      [:br]
+      [:div
+       [:div (stylefy/use-style style-admin/detection-info-text)
+        "Käynnistä muutostunnistus vain yhdelle palvelulle. Anna palvelun id ja päivä yyyy-mm-dd."]
+       [:div (stylefy/use-style style-admin/detection-button-container)
+        [ui/text-field
+         {:id "detection-service-id"
+          :name "detection-service-name"
+          :floating-label-text "Palvelun id"
+          :value (get-in app-state [:admin :transit-changes :single-detection-service-id])
+          :on-change #(do
+                        (.preventDefault %)
+                        (e! (admin-transit-changes/->SetSingleDetectionServiceId %2)))}]
+        [ui/text-field
+         {:id "detection-date"
+          :name "detection-date"
+          :floating-label-text "Muutostunnistuspäivä"
+          :value (get-in app-state [:admin :transit-changes :single-detection-date])
+          :on-change #(do
+                        (.preventDefault %)
+                        (e! (admin-transit-changes/->SetSingleDetectionDate %2)))}]
+        [:a (merge (stylefy/use-style (merge button-styles/primary-button style-admin/detection-button-with-input))
+                   {:id "detect-changes-for-given-service-and-date"
+                    :href "#"
+                    :on-click #(do
+                                 (.preventDefault %)
+                                 (e! (admin-transit-changes/->DetectChangesForGivenServiceAndDate)))
+                    :icon (ic/content-filter-list)})
+         [:span "Muutostunnitus yhdelle palvelulle päivän perusteella"]]]]]
+
      [:hr {:style {:width "100%" :margin "4em 0 1em 0"}}]
 
      [:h2 "Päivätiivisteet - käytä vain jos tiedät mitä olet tekemässä"]
