@@ -106,14 +106,11 @@
 
 (defn time-for-stop
   "Stoptime-display is mainly a list of stops that are combined from trip1 and trip2. Here we use only stoptime data from :stoptime key.
-  If stop isn't in stoptime-display list, return the first one to enable some kind of possibility to compare trips."
+  Return first found time for stop. If stop isn't in stoptime-display list, return nil."
   [stoptimes-display stop-name]
   (let [stop-time (some #(when (= stop-name (:gtfs/stop-name %))
                            (:gtfs/departure-time %))
-                        (:stoptimes stoptimes-display))
-        stop-time (if stop-time
-                    stop-time
-                    (:gtfs/departure-time (first (:stoptimes stoptimes-display))))]
+                        (:stoptimes stoptimes-display))]
     stop-time))
 
 (defn first-common-stop
@@ -123,11 +120,17 @@
                              (mapcat (fn [stoptime-display]
                                        (map #(select-keys % [:gtfs/stop-name :gtfs/stop-sequence])
                                             (:stoptimes stoptime-display))))
-                             stoptime-displays)]
-    (some (fn [{:gtfs/keys [stop-name] :as common-stop-candidate}]
-            (when (every? #(time-for-stop % stop-name) stoptime-displays)
-              stop-name))
-          (sort-by :gtfs/stop-sequence distinct-stops))))
+                             stoptime-displays)
+        common-stop (some (fn [{:gtfs/keys [stop-name] :as common-stop-candidate}]
+                            (when
+                              (every? (fn [val]
+                                        (let [stop-time (time-for-stop val stop-name)
+                                              _ (println "every? :: stop-time - name" (pr-str stop-name) (pr-str stop-time))]
+                                          stop-time))
+                                      stoptime-displays)
+                              stop-name))
+                          (sort-by :gtfs/stop-sequence distinct-stops))]
+    common-stop))
 
 (defn normalize-stop-sequence-numbers [stop-seq-of-zero stop-seq]
   (map (fn [stoptime]
@@ -179,7 +182,7 @@
     ordered-removed-stops))
 
 (defn format-stop-info
-  "recieves 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
+  "Receives 2 vectors, first vector has coordinates, which are not used here, second vector is other stop-information"
   [[_ stop-times]]
   (let [min-stop-sequence (min
                             (or (:gtfs/stop-sequence
