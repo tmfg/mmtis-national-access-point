@@ -30,7 +30,23 @@ SELECT ts.id,
 SELECT child_parent_interfaces(:parent-id::INTEGER, :child-id::INTEGER);
 
 -- name: update-old-package-interface-ids!
-UPDATE gtfs_package p SET "external-interface-description-id" = :new-interface-id WHERE p."transport-service-id" = :service-id AND p."external-interface-description-id" NOT IN (:ids);
+UPDATE gtfs_package p SET "external-interface-description-id" = :new-interface-id
+ WHERE p."transport-service-id" = :service-id
+   AND p."external-interface-description-id" NOT IN (:ids);
+
+-- name: update-packages-with-deleted-interface-true!
+WITH packages AS (
+    SELECT id
+        FROM gtfs_package p
+        WHERE p."transport-service-id" = :service-id
+          AND p."interface-deleted?" = FALSE
+          AND p."external-interface-description-id" NOT IN
+            (SELECT id FROM "external-interface-description" i
+              WHERE i."transport-service-id" = :service-id)
+    )
+UPDATE gtfs_package p SET "interface-deleted?" = TRUE
+    WHERE p."transport-service-id" = :service-id
+      AND p.id IN (SELECT id FROM packages);
 
 -- name: select-old-packages
 select * from gtfs_package p WHERE p."transport-service-id" = :service-id AND p."external-interface-description-id" NOT IN (:ids);

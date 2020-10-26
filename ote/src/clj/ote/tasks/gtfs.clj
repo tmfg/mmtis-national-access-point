@@ -149,7 +149,8 @@
                                    :start-date start-date
                                    :end-date end-date}
                      _ (log/info "Detecting :: query-params" (pr-str query-params))
-                     packages-for-detection (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past? query-detection-date)]
+                     packages-for-detection (detection/service-package-ids-for-date-range db query-params detection-date-in-the-past? query-detection-date)
+                     _ (log/info "Detecting :: packages-for-detection " (pr-str packages-for-detection))]
                  (detection/update-transit-changes!
                    db detection-date service-id
                    packages-for-detection
