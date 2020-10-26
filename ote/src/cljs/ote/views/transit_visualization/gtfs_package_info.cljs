@@ -22,7 +22,7 @@
         show-transit-changes-modal? (:show-transit-changes-modal? transit-visualization)
         grouped-packages (group-by :interface-url packages)
         group-keys (keys grouped-packages)
-        latests-packages (mapv
+        latest-packages (mapv
                            (fn [k]
                              (first (get grouped-packages k)))
                            group-keys)
@@ -55,7 +55,7 @@
        [ui/dialog
         {:open true
          :actionsContainerStyle style-dialog/dialog-action-container
-         :title "Viimeisimmät max 50 muutostunnistusta"
+         :title "Viimeisimmät tunnistukset (max 50kpl)"
          :autoScrollBodyContent true
          :actions [(r/as-element
                      [ui/flat-button
@@ -67,20 +67,46 @@
 
         [:div
          [table/html-table
-          (vector "Tunnistus ajettu" "Uusia reittejä" "Poistuvia reittejä" "Muuttuvia reittejä" "Tauollisia reittejä")
+          (vector "Tunnistus ajettu" "Uusia reittejä" "Poistuvia reittejä" "Muuttuvia reittejä" "Tauollisia reittejä" "Käytetyt gtfs paketit")
           (mapv
             (fn [c]
-              {:on-click #(routes/navigate! :transit-visualization
-                                            {:date (time/format-date-iso-8601 (:gtfs/date c))
-                                             :scope "all"
-                                             :service-id service-id
-                                             :route-hash-id selected-route})
-               :data (vector
-                       (time/format-date (:gtfs/date c))
-                       (if-not (nil? (:gtfs/added-routes c)) (:gtfs/added-routes c) "")
-                       (if-not (nil? (:gtfs/removed-routes c)) (:gtfs/removed-routes c) "")
-                       (if-not (nil? (:gtfs/changed-routes c)) (:gtfs/changed-routes c) "")
-                       (if-not (nil? (:gtfs/no-traffic-routes c)) (:gtfs/no-traffic-routes c) ""))})
+              (let [package-info-rows (when-not (nil? (:package-info c))
+                                        (str/split (:package-info c) ";"))
+                    package-infos (when-not (nil? package-info-rows)
+                                    (map
+                                      #(str/split % #",")
+                                      package-info-rows))
+                    info-links (when-not (nil? package-info-rows)
+                                 (map (fn [row]
+                                        (let [link-key (str (:date c) "-" (first row))]
+                                          ^{:key (str "link-key-" link-key)}
+                                          [:a {:id link-key
+                                               :href "#"
+                                               :on-click (fn [event]
+                                                           (do
+                                                             (.preventDefault event)
+                                                             (.stopPropagation event)
+                                                             (e! (tv/->OpenPackageInfoPackageIdLink link-key))))}
+                                           (if (= (:package-id-link transit-visualization) link-key)
+                                             [:div
+                                              "Id " (first row) [:br]
+                                              "Paketti ladattu: " (second row) [:br]
+                                              "Paketin url: " (nth row 2)]
+                                             (str (first row) " "))]))
+                                      package-infos))]
+
+                {:on-click #(routes/navigate! :transit-visualization
+                                              {:date (time/format-date-iso-8601 (:date c))
+                                               :scope "all"
+                                               :service-id service-id
+                                               :route-hash-id selected-route})
+                 :data (vector
+                         (time/format-date (:date c))
+                         (if-not (nil? (:added-routes c)) (:added-routes c) "")
+                         (if-not (nil? (:removed-routes c)) (:removed-routes c) "")
+                         (if-not (nil? (:changed-routes c)) (:changed-routes c) "")
+                         (if-not (nil? (:no-traffic-routes c)) (:no-traffic-routes c) "")
+                         (if-not (nil? info-links) info-links ""))}))
             transit-changes)]]])
 
      [:div (stylefy/use-style style/infobox)
@@ -93,7 +119,7 @@
                                                           (e! (tv/->ToggleTransitChangesModal)))}
                                           [ic/image-compare]]]]
        (doall
-         (for [p latests-packages]
+         (for [p latest-packages]
            ^{:key (str "latest-package-id-" (:id p))}
            [pkg p true]))]
       (when (seq previous-packages)

@@ -202,3 +202,12 @@ SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-h
        LEFT JOIN "detected-change-history" h ON h."transport-service-id" = c."transit-service-id" AND h."change-key" = c."change-key"
  WHERE c."transit-change-date" = :date
    AND c."transit-service-id" = :service-id;
+
+-- name: latest-transit-changes-for-visualization
+SELECT tc.date, tc."added-routes", tc."removed-routes", tc."changed-routes", tc."no-traffic-routes",
+       string_agg(concat(p.id::TEXT,',', p.created::TEXT,',', p."deleted?"::TEXT,',', p."interface-deleted?"::TEXT,',',ds.url::TEXT), ';') AS "package-info"
+  FROM "gtfs-transit-changes" tc
+        JOIN gtfs_package p ON p.id = ANY(tc."package-ids") AND p."transport-service-id" = :service-id
+        LEFT JOIN "external-interface-download-status" ds ON ds."external-interface-description-id" = p."external-interface-description-id"
+ WHERE tc."transport-service-id" = :service-id
+ GROUP BY tc.date,tc."added-routes", tc."removed-routes", tc."changed-routes", tc."no-traffic-routes";
