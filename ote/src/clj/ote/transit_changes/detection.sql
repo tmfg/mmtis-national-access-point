@@ -32,6 +32,8 @@ SELECT DISTINCT pids.id
   JOIN LATERAL unnest(gtfs_service_packages_for_date(:service-id::INTEGER, d.date)) pids (id) ON TRUE;
 
 -- name: service-packages-for-detection-date
+-- These packages are fetched for change detection. Change detection doesn't need
+-- packages that are fetched from interface that is deleted.
 WITH dates AS (
     SELECT :start-date::DATE + d AS date
     FROM generate_series(0, :end-date::DATE - :start-date::DATE) s (d)
@@ -42,6 +44,7 @@ SELECT DISTINCT pids.id
        JOIN LATERAL unnest(gtfs_packages_for_detection(:service-id::INTEGER, d.date)) pids (id) ON TRUE
  WHERE p."transport-service-id" = :service-id::INTEGER
    AND pids.id = p.id
+   AND p."interface-deleted?" = false
    AND p.created::DATE <= :detection-date::DATE;
 
 -- name: service-routes-with-date-range

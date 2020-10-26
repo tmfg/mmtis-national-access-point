@@ -194,12 +194,12 @@
 
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
-  [db transport-service-id external-interfaces removed-resources]
+  [db transport-service-id external-interfaces removable-interfaces]
   (let [external-interfaces (mapv #(dissoc % :url-ote-netex) ; Remove because not part of db data model
                                   external-interfaces)]
 
     ;; Delete removed services from OTE db
-    (doseq [{id ::t-service/id} removed-resources]
+    (doseq [{id ::t-service/id} removable-interfaces]
       ;; Delete from external-interface-description
       ;; We do not delete packages that might be downloaded from this interface
       ;; We also do not delete interface download history. It should be available in transit visualization
@@ -208,12 +208,14 @@
 
     (doseq [{id ::t-service/id :as ext-if} external-interfaces]
       (if id
-        (specql/update! db ::t-service/external-interface-description
-                        ext-if
-                        {::t-service/transport-service-id transport-service-id
-                         ::t-service/id id})
-        (specql/insert! db ::t-service/external-interface-description
-                        (assoc ext-if ::t-service/transport-service-id transport-service-id))))))
+        (do
+          (specql/update! db ::t-service/external-interface-description
+                          ext-if
+                          {::t-service/transport-service-id transport-service-id
+                           ::t-service/id id}))
+        (do
+          (specql/insert! db ::t-service/external-interface-description
+                          (assoc ext-if ::t-service/transport-service-id transport-service-id)))))))
 
 (defn- removable-resources
   [from-db from-client]
@@ -265,7 +267,7 @@
   (let [child-interface-id-list (fetch-child-service-interfaces db {:service-id child-id})
        ;; Update download-history interface-id:s to new ids.
         id-list (doall
-                  (map
+                  (mapv
                     (fn [row]
                       (let [url (:url row)
                             orig-interface-id (:original-interface-id row)
@@ -275,17 +277,26 @@
                                               {::t-service/transport-service-id parent-id
                                                ::t-service/url url})
                             ;; Update packages
+                            packages (specql/fetch db :gtfs/package (specql/columns :gtfs/package)
+                                                   {:gtfs/transport-service-id parent-id
+                                                    :gtfs/external-interface-description-id orig-interface-id})
                             _ (specql/update! db :gtfs/package
                                               {:gtfs/external-interface-description-id (:id row)}
                                               {:gtfs/transport-service-id parent-id
                                                :gtfs/external-interface-description-id orig-interface-id})]
                         (:id row)))
                     child-interface-id-list))
-        ids (mapv #(::t-service/id %) child-interface-id-list)
+        ids (mapv #(:id %) child-interface-id-list)
+        ;; When updating old interfaces, this will change interface-id's correctly tot package_gtfs table
+        ;; However when interfaces are deleted and created again (users can "edit" their interfaces by deleting and creating them as a new row
+        ;; This won't update interface-id:s correctly.
         _ (update-old-package-interface-ids! db {:new-interface-id (first id-list) ;; It doesnt matter to which interface those old packages point, because the history is stored in history table and the
                                                  ;; interface-id is critical for change detection. Change detection gets unique packages based on interface id. If we don't rewrite those we get corrupted change detection results
                                                  :service-id parent-id
-                                                 :ids ids})]))
+                                                 :ids ids})
+        ;; So we need to ensure that those deleted interfaces are marked as deleted so that
+        ;; change-detection can skip packages that are donwloaded from deleted interface
+        _ (update-packages-with-deleted-interface-true! db {:service-id parent-id})]))
 
 (defn replace-parent-service-with-child [db bucket child-id publish?]
   (let [;; Get child service data
@@ -465,8 +476,8 @@
                                      ::t-service/service-company)
                              (maybe-clear-companies)
                              (ensure-created-time db))
-            resources-from-db (fetch-transport-service-external-interfaces db original-service-id)
-            removed-resources (removable-resources resources-from-db external-interfaces)
+            interfaces-from-db (fetch-transport-service-external-interfaces db original-service-id)
+            removable-interfaces (removable-resources interfaces-from-db external-interfaces)
             csv-file-key (:db-file-key service-info)        ;; Take csv id from temp table
             service-info (dissoc service-info :db-file-key) ;; Remove csv id to make save to work
             ;; Store to OTE database
@@ -488,7 +499,6 @@
                     (save-service-company-csv db original-service-id (get-in config [:csv :bucket]))
                     (maybe-copy-service-company-csv db (get-in config [:csv :bucket]) transport-service-id original-service-id))
                   (save-service-company-csv db transport-service-id (get-in config [:csv :bucket])))
-
                 ;; Save possible external interfaces
                 (if (and (not (nil? original-service-id))
                          (not= original-service-id transport-service-id))
@@ -504,7 +514,7 @@
                                                     (dissoc ::t-service/id)))
                                               external-interfaces)
                     nil)
-                  (save-external-interfaces db transport-service-id external-interfaces removed-resources))
+                  (save-external-interfaces db transport-service-id external-interfaces removable-interfaces))
 
                 ;; Save operation areas for duplicates and original services
                 (if (and (not (nil? original-service-id))
@@ -531,7 +541,10 @@
         ;; Return the stored transport-service
         transport-service))))
 
-(defn- re-edit-service [db user service-id]
+(defn- re-edit-service
+  "Services can be changed to re-edit state when they are in validation but admin haven't yet
+  validated them."
+  [db user service-id]
   (let [service-operator-id (::t-service/transport-operator-id (first (specql/fetch db
                                                                                     ::t-service/transport-service
                                                                                     #{::t-service/transport-operator-id}
@@ -553,8 +566,9 @@
                                                           {::t-service/id service-id}))))
 
 (defn back-to-validation
-  "User has possibility to take service back to editing state, but not continue with it. This fn will return
-  service to validation in those cases."
+  "User has possibility to take service back to editing state when it is changed to re-edit state. Also
+  if user doesn't make any changes in 24 hours service will be changed back to validation to ensure
+  that services that are edited will be published and not leave as drafts."
   [db service-id]
   (let [current-timestamp (java.sql.Timestamp. (System/currentTimeMillis))]
     (do
@@ -567,8 +581,7 @@
 (defn- save-transport-service-handler
   "Process transport service save POST request. Checks that the transport operator id
   in the service to be stored is in the set of allowed operators for the user.
-  If authorization check succeeds, the transport service is saved to the database and optionally
-  published to CKAN."
+  If authorization check succeeds, the transport service is saved to the database."
   [config db user request]
   (authorization/with-transport-operator-check
     db user (::t-service/transport-operator-id request)

@@ -173,6 +173,12 @@
                              sorted-changes)]
     all-sorted-changes))
 
+(define-event OpenPackageInfoPackageIdLink [link-id]
+  {:path [:transit-visualization]}
+  (if (= (:package-id-link app) link-id)
+    (dissoc app :package-id-link)
+    (assoc app :package-id-link link-id)))
+
 (define-event RoutesForDatesResponse [routes dates]
   {:path [:transit-visualization :compare]}
   (if (= dates (select-keys app [:date1 :date2]))

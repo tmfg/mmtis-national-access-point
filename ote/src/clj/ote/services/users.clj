@@ -21,7 +21,6 @@
             [taoensso.timbre :as log]
             [ote.time :as time]
             [clj-time.core :as t]
-            [clj-time.coerce :as tc]
             [ote.util.throttle :as throttle]
             [clj-time.coerce :as tc])
   (:import (java.util UUID)))

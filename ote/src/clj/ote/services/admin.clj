@@ -2,12 +2,10 @@
   "Backend services for admin functionality."
   (:require [clojure.data.csv :as csv]
             [clojure.data :as data]
-            [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.spec.alpha :as spec]
             [clojure.string :as str]
             [clj-http.client :as http-client]
-            [ring.util.io :as ring-io]
             [com.stuartsierra.component :as component]
             [specql.impl.composite :as composite]
             [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
@@ -706,6 +704,14 @@
     (log-java-time-objs)
     (http/transit-response date-str 200)))
 
+(defn- list-service-gtfs-packages
+"Return a list of gtfs_packages for service"
+  [db service-id]
+  (let [packages (specql/fetch db :gtfs/package
+                      (specql/columns :gtfs/package)
+                      {:gtfs/transport-service-id service-id})]
+    (http/transit-response packages 200)))
+
 (defn- admin-routes [db config]
   (routes
 
@@ -804,6 +810,12 @@
     (GET "/admin/pre-notices/notify" req
       (or (authorization-fail-response (get-in req [:user :user]))
           (send-pre-notice-email-response db config)))
+
+    (GET "/admin/service-gtfs-packages/:service-id" {{:keys [service-id]}
+                                         :params
+                                         user :user}
+      (require-admin-user "/admin/service-gtfs-packages/:service-id" (:user user))
+          (list-service-gtfs-packages db (Long/parseLong service-id)))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req

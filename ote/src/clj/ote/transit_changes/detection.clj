@@ -1050,7 +1050,7 @@
       (log/info "Getting package-ids for service. Using query that returns packages from deleted interface also.")
       (mapv :id (service-packages-for-date-range db query-params)))
     (do
-      (log/info "Getting package-ids for service. Using query that is optimated for newest detection date.")
+      (log/info "Getting package-ids for service. Using query that is optimized for newest detection date.")
       (mapv :id (service-packages-for-detection-date db (merge {:detection-date detection-date}
                                                                query-params))))))
 

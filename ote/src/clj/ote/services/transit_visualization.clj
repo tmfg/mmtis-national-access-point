@@ -14,7 +14,8 @@
             [ote.transit-changes.detection :as detection]
             [clojure.set :as set]
             [digest]
-            [ote.authorization :as authorization]))
+            [ote.authorization :as authorization]
+            [ote.util.db :as db-util]))
 
 (defqueries "ote/services/transit_visualization.sql")
 ;; Testing to declare jeesql functions to make clj-kondo work better
@@ -124,7 +125,8 @@
   (GET "/transit-visualization/:service-id/:date{[0-9\\-]+}"
        {{:keys [service-id date]} :params
         user :user}
-    (let [service-id (Long/parseLong service-id)]
+    (let [service-id (Long/parseLong service-id)
+          package-infos (latest-transit-changes-for-visualization db {:service-id service-id})]
       ;; Is transit authority
       (or (authorization/transit-authority-authorization-response user)
 
@@ -141,12 +143,7 @@
                                                     #{:gtfs/route-hash-id-type}
                                                     {:gtfs/transport-service-id service-id}))
            :gtfs-package-info (fetch-gtfs-packages-for-service db {:service-id service-id})
-           :transit-changes (specql/fetch db :gtfs/transit-changes
-                                          (specql/columns :gtfs/transit-changes)
-                                          {:gtfs/transport-service-id service-id}
-                                          {:specql.core/order-by :gtfs/date
-                                           :specql.core/order-direction :desc
-                                           :specql.core/limit 50})
+           :transit-changes package-infos
            :used-packages (:gtfs/package-ids (first (specql/fetch db :gtfs/transit-changes
                                                                   #{:gtfs/package-ids}
                                                                   {:gtfs/transport-service-id service-id
