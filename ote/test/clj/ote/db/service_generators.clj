@@ -143,6 +143,14 @@
              :parking ::t-service/parking
              :rentals ::t-service/rentals) type-specific)))
 
+(defn service-sub-type-generator [service-sub-type]
+  (gen/let [common gen-transport-service-common
+            type (gen/return :passenger-transportation)]
+     (-> common
+           (assoc ::t-service/type type)
+           (assoc ::t-service/sub-type service-sub-type)
+           (assoc ::t-service/passenger-transportation (gen/generate gen-passenger-transportation)))))
+
 (def gen-transport-service
   (gen/frequency
    [[3 (service-type-generator :passenger-transportation)]

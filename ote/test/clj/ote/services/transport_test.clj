@@ -240,5 +240,122 @@
 
     ;; Try to fetch now and it does not exist
     (is (thrown-with-msg?
-         clojure.lang.ExceptionInfo #"status 404"
-         (http-get "normaluser" (str "transport-service/" id))))))
+          clojure.lang.ExceptionInfo #"status 404"
+          (http-get "normaluser" (str "transport-service/" id))))))
+
+(defn- create-new-package [db operator-id ts-id interface-id]
+  (let [new-gtfs-hash (gtfs-import/gtfs-hash "sdfsdf")]
+    (specql/insert! db :gtfs/package
+                    {:gtfs/sha256 new-gtfs-hash
+                     :gtfs/first_package true               ;;
+
+                     :gtfs/transport-operator-id operator-id
+                     :gtfs/transport-service-id ts-id
+                     :gtfs/created (time-coerce/to-sql-date (time/now))
+                     :gtfs/etag (str "etag-" ts-id)
+                     :gtfs/license "license"
+                     :gtfs/external-interface-description-id interface-id})))
+
+(defn- clean-service-for-printing [service]
+  (-> service
+      (dissoc :ote.db.transport-service/operation-area)
+      (dissoc :ote.db.transport-service/description)
+      (dissoc :ote.db.transport-service/contact-address)
+      (dissoc :ote.db.transport-service/homepage)
+      (dissoc :ote.db.transport-service/passenger-transportation)))
+
+(defn- clean-interfaces-for-printing [interfaces]
+  (map #(-> %
+            (update ::t-service/external-interface dissoc ::t-service/description)
+            (update ::t-service/external-interface dissoc ::t-service/format)
+            (update ::t-service/external-interface dissoc ::t-service/license))
+       interfaces))
+
+(deftest update-external-interface-url
+  (let [operator-id 2                                       ;; force operator id
+        db (:db ote.test/*ote*)
+        generated-service (gen/generate (s-generators/service-sub-type-generator :schedule))
+        ;; Generated interfaces cannot be trusted so create one with correct data
+        default-interface {::t-service/external-interface {::t-service/url "www.default.url"
+                                                           ::t-service/description [{::t-service/lang "FI",
+                                                                                     ::t-service/text "Default text"}]}
+                           ::t-service/data-content [:route-and-schedule]
+                           ::t-service/format ["GTFS"]
+                           ::t-service/license "jnppWN61pC0u77PG4ha0"}
+        generated-service (-> generated-service
+                              (assoc ::t-service/transport-operator-id operator-id)
+                              (dissoc ::t-service/external-interfaces)
+                              (assoc-in [::t-service/external-interfaces] [default-interface])
+                              ;; "move" to validation
+                              (assoc ::t-service/validate? (time-coerce/to-sql-date (time/now))))
+        saved-service (:transit (http-post (:user-id-normal @ote.test/user-db-ids-atom) "transport-service" generated-service))
+        service-id (::t-service/id saved-service)
+        saved-service (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        ;; Ensure that service is in validate state (admin must accept the service)
+        _ (is (not (nil? (::t-service/validate saved-service)))) ;; in validation
+        _ (is (nil? (::t-service/published saved-service))) ;; not published
+        _ (is (nil? (::t-service/re-edit saved-service)))   ;; not in re-edit
+
+        ;; Generated services are not published, publish this one
+        _ (http-post (:user-id-admin @ote.test/user-db-ids-atom) "admin/publish-service" {:id service-id})
+        ;; And fetch it
+        saved-service (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        ;; Ensure that service is in published state
+        _ (is (not (nil? (::t-service/published saved-service)))) ;; is published
+        _ (is (nil? (::t-service/validate saved-service)))  ;; not in validation
+        _ (is (nil? (::t-service/re-edit saved-service)))   ;; not in re-edit
+
+        ;; Create package with received interface-id
+        interfaces (::t-service/external-interfaces saved-service)
+        packages (doall (mapv
+                          (fn [interface]
+                            (create-new-package db operator-id service-id (::t-service/id interface)))
+                          interfaces))]
+    ;; Saved ok
+    (is (pos? service-id))
+
+    ;; Fetch and update
+    (let [;; Service must be changed to validate state to make changes to interfaces
+          v-service (assoc saved-service ::t-service/validate? (time-coerce/to-sql-date (time/now)))
+          ;; Edit interface -> if only url changes and id remains the same, everything should be as before
+          ;; That is why we "delete" and "create new interface" by changing the interface id to nil
+          v-service (-> v-service
+                        (update-in [::t-service/external-interfaces 0] dissoc ::t-service/id)
+                        (assoc-in [::t-service/external-interfaces 0 ::t-service/external-interface ::t-service/url] "first-change.com"))
+          v-service (:transit (http-post (:user-id-normal @ote.test/user-db-ids-atom) "transport-service" v-service))
+          v-service (:transit (http-get "normaluser" (str "transport-service/" (::t-service/id v-service))))
+          ;; Ensure that service is not in published state to make additional changes to it
+          _ (is (not (nil? (::t-service/validate v-service)))) ;;in validation
+          _ (is (nil? (::t-service/published v-service)))   ;; not published
+          _ (is (nil? (::t-service/re-edit v-service)))     ;;not in re-edit
+          _ (is (not (nil? (::t-service/parent-id v-service)))) ;;has parent-id
+          parent-id (::t-service/parent-id v-service)
+
+          ;; publish service again
+          _ (http-post (:user-id-admin @ote.test/user-db-ids-atom) "admin/publish-service" {:id (::t-service/id v-service)})
+          ;; fetch original service using parent-id
+          p-service (:transit (http-get "normaluser" (str "transport-service/" parent-id)))
+
+          ;; Ensure that service is in published state
+          _ (is (not (nil? (::t-service/published p-service))))
+          _ (is (nil? (::t-service/validate p-service)))    ;; not in validate
+          _ (is (nil? (::t-service/re-edit p-service)))     ;; not in re-edit
+          _ (is (nil? (::t-service/parent-id p-service)))   ;; is not child
+
+          ;; Get possibly changed packages
+          possibly-changed-packages (:transit
+                                      (http-get (:user-id-admin @ote.test/user-db-ids-atom) (str "admin/service-gtfs-packages/" parent-id)))]
+      ;; interface-id should be changed
+      (is (not= (:gtfs/external-interface-description-id (first packages)) (:gtfs/external-interface-description-id (first possibly-changed-packages))))
+      (is (= true (:gtfs/interface-deleted? (first possibly-changed-packages)))))
+
+    ;; Delete
+    (let [delete-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
+                                     "transport-service/delete"
+                                     {:id service-id})]
+      (is (= (:transit delete-response) service-id)))
+
+    ;; Try to fetch now and it does not exist
+    (is (thrown-with-msg?
+          clojure.lang.ExceptionInfo #"status 404"
+          (http-get "normaluser" (str "transport-service/" service-id))))))
