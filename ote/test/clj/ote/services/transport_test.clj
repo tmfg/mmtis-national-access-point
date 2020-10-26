@@ -1,33 +1,50 @@
 (ns ote.services.transport-test
-  (:require  [clojure.test :as t :refer [deftest testing is]]
-             [ote.test :refer [system-fixture http-get http-post]]
-             [clojure.java.jdbc :as jdbc]
-             [clojure.test.check :as tc]
-             [clojure.test.check.generators :as gen]
-             [clojure.test.check.clojure-test :refer [defspec]]
-             [clojure.test.check.properties :as prop]
-             [ote.components.db :as db]
-             [com.stuartsierra.component :as component]
-             [ote.components.http :as http]
-             [ote.services.transport :as transport-service]
-             [ote.db.transport-operator :as t-operator]
-             [ote.db.transport-service :as t-service]
-             [ote.db.common :as common]
-             [clojure.spec.gen.alpha :as sgen]
-             [clojure.spec.test.alpha :as stest]
-             [clojure.spec.alpha :as s]
-             [ote.db.generators :as generators]
-             [ote.db.service-generators :as s-generators]
-             [clojure.string :as str]
-             [clojure.set :as set]
-             [ote.time :as time]))
+  (:require [clojure.test :as t :refer [deftest testing is]]
+            [ote.test :refer [system-fixture http-get http-post]]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.test.check :as tc]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.properties :as prop]
+            [cheshire.core :as chesire]
+            [ote.components.db :as db]
+            [com.stuartsierra.component :as component]
+            [ote.components.http :as http]
+            [ote.services.transport :as transport-service]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
+            [ote.db.common :as common]
+            [clojure.spec.gen.alpha :as sgen]
+            [clojure.spec.test.alpha :as stest]
+            [clojure.spec.alpha :as s]
+            [ote.db.generators :as generators]
+            [ote.db.service-generators :as s-generators]
+            [clojure.string :as str]
+            [clojure.set :as set]
+            [ote.time :as time]
+            [clj-time.coerce :as time-coerce]
+            [specql.core :as specql]
+            [ote.integration.import.gtfs :as gtfs-import]
+            [ote.services.admin :as admin]
+            [cheshire.core :as cheshire]))
+
+(def enabled-features {:enabled-features #{:ote-login
+                                           :sea-routes
+                                           :gtfs-import
+                                           :ote-register
+                                           :netex-conversion-automated
+                                           :service-validation
+                                           :terms-of-service
+                                           :other-catalogs}})
 
 (t/use-fixtures :each
-  (system-fixture
-   :transport (component/using
-                (transport-service/->TransportService
-                  (:nap nil))
-                [:http :db])))
+                (system-fixture
+                  :admin (component/using (admin/->Admin enabled-features)
+                                          [:http :db])
+                  :transport (component/using
+                               (transport-service/->TransportService
+                                 enabled-features)
+                               [:http :db])))
 
 ;; We have a single transport service inserted in the test data,
 ;; check that its information is fetched ok
@@ -159,26 +176,26 @@
 
     (and (= (:status response) (:status fetch-response) 200)
          (effectively-same-deep
-          (compare-key service)
-          (compare-key fetched)))))
+           (compare-key service)
+           (compare-key fetched)))))
 
 (defspec save-and-fetch-generated-passenger-transport-service
-  25
-  (prop/for-all
-   [transport-service (s-generators/service-type-generator :passenger-transportation)]
-   (save-and-fetch-compare transport-service ::t-service/passenger-transportation)))
+         25
+         (prop/for-all
+           [transport-service (s-generators/service-type-generator :passenger-transportation)]
+           (save-and-fetch-compare transport-service ::t-service/passenger-transportation)))
 
 (defspec save-and-fetch-generated-parking-service
-  25
-  (prop/for-all
-   [transport-service (s-generators/service-type-generator :parking)]
-   (save-and-fetch-compare transport-service ::t-service/parking)))
+         25
+         (prop/for-all
+           [transport-service (s-generators/service-type-generator :parking)]
+           (save-and-fetch-compare transport-service ::t-service/parking)))
 
 (defspec save-and-fetch-generated-rental-service
-  25
-  (prop/for-all
-   [transport-service (s-generators/service-type-generator :rentals)]
-    (save-and-fetch-compare transport-service ::t-service/rentals)))
+         25
+         (prop/for-all
+           [transport-service (s-generators/service-type-generator :rentals)]
+           (save-and-fetch-compare transport-service ::t-service/rentals)))
 
 (deftest save-terminal-service-to-wrong-operator
   (let [generated-terminal-service (gen/generate s-generators/gen-terminal-service)
@@ -202,7 +219,7 @@
 
 (deftest delete-transport-service
   (let [service (assoc (gen/generate s-generators/gen-transport-service)
-                       ::t-service/transport-operator-id 2)
+                  ::t-service/transport-operator-id 2)
         save-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
                                  "transport-service"
                                  service)
