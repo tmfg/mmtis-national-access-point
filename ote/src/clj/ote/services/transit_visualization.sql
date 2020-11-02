@@ -193,7 +193,8 @@ WHERE c."transport-service-id" = :service-id
 
 -- name: detected-route-changes-by-date
 -- Fetch changes for service joining detected-route-change table and detected-change-history table.
-SELECT h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
+-- Take same change only once (distinct) due to some change detection issues there might be no-change type changes multiple times in database.
+SELECT distinct h."change-detected", c."route-short-name", c."route-long-name", c."trip-headsign", c."route-hash-id", c."change-type", c."added-trips",
        c."removed-trips", c."trip-stop-sequence-changes-lower", c."trip-stop-sequence-changes-upper",
        c."trip-stop-time-changes-lower", c."trip-stop-time-changes-upper", c."current-week-date",
        c."different-week-date", c."change-date", c."created-date",
