@@ -124,8 +124,7 @@
         common-stop (some (fn [{:gtfs/keys [stop-name] :as common-stop-candidate}]
                             (when
                               (every? (fn [val]
-                                        (let [stop-time (time-for-stop val stop-name)
-                                              _ (println "every? :: stop-time - name" (pr-str stop-name) (pr-str stop-time))]
+                                        (let [stop-time (time-for-stop val stop-name)]
                                           stop-time))
                                       stoptime-displays)
                               stop-name))

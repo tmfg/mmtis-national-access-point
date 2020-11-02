@@ -520,7 +520,7 @@
   {}
   (let [{:keys [date scope] :as router-params} router-params
         detection-date date
-        date-filter (if (= (name :now) scope)
+        date-filter (if (or (= (name :now) scope) (= (name :new) scope))          ;; scope is mixed somehow, so check both
                       (time/now-iso-date-str)
                       nil)
         changes (if (not (nil? date-filter))
