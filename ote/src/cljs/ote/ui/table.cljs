@@ -82,7 +82,7 @@
         (doall
           (map-indexed
             (fn [i row]
-              ^{:key (str table-id "-b-row-" (if (and key-fn (key-fn row))
+              ^{:key (str table-id "-" i "-b-row-" (if (and key-fn (key-fn row))
                                                (key-fn row)
                                                row))}
               [ui/table-row (merge
