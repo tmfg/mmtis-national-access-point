@@ -211,4 +211,6 @@ SELECT tc.date, tc."added-routes", tc."removed-routes", tc."changed-routes", tc.
         JOIN gtfs_package p ON p.id = ANY(tc."package-ids") AND p."transport-service-id" = :service-id
         LEFT JOIN "external-interface-download-status" ds ON ds."external-interface-description-id" = p."external-interface-description-id"
  WHERE tc."transport-service-id" = :service-id
- GROUP BY tc.date,tc."added-routes", tc."removed-routes", tc."changed-routes", tc."no-traffic-routes";
+ GROUP BY tc.date,tc."added-routes", tc."removed-routes", tc."changed-routes", tc."no-traffic-routes"
+ ORDER BY tc.date desc
+ LIMIT 50;
