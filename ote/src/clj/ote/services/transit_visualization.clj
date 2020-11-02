@@ -118,6 +118,30 @@
         (dissoc :starting-week-date :different-week-date :trip-changes)
         (set/rename-keys {:added-trips :gtfs/added-trips :removed-trips :gtfs/removed-trips}))))
 
+(defn- filter-route-changes
+  "Due to issues in change detection some of no-change type of changes are found multiple times.
+  Filter those cases out."
+  [db date service-id]
+  (let [route-changes (map #(assoc % :change-type (keyword (:change-type %)))
+                           (detected-route-changes-by-date db
+                                                           {:date (time/iso-8601-date->sql-date date)
+                                                            :service-id service-id}))
+        grouped-route-changes (map
+                                (fn [x]
+                                  (let [x (if (>= (count (second x)) 2)
+                                            ;; This confusing piece of code is transforming
+                                            ;; Destructed (second x) group-by result and adding them back to vector
+                                            ;; In the same format where group-by made them.
+                                            [(first x) (filter
+                                                         (fn [y]
+                                                           (not= (:change-type y) :no-change))
+                                                         (second x))]
+                                            x)]
+                                    x))
+                                (group-by :route-hash-id route-changes))
+        route-changes (mapcat #(second %) grouped-route-changes)]
+    route-changes))
+
 (define-service-component TransitVisualization {}
 
   ;; Get transit changes, service info and package info for given date and service
@@ -126,7 +150,8 @@
        {{:keys [service-id date]} :params
         user :user}
     (let [service-id (Long/parseLong service-id)
-          package-infos (latest-transit-changes-for-visualization db {:service-id service-id})]
+          package-infos (latest-transit-changes-for-visualization db {:service-id service-id})
+          route-changes (filter-route-changes db date service-id)]
       ;; Is transit authority
       (or (authorization/transit-authority-authorization-response user)
 
@@ -135,10 +160,7 @@
            :changes (first (detected-service-change-by-date db
                                                             {:service-id service-id
                                                              :date (time/iso-8601-date->sql-date date)}))
-           :route-changes (map #(assoc % :change-type (keyword (:change-type %)))
-                               (detected-route-changes-by-date db
-                                                               {:date (time/iso-8601-date->sql-date date)
-                                                                :service-id service-id}))
+           :route-changes route-changes
            :route-hash-id-type (first (specql/fetch db :gtfs/detection-service-route-type
                                                     #{:gtfs/route-hash-id-type}
                                                     {:gtfs/transport-service-id service-id}))
