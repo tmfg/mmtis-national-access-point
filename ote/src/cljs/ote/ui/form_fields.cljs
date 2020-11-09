@@ -785,6 +785,12 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
+(defn- datepicker-locale [current-locale]
+  (case (keyword current-locale)
+    :fi "fi-FI"
+    :sv "sv-SE"
+    :en "en-UK"
+    "fi-FI"))
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
                                        show-clear? hint-text id date-fields? disabled? element-id full-width?] :as opts} data]
   (let [warning (when (and required? (not data))
