@@ -785,6 +785,12 @@
     :on-change (fn [event value]
                  (update! (time/parse-time (time/format-js-time value))))}]))
 
+(defn- datepicker-locale [current-locale]
+  (case (keyword current-locale)
+    :fi "fi-FI"
+    :sv "sv-SE"
+    :en "en-UK"
+    "fi-FI"))
 (defmethod field :date-picker [{:keys [update! required? table? label ok-label cancel-label
                                        show-clear? hint-text id date-fields? disabled? element-id full-width?] :as opts} data]
   (let [warning (when (and required? (not data))
@@ -792,7 +798,7 @@
     [:div {:style (merge
                     style-base/inline-block
                     (when full-width? {:width "100%"} ))}
-     [ui/date-picker (merge {:id (if element-id element-id (str label))
+     [ui/date-picker (merge {:id (str use-locale "-" (if element-id element-id (str label)))
                              :style (merge
                                       {:display "inline-block"}
                                       (when full-width?
@@ -815,11 +821,7 @@
                              :disabled (if disabled? true false)
                              :ok-label (or ok-label (tr [:buttons :save]))
                              :cancel-label (or cancel-label (tr [:buttons :cancel]))
-                             :locale (case @localization/selected-language
-                                       :fi "fi-FI"
-                                       :sv "sv-SE"
-                                       :en "en-UK"
-                                       "fi-FI")
+                             :locale (datepicker-locale @localization/selected-language)
                              :Date-time-format js/Intl.DateTimeFormat}
                             (when warning
                               ;; Show warning text
