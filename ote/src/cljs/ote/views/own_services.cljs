@@ -179,8 +179,9 @@
      [:div
       [:h5 {:style {:margin-top 0}} (tr [:own-services-page :flaws])]
       (doall
-        (for [error errors]
-          ^{:key (str error)}
+        (for [index (range (count errors))
+              :let [error (get errors index)]]
+          ^{:key (str index "-" error)}
           [:p {:style {:margin 0}}
            [:strong
             [ic/alert-warning {:style {:color colors/negative-button

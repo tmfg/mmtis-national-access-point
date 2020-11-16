@@ -798,7 +798,7 @@
     [:div {:style (merge
                     style-base/inline-block
                     (when full-width? {:width "100%"} ))}
-     [ui/date-picker (merge {:id (str use-locale "-" (if element-id element-id (str label)))
+     [ui/date-picker (merge {:id (str @localization/selected-language "-" (if element-id element-id (str label)))
                              :style (merge
                                       {:display "inline-block"}
                                       (when full-width?
