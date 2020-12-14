@@ -1008,7 +1008,14 @@
                                                                                 :detection-date analysis-date}))
         all-routes (map-by-route-key service-routes-for-3-years route-hash-id-type)
         all-route-keys (set (keys all-routes))
-
+        ;; Save this to help filtering out all but selected route
+        ;_ (println "1: all-route-keys " (pr-str all-route-keys))
+        ;all-route-keys
+        #_ (set (filter
+                              #(if (= % "-Loviisa - Liljendal-")
+                                 true false)
+                              all-route-keys))
+        ;_ (println "2: all-route-keys " (pr-str all-route-keys))
         route-hashes (sort-by :date
                                 (apply concat
                                      (mapv (fn [route-key]

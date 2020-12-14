@@ -67,6 +67,52 @@
             ;; One or both items not available, ignore this pair
             (recur left-items-set right-items-set pairs result)))))))
 
+(defn remove-once [x c]
+  (letfn [(rmv [x c1 c2 b]
+            (if-let [[v & c] (seq c1)]
+              (if  (and (= x v) b)
+                (recur x c c2 false)
+                (recur x c (cons v c2) b))
+              c2))]
+    (lazy-seq (reverse (rmv x c '() true)))))
+
+(defn differences-in-two-vectors [v1 v2]
+  (let [v1-atom (atom v1)
+        v2-atom (atom v2)
+        same-elements (for [a @v1-atom b @v2-atom
+                            :when
+                            (= a b)]
+                        (do
+                          (reset! v1-atom (remove-once a @v1-atom))
+                          (reset! v2-atom (remove-once b @v2-atom))
+                          a))
+        same-elements-atom (atom same-elements)
+        different-elements-v1 (doall (remove (fn [val]
+                                               (some (fn [s]
+                                                       (when (= s val)
+                                                         (do
+                                                           ;; Handle every element only once and remove those that are used
+                                                           ;(reset! all-elements-atom (remove-once val @all-elements-atom))
+                                                           (reset! same-elements-atom (remove-once s @same-elements-atom))
+                                                           true)))
+                                                     ;; Remove those that are in both vectors
+                                                     @same-elements-atom))
+                                          ;; Loop every element
+                                          v1))
+        same-elements-atom (atom same-elements)
+        different-elements-v2 (doall (remove (fn [val]
+                                               (some (fn [s]
+                                                       (when (= s val)
+                                                         (do
+                                                           ;; Handle every element only once and remove those that are used
+                                                           (reset! same-elements-atom (remove-once s @same-elements-atom))
+                                                           true)))
+                                                     ;; Remove those that are in both vectors
+                                                     @same-elements-atom))
+                                             ;; Loop every element
+                                             v2))]
+    (concat different-elements-v1 different-elements-v2 )))
+
 (defn stop-key
   "Use lat and lon values as stop-key. Stop-key is used to determine is the stop remain the same in different gtfs packages.
   Was earlier stop-name, now changed to lat lon pair."
@@ -78,7 +124,37 @@
   [stop]
   [(:gtfs/stop-fuzzy-lat stop) (:gtfs/stop-fuzzy-lon stop) (:instance stop)])
 
-(defn trip-stop-differences
+(defn format-difference-to-map
+  "Sequence change will affect on time changes also so we need to remove sequence changes from the time changes
+  to get accurate change count. And because we need to compare result in both directions we get time differences
+  twice to the list so we devide it by two."
+  [sequence-diff time-diff]
+  (let [same-changes (filter (fn [val]
+                               (let [time-key (first val)]
+                                 (some (fn [s]
+                                         (when (= (first s) time-key)
+                                           true))
+                                       sequence-diff)))
+                             time-diff)]
+    {:stop-seq-changes (count sequence-diff)
+     :stop-time-changes (int (Math/ceil (/ (- (count time-diff) (count same-changes)) 2)))}))
+
+(defn- stoptimes-with-stop-key [trip]
+  (into []
+        (map (juxt stop-key))
+        (:stoptimes trip)))
+
+(defn- stoptimes-with-stop-and-time-key [trip]
+  (into []
+        (map (juxt stop-key (fn [val]
+                                              (let [val (:gtfs/departure-time val)]
+                                                (if (= ote.time.Interval (type val))
+                                                  (int (time/interval->seconds val))
+                                                  val)))))
+        (:stoptimes trip)))
+
+;; Not going to remove this just yet.
+#_ (defn trip-stop-differences-old
   "Returns the amount of differences in stop times and stop sequence and stop names for the given trip pair."
   [left right]
   (let [left-stop-times (into {}
@@ -93,6 +169,10 @@
                              (set/union left-stop-keys right-stop-keys))
         left-different-stop-keys (set/difference left-stop-keys right-stop-keys)
         right-different-stop-keys (set/difference right-stop-keys left-stop-keys)]
+    ;(def stop-times-left* (:stoptimes left))
+    ;(def stop-times-right* (:stoptimes right))
+    ;(def left* left)
+    ;(def right* right)
     {:stop-time-changes (reduce (fn [chg stop-name]
                                   (let [left (left-stop-times stop-name)
                                         right (right-stop-times stop-name)]
@@ -103,6 +183,18 @@
      :stop-seq-changes (+ (count left-different-stop-keys)
                           (count right-different-stop-keys))}))
 
+
+(defn trip-stop-differences [left-trip right-trip]
+  (let [new-result (format-difference-to-map
+                     (differences-in-two-vectors
+                       (stoptimes-with-stop-key left-trip)
+                       (stoptimes-with-stop-key right-trip))
+                     (differences-in-two-vectors
+                       (stoptimes-with-stop-and-time-key left-trip)
+                       (stoptimes-with-stop-and-time-key right-trip)))
+        ;old-result (trip-stop-differences-old left-trip right-trip)
+        ]
+    new-result))
 
 (defn time-for-stop
   "Stoptime-display is mainly a list of stops that are combined from trip1 and trip2. Here we use only stoptime data from :stoptime key.
