@@ -109,6 +109,9 @@
                              (map :stop-time-changes (:trip-changes result)))
         sequence-changes (reduce detection/update-min-max-range nil
                                  (map :stop-seq-changes (:trip-changes result)))]
+    ;(def *result result)
+    ;(def *date1-trips date1-trips)
+    ;(def *date2-trips date2-trips)
 
     (-> result
         (assoc :trip-stop-sequence-changes-lower (:lower sequence-changes))
@@ -183,7 +186,7 @@
     (or (authorization/transit-authority-authorization-response user)
         {:calendar (service-calendar-for-route db (Long/parseLong service-id) route-hash-id detection-date)}))
 
-
+  ;; Route lines and stops for map
   ^{:unauthenticated false}
   (GET "/transit-visualization/:service-id/route-lines-for-date"
        {{service-id :service-id} :params
@@ -202,6 +205,7 @@
                             :route-hash-id route-hash-id}))}
             {:key-fn name}))))
 
+  ;; Trips for trips list and stops for stop list
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-trips-for-date"
        {{service-id :service-id} :params
@@ -218,6 +222,7 @@
                  :detection-date detection-date
                  :route-hash-id route-hash-id}))))
 
+  ;; Differences between two days
   ^{:unauthenticated false :format :transit}
   (GET "/transit-visualization/:service-id/route-differences"
        {{service-id :service-id} :params
