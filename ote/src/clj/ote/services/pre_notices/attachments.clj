@@ -184,6 +184,20 @@
                           row-list))]
     (str/join "" row-list)))
 
+(defn- maybe-utf-8 [file]
+  "Example file of company csv:s is utf-8 encoded. This doesn't help however. Too many users
+   upload company csv with different encoding.
+   So we have this
+   simple check that if there is some finnish letters we assume that it is endoded with iso88591."
+  (let [utf8file (slurp file :encoding "UTF-8")
+        isofile (slurp file :encoding "ISO-8859-1")
+        f (cond
+            ;; Simple check to ensure that file contains ä Ä ö Ö å Å
+            (some #(clojure.string/includes? (str utf8file) %) ["ä" "Ä" "ö" "Ö" "å" "Å" "å"]) utf8file
+            (some #(clojure.string/includes? (str isofile) %) ["ä" "Ä" "ö" "Ö" "å" "Å" "å"]) isofile
+            :else isofile)]
+    f))
+
 (defn upload-transport-service-csv
   "Company csv files are uploaded to s3 and stored to temp table at first. "
   [db {bucket :bucket :as config} service-id db-file-key {user :user :as req}]
@@ -196,7 +210,9 @@
           orig-filename (:filename uploaded-file)
           ;; Customer want's to support malformed csv that is wrapped inside extra double quotes because it would be too difficult to change settings in used software
           ;; So we need to remove extra double quotes before parsing csv
-          file (slurp (:tempfile uploaded-file))
+          ;;file (slurp (:tempfile uploaded-file))
+          ;; Given file might not be encoded with in utf-8 so try it out
+          file (maybe-utf-8 (:tempfile uploaded-file))
           edited-file (parse-extra-quotes-from-company-csv file)
           data (external/read-csv edited-file)
           parsed-data (external/parse-response->csv data)
