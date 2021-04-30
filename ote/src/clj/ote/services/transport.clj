@@ -411,10 +411,19 @@
 
 (defn- save-service-company-csv
   "New Service company csv's are stored in temp table. And if they are they need to stored to more permanent place."
-  [db transport-service-id bucket]
+  [db transport-service-id filename bucket]
   (let [temp-csv-row (first (specql/fetch db ::t-service/transport-service-company-csv-temp
                                           (specql/columns ::t-service/transport-service-company-csv-temp)
                                           {::t-service/transport-service-id transport-service-id}))
+        temp-csv-row (if (or (nil? temp-csv-row) (empty? temp-csv-row))
+                       ;; When service is first saved transport-service-company-csv-temp table doesn't contain
+                       ;; service-id, because there were non when it was added to the temp table.
+                       ;; So find the latest ro with the same file name and assume that it is correct.
+                       (last (specql/fetch db ::t-service/transport-service-company-csv-temp
+                                           (specql/columns ::t-service/transport-service-company-csv-temp)
+                                           {::t-service/csv-file-name filename}))
+                       ;; Return it if it exists
+                       temp-csv-row)
         ;; Service may have company csv in permanent table. If so, delete it
         permanent-csv (first (specql/fetch db ::t-service/transport-service-company-csv
                                            (specql/columns ::t-service/transport-service-company-csv)
@@ -496,9 +505,9 @@
                 (if (and (not (nil? original-service-id))
                          (not= original-service-id transport-service-id)) ;; child id is given
                   (do
-                    (save-service-company-csv db original-service-id (get-in config [:csv :bucket]))
+                    (save-service-company-csv db original-service-id (::t-service/company-csv-filename service-info) (get-in config [:csv :bucket]))
                     (maybe-copy-service-company-csv db (get-in config [:csv :bucket]) transport-service-id original-service-id))
-                  (save-service-company-csv db transport-service-id (get-in config [:csv :bucket])))
+                  (save-service-company-csv db transport-service-id (::t-service/company-csv-filename service-info) (get-in config [:csv :bucket])))
                 ;; Save possible external interfaces
                 (if (and (not (nil? original-service-id))
                          (not= original-service-id transport-service-id))
@@ -681,7 +690,8 @@
       ;; Authenticate and delete temp-csv
       (when (= (:id (:user user)) (::modification/created-by temp-csv))
         ;; Same user, we can delete temp-csv
-        (s3/delete-object bucket (::t-service/file-key temp-csv))
+        ;; S3 bucket usage is not in use currently
+        ;;(s3/delete-object bucket (::t-service/file-key temp-csv))
         (specql/delete! db ::t-service/transport-service-company-csv-temp
                         {::t-service/file-key file-key})
         ;; Return
@@ -690,7 +700,8 @@
         (authorization/with-transport-operator-check
           db user operator-id
           #(do
-             (s3/delete-object bucket (::t-service/file-key permanent-csv))
+             ;; S3 bucket usage is not in use currently
+             ;;(s3/delete-object bucket (::t-service/file-key permanent-csv))
              (specql/delete! db ::t-service/transport-service-company-csv
                              {::t-service/file-key file-key})
              ;; Return
