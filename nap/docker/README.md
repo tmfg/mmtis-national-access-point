@@ -19,6 +19,13 @@ If you encounter weird errors with docker containers or the images are taking to
 `docker-compose build`  
 `docker-compose up -d`  
 
+If you have problems with ckan related tables. Run initial db scripts.
+Go to /nap folder and run
+> psql -h localhost -p 5432 -U napote -f ckan-initial-db.sql napote
+Then you can run migrate scripts from /database folder
+> sh devdb_migrate.sh 
+And all are set.
+
 If you want to take a look inside a docker container run e.g.
 `docker exec -it napote-db /bin/bash`
 
