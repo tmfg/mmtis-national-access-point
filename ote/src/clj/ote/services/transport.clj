@@ -16,6 +16,7 @@
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.stats :as stats]
             [ote.util.db :as util]
             [ote.authorization :as authorization]
             [ote.netex.netex_util :as netex-util]
@@ -154,6 +155,9 @@
            (delete! db ::t-service/transport-service {::t-service/id parent-id}))
          ;; Delete service company csv files
          (maybe-delete-company-csv-from-s3 db bucket service-id)
+
+         ;; All stats-service rows must also be deleted when service is deleted. We do not want to leave anything behind
+         (delete! db ::stats/stats-service {::stats/transport-service-id service-id})
 
          ;; Delete service
          (delete! db ::t-service/transport-service {::t-service/id service-id})
