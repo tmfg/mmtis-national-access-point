@@ -25,7 +25,7 @@
             :border "4px dashed red"}}
    [:p {:style {:margin "10px 0px 0px 10px"
                 :font-weight "bold"}}
-    "TÄMÄ ON TESTIPALVELU!"]
+    "TÄMÄ ON TESTIPALVELU!!"]
    [:p {:style {:margin "10px"}}
     "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "
     [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
