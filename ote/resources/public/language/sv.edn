@@ -1715,4 +1715,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :ZA "Sydafrika"
   :ZM "Zambia"
   :ZW "Zimbabwe"}
+
+ ;; Fintraffic common quicklink header
+ :quicklink-header
+ {:liikennetilanne "Trafikläget"
+  :palautevayla "Responskanalen"
+  :junalahdot "Tågavgångar"
+  :skynavx "Drone-tjänster"
+  :digitraffic "Digitraffic"
+  :digitransit "Digitransit"
+  :finap "NAP"}
  }

@@ -1721,4 +1721,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :UM "Yhdysvaltain erillissaaret"
   :VI "Yhdysvaltain Neitsytsaaret"
   :ZW "Zimbabwe"}
+
+ ;; Fintraffic common quicklink header
+ :quicklink-header
+ {:liikennetilanne "Liikennetilanne"
+  :palautevayla "Palauteväylä"
+  :junalahdot "Junalähdöt"
+  :skynavx "Drone-palvelut"
+  :digitraffic "Digitraffic"
+  :digitransit "Digitransit"
+  :finap "NAP"}
  }
