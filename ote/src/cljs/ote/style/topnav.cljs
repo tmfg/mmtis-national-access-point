@@ -12,7 +12,7 @@
                      ::stylefy/auto-prefix #{:transition}})
 
 (def topnav-dropdown {:width "100%"
-                      :background-color "#323232"
+                      :background-color "#000000"
                       :min-height "120px"
                       :padding-top "20px"
                       :padding-bottom "20px"
@@ -24,7 +24,7 @@
 
 
 (def topnav {:min-height "56px"
-             :background-color "#323232"
+             :background-color "#000000"
              :overflow "hidden"
              :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
              :transition "all 300ms ease"

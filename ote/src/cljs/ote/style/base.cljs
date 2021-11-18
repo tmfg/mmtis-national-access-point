@@ -12,7 +12,7 @@
 
 (def wrapper {:padding-top "20px"})
 
-(def font {:font-family "'Roboto', sans-serif"})
+(def font {:font-family "'Public Sans', sans-serif"})
 
 (def divider {:margin "20px 0px 15px 0px"
               :border-top "1px solid rgb(217, 217, 217)"})
@@ -230,7 +230,7 @@
                      :display "block"
                      :width "calc(100% - 38px)"
                      :line-height "24px"
-                     :font-family "Roboto, sans-serif"})
+                     :font-family "Public Sans, sans-serif"})
 (def checkbox-label-with-width (assoc checkbox-label :width "260px"))
 
 (def mobile-extra-padding {::stylefy/media {{:max-width (str mobile-width-px "px")} {:padding-top "20px"}}})

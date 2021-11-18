@@ -33,11 +33,11 @@
     [:td {:align "center"
           :valign "middle"
           :class "mcnButtonContent"
-          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px;"}
+          :style "font-family: &quot;Public Sans&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px;"}
      [:a.mcnButton {:title text
                     :href link
                     :target "_blank"
-                    :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+                    :style "font-family:Public Sans,helvetica neue,arial,sans-serif;
                             font-size: 16px;
                             font-weight: normal;
                             letter-spacing: normal;
@@ -54,11 +54,11 @@
     [:td {:align "center"
           :valign "middle"
           :class "mcnBorderButtonContent"
-          :style "font-family: Roboto, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px; color: #0066CC;"}
+          :style "font-family: &quot;Public Sans&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 16px; color: #0066CC;"}
      [:a.mcnBorderButton {:title text
                     :href link
                     :target "_blank"
-                    :style "font-family:Roboto,helvetica neue,arial,sans-serif;
+                    :style "font-family:Public Sans,helvetica neue,arial,sans-serif;
                             font-size: 16px;
                             font-weight: normal;
                             letter-spacing: normal;
@@ -146,29 +146,29 @@
     [:meta {:name "format-detection", :content "telephone=no"}]
     [:title title]
     "<!--[if !mso]><!-->
-    <link href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,600,700,800\" rel=\"stylesheet\" />
+    <link href=\"https://fonts.googleapis.com/css?family=Public%20Sans:300,400,600,700,800\" rel=\"stylesheet\" />
     <!--<![endif]-->"
     [:style {:type "text/css"}
-     "body { margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; -ms-text-size-adjust: 100% !important; -webkit-font-smoothing: antialiased !important;font-family:Roboto,helvetica neue,arial,sans-serif;}
+     "body { margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; -ms-text-size-adjust: 100% !important; -webkit-font-smoothing: antialiased !important;font-family:Public Sans,helvetica neue,arial,sans-serif;}
      img { border: 0 !important; outline: none !important;}
      p { margin: 0px; }
      table { border-collapse: collapse; mso-table-lspace: 0px; mso-table-rspace: 0px;}
      td, a, span { border-collapse: collapse; mso-line-height-rule: exactly;}
-     .headerText1 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
-     .headerText2 {font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
+     .headerText1 {font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:2rem; font-weight:700;}
+     .headerText2 {font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;}
      .whiteBackground {background-color:#FFFFFF}
      .grayBackground {background-color:#EFEFEF}
      .mcnButtonContent {background-color:#0066CC;padding:15px;}
      .mcnBorderButtonContent {background-color:#FFFFFF;padding:15px;border:2px solid #0066CC;color:#0066CC;}
-     .footer {font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;}
-     a.mcnButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
-     a.mcnBorderButton{font-family:Roboto,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #0066CC !important;}
+     .footer {font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;}
+     a.mcnButton{font-family:Public Sans,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #FFF !important;}
+     a.mcnBorderButton{font-family:Public Sans,helvetica neue,arial,sans-serif;font-size: 16px;font-weight: normal;letter-spacing: normal;line-height: 25px;text-align: center;text-decoration: none; display: inline-block; color: #0066CC !important;}
      .even-row {background-color:#EFEFEF;}
      .odd-row {background-color:#FFFFFF;}
      .change-link:visited {color: #663366;}
      .tg  {border-collapse:collapse;border-spacing:0;}
-     .tg td{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
-     .tg th{font-family:Roboto,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg td{font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:14px;padding:10px 5px;overflow:hidden;word-break:normal;}
+     .tg th{font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:16px;font-weight:700;padding:10px 5px;overflow:hidden;word-break:normal;}
      .tg .tg-oe15{background-color:#ffffff;text-align:left;vertical-align:top}
      .tg .tg-lusz{background-color:#656565;color:#ffffff;text-align:left;vertical-align:top}
      .tg .tg-vnjh{text-decoration:underline;background-color:#ffffff;color:#0066cc;text-align:left;vertical-align:top}
@@ -192,23 +192,23 @@
      [:div.grayBackground.footer
       [:br]
       [:br]
-      [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+      [:p {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
        (tr [:email-templates :footer :email-sender])]
       [:br]
-      [:span [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+      [:span [:strong {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
               (tr [:email-templates :footer :help-desk])]]
       [:p
-       [:a {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+       [:a {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
             :href "mailto:nap@traficom.fi"} (tr [:email-templates :footer :help-desk-email])]
-       [:span {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       [:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         (tr [:email-templates :footer :help-desk-phone])]]
       [:br]
       (when show-email-settings?
-        [:p {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+        [:p {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
          "Haluatko muuttaa sähköpostiasetuksiasi?"
          [:br]
          [:a
-          {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"
+          {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
            :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]])
       [:br]]]]])
 
@@ -217,7 +217,7 @@
     [:div
      [:br]
      [:h1 {:class "headerText1"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+           :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
       "NAP:ssa on uutta tietoa markkinaehtoisen liikenteen tulevista muutoksista."]
 
      (when (seq pre-notices)
@@ -225,7 +225,7 @@
         (html-divider-border nil)
         [:p {:style "margin-bottom:  20px;"}
          [:h2 {:class "headerText2"
-               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
+               :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
           "Liikennöitsijöiden lähettämät lomakeilmoitukset"]]
 
         (html-table
@@ -245,11 +245,11 @@
         (html-divider-border nil)
         [:p
          [:h2 {:class "headerText2"
-               :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
+               :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin:0;"}
           "Rajapinnoista tunnistetut muutokset"]
          [:h2
           {:class "headerText2"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:20px;"}
+           :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0; margin-bottom:20px;"}
           "Tunnistusajankohta " (time/format-date (time/now))]
          (html-table
            [{:class "tg-lusz" :width "20%" :label "Palveluntuottaja"}
@@ -267,12 +267,12 @@
     [:div {:style "max-width 800px"}
      [:br]
      [:h1 {:class "headerText1"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+           :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
       (str "Sinut on kutsuttu " (::t-operator/title operator) "-nimisen palveluntuottajan jäseneksi.")]
 
      (html-divider-border "100%")
      [:p
-      [:strong {:style "font-family:Roboto,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+      [:strong {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
        (get-in requester [:user :name])] " on kutsunut sinut NAP-palveluun "
       [:strong (::t-operator/title operator)]
       (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/title operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
@@ -290,7 +290,7 @@
     [:div {:style "max-width 800px"}
      [:br]
      [:h1 {:class "headerText1"
-           :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+           :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
       (str "Olet saanut kutsun liittyä tarkastelemaan markkinaehtoisen henkilöliikenteen muutosilmoituksia NAP:ssa.")]
 
      (html-divider-border "100%")
@@ -310,7 +310,7 @@
       [:div {:style "max-width: 800px"}
        [:br]
        [:h1 {:class "headerText1"
-             :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+             :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-weight:700;"}
         (str "Olet saanut kutsun liittyä NAP:iin")]
 
        (html-divider-border "100%")
@@ -332,7 +332,7 @@
       [:div {:style "max-width: 800px"}
        [:br]
        [:h1 {:class "headerText1"
-             :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+             :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-weight:700;"}
         (str "Olet saanut kutsun liittyä NAP:iin")]
 
        (html-divider-border "100%")
@@ -361,7 +361,7 @@
                  [:div {:style "max-width: 800px"}
                   [:br]
                   [:h1 {:class "headerText1"
-                        :style "font-family:Roboto,helvetica neue,arial,sans-serif; font-weight:700;"}
+                        :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-weight:700;"}
                    (tr [:email-templates :password-reset :subject])]
 
                   (html-divider-border "100%")
