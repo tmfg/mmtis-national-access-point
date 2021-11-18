@@ -34,7 +34,7 @@
                                            :transform "scale(0.98)"}
                                    ::stylefy/vendors ["webkit" "moz" "ms"]
                                    ::stylefy/auto-prefix #{:transform}}})
-(def fp-btn-blue-hover {:background-image "linear-gradient(45deg, #06c, #0029b8)"})
+(def fp-btn-blue-hover {:background-image "linear-gradient(45deg, #0034ac, #0034ac)"})
 (def fp-btn-gray {:background-image "linear-gradient(90deg, #ccc, #ccc)"})
 (def fp-btn {:display "flex"
              :padding "20px 20px 20px 10px"
