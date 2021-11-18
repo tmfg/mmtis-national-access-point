@@ -5,6 +5,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [cljs-react-material-ui.core :refer [color]]
             [cljs-react-material-ui.icons :as ic]
+            [re-svg-icons.feather-icons :as feather-icons]
             [stylefy.core :as stylefy]
             [ote.util.text :as text]
             [ote.localization :refer [tr tr-key]]
@@ -408,29 +409,126 @@
                              (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
                              (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))
                     false)]
-    [:div {:style (cond
-                    (and (= false @is-scrolled?) show-tos?)
-                    {:padding-bottom "3rem"}
-                    (and @is-scrolled? show-tos?)
-                    {:padding-bottom "2rem"}
-                    (and (and (= false) @is-scrolled?) (= false show-tos?))
-                    {:padding-bottom "0rem"}
-                    :else
-                    {:padding-bottom "0rem"})}
-     [:div
-      [header-scroll-sensor is-scrolled? -250]
-      [esc-press-listener e! app]
-      [:div (stylefy/use-style style-topnav/topnav-wrapper)
-       [:div
-        (stylefy/use-style (merge
-                             style-topnav/topnav-desktop
-                             (when @is-scrolled?
-                               {:height "56px" :line-height "56px"})))
-        [:div.container
-         [top-nav-links e! app is-scrolled?]]]
+  (when (and (flags/enabled? :terms-of-service)
+             show-tos?)
+    [tos e! app desktop?])))
 
-       [top-nav-drop-down-menu e! app is-scrolled?]
-       [user-menu e! app]
-       [lang-menu e! app]
-       (when (flags/enabled? :terms-of-service)
-         [tos e! app desktop?])]]]))
+(defn get-lang-label [lang]
+  (str (->> footer/selectable-languages
+            (filter #(= (first %) (name lang)))
+            first
+            second)))
+
+(defn nap-navbar [e! app desktop?]
+  (let [lang-menu-open? (get-in app [:ote-service-flags :lang-menu-open])]
+    [:div (stylefy/use-style style-topnav/header-bottombar)
+     [:div (stylefy/use-style style-topnav/nap-navigation)
+      [:div (stylefy/use-style style-topnav/nap-menu)
+       [:ul (stylefy/use-style style-topnav/nap-menu-links)
+        ^{:key "entry 1"}
+        [:li (stylefy/use-style style-topnav/nap-menu-links-item)
+         [:a (stylefy/use-style style-topnav/nap-menu-links-link) "entry 1"]]
+        ^{:key "entry 2"}
+        [:li (stylefy/use-style style-topnav/nap-menu-links-item)
+         [:a (stylefy/use-style style-topnav/nap-menu-links-link) "entry 2"]]
+        ^{:key "entry 3"}
+        [:li (stylefy/use-style style-topnav/nap-menu-links-item)
+         [:a (stylefy/use-style style-topnav/nap-menu-links-link) "entry 3"]]]]]
+
+     [:div (stylefy/use-style style-topnav/nap-languages)
+      [:div (stylefy/use-style style-topnav/nap-languages-switcher)]
+      [:button (merge (stylefy/use-style style-topnav/nap-languages-switcher-button)
+                      {:on-click #(e! (fp-controller/->OpenLangMenu))}
+                      #_{:on-click (fn [] (reset! menu-visible (not @menu-visible)))})
+       [feather-icons/globe (stylefy/use-style (merge style-topnav/nap-languages-switcher-icon
+                                                      {:margin-right ".5rem"}))]
+
+       [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+        (get-lang-label @localization/selected-language)]
+
+       [(if lang-menu-open?
+          feather-icons/chevron-up
+          feather-icons/chevron-down)
+        (stylefy/use-style style-topnav/nap-languages-switcher-icon)]]
+      [:ul#languages-menu (stylefy/use-style (merge style-topnav/nap-languages-switcher-menu
+                                                    (when (not lang-menu-open?)
+                                                      {:display "none"})))
+
+       (doall
+         (for [[lang flag] footer/selectable-languages]
+           ^{:key (str "link_" (name lang) "_" flag)}
+           [:li (stylefy/use-style style-topnav/nap-languages-switcher-item)
+            [:a (merge (stylefy/use-style style-topnav/nap-languages-switcher-link)
+                       {:key lang
+                        :href "#"
+                        :on-click #(do
+                                     (.preventDefault %)
+                                     (e! (fp-controller/->OpenLangMenu))
+                                     (e! (fp-controller/->SetLanguage lang)))})
+             flag]]))]]
+     ]))
+
+(def quicklink-urls
+  {:fintraffic      {:url "https://www.fintraffic.fi/fi"                :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :liikennetilanne {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :palautevayla    {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
+   :junalahdot      {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
+   :skynavx         {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :digitraffic     {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
+   :digitransit     {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
+   :finap           {:url "https://finap.fi/#/"                         :langs {}}})
+
+(defn- localized-quicklink-uri [quicklink]
+  (let [current-language    (or @localization/selected-language :fi)
+        {:keys [url langs]} (get quicklink-urls quicklink)
+        lang                (get langs current-language "")]
+    (str url lang)))
+
+(defn fintraffic-quick-links []
+  [:ul (stylefy/use-style style-topnav/fintraffic-quick-links-menu)
+     (doall
+       (for [[href service] (map (juxt localized-quicklink-uri identity)
+                                 [:liikennetilanne
+                                  :palautevayla
+                                  :junalahdot
+                                  :skynavx
+                                  :digitraffic
+                                  :digitransit
+                                  :finap])]
+         ^{:key (str "quicklink_" (name service))}
+         [:li (stylefy/use-style (merge style-topnav/fintraffic-quick-links-item
+                                        (when (= service :finap) style-topnav/fintraffic-quick-links-active)))
+          [:a (merge (stylefy/use-style style-topnav/fintraffic-quick-links-link)
+                     {:href href})
+           (tr [:quicklink-header service])]
+          (when (= service :finap)
+            [:div (stylefy/use-style style-topnav/fintraffic-quick-links-uparrow) ""])]))])
+
+(defn- fintraffic-navbar []
+  ; TODO: ::before height .5rem, width .5rem, display: block, position:absolute...
+  [:div (stylefy/use-style style-topnav/header-topbar)
+   [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
+              {:href (localized-quicklink-uri :fintraffic)})
+    [:img {:style style-topnav/fintraffic-logo
+           :src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]]
+   [:nav {:style {:display "inline-flex"}}
+    [fintraffic-quick-links]]])
+
+(defn header [e! app desktop?]
+  [:header
+   [fintraffic-navbar]
+   [nap-navbar e! app desktop?]
+   ; old bar's remnants
+   [:div
+    [:div (stylefy/use-style style-topnav/topnav-wrapper)
+     [:div
+      (stylefy/use-style style-topnav/topnav-desktop)
+      [:div.container
+       [top-nav-links e! app]]]
+
+     [top-nav-drop-down-menu e! app]
+     [user-menu e! app]
+     [lang-menu e! app]]]
+
+   [esc-press-listener e! app]
+   [tos-notification e! app desktop?]])

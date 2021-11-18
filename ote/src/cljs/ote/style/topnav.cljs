@@ -3,8 +3,7 @@
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
             [ote.style.base :as base]))
 
-(def topnav-wrapper {:position "fixed"
-                     :width "100%"
+(def topnav-wrapper {:width "100%"
                      :top 0
                      :z-index 1001
                      :transition "all 300ms ease"
@@ -90,6 +89,134 @@
    :font-size "1rem"
    :display "block"
    ::stylefy/mode {:hover {:text-decoration "underline"}}})
+
+(def header-topbar {:display "flex"
+                    :padding-left "2rem"
+                    :padding-right "2rem"
+                    :padding-top ".5rem"
+                    :padding-bottom ".5rem"
+                    :background-color "#000"
+                    :min-height "44px"
+                    :position "relative"
+                    })
+
+(def header-bottombar {:padding-left "2rem"
+                       :padding-right "2rem"
+                       :display "flex"
+                       :border-bottom "1px solid #f2f2f2"
+                       :box-shadow "0 8px 6px -6px #f2f2f2"
+                       :background-color "#fff"
+                       :flex-direction "row"
+                       :justify-content "flex-end"
+                       :min-height "54px"})
+
+(def nap-navigation {:margin-right "auto"
+                                  :display "flex"
+                                  :align-items "center"})
+
+(def nap-menu {:height "100%"
+                                 :width "100%"})
+
+(def nap-menu-links {:height "100%"
+                                       :margin "0"
+                                       :padding "0"
+                                       :list-style "none"
+                                       :flex-wrap "nowrap"
+                                       :justify-content "flex-end"
+                                       :display "flex"
+                                       :position "relative"})
+
+(def nap-menu-links-item {:position "relative"
+                                            :float "none"
+                                            :display "inline-block"})
+
+(def nap-menu-links-link {:position "relative"
+                                            :float "none"
+                                            :align-items "center"
+                                            :display "flex"
+                                            :margin-right "1.2rem"
+                                            :height "100%"})
+
+(def nap-languages {:align-self "center"})
+
+(def nap-languages-switcher {:display "flex"
+                             :position "relative"})
+
+(def nap-languages-switcher-icon {:color "#000"
+                                  :width "16px"
+                                  :height "16px"
+                                  :align-self "center"})
+
+(def nap-languages-switcher-button {:display "flex"
+                                    :justify-content "center"
+                                    :background-color "transparent"
+                                    :border "0"
+                                    :cursor "pointer"
+                                    :padding 0})
+
+(def nap-languages-switcher-active {:margin-right ".5rem"})
+
+(def nap-languages-switcher-menu {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
+                                                           :display "block"
+                                                           :position "absolute"
+                                                           :background-color "#fff"
+                                                           :width ".5rem"
+                                                           :height ".5rem"
+                                                           :top "-5px"
+                                                           :right ".5rem"
+                                                           :transform "rotate(45deg)"
+                                                           :border-left "1px solid #ddd"
+                                                           :border-top "1px solid #ddd"}}
+                                  ;:display "none"
+                                  :background-color "#fff"
+                                  :border "1px solid #ddd"
+                                  :border-radius "3px"
+                                  :position "absolute"
+                                  :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
+                                  :z-index "1"})
+
+(def nap-languages-switcher-item {:border-bottom "1px solid #ddd"
+                                  :display "block"
+                                  :margin-right "0"
+                                  :white-space "nowrap"})
+
+(def nap-languages-switcher-link {:display "block"
+                                  :padding ".5rem 1rem"
+                                  :transition "color .15s ease-out"
+                                  :color "#000"
+                                  :text-decoration "none"})
+
+(def fintraffic-logo-link {:align-self "center"
+                           :display "inline-flex"
+                           :margin-right "1.5rem"})
+
+(def fintraffic-logo {:height "18px"
+                      :width "106px"})
+
+(def fintraffic-quick-links-menu {:list-style "none"
+                                  :margin "0"
+                                  :padding "0"
+                                  :align-self "center"})
+
+(def fintraffic-quick-links-item {:display "inline-block"
+                                  :margin-right "1.5rem"})
+
+(def fintraffic-quick-links-link {:color "#FFFFFF"
+                                  :font-weight "600"
+                                  :text-decoration "none"})
+
+(def fintraffic-quick-links-active {:position "relative"})
+
+(def fintraffic-quick-links-uparrow {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle
+                                                              :position "absolute"
+                                                              :left "50%" ; TODO: garden units?
+                                                              :border-width "5px"
+                                                              :border-style "solid"
+                                                              :border-color "transparent transparent white transparent"
+                                                              :transform "translateX(-50%)"
+                                                              }}})
+
+(def style {:content ""})
 
 (def logo {:transition "margin-top 300ms ease, height 300ms ease"
            :margin-top "13px"
