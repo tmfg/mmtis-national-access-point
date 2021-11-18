@@ -9,9 +9,9 @@
             [ote.app.controller.front-page :as fp-controller]
             [ote.app.controller.flags :as flags]))
 
-(def selectable-languages [["fi" "suomi"]
-                           ["sv" "svenska"]
-                           ["en" "english"]])
+(def selectable-languages [["fi" "Suomeksi"]
+                           ["sv" "På Svenska"]
+                           ["en" "In English"]])
 
 (defn footer [e!]
   [:div
