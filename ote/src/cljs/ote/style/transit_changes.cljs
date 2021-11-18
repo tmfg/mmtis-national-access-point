@@ -89,7 +89,7 @@
   {:background-color "#646464"
    :color "white"
    :font-size "1.125rem"
-   :font-family "Montserrat"
+   :font-family "Public Sans"
    :padding "0.875rem 0.875rem 0.875rem 0.625rem"
    :line-height "2rem"
    :font-weight "600"})
@@ -99,7 +99,7 @@
               :margin-bottom "1.25rem"
               :padding "0.7rem 0.875rem 0.75rem"
               :font-size "0.875rem"
-              :font-family "Roboto, sans-serif"
+              :font-family "Public Sans, sans-serif"
               :color "#505050"})
 
 (def infobox-text {:margin-bottom "0.25rem"

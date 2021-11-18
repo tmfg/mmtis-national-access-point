@@ -44,7 +44,7 @@
              :backface-visibility "visible"
              :transform-origin "50% 50% 0px"
              :transition "all 300ms ease"
-             :font-family "Roboto, sans-serif"
+             :font-family "Public Sans, sans-serif"
              :font-weight "400"
              :font-size "1.1rem"
              :text-align "center"
@@ -106,7 +106,7 @@
                     :box-align "center"                     ;; Old flex standard
                     :flex-align "center"                    ;; Old flex standard
                     :align-items "center"
-                    :font-family "Montserrat, sans-serif"
+                    :font-family "Public Sans, sans-serif"
                     :color "#fff"
                     :font-size "6rem"
                     :font-weight "200"
@@ -127,7 +127,7 @@
                            :margin-top "2.5rem"
                            :height "100px"
                            :align-items "cexnter"
-                           :font-family "Montserrat, sans-serif"
+                           :font-family "Public Sans, sans-serif"
                            :color "#fafafa"
                            :font-size "2.25rem"
                            :line-height "3rem"
