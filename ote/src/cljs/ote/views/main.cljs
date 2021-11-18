@@ -69,90 +69,89 @@
 (defn ote-application
   "OTE application main view"
   [e! app]
-  (let [is-scrolled? (r/atom false)]
-    (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
-      (let [desktop? (> (:width app) style-base/mobile-width-px)
-            wide? (boolean (wide-pages (:page app)))]
-        [:div {:style (stylefy/use-style style-base/body)}
-         [theme e! app
-          (if (nil? app)
-            [spinner/circular-progress]
-            [:div.ote-sovellus {:style {:display "flex"
-                                        :flex-direction "column"
-                                        :height "100vh"}}
-             [top-nav e! app is-scrolled? desktop?]
-             [:div (merge (stylefy/use-style style-base/sticky-footer)
-                     {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
-              (if (not loaded?)
-                [spinner/circular-progress]
-                [(if wide? :div :div.wrapper)
-                 (if wide?
-                   {}
-                   (stylefy/use-style {:transition "margin-top 300ms ease"}))
-                 [:div (cond
-                         (= :front-page (:page app))
-                         {:class "container-fluid"}
+  (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
+    (let [desktop? (> (:width app) style-base/mobile-width-px)
+          wide? (boolean (wide-pages (:page app)))]
+      [:div {:style (stylefy/use-style style-base/body)}
+       [theme e! app
+        (if (nil? app)
+          [spinner/circular-progress]
+          [:div.ote-sovellus {:style {:display "flex"
+                                      :flex-direction "column"
+                                      :height "100vh"}}
+           [header e! app desktop?]
+           [:div (merge (stylefy/use-style style-base/sticky-footer)
+                   {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
+            (if (not loaded?)
+              [spinner/circular-progress]
+              [(if wide? :div :div.wrapper)
+               (if wide?
+                 {}
+                 (stylefy/use-style {:transition "margin-top 300ms ease"}))
+               [:div (cond
+                       (= :front-page (:page app))
+                       {:class "container-fluid"}
 
-                         wide?
-                         {}
+                       wide?
+                       {}
 
-                         :else
-                         {:style {:padding-bottom "20px"}
-                          :class "container"})
-                  [document-title (:page app)]
+                       :else
+                       {:style {:padding-bottom "20px"}
+                        :class "container"})
+                [document-title (:page app)]
 
-                  ;; Ensure that a new scroll-to-page component is created when page changes
-                  ^{:key (name (:page app))}
-                  [scroll-to-page (:page app)]
+                ;; Ensure that a new scroll-to-page component is created when page changes
+                ^{:key (name (:page app))}
+                [scroll-to-page (:page app)]
 
-                  (case (:page app)
-                    :login [login/login e! (:login app)]
-                    :error-landing [error-landing/error-landing-vw app]
-                    :reset-password [login/reset-password e! app]
-                    :register [register/register e! (:params app) (:register app) (:user app)]
-                    :user [user/user e! (:user app)]
-                    :user-edit [user-edit/edit-user e! app]
-                    :front-page [fp/front-page e! app]
-                    :own-services [os/own-services e! app]
-                    :transport-service [service-type/select-service-type e! app]
-                    :transport-operator [to/operator e! app]
-                    :operator-users [ou/manage-access e! app]
-                    ;; Routes for the service form, one for editing an existing one by id
-                    ;; and another when creating a new service
-                    :edit-service [t-service/edit-service-by-id e! app]
-                    :new-service [t-service/create-new-service e! app]
+                (case (:page app)
+                  :login [login/login e! (:login app)]
+                  :error-landing [error-landing/error-landing-vw app]
+                  :reset-password [login/reset-password e! app]
+                  :register [register/register e! (:params app) (:register app) (:user app)]
+                  :user [user/user e! (:user app)]
+                  :user-edit [user-edit/edit-user e! app]
+                  :front-page [fp/front-page e! app]
+                  :own-services [os/own-services e! app]
+                  :transport-service [service-type/select-service-type e! app]
+                  :transport-operator [to/operator e! app]
+                  :operator-users [ou/manage-access e! app]
+                  ;; Routes for the service form, one for editing an existing one by id
+                  ;; and another when creating a new service
+                  :edit-service [t-service/edit-service-by-id e! app]
+                  :new-service [t-service/create-new-service e! app]
 
-                    ;; service catalog page
-                    :services [service-search/service-search e! app]
-                    :service-view [sv/service-view e! app]
+                  ;; service catalog page
+                  :services [service-search/service-search e! app]
+                  :service-view [sv/service-view e! app]
 
-                    :admin [admin/admin-panel e! app]
-                    :admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
-                    :admin-route-id [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-route-id")]
-                    :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-upload-gtfs")]
-                    :admin-commercial-services [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-commercial-services")]
-                    :admin-exception-days [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-exception-days")]
+                  :admin [admin/admin-panel e! app]
+                  :admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
+                  :admin-route-id [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-route-id")]
+                  :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-upload-gtfs")]
+                  :admin-commercial-services [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-commercial-services")]
+                  :admin-exception-days [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-exception-days")]
 
-                    :email-settings [email-settings/email-notification-settings e! app]
-                    :confirm-email [ce/confirm-email e! app]
-                    :resend-confirmation [rc/email-confirmation-form e! app]
+                  :email-settings [email-settings/email-notification-settings e! app]
+                  :confirm-email [ce/confirm-email e! app]
+                  :resend-confirmation [rc/email-confirmation-form e! app]
 
-                    :routes [route-list/routes e! app]
-                    :new-route [route/new-route e! app]
-                    :edit-route [route/edit-route-by-id e! app]
+                  :routes [route-list/routes e! app]
+                  :new-route [route/new-route e! app]
+                  :edit-route [route/edit-route-by-id e! app]
 
-                    :monitor [monitor/monitor-main e! app]
+                  :monitor [monitor/monitor-main e! app]
 
-                    ;; 60days pre notice views
-                    :new-notice [notice/new-pre-notice e! app]
-                    :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
-                    :pre-notices [pre-notices-listing/pre-notices e! app]
+                  ;; 60days pre notice views
+                  :new-notice [notice/new-pre-notice e! app]
+                  :edit-pre-notice [notice/edit-pre-notice-by-id e! app]
+                  :pre-notices [pre-notices-listing/pre-notices e! app]
 
-                    :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                    :transit-visualization [transit-visualization/transit-visualization e! app]
+                  :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
+                  :transit-visualization [transit-visualization/transit-visualization e! app]
 
-                    (:transit-changes :authority-pre-notices)
-                    [transit-changes/transit-changes e! app]
+                  (:transit-changes :authority-pre-notices)
+                  [transit-changes/transit-changes e! app]
 
-                    [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
-              [footer/footer e!]]])]]))))
+                  [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
+            [footer/footer e!]]])]])))
