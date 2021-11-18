@@ -22,26 +22,8 @@
             [ote.views.theme :refer [theme]]
             [ote.views.footer :as footer]
             [ote.views.front-page :as fp]
-            [ote.views.transport-operator :as to]))
-
-(defn header-scroll-sensor [is-scrolled? trigger-offset]
-  (let [sensor-node (atom nil)
-        check-scroll (fn []
-                       (let [element-y (.-top (.getBoundingClientRect @sensor-node))]
-                         (reset! is-scrolled? (< element-y trigger-offset))))]
-
-    (r/create-class
-      {:component-did-mount
-       (fn [this]
-         (reset! sensor-node (aget this "refs" "sensor"))
-         (check-scroll)
-         (.addEventListener js/window "scroll" check-scroll))
-       :component-will-unmount
-       (fn [this]
-         (.removeEventListener js/window "scroll" check-scroll))
-       :reagent-render
-       (fn [_]
-         [:span {:ref "sensor"}])})))
+            [ote.views.transport-operator :as to]
+            [re-svg-icons.feather-icons :as feather-icons]))
 
 (defn esc-press-listener [e! app]
   "Listens to keydown events on document. If esc is clicked call CloseHeaderMenus"
@@ -140,7 +122,7 @@
                                        (e! (login/->Logout)))})
              (tr [:common-texts :user-menu-log-out])]]]]]]])))
 
-(defn- top-nav-drop-down-menu [e! app is-scrolled? pages]
+(defn- top-nav-drop-down-menu [e! app pages]
   (let [header-open? (get-in app [:ote-service-flags :header-open])]
     [:div {:style (merge style-topnav/topnav-dropdown
                          (if header-open?
@@ -292,7 +274,7 @@
           [:span (stylefy/use-style style-topnav/gray-info-text)
            (tr [:common-texts :navigation-feedback-email])]]]]]]]))
 
-(defn- top-nav-links [e! {:keys [user] :as app} is-scrolled?]
+(defn- top-nav-links [e! {:keys [user] :as app}]
   (let [current-language @localization/selected-language]
     [:div.navbar (stylefy/use-style style-topnav/clear)
      [:ul (stylefy/use-style style-topnav/ul)
@@ -300,18 +282,11 @@
        [:a
         {:style (merge
                   style-topnav/desktop-link
-                  (if @is-scrolled?
-                    {:padding-top "0px"}
-                    {:padding-top "11px"}))
+                  {:padding-top "11px"})
          :href "/#/"
          :on-click #(do
                       (e! (fp-controller/->CloseHeaderMenus))
-                      (routes/navigate! :front-page))}
-        [:img {:style (merge
-                        style-topnav/logo
-                        (when @is-scrolled?
-                          style-topnav/logo-small))
-               :src "img/icons/nap-logo.svg"}]]]
+                      (routes/navigate! :front-page))}]]
 
       (doall
         (for [{:keys [page label url]}
@@ -324,10 +299,7 @@
           [:li.hidden-xs.hidden-sm
            [:a
             (merge
-              (stylefy/use-style
-                (merge style-topnav/desktop-link
-                       (when @is-scrolled?
-                         {:height "56px"})))
+              (stylefy/use-style style-topnav/desktop-link)
               {:href (str "/#/" (name page))
                :on-click #(do
                             (.preventDefault %)
@@ -339,9 +311,7 @@
       [:li (stylefy/use-style style-topnav/li-right)
        [:div (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :lang-menu-open])
                                                 style-topnav/li-right-div-blue
-                                                style-topnav/li-right-div-white)
-                                              (when @is-scrolled?
-                                                {:height "56px"})))
+                                                style-topnav/li-right-div-white)))
                     {:on-click #(e! (fp-controller/->OpenLangMenu))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
@@ -353,9 +323,7 @@
       [:li (stylefy/use-style style-topnav/li-right)
        [:div.header-general-menu (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :header-open])
                                                                     style-topnav/li-right-div-blue
-                                                                    style-topnav/li-right-div-white)
-                                                                  (when @is-scrolled?
-                                                                    {:height "56px"})))
+                                                                    style-topnav/li-right-div-white)))
                                         {:on-click #(e! (fp-controller/->OpenHeader))})
         [:div {:style (merge {:transition "margin-top 300ms ease"}
                              {:margin-top "7px"})}
@@ -368,9 +336,7 @@
         [:li (stylefy/use-style style-topnav/li-right)
          [:div.header-user-menu (merge (stylefy/use-style (merge (if (get-in app [:ote-service-flags :user-menu-open])
                                                                    style-topnav/li-right-div-blue
-                                                                   style-topnav/li-right-div-white)
-                                                                 (when @is-scrolled?
-                                                                   {:height "56px"})))
+                                                                   style-topnav/li-right-div-white)))
                                        {:on-click #(e! (fp-controller/->OpenUserMenu))})
           [:div {:style (merge {:transition "margin-top 300ms ease"}
                                {:margin-top "7px"})}
@@ -385,26 +351,18 @@
 
       (when (not (user-logged-in? app))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
-                                                (when @is-scrolled?
-                                                  {:height "56px"})))
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white))
                       {:on-click #(e! (fp-controller/->ToggleRegistrationDialog))})
-          [:div {:style (merge {:transition "margin-top 300ms ease"}
-                               (if @is-scrolled?
-                                 {:margin-top "0px"}
-                                 {:margin-top "0px"}))}
+          [:div {:style (merge {:transition "margin-top 300ms ease"
+                                :margin-top "0px"})}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-register])]]]])
 
       (when (and (not (user-logged-in? app)) (flags/enabled? :ote-login))
         [:li (stylefy/use-style style-topnav/li-right)
-         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white
-                                                (when @is-scrolled?
-                                                  {:height "56px"})))
+         [:div (merge (stylefy/use-style (merge style-topnav/li-right-div-white))
                       {:on-click #(e! (login/->ShowLoginPage))})
-          [:div {:style (merge {:transition "margin-top 300ms ease"}
-                               (if @is-scrolled?
-                                 {:margin-top "0px"}
-                                 {:margin-top "0px"}))}
+          [:div {:style {:transition "margin-top 300ms ease"
+                         :margin-top "0px"}}
            [:span.hidden-xs {:style {:color "#fff"}} (tr [:common-texts :navigation-login])]]]])]]))
 
 (defn tos [e! app desktop?]
@@ -441,7 +399,7 @@
                              (e! (fp-controller/->CloseTermsAndPrivacy user)))}
          [ic/navigation-close {:style {:color "#FFFFFF"}}]]]])))
 
-(defn top-nav [e! app is-scrolled? desktop?]
+(defn tos-notification [e! app desktop?]
   (let [user (:user app)
         page (:page app)
         user-logged-in? (not (nil? user))
