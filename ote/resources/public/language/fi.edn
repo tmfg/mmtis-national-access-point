@@ -1726,9 +1726,9 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  ;; Fintraffic common quicklink header
  :quicklink-header
- {:liikennetilanne "Liikennetilanne"
-  :palautevayla "Palauteväylä"
-  :junalahdot "Junalähdöt"
+ {:traffic-situation "Liikennetilanne"
+  :feedback-channel "Palauteväylä"
+  :train-departures "Junalähdöt"
   :skynavx "Drone-palvelut"
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"

@@ -1717,9 +1717,9 @@ You can also draw the operating area or point to the map with drawing tools. You
 
  ;; Fintraffic common quicklink header
  :quicklink-header
- {:liikennetilanne "Traffic Situation"
-  :palautevayla "Feedback Channel"
-  :junalahdot "Train Departures"
+ {:traffic-situation "Traffic Situation"
+  :feedback-channel "Feedback Channel"
+  :train-departures "Train Departures"
   :skynavx "Drone services"
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"

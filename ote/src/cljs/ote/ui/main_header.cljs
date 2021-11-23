@@ -146,7 +146,7 @@
    [:span (stylefy/use-style {:display "flex"})
 
     ; TODO: Not sure where "tiedotteet" should be...
-    #_[bottombar-dropdown e! app {:tag              :ajankohtaista
+    #_[bottombar-dropdown e! app {:tag              :updates
                                   :entries          []#_[[:tiedotteet "Tiedotteet"]]
                                   :label            "Ajankohtaista"
                                   :state-flag [:ote-service-flags :lang-TODO-open]  ; TODO
@@ -261,14 +261,14 @@
                                                        (e! (fp-controller/->SetLanguage (:key entry))))}]]])
 
 (def quicklink-urls
-  {:fintraffic      {:url "https://www.fintraffic.fi/fi"                :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :liikennetilanne {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :palautevayla    {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
-   :junalahdot      {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
-   :skynavx         {:url "https://skynavx.fi/#/drone"                  :langs {}}
-   :digitraffic     {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
-   :digitransit     {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
-   :finap           {:url "https://finap.fi/#/"                         :langs {}}})
+  {:fintraffic        {:url "https://www.fintraffic.fi/fi"                :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
+   :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
+   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
+   :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
+   :finap             {:url "https://finap.fi/#/"                         :langs {}}})
 
 (defn- localized-quicklink-uri [quicklink]
   (let [current-language    (or (keyword @localization/selected-language) :fi)
@@ -280,9 +280,9 @@
   [:ul (stylefy/use-style style-topnav/fintraffic-quick-links-menu)
      (doall
        (for [[href service] (map (juxt localized-quicklink-uri identity)
-                                 [:liikennetilanne
-                                  :palautevayla
-                                  :junalahdot
+                                 [:traffic-situation
+                                  :feedback-channel
+                                  :train-departures
                                   :skynavx
                                   :digitraffic
                                   :digitransit

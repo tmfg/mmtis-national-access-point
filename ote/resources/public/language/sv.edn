@@ -1720,9 +1720,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  ;; Fintraffic common quicklink header
  :quicklink-header
- {:liikennetilanne "Trafikläget"
-  :palautevayla "Responskanalen"
-  :junalahdot "Tågavgångar"
+ {:traffic-situation "Trafikläget"
+  :feedback-channel "Responskanalen"
+  :train-departures "Tågavgångar"
   :skynavx "Drone-tjänster"
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
