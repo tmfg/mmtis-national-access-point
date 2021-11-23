@@ -41,7 +41,7 @@
                        :background-color "#fff"
                        :flex-direction "row"
                        :justify-content "flex-start"
-                       :min-height "54px"})
+                       :min-height "56px"})
 
 (def nap-menu {:height "100%"
                :width "100%"})
