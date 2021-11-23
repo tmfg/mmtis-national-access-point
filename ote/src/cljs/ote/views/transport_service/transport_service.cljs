@@ -77,7 +77,7 @@
             edit-header-text (edit-service-header-text service-type)]
         [:div
          [ui-common/rotate-device-notice]
-         [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+         [:div.container {:style {:padding-top "3rem"}}
           [:h1 edit-header-text]
           (when (ts-controller/in-readonly? in-validation? admin-validating-id service-id)
             [:div {:style {:margin-bottom "1.5rem"}}
@@ -131,7 +131,7 @@
 
       [:div
        [ui-common/rotate-device-notice]
-       [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+       [:div.container {:style {:padding-top "3rem"}}
         [:h1 new-header-text]
         [:div {:style {:padding-top "1rem"}}
          [:div [:strong (str (tr [:transport-services-common-page :title-transport-operator]) ": ")] operator-name]

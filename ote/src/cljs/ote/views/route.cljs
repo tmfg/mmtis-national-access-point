@@ -116,7 +116,7 @@
 (defn new-route [e! {:keys [route] :as app}]
   (when-not (nil? route)
     [:div
-     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+     [:div.container {:style {:padding-top "3rem"}}
      [form-container e! app]]
      [:div (stylefy/use-style style-base/form-footer)
       [:div.container
@@ -139,7 +139,7 @@
 
 (defn edit-route-by-id [e! {:keys [route] :as app}]
   [:div
-   [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+   [:div.container {:style {:padding-top "3rem"}}
     [form-container e! app]]
    [:div (stylefy/use-style style-base/form-footer)
     [:div.container
