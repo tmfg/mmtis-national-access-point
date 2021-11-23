@@ -14,9 +14,11 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
+(defrecord OpenServiceInfoMenu [])
+(defrecord OpenMyServicesMenu [])
 (defrecord OpenUserMenu [])
-(defrecord OpenHeader [])
 (defrecord OpenLangMenu [])
+(defrecord OpenHeader [])
 (defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
@@ -85,20 +87,33 @@
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
 
+  OpenServiceInfoMenu
+  (process-event [_ app]
+    (-> app
+        (assoc-in [:ote-service-flags :service-info-menu-open]
+                  (if (get-in app [:ote-service-flags :service-info-menu-open]) false true))
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :header-open] false)))
+
+  OpenMyServicesMenu
+  (process-event [_ app]
+    (-> app
+      (assoc-in [:ote-service-flags :my-services-menu-open]
+                (if (get-in app [:ote-service-flags :my-services-menu-open]) false true))
+      (assoc-in [:ote-service-flags :service-info-menu-open] false)
+      (assoc-in [:ote-service-flags :header-open] false)
+      (assoc-in [:ote-service-flags :user-menu-open] false)
+      (assoc-in [:ote-service-flags :lang-menu-open] false)))
+
   OpenUserMenu
   (process-event [_ app]
     (-> app
       (assoc-in [:ote-service-flags :user-menu-open]
                 (if (get-in app [:ote-service-flags :user-menu-open]) false true))
+      (assoc-in [:ote-service-flags :service-info-menu-open] false)
+      (assoc-in [:ote-service-flags :my-services-menu-open] false)
       (assoc-in [:ote-service-flags :header-open] false)
-      (assoc-in [:ote-service-flags :lang-menu-open] false)))
-
-  OpenHeader
-  (process-event [_ app]
-    (-> app
-      (assoc-in [:ote-service-flags :header-open]
-              (if (get-in app [:ote-service-flags :header-open]) false true))
-      (assoc-in [:ote-service-flags :user-menu-open] false)
       (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
   OpenLangMenu
@@ -106,14 +121,29 @@
     (-> app
       (assoc-in [:ote-service-flags :lang-menu-open]
                 (if (get-in app [:ote-service-flags :lang-menu-open]) false true))
+      (assoc-in [:ote-service-flags :service-info-menu-open] false)
+      (assoc-in [:ote-service-flags :my-services-menu-open] false)
       (assoc-in [:ote-service-flags :user-menu-open] false)
       (assoc-in [:ote-service-flags :header-open] false)))
 
+  ; TODO: this is probably pointless
+  OpenHeader
+  (process-event [_ app]
+    (-> app
+        (assoc-in [:ote-service-flags :header-open]
+                  (if (get-in app [:ote-service-flags :header-open]) false true))
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+; TODO: Add all menus here
   CloseHeaderMenus
   (process-event [_ app]
     (-> app
-        (assoc-in [:ote-service-flags :lang-menu-open] false)
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :lang-menu-open] false)
         (assoc-in [:ote-service-flags :header-open] false)))
 
   Logout

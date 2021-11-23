@@ -1071,6 +1071,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-terms-of-service-text "Användarvillkor"
   :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/Anvandarvillkor%20for%20NAP-tjanst.pdf"
   :navigation-terms-and-cookies " för tjänsten, inklusive användningen av kakor (cookies)."
+  :navigation-service-info-menu "TODO Tietoa palvelusta"
+  :navigation-my-services-menu "TODO my services"
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"

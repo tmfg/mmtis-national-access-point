@@ -419,6 +419,171 @@
             first
             second)))
 
+(defn bottombar-dropdown [e! app options]
+  (let [{:keys [tag entries label prefix-icon menu-click-handler entry-click-handler state-flag]} options
+        menu-open?                                                                            (get-in app state-flag)]
+   [:div (stylefy/use-style {:align-self "center"})
+    [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
+                    {:on-click menu-click-handler})
+     ; prefix icon
+     (when prefix-icon
+       [prefix-icon (stylefy/use-style (merge style-topnav/bottombar-entry-icon
+                                                        {:margin-right ".5rem"}))])
+     ; label
+     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+      (if (not (nil? label)) label)]
+
+     ; dropdown open link
+     [(if menu-open?
+        feather-icons/chevron-up
+        feather-icons/chevron-down)
+      (stylefy/use-style style-topnav/bottombar-entry-icon)]]
+
+    ; menu items
+    [:ul (merge (stylefy/use-style (merge style-topnav/nap-languages-switcher-menu
+                                                  (when (not menu-open?)
+                                                    {:display "none"})))
+                {:id (str (name tag) "-menu")})
+     (doall
+       (for [{:keys [key label href target] :or [href "#"]} (filter some? entries)]
+         ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
+         [:li (stylefy/use-style style-topnav/nap-languages-switcher-item)
+          [:a (merge (stylefy/use-style style-topnav/nap-languages-switcher-link)
+                     {:key (name key)
+                      :href href
+                      ; the rewrapping of entry values to map is done manually instead of using map destructuring's
+                      ; :as directive because the :as doesn't include default values from :or directive
+                      :on-click #(entry-click-handler % {:key key :label label :href href})}
+                     (when (some? target)
+                       {:target target}))
+           (str label)]]))]
+    ]))
+
+(defn bottombar-spacer
+  "Horizontal spacing to give entries a bit of breathing room."
+  []
+  [:span {:style {:margin-right "1.2rem"}}])
+
+(defn nap-bottombar [e! app]
+  [:div (stylefy/use-style style-topnav/header-bottombar)
+   ; left grouped entries
+   [:span (stylefy/use-style {:display "flex"})
+
+    ; TODO: Not sure where "tiedotteet" should be...
+    #_[bottombar-dropdown e! app {:tag              :ajankohtaista
+                                  :entries          []#_[[:tiedotteet "Tiedotteet"]]
+                                  :label            "Ajankohtaista"
+                                  :state-flag [:ote-service-flags :lang-TODO-open]  ; TODO
+                                      :menu-click-handler identity
+                                  :entry-click-handler identity}]
+
+    [bottombar-spacer]
+
+    [bottombar-dropdown e! app {:tag                 :service-info
+                                :entries             [{:key :ohjeet
+                                                       :label (tr [:common-texts :user-menu-nap-help])
+                                                       :href (tr [:common-texts :user-menu-nap-help-link])
+                                                       :target "_blank"}
+                                                      {:key :rajapinta
+                                                       :label (tr [:common-texts :navigation-for-developers])
+                                                       :href "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
+                                                       :target "_blank"}
+                                                      (when (flags/enabled? :terms-of-service)
+                                                        {:key :käyttöehdot
+                                                         :label (tr [:common-texts :navigation-terms-of-service-text])
+                                                         :href (tr [:common-texts :navigation-terms-of-service-url])
+                                                         :target "_blank"})
+                                                      {:key :tietosuojaseloste
+                                                       :label (tr [:common-texts :navigation-privacy-policy])
+                                                       :href (tr [:common-texts :navigation-privacy-policy-url])
+                                                       :target "_blank"}]
+                                :label               (tr [:common-texts :navigation-service-info-menu])
+                                :state-flag          [:ote-service-flags :service-info-menu-open]  ; TODO
+                                :menu-click-handler  #(e! (fp-controller/->OpenServiceInfoMenu))
+                                :entry-click-handler identity}]
+
+    ; TODO: I don't think we have "Tuen tarjonta" page yet...?
+    #_[bottombar-spacer]
+    #_[bottombar-dropdown e! app  {:tag                 :support
+                                   :entries             [[:tuen-tarjonta "Tuen tarjonta"]]
+                                   :label               "Tuki"
+                                   :state-flag          [:ote-service-flags :lang-TODO-open]  ; TODO
+                                   :menu-click-handler  identity
+                                   :entry-click-handler identity}]
+
+    [bottombar-spacer]
+
+    (when (user-logged-in? app)
+      [bottombar-dropdown e! app {:tag                 :my-services
+                                  :entries             [{:key :services
+                                                         :label (tr [:document-title :services])
+                                                         :href "#/services"}
+                                                        {:key :own-services
+                                                         :label (tr [:document-title :own-services])
+                                                         :href "#/own-services"}
+                                                        {:key :routes
+                                                         :label (tr [:common-texts :navigation-route])
+                                                         :href "#/routes"}
+                                                        {:key :pre-notices
+                                                         :label (tr [:common-texts :navigation-pre-notice])
+                                                         :href "#/pre-notices"}
+                                                        {:key :authority-pre-notices
+                                                         :label (tr [:common-texts :navigation-authority-pre-notices])
+                                                         :href "#/authority-pre-notices"}
+                                                        {:key :admin
+                                                         :label (tr [:document-title :admin])
+                                                         :href "#/admin"}
+                                                        {:key :monitor
+                                                         :label (tr [:document-title :monitor])
+                                                         :href "#/monitor"}]
+                                  :label               (tr [:common-texts :navigation-my-services-menu])
+                                  :state-flag          [:ote-service-flags :my-services-menu-open]
+                                  :menu-click-handler  #(e! (fp-controller/->OpenMyServicesMenu))
+                                  :entry-click-handler (fn [e entry]
+                                                         (routes/navigate! (:key entry))
+                                                         (e! (fp-controller/->OpenMyServicesMenu)))}])
+   ]
+   ; right aligned entries
+   [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
+    ; TODO: alternate links when logged out, for logging in/registering
+    (when (user-logged-in? app)
+      [bottombar-dropdown e! app {:tag                 :user-details
+                                  :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
+                                                         :label (tr [:common-texts :navigation-email-notification-settings])
+                                                         :href  "#/email-settings"}
+                                                        {:key   :Käyttäjätilin-muokkaus
+                                                         :label (tr [:common-texts :user-menu-profile])
+                                                         :href "#/user"}
+                                                        {:key   :Kirjaudu-ulos
+                                                         :label (tr [:common-texts :user-menu-log-out])}]
+                                  :label               (get-in app [:user :name])
+                                  :prefix-icon         feather-icons/user
+                                  :state-flag          [:ote-service-flags :user-menu-open]
+                                  :menu-click-handler  #(e! (fp-controller/->OpenUserMenu))
+                                  :entry-click-handler (fn [e entry]
+                                                         (when (= (:key entry) :Kirjaudu-ulos)
+                                                           (.preventDefault e)
+                                                           (e! (fp-controller/->OpenUserMenu))
+                                                           (e! (login/->Logout))))}])
+
+    [bottombar-spacer]
+
+    [bottombar-dropdown e! app {:tag                 :language-selector
+                                :entries             [{:key "fi"
+                                                       :label "Suomeksi"}
+                                                      {:key "sv"
+                                                       :label "På Svenska"}
+                                                      {:key "en"
+                                                       :label "In English"}]
+                                :label               (get-lang-label @localization/selected-language)
+                                :prefix-icon         feather-icons/globe
+                                :state-flag          [:ote-service-flags :lang-menu-open]
+                                :menu-click-handler  #(e! (fp-controller/->OpenLangMenu))
+                                :entry-click-handler (fn [e entry]
+                                                       (.preventDefault e)
+                                                       (e! (fp-controller/->OpenLangMenu))
+                                                       (e! (fp-controller/->SetLanguage (:key entry))))}]]])
+
 (defn nap-navbar [e! app desktop?]
   (let [lang-menu-open? (get-in app [:ote-service-flags :lang-menu-open])]
     [:div (stylefy/use-style style-topnav/header-bottombar)
@@ -436,7 +601,6 @@
          [:a (stylefy/use-style style-topnav/nap-menu-links-link) "entry 3"]]]]]
 
      [:div (stylefy/use-style style-topnav/nap-languages)
-      [:div (stylefy/use-style style-topnav/nap-languages-switcher)]
       [:button (merge (stylefy/use-style style-topnav/nap-languages-switcher-button)
                       {:on-click #(e! (fp-controller/->OpenLangMenu))}
                       #_{:on-click (fn [] (reset! menu-visible (not @menu-visible)))})
@@ -479,7 +643,7 @@
    :finap           {:url "https://finap.fi/#/"                         :langs {}}})
 
 (defn- localized-quicklink-uri [quicklink]
-  (let [current-language    (or @localization/selected-language :fi)
+  (let [current-language    (or (keyword @localization/selected-language) :fi)
         {:keys [url langs]} (get quicklink-urls quicklink)
         lang                (get langs current-language "")]
     (str url lang)))
@@ -517,7 +681,8 @@
 (defn header [e! app desktop?]
   [:header
    [fintraffic-navbar]
-   [nap-navbar e! app desktop?]
+   #_[nap-navbar e! app desktop?]
+   [nap-bottombar e! app]  ; navbar-refaktorointi
    ; old bar's remnants
    [:div
     [:div (stylefy/use-style style-topnav/topnav-wrapper)

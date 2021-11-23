@@ -107,12 +107,15 @@
                        :box-shadow "0 8px 6px -6px #f2f2f2"
                        :background-color "#fff"
                        :flex-direction "row"
-                       :justify-content "flex-end"
+                       :justify-content "flex-start"
                        :min-height "54px"})
 
-(def nap-navigation {:margin-right "auto"
-                                  :display "flex"
-                                  :align-items "center"})
+(def nap-navigation {:display "flex"
+                     :align-items "center"})
+
+(def left-aligned {:margin-right "2rem"})
+
+(def right-aligned {:margin-left "auto"})
 
 (def nap-menu {:height "100%"
                                  :width "100%"})
@@ -137,15 +140,29 @@
                                             :margin-right "1.2rem"
                                             :height "100%"})
 
-(def nap-languages {:align-self "center"})
+(def nap-languages {:align-self "center"
+                    :margin-left "auto"})
 
 (def nap-languages-switcher {:display "flex"
                              :position "relative"})
+
+
+(def bottombar-entry-icon {:color "#000"
+                           :width "16px"
+                           :height "16px"
+                           :align-self "center"})
 
 (def nap-languages-switcher-icon {:color "#000"
                                   :width "16px"
                                   :height "16px"
                                   :align-self "center"})
+
+(def bottombar-entry-button {:display "flex"
+                       :justify-content "center"
+                       :background-color "transparent"
+                       :border "0"
+                       :cursor "pointer"
+                       :padding 0})
 
 (def nap-languages-switcher-button {:display "flex"
                                     :justify-content "center"
