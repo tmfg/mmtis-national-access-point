@@ -307,7 +307,8 @@
     [fintraffic-quick-links]]])
 
 (defn header [e! app desktop?]
-  [:header
+  [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
+                    :z-index "100"}}
    [fintraffic-navbar]
    [nap-bottombar e! app]
    [esc-press-listener e! app]

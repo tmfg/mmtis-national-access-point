@@ -77,7 +77,7 @@
                                   :border-radius "3px"
                                   :position "absolute"
                                   :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
-                                  :z-index "1"})
+                                  })
 
 (def nap-languages-switcher-item {:border-bottom "1px solid #ddd"
                                   :display "block"
