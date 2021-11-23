@@ -135,6 +135,16 @@
            (str label)]]))]
     ]))
 
+(defn bottombar-simplelink [e! app options]
+  (let [{:keys [label menu-click-handler]} options]
+   [:div (stylefy/use-style {:align-self "center"})
+    [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
+                    {:on-click menu-click-handler})
+     ; label
+     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+      (if (not (nil? label)) label)]
+    ]]))
+
 (defn bottombar-spacer
   "Horizontal spacing to give entries a bit of breathing room."
   []
@@ -241,6 +251,18 @@
                                                            (.preventDefault e)
                                                            (e! (fp-controller/->ToggleUserMenu))
                                                            (e! (login/->Logout))))}])
+    ; reagent version in this project is so old that it doesn't support fragments ([:<>]) so have to do these three
+    ; like so...
+    (when (and (not (user-logged-in? app))
+               (flags/enabled? :ote-login))
+      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-login])
+                                    :menu-click-handler #(e! (login/->ShowLoginPage))}])
+
+    (when (not (user-logged-in? app)) [bottombar-spacer])
+
+    (when (not (user-logged-in? app))
+      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-register])
+                                    :menu-click-handler #(e! (fp-controller/->ToggleRegistrationDialog))}])
 
     [bottombar-spacer]
 
