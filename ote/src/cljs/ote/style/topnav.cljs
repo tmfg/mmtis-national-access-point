@@ -3,71 +3,12 @@
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
             [ote.style.base :as base]))
 
-(def topnav-wrapper {:width "100%"
-                     :top 0
-                     :z-index 1001
-                     :transition "all 300ms ease"
-                     ::stylefy/vendors ["webkit" "moz" "ms"]
-                     ::stylefy/auto-prefix #{:transition}})
-
-(def topnav-dropdown {:width "100%"
-                      :background-color "#000000"
-                      :min-height "120px"
-                      :padding-top "20px"
-                      :padding-bottom "20px"
-                      :border-top "2px solid #646464"
-                      :transition "visibility 300ms ease, opacity 300ms ease"
-                      :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
-                      ::stylefy/vendors ["webkit" "moz" "ms"]
-                      ::stylefy/auto-prefix #{:transition}})
-
-
-(def topnav {:min-height "56px"
-             :background-color "#000000"
-             :overflow "hidden"
-             :box-shadow "0 4px 4px 0 rgba(0, 0, 0, .2)"
-             :transition "all 300ms ease"
-             ::stylefy/vendors ["webkit" "moz" "ms"]
-             ::stylefy/auto-prefix #{:transition}})
-
-(def topnav-desktop (merge topnav {:height "80px"
-                                   :line-height "80px"}))
-
 (def clear {:clear "both"})
 
 (def bottom-border {:box-sizing "border-box"
                     :height "80px"
                     ::stylefy/vendors ["webkit" "moz" "ms"]
                     ::stylefy/auto-prefix #{:box-sizing}})
-
-(def ul {:list-style-type "none"})
-
-(def li-right {:font-size "0.875rem"
-               :float "right"
-               :padding-right "10px"})
-
-(def li-right-div {:display "flex"
-                   :cursor "pointer"
-                   :padding-right "10px"
-                   :margin-left "10px"
-                   ::stylefy/vendors ["webkit" "moz" "ms"]
-                   ::stylefy/auto-prefix #{:display}})
-
-(def li-right-div-blue (merge bottom-border li-right-div
-                              {:display "flex"
-                               :cursor "pointer"
-                               :border-bottom "4px solid rgb(102,163,224)"
-                               ::stylefy/vendors ["webkit" "moz" "ms"]
-                               ::stylefy/auto-prefix #{:display}}))
-
-(def li-right-div-white (merge bottom-border li-right-div
-                               {:display "flex"
-                                :cursor "pointer"
-                                ::stylefy/mode {:hover {:border-bottom "4px solid #fafafa"}}
-                                ::stylefy/vendors ["webkit" "moz" "ms"]
-                                ::stylefy/auto-prefix #{:display}}))
-
-(def mobile-li {:padding-top "10px" :padding-bottom "10px"})
 
 (def link {:display "block"
            :transition "padding-top 300ms ease, height 300ms ease"
@@ -81,14 +22,6 @@
                                    :border-bottom "4px solid #fafafa"}}
            ::stylefy/vendors ["webkit" "moz" "ms"]
            ::stylefy/auto-prefix #{:transition}})
-
-(def topnav-dropdown-link
-  {:color "#fafafa"
-   :padding "10px 0 10px 0"
-   :text-decoration "none"
-   :font-size "1rem"
-   :display "block"
-   ::stylefy/mode {:hover {:text-decoration "underline"}}})
 
 (def header-topbar {:display "flex"
                     :padding-left "2rem"
@@ -110,52 +43,13 @@
                        :justify-content "flex-start"
                        :min-height "54px"})
 
-(def nap-navigation {:display "flex"
-                     :align-items "center"})
-
-(def left-aligned {:margin-right "2rem"})
-
-(def right-aligned {:margin-left "auto"})
-
 (def nap-menu {:height "100%"
-                                 :width "100%"})
-
-(def nap-menu-links {:height "100%"
-                                       :margin "0"
-                                       :padding "0"
-                                       :list-style "none"
-                                       :flex-wrap "nowrap"
-                                       :justify-content "flex-end"
-                                       :display "flex"
-                                       :position "relative"})
-
-(def nap-menu-links-item {:position "relative"
-                                            :float "none"
-                                            :display "inline-block"})
-
-(def nap-menu-links-link {:position "relative"
-                                            :float "none"
-                                            :align-items "center"
-                                            :display "flex"
-                                            :margin-right "1.2rem"
-                                            :height "100%"})
-
-(def nap-languages {:align-self "center"
-                    :margin-left "auto"})
-
-(def nap-languages-switcher {:display "flex"
-                             :position "relative"})
-
+               :width "100%"})
 
 (def bottombar-entry-icon {:color "#000"
                            :width "16px"
                            :height "16px"
                            :align-self "center"})
-
-(def nap-languages-switcher-icon {:color "#000"
-                                  :width "16px"
-                                  :height "16px"
-                                  :align-self "center"})
 
 (def bottombar-entry-button {:display "flex"
                        :justify-content "center"
@@ -163,13 +57,6 @@
                        :border "0"
                        :cursor "pointer"
                        :padding 0})
-
-(def nap-languages-switcher-button {:display "flex"
-                                    :justify-content "center"
-                                    :background-color "transparent"
-                                    :border "0"
-                                    :cursor "pointer"
-                                    :padding 0})
 
 (def nap-languages-switcher-active {:margin-right ".5rem"})
 
@@ -244,29 +131,11 @@
            ::stylefy/vendors ["webkit" "moz" "ms"]
            ::stylefy/auto-prefix #{:flex :transition}})
 
-(def logo-small
-  (merge logo
-         {:transition "margin-top 300ms ease, height 300ms ease"
-          :margin-top "16px"
-          :height "24px"
-          ::stylefy/vendors ["webkit" "moz" "ms"]
-          ::stylefy/auto-prefix #{:transition}}))
-
-
 (def link-left (merge link
                       {:float "left"}))
 
 (def white-hover {:padding-bottom "0px"
                   :border-bottom "4px solid #fafafa"})
-
-(def default-main-header-object (merge bottom-border
-                                       {:padding-top "0px"
-                                        :padding-right "15px"
-                                        :padding-bottom "0px"
-                                        :padding-left "15px"}))
-(def desktop-link
-  (merge link-left default-main-header-object
-         {::stylefy/mode {:hover white-hover}}))
 
 (def active-style {:background "rgba(0, 0, 0, 0.3)"})
 

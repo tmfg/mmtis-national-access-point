@@ -18,7 +18,6 @@
 (defrecord OpenMyServicesMenu [])
 (defrecord OpenUserMenu [])
 (defrecord OpenLangMenu [])
-(defrecord OpenHeader [])
 (defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
@@ -126,17 +125,6 @@
       (assoc-in [:ote-service-flags :user-menu-open] false)
       (assoc-in [:ote-service-flags :header-open] false)))
 
-  ; TODO: this is probably pointless
-  OpenHeader
-  (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :header-open]
-                  (if (get-in app [:ote-service-flags :header-open]) false true))
-        (assoc-in [:ote-service-flags :service-info-menu-open] false)
-        (assoc-in [:ote-service-flags :my-services-menu-open] false)
-        (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open] false)))
-; TODO: Add all menus here
   CloseHeaderMenus
   (process-event [_ app]
     (-> app
