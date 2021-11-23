@@ -199,7 +199,7 @@
 
     [bottombar-spacer]
 
-    (when (user-logged-in? app)
+    (if (user-logged-in? app)
       [bottombar-dropdown e! app {:tag                 :my-services
                                   :entries             [{:key :services
                                                          :label (tr [:document-title :services])
@@ -227,7 +227,10 @@
                                   :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
                                   :entry-click-handler (fn [e entry]
                                                          (routes/navigate! (:key entry))
-                                                         (e! (fp-controller/->ToggleMyServicesMenu)))}])
+                                                         (e! (fp-controller/->ToggleMyServicesMenu)))}]
+      [bottombar-simplelink e! app {:label              (tr [:document-title :services])
+                                    :href               "#/services"
+                                    :menu-click-handler #(routes/navigate! :services)}])
    ]
    ; right aligned entries
    [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
