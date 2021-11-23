@@ -14,10 +14,10 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
-(defrecord OpenServiceInfoMenu [])
-(defrecord OpenMyServicesMenu [])
-(defrecord OpenUserMenu [])
-(defrecord OpenLangMenu [])
+(defrecord ToggleServiceInfoMenu [])
+(defrecord ToggleMyServicesMenu [])
+(defrecord ToggleUserMenu [])
+(defrecord ToggleLangMenu [])
 (defrecord CloseHeaderMenus [])
 (defrecord Logout [])
 (defrecord SetLanguage [lang])
@@ -86,44 +86,41 @@
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
 
-  OpenServiceInfoMenu
+  ToggleServiceInfoMenu
   (process-event [_ app]
     (-> app
         (assoc-in [:ote-service-flags :service-info-menu-open]
                   (if (get-in app [:ote-service-flags :service-info-menu-open]) false true))
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :header-open] false)))
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
-  OpenMyServicesMenu
+  ToggleMyServicesMenu
   (process-event [_ app]
     (-> app
-      (assoc-in [:ote-service-flags :my-services-menu-open]
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open]
                 (if (get-in app [:ote-service-flags :my-services-menu-open]) false true))
-      (assoc-in [:ote-service-flags :service-info-menu-open] false)
-      (assoc-in [:ote-service-flags :header-open] false)
-      (assoc-in [:ote-service-flags :user-menu-open] false)
-      (assoc-in [:ote-service-flags :lang-menu-open] false)))
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
-  OpenUserMenu
+  ToggleUserMenu
   (process-event [_ app]
     (-> app
-      (assoc-in [:ote-service-flags :user-menu-open]
-                (if (get-in app [:ote-service-flags :user-menu-open]) false true))
-      (assoc-in [:ote-service-flags :service-info-menu-open] false)
-      (assoc-in [:ote-service-flags :my-services-menu-open] false)
-      (assoc-in [:ote-service-flags :header-open] false)
-      (assoc-in [:ote-service-flags :lang-menu-open] false)))
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open]
+                  (if (get-in app [:ote-service-flags :user-menu-open]) false true))
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
-  OpenLangMenu
+  ToggleLangMenu
   (process-event [_ app]
     (-> app
-      (assoc-in [:ote-service-flags :lang-menu-open]
-                (if (get-in app [:ote-service-flags :lang-menu-open]) false true))
-      (assoc-in [:ote-service-flags :service-info-menu-open] false)
-      (assoc-in [:ote-service-flags :my-services-menu-open] false)
-      (assoc-in [:ote-service-flags :user-menu-open] false)
-      (assoc-in [:ote-service-flags :header-open] false)))
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :lang-menu-open]
+                  (if (get-in app [:ote-service-flags :lang-menu-open]) false true))))
 
   CloseHeaderMenus
   (process-event [_ app]
@@ -131,8 +128,7 @@
         (assoc-in [:ote-service-flags :service-info-menu-open] false)
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open] false)
-        (assoc-in [:ote-service-flags :header-open] false)))
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
 
   Logout
   (process-event [_ app]

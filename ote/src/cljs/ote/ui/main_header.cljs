@@ -175,7 +175,7 @@
                                                        :target "_blank"}]
                                 :label               (tr [:common-texts :navigation-service-info-menu])
                                 :state-flag          [:ote-service-flags :service-info-menu-open]  ; TODO
-                                :menu-click-handler  #(e! (fp-controller/->OpenServiceInfoMenu))
+                                :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
                                 :entry-click-handler identity}]
 
     ; TODO: I don't think we have "Tuen tarjonta" page yet...?
@@ -214,10 +214,10 @@
                                                          :href "#/monitor"}]
                                   :label               (tr [:common-texts :navigation-my-services-menu])
                                   :state-flag          [:ote-service-flags :my-services-menu-open]
-                                  :menu-click-handler  #(e! (fp-controller/->OpenMyServicesMenu))
+                                  :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
                                   :entry-click-handler (fn [e entry]
                                                          (routes/navigate! (:key entry))
-                                                         (e! (fp-controller/->OpenMyServicesMenu)))}])
+                                                         (e! (fp-controller/->ToggleMyServicesMenu)))}])
    ]
    ; right aligned entries
    [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
@@ -235,11 +235,11 @@
                                   :label               (get-in app [:user :name])
                                   :prefix-icon         feather-icons/user
                                   :state-flag          [:ote-service-flags :user-menu-open]
-                                  :menu-click-handler  #(e! (fp-controller/->OpenUserMenu))
+                                  :menu-click-handler  #(e! (fp-controller/->ToggleUserMenu))
                                   :entry-click-handler (fn [e entry]
                                                          (when (= (:key entry) :Kirjaudu-ulos)
                                                            (.preventDefault e)
-                                                           (e! (fp-controller/->OpenUserMenu))
+                                                           (e! (fp-controller/->ToggleUserMenu))
                                                            (e! (login/->Logout))))}])
 
     [bottombar-spacer]
@@ -254,10 +254,10 @@
                                 :label               (get-lang-label @localization/selected-language)
                                 :prefix-icon         feather-icons/globe
                                 :state-flag          [:ote-service-flags :lang-menu-open]
-                                :menu-click-handler  #(e! (fp-controller/->OpenLangMenu))
+                                :menu-click-handler  #(e! (fp-controller/->ToggleLangMenu))
                                 :entry-click-handler (fn [e entry]
                                                        (.preventDefault e)
-                                                       (e! (fp-controller/->OpenLangMenu))
+                                                       (e! (fp-controller/->ToggleLangMenu))
                                                        (e! (fp-controller/->SetLanguage (:key entry))))}]]])
 
 (def quicklink-urls
