@@ -121,7 +121,7 @@
                                                     {:display "none"})))
                 {:id (str (name tag) "-menu")})
      (doall
-       (for [{:keys [key label href target] :or [href "#"]} (filter some? entries)]
+       (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
          ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
          [:li (stylefy/use-style style-topnav/nap-languages-switcher-item)
           [:a (merge (stylefy/use-style style-topnav/nap-languages-switcher-link)
@@ -159,7 +159,7 @@
     #_[bottombar-dropdown e! app {:tag              :updates
                                   :entries          []#_[[:tiedotteet "Tiedotteet"]]
                                   :label            "Ajankohtaista"
-                                  :state-flag [:ote-service-flags :lang-TODO-open]  ; TODO
+                                  :state-flag [:ote-service-flags :lang-TODO-open]
                                       :menu-click-handler identity
                                   :entry-click-handler identity}]
 
@@ -184,7 +184,7 @@
                                                        :href (tr [:common-texts :navigation-privacy-policy-url])
                                                        :target "_blank"}]
                                 :label               (tr [:common-texts :navigation-service-info-menu])
-                                :state-flag          [:ote-service-flags :service-info-menu-open]  ; TODO
+                                :state-flag          [:ote-service-flags :service-info-menu-open]
                                 :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
                                 :entry-click-handler identity}]
 
@@ -193,7 +193,7 @@
     #_[bottombar-dropdown e! app  {:tag                 :support
                                    :entries             [[:tuen-tarjonta "Tuen tarjonta"]]
                                    :label               "Tuki"
-                                   :state-flag          [:ote-service-flags :lang-TODO-open]  ; TODO
+                                   :state-flag          [:ote-service-flags :lang-TODO-open]
                                    :menu-click-handler  identity
                                    :entry-click-handler identity}]
 
@@ -234,7 +234,6 @@
    ]
    ; right aligned entries
    [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
-    ; TODO: alternate links when logged out, for logging in/registering
     (when (user-logged-in? app)
       [bottombar-dropdown e! app {:tag                 :user-details
                                   :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
@@ -322,7 +321,6 @@
             [:div (stylefy/use-style style-topnav/fintraffic-quick-links-uparrow) ""])]))])
 
 (defn- fintraffic-navbar []
-  ; TODO: ::before height .5rem, width .5rem, display: block, position:absolute...
   [:div (stylefy/use-style style-topnav/header-topbar)
    [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
               {:href (localized-quicklink-uri :fintraffic)})
@@ -333,7 +331,7 @@
 
 (defn header [e! app desktop?]
   [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
-                    :z-index "100"}}
+                    :z-index    "100"}}
    [fintraffic-navbar]
    [nap-bottombar e! app]
    [esc-press-listener e! app]
