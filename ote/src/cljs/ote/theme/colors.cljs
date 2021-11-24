@@ -14,6 +14,7 @@
 
 (def primary-background-color basic-black)
 (def primary-text-color basic-white)
+(def primary-button-background-color dark-blue)
 
 (def blue-lighter "#66a3e0")
 (def blue-light "#3385d6")
