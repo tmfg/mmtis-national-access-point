@@ -1076,6 +1076,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-terms-of-service-text "Käyttöehdot"
   :navigation-terms-of-service-url "https://www.traficom.fi/sites/default/files/media/file/NAP-palvelun%20kayttoehdot.pdf"
   :navigation-terms-and-cookies ", mukaan lukien evästekäytännöt."
+  :navigation-service-info-menu "Tietoa palvelusta"
+  :navigation-my-services-menu "Omat Palvelut"
   :navigation-general-menu "Valikko"
   :navigation-for-developers "Ohjelmointirajapinta kehittäjille"
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
@@ -1721,4 +1723,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :UM "Yhdysvaltain erillissaaret"
   :VI "Yhdysvaltain Neitsytsaaret"
   :ZW "Zimbabwe"}
+
+ ;; Fintraffic common quicklink header
+ :quicklink-header
+ {:traffic-situation "Liikennetilanne"
+  :feedback-channel "Palauteväylä"
+  :train-departures "Junalähdöt"
+  :skynavx "Drone-palvelut"
+  :digitraffic "Digitraffic"
+  :digitransit "Digitransit"
+  :finap "NAP"}
  }

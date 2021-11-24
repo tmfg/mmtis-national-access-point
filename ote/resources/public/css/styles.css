@@ -6,6 +6,7 @@ html {
     height: 100%;
     min-height: 100%;
     line-height: 1.5;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html table {
@@ -21,7 +22,6 @@ body {
     color: #444444;
     background-color: #fafafa;
 }
-
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -155,14 +155,6 @@ In order to our OTE menu to render correctly work, we need to reset margin and p
 
 .wrapper {
     padding: 20px 0px 0px 0px;
-    margin-top: 80px;
-}
-
-/* Disable top margin for h1 inside wrapper, we do not need top margin for these, as they are our titles.
-   The needed margin comes from .wrapper class.
- */
-.wrapper h1 {
-    margin-top: 0;
 }
 
 .grey-wrapper {
