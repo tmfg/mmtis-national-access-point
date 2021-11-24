@@ -163,6 +163,11 @@
                                       :menu-click-handler identity
                                   :entry-click-handler identity}]
 
+    #_[bottombar-spacer]
+
+    [bottombar-simplelink e! app {:label              "NAP"
+                                  :menu-click-handler #(routes/navigate! :front-page)}]
+
     [bottombar-spacer]
 
     [bottombar-dropdown e! app {:tag                 :service-info
