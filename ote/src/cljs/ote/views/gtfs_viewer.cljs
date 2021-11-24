@@ -103,8 +103,7 @@
 (defn gtfs-viewer [e! {gtfs :gtfs-viewer}]
   [:div.gtfs-viewer
    (if-let [err (:error-message gtfs)]
-     [:div (use-style (merge style-base/error-element
-                             {:margin-top "40px"}))
+     [:div (use-style style-base/error-element)
       err]
      [:div
       [page/page-controls

@@ -3,7 +3,6 @@
 
 (def page-controls
   {:background-color "#F0F0F0"
-   :margin-top "40px"
    :margin-bottom "1rem"
    :padding-top "2rem"
    :width "100%"

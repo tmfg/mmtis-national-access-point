@@ -121,7 +121,7 @@
                                                     {:display "none"})))
                 {:id (str (name tag) "-menu")})
      (doall
-       (for [{:keys [key label href target] :or [href "#"]} (filter some? entries)]
+       (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
          ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
          [:li (stylefy/use-style style-topnav/nap-languages-switcher-item)
           [:a (merge (stylefy/use-style style-topnav/nap-languages-switcher-link)
@@ -134,6 +134,16 @@
                        {:target target}))
            (str label)]]))]
     ]))
+
+(defn bottombar-simplelink [e! app options]
+  (let [{:keys [label menu-click-handler]} options]
+   [:div (stylefy/use-style {:align-self "center"})
+    [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
+                    {:on-click menu-click-handler})
+     ; label
+     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+      (if (not (nil? label)) label)]
+    ]]))
 
 (defn bottombar-spacer
   "Horizontal spacing to give entries a bit of breathing room."
@@ -149,9 +159,14 @@
     #_[bottombar-dropdown e! app {:tag              :updates
                                   :entries          []#_[[:tiedotteet "Tiedotteet"]]
                                   :label            "Ajankohtaista"
-                                  :state-flag [:ote-service-flags :lang-TODO-open]  ; TODO
+                                  :state-flag [:ote-service-flags :lang-TODO-open]
                                       :menu-click-handler identity
                                   :entry-click-handler identity}]
+
+    #_[bottombar-spacer]
+
+    [bottombar-simplelink e! app {:label              "NAP"
+                                  :menu-click-handler #(routes/navigate! :front-page)}]
 
     [bottombar-spacer]
 
@@ -174,7 +189,7 @@
                                                        :href (tr [:common-texts :navigation-privacy-policy-url])
                                                        :target "_blank"}]
                                 :label               (tr [:common-texts :navigation-service-info-menu])
-                                :state-flag          [:ote-service-flags :service-info-menu-open]  ; TODO
+                                :state-flag          [:ote-service-flags :service-info-menu-open]
                                 :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
                                 :entry-click-handler identity}]
 
@@ -183,13 +198,13 @@
     #_[bottombar-dropdown e! app  {:tag                 :support
                                    :entries             [[:tuen-tarjonta "Tuen tarjonta"]]
                                    :label               "Tuki"
-                                   :state-flag          [:ote-service-flags :lang-TODO-open]  ; TODO
+                                   :state-flag          [:ote-service-flags :lang-TODO-open]
                                    :menu-click-handler  identity
                                    :entry-click-handler identity}]
 
     [bottombar-spacer]
 
-    (when (user-logged-in? app)
+    (if (user-logged-in? app)
       [bottombar-dropdown e! app {:tag                 :my-services
                                   :entries             [{:key :services
                                                          :label (tr [:document-title :services])
@@ -217,11 +232,13 @@
                                   :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
                                   :entry-click-handler (fn [e entry]
                                                          (routes/navigate! (:key entry))
-                                                         (e! (fp-controller/->ToggleMyServicesMenu)))}])
+                                                         (e! (fp-controller/->ToggleMyServicesMenu)))}]
+      [bottombar-simplelink e! app {:label              (tr [:document-title :services])
+                                    :href               "#/services"
+                                    :menu-click-handler #(routes/navigate! :services)}])
    ]
    ; right aligned entries
    [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
-    ; TODO: alternate links when logged out, for logging in/registering
     (when (user-logged-in? app)
       [bottombar-dropdown e! app {:tag                 :user-details
                                   :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
@@ -241,6 +258,18 @@
                                                            (.preventDefault e)
                                                            (e! (fp-controller/->ToggleUserMenu))
                                                            (e! (login/->Logout))))}])
+    ; reagent version in this project is so old that it doesn't support fragments ([:<>]) so have to do these three
+    ; like so...
+    (when (and (not (user-logged-in? app))
+               (flags/enabled? :ote-login))
+      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-login])
+                                    :menu-click-handler #(e! (login/->ShowLoginPage))}])
+
+    (when (not (user-logged-in? app)) [bottombar-spacer])
+
+    (when (not (user-logged-in? app))
+      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-register])
+                                    :menu-click-handler #(e! (fp-controller/->ToggleRegistrationDialog))}])
 
     [bottombar-spacer]
 
@@ -297,7 +326,6 @@
             [:div (stylefy/use-style style-topnav/fintraffic-quick-links-uparrow) ""])]))])
 
 (defn- fintraffic-navbar []
-  ; TODO: ::before height .5rem, width .5rem, display: block, position:absolute...
   [:div (stylefy/use-style style-topnav/header-topbar)
    [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
               {:href (localized-quicklink-uri :fintraffic)})
@@ -307,7 +335,8 @@
     [fintraffic-quick-links]]])
 
 (defn header [e! app desktop?]
-  [:header
+  [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
+                    :z-index    "100"}}
    [fintraffic-navbar]
    [nap-bottombar e! app]
    [esc-press-listener e! app]

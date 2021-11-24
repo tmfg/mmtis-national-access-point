@@ -41,7 +41,7 @@
                        :background-color "#fff"
                        :flex-direction "row"
                        :justify-content "flex-start"
-                       :min-height "54px"})
+                       :min-height "56px"})
 
 (def nap-menu {:height "100%"
                :width "100%"})
@@ -77,7 +77,7 @@
                                   :border-radius "3px"
                                   :position "absolute"
                                   :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
-                                  :z-index "1"})
+                                  })
 
 (def nap-languages-switcher-item {:border-bottom "1px solid #ddd"
                                   :display "block"

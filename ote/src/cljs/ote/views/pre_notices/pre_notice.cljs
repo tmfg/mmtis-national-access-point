@@ -382,7 +382,7 @@
   (let [pre-notice (:pre-notice app)
         sent? (= :sent (::transit/pre-notice-state pre-notice))]
     [:div
-     [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+     [:div.container {:style {:padding-top "3rem"}}
       [pre-notice-form e! app]]
      [:div (stylefy/use-style style-base/form-footer)
       [:div.container
@@ -396,7 +396,7 @@
     (if (or (nil? pre-notice) (:loading pre-notice))
       [circular-progress/circular-progress]
       [:div
-       [:div.container {:style {:margin-top "40px" :padding-top "3rem"}}
+       [:div.container {:style {:padding-top "3rem"}}
         [pre-notice-form e! app]]
        [:div (stylefy/use-style style-base/form-footer)
         [:div.container
