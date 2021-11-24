@@ -1,5 +1,20 @@
 (ns ote.theme.colors)
 
+(def dark-blue "#0034ac")
+(def dark-green "#005f61")
+(def basic-purple "#73468c")
+(def dark-purple "#520076")
+
+(def dark-red "#b40000")
+(def dark-gray "#505064")
+(def basic-brown "#784b28")
+
+(def basic-black "#000000")
+(def basic-white "#ffffff")
+
+(def primary-background-color basic-black)
+(def primary-text-color basic-white)
+
 (def blue-lighter "#66a3e0")
 (def blue-light "#3385d6")
 (def blue "#0066cc")
