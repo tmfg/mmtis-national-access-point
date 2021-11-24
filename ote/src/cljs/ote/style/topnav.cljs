@@ -151,7 +151,7 @@
                     ;:position "fixed"
                     :height "50px"
                     :width "100%"
-                    :background-color "#0029b8"
+                    :background-color "#0034ac"
                     :padding "12px"
                     :color "#FFFFFF"
                     :font-size "0.875rem"
