@@ -159,7 +159,8 @@
 
     [bottombar-simplelink e! app {:label              "NAP"
                                   :label-styles       {:font-weight "800"}
-                                  :menu-click-handler #(routes/navigate! :front-page)}]
+                                  :menu-click-handler #(do (routes/navigate! :front-page)
+                                                           (e! (fp-controller/->CloseHeaderMenus)))}]
 
     [bottombar-spacer]
 
@@ -240,7 +241,8 @@
                                                          (e! (fp-controller/->ToggleMyServicesMenu)))}]
       [bottombar-simplelink e! app {:label              (tr [:document-title :services])
                                     :href               "#/services"
-                                    :menu-click-handler #(routes/navigate! :services)}])
+                                    :menu-click-handler #(do (routes/navigate! :services)
+                                                             (e! (fp-controller/->CloseHeaderMenus)))}])
    ]
    ; right aligned entries
    [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
