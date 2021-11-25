@@ -106,7 +106,7 @@
        [prefix-icon (stylefy/use-style (merge style-topnav/bottombar-entry-icon
                                                         {:margin-right ".5rem"}))])
      ; label
-     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+     [:span (stylefy/use-style style-topnav/bottombar-entry-label)
       (if (not (nil? label)) label)]
 
      ; dropdown open link
@@ -136,12 +136,14 @@
     ]))
 
 (defn bottombar-simplelink [e! app options]
-  (let [{:keys [label menu-click-handler]} options]
+  (let [{:keys [label label-styles menu-click-handler]} options]
    [:div (stylefy/use-style {:align-self "center"})
     [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
                     {:on-click menu-click-handler})
      ; label
-     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+     [:span (stylefy/use-style (merge style-topnav/bottombar-entry-label
+                                      (when label-styles
+                                        label-styles )))
       (if (not (nil? label)) label)]
     ]]))
 
@@ -155,18 +157,19 @@
    ; left grouped entries
    [:span (stylefy/use-style {:display "flex"})
 
-    ; TODO: Not sure where "tiedotteet" should be...
-    #_[bottombar-dropdown e! app {:tag              :updates
-                                  :entries          []#_[[:tiedotteet "Tiedotteet"]]
-                                  :label            "Ajankohtaista"
-                                  :state-flag [:ote-service-flags :lang-TODO-open]
-                                      :menu-click-handler identity
-                                  :entry-click-handler identity}]
-
-    #_[bottombar-spacer]
-
     [bottombar-simplelink e! app {:label              "NAP"
+                                  :label-styles       {:font-weight "800"}
                                   :menu-click-handler #(routes/navigate! :front-page)}]
+
+    [bottombar-spacer]
+
+    [bottombar-dropdown e! app {:tag     :updates
+                                :entries             [{:key   :tiedotteet
+                                                       :label (tr [:common-texts :updates-menu-updates])}]
+                                :label               (tr [:common-texts :navigation-updates-menu])
+                                :state-flag          [:ote-service-flags :navigation-updates-menu]
+                                :menu-click-handler  #(e! (fp-controller/->ToggleUpdatesMenu))
+                                :entry-click-handler identity}]
 
     [bottombar-spacer]
 
@@ -193,14 +196,16 @@
                                 :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
                                 :entry-click-handler identity}]
 
-    ; TODO: I don't think we have "Tuen tarjonta" page yet...?
-    #_[bottombar-spacer]
-    #_[bottombar-dropdown e! app  {:tag                 :support
-                                   :entries             [[:tuen-tarjonta "Tuen tarjonta"]]
-                                   :label               "Tuki"
-                                   :state-flag          [:ote-service-flags :lang-TODO-open]
-                                   :menu-click-handler  identity
-                                   :entry-click-handler identity}]
+    [bottombar-spacer]
+    [bottombar-dropdown e! app  {:tag                 :support
+                                 :entries             [{:key :kanavat
+                                                        :label (tr [:common-texts :support-menu-channels])}
+                                                       {:key :kontaktit
+                                                        :label (tr [:common-texts :support-menu-contacts])}]
+                                 :label               (tr [:common-texts :navigation-support-menu])
+                                 :state-flag          [:ote-service-flags :support-menu-open]
+                                 :menu-click-handler  #(e! (fp-controller/->ToggleSupportMenu))
+                                 :entry-click-handler identity}]
 
     [bottombar-spacer]
 
