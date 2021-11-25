@@ -1,24 +1,25 @@
 (ns ote.theme.colors)
 
-(def dark-blue "#0034ac")
-(def dark-green "#005f61")
-(def basic-purple "#73468c")
-(def dark-purple "#520076")
-
-(def dark-red "#b40000")
-(def dark-gray "#505064")
-(def basic-brown "#784b28")
-
+;; Primary colors are black and white.
 (def basic-black "#000000")
 (def basic-white "#ffffff")
+
+;; Basic colors.
+(def basic-purple "#73468c")
+(def basic-brown "#784b28")
+
+;; Dark colors.
+(def dark-blue "#0034ac")
+(def dark-green "#005f61")
+(def dark-purple "#520076")
+(def dark-red "#b40000")
+(def dark-gray "#505064")
 
 (def primary-background-color basic-black)
 (def primary-text-color basic-white)
 (def primary-button-background-color dark-blue)
 
-(def blue-lighter "#66a3e0")
 (def blue-light "#3385d6")
-(def blue "#0066cc")
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
 
@@ -28,9 +29,7 @@
 (def gray750 "#646464")
 (def gray700 "#7d7d7d")
 (def gray650 "#969696")
-(def gray600 "#afafaf")
 (def gray550 "#c8c8c8")
-(def gray500 "#d2d2d2")
 (def gray450 "#dcdcdc")
 (def gray400 "#e1e1e1")
 (def gray350 "#e6e6e6")
@@ -39,16 +38,13 @@
 (def gray100 "#f5f5f5")
 (def gray50 "#fafafa")
 
-(def green-dark "#008800")
 (def green-basic "#00AA00")
-(def green-light "#66cc66")
 (def red-basic "#DD0000")
 (def red-dark "#CF0000")
 (def red-darker "#C10000")
 (def orange-basic "#FF8800")
 (def white-basic "white")
 (def yellow-basic "#ddcc00")
-(def yellow-dark "#cfb800")
 (def purple-darker "#7000D0")
 
 (def add-color green-basic)
@@ -57,7 +53,7 @@
 (def negative-button red-basic)
 (def negative-text white-basic)
 (def negative-button-hover red-dark)
-(def primary blue)
+(def primary dark-blue)
 (def primary-dark blue-dark)
 (def primary-darker blue-darker)
 (def primary-text white-basic)

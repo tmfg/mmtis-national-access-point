@@ -51,7 +51,7 @@
                                 {:color colors/primary-text
                                  :font-size "1rem"
                                  :border 0
-                                 :background-color colors/primary})
+                                 :background-color colors/primary-button-background-color})
                          :file-input {:font-size "100px"
                                       :position "absolute"
                                       :left "0"

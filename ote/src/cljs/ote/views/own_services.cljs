@@ -281,7 +281,7 @@
                     :on-click #(do
                                  (.preventDefault %)
                                  (e! (to-controller/->CreateTransportOperator)))}
-                   (stylefy/use-style style-buttons/outline-button))
+                   (stylefy/use-style style-buttons/primary-button))
          (tr [:buttons :add-new-transport-operator])]]])))
 
 (defn table-container-for-own-services [e! has-services? operator-services state]
