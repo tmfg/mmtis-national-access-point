@@ -69,21 +69,23 @@
                           [:ote-service-flags :user-menu-open]
                           [:ote-service-flags :lang-menu-open]])
 
-(defn- close-all-menus [app]
+(defn- switch-menus [app switch-fn]
   (reduce
     (fn [app path]
-      (assoc-in app path false))
+      (assoc-in app path (switch-fn app path)))
     app
     all-menus))
 
+(defn- close-all-menus [app]
+  (switch-menus app (constantly false)))
+
 (defn- toggle-menu [app menu-flag-path]
-  (reduce
-    (fn [app path]
-      (assoc-in app path (if (= menu-flag-path path)
-                           (if (get-in app path) false true)
-                           false)))
+  (switch-menus
     app
-    all-menus))
+    (fn [app path]
+      (if (= menu-flag-path path)
+        (if (get-in app path) false true)
+        false))))
 
 (extend-protocol tuck/Event
 
