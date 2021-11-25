@@ -95,7 +95,7 @@
             first
             second)))
 
-(defn bottombar-dropdown [e! app options]
+(defn bottombar-dropdown [e! app desktop? options]
   (let [{:keys [tag entries label prefix-icon menu-click-handler entry-click-handler state-flag]} options
         menu-open?                                                                            (get-in app state-flag)]
    [:div (stylefy/use-style style-topnav/bottombar-menu-section)
@@ -118,7 +118,8 @@
     ; menu items
     [:ul (merge (stylefy/use-style (merge style-topnav/bottombar-dropdown-items
                                                   (when (not menu-open?)
-                                                    {:display "none"}))) ;; Todo jotain mobiilissa psks
+
+                                                      {:display "none"}))) ;; Todo jotain mobiilissa psks
                 {:id (str (name tag) "-menu")})
      (doall
        (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
@@ -141,7 +142,7 @@
     [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
                     {:on-click menu-click-handler})
      ; label
-     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
+     [:span (stylefy/use-style style-topnav/bottombar-dropdown-active)
       (if (not (nil? label)) label)]
     ]]))
 
@@ -150,14 +151,14 @@
   []
   [:span (stylefy/use-style style-topnav/bottombar-spacer)])
 
-(defn nap-bottombar [e! app]
+(defn nap-bottombar [e! app desktop?]
 
   [:div (stylefy/use-style style-topnav/header-bottombar)
    ; left grouped entries
    [:span (stylefy/use-style style-topnav/bottombar-left-aligned-items)
 
     ; TODO: Not sure where "tiedotteet" should be...
-    #_[bottombar-dropdown e! app {:tag              :updates
+    #_[bottombar-dropdown e! app desktop? {:tag              :updates
                                   :entries          []#_[[:tiedotteet "Tiedotteet"]]
                                   :label            "Ajankohtaista"
                                   :state-flag [:ote-service-flags :lang-TODO-open]
@@ -171,7 +172,7 @@
 
     [bottombar-spacer]
 
-    [bottombar-dropdown e! app {:tag                 :service-info
+    [bottombar-dropdown e! app desktop? {:tag                 :service-info
                                 :entries             [{:key :ohjeet
                                                        :label (tr [:common-texts :user-menu-nap-help])
                                                        :href (tr [:common-texts :user-menu-nap-help-link])
@@ -196,7 +197,7 @@
 
     ; TODO: I don't think we have "Tuen tarjonta" page yet...?
     #_[bottombar-spacer]
-    #_[bottombar-dropdown e! app  {:tag                 :support
+    #_[bottombar-dropdown e! app desktop?  {:tag                 :support
                                    :entries             [[:tuen-tarjonta "Tuen tarjonta"]]
                                    :label               "Tuki"
                                    :state-flag          [:ote-service-flags :lang-TODO-open]
@@ -206,7 +207,7 @@
     [bottombar-spacer]
 
     (if (user-logged-in? app)
-      [bottombar-dropdown e! app {:tag                 :my-services
+      [bottombar-dropdown e! app desktop? {:tag                 :my-services
                                   :entries             [{:key :services
                                                          :label (tr [:document-title :services])
                                                          :href "#/services"}
@@ -241,7 +242,7 @@
    ; right aligned entries
    [:span (stylefy/use-style style-topnav/bottombar-right-aligned-items)
     (when (user-logged-in? app)
-      [bottombar-dropdown e! app {:tag                 :user-details
+      [bottombar-dropdown e! app desktop? {:tag                 :user-details
                                   :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
                                                          :label (tr [:common-texts :navigation-email-notification-settings])
                                                          :href  "#/email-settings"}
@@ -274,7 +275,7 @@
 
     [bottombar-spacer]
 
-    [bottombar-dropdown e! app {:tag                 :language-selector
+    [bottombar-dropdown e! app desktop? {:tag                 :language-selector
                                 :entries             [{:key "fi"
                                                        :label "Suomeksi"}
                                                       {:key "sv"
@@ -306,7 +307,7 @@
         lang                (get langs current-language "")]
     (str url lang)))
 
-(defn fintraffic-quick-links [app menu-open? desktop?]
+(defn fintraffic-quick-links [e! app menu-open? desktop?]
   (js/console.log (str "no onpa notta " menu-open? " ja " desktop? " koska " (:width app) " > " style-base/mobile-width-px))
   [:ul (stylefy/use-style (merge style-topnav/fintraffic-quick-links-menu
                                  (when (and (not desktop?)
@@ -346,12 +347,12 @@
          feather-icons/chevron-up
          feather-icons/chevron-down)
        (stylefy/use-style style-topnav/topbar-entry-icon)]]
-      [fintraffic-quick-links app menu-open? desktop?]]]))
+      [fintraffic-quick-links e! app menu-open? desktop?]]]))
 
 (defn header [e! app desktop?]
   [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
                     :z-index    "100"}}
-   [fintraffic-navbar]
+   [fintraffic-navbar e! app desktop?]
    [nap-bottombar e! app]
    [esc-press-listener e! app]
    [tos-notification e! app desktop?]])

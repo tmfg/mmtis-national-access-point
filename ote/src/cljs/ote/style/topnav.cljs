@@ -70,7 +70,11 @@
                                                                                 :flex-direction "column"
                                                                                 :justify-content "space-between"}}})
 
-(def bottombar-dropdown-active {:margin-right ".5rem"})
+(def bottombar-dropdown-active {:margin-right ".5rem"
+                                ::stylefy/media {{:max-width (str width-sm "px")} {:width "100%"
+                                                                                   :text-align "left"
+                                                                                   :line-height "1.5"
+                                                                                   :padding ".5em 1em .5em 1em"}}})
 
 (def bottombar-left-aligned-items {:display "flex"
                                    ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})
@@ -100,9 +104,9 @@
                           :position "absolute"
                           :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
                           :z-index "1"
-                          ::stylefy/media {{:max-width (str width-md "px")} {:position "unset"
-                                                                             :display "block"
-                                                                             :width "100%"}}})
+                          ::stylefy/media {{:max-width (str width-sm "px")} {:position "unset"
+                                                                             :width "100%"
+                                                                             :border "none"}}})
 
 (def bottombar-dropdown-item {:border-bottom "1px solid #ddd"
                                   :display "block"
