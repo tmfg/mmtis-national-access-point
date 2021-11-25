@@ -87,26 +87,15 @@
 (def bottombar-spacer {:margin-right "1.2rem"
                        ::stylefy/media {{:max-width (str width-sm "px")} {:display "none"}}})
 
-(def bottombar-dropdown-items {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
-                                                           :display "block"
-                                                           :position "absolute"
-                                                           :background-color colors/primary-text-color
-                                                           :width ".5rem"
-                                                           :height ".5rem"
-                                                           :top "-5px"
-                                                           :right ".5rem"
-                                                           :transform "rotate(45deg)"
-                                                           :border-left "1px solid #ddd"
-                                                           :border-top "1px solid #ddd"}}
-                          :background-color colors/primary-text-color
-                          :border "1px solid #ddd"
-                          :border-radius "3px"
-                          :position "absolute"
-                          :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
-                          :z-index "1"
-                          ::stylefy/media {{:max-width (str width-sm "px")} {:position "unset"
-                                                                             :width "100%"
-                                                                             :border "none"}}})
+(def bottombar-dropdown-items {:background-color colors/primary-text-color
+                               :border "1px solid #ddd"
+                               :border-radius "3px"
+                               :position "absolute"
+                               :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
+                               :z-index "1"
+                               ::stylefy/media {{:max-width (str width-sm "px")} {:position "unset"
+                                                                                  :width "100%"
+                                                                                  :border "none"}}})
 
 (def bottombar-dropdown-item {:border-bottom "1px solid #ddd"
                                   :display "block"
