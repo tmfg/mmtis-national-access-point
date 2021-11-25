@@ -1,7 +1,8 @@
 (ns ote.style.topnav
   (:require [stylefy.core :as stylefy]
             [ote.theme.screen-sizes :refer [width-xxs width-xs width-sm width-md width-l width-xl]]
-            [ote.style.base :as base]))
+            [ote.style.base :as base]
+            [ote.theme.colors :as colors]))
 
 (def clear {:clear "both"})
 
@@ -13,7 +14,7 @@
 (def link {:display "block"
            :transition "padding-top 300ms ease, height 300ms ease"
            :bottom "0"
-           :color "#ffffff"
+           :color colors/primary-text-color
            :text-align "center"
            :padding "10px 15px 10px 15px"
            :text-decoration "none"
@@ -28,7 +29,7 @@
                     :padding-right "2rem"
                     :padding-top ".5rem"
                     :padding-bottom ".5rem"
-                    :background-color "#000"
+                    :background-color colors/primary-background-color
                     :min-height "44px"
                     :position "relative"
                     })
@@ -38,7 +39,7 @@
                        :display "flex"
                        :border-bottom "1px solid #f2f2f2"
                        :box-shadow "0 8px 6px -6px #f2f2f2"
-                       :background-color "#fff"
+                       :background-color colors/basic-white
                        :flex-direction "row"
                        :justify-content "flex-start"
                        :min-height "56px"})
@@ -63,7 +64,7 @@
 (def nap-languages-switcher-menu {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
                                                            :display "block"
                                                            :position "absolute"
-                                                           :background-color "#fff"
+                                                           :background-color colors/primary-text-color
                                                            :width ".5rem"
                                                            :height ".5rem"
                                                            :top "-5px"
@@ -72,7 +73,7 @@
                                                            :border-left "1px solid #ddd"
                                                            :border-top "1px solid #ddd"}}
                                   ;:display "none"
-                                  :background-color "#fff"
+                                  :background-color colors/primary-text-color
                                   :border "1px solid #ddd"
                                   :border-radius "3px"
                                   :position "absolute"
@@ -105,7 +106,7 @@
 (def fintraffic-quick-links-item {:display "inline-block"
                                   :margin-right "1.5rem"})
 
-(def fintraffic-quick-links-link {:color "#FFFFFF"
+(def fintraffic-quick-links-link {:color colors/primary-text-color
                                   :font-weight "600"
                                   :text-decoration "none"})
 
@@ -153,7 +154,7 @@
                     :width "100%"
                     :background-color "#0034ac"
                     :padding "12px"
-                    :color "#FFFFFF"
+                    :color colors/primary-text-color
                     :font-size "0.875rem"
                     :line-height "0.875rem"})
 
@@ -165,8 +166,8 @@
 
 (def tos-toplink (merge
                    base/base-link
-                   {:color "#FFFFFF"
+                   {:color colors/primary-text-color
                     :text-decoration "underline"
                     :padding-left "0.25rem"
                     :padding-right "0.25rem"
-                    ::stylefy/mode {:hover {:color "#FFFFFF"}}}))
+                    ::stylefy/mode {:hover {:color colors/primary-text-color}}}))
