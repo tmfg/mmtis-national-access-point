@@ -14,6 +14,7 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
+(defrecord ToggleFintrafficMenu [])
 (defrecord ToggleServiceInfoMenu [])
 (defrecord ToggleMyServicesMenu [])
 (defrecord ToggleUserMenu [])
@@ -86,9 +87,20 @@
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
 
+  ToggleFintrafficMenu
+  (process-event [_ app]
+    (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open]
+                  (if (get-in app [:ote-service-flags :fintraffic-menu-open]) false true))
+        (assoc-in [:ote-service-flags :service-info-menu-open] false)
+        (assoc-in [:ote-service-flags :my-services-menu-open] false)
+        (assoc-in [:ote-service-flags :user-menu-open] false)
+        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+
   ToggleServiceInfoMenu
   (process-event [_ app]
     (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open] false)
         (assoc-in [:ote-service-flags :service-info-menu-open]
                   (if (get-in app [:ote-service-flags :service-info-menu-open]) false true))
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
@@ -98,6 +110,7 @@
   ToggleMyServicesMenu
   (process-event [_ app]
     (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open] false)
         (assoc-in [:ote-service-flags :service-info-menu-open] false)
         (assoc-in [:ote-service-flags :my-services-menu-open]
                 (if (get-in app [:ote-service-flags :my-services-menu-open]) false true))
@@ -107,6 +120,7 @@
   ToggleUserMenu
   (process-event [_ app]
     (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open] false)
         (assoc-in [:ote-service-flags :service-info-menu-open] false)
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open]
@@ -116,6 +130,7 @@
   ToggleLangMenu
   (process-event [_ app]
     (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open] false)
         (assoc-in [:ote-service-flags :service-info-menu-open] false)
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open] false)
@@ -125,6 +140,7 @@
   CloseHeaderMenus
   (process-event [_ app]
     (-> app
+        (assoc-in [:ote-service-flags :fintraffic-menu-open] false)
         (assoc-in [:ote-service-flags :service-info-menu-open] false)
         (assoc-in [:ote-service-flags :my-services-menu-open] false)
         (assoc-in [:ote-service-flags :user-menu-open] false)

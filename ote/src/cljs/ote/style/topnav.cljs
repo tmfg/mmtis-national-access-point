@@ -32,7 +32,9 @@
                     :background-color colors/primary-background-color
                     :min-height "44px"
                     :position "relative"
-                    })
+                    ::stylefy/media {{:max-width (str width-sm "px")} {:justify-content "space-between"
+                                                                       :padding-right "1rem"
+                                                                       :padding-left "1rem"}}})
 
 (def header-bottombar {:padding-left "2rem"
                        :padding-right "2rem"
@@ -42,15 +44,19 @@
                        :background-color colors/basic-white
                        :flex-direction "row"
                        :justify-content "flex-start"
-                       :min-height "56px"})
+                       :min-height "56px"
+                       ::stylefy/media {{:max-width (str width-sm "px")} {:flex-direction "column"
+                                                                          :padding "0"}}})
 
 (def nap-menu {:height "100%"
                :width "100%"})
 
-(def bottombar-entry-icon {:color "#000"
-                           :width "16px"
-                           :height "16px"
-                           :align-self "center"})
+(def topbar-entry-icon {:color "#fff"
+                        :width "16px"
+                        :height "16px"
+                        :align-self "center"})
+
+(def bottombar-entry-icon (merge topbar-entry-icon {:color "#000"}))
 
 (def bottombar-entry-button {:display "flex"
                        :justify-content "center"
@@ -59,9 +65,25 @@
                        :cursor "pointer"
                        :padding 0})
 
-(def nap-languages-switcher-active {:margin-right ".5rem"})
+(def bottombar-menu-section {:align-self "center"
+                             ::stylefy/media {{:max-width (str width-sm "px")} {:display "flex"
+                                                                                :flex-direction "column"
+                                                                                :justify-content "space-between"}}})
 
-(def nap-languages-switcher-menu {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
+(def bottombar-dropdown-active {:margin-right ".5rem"})
+
+(def bottombar-left-aligned-items {:display "flex"
+                                   ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})
+
+(def bottombar-right-aligned-items {:display "flex"
+                                    :margin-left "auto"
+                                    ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"
+                                                                                       :margin "unset"}}})
+
+(def bottombar-spacer {:margin-right "1.2rem"
+                       ::stylefy/media {{:max-width (str width-sm "px")} {:display "none"}}})
+
+(def bottombar-dropdown-items {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
                                                            :display "block"
                                                            :position "absolute"
                                                            :background-color colors/primary-text-color
@@ -72,20 +94,22 @@
                                                            :transform "rotate(45deg)"
                                                            :border-left "1px solid #ddd"
                                                            :border-top "1px solid #ddd"}}
-                                  ;:display "none"
-                                  :background-color colors/primary-text-color
-                                  :border "1px solid #ddd"
-                                  :border-radius "3px"
-                                  :position "absolute"
-                                  :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
-                                  })
+                          :background-color colors/primary-text-color
+                          :border "1px solid #ddd"
+                          :border-radius "3px"
+                          :position "absolute"
+                          :top "93px"  ; XXX: This was originally 1rem, but due to layout differences was positioned manually
+                          :z-index "1"
+                          ::stylefy/media {{:max-width (str width-md "px")} {:position "unset"
+                                                                             :display "block"
+                                                                             :width "100%"}}})
 
-(def nap-languages-switcher-item {:border-bottom "1px solid #ddd"
+(def bottombar-dropdown-item {:border-bottom "1px solid #ddd"
                                   :display "block"
                                   :margin-right "0"
                                   :white-space "nowrap"})
 
-(def nap-languages-switcher-link {:display "block"
+(def bottombar-dropdown-link {:display "block"
                                   :padding ".5rem 1rem"
                                   :transition "color .15s ease-out"
                                   :color "#000"
@@ -98,13 +122,22 @@
 (def fintraffic-logo {:height "18px"
                       :width "106px"})
 
+(def fintraffic-quick-links {:display "inline-flex"
+                             ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})
+
 (def fintraffic-quick-links-menu {:list-style "none"
                                   :margin "0"
                                   :padding "0"
-                                  :align-self "center"})
+                                  :align-self "center"
+                                  ::stylefy/media {{:max-width (str width-sm "px")} {:position "absolute"
+                                                                                     :right "0"
+                                                                                     :align-self "start"
+                                                                                     :z-index 500
+                                                                                     :background-color "#000000"}}})
 
 (def fintraffic-quick-links-item {:display "inline-block"
-                                  :margin-right "1.5rem"})
+                                  :margin-right "1.5rem"
+                                  ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})
 
 (def fintraffic-quick-links-link {:color colors/primary-text-color
                                   :font-weight "600"
@@ -120,6 +153,12 @@
                                                               :border-color "transparent transparent white transparent"
                                                               :transform "translateX(-50%)"
                                                               }}})
+
+(def fintraffic-mobile-nav-button {:color "#fff"
+                                   :background-color "transparent"
+                                   :cursor "pointer"
+                                   :height "100%"
+                                   :border "0"})
 
 (def style {:content ""})
 
@@ -171,3 +210,6 @@
                     :padding-left "0.25rem"
                     :padding-right "0.25rem"
                     ::stylefy/mode {:hover {:color colors/primary-text-color}}}))
+
+(def mobile-only {:display "none"
+                  ::stylefy/media {{:max-width (str width-sm "px")} {:display "flex"}}})

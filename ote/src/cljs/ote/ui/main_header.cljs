@@ -98,7 +98,7 @@
 (defn bottombar-dropdown [e! app options]
   (let [{:keys [tag entries label prefix-icon menu-click-handler entry-click-handler state-flag]} options
         menu-open?                                                                            (get-in app state-flag)]
-   [:div (stylefy/use-style {:align-self "center"})
+   [:div (stylefy/use-style style-topnav/bottombar-menu-section)
     [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
                     {:on-click menu-click-handler})
      ; prefix icon
@@ -106,8 +106,8 @@
        [prefix-icon (stylefy/use-style (merge style-topnav/bottombar-entry-icon
                                                         {:margin-right ".5rem"}))])
      ; label
-     [:span (stylefy/use-style style-topnav/nap-languages-switcher-active)
-      (if (not (nil? label)) label)]
+     [:span (stylefy/use-style style-topnav/bottombar-dropdown-active)
+      (or label "")]
 
      ; dropdown open link
      [(if menu-open?
@@ -116,15 +116,15 @@
       (stylefy/use-style style-topnav/bottombar-entry-icon)]]
 
     ; menu items
-    [:ul (merge (stylefy/use-style (merge style-topnav/nap-languages-switcher-menu
+    [:ul (merge (stylefy/use-style (merge style-topnav/bottombar-dropdown-items
                                                   (when (not menu-open?)
-                                                    {:display "none"})))
+                                                    {:display "none"}))) ;; Todo jotain mobiilissa psks
                 {:id (str (name tag) "-menu")})
      (doall
        (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
          ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
-         [:li (stylefy/use-style style-topnav/nap-languages-switcher-item)
-          [:a (merge (stylefy/use-style style-topnav/nap-languages-switcher-link)
+         [:li (stylefy/use-style style-topnav/bottombar-dropdown-item)
+          [:a (merge (stylefy/use-style style-topnav/bottombar-dropdown-link)
                      {:key (name key)
                       :href href
                       ; the rewrapping of entry values to map is done manually instead of using map destructuring's
@@ -148,12 +148,13 @@
 (defn bottombar-spacer
   "Horizontal spacing to give entries a bit of breathing room."
   []
-  [:span {:style {:margin-right "1.2rem"}}])
+  [:span (stylefy/use-style style-topnav/bottombar-spacer)])
 
 (defn nap-bottombar [e! app]
+
   [:div (stylefy/use-style style-topnav/header-bottombar)
    ; left grouped entries
-   [:span (stylefy/use-style {:display "flex"})
+   [:span (stylefy/use-style style-topnav/bottombar-left-aligned-items)
 
     ; TODO: Not sure where "tiedotteet" should be...
     #_[bottombar-dropdown e! app {:tag              :updates
@@ -238,7 +239,7 @@
                                     :menu-click-handler #(routes/navigate! :services)}])
    ]
    ; right aligned entries
-   [:span (stylefy/use-style {:display "flex" :margin-left "auto"})
+   [:span (stylefy/use-style style-topnav/bottombar-right-aligned-items)
     (when (user-logged-in? app)
       [bottombar-dropdown e! app {:tag                 :user-details
                                   :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
@@ -305,8 +306,12 @@
         lang                (get langs current-language "")]
     (str url lang)))
 
-(defn fintraffic-quick-links []
-  [:ul (stylefy/use-style style-topnav/fintraffic-quick-links-menu)
+(defn fintraffic-quick-links [app menu-open? desktop?]
+  (js/console.log (str "no onpa notta " menu-open? " ja " desktop? " koska " (:width app) " > " style-base/mobile-width-px))
+  [:ul (stylefy/use-style (merge style-topnav/fintraffic-quick-links-menu
+                                 (when (and (not desktop?)
+                                            (not menu-open?))
+                                   {:display "none"})))
      (doall
        (for [[href service] (map (juxt localized-quicklink-uri identity)
                                  [:traffic-situation
@@ -325,19 +330,28 @@
           (when (= service :finap)
             [:div (stylefy/use-style style-topnav/fintraffic-quick-links-uparrow) ""])]))])
 
-(defn- fintraffic-navbar []
-  [:div (stylefy/use-style style-topnav/header-topbar)
-   [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
-              {:href (localized-quicklink-uri :fintraffic)})
-    [:img {:style style-topnav/fintraffic-logo
-           :src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]]
-   [:nav {:style {:display "inline-flex"}}
-    [fintraffic-quick-links]]])
+(defn- fintraffic-navbar [e! app desktop?]
+  (let [menu-open? (get-in app [:ote-service-flags :fintraffic-menu-open])]
+    [:div (stylefy/use-style style-topnav/header-topbar)
+     [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
+                {:href (localized-quicklink-uri :fintraffic)})
+      [:img {:style style-topnav/fintraffic-logo
+             :src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]]
+     [:nav (stylefy/use-style style-topnav/fintraffic-quick-links)
+      [:button (merge (stylefy/use-style (merge style-topnav/mobile-only
+                                                style-topnav/fintraffic-mobile-nav-button))
+                      {:on-click #(e! (fp-controller/->ToggleFintrafficMenu))})
+       [:span {:style {:font-weight 600 :align-self "center"}} "Palvelut"]
+       [(if menu-open?
+         feather-icons/chevron-up
+         feather-icons/chevron-down)
+       (stylefy/use-style style-topnav/topbar-entry-icon)]]
+      [fintraffic-quick-links app menu-open? desktop?]]]))
 
 (defn header [e! app desktop?]
   [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
                     :z-index    "100"}}
-   [fintraffic-navbar]
+   [fintraffic-navbar e! app desktop?]
    [nap-bottombar e! app]
    [esc-press-listener e! app]
    [tos-notification e! app desktop?]])
