@@ -20,7 +20,6 @@
 (def primary-button-background-color dark-blue)
 
 (def blue-light "#3385d6")
-(def blue "#0066cc")
 (def blue-dark "#0048c2")
 (def blue-darker "#0029B8")
 
@@ -54,7 +53,7 @@
 (def negative-button red-basic)
 (def negative-text white-basic)
 (def negative-button-hover red-dark)
-(def primary blue)
+(def primary dark-blue)
 (def primary-dark blue-dark)
 (def primary-darker blue-darker)
 (def primary-text white-basic)
