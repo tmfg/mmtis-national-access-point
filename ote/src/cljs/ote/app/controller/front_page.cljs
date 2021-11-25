@@ -14,8 +14,10 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
+(defrecord ToggleUpdatesMenu [])
 (defrecord ToggleServiceInfoMenu [])
 (defrecord ToggleMyServicesMenu [])
+(defrecord ToggleSupportMenu [])
 (defrecord ToggleUserMenu [])
 (defrecord ToggleLangMenu [])
 (defrecord CloseHeaderMenus [])
@@ -60,6 +62,31 @@
           (dissoc :transport-operators-with-services)))
     app))
 
+(def ^:private all-menus [[:ote-service-flags :navigation-updates-menu]
+                          [:ote-service-flags :service-info-menu-open]
+                          [:ote-service-flags :my-services-menu-open]
+                          [:ote-service-flags :support-menu-open]
+                          [:ote-service-flags :user-menu-open]
+                          [:ote-service-flags :lang-menu-open]])
+
+(defn- switch-menus [app switch-fn]
+  (reduce
+    (fn [app path]
+      (assoc-in app path (switch-fn app path)))
+    app
+    all-menus))
+
+(defn- close-all-menus [app]
+  (switch-menus app (constantly false)))
+
+(defn- toggle-menu [app menu-flag-path]
+  (switch-menus
+    app
+    (fn [app path]
+      (if (= menu-flag-path path)
+        (if (get-in app path) false true)
+        false))))
+
 (extend-protocol tuck/Event
 
   ChangePage
@@ -86,49 +113,33 @@
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
 
+  ToggleUpdatesMenu
+  (process-event [_ app]
+    (toggle-menu app [:ote-service-flags :navigation-updates-menu]))
+
   ToggleServiceInfoMenu
   (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :service-info-menu-open]
-                  (if (get-in app [:ote-service-flags :service-info-menu-open]) false true))
-        (assoc-in [:ote-service-flags :my-services-menu-open] false)
-        (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+    (toggle-menu app [:ote-service-flags :service-info-menu-open]))
 
   ToggleMyServicesMenu
   (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :service-info-menu-open] false)
-        (assoc-in [:ote-service-flags :my-services-menu-open]
-                (if (get-in app [:ote-service-flags :my-services-menu-open]) false true))
-        (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+    (toggle-menu app [:ote-service-flags :my-services-menu-open]))
+
+  ToggleSupportMenu
+  (process-event [_ app]
+    (toggle-menu app [:ote-service-flags :support-menu-open]))
 
   ToggleUserMenu
   (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :service-info-menu-open] false)
-        (assoc-in [:ote-service-flags :my-services-menu-open] false)
-        (assoc-in [:ote-service-flags :user-menu-open]
-                  (if (get-in app [:ote-service-flags :user-menu-open]) false true))
-        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+    (toggle-menu app [:ote-service-flags :user-menu-open]))
 
   ToggleLangMenu
   (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :service-info-menu-open] false)
-        (assoc-in [:ote-service-flags :my-services-menu-open] false)
-        (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open]
-                  (if (get-in app [:ote-service-flags :lang-menu-open]) false true))))
+    (toggle-menu app [:ote-service-flags :lang-menu-open]))
 
   CloseHeaderMenus
   (process-event [_ app]
-    (-> app
-        (assoc-in [:ote-service-flags :service-info-menu-open] false)
-        (assoc-in [:ote-service-flags :my-services-menu-open] false)
-        (assoc-in [:ote-service-flags :user-menu-open] false)
-        (assoc-in [:ote-service-flags :lang-menu-open] false)))
+    (close-all-menus app))
 
   Logout
   (process-event [_ app]

@@ -59,7 +59,7 @@
                        :cursor "pointer"
                        :padding 0})
 
-(def nap-languages-switcher-active {:margin-right ".5rem"})
+(def bottombar-entry-label {:margin-right ".5rem"})
 
 (def nap-languages-switcher-menu {::stylefy/mode {:before {:content "\"\""  ; this is the magic triangle again...
                                                            :display "block"
