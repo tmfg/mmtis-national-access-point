@@ -37,7 +37,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (route-list/->OpenDeleteRouteModal route-id)))}
-                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                          (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary-button-background-color " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      [ui/dialog
@@ -94,7 +94,7 @@
                       :on-click #(do
                                    (.preventDefault %)
                                    (e! (fp/->ChangePage :edit-route {:id route-id})))}
-                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary-button-background-color " !important")}]]]}))
               [ic/content-create]]
              [delete-route-action e! row]]])
          routes)))]])

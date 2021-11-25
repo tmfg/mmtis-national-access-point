@@ -59,7 +59,7 @@
                    (if (:disabled opts)
                      (stylefy/use-style style-buttons/disabled-button)
                      (stylefy/use-style style-buttons/outline-button)))
-    [ic/navigation-close {:style {:color colors/primary :margin-right "1rem"}}] [:span label]]])
+    [ic/navigation-close {:style {:color colors/primary-button-background-color :margin-right "1rem"}}] [:span label]]])
 
 (defn delete [opts label]
   [button-container

@@ -21,7 +21,7 @@
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (fp/->ChangePage :user-edit {:id id})))}
-                    (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                    (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary-button-background-color " !important")}]]]}))
    [ic/content-create]])
 
 (defn- delete-user-action [e! {:keys [id show-delete-modal? other-members] :as user}]
@@ -31,7 +31,7 @@
                            :on-click #(do
                                         (.preventDefault %)
                                         (e! (admin-controller/->OpenDeleteUserModal id)))}
-                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]}))
+                     (stylefy/use-style {::stylefy/manual [[:&:hover [:svg {:color (str colors/primary-button-background-color " !important")}]]]}))
     [ic/action-delete]]
    (when show-delete-modal?
      (let [admin-list (mapv #(if (> (count (:members %)) 0) true false) other-members)]
