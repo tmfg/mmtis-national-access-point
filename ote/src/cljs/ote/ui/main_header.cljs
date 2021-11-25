@@ -165,7 +165,7 @@
     [bottombar-spacer]
 
     [bottombar-dropdown e! app {:tag     :updates
-                                :entries             [{:key   :tiedotteet
+                                :entries             [{:key   :updates
                                                        :label (tr [:common-texts :updates-menu-updates])}]
                                 :label               (tr [:common-texts :navigation-updates-menu])
                                 :state-flag          [:ote-service-flags :navigation-updates-menu]
@@ -199,9 +199,9 @@
 
     [bottombar-spacer]
     [bottombar-dropdown e! app  {:tag                 :support
-                                 :entries             [{:key :kanavat
+                                 :entries             [{:key :channels
                                                         :label (tr [:common-texts :support-menu-channels])}
-                                                       {:key :kontaktit
+                                                       {:key :contacts
                                                         :label (tr [:common-texts :support-menu-contacts])}]
                                  :label               (tr [:common-texts :navigation-support-menu])
                                  :state-flag          [:ote-service-flags :support-menu-open]
