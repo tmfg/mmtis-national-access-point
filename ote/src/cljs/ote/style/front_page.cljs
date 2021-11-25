@@ -165,7 +165,7 @@
                     :padding-top "80px"
                     :padding-bottom "100px"
                     :background-image "linear-gradient(45deg, #ddd, #f8f8f8 46%, #f1f1f1)"
-                    :box-shadow "4px 0 50px 0 rgba(0, 0, 0, .2), 4px 0 20px 0 #fff"})
+                    :box-shadow "4px 0 50px 0 rgba(0, 0, 0, .25), 4px 0 20px 0 #fff"})
 
 (def media-transport-service {::stylefy/media {{:max-width (str width-xs "px")} {:padding-top "60px"}}})
 
