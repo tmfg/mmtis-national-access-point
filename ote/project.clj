@@ -134,9 +134,6 @@
                  [com.amazonaws/aws-java-sdk-core "1.11.312"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
 
-                 ;; Free SVG icons as simple hiccup generating ClojureScript functions. - MIT
-                 [tatut/re-svg-icons "bc236886fc81b186888226bb161dcd279db2bee0"]
-
                  ;; Override old guava version from deps - Apache 2.0
                  [com.google.guava/guava "21.0"]
                  ;; Infer clojure specs from sample data. - Eclipse Public License 1.0
@@ -162,9 +159,7 @@
             ;; Figwheel builds your ClojureScript code and hot loads it into the browser - Eclipse Public License 1.0
             [lein-figwheel "0.5.13"]
             ;; Static code analyzer for Clojure, ClojureScript - Eclipse Public License 1.0
-            [lein-kibit "0.1.6"]
-            ;; A Leiningen plugin for resolving Clojure(Script) dependencies from a Git repository. - MIT
-            [reifyhealth/lein-git-down "0.4.0"]]
+            [lein-kibit "0.1.6"]]
 
   ;; Backend sources: clj and cljc which is used in front end (cljc) also
   :source-paths ["src/clj" "src/cljc"]
