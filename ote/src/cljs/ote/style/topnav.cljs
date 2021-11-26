@@ -70,11 +70,11 @@
                                                                                 :flex-direction "column"
                                                                                 :justify-content "space-between"}}})
 
-(def bottombar-dropdown-active {:margin-right ".5rem"
-                                ::stylefy/media {{:max-width (str width-sm "px")} {:width "100%"
-                                                                                   :text-align "left"
-                                                                                   :line-height "1.5"
-                                                                                   :padding ".5em 1em .5em 1em"}}})
+(def bottombar-entry-label {:margin-right ".5rem"
+                            ::stylefy/media {{:max-width (str width-sm "px")} {:width "100%"
+                                                                               :text-align "left"
+                                                                               :line-height "1.5"
+                                                                               :padding ".5em 1em .5em 1em"}}})
 
 (def bottombar-left-aligned-items {:display "flex"
                                    ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})

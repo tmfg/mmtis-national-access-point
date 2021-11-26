@@ -11,7 +11,7 @@
 
 (def outline-btn-hover-focus
   {:text-decoration "none"
-   :outline (str "1px solid " colors/primary)
+   :outline (str "1px solid " colors/primary-button-background-color)
    :box-shadow "1px 1px 2px 0 rgba(0, 0, 0, .2)"
    :transform "scale(0.98)"})
 
@@ -76,7 +76,7 @@
   (merge row-button
          {:color colors/negative-text
           :border 0
-          :background-color colors/primary
+          :background-color colors/primary-button-background-color
           ::stylefy/mode {:hover primary-btn-hover-focus
                           :focus primary-btn-hover-focus}}))
 
@@ -84,7 +84,7 @@
   (merge row-button
          {:color colors/negative-text
           :border 0
-          :background-color colors/primary
+          :background-color colors/primary-button-background-color
           ::stylefy/mode {:hover negative-btn-hover-focus
                           :focus negative-btn-hover-focus}}))
 
@@ -107,10 +107,10 @@
 (def outline-button
   (merge button-common
          {:background-color "white"
-          :color colors/primary
+          :color colors/primary-button-background-color
           :border "1px solid"
           :cursor "pointer"
-          :border-color colors/primary
+          :border-color colors/primary-button-background-color
           ::stylefy/mode {:hover outline-btn-hover-focus
                           :focus outline-btn-hover-focus
                           :active outline-btn-active}}))
@@ -119,8 +119,8 @@
   (merge button-common
          {:color colors/primary-text
           :cursor "pointer"
-          :border-color colors/primary
-          :background-color colors/primary
+          :border-color colors/primary-button-background-color
+          :background-color colors/primary-button-background-color
           ::stylefy/mode {:hover primary-btn-hover-focus
                           :focus primary-btn-hover-focus
                           :active primary-btn-active}}))
@@ -129,4 +129,4 @@
   {:background-color "transparent"
    :border "none"
    :cursor "pointer"
-   ::stylefy/manual [[:&:hover [:svg {:color (str colors/primary " !important")}]]]})
+   ::stylefy/manual [[:&:hover [:svg {:color (str colors/primary-button-background-color " !important")}]]]})
