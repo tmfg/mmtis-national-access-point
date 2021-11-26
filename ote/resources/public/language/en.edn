@@ -1062,7 +1062,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-admin "Admin panel"
   :navigation-route "Sea traffic route and timetable editor"
   :navigation-pre-notice "Report changes in regular scheduled passenger transport"
-  :navigation-authority-pre-notices "Saapuneet ilmoitukset"
+  :navigation-authority-pre-notices "Received change notifications"
   :navigation-privacy-policy "Privacy Policy"
   :navigation-privacy-policy-text "privacy statement"
   :navigation-privacy-policy-text2 "the privacy statement"
