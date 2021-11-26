@@ -14,6 +14,7 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
+(defrecord ToggleFintrafficMenu [])
 (defrecord ToggleUpdatesMenu [])
 (defrecord ToggleServiceInfoMenu [])
 (defrecord ToggleMyServicesMenu [])
@@ -62,7 +63,8 @@
           (dissoc :transport-operators-with-services)))
     app))
 
-(def ^:private all-menus [[:ote-service-flags :navigation-updates-menu]
+(def ^:private all-menus [[:ote-service-flags :fintraffic-menu-open]
+                          [:ote-service-flags :navigation-updates-menu]
                           [:ote-service-flags :service-info-menu-open]
                           [:ote-service-flags :my-services-menu-open]
                           [:ote-service-flags :support-menu-open]
@@ -112,6 +114,10 @@
   StayOnPage
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
+
+  ToggleFintrafficMenu
+  (process-event [_ app]
+    (toggle-menu app [:ote-service-flags :fintraffic-menu-open]))
 
   ToggleUpdatesMenu
   (process-event [_ app]
