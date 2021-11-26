@@ -154,149 +154,174 @@
   [:span (stylefy/use-style style-topnav/bottombar-spacer)])
 
 (defn nap-bottombar [e! app desktop?]
+  (let [menu-open? (get-in app [:ote-service-flags :mobile-bottom-menu-open])]
+    [:div (stylefy/use-style style-topnav/header-bottombar)
+     ; frontpage link has its own container to keep it always visible
+     [:span (stylefy/use-style style-topnav/bottombar-left-aligned-items)
+      [:div (stylefy/use-style {:align-self "center"})
+       [:button (merge (stylefy/use-style style-topnav/bottombar-entry-button)
+                       {:on-click #(do (routes/navigate! :front-page)
+                                       (e! (fp-controller/->CloseHeaderMenus)))})
+        ; label
+        [:span (stylefy/use-style (merge style-topnav/bottombar-frontpage-label
+                                         {:font-weight "800"}))
+         "NAP"]
+        ]]
 
-  [:div (stylefy/use-style style-topnav/header-bottombar)
-   ; left grouped entries
-   [:span (stylefy/use-style style-topnav/bottombar-left-aligned-items)
+      ; mobile only right aligned menu toggle button
+      [:span (stylefy/use-style style-topnav/bottombar-mobile-menu)
+       [:button (merge (stylefy/use-style (merge style-topnav/mobile-only
+                                                 style-topnav/bottombar-mobile-nav-button))
+                       {:on-click #(e! (fp-controller/->ToggleMobileBottomMenu))})
+        [:span {:style {:font-weight 600 :align-self "center"}} (tr [:common-texts :navigation-general-menu])]  ; TODO: translations
+        [feather-icons/menu
+         (stylefy/use-style style-topnav/bottombar-entry-icon)]]]]
 
-    [bottombar-simplelink e! app {:label              "NAP"
-                                  :label-styles       {:font-weight "800"}
-                                  :menu-click-handler #(do (routes/navigate! :front-page)
-                                                           (e! (fp-controller/->CloseHeaderMenus)))}]
+     ; left grouped entries
+     [:span (stylefy/use-style (merge style-topnav/bottombar-left-aligned-items
+                                      (when (not desktop?)
+                                        (if menu-open?
+                                          {:display "block"}
+                                          {:display "none"}))))
 
-    [bottombar-spacer]
+      [bottombar-spacer]
 
-    [bottombar-dropdown e! app desktop? {:tag     :updates
-                                         :entries             [{:key   :updates
-                                                                :label (tr [:common-texts :updates-menu-updates])}]
-                                         :label               (tr [:common-texts :navigation-updates-menu])
-                                         :state-flag          [:ote-service-flags :navigation-updates-menu]
-                                         :menu-click-handler  #(e! (fp-controller/->ToggleUpdatesMenu))
-                                         :entry-click-handler identity}]
+      [bottombar-dropdown e! app desktop? {:tag     :updates
+                                           :entries             [{:key   :updates
+                                                                  :label (tr [:common-texts :updates-menu-updates])}]
+                                           :label               (tr [:common-texts :navigation-updates-menu])
+                                           :state-flag          [:ote-service-flags :navigation-updates-menu]
+                                           :menu-click-handler  #(e! (fp-controller/->ToggleUpdatesMenu))
+                                           :entry-click-handler identity}]
 
-    [bottombar-spacer]
+      [bottombar-spacer]
 
-    [bottombar-dropdown e! app desktop? {:tag                 :service-info
-                                         :entries             [{:key :ohjeet
-                                                                :label (tr [:common-texts :user-menu-nap-help])
-                                                                :href (tr [:common-texts :user-menu-nap-help-link])
-                                                                :target "_blank"}
-                                                               {:key :rajapinta
-                                                                :label (tr [:common-texts :navigation-for-developers])
-                                                                :href "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
-                                                                :target "_blank"}
-                                                               (when (flags/enabled? :terms-of-service)
-                                                                 {:key :käyttöehdot
-                                                                  :label (tr [:common-texts :navigation-terms-of-service-text])
-                                                                  :href (tr [:common-texts :navigation-terms-of-service-url])
-                                                                  :target "_blank"})
-                                                               {:key :tietosuojaseloste
-                                                                :label (tr [:common-texts :navigation-privacy-policy])
-                                                                :href (tr [:common-texts :navigation-privacy-policy-url])
-                                                                :target "_blank"}]
-                                         :label               (tr [:common-texts :navigation-service-info-menu])
-                                         :state-flag          [:ote-service-flags :service-info-menu-open]
-                                         :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
-                                         :entry-click-handler identity}]
+      [bottombar-dropdown e! app desktop? {:tag                 :service-info
+                                           :entries             [{:key :ohjeet
+                                                                  :label (tr [:common-texts :user-menu-nap-help])
+                                                                  :href (tr [:common-texts :user-menu-nap-help-link])
+                                                                  :target "_blank"}
+                                                                 {:key :rajapinta
+                                                                  :label (tr [:common-texts :navigation-for-developers])
+                                                                  :href "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
+                                                                  :target "_blank"}
+                                                                 (when (flags/enabled? :terms-of-service)
+                                                                   {:key :käyttöehdot
+                                                                    :label (tr [:common-texts :navigation-terms-of-service-text])
+                                                                    :href (tr [:common-texts :navigation-terms-of-service-url])
+                                                                    :target "_blank"})
+                                                                 {:key :tietosuojaseloste
+                                                                  :label (tr [:common-texts :navigation-privacy-policy])
+                                                                  :href (tr [:common-texts :navigation-privacy-policy-url])
+                                                                  :target "_blank"}]
+                                           :label               (tr [:common-texts :navigation-service-info-menu])
+                                           :state-flag          [:ote-service-flags :service-info-menu-open]
+                                           :menu-click-handler  #(e! (fp-controller/->ToggleServiceInfoMenu))
+                                           :entry-click-handler identity}]
 
-    [bottombar-spacer]
-    [bottombar-dropdown e! app desktop? {:tag                 :support
-                                         :entries             [{:key :channels
-                                                                :label (tr [:common-texts :support-menu-channels])}
-                                                               {:key :contacts
-                                                                :label (tr [:common-texts :support-menu-contacts])}]
-                                         :label               (tr [:common-texts :navigation-support-menu])
-                                         :state-flag          [:ote-service-flags :support-menu-open]
-                                         :menu-click-handler  #(e! (fp-controller/->ToggleSupportMenu))
-                                         :entry-click-handler identity}]
+      [bottombar-spacer]
+      [bottombar-dropdown e! app desktop? {:tag                 :support
+                                           :entries             [{:key :channels
+                                                                  :label (tr [:common-texts :support-menu-channels])}
+                                                                 {:key :contacts
+                                                                  :label (tr [:common-texts :support-menu-contacts])}]
+                                           :label               (tr [:common-texts :navigation-support-menu])
+                                           :state-flag          [:ote-service-flags :support-menu-open]
+                                           :menu-click-handler  #(e! (fp-controller/->ToggleSupportMenu))
+                                           :entry-click-handler identity}]
 
-    [bottombar-spacer]
+      [bottombar-spacer]
 
-    (if (user-logged-in? app)
-      [bottombar-dropdown e! app desktop? {:tag                 :my-services
-                                           :entries             [{:key :services
-                                                                  :label (tr [:document-title :services])
-                                                                  :href "#/services"}
-                                                                 {:key :own-services
-                                                                  :label (tr [:document-title :own-services])
-                                                                  :href "#/own-services"}
-                                                                 {:key :routes
-                                                                  :label (tr [:common-texts :navigation-route])
-                                                                  :href "#/routes"}
-                                                                 {:key :pre-notices
-                                                                  :label (tr [:common-texts :navigation-pre-notice])
-                                                                  :href "#/pre-notices"}
-                                                                 {:key :authority-pre-notices
-                                                                  :label (tr [:common-texts :navigation-authority-pre-notices])
-                                                                  :href "#/authority-pre-notices"}
-                                                                 {:key :admin
-                                                                  :label (tr [:document-title :admin])
-                                                                  :href "#/admin"}
-                                                                 {:key :monitor
-                                                                  :label (tr [:document-title :monitor])
-                                                                  :href "#/monitor"}]
-                                           :label               (tr [:common-texts :navigation-my-services-menu])
-                                           :state-flag          [:ote-service-flags :my-services-menu-open]
-                                           :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
+      (if (user-logged-in? app)
+        [bottombar-dropdown e! app desktop? {:tag                 :my-services
+                                             :entries             [{:key :services
+                                                                    :label (tr [:document-title :services])
+                                                                    :href "#/services"}
+                                                                   {:key :own-services
+                                                                    :label (tr [:document-title :own-services])
+                                                                    :href "#/own-services"}
+                                                                   {:key :routes
+                                                                    :label (tr [:common-texts :navigation-route])
+                                                                    :href "#/routes"}
+                                                                   {:key :pre-notices
+                                                                    :label (tr [:common-texts :navigation-pre-notice])
+                                                                    :href "#/pre-notices"}
+                                                                   {:key :authority-pre-notices
+                                                                    :label (tr [:common-texts :navigation-authority-pre-notices])
+                                                                    :href "#/authority-pre-notices"}
+                                                                   {:key :admin
+                                                                    :label (tr [:document-title :admin])
+                                                                    :href "#/admin"}
+                                                                   {:key :monitor
+                                                                    :label (tr [:document-title :monitor])
+                                                                    :href "#/monitor"}]
+                                             :label               (tr [:common-texts :navigation-my-services-menu])
+                                             :state-flag          [:ote-service-flags :my-services-menu-open]
+                                             :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
+                                             :entry-click-handler (fn [e entry]
+                                                                    (routes/navigate! (:key entry))
+                                                                    (e! (fp-controller/->ToggleMyServicesMenu)))}]
+        [bottombar-simplelink e! app {:label              (tr [:document-title :services])
+                                      :href               "#/services"
+                                      :menu-click-handler #(do (routes/navigate! :services)
+                                                               (e! (fp-controller/->CloseHeaderMenus)))}])
+     ]
+
+     ; right aligned entries
+     [:span (stylefy/use-style (merge style-topnav/bottombar-right-aligned-items
+                                      (when (not desktop?)
+                                        (if menu-open?
+                                          {:display "block"}
+                                          {:display "none"}))))
+      (when (user-logged-in? app)
+        [bottombar-dropdown e! app desktop? {:tag                 :user-details
+                                             :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
+                                                                    :label (tr [:common-texts :navigation-email-notification-settings])
+                                                                    :href  "#/email-settings"}
+                                                                   {:key   :Käyttäjätilin-muokkaus
+                                                                    :label (tr [:common-texts :user-menu-profile])
+                                                                    :href "#/user"}
+                                                                   {:key   :Kirjaudu-ulos
+                                                                    :label (tr [:common-texts :user-menu-log-out])}]
+                                             :label               (get-in app [:user :name])
+                                             :prefix-icon         feather-icons/user
+                                             :state-flag          [:ote-service-flags :user-menu-open]
+                                             :menu-click-handler  #(e! (fp-controller/->ToggleUserMenu))
+                                             :entry-click-handler (fn [e entry]
+                                                                    (when (= (:key entry) :Kirjaudu-ulos)
+                                                                      (.preventDefault e)
+                                                                      (e! (fp-controller/->ToggleUserMenu))
+                                                                      (e! (login/->Logout))))}])
+      ; reagent version in this project is so old that it doesn't support fragments ([:<>]) so have to do these three
+      ; like so...
+      (when (and (not (user-logged-in? app))
+                 (flags/enabled? :ote-login))
+        [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-login])
+                                      :menu-click-handler #(e! (login/->ShowLoginPage))}])
+
+      (when (not (user-logged-in? app)) [bottombar-spacer])
+
+      (when (not (user-logged-in? app))
+        [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-register])
+                                      :menu-click-handler #(e! (fp-controller/->ToggleRegistrationDialog))}])
+
+      [bottombar-spacer]
+
+      [bottombar-dropdown e! app desktop? {:tag                 :language-selector
+                                           :entries             [{:key "fi"
+                                                                  :label "Suomeksi"}
+                                                                 {:key "sv"
+                                                                  :label "På Svenska"}
+                                                                 {:key "en"
+                                                                  :label "In English"}]
+                                           :label               (get-lang-label @localization/selected-language)
+                                           :prefix-icon         feather-icons/globe
+                                           :state-flag          [:ote-service-flags :lang-menu-open]
+                                           :menu-click-handler  #(e! (fp-controller/->ToggleLangMenu))
                                            :entry-click-handler (fn [e entry]
-                                                                  (routes/navigate! (:key entry))
-                                                                  (e! (fp-controller/->ToggleMyServicesMenu)))}]
-      [bottombar-simplelink e! app {:label              (tr [:document-title :services])
-                                    :href               "#/services"
-                                    :menu-click-handler #(do (routes/navigate! :services)
-                                                             (e! (fp-controller/->CloseHeaderMenus)))}])
-   ]
-   ; right aligned entries
-   [:span (stylefy/use-style style-topnav/bottombar-right-aligned-items)
-    (when (user-logged-in? app)
-      [bottombar-dropdown e! app desktop? {:tag                 :user-details
-                                           :entries             [{:key   :Sähköposti-ilmoitusten-asetukset
-                                                                  :label (tr [:common-texts :navigation-email-notification-settings])
-                                                                  :href  "#/email-settings"}
-                                                                 {:key   :Käyttäjätilin-muokkaus
-                                                                  :label (tr [:common-texts :user-menu-profile])
-                                                                  :href "#/user"}
-                                                                 {:key   :Kirjaudu-ulos
-                                                                  :label (tr [:common-texts :user-menu-log-out])}]
-                                           :label               (get-in app [:user :name])
-                                           :prefix-icon         feather-icons/user
-                                           :state-flag          [:ote-service-flags :user-menu-open]
-                                           :menu-click-handler  #(e! (fp-controller/->ToggleUserMenu))
-                                           :entry-click-handler (fn [e entry]
-                                                                  (when (= (:key entry) :Kirjaudu-ulos)
-                                                                    (.preventDefault e)
-                                                                    (e! (fp-controller/->ToggleUserMenu))
-                                                                    (e! (login/->Logout))))}])
-    ; reagent version in this project is so old that it doesn't support fragments ([:<>]) so have to do these three
-    ; like so...
-    (when (and (not (user-logged-in? app))
-               (flags/enabled? :ote-login))
-      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-login])
-                                    :menu-click-handler #(e! (login/->ShowLoginPage))}])
-
-    (when (not (user-logged-in? app)) [bottombar-spacer])
-
-    (when (not (user-logged-in? app))
-      [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-register])
-                                    :menu-click-handler #(e! (fp-controller/->ToggleRegistrationDialog))}])
-
-    [bottombar-spacer]
-
-    [bottombar-dropdown e! app desktop? {:tag                 :language-selector
-                                         :entries             [{:key "fi"
-                                                                :label "Suomeksi"}
-                                                               {:key "sv"
-                                                                :label "På Svenska"}
-                                                               {:key "en"
-                                                                :label "In English"}]
-                                         :label               (get-lang-label @localization/selected-language)
-                                         :prefix-icon         feather-icons/globe
-                                         :state-flag          [:ote-service-flags :lang-menu-open]
-                                         :menu-click-handler  #(e! (fp-controller/->ToggleLangMenu))
-                                         :entry-click-handler (fn [e entry]
-                                                                (.preventDefault e)
-                                                                (e! (fp-controller/->ToggleLangMenu))
-                                                                (e! (fp-controller/->SetLanguage (:key entry))))}]]])
+                                                                  (.preventDefault e)
+                                                                  (e! (fp-controller/->ToggleLangMenu))
+                                                                  (e! (fp-controller/->SetLanguage (:key entry))))}]]]))
 
 (def quicklink-urls
   {:fintraffic        {:url "https://www.fintraffic.fi/fi"                :langs {:fi "/fi" :sv "/sv" :en "/en"}}
@@ -348,7 +373,7 @@
       [:button (merge (stylefy/use-style (merge style-topnav/mobile-only
                                                 style-topnav/fintraffic-mobile-nav-button))
                       {:on-click #(e! (fp-controller/->ToggleFintrafficMenu))})
-       [:span {:style {:font-weight 600 :align-self "center"}} "Palvelut"]
+       [:span {:style {:font-weight 600 :align-self "center"}} "Palvelut"]  ; TODO: translations
        [(if menu-open?
          feather-icons/chevron-up
          feather-icons/chevron-down)
@@ -359,6 +384,6 @@
   [:header {:style {:box-shadow "0 2px 10px 0 rgba(0,0,0,0.1)"
                     :z-index    "100"}}
    [fintraffic-navbar e! app desktop?]
-   [nap-bottombar e! app]
+   [nap-bottombar e! app desktop?]
    [esc-press-listener e! app]
    [tos-notification e! app desktop?]])
