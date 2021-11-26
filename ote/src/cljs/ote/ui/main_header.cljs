@@ -315,7 +315,6 @@
     (str url lang)))
 
 (defn fintraffic-quick-links [e! app menu-open? desktop?]
-  (js/console.log (str "no onpa notta " menu-open? " ja " desktop? " koska " (:width app) " > " style-base/mobile-width-px))
   [:ul (stylefy/use-style (merge style-topnav/fintraffic-quick-links-menu
                                  (when (and (not desktop?)
                                             (not menu-open?))
