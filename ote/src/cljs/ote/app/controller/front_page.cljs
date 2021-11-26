@@ -15,6 +15,7 @@
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
 (defrecord ToggleFintrafficMenu [])
+(defrecord ToggleMobileBottomMenu [])
 (defrecord ToggleUpdatesMenu [])
 (defrecord ToggleServiceInfoMenu [])
 (defrecord ToggleMyServicesMenu [])
@@ -119,6 +120,14 @@
   (process-event [_ app]
     (toggle-menu app [:ote-service-flags :fintraffic-menu-open]))
 
+  ToggleMobileBottomMenu
+  (process-event [_ app]
+    ; mobile bottom menu is handled separately to support two-level nested menus
+    (assoc-in
+      app
+      [:ote-service-flags :mobile-bottom-menu-open]
+      (if (get-in app [:ote-service-flags :mobile-bottom-menu-open]) false true)))
+
   ToggleUpdatesMenu
   (process-event [_ app]
     (toggle-menu app [:ote-service-flags :navigation-updates-menu]))
@@ -145,7 +154,10 @@
 
   CloseHeaderMenus
   (process-event [_ app]
-    (close-all-menus app))
+    (-> app
+        (close-all-menus)
+        ; mobile bottom menu is handled separately to support two-level nested menus
+        (assoc-in [:ote-service-flags :mobile-bottom-menu-open] false)))
 
   Logout
   (process-event [_ app]

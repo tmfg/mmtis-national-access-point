@@ -46,7 +46,9 @@
                        :justify-content "flex-start"
                        :min-height "56px"
                        ::stylefy/media {{:max-width (str width-sm "px")} {:flex-direction "column"
-                                                                          :padding "0"}}})
+                                                                          :padding-left "1rem"
+                                                                          :padding-right "1rem"
+                                                                          :min-height "unset"}}})
 
 (def nap-menu {:height "100%"
                :width "100%"})
@@ -74,15 +76,23 @@
                             ::stylefy/media {{:max-width (str width-sm "px")} {:width "100%"
                                                                                :text-align "left"
                                                                                :line-height "1.5"
-                                                                               :padding ".5em 1em .5em 1em"}}})
+                                                                               :padding ".5em 0em .5em 0em"}}})
 
-(def bottombar-left-aligned-items {:display "flex"
-                                   ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"}}})
+(def bottombar-frontpage-label {:margin-right ".5rem"
+                                ::stylefy/media {{:max-width (str width-sm "px")} {:width "100%"
+                                                                                   :text-align "left"
+                                                                                   :line-height "1.5"
+                                                                                   :padding ".5em 0em .5em 0em"}}})
+
+(def bottombar-left-aligned-items {:display "flex"})
 
 (def bottombar-right-aligned-items {:display "flex"
                                     :margin-left "auto"
-                                    ::stylefy/media {{:max-width (str width-sm "px")} {:display "block"
-                                                                                       :margin "unset"}}})
+                                    ::stylefy/media {{:max-width (str width-sm "px")} {:margin "unset"}}})
+
+(def bottombar-mobile-menu {:display "flex"
+                            :margin-left "auto"
+                            :color "#000"})
 
 (def bottombar-spacer {:margin-right "1.2rem"
                        ::stylefy/media {{:max-width (str width-sm "px")} {:display "none"}}})
@@ -98,15 +108,17 @@
                                                                                   :border "none"}}})
 
 (def bottombar-dropdown-item {:border-bottom "1px solid #ddd"
-                                  :display "block"
-                                  :margin-right "0"
-                                  :white-space "nowrap"})
+                              :display "block"
+                              :margin-right "0"
+                              :white-space "nowrap"
+                              ::stylefy/media {{:max-width (str width-sm "px")} {:border "unset"}}})
 
 (def bottombar-dropdown-link {:display "block"
-                                  :padding ".5rem 1rem"
-                                  :transition "color .15s ease-out"
-                                  :color "#000"
-                                  :text-decoration "none"})
+                              :padding ".5rem 1rem"
+                              :transition "color .15s ease-out"
+                              :color "#000"
+                              :text-decoration "none"
+                              ::stylefy/media {{:max-width (str width-sm "px")} {:padding ".5rem 0rem"}}})
 
 (def fintraffic-logo-link {:align-self "center"
                            :display "inline-flex"
@@ -152,6 +164,9 @@
                                    :cursor "pointer"
                                    :height "100%"
                                    :border "0"})
+
+(def bottombar-mobile-nav-button (merge fintraffic-mobile-nav-button
+                                        {:color "#000"}))
 
 (def style {:content ""})
 
