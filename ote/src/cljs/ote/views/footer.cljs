@@ -1,9 +1,6 @@
 (ns ote.views.footer
   "NAP - footer"
-  (:require [cljs-react-material-ui.icons :as ic]
-            [ote.app.controller.flags :as flags]
-            [ote.app.controller.front-page :as fp-controller]
-            [ote.localization :refer [tr tr-key] :as localization]
+  (:require [ote.localization :refer [tr tr-key] :as localization]
             [ote.style.footer :as footer-styles]
             [ote.ui.common :as common :refer [linkify]]
             [re-svg-icons.feather-icons :as feather-icons]
@@ -23,7 +20,7 @@
    :en [{:href "https://www.fintraffic.fi/en/fintraffic/contact-information-and-invoicing-instructions" :label "Contact information"}
         {:href "https://www.fintraffic.fi/en/fintraffic/privacy-policy" :label "Privacy policy"}]})
 
-(defn footer [e! app]
+(defn footer []
   [:footer (stylefy/use-style footer-styles/footer)
    ; topbar
    [:div (stylefy/use-style footer-styles/topbar)

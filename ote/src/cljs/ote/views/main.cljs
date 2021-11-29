@@ -154,4 +154,4 @@
                   [transit-changes/transit-changes e! app]
 
                   [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
-            [footer/footer e! app]]])]])))
+            [footer/footer]]])]])))
