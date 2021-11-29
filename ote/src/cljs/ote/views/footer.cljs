@@ -13,13 +13,24 @@
                            ["sv" "På Svenska"]
                            ["en" "In English"]])
 
-(defn footer [e!]
+(def ^:private legal-links
+  {:fi [{:href "https://www.fintraffic.fi/fi/fintraffic/tietosuoja" :label "Tietosuoja"}
+        {:href "https://www.fintraffic.fi/fi/palaute" :label "Palaute"}
+        {:href "https://www.fintraffic.fi/fi/yhteystiedot" :label "Yhteystiedot"}
+        {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste" :label "Saavutettavuus"}]
+   :sv [{:href "https://www.fintraffic.fi/sv/fintraffic/kontaktuppgifter" :label "Kontaktinformation"}
+        {:href "https://www.fintraffic.fi/sv/fintraffic/dataskydd" :label "Dataskydd"}]
+   :en [{:href "https://www.fintraffic.fi/en/fintraffic/contact-information-and-invoicing-instructions" :label "Contact information"}
+        {:href "https://www.fintraffic.fi/en/fintraffic/privacy-policy" :label "Privacy policy"}]})
+
+(defn footer [e! app]
   [:footer (stylefy/use-style footer-styles/footer)
    ; topbar
    [:div (stylefy/use-style footer-styles/topbar)
     [:img (merge (stylefy/use-style footer-styles/fintraffic-logo)
                  {:src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"})]
     [:a (merge (stylefy/use-style footer-styles/link) {:href "https://fintraffic.fi"}) "fintraffic.fi"]]
+
    ; Fintraffic links
    [:div (stylefy/use-style footer-styles/site-links)
     [:div (stylefy/use-style footer-styles/fintraffic-site-links-wrapper)
@@ -36,11 +47,17 @@
           ^{:key (str "quicklink_" (name service))}
           [:li (stylefy/use-style footer-styles/site-link-entry)
            [:a (stylefy/use-style footer-styles/link {:href href}) (tr [:quicklink-header service])]]))]]
+
     [:ul (stylefy/use-style footer-styles/fintraffic-legal-links)
-     [:li [:a (merge (stylefy/use-style footer-styles/link) {:href "https://www.fintraffic.fi/fi/fintraffic/tietosuoja"}) "Tietosuoja"]]
-     [:li [:a (merge (stylefy/use-style footer-styles/link) {:href "https://www.fintraffic.fi/fi/fintraffic/palaute"}) "Palaute"]]
-     [:li [:a (merge (stylefy/use-style footer-styles/link) {:href "https://www.fintraffic.fi/fi/fintraffic/yhteystiedot"}) "Yhteystiedot"]]
-     [:li [:a (merge (stylefy/use-style footer-styles/link) {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste"}) "Saavutettavuus"]]]]
+     (let [language (or (keyword @localization/selected-language) :fi)]
+       (js/console.log (str "lang " language " >> " (str (get legal-links language))))
+       (doall
+         (for [{:keys [href label]} (get legal-links language)]
+           ^{:key (str "legallink_" (clojure.string/lower-case (name label)))}
+           [:li [:a (merge (stylefy/use-style footer-styles/link) {:href href})
+                 label]])))
+     ]]
+
    ; social media links
    [:div (stylefy/use-style footer-styles/some-link-wrapper)
     [:a  (merge (stylefy/use-style footer-styles/some-link)
