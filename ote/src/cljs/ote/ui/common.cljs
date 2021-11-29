@@ -4,6 +4,7 @@
             [cljs-react-material-ui.reagent :as ui]
             [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
+            [ote.localization :as localization]
             [ote.style.base :as style-base]
             [ote.style.form :as style-form]
             [ote.theme.colors :as colors]
@@ -348,3 +349,21 @@
                                   {:color colors/gray650
                                    :font-style "italic"}))
        (tr [:service-viewer :not-disclosed])])]))
+
+;;; Fintraffic header and footer common link helpers
+
+(def ^:private quicklink-urls
+  {:fintraffic        {:url "https://www.fintraffic.fi"                   :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
+   :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
+   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
+   :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
+   :finap             {:url "https://finap.fi/#/"                         :langs {}}})
+
+(defn localized-quicklink-uri [quicklink]
+  (let [current-language    (or (keyword @localization/selected-language) :fi)
+        {:keys [url langs]} (get quicklink-urls quicklink)
+        lang                (get langs current-language "")]
+    (str url lang)))

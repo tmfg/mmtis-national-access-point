@@ -1,48 +1,73 @@
 (ns ote.views.footer
   "NAP - footer"
-  (:require [ote.style.base :as style-base]
-            [ote.localization :refer [tr tr-key] :as localization]
-            [ote.ui.common :refer [linkify]]
-            [cljs-react-material-ui.icons :as ic]
-            [stylefy.core :as stylefy]
-            [ote.style.front-page :as style-front-page]
-            [ote.app.controller.front-page :as fp-controller]
-            [ote.app.controller.flags :as flags]))
+  (:require [ote.localization :refer [tr tr-key] :as localization]
+            [ote.style.footer :as footer-styles]
+            [ote.ui.common :as common :refer [linkify]]
+            [re-svg-icons.feather-icons :as feather-icons]
+            [stylefy.core :as stylefy]))
 
 (def selectable-languages [["fi" "Suomeksi"]
                            ["sv" "På Svenska"]
                            ["en" "In English"]])
 
-(defn footer [e!]
-  [:div
-   [:footer.site-footer
-    [:div.container {:style {:margin-bottom "60px"}}
-     [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
-      [:ul.unstyled
-       [:li (stylefy/use-style style-front-page/third-column-text)
-        [:a.logo {:href (tr [:common-texts :footer-livi-url-link])}
-             [:img {:class (:class (stylefy/use-style style-front-page/footer-logo)) :src "/img/icons/TRAFICOM_rgb.svg" :alt (tr [:common-texts :footer-livi-logo])}]]]
-       [:li (stylefy/use-style style-front-page/third-column-text)
-        [:a.logo {:href "#"}
-             [:img {:style {:width "120px"} :src "/img/icons/nap-logo.svg" :alt "NAP"}]]]]]
-     [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
-      [:ul.unstyled {:style {:font-size "0.875em"}}
-       [:li [linkify (tr [:common-texts :user-menu-nap-help-link])
-             [:div {:style {:height "30px"}} [:span [ic/notification-sms-failed {:style style-front-page/footer-small-icon}] (tr [:common-texts :user-menu-nap-help])]] {:target "_blank"}]]
-       [:li [linkify "https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/api/README.md"
-             [:div {:style {:height "30px"}} [:span [ic/action-code {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-for-developers])]] {:target "_blank"}]]
-       [:li [linkify (tr [:common-texts :navigation-feedback-link])
-             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-give-feedback])]] {:target "_blank"}]
-        [:span (stylefy/use-style style-front-page/footer-gray-info-text)
-         (tr [:common-texts :navigation-feedback-email])]]
-       (when (flags/enabled? :terms-of-service)
-         [:li [linkify (tr [:common-texts :navigation-terms-of-service-url])
-               [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-terms-of-service-text])]] {:target "_blank"}]])
-       [:li [linkify (tr [:common-texts :navigation-privacy-policy-url])
-             [:div {:style {:height "30px"}} [:span [ic/action-description {:style style-front-page/footer-small-icon}] (tr [:common-texts :navigation-privacy-policy])]] {:target "_blank"}]]
-       [:li [linkify (tr [:common-texts :footer-livi-url-link])
-             [:div {:style {:height "30px"}} [:span [ic/action-open-in-new {:style style-front-page/footer-small-icon}] (tr [:common-texts :footer-livi-url])]] {:target "_blank"}]]]]
-     [:div.col-xs-12.col-sm-4.col-md-4 (stylefy/use-style style-front-page/footer-3-container)
-      [:ul.unstyled
-       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width "80px" :height "52px" :margin-right "20px"} :src "/img/EU-logo.svg"}] (tr [:common-texts :footer-funded])]]
-       [:li (stylefy/use-style style-front-page/third-column-text) [:div {:style {:display "flex"}} [:img {:style {:width "60px" :height "60px" :margin-right "40px"} :src "/img/icons/cc.svg"}] (tr [:common-texts :footer-copyright-disclaimer])]]]]]]])
+(def ^:private legal-links
+  {:fi [{:href "https://www.fintraffic.fi/fi/fintraffic/tietosuoja" :label "Tietosuoja"}
+        {:href "https://www.fintraffic.fi/fi/palaute" :label "Palaute"}
+        {:href "https://www.fintraffic.fi/fi/yhteystiedot" :label "Yhteystiedot"}
+        {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste" :label "Saavutettavuus"}]
+   :sv [{:href "https://www.fintraffic.fi/sv/fintraffic/kontaktuppgifter" :label "Kontaktinformation"}
+        {:href "https://www.fintraffic.fi/sv/fintraffic/dataskydd" :label "Dataskydd"}]
+   :en [{:href "https://www.fintraffic.fi/en/fintraffic/contact-information-and-invoicing-instructions" :label "Contact information"}
+        {:href "https://www.fintraffic.fi/en/fintraffic/privacy-policy" :label "Privacy policy"}]})
+
+(defn footer []
+  [:footer (stylefy/use-style footer-styles/footer)
+   ; topbar
+   [:div (stylefy/use-style footer-styles/topbar)
+    [:img (merge (stylefy/use-style footer-styles/fintraffic-logo)
+                 {:src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"})]
+    [:a (merge (stylefy/use-style footer-styles/link) {:href "https://fintraffic.fi"}) "fintraffic.fi"]]
+
+   ; Fintraffic links
+   [:div (stylefy/use-style footer-styles/site-links)
+    [:div (stylefy/use-style footer-styles/fintraffic-site-links-wrapper)
+     [:ul (stylefy/use-style footer-styles/fintraffic-links)
+      (doall
+        (for [[href service] (map (juxt common/localized-quicklink-uri identity)
+                                [:traffic-situation
+                                 :feedback-channel
+                                 :train-departures
+                                 :skynavx
+                                 :digitraffic
+                                 :digitransit
+                                 :finap])]
+          ^{:key (str "quicklink_" (name service))}
+          [:li (stylefy/use-style footer-styles/site-link-entry)
+           [:a (stylefy/use-style footer-styles/link {:href href}) (tr [:quicklink-header service])]]))]]
+
+    [:ul (stylefy/use-style footer-styles/fintraffic-legal-links)
+     (let [language (or (keyword @localization/selected-language) :fi)]
+       (doall
+         (for [{:keys [href label]} (get legal-links language)]
+           ^{:key (str "legallink_" (clojure.string/lower-case (name label)))}
+           [:li [:a (merge (stylefy/use-style footer-styles/link) {:href href})
+                 label]])))
+     ]]
+
+   ; social media links
+   [:div (stylefy/use-style footer-styles/some-link-wrapper)
+    [:a  (merge (stylefy/use-style footer-styles/some-link)
+                {:href "https://www.facebook.com/FintrafficFI"})
+     [feather-icons/facebook (stylefy/use-style footer-styles/some-link-icon)]]
+    [:a (merge (stylefy/use-style footer-styles/some-link)
+               {:href "https://twitter.com/Fintraffic_fi"})
+     [feather-icons/twitter (stylefy/use-style footer-styles/some-link-icon)]]
+    [:a (merge (stylefy/use-style footer-styles/some-link)
+               {:href "https://www.instagram.com/fintraffic_stories_fi"})
+     [feather-icons/instagram (stylefy/use-style footer-styles/some-link-icon)]]
+    [:a (merge (stylefy/use-style footer-styles/some-link)
+               {:href "https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ"})
+     [feather-icons/youtube (stylefy/use-style footer-styles/some-link-icon)]]
+    [:a (merge (stylefy/use-style footer-styles/some-link)
+               {:href "https://www.linkedin.com/company/fintraffic"})
+     [feather-icons/linkedin (stylefy/use-style footer-styles/some-link-icon)]]]])

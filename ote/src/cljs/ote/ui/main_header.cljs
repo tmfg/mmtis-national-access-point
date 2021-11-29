@@ -13,7 +13,7 @@
             [ote.app.localstorage :as localstorage]
             [ote.app.routes :as routes]
             [ote.app.utils :refer [user-logged-in?]]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :as common :refer [linkify]]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
             [ote.style.base :as base]
@@ -323,29 +323,13 @@
                                                                   (e! (fp-controller/->ToggleLangMenu))
                                                                   (e! (fp-controller/->SetLanguage (:key entry))))}]]]))
 
-(def quicklink-urls
-  {:fintraffic        {:url "https://www.fintraffic.fi/fi"                :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
-   :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
-   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
-   :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
-   :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
-   :finap             {:url "https://finap.fi/#/"                         :langs {}}})
-
-(defn- localized-quicklink-uri [quicklink]
-  (let [current-language    (or (keyword @localization/selected-language) :fi)
-        {:keys [url langs]} (get quicklink-urls quicklink)
-        lang                (get langs current-language "")]
-    (str url lang)))
-
 (defn fintraffic-quick-links [e! app menu-open? desktop?]
   [:ul (stylefy/use-style (merge style-topnav/fintraffic-quick-links-menu
                                  (when (and (not desktop?)
                                             (not menu-open?))
                                    {:display "none"})))
      (doall
-       (for [[href service] (map (juxt localized-quicklink-uri identity)
+       (for [[href service] (map (juxt common/localized-quicklink-uri identity)
                                  [:traffic-situation
                                   :feedback-channel
                                   :train-departures
@@ -366,7 +350,7 @@
   (let [menu-open? (get-in app [:ote-service-flags :fintraffic-menu-open])]
     [:div (stylefy/use-style style-topnav/header-topbar)
      [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
-                {:href (localized-quicklink-uri :fintraffic)})
+                {:href (common/localized-quicklink-uri :fintraffic)})
       [:img {:style style-topnav/fintraffic-logo
              :src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]]
      [:nav (stylefy/use-style style-topnav/fintraffic-quick-links)
