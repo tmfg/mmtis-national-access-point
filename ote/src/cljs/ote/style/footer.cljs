@@ -17,8 +17,8 @@
              :margin-bottom   "1rem"
              :display         "flex"
              :justify-content "space-between"
-             :align-items     "center"}
-             ::stylefy/media  {{:min-width (str screens/width-sm "px")} {:flex-basis "100%"}})
+             :align-items     "center"
+             ::stylefy/media  {{:min-width (str screens/width-sm "px")} {:flex-basis "100%"}}})
 
 (def link {:color           "inherit"
            :text-decoration "none"
