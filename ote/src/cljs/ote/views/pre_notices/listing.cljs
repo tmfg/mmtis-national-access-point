@@ -8,6 +8,7 @@
             [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
+            [ote.style.buttons :as style-buttons]
             [ote.views.transport-operator-selection :as t-operator-sel]
             [cljs-react-material-ui.icons :as ic]
             [cljs-react-material-ui.reagent :as ui]
@@ -16,7 +17,8 @@
             [ote.app.controller.front-page :as fp]
             [ote.ui.common :as common]
             [ote.style.dialog :as style-dialog]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [stylefy.core :as stylefy]))
 
 (defn pre-notice-type->str
   [types]
@@ -76,13 +78,11 @@
           [list-header/header
            app
            (tr [:pre-notice-list-page :header-pre-notice-list])
-           [ui/raised-button {:id "add-new-pre-notice"
-                              :label (tr [:buttons :add-new-pre-notice])
-                              :on-click #(do
-                                           (.preventDefault %)
-                                           (e! (pre-notice/->CreateNewPreNotice)))
-                              :primary true
-                              :icon (ic/content-add)}]
+           [:a (merge {:on-click #(do
+                                    (.preventDefault %)
+                                    (e! (pre-notice/->CreateNewPreNotice)))}
+                      (stylefy/use-style style-buttons/primary-button))
+            (tr [:buttons :add-new-pre-notice])]
            [t-operator-sel/transport-operator-selection e! app]]]
          [:div {:style {:margin-bottom "40px"}}
           [:h3 (tr [:pre-notice-list-page :pre-notice-drafts])]
