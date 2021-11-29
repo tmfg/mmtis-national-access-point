@@ -43,7 +43,8 @@
      [:li [:a (merge (stylefy/use-style footer-styles/link) {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste"}) "Saavutettavuus"]]]]
    ; social media links
    [:div (stylefy/use-style footer-styles/some-link-wrapper)
-    [:a {:style {:color "inherit" :text-decoration "none"} :href "https://www.facebook.com/FintrafficFI"}
+    [:a  (merge (stylefy/use-style footer-styles/some-link)
+                {:href "https://www.facebook.com/FintrafficFI"})
      [feather-icons/facebook (stylefy/use-style footer-styles/some-link-icon)]]
     [:a (merge (stylefy/use-style footer-styles/some-link)
                {:href "https://twitter.com/Fintraffic_fi"})
