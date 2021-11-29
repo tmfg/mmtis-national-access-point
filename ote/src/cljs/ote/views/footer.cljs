@@ -50,7 +50,6 @@
 
     [:ul (stylefy/use-style footer-styles/fintraffic-legal-links)
      (let [language (or (keyword @localization/selected-language) :fi)]
-       (js/console.log (str "lang " language " >> " (str (get legal-links language))))
        (doall
          (for [{:keys [href label]} (get legal-links language)]
            ^{:key (str "legallink_" (clojure.string/lower-case (name label)))}
