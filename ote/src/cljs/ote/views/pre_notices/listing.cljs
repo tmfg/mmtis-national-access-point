@@ -18,6 +18,7 @@
             [ote.ui.common :as common]
             [ote.style.dialog :as style-dialog]
             [ote.ui.circular_progress :as circular-progress]
+            [re-svg-icons.feather-icons :as feather-icons]
             [stylefy.core :as stylefy]))
 
 (defn pre-notice-type->str
@@ -82,6 +83,7 @@
                                     (.preventDefault %)
                                     (e! (pre-notice/->CreateNewPreNotice)))}
                       (stylefy/use-style style-buttons/primary-button))
+            [feather-icons/plus {:style {:padding-right ".5rem"}}]
             (tr [:buttons :add-new-pre-notice])]
            [t-operator-sel/transport-operator-selection e! app]]]
          [:div {:style {:margin-bottom "40px"}}
