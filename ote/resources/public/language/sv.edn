@@ -1073,7 +1073,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-terms-and-cookies " för tjänsten, inklusive användningen av kakor (cookies)."
   :navigation-updates-menu "Uppdateringar"
   :navigation-service-info-menu "Om NAP"
-  :navigation-my-services-menu "TODO my services"
+  :navigation-my-services-menu "Min tjänster"
   :navigation-support-menu "Hjälp"
   :navigation-general-menu "Meny"
   :navigation-for-developers "Programmeringsgränssnitt för utvecklare"
