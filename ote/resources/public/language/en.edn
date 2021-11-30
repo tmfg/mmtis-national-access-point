@@ -393,6 +393,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
   :continue-editing "Continue modifying the information"
+
+  :load-transport-service-operator-data-as-csv "TODO: translate into English: Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
 
  ;; Database enumeration values

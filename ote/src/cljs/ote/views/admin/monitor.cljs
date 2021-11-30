@@ -12,7 +12,8 @@
             [ote.style.base :as style-base]
             [cljs-react-material-ui.icons :as ic]
             [ote.time :as time]
-            [ote.ui.circular_progress :as circular-progress]))
+            [ote.ui.circular_progress :as circular-progress]
+            [re-svg-icons.feather-icons :as feather-icons]))
 
 ;; Patterned after the advice at
 ;; https://github.com/Day8/re-frame/blob/master/docs/Using-Stateful-JS-Components.md
@@ -116,15 +117,11 @@
 
      [:div {:style {:padding-top "2rem"}}
       [:div
-       [btn/big-icon-button-with-label
-        {:id "btn-all-companies-csv"
-         :on-click #(e! (monitor-controller/->DownloadCsv "/admin/reports/monitor/csv/all-companies" (str "yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")))
-         :style {:padding "1rem"}}
-        [ic/action-description {:style {:width 30
-                                          :height 30
-                                          :margin-right "0.5rem"
-                                          :color colors/primary}}]
-        "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"]]
+       (merge {:on-click #(e! (monitor-controller/->DownloadCsv "/admin/reports/monitor/csv/all-companies" (str "yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")))
+               :id "btn-all-companies-csv"}
+              (stylefy/use-style style-buttons/primary-button))
+       [feather-icons/file-text {:style {:padding-right ".5rem"}}]
+       (tr [:buttons :load-transport-service-operator-data-as-csv])]
       [:div
        [form-fields/field
         {:label "Kaavioiden aikayksikkö"
