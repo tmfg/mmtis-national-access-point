@@ -471,7 +471,7 @@
                :on-click #(do
                             (.preventDefault %)
                             (e! (to-controller/->CreateTransportOperator)))}
-              (stylefy/use-style style-buttons/outline-button))
+              (stylefy/use-style style-buttons/primary-button))
     (tr [:buttons :add-new-transport-operator])]])
 
 (defn- no-operator
