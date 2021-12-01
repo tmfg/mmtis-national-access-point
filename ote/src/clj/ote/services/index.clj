@@ -127,6 +127,8 @@
              (when (bound? #'anti-forgery/*anti-forgery-token*)
                {:data-anti-csrf-token anti-forgery/*anti-forgery-token*}))
       [:div#oteapp]
+      (when (not dev-mode?)
+        [:script#CookieConsent {:src "https://policy.app.cookieinformation.com/uc.js" :data-culture "FI" :type "text/javascript"}])
       (when dev-mode?
         [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
