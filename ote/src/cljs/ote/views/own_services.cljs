@@ -42,7 +42,7 @@
                :on-click #(do
                             (.preventDefault %)
                             (e! (ts-controller/->DeleteTransportService id)))})
-    [feather-icons/trash-2]
+    [feather-icons/trash-2 (stylefy/use-style style-base/gray-link-with-icon)]
     [:span {:style {:padding-top "4px"}} (tr [:buttons :delete])]]
    (when show-delete-modal?
      [ui/dialog
@@ -155,7 +155,7 @@
                           :on-click #(do
                                        (.preventDefault %)
                                        (e! (fp-controller/->ChangePage :edit-service {:id id})))})
-               [feather-icons/edit]
+               [feather-icons/edit (stylefy/use-style style-base/gray-link-with-icon)]
                [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
               [delete-service-action e! row]]]]))
        (filter #(false? (::t-service/has-child? %)) services)))])
