@@ -154,12 +154,8 @@
                           :id (str "edit-service-button" id)
                           :on-click #(do
                                        (.preventDefault %)
-                                       (e! (fp-controller/->ChangePage :edit-service {:id id})))}
-                         (stylefy/use-style style-base/gray-link-with-icon))
-               (ic/content-create {:style {:width 24
-                                           :height 24
-                                           :margin-right "2px"
-                                           :color colors/icon-gray}})
+                                       (e! (fp-controller/->ChangePage :edit-service {:id id})))})
+               [feather-icons/edit]
                [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
               [delete-service-action e! row]]]]))
        (filter #(false? (::t-service/has-child? %)) services)))])
