@@ -24,17 +24,15 @@
             [ote.ui.page :as page]
             [ote.app.utils :as utils]
             [ote.style.dialog :as style-dialog]
-            [ote.format :as format]))
+            [ote.format :as format]
+            [re-svg-icons.feather-icons :as feather-icons]))
 
 (defn- delete-service-action [e! id name show-delete-modal?]
-  [:div {:style {:color "#fff"}}
-   [ui/icon-button {:href "#"
-                    :style style/delete-button
-                    :on-click #(do
-                                 (.preventDefault %)
-                                 (e! (admin/->DeleteTransportService id)))}
-    [ic/action-delete {:class-name (:class (stylefy/use-style style/delete-icon))
-                       :style style/partly-visible-delete-icon}]]
+  [:div
+   (merge {:on-click #(do
+                        (.preventDefault %)
+                        (e! (admin/->DeleteTransportService id)))})
+   [feather-icons/trash-2 (stylefy/use-style style/delete-icon)]
    (when show-delete-modal?
      [ui/dialog
       {:open true
