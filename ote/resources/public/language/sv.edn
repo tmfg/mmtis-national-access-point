@@ -396,6 +396,8 @@
   :register-to-service "Registrering"
   :check-out-the-service "Bekanta dig med informationen"
   :continue-editing "Fortsätt redigera uppgifter"
+
+  :load-transport-service-operator-data-as-csv "TODO: translate into Swedish: Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
 
  ;; Database enumeration values

@@ -391,6 +391,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :register-to-service "Rekisteröidy palveluun"
   :check-out-the-service "Tutustu tietoihin"
   :continue-editing "Jatka tietojen muokkaamista"
+
+  :load-transport-service-operator-data-as-csv "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
 
  ;; Database enumeration values
