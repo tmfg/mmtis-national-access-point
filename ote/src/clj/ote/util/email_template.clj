@@ -199,7 +199,7 @@
               (tr [:email-templates :footer :help-desk])]]
       [:p
        [:a {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-            :href "mailto:nap@traficom.fi"} (tr [:email-templates :footer :help-desk-email])]
+            :href "mailto:nap@fintraffic.fi"} (tr [:email-templates :footer :help-desk-email])]
        [:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         (tr [:email-templates :footer :help-desk-phone])]]
       [:br]

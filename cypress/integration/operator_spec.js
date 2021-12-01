@@ -15,7 +15,7 @@ describe('Operator creation basic tests', function () {
         telephone: "555 4567890",
         email: "e2eacmecorp@localhost",
         web: "www.acmecorp.acme",
-        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@traficom.fi',
+        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@fintraffic.fi',
         businessIdInvalidWarding: 'Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero.'
 
     };
@@ -70,7 +70,7 @@ describe('Operator creation advanced tests', function () {
         telephone: "555 4567890",
         email: "e2eacmecorp@localhost",
         web: "www.acmecorp.acme",
-        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@traficom.fi',
+        businessIdExistsWarning: 'Antamasi Y-tunnus löytyy jo NAP:sta. Ota yhteys NAP-Helpdeskiin asian selvittämiseksi, nap@fintraffic.fi',
         businessIdInvalidWarding: 'Y-tunnuksen tulee olla muotoa: 7 numeroa, väliviiva ja tarkistusnumero.'
 
     };
