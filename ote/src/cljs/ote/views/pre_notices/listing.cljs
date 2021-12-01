@@ -55,7 +55,7 @@
                                                 (.preventDefault %)
                                                 (e! (fp/->ChangePage :edit-pre-notice {:id (::transit/id row)})))}
                    (case state
-                     :draft [ic/content-create]
+                     :draft [feather-icons/edit]
                      :sent [ic/action-visibility])]]
 
                  (when (= :draft state)
@@ -64,7 +64,7 @@
                                      :on-click #(do
                                                   (.preventDefault %)
                                                   (e! (pre-notice/->DeletePreNotice row)))}
-                     [ic/action-delete]]])])}]
+                     [feather-icons/trash-2]]])])}]
       notices]]))
 
 (defn pre-notices [e! {:keys [transport-operator pre-notices delete-pre-notice-dialog] :as app}]
