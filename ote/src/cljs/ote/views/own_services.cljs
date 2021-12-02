@@ -27,7 +27,8 @@
             [ote.app.controller.transport-service :as ts-controller]
             [ote.views.transport-service.transport-service :as transport-service]
             [ote.views.transport-service.service-type :as service-type]
-            [ote.ui.common :as common]))
+            [ote.ui.common :as common]
+            [re-svg-icons.feather-icons :as feather-icons]))
 
 (def ic-warning [ic/alert-warning {:style {:color colors/negative-button
                                            :margin-bottom "5px"}}])
@@ -40,12 +41,8 @@
                :id (str "delete-service-button" id)
                :on-click #(do
                             (.preventDefault %)
-                            (e! (ts-controller/->DeleteTransportService id)))}
-              (stylefy/use-style style-base/gray-link-with-icon))
-    (ic/action-delete {:style {:width 24
-                               :height 24
-                               :margin-right "2px"
-                               :color colors/icon-gray}})
+                            (e! (ts-controller/->DeleteTransportService id)))})
+    [feather-icons/trash-2 (stylefy/use-style style-base/gray-link-with-icon)]
     [:span {:style {:padding-top "4px"}} (tr [:buttons :delete])]]
    (when show-delete-modal?
      [ui/dialog
@@ -157,12 +154,8 @@
                           :id (str "edit-service-button" id)
                           :on-click #(do
                                        (.preventDefault %)
-                                       (e! (fp-controller/->ChangePage :edit-service {:id id})))}
-                         (stylefy/use-style style-base/gray-link-with-icon))
-               (ic/content-create {:style {:width 24
-                                           :height 24
-                                           :margin-right "2px"
-                                           :color colors/icon-gray}})
+                                       (e! (fp-controller/->ChangePage :edit-service {:id id})))})
+               [feather-icons/edit (stylefy/use-style style-base/gray-link-with-icon)]
                [:span {:style {:padding-top "4px"}} (tr [:buttons :edit])]]
               [delete-service-action e! row]]]]))
        (filter #(false? (::t-service/has-child? %)) services)))])
