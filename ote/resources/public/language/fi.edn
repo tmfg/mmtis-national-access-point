@@ -1260,6 +1260,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :service-count [:count " palvelua"]
   :service-providing-text ", joiden tuottamiseen osallistuu yhteensä "
   :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
+  :service-search-tos-notification-start "Hakemalla ja hyödyntämällä aineistoja sitoudut palvelun "
+  :service-search-tos-notification-link "käyttöehtoihin"
   :fetching-more "Haetaan lisää palveluita..."
   :view-routes "Katsele reittejä"
   :view-routes-failure "Reittejä ei voi katsella"

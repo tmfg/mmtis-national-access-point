@@ -1253,6 +1253,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :service-count [:count " services"]
   :service-providing-text ", the production of which involves a total of "
   :service-and-operator-summary-text [:count " companies or organisations."]
+  :service-search-tos-notification-start "By downloading and utilizing the materials, you agree to the "
+  :service-search-tos-notification-link "Terms and Conditions"
   :fetching-more "Fetching more services..."
   :view-routes "View routes"
   :view-routes-failure "Route viewing not possible"
