@@ -52,7 +52,14 @@
            ^{:key (str "legallink_" (clojure.string/lower-case (name label)))}
            [:li [:a (merge (stylefy/use-style footer-styles/link) {:href href})
                  label]])))
-     ]]
+     ]
+
+    [:ul (stylefy/use-style footer-styles/fintraffic-support-link)
+     [:li
+      [:a (merge (stylefy/use-style footer-styles/link)
+                 {:href (tr [:common-texts :navigation-feedback-link])})
+       [:span {:style {:font-weight 600}} (tr [:common-texts :navigation-give-feedback])][:br]
+       (tr [:common-texts :navigation-feedback-email])]]]]
 
    ; social media links
    [:div (stylefy/use-style footer-styles/some-link-wrapper)

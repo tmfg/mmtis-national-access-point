@@ -29,7 +29,7 @@
                  ::stylefy/media {{:min-width (str screens/width-sm "px")} {:margin-bottom         "3.5rem"
                                                                             :padding-bottom        "1rem"
                                                                             :display               "grid"
-                                                                            :grid-template-columns "max-content min-content"
+                                                                            :grid-template-columns "max-content min-content auto"
                                                                             :gap                   "0 3rem"}}})
 
 (def site-link-entry {::stylefy/mode {":nth-child(4)" {:margin-bottom "1rem"}}})
@@ -43,7 +43,12 @@
 (def fintraffic-site-links-wrapper {:margin-bottom "1rem"
                                     :font-weight   "600"})
 
-(def fintraffic-legal-links {:list-style "none"})
+(def footer-ul-section {:list-style "none"
+                        :margin-bottom "1rem !important"})
+
+(def fintraffic-legal-links footer-ul-section)
+
+(def fintraffic-support-link footer-ul-section)
 
 (def fintraffic-logo {:height "18px"
                       :width  "106px"})
