@@ -1262,6 +1262,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :service-and-operator-summary-text [:count " yritystä tai organisaatiota."]
   :service-search-tos-notification-start "Hakemalla ja hyödyntämällä aineistoja sitoudut palvelun "
   :service-search-tos-notification-link "käyttöehtoihin"
+  :service-search-tos-notification-end "."
   :fetching-more "Haetaan lisää palveluita..."
   :view-routes "Katsele reittejä"
   :view-routes-failure "Reittejä ei voi katsella"

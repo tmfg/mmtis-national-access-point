@@ -1254,7 +1254,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :service-count [:count " tjänster"]
   :service-providing-text ", i vars produktion medverkar totalt "
   :service-and-operator-summary-text [:count " företag eller organisationer."]
-  :service-search-tos-notification-start "Hakemalla ja hyödyntämällä aineistoja sitoudut palvelun käyttöehtoihin."
+  :service-search-tos-notification-start "Du godkänner "
+  :service-search-tos-notification-end " genom att ladda ner och använda materialet från Finap"
   :service-search-tos-notification-link "användvillkor"
   :fetching-more "Sökning av tjänster pågår..."
   :view-routes "Visa rutter"
