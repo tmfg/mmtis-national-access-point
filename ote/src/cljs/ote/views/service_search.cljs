@@ -312,8 +312,15 @@
     [:div
      [:p (stylefy/use-style style/title-group-description) (tr [:service-search :service-summary-text])
       [:strong (tr [:service-search :service-count] {:count total-service-count})]
-     (tr [:service-search :service-providing-text])
-      [:strong (tr [:service-search :service-and-operator-summary-text] {:count total-company-count})]]
+      (tr [:service-search :service-providing-text])
+      [:strong (tr [:service-search :service-and-operator-summary-text] {:count total-company-count}) " "]
+      (tr [:service-search :service-search-tos-notification-start])
+      [common-ui/linkify
+       (tr [:common-texts :navigation-terms-of-service-url])
+       (tr [:service-search :service-search-tos-notification-link])
+       {:target "_blank"}]
+      (tr [:service-search :service-search-tos-notification-end])]
+
      [:h3 (tr [:service-search :limit-search-results])]
      [form/form {:update! #(e! (ss/->UpdateSearchFilters %))
                  :name->label (tr-key [:service-search]

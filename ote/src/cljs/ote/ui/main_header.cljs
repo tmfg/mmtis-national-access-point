@@ -42,53 +42,6 @@
        (fn [_]
          [:span {:ref "clicksensor"}])})))
 
-(defn tos [e! app desktop?]
-  (let [page (:page app)
-        user (:user app)
-        user-logged-in? (not (nil? user))
-        show-tos? (not (or (= page :register)
-                           (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
-                           (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))]
-    (when show-tos?
-      [:div {:style
-             (merge
-               style-topnav/tos-container
-               (when-not desktop?
-                 {:padding "2px"}))}
-       [:div {:style {:display "inline-flex" :width "90%"}}
-        [ic/action-info {:style {:color "#FFFFFF"}}]
-        [:span (stylefy/use-style style-topnav/tos-texts)
-         (tr [:common-texts :agree-to-privacy-and-terms])
-         (linkify (tr [:common-texts :navigation-terms-of-service-url]) (str/lower-case (tr [:common-texts :navigation-terms-of-service])) {:style style-topnav/tos-toplink
-                                                                                                                                            :target "_blank"})
-         (tr [:common-texts :and])
-         (linkify (tr [:common-texts :navigation-privacy-policy-url]) (tr [:common-texts :navigation-privacy-policy-text]) {:style (merge style-topnav/tos-toplink
-                                                                                                                                          {:padding-right 0})
-                                                                                                                            :target "_blank"})
-         (tr [:common-texts :navigation-terms-and-cookies])]]
-       [:div {:style (merge
-                       {:width "10%" :float "right"}
-                       (when-not desktop?
-                         {:padding-top "10px"}))}
-        [:span {:style {:float "right" :padding-right "10px"}
-                :on-click #(do
-                             (.preventDefault %)
-                             (e! (fp-controller/->CloseTermsAndPrivacy user)))}
-         [ic/navigation-close {:style {:color "#FFFFFF"}}]]]])))
-
-(defn tos-notification [e! app desktop?]
-  (let [user (:user app)
-        page (:page app)
-        user-logged-in? (not (nil? user))
-        show-tos? (if (flags/enabled? :terms-of-service)
-                    (not (or (= page :register)
-                             (and (not user-logged-in?) (= "true" (localstorage/get-item :tos-ok)))
-                             (and user-logged-in? (= "true" (localstorage/get-item (keyword (str (:email user) "-tos-ok")))))))
-                    false)]
-  (when (and (flags/enabled? :terms-of-service)
-             show-tos?)
-    [tos e! app desktop?])))
-
 (defn get-lang-label [lang]
   (str (->> footer/selectable-languages
             (filter #(= (first %) (name lang)))
@@ -369,5 +322,4 @@
                     :z-index    "100"}}
    [fintraffic-navbar e! app desktop?]
    [nap-bottombar e! app desktop?]
-   [esc-press-listener e! app]
-   [tos-notification e! app desktop?]])
+   [esc-press-listener e! app]])
