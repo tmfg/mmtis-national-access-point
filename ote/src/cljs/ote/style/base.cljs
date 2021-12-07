@@ -54,8 +54,12 @@
 
 (def base-link {:color colors/primary
                 :text-decoration "none"
-                ::stylefy/mode {:hover {:text-decoration "underline"
-                                        :color colors/primary-dark}}})
+                ::stylefy/mode {:hover {:text-decoration "underline"}}})
+
+(def inline-icon {:height "16px"
+                  :position "relative"
+                  :top "2px"
+                  :align-self "center"})
 
 (def base-button
   {:padding-left "1.1em"
@@ -187,7 +191,7 @@
 (def link-icon-container {:float "left" :padding-right "10px"})
 (def link-icon {:color "#06c" :height 18 :width 18})
 
-(def link-color "#2D75B4")
+(def link-color colors/primary-text-color)
 
 (def filters-form
   {:border "solid 1px #0046ad"})

@@ -53,12 +53,9 @@
 (def nap-menu {:height "100%"
                :width "100%"})
 
-(def topbar-entry-icon {:color "#fff"
-                        :width "16px"
-                        :height "16px"
-                        :align-self "center"})
+(def topbar-entry-icon (merge base/inline-icon {:color "#fff"}))
 
-(def bottombar-entry-icon (merge topbar-entry-icon {:color "#000"}))
+(def bottombar-entry-icon (merge base/inline-icon {:color "#000"}))
 
 (def bottombar-entry-button {:display "flex"
                        :justify-content "center"
