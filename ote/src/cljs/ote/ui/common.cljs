@@ -12,6 +12,7 @@
             [reagent.core :as r]
             [clojure.string :as str]
             [reagent.core :as reagent]
+            [re-svg-icons.feather-icons :as feather-icons]
 
             [goog.crypt.Md5]
             [goog.crypt]
@@ -19,51 +20,103 @@
             [ote.util.text :as text]
             [ote.app.routes :as routes]))
 
+(def ^:private quicklink-urls
+  {:fintraffic        {:url "https://www.fintraffic.fi"                   :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
+   :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
+   :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
+   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
+   :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
+   :finap             {:url "https://finap.fi/#/"                         :langs {}}})
+
+(def ^:private trusted-urls
+  "List of external trusted URLs which user doesn't need to confirm before navigating."
+  (concat
+    (map (fn [[_ data]] (:url data)) quicklink-urls)  ; Fintraffic properties
+    ["https://www.traficom.fi"]                       ; UI links to various resources hosted on Traficom.fi
+    ))
+
+(defn- trusted-url?
+  [url]
+  (some #(clojure.string/starts-with? url %) trusted-urls))
+
+(defn localized-quicklink-uri [quicklink]
+  (let [current-language    (or (keyword @localization/selected-language) :fi)
+        {:keys [url langs]} (get quicklink-urls quicklink)
+        lang                (get langs current-language "")]
+    (str url lang)))
+
 (def mobile?
   (let [ua (str/lower-case js/window.navigator.userAgent)]
     (boolean (some (partial str/includes? ua) ["android" "iphone" "ipad" "mobile"]))))
 
+(defn- sanitize-url
+  "Autodetects and sanitizes given URL based on whether it's internal or external link. Returns a tuple of sanitized URL
+   and a boolean indicating whether the link is internal or external,
+   ```clojure
+   (sanitize-url \"www.example.com\")
+   ;=> [\"http://www.example.com\" true]
+   ```"
+  [url]
+  (cond
+    ;; URL with protocol, use as is
+    (re-matches #"^(\w+:).*" url)
+    [url true]
+
+    ;; User specified link without protocol (like "www.serviceprovider.fi/foo")
+    (re-matches #"^[^/]+\..*" url)
+    [(str "http://" url) true]
+
+    ;; Internal relative link, like "pre-notice/attachment/1"
+    :default
+    [url false]))
+
+(defn- icon-link
+  [icon label]
+  (let [[icon-elt icon-attrs] icon]
+    [:span [icon-elt (merge icon-attrs
+                            {:style {:position "relative"
+                                     :top "6px"
+                                     :padding-right "5px"}})]
+     label]))
+
+(defn- link-warning
+  "Confirm from user that it is OK to follow the link. Returns the event for chaining."
+  [e]
+  (when-not (boolean (js/confirm (tr [:common-texts :follow-external-link-confirm])))
+    (.preventDefault e))
+  e)
+
 (defn linkify
   ([url label]
    (linkify url label nil))
-  ([url label {:keys [icon target style] :as props}]
-   (let [a-props (dissoc
-                   (if (= target "_blank")
-                     ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
-                     (assoc props :rel "noopener noreferrer")
-                     props)
-                   :icon :style)]
+  ([url label {:keys [icon target style hide-external-icon? on-click] :as props}]
+   (let [a-props         (dissoc
+                           (if (= target "_blank")
+                             ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
+                             (assoc props :rel "noopener noreferrer")
+                             props)
+                           :icon :style)
+         [url external?] (sanitize-url url)
+         on-click-fn     (if (and external?
+                                  (not (trusted-url? url)))
+                           (comp (or on-click identity) link-warning)
+                           on-click)]
 
-     (if-not url
-       [:span]
-       ;; Lazy check if url has a protocol, or if it is a relative path
-       (let [url (cond
-                   ;; URL with protocol, use as is
-                   (re-matches #"^(\w+:|.?.?/).*" url)
-                   url
-
-                   ;; User specified link without protocol (like "www.serviceprovider.fi/foo")
-                   (re-matches #"^[^/]+\..*" url)
-                   (str "http://" url)
-
-                   ;; Internal relative link, like "pre-notice/attachment/1"
-                   :default
-                   url)]
-         [:a (merge
-               (stylefy/use-style (merge style-base/base-link
-                                         (when style
-                                           style)))
-               {:href url}
-               a-props)
+       [:a (merge
+             (stylefy/use-style (merge style-base/base-link
+                                       (when style
+                                         style)))
+             {:href url}
+             a-props
+             (when (fn? on-click-fn) {:on-click on-click-fn}))
           (if icon
-            (let [[icon-elt icon-attrs] icon]
-              [:span [icon-elt (merge icon-attrs
-                                      {:style {:position "relative"
-                                               :top "6px"
-                                               :padding-right "5px"
-                                               :color style-base/link-color}})]
-               label])
-            label)])))))
+            [icon-link icon label]
+            label)
+          (when (and external?
+                     (not hide-external-icon?))
+            [feather-icons/external-link (stylefy/use-style style-base/inline-icon)])])))
 
 (defn tooltip-wrapper
   "Wrap any ui component with balloon.css tooltip bindings."
@@ -349,21 +402,3 @@
                                   {:color colors/gray650
                                    :font-style "italic"}))
        (tr [:service-viewer :not-disclosed])])]))
-
-;;; Fintraffic header and footer common link helpers
-
-(def ^:private quicklink-urls
-  {:fintraffic        {:url "https://www.fintraffic.fi"                   :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
-   :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
-   :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
-   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
-   :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
-   :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
-   :finap             {:url "https://finap.fi/#/"                         :langs {}}})
-
-(defn localized-quicklink-uri [quicklink]
-  (let [current-language    (or (keyword @localization/selected-language) :fi)
-        {:keys [url langs]} (get quicklink-urls quicklink)
-        lang                (get langs current-language "")]
-    (str url lang)))
