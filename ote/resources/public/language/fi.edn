@@ -1168,6 +1168,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :have-read-services "Olen tutustunut NAP-palvelun "
   :and-agree-service-terms " ja hyväksyn palvelun "
   :of-service "."
+
+  :follow-external-link-confirm "Olet poistumassa NAP-palvelusta. Haluatko varmasti jatkaa?"
   }
 
 

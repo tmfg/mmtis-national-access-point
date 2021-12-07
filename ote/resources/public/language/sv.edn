@@ -1163,6 +1163,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :have-read-services "Jag har läst "
   :and-agree-service-terms " för NAP-tjänsten och godkänner "
   :of-service " för tjänsten."
+
+  :follow-external-link-confirm "(SV) Olet poistumassa NAP-palvelusta. Haluatko varmasti jatkaa?"
   }
 
 
