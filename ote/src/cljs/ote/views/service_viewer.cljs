@@ -6,6 +6,7 @@
             [clojure.spec.alpha :as s]
             [ote.ui.leaflet :as leaflet]
             [reagent.core :as r]
+            [re-svg-icons.feather-icons :as feather-icons]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.netex :as netex]
@@ -15,14 +16,12 @@
             [ote.ui.common :as common-ui]
             [ote.style.base :as style-base]
             [ote.localization :refer [tr supported-languages tr-key selected-language tr-tree]]
-            [ote.ui.icons :as icons]
             [ote.theme.colors :as colors]
             [ote.ui.link-icon :refer [link-with-icon]]
             [ote.style.service-viewer :as service-viewer]
             [ote.app.controller.place-search :as place-search]
             [ote.ui.form-fields :as form-fields]
-            [ote.style.base :as base]
-            [clojure.string :as str]))
+            [ote.style.base :as base]))
 
 (defonce shown-language
          (r/atom (string/upper-case (name @selected-language))))
@@ -140,11 +139,11 @@
 (defn- service-header
   [service-name o-id s-id]
   [:section
-   [common-ui/linkify "/#/services" [:span [icons/arrow-back {:position "relative"
-                                                              :top "6px"
-                                                              :padding-right "5px"
-                                                              :color style-base/link-color}]
-                                     (tr [:service-search :back-link])]]
+   [common-ui/linkify
+    "/#/services"
+    [:span
+     [feather-icons/arrow-left style-base/inline-icon]
+     (tr [:service-search :back-link])]]
    [:h1 {:style {:margin-top "1rem"}} service-name]
    [link-with-icon {:target-blank? true} open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
 

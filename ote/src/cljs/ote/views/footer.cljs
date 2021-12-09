@@ -2,7 +2,7 @@
   "NAP - footer"
   (:require [ote.localization :refer [tr tr-key] :as localization]
             [ote.style.footer :as footer-styles]
-            [ote.ui.common :as common :refer [linkify]]
+            [ote.ui.common :as common]
             [re-svg-icons.feather-icons :as feather-icons]
             [stylefy.core :as stylefy]))
 
@@ -26,7 +26,7 @@
    [:div (stylefy/use-style footer-styles/topbar)
     [:img (merge (stylefy/use-style footer-styles/fintraffic-logo)
                  {:src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"})]
-    [:a (merge (stylefy/use-style footer-styles/link) {:href "https://fintraffic.fi"}) "fintraffic.fi"]]
+    [common/linkify "https://www.fintraffic.fi" "fintraffic.fi" {:style footer-styles/link :hide-external-icon? true}]]
 
    ; Fintraffic links
    [:div (stylefy/use-style footer-styles/site-links)
@@ -43,19 +43,24 @@
                                  :finap])]
           ^{:key (str "quicklink_" (name service))}
           [:li (stylefy/use-style footer-styles/site-link-entry)
-           [:a (stylefy/use-style footer-styles/link {:href href}) (tr [:quicklink-header service])]]))]]
+           [common/linkify href (tr [:quicklink-header service]) {:style footer-styles/link :hide-external-icon? true}]]))]]
 
     [:ul (stylefy/use-style footer-styles/fintraffic-legal-links)
      (let [language (or (keyword @localization/selected-language) :fi)]
        (doall
          (for [{:keys [href label]} (get legal-links language)]
            ^{:key (str "legallink_" (clojure.string/lower-case (name label)))}
-           [:li [:a (merge (stylefy/use-style footer-styles/link) {:href href})
-                 label]])))
+           [:li
+            [common/linkify
+             href
+             label
+             {:style               footer-styles/link
+              :hide-external-icon? true}]])))
      ]
 
     [:ul (stylefy/use-style footer-styles/fintraffic-support-link)
      [:li
+      ; linkify not used here as this is a mailto: link with very specific custom styling
       [:a (merge (stylefy/use-style footer-styles/link)
                  {:href (tr [:common-texts :navigation-feedback-link])})
        [:span {:style {:font-weight 600}} (tr [:common-texts :navigation-give-feedback])][:br]
@@ -63,18 +68,14 @@
 
    ; social media links
    [:div (stylefy/use-style footer-styles/some-link-wrapper)
-    [:a  (merge (stylefy/use-style footer-styles/some-link)
-                {:href "https://www.facebook.com/FintrafficFI"})
-     [feather-icons/facebook (stylefy/use-style footer-styles/some-link-icon)]]
-    [:a (merge (stylefy/use-style footer-styles/some-link)
-               {:href "https://twitter.com/Fintraffic_fi"})
-     [feather-icons/twitter (stylefy/use-style footer-styles/some-link-icon)]]
-    [:a (merge (stylefy/use-style footer-styles/some-link)
-               {:href "https://www.instagram.com/fintraffic_stories_fi"})
-     [feather-icons/instagram (stylefy/use-style footer-styles/some-link-icon)]]
-    [:a (merge (stylefy/use-style footer-styles/some-link)
-               {:href "https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ"})
-     [feather-icons/youtube (stylefy/use-style footer-styles/some-link-icon)]]
-    [:a (merge (stylefy/use-style footer-styles/some-link)
-               {:href "https://www.linkedin.com/company/fintraffic"})
-     [feather-icons/linkedin (stylefy/use-style footer-styles/some-link-icon)]]]])
+    (doall
+      (for [[link icon] [["https://www.facebook.com/FintrafficFI" feather-icons/facebook]
+                         ["https://twitter.com/Fintraffic_fi" feather-icons/twitter]
+                         ["https://www.instagram.com/fintraffic_stories_fi" feather-icons/instagram]
+                         ["https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ" feather-icons/youtube]
+                         ["https://www.linkedin.com/company/fintraffic" feather-icons/linkedin]]]
+        [common/linkify
+         link
+         [icon (stylefy/use-style footer-styles/some-link-icon)]
+         {:style               footer-styles/some-link
+          :hide-external-icon? true}]))]])

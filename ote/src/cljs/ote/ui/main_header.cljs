@@ -78,15 +78,12 @@
        (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
          ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
          [:li (stylefy/use-style style-topnav/bottombar-dropdown-item)
-          [:a (merge (stylefy/use-style style-topnav/bottombar-dropdown-link)
-                     {:key (name key)
-                      :href href
-                      ; the rewrapping of entry values to map is done manually instead of using map destructuring's
-                      ; :as directive because the :as doesn't include default values from :or directive
-                      :on-click #(entry-click-handler % {:key key :label label :href href})}
-                     (when (some? target)
-                       {:target target}))
-           (str label)]]))]
+          [common/linkify
+           href
+           (str label)
+           {:key      (name key)
+            :style    style-topnav/bottombar-dropdown-link
+            :on-click #(entry-click-handler % {:key key :label label :href href})}]]))]
     ]))
 
 (defn bottombar-simplelink [e! app options]
@@ -293,19 +290,23 @@
          ^{:key (str "quicklink_" (name service))}
          [:li (stylefy/use-style (merge style-topnav/fintraffic-quick-links-item
                                         (when (= service :finap) style-topnav/fintraffic-quick-links-active)))
-          [:a (merge (stylefy/use-style style-topnav/fintraffic-quick-links-link)
-                     {:href href})
-           (tr [:quicklink-header service])]
+          [common/linkify
+            href
+            (tr [:quicklink-header service])
+            {:style               style-topnav/fintraffic-quick-links-link
+             :hide-external-icon? true}]
           (when (= service :finap)
             [:div (stylefy/use-style style-topnav/fintraffic-quick-links-uparrow) ""])]))])
 
 (defn- fintraffic-navbar [e! app desktop?]
   (let [menu-open? (get-in app [:ote-service-flags :fintraffic-menu-open])]
     [:div (stylefy/use-style style-topnav/header-topbar)
-     [:a (merge (stylefy/use-style style-topnav/fintraffic-logo-link)
-                {:href (common/localized-quicklink-uri :fintraffic)})
+     [common/linkify
+      (common/localized-quicklink-uri :fintraffic)
       [:img {:style style-topnav/fintraffic-logo
-             :src "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]]
+             :src   "img/icons/Fintraffic_vaakalogo_valkoinen.svg"}]
+      {:style               style-topnav/fintraffic-logo-link
+       :hide-external-icon? true}]
      [:nav (stylefy/use-style style-topnav/fintraffic-quick-links)
       [:button (merge (stylefy/use-style (merge style-topnav/mobile-only
                                                 style-topnav/fintraffic-mobile-nav-button))
