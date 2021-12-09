@@ -391,7 +391,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :register-to-service "Rekisteröidy palveluun"
   :check-out-the-service "Tutustu tietoihin"
   :continue-editing "Jatka tietojen muokkaamista"
-
+  :visit-service-operator "Vieraile Traficomin sivustolla"
   :load-transport-service-operator-data-as-csv "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
 
@@ -632,12 +632,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :title-essential-info "Olennaiset tiedot"
   :title-transport-operator "Palveluntuottaja"
   :title-developer "Sovelluskehittäjä"
+
   :column-NAP (:md
                 "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon **liikkumispalvelun tuottajien** on toimitettava tietoja digitaalisista **olennaisten tietojen** koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille.")
   :column-transport-services "Liikkumispalveluilla tarkoitetaan henkilöiden kuljetuspalveluita, kuten tieliikenteen, merenkulun ja ilmailun henkilökuljetuksia; asemia, satamia ja terminaaleja; liikennevälineiden vuokrauspalveluita ja kaupallisia yhteistyökäyttöpalveluita; yleisiä kaupallisia pysäköintipalveluita sekä välityspalveluita."
   :column-essential-info "Olennaisia tietoja ovat esimerkiksi palvelualue, reitit, aikataulut, hinnat, palvelun saatavuus, esteettömyys sekä varaus-, myynti-, lippu- ja maksutiedot. Kaikki tiedot eivät ole olennaisia jokaisen palvelun osalta.  Avattavat tiedot on määritetty valtioneuvoston asetuksessa."
   :column-transport-operator "Tietojen avaamisvelvollisuus koskee kaikkia liikkumispalveluita tarjoavia yrityksiä. Liikkumispalveluiden digitointi ja julkaiseminen NAP-palvelussa vaatii rekisteröitymisen ja kirjautumisen palveluun. NAP-palvelu ohjeistaa käyttäjää kirjaamaan tiettyä palvelua koskevat olennaiset tiedot."
   :column-developer "NAP on palveluiden kehittäjille tarkoitettu katalogi, josta kehittäjät löytävät tarvitsemiaan tietoja ja rajapintoja. Tietojen hyödyntäminen ei vaadi rekisteröitymistä. NAP mahdollistaa esimerkiksi nykyistä laajempien reittioppaiden ja liikennepalveluiden kehittämisen."
+  :column-service-operator-info "FINAP-palvelua operoi Liikenteenohjausyhtiö Fintraffic Oy Liikenne- ja Viestintäviraston (Traficomin) toimeksiannosta. Liikenne- ja viestintäviraston tehtävänä on valvoa tietojen toimittamista ja rajapintojen tietosisältöä."
 
   :front-page-content (:md
                         "\n"
