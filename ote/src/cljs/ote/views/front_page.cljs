@@ -3,6 +3,7 @@
   (:require [clojure.string :as s]
             [reagent.core :as reagent]
             [reagent.core :as r]
+            [re-svg-icons.feather-icons :as feather-icons]
             [cljs-react-material-ui.icons :as ic]
             [stylefy.core :as stylefy]
             [clojure.string :as str]
@@ -50,7 +51,7 @@
                          (.preventDefault %)
                          (e! (fp/->ChangePage :services nil)))}
         [:button (stylefy/use-style style-front-page/hero-btn)
-         [:span [ic/device-dvr {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
+         [:span [feather-icons/monitor {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
          (tr [:buttons :transport-service-catalog])]]]
       (when (flags/enabled? :other-catalogs)
         [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto" :margin-top "1.5rem"}}
@@ -58,7 +59,7 @@
               :href (tr [:buttons :other-access-points-url])
               :target "_blank"}
           [:button (stylefy/use-style style-front-page/hero-btn)
-           [:span [ic/action-open-in-new {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
+           [:span [feather-icons/external-link {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
            (tr [:buttons :other-access-points])]]])]]]
 
    (when test-env?
@@ -96,8 +97,10 @@
        (tr [:front-page :column-essential-info])]]]]
 
    [:div (stylefy/use-style style-front-page/lower-section)
-    [:div.container
-     [:div.col-md-6
+    [:div.container {:style {:display "flex"
+                             :flex-wrap "wrap"
+                             :justify-content "center"}}
+     [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [icons/train style-front-page/lower-section-font-icon]
        [:h3 (stylefy/use-style style-front-page/lower-section-title) (tr [:front-page :title-transport-operator])]
@@ -111,10 +114,10 @@
                             (.preventDefault %)
                             (e! (fp/->ToggleRegistrationDialog)))}
            [:button (stylefy/use-style style-front-page/front-page-button)
-            [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+            [:span [feather-icons/user-plus {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
             (tr [:buttons :register-to-service])]]
           [:div (stylefy/use-style style-front-page/front-page-button-disabled)
-           [:span [ic/social-person-add {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+           [:span [feather-icons/user-plus {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
            (tr [:buttons :register-to-service])])]]]
 
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
@@ -128,5 +131,19 @@
                           (.preventDefault %)
                           (e! (fp/->ChangePage :services nil)))}
          [:button (stylefy/use-style style-front-page/front-page-button)
-          [:span [ic/device-dvr {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-          (tr [:buttons :check-out-the-service])]]]]]]]])
+          [:span [feather-icons/monitor {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+          (tr [:buttons :check-out-the-service])]]]]]
+
+     [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
+      [:div (stylefy/use-style style-front-page/lower-section-data-container)
+       [:img (merge (stylefy/use-style style-front-page/lower-section-font-icon)
+                    {:src "/img/icons/TRAFICOM_rgb.svg"
+                     :alt (tr [:common-texts :footer-livi-logo])}) ]
+       [:p (stylefy/use-style style-front-page/lower-section-text)
+        (tr [:front-page :column-service-operator-info])]
+       [:div {:style {:padding-top "20px"}}
+        [linkify
+         "https://www.traficom.fi/fi/liikenne-ja-viestintavirasto-traficom"
+         [:button (stylefy/use-style style-front-page/front-page-button)
+          [:span [feather-icons/compass {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
+          (tr [:buttons :visit-service-operator])]]]]]]]])
