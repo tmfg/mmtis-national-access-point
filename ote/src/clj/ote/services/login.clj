@@ -3,7 +3,8 @@
   (:require [buddy.hashers :as hashers]
             [hiccup.core :refer [html]]
             [ote.components.http :as http]
-            [compojure.core :refer [routes POST]]
+            [ote.middleware.throttler :as throttler]
+            [compojure.core :refer [routes POST wrap-routes]]
             [ote.nap.cookie :as cookie]
             [ote.nap.users :as users]
             [jeesql.core :refer [defqueries]]
@@ -135,9 +136,10 @@
    :dependencies {email :email}}
 
   ^:unauthenticated
-  (POST "/login" {form-data :body}
-    (#'login db auth-tkt-config
-      (http/transit-request form-data)))
+  (-> (POST "/login" {form-data :body}
+        (#'login db auth-tkt-config
+          (http/transit-request form-data)))
+      (wrap-routes throttler/throttle))
 
   ^:unauthenticated
   (POST "/logout" []
