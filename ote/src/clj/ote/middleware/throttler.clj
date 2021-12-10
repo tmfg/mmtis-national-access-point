@@ -1,4 +1,4 @@
-(ns ote.components.middleware.throttler
+(ns ote.middleware.throttler
   (:import (java.time Instant)))
 
 (defn- hit!
