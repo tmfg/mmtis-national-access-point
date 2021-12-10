@@ -24,8 +24,9 @@
   and so on."
   [session config]
   (future
-    (let [delay (- (Math/pow 2 (count (get-in session [(:session-key config) :hits]))) 2)]
-      (Thread/sleep (* delay 1000)))))
+    (let [hits  (count (get-in session [(:session-key config) :hits]))
+          delay (* 1000 (- (Math/pow 2 hits) 2))]
+      (Thread/sleep delay))))
 
 (defn- throttle*
   [session response config]
