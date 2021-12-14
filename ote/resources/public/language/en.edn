@@ -1164,7 +1164,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :and-agree-service-terms " of the NAP service and accept "
   :of-service " of the service."
 
-  :follow-external-link-confirm "(EN) Olet poistumassa NAP-palvelusta. Haluatko varmasti jatkaa?"
+  :follow-external-link-confirm "You are leaving the Finap service. Are you sure you want to continue?"
   }
 
 
