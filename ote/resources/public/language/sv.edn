@@ -1164,7 +1164,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :and-agree-service-terms " för NAP-tjänsten och godkänner "
   :of-service " för tjänsten."
 
-  :follow-external-link-confirm "Du flyttar ut från finap tjänsten. Är du säker på att du vill fortsätta?"
+  :follow-external-link-confirm "Du flyttar ut från Finap tjänsten. Är du säker på att du vill fortsätta?"
   }
 
 
