@@ -393,6 +393,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :register-to-service "Register"
   :check-out-the-service "Explore the information"
   :continue-editing "Continue modifying the information"
+  :visit-service-operator "Visit Traficomin website"
 
   :load-transport-service-operator-data-as-csv "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
@@ -640,6 +641,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :column-essential-info "Essential information contains, for example, operating areas, routes, timetables, prices, service times and accessibility information, including information about tickets, booking and sales channels and accepted payment methods. Not all essential information is valid for each service. The definition of essential information can be found in the Government Decree 643/2017."
   :column-transport-operator "All transport service providers are obliged to produce information on their transport services in machine-readable format. Registration and login are required to publish information in the NAP service catalogue. The NAP service includes user information on how to publish essential information about the transport service providers' services."
   :column-developer "NAP is a service catalogue meant for service developers, where developers can find transport service information and interfaces. Registration is not required to utilize NAP information. NAP enables development of more comprehensive journey planners and new transport services."
+  :column-service-operator-info "The FINAP service is operated by the Traffic Management Company Fintraffic Ltd on behalf of the Finnish Transport and Communications Agency (Traficom). Traficom monitors the transmission of data and the data content of the interfaces published in FINAP."
 
   :front-page-content
   (:md "# **What is NAP?**\n"
