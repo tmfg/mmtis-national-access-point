@@ -396,6 +396,7 @@
   :register-to-service "Registrering"
   :check-out-the-service "Bekanta dig med informationen"
   :continue-editing "Fortsätt redigera uppgifter"
+  :visit-service-operator "Visitera Traficoms webbsida"
 
   :load-transport-service-operator-data-as-csv "Lataa liikkumispalveluiden tarjoajien tiedot CSV:nä"
   }
@@ -639,6 +640,7 @@
   :column-essential-info "Väsentlig information är uppgifter om till exempel serviceområden, rutter, tidtabeller, pris och tillgänglighetsinformation. Väsentlig information definieras i statsrådets förordning 643/2017."
   :column-transport-operator "Alla mobilitetstjänster är skyldiga att uppge information om tjänsten i maskinläsbart format. Registrering och inloggning i NAP krävs för att informationen ska kunna sparas. NAP-tjänsten handleder användaren så att all väsentlig information sparas."
   :column-developer "NAP är en katalog med gränssnitt och information avsedd för tjänsteutvecklare. Man behöver inte registrera sig och logga in i NAP för att använda informationen."
+  :column-service-operator-info "FINAP tjänsten drivs av Fintraffic Ab på uppdrag av Trafik- och kommunikationsverket (Traficom). Traficom övervakar överföringen av data och datainnehållet i de gränssnitt som publiceras i FINAP."
 
   :front-page-content
   (:md
