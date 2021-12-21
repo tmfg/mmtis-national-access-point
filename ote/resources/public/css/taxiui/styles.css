@@ -1,0 +1,121 @@
+/* Taxi UI base CSS. All non-specific CSS definitions and globally applicably rules go here.
+   Some general guidance:
+
+    - avoid defining colors unless absolutely necessary, these are to be handled in CLJS theming
+    - font units: root element uses px, components use rem, text elements use em. See https://css-tricks.com/rems-ems/
+
+ */
+
+html {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 16px;
+    /*-webkit-font-smoothing: antialiased;*/
+    height: 100%;
+    min-height: 100%;
+    line-height: 1.5;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* document root element */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 100%;
+    font-size: 16px;
+}
+
+/* module/component elements
+
+   These are mostly HTML5 semantic elements, such as article, header etc. and their logical class counterparts.
+
+   Use `rem` for font sizing.
+*/
+header, footer {}
+
+/* text/type elements
+
+   Elements which show textual content. Use `em` for font sizing.
+ */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-family: 'Public Sans', 'Public Sans', Arial, sans-serif;
+}
+
+h1 {
+    font-weight: 800;
+    font-size: 3em;
+}
+
+h2 {
+    font-weight: 700;
+    font-size: 2.25em;
+}
+
+h3 {
+    font-weight: 600;
+    font-size: 1.5em;
+}
+
+h4 {
+    font-weight: 500;
+    font-size: 1.125em;
+}
+
+h5 {
+    font-weight: 400;
+    font-size: 1em;
+}
+
+h6 {
+    font-weight: 300;
+    font-size: 0.875em;
+}
+
+p {
+    font-family: 'Piazzolla', serif;
+}
+
+/* form elements */
+
+button, input, optgroup, select, textarea {
+    font-family: 'Public Sans', sans-serif;
+}
+
+/* Rendered translations are wrapped with <p> by Marked JS library.
+   Remove the margins of the first P-element */
+.translation-markdown > p:only-child {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.translation-markdown > p:first-child {
+    margin-top: 0;
+}
+
+.translation-markdown > p:last-child {
+    margin-bottom: 0;
+}
+
+/* Allow rendering single line breaks in translation blocks*/
+.translation-markdown > p {
+    white-space: pre-wrap;
+}
+/* Debug container */
+.debug {
+    font-size: 12px;
+    /*position:absolute;
+    bottom: 0px;*/
+}
+
+/* Show scrollbar always */
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
