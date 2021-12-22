@@ -61,7 +61,7 @@
 ; colors with just a single variant do not have the color intensity in the name
 (def accessible-blue dark-blue)
 (def accessible-green dark-green)
-(def accessible-light-purple light-purple)
+(def accessible-basic-purple basic-purple)
 (def accessible-dark-purple dark-purple)
 (def accessible-red dark-red)
 (def accessible-gray dark-gray)
