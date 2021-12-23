@@ -40,6 +40,8 @@
 
             [ote.util.feature :as feature]
 
+            [ote.services.taxi-index :as taxi-index]
+
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
             [jeesql.autoreload :as autoreload])
@@ -56,9 +58,10 @@
    :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
    :email (email/->Email (:email config))
 
-   ;; Index page
-   :index (component/using (index/->Index config)
-                           [:http :db])
+   ;; Index pages for frontends
+   :ote/index (component/using (index/->Index config) [:http :db])
+   :taxi/index (component/using (taxi-index/->Index config) [:http :db])
+
    :robots (component/using (robots/->RobotsTxt (get-in config [:http :allow-robots?])) [:http])
    :users (component/using (users/->UsersService (get-in config [:http :auth-tkt]))  [:http :db :email])
    ;; Services for the frontend
