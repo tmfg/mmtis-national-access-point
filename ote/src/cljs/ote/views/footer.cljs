@@ -69,11 +69,12 @@
    ; social media links
    [:div (stylefy/use-style footer-styles/some-link-wrapper)
     (doall
-      (for [[link icon] [["https://www.facebook.com/FintrafficFI" feather-icons/facebook]
-                         ["https://twitter.com/Fintraffic_fi" feather-icons/twitter]
-                         ["https://www.instagram.com/fintraffic_stories_fi" feather-icons/instagram]
-                         ["https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ" feather-icons/youtube]
-                         ["https://www.linkedin.com/company/fintraffic" feather-icons/linkedin]]]
+      (for [[link icon tag] [["https://www.facebook.com/FintrafficFI" feather-icons/facebook :facebook]
+                             ["https://twitter.com/Fintraffic_fi" feather-icons/twitter :twitter]
+                             ["https://www.instagram.com/fintraffic_stories_fi" feather-icons/instagram :instagram]
+                             ["https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ" feather-icons/youtube :youtube]
+                             ["https://www.linkedin.com/company/fintraffic" feather-icons/linkedin :linkedin]]]
+        ^{:key (str "some_" tag)}
         [common/linkify
          link
          [icon (stylefy/use-style footer-styles/some-link-icon)]

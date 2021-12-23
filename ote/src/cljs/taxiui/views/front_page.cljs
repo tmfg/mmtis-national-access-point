@@ -52,7 +52,7 @@
    [:p "Konsernissa työskentelee koko Suomessa yhteensä reilut 1000 henkilöä."]
    [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-blue :padding "1em 1em 1em 1em"}) "testi"]
    [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-green :padding "1em 1em 1em 1em"}) "testi"]
-   [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-light-purple :padding "1em 1em 1em 1em"}) "testi"]
+   [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-basic-purple :padding "1em 1em 1em 1em"}) "testi"]
    [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-dark-purple  :padding "1em 1em 1em 1em"}) "testi"]
    [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-red :padding "1em 1em 1em 1em"}) "testi"]
    [:p (stylefy/use-style {:color colors/primary-text-color :background-color colors/accessible-gray :padding "1em 1em 1em 1em"}) "testi"]
