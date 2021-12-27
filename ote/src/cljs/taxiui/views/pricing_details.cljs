@@ -4,7 +4,8 @@
             [taxiui.views.components.formatters :as formatters]
             [taxiui.app.controller.front-page :as fp-controller]
             [re-svg-icons.feather-icons :as feather-icons]
-            [taxiui.app.routes :as routes]))
+            [taxiui.app.routes :as routes]
+            [taxiui.theme :as theme]))
 
 (defn- pricing-input
   [main-title subtitle]
@@ -25,7 +26,7 @@
 (defn pricing-details
   [_ _]
   (fn [_ _]
-    [:main
+    [:main (stylefy/use-style theme/main-container)
      [:a {#_#_:style (stylefy/use-style styles/link)
           :href     "#/"
           :on-click #(do

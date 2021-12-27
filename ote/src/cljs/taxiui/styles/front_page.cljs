@@ -2,7 +2,7 @@
   (:require [ote.theme.colors :as colors]
             [taxiui.theme :as theme :refer [breather-margin breather-padding grid-template-areas]]))
 
-(def info-box {:margin "0.8em 0.8em 0.8em 0.8em"})
+(def info-box {})
 
 (def info-section-title (-> {:font-weight "600"}
                             breather-margin))

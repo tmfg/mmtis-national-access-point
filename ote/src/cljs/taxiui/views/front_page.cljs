@@ -6,7 +6,8 @@
             [taxiui.app.controller.front-page :as fp-controller]
             [taxiui.styles.front-page :as styles]
             [taxiui.views.components.formatters :as formatters]
-            [taxiui.app.routes :as routes]))
+            [taxiui.app.routes :as routes]
+            [taxiui.theme :as theme]))
 
 (let [host (.-host (.-location js/document))]
   (def test-env? (or (str/includes? host "test")
@@ -45,7 +46,7 @@
 (defn front-page
   [_ _]
   (fn [e! _]
-   [:main
+   [:main (stylefy/use-style theme/main-container)
     [:h2 "Omat palvelutiedot"]
     ; infobox
     [link e! "#" :front-page
