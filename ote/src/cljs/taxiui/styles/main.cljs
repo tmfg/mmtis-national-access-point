@@ -1,5 +1,4 @@
-(ns taxiui.styles.main
-  (:require [ote.theme.colors :as colors]))
+(ns taxiui.styles.main)
 
 (def main-flex-container {:display "flex"
                           :flex-direction "column"})

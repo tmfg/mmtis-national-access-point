@@ -1,14 +1,11 @@
 (ns taxiui.views.front-page
   "Front page for Taxi UI"
   (:require [clojure.string :as str]
-            [ote.localization :refer [tr tr-key]]
-            [ote.ui.common :refer [linkify]]
-            [ote.app.utils :refer [user-logged-in?]]
             [re-svg-icons.feather-icons :as feather-icons]
             [stylefy.core :as stylefy]
             [taxiui.views.components.formatters :as formatters]
             [taxiui.styles.front-page :as styles]
-            [re-svg-icons.feather-icons :as feather-icons]))
+            ))
 
 (let [host (.-host (.-location js/document))]
   (def test-env? (or (str/includes? host "test")
@@ -35,7 +32,7 @@
 
 (defn front-page
   "Front page info"
-  [e! {user :user :as app}]
+  [_ _]
   [:main
    [:h2 "Omat palvelutiedot"]
    ; infobox

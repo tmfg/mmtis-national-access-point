@@ -1,5 +1,6 @@
 (ns taxiui.styles.front-page
-  (:require [ote.theme.colors :as colors]))
+  (:require [clojure.string :as str]
+            [ote.theme.colors :as colors]))
 
 (defn- grid-template-areas
   "Small helper to produce properly quoted CSS grid template area string. Provide areas as 1D vector.
@@ -12,7 +13,7 @@
          (map
            (fn [row]
            (str "\"" row "\"")))
-         (clojure.string/join "\n"))))
+         (str/join "\n"))))
 
 (defn- breather-margin
   [styles]

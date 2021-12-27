@@ -1,13 +1,12 @@
 (ns taxiui.app.controller.front-page
-  (:require [reagent.core :as r]
-            [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.communication :as comm]
-            [ote.localization :as localization :refer [tr]]
-            [ote.app.routes :as routes]
-            [ote.app.localstorage :as localstorage]
+  (:require [ote.communication :as comm]
             [ote.app.controller.login :as login]
-            [ote.app.controller.flags :as flags]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.app.controller.common :refer [->ServerError]]
+            [ote.app.localstorage :as localstorage]
+            [ote.app.routes :as routes]
+            [ote.localization :as localization]
+            [reagent.core :as r]
+            [tuck.core :as tuck]))
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page params])
@@ -95,9 +94,8 @@
   ChangePage
   (process-event [{given-page :given-page params :params :as e} app]
     (navigate e app (fn [app]
-                      (do
-                        (routes/navigate! given-page params)
-                        app))))
+                      (routes/navigate! given-page params)
+                      app)))
 
   GoToUrl
   (process-event [{url :url :as e} app]
@@ -239,32 +237,7 @@
       (do
         (localstorage/add-item! :tos-ok true)
         (routes/navigate! (:page app)))
-      (do
-        (comm/post! "register/tos" {:user-email (:email user)}
-                    {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
-                     :on-failure (tuck/send-async! ->ServerError)})))
+      (comm/post! "register/tos" {:user-email (:email user)}
+                  {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
+                   :on-failure (tuck/send-async! ->ServerError)}))
     (assoc app :tos-ok true)))
-
-(define-event ToggleAddMemberDialog []
-  {:path [:show-add-member-dialog?]
-   :app show?}
-  (not show?))
-
-(define-event ToggleRegistrationDialog []
-  {}
-  (if (flags/enabled? :ote-register)
-    (do
-      (routes/navigate! :register)
-      app)
-    (-> app
-        (update :show-register-dialog? not)
-        (assoc-in [:login :navigate-to] {:page :own-services})
-        get-transport-operator-data)))
-
-
-
-(define-event UserResetRequested []
-  {}
-  (assoc app
-         :show-reset-dialog? false
-         :flash-message (tr [:login :check-email-for-link])))
