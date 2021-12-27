@@ -22,8 +22,9 @@
    [icon] " " label])
 
 (defn- pill
-  [label]
-  [:span (stylefy/use-style styles/area-pill) label])
+  ([label] (pill label nil))
+  ([label {:keys [filled?] :or {filled? false}}]
+   [:span (stylefy/use-style (if filled? styles/area-pill-filled styles/area-pill)) label]))
 
 (defn- panel-arrow
   []
@@ -73,9 +74,9 @@
       [:span (formatters/currency 36.90)]
       [:span (stylefy/use-style styles/flex-right-aligned)
        [:span (str (formatters/currency 1.5) "/km")]
-       [:span (str (formatters/currency 1) "/min")]]]
+       [:span (stylefy/use-style styles/currency-breather) (str (formatters/currency 1) "/min")]]]
      [:div (stylefy/use-style styles/area-pills)
-      [pill "hips"]
+      [pill "hips" {:filled? true}]
       [pill "hops"]
       [pill "kops"]]
      [panel-arrow]]]]])
