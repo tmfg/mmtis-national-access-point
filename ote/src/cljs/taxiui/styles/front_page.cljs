@@ -73,9 +73,12 @@
                              breather-padding
                              breather-margin))
 
-(def example-price (-> {:grid-area "prices"}
-                       breather-padding
-                       breather-margin))
+(def example-prices (-> {:grid-area "prices"
+                         :display "flex"}
+                        breather-padding
+                        breather-margin))
+
+(def flex-right-aligned {:margin-left "auto"})
 
 (def area-pills (-> {:grid-area "area-pills"}
                     breather-padding

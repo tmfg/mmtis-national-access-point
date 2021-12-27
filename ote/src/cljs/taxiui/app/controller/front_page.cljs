@@ -1,11 +1,11 @@
 (ns taxiui.app.controller.front-page
-  (:require [ote.communication :as comm]
-            [ote.app.controller.login :as login]
+  (:require [ote.app.controller.login :as login]
             [ote.app.controller.common :refer [->ServerError]]
             [ote.app.localstorage :as localstorage]
-            [ote.app.routes :as routes]
+            [ote.communication :as comm]
             [ote.localization :as localization]
             [reagent.core :as r]
+            [taxiui.app.routes :as routes]
             [tuck.core :as tuck]))
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service

@@ -5,9 +5,6 @@
             [ote.app.utils :refer [user-logged-in?]]
             [tuck.core :as tuck]))
 
-(def ga-tracking-code
-  (.getAttribute js/document.body "data-ga-tracking-code"))
-
 (def dev-mode?
   (.getAttribute js/document.body "data-dev-mode?"))
 
@@ -16,14 +13,12 @@
 
 (def taxiui-router
   (r/router
-   [["/" :front-page]]))
+   [["/" :front-page]  ; this is non-namespaced to work around application default page which is set to local storage
+                       ; front page of all apps is simply referred to as :front-page
+    ["/pricing-details" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list
-(def auth-required #{:own-services :transport-service :edit-service :new-service
-                     :transport-operator :operator-users
-                     :routes :new-route :edit-route
-                     :new-notice :edit-pre-notice :pre-notices
-                     :email-settings :user-edit})
+(def auth-required #{:taxi-ui/pricing-details})
 
 ;; Add pages that needs :transit-authority? authenticating to this list
 (def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes :monitor})

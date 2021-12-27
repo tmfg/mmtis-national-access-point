@@ -1,10 +1,13 @@
 (ns taxiui.views.front-page
   "Front page for Taxi UI"
   (:require [clojure.string :as str]
+            [ote.ui.common :refer [linkify]]
             [re-svg-icons.feather-icons :as feather-icons]
             [stylefy.core :as stylefy]
-            [taxiui.views.components.formatters :as formatters]
+            [taxiui.app.routes :as routes]
+            [taxiui.app.controller.front-page :as fp-controller]
             [taxiui.styles.front-page :as styles]
+            [taxiui.views.components.formatters :as formatters]
             ))
 
 (let [host (.-host (.-location js/document))]
@@ -26,40 +29,53 @@
   []
   [feather-icons/chevron-right (merge (stylefy/use-style styles/details-arrow)
                                       {:stroke-width "0.5"
-                                       :width        "50"
-                                       :height       "100"
-                                       :viewBox      "6 0 12 24"})])
+                                 :width        "50"
+                                 :height       "100"
+                                 :viewBox      "6 0 12 24"})])
+
+(defn- link
+  [e! url page children]
+  [:a {:style {:text-decoration "none"
+               :color "inherit"}
+       :href url
+              :on-click #(do
+                           (.preventDefault %)
+                           (e! (fp-controller/->ChangePage page nil)))}
+   children])
 
 (defn front-page
-  "Front page info"
-  [_ _]
+  [e! _]
   [:main
    [:h2 "Omat palvelutiedot"]
    ; infobox
-   [:section (stylefy/use-style styles/info-box)
-    ; section title
-    [:h4 (stylefy/use-style styles/info-section-title) "Palveluntuottajan tiedot"]
-    [:div (stylefy/use-style styles/company-details)
-     [:h5 {:style {:grid-area "title"}}
-      [:span (stylefy/use-style styles/info-box-title) "Putkosen Kyyti Oy"] " 1234567-8"]
-     [info-panel "personnel" "Henkilöstömäärä" feather-icons/users "1-4"]
-     [info-panel "toimiala" "Toimialaluokitus" feather-icons/file "49320 Taksiliikenne"]
-     [info-panel "liikevaihto" "Liikevaihtoluokka" feather-icons/file "0-0,2 milj. €"]
-     [info-panel "yhtiomuoto" "Yhtiömuoto" feather-icons/tag "Osakeyhtiö"]
-     [panel-arrow]]]
+   [link e! "#" :front-page
+    [:section (stylefy/use-style styles/info-box)
+     ; section title
+     [:h4 (stylefy/use-style styles/info-section-title) "Palveluntuottajan tiedot"]
+     [:div (stylefy/use-style styles/company-details)
+      [:h5 {:style {:grid-area "title"}}
+       [:span (stylefy/use-style styles/info-box-title) "Putkosen Kyyti Oy"] " 1234567-8"]
+      [info-panel "personnel" "Henkilöstömäärä" feather-icons/users "1-4"]
+      [info-panel "toimiala" "Toimialaluokitus" feather-icons/file "49320 Taksiliikenne"]
+      [info-panel "liikevaihto" "Liikevaihtoluokka" feather-icons/file "0-0,2 milj. €"]
+      [info-panel "yhtiomuoto" "Yhtiömuoto" feather-icons/tag "Osakeyhtiö"]
+      [panel-arrow]]]]
 
-   [:section (stylefy/use-style styles/info-box)
+   [link e! "#/pricing-details" :taxi-ui/pricing-details
+    [:section (stylefy/use-style styles/info-box)
+    [:h4 (stylefy/use-style styles/info-section-title) "Päivitä hintatietojasi"]
     [:div (stylefy/use-style styles/pricing-details)
      [:div.logo {:style {:grid-area "logo"}}]
      [:h5 (stylefy/use-style styles/price-box-title)
       "Hintatiedot päivitetty 23.12.2021"]
      [:div (stylefy/use-style styles/example-price-title) "Esimerkkimatka (10 km + 15 min)"]
-     [:div (stylefy/use-style styles/example-price)
+     [:div (stylefy/use-style styles/example-prices)
       [:span (formatters/currency 36.90)]
-      [:span (str (formatters/currency 1.5) "/km")]
-      [:span (str (formatters/currency 1) "/min")]]
+      [:span (stylefy/use-style styles/flex-right-aligned)
+       [:span (str (formatters/currency 1.5) "/km")]
+       [:span (str (formatters/currency 1) "/min")]]]
      [:div (stylefy/use-style styles/area-pills)
       [pill "hips"]
       [pill "hops"]
       [pill "kops"]]
-     [panel-arrow]]]])
+     [panel-arrow]]]]])

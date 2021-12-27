@@ -14,7 +14,8 @@
             [taxiui.app.controller.front-page :as taxi-controller]
             [taxiui.views.main :as taxi-main]
             [ote.localization :as localization]
-            [ote.app.routes :as routes]
+            [ote.app.routes :as ote-routes]
+            [taxiui.app.routes :as taxiui-routes]
             [ote.app.controller.front-page :as fp-controller]
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
@@ -31,14 +32,15 @@
 
    - `navigator` is a Tuck event handler for handling navigation
    - `application` is the root view for that particular application
+   - `router-fn` is a callback function for initializing the application's router
    - `root-element-id` is the id of the DOM element the application should be mounted to
    - `session-data` contains data relating to user's active session, if any"
-  [navigator application root-element-id session-data]
+  [navigator application router-fn root-element-id session-data]
   (if (nil? session-data)
     (swap! state/app login/unauthenticated)  ; TODO: this resets the session' user data, which is hyper annoying
     (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
-  (routes/start! navigator)
+  (router-fn navigator)
   (state/windowresize-handler nil) ;; Calculate window width
   (r/render-component [tuck/tuck state/app application]
                       (.getElementById js/document root-element-id)))
@@ -51,11 +53,11 @@
 
 (defn ^:export main []
   (localization/load-embedded-translations!)
-  (init-app fp-controller/->GoToUrl main/ote-application "oteapp" (load-embedded-user-info)))
+  (init-app fp-controller/->GoToUrl main/ote-application ote-routes/start! "oteapp" (load-embedded-user-info)))
 
 (defn ^:export taxi-main []
   (localization/load-embedded-translations!)
-  (init-app taxi-controller/->GoToUrl taxi-main/taxi-application "taxiapp" (load-embedded-user-info)))
+  (init-app taxi-controller/->GoToUrl taxi-main/taxi-application taxiui-routes/start! "taxiapp" (load-embedded-user-info)))
 
 (defn ^:export reload-hook []
   (r/force-update-all))
