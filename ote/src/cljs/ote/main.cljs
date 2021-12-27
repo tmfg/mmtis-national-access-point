@@ -11,11 +11,11 @@
             [tuck.core :as tuck]
             [ote.app.state :as state]
             [ote.views.main :as main]
+            [taxiui.app.controller.front-page :as taxi-controller]
             [taxiui.views.main :as taxi-main]
             [ote.localization :as localization]
             [ote.app.routes :as routes]
             [ote.app.controller.front-page :as fp-controller]
-            [taxiui.app.controller.front-page :as taxi-controller]
             [stylefy.core :as stylefy]
             [ote.communication :as comm]
             [goog.net.Cookies]
@@ -35,7 +35,7 @@
    - `session-data` contains data relating to user's active session, if any"
   [navigator application root-element-id session-data]
   (if (nil? session-data)
-    (swap! state/app login/unauthenticated)
+    (swap! state/app login/unauthenticated)  ; TODO: this resets the session' user data, which is hyper annoying
     (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
   (routes/start! navigator)
