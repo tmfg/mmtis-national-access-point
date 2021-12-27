@@ -3,3 +3,5 @@
 
 (def header {:background-color colors/primary-background-color
              :color            colors/primary-text-color})
+
+(def nap-logo {:height "2em"})
