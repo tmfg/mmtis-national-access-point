@@ -17,8 +17,8 @@
 
 (defn breather-margin
   [styles]
-  (assoc styles :margin "0.2rem 0.2rem 0.2rem 0.2rem"))
+  (assoc styles :margin "0.2rem 0rem 0.2rem 0rem"))
 
 (defn breather-padding
   [styles]
-  (assoc styles :padding "0.2em 0.2em 0.2em 0.2em"))
+  (assoc styles :padding "0.2em 0em 0.2em 0.2em"))

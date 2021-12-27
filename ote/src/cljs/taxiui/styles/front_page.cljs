@@ -1,9 +1,8 @@
 (ns taxiui.styles.front-page
-  (:require [clojure.string :as str]
-            [ote.theme.colors :as colors]
+  (:require [ote.theme.colors :as colors]
             [taxiui.theme :as theme :refer [breather-margin breather-padding grid-template-areas]]))
 
-(def info-box {:margin "1em 1em 1em 1em"})
+(def info-box {:margin "0.8em 0.8em 0.8em 0.8em"})
 
 (def info-section-title (-> {:font-weight "600"}
                             breather-margin))
@@ -14,7 +13,7 @@
                         breather-padding))
 
 (def company-details (-> {:display               "grid"
-                          :grid-template-columns "1fr 1fr min-content"
+                          :grid-template-columns "0.8fr 1fr min-content"
                           :grid-template-rows    "auto auto auto"
                           :gap                   "0px 0px"
                           :border                (str "0.0625em solid " colors/light-gray)
@@ -74,3 +73,8 @@
                          breather-margin))
 
 (def currency-breather {:margin-left "0.2em"})
+
+(def info-box-link {:text-decoration "none"
+                    :color           "inherit"})
+
+(def panel-icon {:width "1em"})
