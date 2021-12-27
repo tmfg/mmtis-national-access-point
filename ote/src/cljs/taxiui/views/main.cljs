@@ -10,6 +10,8 @@
             [ote.ui.common :refer [linkify]]
             [ote.app.controller.front-page :as fp-controller]
             [taxiui.views.front-page :as fp]  ;; TODO copy
+            [taxiui.styles.main :as styles]
+            [taxiui.views.components.header :refer [header]]
             [ote.views.footer :as footer]
             [ote.views.theme :refer [theme]]))
 
@@ -45,42 +47,9 @@
   "Taxi UI application main view"
   [e! app]
   (fn [e! {loaded? :transport-operator-data-loaded? :as app}]
-    (let [desktop? (> (:width app) style-base/mobile-width-px)
-          wide? (boolean (wide-pages (:page app)))]
-      [:div {:style (stylefy/use-style style-base/body)}
-       [theme e! app
-        (if (nil? app)
-          [spinner/circular-progress]
-          [:div.ote-sovellus {:style {:display "flex"
-                                      :flex-direction "column"
-                                      :height "100vh"}}
-           [header e! app desktop?]
-           [:div (merge (stylefy/use-style style-base/sticky-footer)
-                        {:on-click #(e! (fp-controller/->CloseHeaderMenus))})
-            (if (not loaded?)
-              [spinner/circular-progress]
-              [(if wide? :div :div.wrapper)
-               (if wide?
-                 {}
-                 (stylefy/use-style {:transition "margin-top 300ms ease"}))
-               [:div (cond
-                       (= :front-page (:page app))
-                       {:class "container-fluid"}
-
-                       wide?
-                       {}
-
-                       :else
-                       {:style {:padding-bottom "20px"}
-                        :class "container"})
-                [document-title (:page app)]
-
-                ;; Ensure that a new scroll-to-page component is created when page changes
-                ^{:key (name (:page app))}
-                [scroll-to-page (:page app)]
-
-                (case (:page app)
-                  :front-page [fp/front-page e! app]
-
-                  [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]])
-            [footer/footer]]])]])))
+    [:div (stylefy/use-style styles/main-flex-container)
+     [header app]
+     ; TODO: add test env warning for Taxi UI hereabouts
+     (case (:page app)
+       :front-page [fp/front-page e! app]
+       [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]))
