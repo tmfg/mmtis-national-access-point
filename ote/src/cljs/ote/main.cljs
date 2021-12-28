@@ -37,7 +37,7 @@
    - `session-data` contains data relating to user's active session, if any"
   [navigator application router-fn root-element-id session-data]
   (if (nil? session-data)
-    (swap! state/app login/unauthenticated)  ; TODO: this resets the session' user data, which is hyper annoying
+    (swap! state/app login/unauthenticated)
     (swap! state/app login/update-transport-operator-data session-data))
   (stylefy/init)
   (router-fn navigator)
