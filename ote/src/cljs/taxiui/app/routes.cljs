@@ -13,8 +13,12 @@
 
 (def taxiui-router
   (r/router
-   [["/" :front-page]  ; this is non-namespaced to work around application default page which is set to local storage
-                       ; front page of all apps is simply referred to as :front-page
+    ; These first few routes are non-namespaced to work around application hardcoded default behaviors in several places
+    ; which is significant as the Taxi UI reuses quite a few of the NAPOTE UI services and such.
+    ; It would be possible to refactor all those bits to work dynamically, but it really isn't worth the effort at this
+    ; point.
+   [["/" :front-page]
+    ["/login" :taxi-ui/login]
     ["/pricing-details" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list
@@ -99,11 +103,14 @@
                      not-authorized? (or (requires-authentication? app)
                                        (requires-transit-authority? app)
                                        (requires-admin? app))]
+                 (js/console.log (str "navigation data :: " navigation-data))
                  (if not-authorized?
-                   (do (navigate! :login)
-                       (assoc orig-app
-                         :login {:show? true
-                                 :navigate-to navigation-data}))
+                   (do
+                     (js/console.log "loginia tarvitaan")
+                     (navigate! :taxi-ui/login)
+                     (assoc orig-app
+                       :login {:show? true
+                               :navigate-to navigation-data}))
 
                    ;; Send startup events (if any) immediately after returning from this swap
                    (if (or event-leave event-to)
