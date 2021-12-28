@@ -19,7 +19,7 @@
      ; TODO: add data-frisk here as well
      (case (:page app)
        ;  see taxiui.app.routes for more in-depth documentation
-       :front-page              [fp/front-page e! app]
-       :taxi-ui/login                   [l/login e! app]
+       :taxi-ui/front-page      [fp/front-page e! app]
+       :taxi-ui/login           [l/login e! app]
        :taxi-ui/pricing-details [pd/pricing-details e! app]
        [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]))

@@ -4,7 +4,6 @@
 (defn currency
   "Formats given value as euros as per Finnish locale. Tries to normalize decimal delimiter."
   [value]
-  (js/console.log (str "value is " value " / " (string? value) " / " (type value)))
   (-> (js/Intl.NumberFormat. "fi-FI", #js {:style "currency" :currency "EUR"})
       (.format (if (string? value)
                  (clojure.string/replace value "," ".")

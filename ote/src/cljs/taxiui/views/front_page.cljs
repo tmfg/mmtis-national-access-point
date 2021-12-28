@@ -49,7 +49,7 @@
    [:main (stylefy/use-style theme/main-container)
     [:h2 "Omat palvelutiedot"]
     ; infobox
-    [link e! "#" :front-page
+    [link e! "#" :taxi-ui/front-page
      [:section (stylefy/use-style styles/info-box)
       ; section title
       [:h4 (stylefy/use-style styles/info-section-title) "Palveluntuottajan tiedot"]

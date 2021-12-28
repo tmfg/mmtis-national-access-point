@@ -65,15 +65,17 @@
   ([app response]
    (login-navigate->page app response (tr [:common-texts :logged-in])))
   ([app response flash-message]
-   (let [authority? (get-in response [:session-data :user :transit-authority?])
+   (let [authority?      (get-in response [:session-data :user :transit-authority?])
          operators-count (count (get-in response [:session-data :transport-operators]))
-         navigate-to (get-in app [:login :navigate-to])
-         tos-ok? (get-in response [:session-data :user :seen-tos?])
+         navigate-to     (get-in app [:login :navigate-to])
+         tos-ok?         (get-in response [:session-data :user :seen-tos?])
+         taxi-ui?        (= "taxi-ui" (some-> (or (:page navigate-to) (:page app)) namespace))
          new-page (cond
                     (not (empty? navigate-to))             (:page navigate-to)
                     (and authority? (= 0 operators-count)) :authority-pre-notices
+                    taxi-ui?                               :taxi-ui/front-page
                     :else                                  :own-services)]
-     (if (= "taxi-ui" (some-> (:page navigate-to) namespace))
+     (if
        (taxi-routes/navigate! new-page (:params navigate-to))
        (routes/navigate! new-page (:params navigate-to)))
      (when tos-ok?

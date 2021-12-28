@@ -31,8 +31,7 @@
           :href     "#/"
           :on-click #(do
                        (.preventDefault %)
-                       (routes/navigate! :front-page nil)
-                       false)}
+                       (routes/navigate! :taxi-ui/front-page nil))}
       [feather-icons/arrow-left] " Palaa omiin palvelutietoihin"]
      [:h2 "Yrityksesi hintatiedot"]
 

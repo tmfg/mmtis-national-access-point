@@ -13,16 +13,12 @@
 
 (def taxiui-router
   (r/router
-    ; These first few routes are non-namespaced to work around application hardcoded default behaviors in several places
-    ; which is significant as the Taxi UI reuses quite a few of the NAPOTE UI services and such.
-    ; It would be possible to refactor all those bits to work dynamically, but it really isn't worth the effort at this
-    ; point.
-   [["/" :front-page]
-    ["/login" :taxi-ui/login]
+   [["/"                :taxi-ui/front-page]
+    ["/login"           :taxi-ui/login]
     ["/pricing-details" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list
-(def auth-required #{:taxi-ui/pricing-details})
+(def auth-required #{:taxi-ui/front-page :taxi-ui/pricing-details})
 
 ;; Add pages that needs :transit-authority? authenticating to this list
 (def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes :monitor})
@@ -103,10 +99,8 @@
                      not-authorized? (or (requires-authentication? app)
                                        (requires-transit-authority? app)
                                        (requires-admin? app))]
-                 (js/console.log (str "navigation data :: " navigation-data))
                  (if not-authorized?
                    (do
-                     (js/console.log "loginia tarvitaan")
                      (navigate! :taxi-ui/login)
                      (assoc orig-app
                        :login {:show? true
@@ -132,7 +126,7 @@
                app)))))
 
 (defn start! [go-to-url-event]
-  (r/start! taxiui-router {:default     :front-page
+  (r/start! taxiui-router {:default     :taxi-ui/front-page
                            :on-navigate (partial on-navigate go-to-url-event)}))
 
 (defn navigate!

@@ -93,7 +93,6 @@
 
   ChangePage
   (process-event [{given-page :given-page params :params :as e} app]
-    (js/console.log (str "ChangePage :: given page: " given-page))
     (navigate e app (fn [app]
                       (routes/navigate! given-page params)
                       app)))
