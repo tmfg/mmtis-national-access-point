@@ -39,8 +39,7 @@
              {:href     url
               :on-click #(do
                            (.preventDefault %)
-                           (routes/navigate! page nil)
-                           false)})
+                           (e! (fp-controller/->ChangePage page nil)))})
    children])
 
 (defn front-page
