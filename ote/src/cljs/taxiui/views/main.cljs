@@ -6,6 +6,7 @@
             [taxiui.views.front-page :as fp]
             [taxiui.views.login :as l]
             [taxiui.views.pricing-details :as pd]
+            [taxiui.views.stats :as s]
             [taxiui.views.components.header :refer [header]]
             ))
 
@@ -22,4 +23,5 @@
        :taxi-ui/front-page      [fp/front-page e! app]
        :taxi-ui/login           [l/login e! app]
        :taxi-ui/pricing-details [pd/pricing-details e! app]
+       :taxi-ui/stats           [s/stats e! app]
        [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]))

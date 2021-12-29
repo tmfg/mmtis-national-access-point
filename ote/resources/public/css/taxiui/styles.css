@@ -119,3 +119,9 @@ button, input, optgroup, select, textarea {
   background-color: rgba(0, 0, 0, .5);
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
+
+/* reset table spacing - remember to add cellspacing="0" to your tables! */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}

@@ -1747,4 +1747,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}
+
+ ;; Taxi UI translations
+ :taxi-ui {:stats {:name               "Yritys"
+                   :example-trip       "Esimerkkimatka"
+                   :cost-start-daytime "Aloitus (06-18)"
+                   :cost-travel-km     "Matka (per km)"
+                   :cost-travel-min    "Matka (per min)"
+                   :operation-area     "Toiminta-alue (ensisijainen)"}}
  }

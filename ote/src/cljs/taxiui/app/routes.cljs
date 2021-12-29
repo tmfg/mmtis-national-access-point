@@ -15,6 +15,7 @@
   (r/router
    [["/"                :taxi-ui/front-page]
     ["/login"           :taxi-ui/login]
+    ["/stats"           :taxi-ui/stats]
     ["/pricing-details" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list

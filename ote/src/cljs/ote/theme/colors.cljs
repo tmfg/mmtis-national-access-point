@@ -6,6 +6,8 @@
    2. Prefer `accessible-` colors for highlights, area element backgrounds etc. These have the best contrast.
    3. Expanded palette is available through prefixes `basic-`, `light-` and `dark-`. Use these sparingly.
 
+For extra specific reasons there's also `faint-` colors. Use this extremely sparingly!
+
   More details and guidance available in `Fintraffic_Brand_Book_Joulukuu2020.pdf` pages 17 to 21.")
 
 ;;;; Fintraffic official colors - USE THESE!!
@@ -24,7 +26,6 @@
 (def basic-red "#ff5a05")
 (def basic-yellow "#ffd000")
 (def basic-gray "#9696aa")
-(def basic-brown "#784b28")
 (def basic-brown sand)
 
 ;; Dark colors
@@ -51,6 +52,11 @@
 (def light-yellow "#fff5aa")
 (def light-gray "#cdcdd7")
 (def light-brown beige)
+
+;; Faint colors
+;  !! NON-STANDARD COLORS !!
+;  for use as non-important element background highlighting and similar places where accessability is not an issue
+(def faint-gray "#eaeaea")
 
 ;; Semantic colors - prefer the use of these above everything else
 ;  Primary colors by usage context.
