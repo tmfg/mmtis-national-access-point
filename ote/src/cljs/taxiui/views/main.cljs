@@ -7,8 +7,8 @@
             [taxiui.views.login :as l]
             [taxiui.views.pricing-details :as pd]
             [taxiui.views.stats :as s]
-            [taxiui.views.components.header :refer [header]]
-            ))
+            [taxiui.views.components.devtools :as devtools]
+            [taxiui.views.components.header :refer [header]]))
 
 (defn taxi-application
   "Taxi UI application main view"
@@ -17,11 +17,13 @@
     [:div (stylefy/use-style styles/main-flex-container)
      [header app]
      ; TODO: add test env warning for Taxi UI hereabouts
-     ; TODO: add data-frisk here as well
+     ; TODO: add cookie banner to this index
      (case (:page app)
        ;  see taxiui.app.routes for more in-depth documentation
        :taxi-ui/front-page      [fp/front-page e! app]
        :taxi-ui/login           [l/login e! app]
        :taxi-ui/pricing-details [pd/pricing-details e! app]
        :taxi-ui/stats           [s/stats e! app]
-       [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])]))
+       [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])
+
+     [devtools/debug-state app]]))
