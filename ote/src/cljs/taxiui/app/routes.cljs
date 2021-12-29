@@ -67,63 +67,36 @@
 
 (declare navigate!)
 
+(defn- force-login!
+  [orig-app navigation-data]
+  (do
+    (navigate! :taxi-ui/login)
+    (assoc orig-app
+      :login {:show? true
+              :navigate-to navigation-data})))
+
+(defn- not-authorized?
+  [app]
+  (or (requires-authentication? app)
+      (requires-transit-authority? app)
+      (requires-admin? app)))
+
 (defn on-navigate [go-to-url-event route-name params query]
   (swap! state/app
-         (fn [{:keys [before-unload-message navigation-prompt-open? url] :as app}]
-           (if (and before-unload-message (not navigation-prompt-open?))
-             (let [new-url js/window.location.href]
-               ;; push previous URL to the history (the one we want to stay on)
-               (.pushState js/window.history #js {} js/document.title
-                           url)
-               ;; Open confirmation dialog and only go to new page
-               ;; if the user confirms navigation.
-               (assoc app
-                 :navigation-prompt-open? true
-                 :navigation-confirm (go-to-url-event new-url)))
-
-             (if (not= (:url app) js/window.location.href)
-               (let [navigation-data {:page route-name
+         (fn [app]
+           (let [navigation-data {:page   route-name
                                       :params params
-                                      :query query
-                                      :url js/window.location.href}
-                     event-leave (on-leave-event {:page (:page app)})
-                     event-leave (if (vector? event-leave) event-leave [event-leave])
-                     event-to (on-navigate-event navigation-data)
-                     event-to (if (vector? event-to) event-to [event-to])
+                                      :query  query
+                                      :url    js/window.location.href}
                      orig-app app
-                     app (merge app navigation-data)
-                     win-location (subs (.. js/window -location -hash) 1)
-                     ;; Remove potentially sensitive arguments from analytics script reporting
-                     win-location (if-let [opt-out-page (#{:register :reset-password :confirm-email} (:page navigation-data))]
-                                    (str "/" (name opt-out-page))
-                                    win-location)
-                     not-authorized? (or (requires-authentication? app)
-                                       (requires-transit-authority? app)
-                                       (requires-admin? app))]
-                 (if not-authorized?
-                   (do
-                     (navigate! :taxi-ui/login)
-                     (assoc orig-app
-                       :login {:show? true
-                               :navigate-to navigation-data}))
-
-                   ;; Send startup events (if any) immediately after returning from this swap
-                   (if (or event-leave event-to)
-                     (do
-                       ; SPA page changes must be pushed to analytics script because url route might not change.
-                       ;; Check tracker script in case script loading failed. A browser extension or other issue may block it.
-                       (when (exists? js/_paq)
-                         (.push js/_paq (clj->js ["setCustomUrl", win-location]))
-                         ;; trackPageView signals to matomo piwik js api a single page visit.
-                         (.push js/_paq (clj->js ["trackPageView"])))
-
-                       (.setTimeout
-                         js/window
-                         (fn []
-                           (send-startup-events (vec (concat event-leave event-to))))
-                         0)
-                       app)
-                     app)))
+                     app (merge app navigation-data)]
+             (.setTimeout
+               js/window
+               (fn []
+                 (send-startup-events (on-navigate-event navigation-data)))
+               0)
+             (if (not-authorized? app)
+               (force-login! orig-app navigation-data)
                app)))))
 
 (defn start! [go-to-url-event]
