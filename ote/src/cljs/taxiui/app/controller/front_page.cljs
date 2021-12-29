@@ -13,17 +13,6 @@
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
-(defrecord ToggleFintrafficMenu [])
-(defrecord ToggleMobileBottomMenu [])
-(defrecord ToggleUpdatesMenu [])
-(defrecord ToggleServiceInfoMenu [])
-(defrecord ToggleMyServicesMenu [])
-(defrecord ToggleSupportMenu [])
-(defrecord ToggleUserMenu [])
-(defrecord ToggleLangMenu [])
-(defrecord CloseHeaderMenus [])
-(defrecord Logout [])
-(defrecord SetLanguage [lang])
 (defrecord ForceUpdateAll [app scroll-y])
 
 (defrecord GetTransportOperator [])
@@ -63,32 +52,6 @@
           (dissoc :transport-operators-with-services)))
     app))
 
-(def ^:private all-menus [[:ote-service-flags :fintraffic-menu-open]
-                          [:ote-service-flags :navigation-updates-menu]
-                          [:ote-service-flags :service-info-menu-open]
-                          [:ote-service-flags :my-services-menu-open]
-                          [:ote-service-flags :support-menu-open]
-                          [:ote-service-flags :user-menu-open]
-                          [:ote-service-flags :lang-menu-open]])
-
-(defn- switch-menus [app switch-fn]
-  (reduce
-    (fn [app path]
-      (assoc-in app path (switch-fn app path)))
-    app
-    all-menus))
-
-(defn- close-all-menus [app]
-  (switch-menus app (constantly false)))
-
-(defn- toggle-menu [app menu-flag-path]
-  (switch-menus
-    app
-    (fn [app path]
-      (if (= menu-flag-path path)
-        (if (get-in app path) false true)
-        false))))
-
 (extend-protocol tuck/Event
 
   ChangePage
@@ -100,8 +63,8 @@
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-      (.setTimeout js/window #(set! (.-location js/window) url) 0)
-      app)))
+                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+                      app)))
 
   OpenNewTab
   (process-event [{url :url :as e} app]
@@ -113,54 +76,6 @@
   StayOnPage
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
-
-  ToggleFintrafficMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :fintraffic-menu-open]))
-
-  ToggleMobileBottomMenu
-  (process-event [_ app]
-    ; mobile bottom menu is handled separately to support two-level nested menus
-    (assoc-in
-      app
-      [:ote-service-flags :mobile-bottom-menu-open]
-      (if (get-in app [:ote-service-flags :mobile-bottom-menu-open]) false true)))
-
-  ToggleUpdatesMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :navigation-updates-menu]))
-
-  ToggleServiceInfoMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :service-info-menu-open]))
-
-  ToggleMyServicesMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :my-services-menu-open]))
-
-  ToggleSupportMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :support-menu-open]))
-
-  ToggleUserMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :user-menu-open]))
-
-  ToggleLangMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :lang-menu-open]))
-
-  CloseHeaderMenus
-  (process-event [_ app]
-    (-> app
-        (close-all-menus)
-        ; mobile bottom menu is handled separately to support two-level nested menus
-        (assoc-in [:ote-service-flags :mobile-bottom-menu-open] false)))
-
-  Logout
-  (process-event [_ app]
-    (assoc-in app [:ote-service-flags :user-menu-open] true)
-    app)
 
   EnsureTransportOperator
   (process-event [_ app]
@@ -200,21 +115,6 @@
       (when page
         (routes/navigate! page params)))
     (login/update-transport-operator-data (dissoc app :login) response))
-
-  SetLanguage
-  (process-event [{lang :lang} app]
-    (let [force-update-all (tuck/send-async! ->ForceUpdateAll app js/window.scrollY)]
-      (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-      (r/after-render
-       #(localization/load-language! lang
-                                     (fn [lang _]
-                                       (reset! localization/selected-language lang)
-                                       ;; Reset app state to re-render everything
-                                       (force-update-all)))))
-    ;; Return empty app state, until new language has been fetched
-    ;; Just calling (r/force-update-all) is not enough because some components
-    ;; implement component should update.
-    nil)
 
   ForceUpdateAll
   (process-event [{app :app scroll-y :scroll-y} _]
