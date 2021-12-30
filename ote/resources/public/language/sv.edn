@@ -1113,7 +1113,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer-livi-url-link "https://www.traficom.fi/sv/vara-tjanster/lamna-uppgifter-om-din-mobilitetstjanst-i-nap-tjansten"
   :footer-made-width "Made with"
   :footer-copyright-disclaimer (:md "Webbplatsen finap.fi som är publiceras med licensen [Creative Commons Erkännande 4.0 Internationell](http://creativecommons.org/licenses/by/4.0/).")
-  :footer-funded (:md "Delvis finansierat av EU [Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
+  ; the newline and whitespace alignment is important, do not change!
+  :footer-funded (:md "Delvis finansierat av EU
+[Connecting Europe Facility.](https://ec.europa.eu/inea/connecting-europe-facility/cef-transport)")
   :no-such-page "Valda sidan hittas ej: "
   :time-unit "Tidsenhet"
   :time-units {:minutes "Minuter"

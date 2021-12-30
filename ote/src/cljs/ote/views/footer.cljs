@@ -78,4 +78,9 @@
          link
          [icon (stylefy/use-style footer-styles/some-link-icon)]
          {:style               footer-styles/some-link
-          :hide-external-icon? true}]))]])
+          :hide-external-icon? true}]))]
+
+   [:div#footer-fundedby {:style {:margin-left "auto"
+                                  :display "flex"}}
+    [:img {:style {:width "80px" :height "52px" :margin-right "20px"} :src "/img/EU-logo.svg"}]
+    (tr [:common-texts :footer-funded])]])
