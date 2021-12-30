@@ -146,4 +146,5 @@
          "https://www.traficom.fi/fi/liikenne-ja-viestintavirasto-traficom"
          [:button (stylefy/use-style style-front-page/front-page-button)
           [:span [feather-icons/compass {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-          (tr [:buttons :visit-service-operator])]]]]]]]])
+          (tr [:buttons :visit-service-operator])]
+         {:hide-external-icon? true}]]]]]]])
