@@ -26,9 +26,7 @@
 
 (define-event LoadStatistics [params]
               {}
-              (do
-                (js/console.log "Loading statistics...")
-                (assoc-in app [:taxi-ui :companies] test-data)))
+              (assoc-in app [:taxi-ui :companies] (->> test-data (random-sample 0.5) shuffle)))
 
 (defmethod routes/on-navigate-event :taxi-ui/stats [{params :params}]
   (do (js/console.log "On navigate hit!")

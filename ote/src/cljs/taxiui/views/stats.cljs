@@ -27,18 +27,18 @@
     :none       :ascending} current))
 
 (defn- table
-  [companies]
+  [e! companies]
   (let [state (r/atom {:columns [{:label :name               :sortable? true  :renderer str}
-                           {:label :updated            :sortable? false :renderer (partial formatters/street-light 0 6 12)}
-                           {:label :example-trip       :sortable? true  :renderer formatters/currency}
-                           {:label :cost-start-daytime :sortable? true  :renderer formatters/currency}
-                           {:label :cost-travel-km     :sortable? true  :renderer formatters/currency}
-                           {:label :cost-travel-min    :sortable? true  :renderer formatters/currency}
-                           {:label :operation-area     :sortable? true  :renderer str}]
-                 :sorting {:column  :cost-start-daytime  ;; TODO: just a hardcoded test value
-                           :sort-fn identity
-                           :direction :ascending}})]  ; cycles between :ascending, :descending, :none
-    (fn [companies]
+                                 {:label :updated            :sortable? false :renderer (partial formatters/street-light 0 6 12)}
+                                 {:label :example-trip       :sortable? true  :renderer formatters/currency}
+                                 {:label :cost-start-daytime :sortable? true  :renderer formatters/currency}
+                                 {:label :cost-travel-km     :sortable? true  :renderer formatters/currency}
+                                 {:label :cost-travel-min    :sortable? true  :renderer formatters/currency}
+                                 {:label :operation-area     :sortable? true  :renderer str}]
+                       :sorting {:column    :cost-start-daytime  ;; TODO: just a hardcoded test value
+                                 :sort-fn   identity
+                                 :direction :none}})]  ; cycles between :ascending, :descending, :none
+    (fn [e! companies]
       (let [{:keys [columns sorting]} @state]
         [:table {:cellSpacing "0"
                  :style {:width "100%"}}
@@ -57,11 +57,11 @@
                                              :on-click (fn [e]
                                                          (do
                                                           (.preventDefault e)
-                                                          (js/console.log (str "swapping " label " / " direction))
                                                           (swap! state update-in [:sorting :column] (constantly label))
                                                           (swap! state update-in [:sorting :direction] #(if (= label column)
                                                                                                           (sort-direction-transitions direction)
-                                                                                                          :ascending))))})
+                                                                                                          :ascending))
+                                                          (e! (controller/->LoadStatistics (get @state :sorting)))))})
                       (feather-icons/chevron-up {:height  ".75em"
                                                  :viewBox "0 6 24 12"
                                                  :stroke  (cond
@@ -78,7 +78,7 @@
 
 (defn stats
   [_ _]
-  (fn [_ app]
+  (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
      [:h2 "Kokonaiskatsaus"]
-     [table (get-in app [:taxi-ui :companies])]]))
+     [table e! (get-in app [:taxi-ui :companies])]]))
