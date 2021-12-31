@@ -12,17 +12,26 @@
 (def ^:private area-pill-filled (merge area-pill
                                        {:background-color colors/primary-background-color
                                         :color            colors/primary-text-color}))
+
+(def ^:private pill-link {:text-decoration "none"})
+
+(def ^:private pill-button {})
+
 (defn pill
   ([label] (pill label nil))
   ([label {:keys [filled? clickable]
            :or   {filled? false clickable nil}}]
 
-   (let [root    [:span {:style {:display "flex"
-                                 :align-items "center"}}]
-         link    [:a {:href "#"
-                      :on-click clickable}]
-         content [[:span (stylefy/use-style (if filled? area-pill-filled area-pill)) label]
-                  (when clickable [feather-icons/x-circle {:stroke colors/accessible-red}])]]
+   (let [root-styles  {:display     "flex"
+                       :align-items "center"}
+         pill         [:span (stylefy/use-style (if filled? area-pill-filled area-pill)) label]
+         button       [feather-icons/x-circle {:stroke colors/accessible-red
+                                               :style  pill-button}]]
+
      (if clickable
-       (conj root (into link content))
-       (into root content)))))
+       [:a (stylefy/use-style (merge root-styles pill-link)
+                              {:href     "#"
+                               :on-click clickable})
+         pill
+         button]
+       [:span root-styles pill]))))
