@@ -8,12 +8,8 @@
                         theme/breather-padding
                         theme/breather-margin))
 
-(def pricing-input-container {:width "47.5%"})
+(def pricing-input-container {})
 
-(def pricing-input-element (-> {:border        (str "0.0625em solid " colors/light-gray)
-                                :border-radius "0.3em"
-                                :height        "3rem"
-                                :font-size     "2em"
-                                :width         "100%"
-                                :box-sizing    "border-box"}
-                               (theme/breather-padding)))
+(def left-column {:flex "1"})
+(def spacer {:width "2em"})
+(def right-column {:flex "1"})

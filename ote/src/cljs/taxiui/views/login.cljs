@@ -15,30 +15,30 @@
             [clojure.string :as str]
             [ote.ui.notification :as notification]
             [ote.style.buttons :as style-buttons]
-            [taxiui.theme :as theme]))
+            [taxiui.theme :as theme]
+            [taxiui.views.components.forms :as forms]))
 
 (def login-on-enter (fn [event e!]
                       (when (= "Enter" (.-key event))
                         (e! (lc/->Login)))))
 
 (defn login-form [e! {:keys [credentials failed? error in-progress?] :as login}]
-  ; TODO: this looks visually absolutely horrible
   [:div {}
    [:div
     [:label {:for "name"} (tr [:field-labels :login :email-or-username])]
-    [:input {:name "name"
-             :type "text"
-             :autoComplete "email"
-             :required "true"
-             :on-input #(e! (lc/->UpdateLoginCredentials {:email (-> % .-target .-value)}))
-             :on-key-press #(login-on-enter % e!)}]]
+    [forms/input {:name         "name"
+                  :type         "text"
+                  :autoComplete "email"
+                  :required     "true"
+                  :on-input     #(e! (lc/->UpdateLoginCredentials {:email (-> % .-target .-value)}))
+                  :on-key-press #(login-on-enter % e!)}]]
    [:div
     [:label {:for "password"} (tr [:field-labels :login :password])]
-    [:input {:name "password"
-             :type "password"
-             :required "true"
-             :on-input #(e! (lc/->UpdateLoginCredentials {:password (-> % .-target .-value)}))
-             :on-key-press #(login-on-enter % e!)}]]
+    [forms/input {:name         "password"
+                  :type         "password"
+                  :required     "true"
+                  :on-input     #(e! (lc/->UpdateLoginCredentials {:password (-> % .-target .-value)}))
+                  :on-key-press #(login-on-enter % e!)}]]
    [:button (merge (stylefy/use-style style-buttons/primary-button)
                    {:on-click #(e! (lc/->Login))})
     (tr [:login :login-button])]])

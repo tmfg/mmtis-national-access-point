@@ -2,6 +2,7 @@
   (:require [stylefy.core :as stylefy]
             [taxiui.styles.pricing-details :as styles]
             [taxiui.views.components.formatters :as formatters]
+            [taxiui.views.components.forms :as forms]
             [taxiui.app.controller.front-page :as fp-controller]
             [re-svg-icons.feather-icons :as feather-icons]
             [taxiui.app.routes :as routes]
@@ -12,15 +13,14 @@
   [:div (stylefy/use-style styles/pricing-input-container)
    [:h5 main-title]
    [:h5 subtitle]
-   [:input (merge (stylefy/use-style styles/pricing-input-element)
-                  {:type      "text"
-                   :input-mode "decimal"
-                   :on-focus  (fn [e] (set! (.. e -target -value)
-                                            (or (.. e -target -dataset -rawvalue) "")))
-                   :on-change (fn [e] (set! (.. e -target -dataset -rawvalue)
-                                            (.. e -target -value)))
-                   :on-blur   (fn [e] (set! (.. e -target -value)
-                                            (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))})]])
+   [forms/input {:type      "text"
+                 :input-mode "decimal"
+                 :on-focus  (fn [e] (set! (.. e -target -value)
+                                          (or (.. e -target -dataset -rawvalue) "")))
+                 :on-change (fn [e] (set! (.. e -target -dataset -rawvalue)
+                                          (.. e -target -value)))
+                 :on-blur   (fn [e] (set! (.. e -target -value)
+                                          (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))}]])
 
 
 (defn pricing-details
@@ -36,8 +36,12 @@
      [:h2 "Yrityksesi hintatiedot"]
 
      [:section (stylefy/use-style styles/pricing-inputs)
-      [pricing-input "Aloitus" "(välille 06-18)"]
-      [pricing-input "Aloitus" "(viikonloppu)"]
-      [pricing-input "Aloitus" "(välille 18-24)"]
-      [pricing-input "Matka" "(hinta per kilometri)"]
-      [pricing-input "Matka" "(hinta per minuutti)"]]]))
+      [:div (stylefy/use-style styles/left-column)
+       [pricing-input "Aloitus" "(välille 06-18)"]
+       [pricing-input "Aloitus" "(välille 18-24)"]
+       [pricing-input "Matka" "(hinta per minuutti)"]]
+      [:div (stylefy/use-style styles/spacer)]
+      [:div (stylefy/use-style styles/right-column)
+       [pricing-input "Aloitus" "(viikonloppu)"]
+       [pricing-input "Matka" "(hinta per kilometri)"]]
+      ]]))
