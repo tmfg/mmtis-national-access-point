@@ -85,9 +85,9 @@
   (swap! state/app
          (fn [app]
            (let [navigation-data {:page   route-name
-                                      :params params
-                                      :query  query
-                                      :url    js/window.location.href}
+                                  :params params
+                                  :query  query
+                                  :url    js/window.location.href}
                      orig-app app
                      app (merge app navigation-data)]
              (.setTimeout
