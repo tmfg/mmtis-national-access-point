@@ -6,8 +6,10 @@
             [taxiui.app.controller.front-page :as fp-controller]
             [taxiui.styles.front-page :as styles]
             [taxiui.views.components.formatters :as formatters]
+            [taxiui.views.components.pill :refer [pill]]
             [taxiui.app.routes :as routes]
-            [taxiui.theme :as theme]))
+            [taxiui.theme :as theme]
+            [ote.theme.colors :as colors]))
 
 (let [host (.-host (.-location js/document))]
   (def test-env? (or (str/includes? host "test")
@@ -19,11 +21,6 @@
                {:style {:grid-area grid-area}})
    [:h5 title]
    [icon (stylefy/use-style styles/panel-icon)] " " label])
-
-(defn- pill
-  ([label] (pill label nil))
-  ([label {:keys [filled?] :or {filled? false}}]
-   [:span (stylefy/use-style (if filled? styles/area-pill-filled styles/area-pill)) label]))
 
 (defn- panel-arrow
   []

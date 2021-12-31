@@ -44,4 +44,8 @@
       [:div (stylefy/use-style styles/right-column)
        [pricing-input "Aloitus" "(viikonloppu)"]
        [pricing-input "Matka" "(hinta per kilometri)"]]
-      ]]))
+      ]
+
+     [:h3 "Toiminta-alue"]
+     ; pills here
+     ]))
