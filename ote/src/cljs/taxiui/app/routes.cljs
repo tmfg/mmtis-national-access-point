@@ -56,13 +56,11 @@
        (contains? auth-required (:page app))))
 
 (defn- send-startup-events [event]
-  (let [e! (tuck/control state/app)]
-    (if (vector? event)
-      ;; Received multiple events, apply them all
-      (doseq [event event
-              :when event]
-        (e! event))
-      ;; Apply single event
+  (let [e!     (tuck/control state/app)
+        events (->> (if (not (vector? event)) [event] event)
+                    (filter some?))]
+    (doseq [event events
+            :when event]
       (e! event))))
 
 (declare navigate!)
@@ -88,8 +86,8 @@
                                   :params params
                                   :query  query
                                   :url    js/window.location.href}
-                     orig-app app
-                     app (merge app navigation-data)]
+                     orig-app    app
+                     app         (merge app navigation-data)]
              (.setTimeout
                js/window
                (fn []
