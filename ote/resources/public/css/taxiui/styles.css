@@ -59,12 +59,12 @@ h3 {
 }
 
 h4 {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 1.125em;
 }
 
 h5 {
-    font-weight: 400;
+    font-weight: 600;
     font-size: 1em;
 }
 
@@ -75,6 +75,12 @@ h6 {
 
 p {
     font-family: 'Piazzolla', serif;
+}
+
+/* list elements are easier to work through resetting instead of normalization */
+ol,ul {
+    margin: 0;
+    padding: 0
 }
 
 /* form elements */
