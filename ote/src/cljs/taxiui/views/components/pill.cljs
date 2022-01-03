@@ -15,7 +15,8 @@
 
 (def ^:private pill-link {:text-decoration "none"})
 
-(def ^:private pill-button {})
+(def ^:private pill-button {:margin-left  "0.25em"
+                            :margin-right "0.25em"})
 
 (defn pill
   ([label] (pill label nil))
