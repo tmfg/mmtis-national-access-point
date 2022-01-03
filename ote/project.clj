@@ -141,6 +141,9 @@
                  ;; Also in use:
                  ;; Chouette command line tool - CeCILL-B
                  ;; Firejail - GNU General Public License, version 2
+
+                 ;; ClojureScript atoms backed by HTML5 web storage. - Eclipse Public License 1.0
+                 [alandipert/storage-atom "2.0.1"]
                  ]
   :profiles {:uberjar {:aot :all
 

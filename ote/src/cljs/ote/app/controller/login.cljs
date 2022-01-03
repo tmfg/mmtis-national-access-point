@@ -8,7 +8,8 @@
             [ote.app.routes :as routes]
             [ote.app.localstorage :as localstorage]
             [ote.app.controller.common :refer [->ServerError]]
-            [ote.app.controller.user-edit :as user-edit]))
+            [ote.app.controller.user-edit :as user-edit]
+            [taxiui.app.routes :as taxi-routes]))
 
 (defrecord ShowLoginPage [])
 (defrecord UpdateLoginCredentials [credentials])
@@ -64,15 +65,19 @@
   ([app response]
    (login-navigate->page app response (tr [:common-texts :logged-in])))
   ([app response flash-message]
-   (let [authority? (get-in response [:session-data :user :transit-authority?])
+   (let [authority?      (get-in response [:session-data :user :transit-authority?])
          operators-count (count (get-in response [:session-data :transport-operators]))
-         navigate-to (get-in app [:login :navigate-to])
-         tos-ok? (get-in response [:session-data :user :seen-tos?])
+         navigate-to     (get-in app [:login :navigate-to])
+         tos-ok?         (get-in response [:session-data :user :seen-tos?])
+         taxi-ui?        (= "taxi-ui" (some-> (or (:page navigate-to) (:page app)) namespace))
          new-page (cond
-                    (not (empty? navigate-to)) (:page navigate-to)
+                    (not (empty? navigate-to))             (:page navigate-to)
                     (and authority? (= 0 operators-count)) :authority-pre-notices
-                    :else :own-services)]
-     (routes/navigate! new-page (:params navigate-to))
+                    taxi-ui?                               :taxi-ui/front-page
+                    :else                                  :own-services)]
+     (if
+       (taxi-routes/navigate! new-page (:params navigate-to))
+       (routes/navigate! new-page (:params navigate-to)))
      (when tos-ok?
        (localstorage/add-item! (keyword (str (get-in response [:session-data :user :email]) "-tos-ok")) true))
      (-> app

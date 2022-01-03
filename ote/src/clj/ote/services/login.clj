@@ -30,7 +30,7 @@
 (defn- with-auth-tkt [response auth-tkt-value domain]
   (update response :headers
           assoc "Set-Cookie" (if (nil? domain)
-                               (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")
+                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")]
                                ;; Three cookies are required to match ckan cookie configuration
                                [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Secure")
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"

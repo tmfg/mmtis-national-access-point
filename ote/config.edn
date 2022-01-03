@@ -10,7 +10,7 @@
  ;;      :password #=(slurp "../../mydbpassword.txt")}
 
  :http {:port 3000
-        :ip "localhost"
+        :ip "0.0.0.0"
         :max-body 33554432 ;; 32 megabytes
         :auth-tkt {:shared-secret "localdev"
                    :max-age-in-seconds 36000

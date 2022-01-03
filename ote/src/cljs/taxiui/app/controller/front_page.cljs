@@ -1,30 +1,18 @@
 (ns taxiui.app.controller.front-page
-  (:require [reagent.core :as r]
-            [tuck.core :as tuck :refer-macros [define-event]]
-            [ote.communication :as comm]
-            [ote.localization :as localization :refer [tr]]
-            [ote.app.routes :as routes]
+  (:require [ote.app.controller.login :as login]
+            [ote.app.controller.common :refer [->ServerError]]
             [ote.app.localstorage :as localstorage]
-            [ote.app.controller.login :as login]
-            [ote.app.controller.flags :as flags]
-            [ote.app.controller.common :refer [->ServerError]]))
+            [ote.communication :as comm]
+            [ote.localization :as localization]
+            [reagent.core :as r]
+            [taxiui.app.routes :as routes]
+            [tuck.core :as tuck]))
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page params])
 (defrecord GoToUrl [url])
 (defrecord OpenNewTab [url])
 (defrecord StayOnPage [])
-(defrecord ToggleFintrafficMenu [])
-(defrecord ToggleMobileBottomMenu [])
-(defrecord ToggleUpdatesMenu [])
-(defrecord ToggleServiceInfoMenu [])
-(defrecord ToggleMyServicesMenu [])
-(defrecord ToggleSupportMenu [])
-(defrecord ToggleUserMenu [])
-(defrecord ToggleLangMenu [])
-(defrecord CloseHeaderMenus [])
-(defrecord Logout [])
-(defrecord SetLanguage [lang])
 (defrecord ForceUpdateAll [app scroll-y])
 
 (defrecord GetTransportOperator [])
@@ -64,46 +52,19 @@
           (dissoc :transport-operators-with-services)))
     app))
 
-(def ^:private all-menus [[:ote-service-flags :fintraffic-menu-open]
-                          [:ote-service-flags :navigation-updates-menu]
-                          [:ote-service-flags :service-info-menu-open]
-                          [:ote-service-flags :my-services-menu-open]
-                          [:ote-service-flags :support-menu-open]
-                          [:ote-service-flags :user-menu-open]
-                          [:ote-service-flags :lang-menu-open]])
-
-(defn- switch-menus [app switch-fn]
-  (reduce
-    (fn [app path]
-      (assoc-in app path (switch-fn app path)))
-    app
-    all-menus))
-
-(defn- close-all-menus [app]
-  (switch-menus app (constantly false)))
-
-(defn- toggle-menu [app menu-flag-path]
-  (switch-menus
-    app
-    (fn [app path]
-      (if (= menu-flag-path path)
-        (if (get-in app path) false true)
-        false))))
-
 (extend-protocol tuck/Event
 
   ChangePage
   (process-event [{given-page :given-page params :params :as e} app]
     (navigate e app (fn [app]
-                      (do
-                        (routes/navigate! given-page params)
-                        app))))
+                      (routes/navigate! given-page params)
+                      app)))
 
   GoToUrl
   (process-event [{url :url :as e} app]
     (navigate e app (fn [app]
-      (.setTimeout js/window #(set! (.-location js/window) url) 0)
-      app)))
+                      (.setTimeout js/window #(set! (.-location js/window) url) 0)
+                      app)))
 
   OpenNewTab
   (process-event [{url :url :as e} app]
@@ -115,54 +76,6 @@
   StayOnPage
   (process-event [_ app]
     (dissoc app :navigation-prompt-open?))
-
-  ToggleFintrafficMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :fintraffic-menu-open]))
-
-  ToggleMobileBottomMenu
-  (process-event [_ app]
-    ; mobile bottom menu is handled separately to support two-level nested menus
-    (assoc-in
-      app
-      [:ote-service-flags :mobile-bottom-menu-open]
-      (if (get-in app [:ote-service-flags :mobile-bottom-menu-open]) false true)))
-
-  ToggleUpdatesMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :navigation-updates-menu]))
-
-  ToggleServiceInfoMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :service-info-menu-open]))
-
-  ToggleMyServicesMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :my-services-menu-open]))
-
-  ToggleSupportMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :support-menu-open]))
-
-  ToggleUserMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :user-menu-open]))
-
-  ToggleLangMenu
-  (process-event [_ app]
-    (toggle-menu app [:ote-service-flags :lang-menu-open]))
-
-  CloseHeaderMenus
-  (process-event [_ app]
-    (-> app
-        (close-all-menus)
-        ; mobile bottom menu is handled separately to support two-level nested menus
-        (assoc-in [:ote-service-flags :mobile-bottom-menu-open] false)))
-
-  Logout
-  (process-event [_ app]
-    (assoc-in app [:ote-service-flags :user-menu-open] true)
-    app)
 
   EnsureTransportOperator
   (process-event [_ app]
@@ -203,21 +116,6 @@
         (routes/navigate! page params)))
     (login/update-transport-operator-data (dissoc app :login) response))
 
-  SetLanguage
-  (process-event [{lang :lang} app]
-    (let [force-update-all (tuck/send-async! ->ForceUpdateAll app js/window.scrollY)]
-      (set! (.-cookie js/document) (str "finap_lang=" lang ";path=/"))
-      (r/after-render
-       #(localization/load-language! lang
-                                     (fn [lang _]
-                                       (reset! localization/selected-language lang)
-                                       ;; Reset app state to re-render everything
-                                       (force-update-all)))))
-    ;; Return empty app state, until new language has been fetched
-    ;; Just calling (r/force-update-all) is not enough because some components
-    ;; implement component should update.
-    nil)
-
   ForceUpdateAll
   (process-event [{app :app scroll-y :scroll-y} _]
     (r/after-render #(.scrollTo js/window 0 scroll-y))
@@ -239,32 +137,7 @@
       (do
         (localstorage/add-item! :tos-ok true)
         (routes/navigate! (:page app)))
-      (do
-        (comm/post! "register/tos" {:user-email (:email user)}
-                    {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
-                     :on-failure (tuck/send-async! ->ServerError)})))
+      (comm/post! "register/tos" {:user-email (:email user)}
+                  {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
+                   :on-failure (tuck/send-async! ->ServerError)}))
     (assoc app :tos-ok true)))
-
-(define-event ToggleAddMemberDialog []
-  {:path [:show-add-member-dialog?]
-   :app show?}
-  (not show?))
-
-(define-event ToggleRegistrationDialog []
-  {}
-  (if (flags/enabled? :ote-register)
-    (do
-      (routes/navigate! :register)
-      app)
-    (-> app
-        (update :show-register-dialog? not)
-        (assoc-in [:login :navigate-to] {:page :own-services})
-        get-transport-operator-data)))
-
-
-
-(define-event UserResetRequested []
-  {}
-  (assoc app
-         :show-reset-dialog? false
-         :flash-message (tr [:login :check-email-for-link])))
