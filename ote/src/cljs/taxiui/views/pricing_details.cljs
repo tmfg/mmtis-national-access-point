@@ -120,13 +120,11 @@
 
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
-       [forms/button :add-button "Lisää" {:style {:text-transform "uppercase"}
+       [forms/button :add-button "Lisää" {:styles styles/secondary-button
                                           :type "button"
                                           :on-click (fn [e]
                                                       (e! (controller/->AddAreaOfOperation (get-in app [:taxi-ui :search :selected]))))}]]]
-      [forms/button :save-button "Tallenna" {:style {:background-color colors/primary-background-color
-                                                     :color            colors/primary-text-color
-                                                     :text-transform   "uppercase"}
+      [forms/button :save-button "Tallenna" {:styles styles/primary-button
                                              :type "button"
                                              :on-click (fn [e]
                                                          (e! (controller/->SavePriceInformation (get-in app [:taxi-ui :price-information]))))}]]]))

@@ -27,3 +27,15 @@
                           :line-height   "1.5em"
                           ::stylefy/mode {:hover {:color            colors/primary-text-color
                                                   :background-color colors/primary-background-color}}})
+
+(def primary-button {:text-transform "uppercase"
+                     :color            colors/primary-text-color
+                     :background-color colors/primary-background-color
+                     ::stylefy/mode    {:hover {:color            colors/basic-black
+                                                :background-color colors/basic-white}}})
+
+(def secondary-button {:text-transform "uppercase"
+                       :color            colors/basic-black
+                       :background-color colors/basic-white
+                       ::stylefy/mode    {:hover {:color            colors/primary-text-color
+                                                  :background-color colors/accessible-gray}}})

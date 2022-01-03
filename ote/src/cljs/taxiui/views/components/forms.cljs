@@ -4,6 +4,13 @@
             [ote.theme.colors :as colors]
             [clojure.string :as str]))
 
+(defn deep-merge [& maps]
+  (apply merge-with (fn [& args]
+                      (if (every? map? args)
+                        (apply deep-merge args)
+                        (last args)))
+         maps))
+
 (def ^:private scaling-and-borders {:border-width  "0.0625em"
                                     :border-style  "solid"
                                     :border-color  colors/basic-gray
@@ -32,7 +39,8 @@
       (vector? label) [:label {:for id} (first label) [:br] (second label)]
       (string? label) [:label {:for id} label])]
    (let [extra-styles (:styles props)
-         props (merge (stylefy/use-style styles extra-styles) (dissoc props :styles) {:id id})]
+         all-styles (deep-merge styles extra-styles)
+         props (merge (stylefy/use-style all-styles) (dissoc props :styles) {:id id})]
      (if (some? inner-content)
        [el props inner-content]
        [el props]))

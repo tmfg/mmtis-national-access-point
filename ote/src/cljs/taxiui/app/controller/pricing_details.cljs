@@ -1,16 +1,24 @@
 (ns taxiui.app.controller.pricing-details
   (:require [taxiui.app.routes :as routes]
             [tuck.core :as tuck]
-            [clojure.string :as str]))
+            [clojure.set :as set]
+            [clojure.string :as str]
+            [ote.communication :as comm]))
 
-(def ^:private test-data [{:id 1 :label "Eka tulos"}
-                          {:id 2 :label "toka tulos"}
-                          {:id 3 :label "kolmas tulos"}
-                          {:id 4 :label "Todella pitkä ja tärkeä tulos, jota voisi verrata vaikka Ilkka Remeksen varhaistuotantoon sekä Yhdysvaltain Perustuslakiin, kaikkine lisäosineen ja muine jatkannaisineen"}])
+(tuck/define-event SearchResponse [results]
+  {}
+  (->> results
+       (map #(-> %
+                 (set/rename-keys {:ote.db.places/id      :id
+                                   :ote.db.places/namefin :label})
+                 (select-keys [:id :label])))
+       (assoc-in app [:taxi-ui :search :results])))
 
 (tuck/define-event Search [term]
   {}
-  (assoc-in app [:taxi-ui :search :results] (->> test-data (filter #(str/includes? (:label %) term)) shuffle)))
+  (when-not (str/blank? term) ;; only on filled input
+    (comm/get! (str "place-completions/" term) {:on-success (tuck/send-async! ->SearchResponse)}))
+                   app)
 
 (tuck/define-event ClearSearch []
   {}
@@ -35,8 +43,8 @@
 
 (tuck/define-event SavePriceInformation [price-info]
   {}
-  (js/console.log (str "Store this stuff: " price-info)
-                  app))
+  (js/console.log (str "Store this stuff: " price-info))
+  app)
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
   [(->ClearSearch)
