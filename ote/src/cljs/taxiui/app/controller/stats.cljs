@@ -1,6 +1,6 @@
 (ns taxiui.app.controller.stats
   (:require [taxiui.app.routes :as routes]
-            [tuck.core :as tuck :refer-macros [define-event]]))
+            [tuck.core :as tuck]))
 
 (def test-data [{:name "Lavishbay Oy"      :updated 4  :example-trip 38.40 :cost-start-daytime 6.90 :cost-travel-km 1.25 :cost-travel-min 1.10 :operation-area "002"}
                 {:name "atlas Oy"          :updated 7  :example-trip 46.40 :cost-start-daytime 6.90 :cost-travel-km 1.25 :cost-travel-min 1.10 :operation-area "003"}
@@ -24,10 +24,9 @@
                 {:name "Flycase Oy"        :updated 13 :example-trip 18.20 :cost-start-daytime 4.90 :cost-travel-km 1.50 :cost-travel-min 1.05 :operation-area "001"}
                 {:name "Pioneerload Oy"    :updated 22 :example-trip 18.20 :cost-start-daytime 4.90 :cost-travel-km 1.70 :cost-travel-min 1.05 :operation-area "001"}])
 
-(define-event LoadStatistics [params]
-              {}
-              (assoc-in app [:taxi-ui :companies] (->> test-data (random-sample 0.5) shuffle)))
+(tuck/define-event LoadStatistics [params]
+  {}
+  (assoc-in app [:taxi-ui :companies] (->> test-data (random-sample 0.5) shuffle)))
 
 (defmethod routes/on-navigate-event :taxi-ui/stats [{params :params}]
-  (do (js/console.log "On navigate hit!")
-  (->LoadStatistics params)))
+  (->LoadStatistics params))
