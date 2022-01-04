@@ -53,15 +53,15 @@ WHERE oa.id = :operation-area-id
 SELECT namefin as "ote.db.places/namefin", id as "ote.db.places/id", type as "ote.db.places/type"
   FROM places
  WHERE namefin ilike :name
- ORDER BY
-  CASE TYPE
-  WHEN 'finnish-region' THEN 1
-  WHEN 'finnish-municipality' THEN 2
-  WHEN 'finnish-postal' THEN 3
-  WHEN 'country' THEN 4
-  WHEN 'continent' THEN 5
-   END,
-  namefin;
+    OR id = CONCAT('finnish-municipality-', :term)
+ ORDER BY CASE TYPE
+              WHEN 'finnish-region' THEN 1
+              WHEN 'finnish-municipality' THEN 2
+              WHEN 'finnish-postal' THEN 3
+              WHEN 'country' THEN 4
+              WHEN 'continent' THEN 5
+              END,
+          namefin;
 
 -- name: copy-operation-area
 INSERT INTO operation_area ("transport-service-id", description, location, "primary?")

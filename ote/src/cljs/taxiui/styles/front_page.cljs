@@ -43,18 +43,11 @@
                     breather-padding
                     breather-margin))
 
-(def area-pills (-> {:grid-area "area-pills"}
+(def area-pills (-> {:grid-area "area-pills"
+                     :display   "flex"
+                     :gap       "1em"}
                     breather-padding
                     breather-margin))
-
-(def area-pill {:border        (str "0.0625em solid " colors/primary-background-color)
-                :border-radius "1em"
-                :padding       "0 0.8em 0 0.8em"
-                :margin        "0.8em"})
-
-(def area-pill-filled (merge area-pill
-                             {:background-color colors/primary-background-color
-                              :color            colors/primary-text-color}))
 
 (def example-price-title (-> {:grid-area "example-trip"}
                              breather-padding
