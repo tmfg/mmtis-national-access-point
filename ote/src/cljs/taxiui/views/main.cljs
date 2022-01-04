@@ -16,6 +16,7 @@
   (fn [e! app]
     [:div (stylefy/use-style styles/main-flex-container)
      [header app]
+     [devtools/env-warning]
      ; TODO: add test env warning for Taxi UI hereabouts
      ; TODO: add cookie banner to this index
      (case (:page app)
