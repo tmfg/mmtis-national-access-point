@@ -98,12 +98,12 @@
 
      [:section (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! 1 :start-price-daytime "Aloitus" "(välille 06-18)"]
-       [pricing-input e! 3 :start-price-nighttime "Aloitus" "(välille 18-24)"]
+       [pricing-input e! 1 :start-price-daytime "Aloitus" "(arkipäivisin)"]
+       [pricing-input e! 3 :start-price-nighttime "Aloitus" "(öisin)"]
        [pricing-input e! 5 :travel-cost-per-minute "Matka" "(hinta per minuutti)"]]
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! 2 :start-time-weekend "Aloitus" "(viikonloppu)"]
+       [pricing-input e! 2 :start-time-weekend "Aloitus" "(viikonloppuna)"]
        [pricing-input e! 4 :travel-cost-per-km "Matka" "(hinta per kilometri)"]]]
 
      [:h3 "Toiminta-alueet"]  ; TODO: design uses singular form, but logically this should be plural
