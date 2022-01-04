@@ -23,6 +23,7 @@
             [ote.services.pre-notices :as pre-notices]
             [ote.services.transit-visualization :as transit-visualization]
             [ote.services.transit-changes :as transit-changes]
+            [ote.services.taxiui :as taxiui-services]
             [ote.services.robots :as robots]
 
             [ote.integration.export.geojson :as export-geojson]
@@ -76,6 +77,8 @@
    ;; Return localization information to frontend
    :localization (component/using
                   (localization-service/->Localization) [:http])
+
+   :taxiui-service (component/using (taxiui-services/->TaxiUIService) [:http :db])
 
    ;; OpenStreetMap Overpass API queries
    :places (component/using (places/->Places (:places config)) [:http :db])

@@ -26,6 +26,9 @@
 
 (tuck/define-event LoadPriceInformation []
   {}
+                   (comm/post! "jokujoku/jotain/joo" (get-in app [:taxi-ui :price-information])
+                               {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
+                                :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
   ; TODO: Right now this just resets the app state, should preload pricing info instead if any available
   (assoc-in app [:taxi-ui :price-information] nil))
 
