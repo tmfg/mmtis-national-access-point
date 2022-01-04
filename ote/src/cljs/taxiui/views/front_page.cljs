@@ -41,11 +41,12 @@
 
 (defn front-page
   [_ _]
-  (fn [e! _]
+  (fn [e! app]
    [:main (stylefy/use-style theme/main-container)
     [:h2 "Omat palvelutiedot"]
-    ; infobox
-    [link e! "#" :taxi-ui/front-page
+    [:h3 [:span (get-in app [:transport-operator :ote.db.transport-operator/name])] (str " " (get-in app [:transport-operator :ote.db.transport-operator/business-id]))]
+    ; company information infobox, use this when YTJ integration gets implemented
+    #_[link e! "#" :taxi-ui/front-page
      [:section (stylefy/use-style styles/info-box)
       ; section title
       [:h4 (stylefy/use-style styles/info-section-title) "Palveluntuottajan tiedot"]
