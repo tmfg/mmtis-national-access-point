@@ -1091,7 +1091,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-profile "Edit user account"
   :user-menu-summary "Summary"
   :user-menu-nap-help "NAP instructions and announcements"
-  :user-menu-nap-help-link "https://www.traficom.fi/en/services/how-submit-your-transport-service-information-nap-service-catalog"
+  :user-menu-nap-help-link "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
   :user-menu-video-tutorials "Video tutorials for service providers"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
