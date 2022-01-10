@@ -21,7 +21,9 @@
                                     :box-sizing    "border-box"
                                     ::stylefy/mode {:focus {:outline-width "0"}}})
 
-(def ^:private input-element (-> scaling-and-borders
+(def ^:private input-element (-> (deep-merge scaling-and-borders
+                                             {::stylefy/mode {"::placeholder" {:color   colors/accessible-black
+                                                                               :opacity 1}}})
                                  (theme/breather-padding)))
 
 (def ^:private button-element (-> (merge scaling-and-borders
