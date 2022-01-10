@@ -13,10 +13,10 @@
 
 (def taxiui-router
   (r/router
-   [["/"                :taxi-ui/front-page]
-    ["/login"           :taxi-ui/login]
-    ["/stats"           :taxi-ui/stats]
-    ["/pricing-details" :taxi-ui/pricing-details]]))
+   [["/"                                         :taxi-ui/front-page]
+    ["/login"                                    :taxi-ui/login]
+    ["/stats"                                    :taxi-ui/stats]
+    ["/pricing-details/:operator-id/:service-id" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:taxi-ui/front-page :taxi-ui/pricing-details})
@@ -100,6 +100,11 @@
 (defn start! [go-to-url-event]
   (r/start! taxiui-router {:default     :taxi-ui/front-page
                            :on-navigate (partial on-navigate go-to-url-event)}))
+
+(defn resolve
+  "Return the URL Path matching to given parameters. Useful for link rendering."
+  [page params]
+  (r/resolve taxiui-router page params))
 
 (defn navigate!
   "Navigate to given page with optional route and query parameters.

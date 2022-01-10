@@ -14,21 +14,24 @@
             [reagent.core :as r]))
 
 (defn- pricing-input
-  [e! tab-index id main-title subtitle]
+  [e! app tab-index id main-title subtitle]
   [forms/input
    id
    [main-title subtitle]
-   {:type       "text"
-    :input-mode "decimal"
-    :tabIndex   tab-index
-    :on-focus   (fn [e] (set! (.. e -target -value)
-                              (or (.. e -target -dataset -rawvalue) "")))
-    :on-change  (fn [e]
-                  (let [value (.. e -target -value)]
-                    (set! (.. e -target -dataset -rawvalue) value)
-                    (e! (controller/->StorePrice id value))))
-    :on-blur    (fn [e] (set! (.. e -target -value)
-                              (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))}
+   (merge {:type       "text"
+           :input-mode "decimal"
+           :tabIndex   tab-index
+           :on-focus   (fn [e] (set! (.. e -target -value)
+                                     (or (.. e -target -dataset -rawvalue) "")))
+           :on-change  (fn [e]
+                         (let [value (.. e -target -value)]
+                           (set! (.. e -target -dataset -rawvalue) value)
+                           (e! (controller/->StorePrice id value))))
+           :on-blur    (fn [e] (set! (.. e -target -value)
+                                     (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))}
+          (when-let [existing-price (get-in app [:taxi-ui :pricing-details :price-information :prices id])]
+            {:data-rawvalue existing-price
+             :placeholder   (formatters/currency existing-price)}))
    nil])
 
 (defn- autocomplete-results
@@ -98,13 +101,13 @@
 
      [:section (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! 1 :start-price-daytime "Aloitus" "(arkipäivisin)"]
-       [pricing-input e! 3 :start-price-nighttime "Aloitus" "(öisin)"]
-       [pricing-input e! 5 :travel-cost-per-minute "Matka" "(hinta per minuutti)"]]
+       [pricing-input e! app 1 :start-price-daytime "Aloitus" "(arkipäivisin)"]
+       [pricing-input e! app 3 :start-price-nighttime "Aloitus" "(öisin)"]
+       [pricing-input e! app 5 :price-per-minute "Matka" "(hinta per minuutti)"]]
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! 2 :start-time-weekend "Aloitus" "(viikonloppuna)"]
-       [pricing-input e! 4 :travel-cost-per-km "Matka" "(hinta per kilometri)"]]]
+       [pricing-input e! app 2 :start-price-weekend "Aloitus" "(viikonloppuna)"]
+       [pricing-input e! app 4 :price-per-kilometer "Matka" "(hinta per kilometri)"]]]
 
      [:h3 "Toiminta-alueet"]  ; TODO: design uses singular form, but logically this should be plural
      ; pills here
@@ -116,15 +119,16 @@
 
      [:div (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 3))
-       [autocomplete-input e! (get-in app [:taxi-ui :search :results])]]
+       [autocomplete-input e! (get-in app [:taxi-ui :pricing-details :search :results])]]
 
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
+       ; TODO: the actions here shouldn't be directly hardcoded to specific path in app
        [forms/button :add-button "Lisää" {:styles styles/secondary-button
                                           :type "button"
                                           :on-click (fn [e]
-                                                      (e! (controller/->AddAreaOfOperation (get-in app [:taxi-ui :search :selected]))))}]]]
+                                                      (e! (controller/->AddAreaOfOperation (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
       [forms/button :save-button "Tallenna" {:styles styles/primary-button
                                              :type "button"
                                              :on-click (fn [e]
-                                                         (e! (controller/->SavePriceInformation (get-in app [:taxi-ui :price-information]))))}]]]))
+                                                         (e! (controller/->SavePriceInformation (get-in app [:taxi-ui :pricing-details :price-information]))))}]]]))

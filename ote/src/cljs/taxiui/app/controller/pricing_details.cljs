@@ -5,6 +5,15 @@
             [clojure.string :as str]
             [ote.communication :as comm]))
 
+(defn- store-in
+  "Small helper to ensure all values are updated within the same root"
+  [app path value]
+  (assoc-in app (concat [:taxi-ui :pricing-details] path) value))
+
+(defn- clear
+  [app path]
+  (assoc-in app (concat [:taxi-ui :pricing-details] path) nil))
+
 (tuck/define-event SearchResponse [results]
   {}
   (->> results
@@ -12,7 +21,7 @@
                  (set/rename-keys {:ote.db.places/id      :id
                                    :ote.db.places/namefin :label})
                  (select-keys [:id :label])))
-       (assoc-in app [:taxi-ui :search :results])))
+       (store-in app [:search :results])))
 
 (tuck/define-event Search [term]
   {}
@@ -22,32 +31,67 @@
 
 (tuck/define-event ClearSearch []
   {}
-  (assoc-in app [:taxi-ui :search] nil))
+  (clear app [:search]))
+
+(tuck/define-event LoadPriceInformationResponse [response]
+  {}
+  (js/console.log (str "LoadPriceInformationResponse Got response: " response))
+                   ; [{:price 1, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_daytime"} {:price 3, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_nighttime"} {:price 2, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_weekend"} {:price 5, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "price_per_minute"} {:price 4, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "price_per_kilometer"}]
+  (reduce
+    (fn [app {:keys [price identifier]}]
+      (store-in app [:price-information :prices (-> (str/replace identifier "_" "-") keyword)] price))
+    (clear app [:price-information])
+    response))
+
+
+(tuck/define-event LoadPriceInformationFailed [response]
+  {}
+  (js/console.log (str "LoadPriceInformationFailed to get response: " response))
+  app)
 
 (tuck/define-event LoadPriceInformation []
   {}
-                   (comm/post! "jokujoku/jotain/joo" (get-in app [:taxi-ui :price-information])
-                               {:on-success (tuck/send-async! ->TransportOperatorDataResponse)
-                                :on-failure (tuck/send-async! ->TransportOperatorDataFailed)})
-  ; TODO: Right now this just resets the app state, should preload pricing info instead if any available
-  (assoc-in app [:taxi-ui :price-information] nil))
+  (js/console.log (str "Loading price information..."))
+  (let [{:keys [operator-id service-id]} (:params app)]
+    (comm/post! "taxiui/price-info"
+                {:operator-id operator-id
+                 :service-id  service-id}
+                {:on-success (tuck/send-async! ->LoadPriceInformationResponse)
+                 :on-failure (tuck/send-async! ->LoadPriceInformationFailed)})
+    ; TODO: could add loading indicator flash thingy here, now just returns app to keep things working
+    app))
 
 (tuck/define-event UserSelectedResult [result]
   {}
-  (assoc-in app [:taxi-ui :search :selected] result))
+  (store-in app [:search :selected] result))
 
 (tuck/define-event AddAreaOfOperation [selected]
   {}
-  (update-in app [:taxi-ui :price-information :areas-of-operation] conj selected))
+  (update-in app [:taxi-ui :pricing-details :price-information :areas-of-operation] conj selected))
 
 (tuck/define-event StorePrice [id value]
   {}
-  (assoc-in app [:taxi-ui :price-information id] value))
+  (store-in app [:price-information :prices id] value))
+
+
+(tuck/define-event SavePriceInformationResponse [response]
+  {}
+  (js/console.log (str "SavePriceInformationResponse Got response: " response))
+  app)
+
+(tuck/define-event SavePriceInformationFailed [response]
+  {}
+  (js/console.log (str "SavePriceInformationFailed to get response: " response))
+  app)
 
 (tuck/define-event SavePriceInformation [price-info]
   {}
-  (js/console.log (str "Store this stuff: " price-info))
-  app)
+  (let [{:keys [operator-id service-id]} (:params app)]
+    (comm/post! (str "taxiui/price-info/" operator-id "/" service-id)
+                price-info
+                {:on-success (tuck/send-async! ->SavePriceInformationResponse)
+                 :on-failure (tuck/send-async! ->SavePriceInformationFailed)})
+    app))
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
   [(->ClearSearch)
