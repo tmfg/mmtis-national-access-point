@@ -1,5 +1,6 @@
 (ns taxiui.app.controller.stats
-  (:require [taxiui.app.routes :as routes]
+  (:require [taxiui.app.controller.loader :as loader]
+            [taxiui.app.routes :as routes]
             [tuck.core :as tuck]))
 
 (def test-data [{:name "Lavishbay Oy"      :updated 4  :example-trip 38.40 :cost-start-daytime 6.90 :cost-travel-km 1.25 :cost-travel-min 1.10 :operation-area "002"}
@@ -29,4 +30,5 @@
   (assoc-in app [:taxi-ui :companies] (->> test-data (random-sample 0.5) shuffle)))
 
 (defmethod routes/on-navigate-event :taxi-ui/stats [{params :params}]
-  (->LoadStatistics params))
+  [(loader/->RemoveHit :page-loading)
+   (->LoadStatistics params)])

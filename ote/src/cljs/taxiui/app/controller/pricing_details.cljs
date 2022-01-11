@@ -1,5 +1,6 @@
 (ns taxiui.app.controller.pricing-details
-  (:require [taxiui.app.routes :as routes]
+  (:require [taxiui.app.controller.loader :as loader]
+            [taxiui.app.routes :as routes]
             [tuck.core :as tuck]
             [clojure.set :as set]
             [clojure.string :as str]
@@ -35,8 +36,6 @@
 
 (tuck/define-event LoadPriceInformationResponse [response]
   {}
-  (js/console.log (str "LoadPriceInformationResponse Got response: " response))
-                   ; [{:price 1, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_daytime"} {:price 3, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_nighttime"} {:price 2, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "start_price_weekend"} {:price 5, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "price_per_minute"} {:price 4, :timestamp #inst "2022-01-10T11:37:43.034-00:00", :identifier "price_per_kilometer"}]
   (reduce
     (fn [app {:keys [price identifier]}]
       (store-in app [:price-information :prices (-> (str/replace identifier "_" "-") keyword)] price))
@@ -94,5 +93,6 @@
     app))
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
-  [(->ClearSearch)
+  [(loader/->RemoveHit :page-loading)
+   (->ClearSearch)
    (->LoadPriceInformation)])

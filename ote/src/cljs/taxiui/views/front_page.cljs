@@ -5,9 +5,11 @@
             [stylefy.core :as stylefy]
             [taxiui.app.routes :as routes]
             [taxiui.app.controller.front-page :as fp-controller]
+            [taxiui.app.controller.loader :as loader]
             [taxiui.styles.front-page :as styles]
             [taxiui.views.components.formatters :as formatters]
             [taxiui.views.components.pill :refer [pill]]
+            [taxiui.views.components.link :refer [link]]
             [taxiui.app.routes :as routes]
             [taxiui.theme :as theme]
             [ote.theme.colors :as colors]))
@@ -31,14 +33,6 @@
                                  :height       "100"
                                  :viewBox      "6 0 12 24"})])
 
-(defn- link
-  [e! page params children]
-  [:a (merge (stylefy/use-style styles/info-box-link)
-             {:href     (str "#" (routes/resolve page params))
-              :on-click #(do
-                           (.preventDefault %)
-                           (e! (fp-controller/->ChangePage page params)))})
-   children])
 
 (defn front-page
   [_ _]
@@ -64,11 +58,14 @@
       (for [service (:transport-service-vector app)
             :when   (= :taxi (:ote.db.transport-service/sub-type service))]
         ^{:key (str "price_infobox_" (:ote.db.transport-service/id service))}
-        [link e! :taxi-ui/pricing-details
+        [link e!
+         :taxi-ui/pricing-details
          {:operator-id (get-in app [:transport-operator :ote.db.transport-operator/id])
           :service-id  (:ote.db.transport-service/id service)}
+         styles/info-box-link
+
          [:section (stylefy/use-style styles/info-box)
-          [:h4 (stylefy/use-style styles/info-section-title) (str "Päivitä palvelun " (:ote.db.transport-service/name service) " hintatietoja")]
+          [:h4 (stylefy/use-style styles/info-section-title) (str (:ote.db.transport-service/name service) " hintatiedot")]
           [:div (stylefy/use-style styles/pricing-details)
            [:div.logo {:style {:grid-area "logo"}}]
            [:h5 (stylefy/use-style styles/price-box-title)

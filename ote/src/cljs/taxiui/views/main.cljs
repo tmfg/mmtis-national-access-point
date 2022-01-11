@@ -8,13 +8,17 @@
             [taxiui.views.pricing-details :as pd]
             [taxiui.views.stats :as s]
             [taxiui.views.components.devtools :as devtools]
-            [taxiui.views.components.header :refer [header]]))
+            [taxiui.views.components.header :refer [header]]
+            [taxiui.views.components.loader :as loader]
+            [ote.theme.colors :as colors]
+            [re-svg-icons.feather-icons :as feather-icons]))
 
 (defn taxi-application
   "Taxi UI application main view"
   [_ _]
   (fn [e! app]
     [:div (stylefy/use-style styles/main-flex-container)
+     [loader/loader app [:taxi-ui :uix :loader]]
      [header app]
      [devtools/env-warning]
      ; TODO: add test env warning for Taxi UI hereabouts
@@ -26,5 +30,4 @@
        :taxi-ui/pricing-details [pd/pricing-details e! app]
        :taxi-ui/stats           [s/stats e! app]
        [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])
-
      [devtools/debug-state app]]))

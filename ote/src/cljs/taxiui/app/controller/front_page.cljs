@@ -5,6 +5,7 @@
             [ote.communication :as comm]
             [ote.localization :as localization]
             [reagent.core :as r]
+            [taxiui.app.controller.loader :as loader]
             [taxiui.app.routes :as routes]
             [tuck.core :as tuck]))
 
@@ -141,3 +142,6 @@
                   {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
                    :on-failure (tuck/send-async! ->ServerError)}))
     (assoc app :tos-ok true)))
+
+(defmethod routes/on-navigate-event :taxi-ui/front-page [{params :params}]
+  (loader/->RemoveHit :page-loading))

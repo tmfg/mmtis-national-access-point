@@ -6,6 +6,7 @@
             [taxiui.views.components.formatters :as formatters]
             [taxiui.views.components.forms :as forms]
             [taxiui.views.components.pill :refer [pill]]
+            [taxiui.views.components.link :refer [link]]
             [taxiui.app.controller.front-page :as fp-controller]
             [re-svg-icons.feather-icons :as feather-icons]
             [taxiui.app.routes :as routes]
@@ -91,12 +92,9 @@
   [_ _]
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
-     [:a {#_#_:style (stylefy/use-style styles/link)
-          :href     "#/"
-          :on-click #(do
-                       (.preventDefault %)
-                       (routes/navigate! :taxi-ui/front-page nil))}
-      [feather-icons/arrow-left] " Palaa omiin palvelutietoihin"]
+     [link e! :taxi-ui/front-page nil {}
+      [:span [feather-icons/arrow-left] " Palaa omiin palvelutietoihin"]]
+
      [:h2 "Yrityksesi hintatiedot"]
 
      [:section (stylefy/use-style styles/flex-columns)
