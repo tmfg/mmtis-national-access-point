@@ -17,7 +17,6 @@
   (fn
     [app path]
     (let [show? (-> (get-in app path) keys some?)]
-      (js/console.log (str "show loader? " show? " / " (get-in app path)))
       [:div (stylefy/use-style {:z-index          1985
                                 :height           "100vh"
                                 :width            "100vw"

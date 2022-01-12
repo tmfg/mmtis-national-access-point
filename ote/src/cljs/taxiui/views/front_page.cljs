@@ -58,7 +58,8 @@
       (for [service (:transport-service-vector app)
             :when   (= :taxi (:ote.db.transport-service/sub-type service))]
         ^{:key (str "price_infobox_" (:ote.db.transport-service/id service))}
-        [link e!
+        [link
+         e!
          :taxi-ui/pricing-details
          {:operator-id (get-in app [:transport-operator :ote.db.transport-operator/id])
           :service-id  (:ote.db.transport-service/id service)}
