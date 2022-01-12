@@ -35,4 +35,4 @@
                                :on-click clickable})
          pill
          button]
-       [:span root-styles pill]))))
+       [:span (stylefy/use-style root-styles) pill]))))
