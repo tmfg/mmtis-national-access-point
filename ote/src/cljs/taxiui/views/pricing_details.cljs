@@ -25,7 +25,7 @@
            :on-focus   (fn [e] (set! (.. e -target -value)
                                      (or (.. e -target -dataset -rawvalue) "")))
            :on-change  (fn [e]
-                         (let [value (.. e -target -value)]
+                         (let [value (str (.. e -target -value))]
                            (set! (.. e -target -dataset -rawvalue) value)
                            (e! (controller/->StorePrice id value))))
            :on-blur    (fn [e] (set! (.. e -target -value)

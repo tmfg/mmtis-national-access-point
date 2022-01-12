@@ -34,23 +34,28 @@
   {}
   (clear app [:search]))
 
+(defn- store-prices
+  [app prices]
+  (reduce
+    (fn [app [identifier price]]
+      (store-in app [:price-information :prices identifier] price))
+    app
+    (select-keys prices [:start-price-daytime :start-price-nighttime :start-price-weekend :price-per-minute :price-per-kilometer])))
+
 (tuck/define-event LoadPriceInformationResponse [response]
   {}
-  (reduce
-    (fn [app {:keys [price identifier]}]
-      (store-in app [:price-information :prices (-> (str/replace identifier "_" "-") keyword)] price))
-    (clear app [:price-information])
-    response))
+  (-> app
+      (clear [:price-information])
+      (store-prices (:prices response))))
 
 
 (tuck/define-event LoadPriceInformationFailed [response]
   {}
-  (js/console.log (str "LoadPriceInformationFailed to get response: " response))
+  ;TODO: something?
   app)
 
 (tuck/define-event LoadPriceInformation []
   {}
-  (js/console.log (str "Loading price information..."))
   (let [{:keys [operator-id service-id]} (:params app)]
     (comm/post! "taxiui/price-info"
                 {:operator-id operator-id
@@ -70,7 +75,7 @@
 
 (tuck/define-event StorePrice [id value]
   {}
-  (store-in app [:price-information :prices id] value))
+  (store-in app [:price-information :prices id] (-> (str value) (str/replace "," "."))))
 
 
 (tuck/define-event SavePriceInformationResponse [response]

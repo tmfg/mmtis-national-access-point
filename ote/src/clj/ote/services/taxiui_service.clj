@@ -1,5 +1,6 @@
 (ns ote.services.taxiui-service
-  (:require [com.stuartsierra.component :as component]
+  (:require [camel-snake-kebab.core :as csk]
+            [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET POST]]
             [jeesql.core :refer [defqueries]]
             [ote.components.service :refer [define-service-component]]
@@ -18,29 +19,26 @@
   (authorization/with-transport-operator-check
     db user operator-id
     (fn []
-      (vec (select-price-information db {:service-id (Integer/parseInt service-id)})))))
+      (let [r (->> (select-price-information db {:service-id (Integer/parseInt service-id)})
+                   first
+                   (map (fn [[k v]] [(csk/->kebab-case k) v]))
+                   (into {}))]
+        (log/info "Returning r " r)
+        {:prices r}))))
 
 (defn update-priceinfo-for-service
   [db user operator-id service-id price-info]
-  (log/info (str "update-priceinfo-for-service " operator-id " / " service-id " / " price-info))
   (authorization/with-transport-operator-check
     db user operator-id
     (fn []
       (tx/with-transaction
         db
         (let [{:keys [prices areas-of-operation]} price-info]
-          (log/info "got prices " prices)
-          (doseq [[id price] prices]
-            (log/info "Store price " id " / " price)
-            (insert-price-information! db {:service-id (Integer/parseInt service-id)
-                                           :identifier (str/replace (name id) "-" "_")
-                                           :price      (new BigDecimal price)}))
+          (insert-price-information! db (into {:service-id (Integer/parseInt service-id)}
+                                              (map (fn [[k v]] [k (BigDecimal. ^String v)]) prices)))
           (when areas-of-operation
             ; TODO
-            (log/info "Update areas with " areas-of-operation))
-
-
-                           )))))
+            (log/info "Update areas with " areas-of-operation)))))))
 
 (defrecord TaxiUIService []
   component/Lifecycle

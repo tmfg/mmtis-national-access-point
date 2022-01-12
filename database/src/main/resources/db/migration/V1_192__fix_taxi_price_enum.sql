@@ -1,21 +1,12 @@
--- the enum happened to use a name which already existed, which causes inserts not to work. Thankfully the existing enum
--- doesn't get overwritten, the redefinition in previous migration just didn't work.
-CREATE TYPE taxi_pricing_category AS ENUM (
-    'start_price_daytime',
-    'start_price_nighttime',
-    'start_price_weekend',
-    'price_per_minute',
-    'price_per_kilometer');
+-- Make the taxi_service_prices table easier to query by exploding the identifier enum to individual price columns.
 
--- Set column type. Also remove the null constraint to enable conversion.
+
+-- replace price and identifier columns with individual pricing columns
 ALTER TABLE taxi_service_prices
-    ALTER COLUMN identifier DROP NOT NULL,
-    ALTER COLUMN identifier TYPE taxi_pricing_category USING NULL;
-
--- This may feel dangerous, but won't affect anything important since this hasn't been run in production at this point
--- so there's no real data to remove.
-DELETE FROM taxi_service_prices WHERE identifier IS NULL;
-
--- Restore null constraint.
-ALTER TABLE taxi_service_prices
-    ALTER COLUMN identifier SET NOT NULL;
+    DROP COLUMN identifier,
+    DROP COLUMN price,
+    ADD COLUMN start_price_daytime   NUMERIC NOT NULL DEFAULT 0,
+    ADD COLUMN start_price_nighttime NUMERIC NOT NULL DEFAULT 0,
+    ADD COLUMN start_price_weekend   NUMERIC NOT NULL DEFAULT 0,
+    ADD COLUMN price_per_minute      NUMERIC NOT NULL DEFAULT 0,
+    ADD COLUMN price_per_kilometer   NUMERIC NOT NULL DEFAULT 0;
