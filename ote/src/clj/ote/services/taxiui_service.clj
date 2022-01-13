@@ -40,6 +40,11 @@
             ; TODO
             (log/info "Update areas with " areas-of-operation)))))))
 
+(defn fetch-pricing-statistics
+  [db {:keys [column direction]}]
+  (vec (list-pricing-statistics db {:column    (csk/->snake_case_string (or column :start-price-daytime))
+                                    :direction (= direction :ascending)})))
+
 (defrecord TaxiUIService []
   component/Lifecycle
   (start [{db :db http :http :as this}]
@@ -57,7 +62,13 @@
                                                                          user                             :user
                                                                          form-data                        :body}
                          (http/transit-response
-                           (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))))))
+                           (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
+
+                    ^:unauthenticated
+                    (POST "/taxiui/statistics" {form-data :body}
+                      (log/info "form data " form-data)
+                      (http/transit-response
+                        (fetch-pricing-statistics db (http/transit-request form-data))))))))
 
   (stop [{stop ::stop :as this}]
     (stop)
