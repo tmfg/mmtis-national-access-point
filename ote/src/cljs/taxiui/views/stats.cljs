@@ -7,14 +7,15 @@
             [taxiui.views.components.formatters :as formatters]
             [re-svg-icons.feather-icons :as feather-icons]
             [ote.theme.colors :as colors]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.string :as str]))
 
 (defn- table-rows
   [columns companies]
   (into [:tbody]
         (doall
           (for [company companies]
-    (into ^{:key (str "row-" (:name company))} [:tr (stylefy/use-style styles/table-row)]
+    (into ^{:key (str/join "-" ["row" (:operator-id company) (:service-id company) (:name company)])} [:tr (stylefy/use-style styles/table-row)]
           (doall
             (for [{:keys [label renderer]} columns]
               [:td (stylefy/use-style styles/table-cell)
@@ -23,21 +24,19 @@
 (defn- sort-direction-transitions
   [current]
   ({:ascending  :descending
-    :descending :none
-    :none       :ascending} current))
+    :descending :ascending} current))
 
 (defn- table
   [e! companies]
-  (let [state (r/atom {:columns [{:label :name               :sortable? true  :renderer str}
-                                 {:label :updated            :sortable? false :renderer (partial formatters/street-light 0 6 12)}
-                                 {:label :example-trip       :sortable? true  :renderer formatters/currency}
-                                 {:label :cost-start-daytime :sortable? true  :renderer formatters/currency}
-                                 {:label :cost-travel-km     :sortable? true  :renderer formatters/currency}
-                                 {:label :cost-travel-min    :sortable? true  :renderer formatters/currency}
-                                 {:label :operation-area     :sortable? true  :renderer str}]
-                       :sorting {:column    :cost-start-daytime  ;; TODO: just a hardcoded test value
-                                 :sort-fn   identity
-                                 :direction :none}})]  ; cycles between :ascending, :descending, :none
+  (let [state (r/atom {:columns [{:label :name                :sortable? false :renderer str}
+                                 {:label :updated             :sortable? false :renderer (partial formatters/street-light 0 6 12)}
+                                 #_{:label :example-trip      :sortable? true  :renderer formatters/currency}
+                                 {:label :start-price-daytime :sortable? true  :renderer formatters/currency}
+                                 {:label :price-per-kilometer :sortable? true  :renderer formatters/currency}
+                                 {:label :price-per-minute    :sortable? true  :renderer formatters/currency}
+                                 #_{:label :operation-area    :sortable? true  :renderer str}]
+                       :sorting {:column    :start-price-daytime  ;; TODO: just a hardcoded test value
+                                 :direction :ascending}})]  ; cycles between :ascending, :descending
     (fn [e! companies]
       (let [{:keys [columns sorting]} @state]
         [:table {:cellSpacing "0"
@@ -51,7 +50,7 @@
                 [:span (stylefy/use-style styles/table-header-title) (tr [:taxi-ui :stats label])
                  ; TODO: linkify/persist sort state to reagent component
                  (when sortable?
-                   (let [{:keys [column sort-fn direction]} sorting]
+                   (let [{:keys [column direction]} sorting]
                      [:a (stylefy/use-style styles/table-header-sorts
                                             {:href "#"
                                              :on-click (fn [e]
@@ -81,4 +80,4 @@
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
      [:h2 "Kokonaiskatsaus"]
-     [table e! (get-in app [:taxi-ui :companies])]]))
+     [table e! (get-in app [:taxi-ui :stats :companies])]]))
