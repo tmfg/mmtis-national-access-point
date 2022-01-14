@@ -5,6 +5,7 @@
             [jeesql.core :refer [defqueries]]
             [ote.components.service :refer [define-service-component]]
             [ote.components.http :as http]
+            [ote.services.places :as places]
             [ote.authorization :as authorization]
             [taoensso.timbre :as log]
             [ote.db.tx :as tx]
@@ -21,7 +22,13 @@
     (fn []
       (let [r (->> (select-price-information db {:service-id (Integer/parseInt service-id)})
                    first
-                   (map (fn [[k v]] [(csk/->kebab-case k) v]))
+                   (map (fn [[k v]]
+                          [(csk/->kebab-case k)
+                           ; XXX: There is a known defect in ns `ote.transit/read-options` function which removes
+                           ; BigDecimal from CLJS side, so they have to be carried over as strings.
+                           (if (decimal? v)
+                             (str v)
+                             v)]))
                    (into {}))]
         (log/info "Returning r " r)
         {:prices r}))))
@@ -38,6 +45,7 @@
                                               (map (fn [[k v]] [k (BigDecimal. ^String v)]) prices)))
           (when areas-of-operation
             ; TODO
+            #_(places/save-transport-service-operation-area! db service-id areas-of-operation false)
             (log/info "Update areas with " areas-of-operation)))))))
 
 (defn fetch-pricing-statistics

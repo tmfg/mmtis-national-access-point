@@ -40,6 +40,8 @@
               ;; Transit "f" tag is an arbitrary precision decimal number that has no native
               ;; JS equivalent, for now we simply map it to parseFloat in JS as we are not doing
               ;; calculations with money
+              ;; XXX: January 14 2022 update: We are now handling calculations with money, but this cannot be changed
+              ;;      anymore since it would break a lot of the existing UI :)
               "f" #?(:clj (t/read-handler #(BigDecimal. %))
                      :cljs js/parseFloat)
               "geo" #?(:clj (t/read-handler identity)
