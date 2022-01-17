@@ -5,10 +5,13 @@
             [jeesql.core :refer [defqueries]]
             [ote.components.service :refer [define-service-component]]
             [ote.components.http :as http]
+            [ote.services.places :as places]
             [ote.authorization :as authorization]
             [taoensso.timbre :as log]
             [ote.db.tx :as tx]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [specql.core :as specql]
+            [specql.op :as op]))
 
 (defqueries "ote/services/taxiui_service.sql")
 
@@ -19,12 +22,31 @@
   (authorization/with-transport-operator-check
     db user operator-id
     (fn []
-      (let [r (->> (select-price-information db {:service-id (Integer/parseInt service-id)})
+      (let [service-id (Integer/parseInt service-id)
+            r (->> (select-price-information db {:service-id service-id})
                    first
-                   (map (fn [[k v]] [(csk/->kebab-case k) v]))
+                   (map (fn [[k v]]
+                          [(csk/->kebab-case k)
+                           ; XXX: There is a known defect in ns `ote.transit/read-options` function which removes
+                           ; BigDecimal from CLJS side, so they have to be carried over as strings.
+                           (if (decimal? v)
+                             (str v)
+                             v)]))
                    (into {}))]
-        (log/info "Returning r " r)
-        {:prices r}))))
+        {:prices          r
+         :operating-areas (places/fetch-transport-service-operation-area db service-id)}))))
+
+(defn- store-new-operation-areas
+  [db service-id new-areas]
+  (places/save-transport-service-operation-area! db service-id new-areas false))
+
+(defn- keep-service-operation-areas
+  [db service-id areas-to-keep]
+    (when-not (empty? areas-to-keep)
+      (specql/delete! db :ote.db.transport-service/operation_area
+                      (merge
+                        {:ote.db.transport-service/transport-service-id service-id}
+                        {:ote.db.transport-service/id (op/not (op/in areas-to-keep))}))))
 
 (defn update-priceinfo-for-service
   [db user operator-id service-id price-info]
@@ -33,12 +55,30 @@
     (fn []
       (tx/with-transaction
         db
-        (let [{:keys [prices areas-of-operation]} price-info]
-          (insert-price-information! db (into {:service-id (Integer/parseInt service-id)}
+        (let [service-id                       (Integer/parseInt service-id)
+              {:keys [prices operating-areas]} price-info]
+          (insert-price-information! db (into {:service-id service-id}
                                               (map (fn [[k v]] [k (BigDecimal. ^String v)]) prices)))
-          (when areas-of-operation
-            ; TODO
-            (log/info "Update areas with " areas-of-operation)))))))
+          (when operating-areas
+            (let [places (->> operating-areas
+                              (group-by #(cond
+                                           (:ote.db.places/id %)            :new-places
+                                           (:ote.db.transport-service/id %) :existing-places
+                                           :else                            :unknown-places)))]
+
+              ; Note: Order matters here! If reversed, this would automatically clear the just added places.
+              (some->> (:existing-places places)
+                       (mapv :ote.db.transport-service/id)
+                       (keep-service-operation-areas db service-id))
+
+              (some->> (:new-places places)
+                       (mapv (fn [place]
+                              (merge (places/place-by-id db (:ote.db.places/id place))
+                                     {:ote.db.places/primary? true})))
+                       (store-new-operation-areas db service-id))
+
+              (some->> (:unknown-places places)
+                       (log/warnf "Detected unknown places while updating %s/%s details! %s" operator-id service-id)))))))))
 
 (defn fetch-pricing-statistics
   [db {:keys [column direction]}]

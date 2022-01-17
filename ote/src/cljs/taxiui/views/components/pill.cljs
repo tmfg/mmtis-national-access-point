@@ -23,8 +23,10 @@
   ([label {:keys [filled? clickable]
            :or   {filled? false clickable nil}}]
 
-   (let [root-styles  {:display     "flex"
-                       :align-items "center"}
+   (let [root-styles  {:display       "flex"
+                       :align-items   "center"
+                       :margin-top    "0.25em"
+                       :margin-bottom "0.25em"}
          pill         [:span (stylefy/use-style (if filled? area-pill-filled area-pill)) label]
          button       [feather-icons/x-circle {:stroke colors/accessible-red
                                                :style  pill-button}]]

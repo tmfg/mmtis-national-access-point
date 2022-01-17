@@ -55,19 +55,19 @@
     (doall
       (for [[index result] (map-indexed vector results)
             :when (some? results)]
-        (let [{:keys [id label]} result]
+        (let [{label :ote.db.places/namefin} result]
           ^{:key (str "result_" index)}
           [:li (stylefy/use-style styles/autocomplete-result
                                   {:on-click (fn [e]
                                                (.preventDefault e)
                                                (e! (controller/->UserSelectedResult result))
-                                               (set! (.. (.getElementById js/document "area-of-operation") -value) label)
+                                               (set! (.. (.getElementById js/document "operating-areas") -value) label)
                                                (set! (.. (.getElementById js/document "results") -style -display) "none"))})
            (str label)])))]])
 
 (defn- autocomplete-input
   [e! search-results]
-    [forms/input :area-of-operation "Lisää toiminta-alue"
+    [forms/input :operating-areas "Lisää toiminta-alue"
      ; TODO: Extract this function + parameterize to work based on given elements, not inlined
      {:on-click (fn [e]
                   (.preventDefault e)
@@ -111,9 +111,17 @@
      ; pills here
      [:section
       [:div (stylefy/use-style styles/area-pills)
-       [pill "001" {:clickable #(.preventDefault %)}]
-       [pill "002" {:clickable #(.preventDefault %)}]
-       [pill "003" {:filled? true :clickable #(.preventDefault %)}]]
+       (doall
+         (for [operating-area (get-in app [:taxi-ui :pricing-details :price-information :operating-areas])]
+           (let [saved? (some? (:ote.db.transport-service/id operating-area))
+                 label (if saved?
+                         (-> operating-area :ote.db.transport-service/description first :ote.db.transport-service/text)
+                         (:ote.db.places/namefin operating-area))
+                 opts  {:clickable (fn [e] (.preventDefault e)
+                                     (e! (controller/->RemoveOperatingArea operating-area)))
+                        :filled?   (:ote.db.transport-service/primary? operating-area)}]
+             ^{:key (str "pill_" label)}
+             [pill label opts])))]
 
      [:div (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 3))
@@ -125,7 +133,7 @@
        [forms/button :add-button "Lisää" {:styles styles/secondary-button
                                           :type "button"
                                           :on-click (fn [e]
-                                                      (e! (controller/->AddAreaOfOperation (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
+                                                      (e! (controller/->AddOperatingArea (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
       [forms/button :save-button "Tallenna" {:styles styles/primary-button
                                              :type "button"
                                              :on-click (fn [e]

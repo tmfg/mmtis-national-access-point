@@ -17,12 +17,7 @@
 
 (tuck/define-event SearchResponse [results]
   {}
-  (->> results
-       (map #(-> %
-                 (set/rename-keys {:ote.db.places/id      :id
-                                   :ote.db.places/namefin :label})
-                 (select-keys [:id :label])))
-       (store-in app [:search :results])))
+  (store-in app [:search :results] results))
 
 (tuck/define-event Search [term]
   {}
@@ -42,17 +37,27 @@
     app
     (select-keys prices [:start-price-daytime :start-price-nighttime :start-price-weekend :price-per-minute :price-per-kilometer])))
 
+(defn- store-operating-areas
+  [app operating-areas]
+  (store-in app [:price-information :operating-areas] (vec operating-areas)))
+
 (tuck/define-event LoadPriceInformationResponse [response]
   {}
-  (-> app
-      (clear [:price-information])
-      (store-prices (:prices response))))
+  (tuck/fx
+    (-> app
+        (clear [:price-information])
+        (store-prices (:prices response))
+        (store-operating-areas (:operating-areas response)))
+    (fn [e!]
+      (e! (loader/->RemoveHit :loading-price-information)))))
 
 
 (tuck/define-event LoadPriceInformationFailed [response]
   {}
-  ;TODO: something?
-  app)
+  (tuck/fx
+    app
+    (fn [e!]
+      (e! (loader/->RemoveHit :loading-price-information)))))
 
 (tuck/define-event LoadPriceInformation []
   {}
@@ -62,16 +67,35 @@
                  :service-id  service-id}
                 {:on-success (tuck/send-async! ->LoadPriceInformationResponse)
                  :on-failure (tuck/send-async! ->LoadPriceInformationFailed)})
-    ; TODO: could add loading indicator flash thingy here, now just returns app to keep things working
-    app))
+    (tuck/fx
+      app
+      (fn [e!]
+        (e! (loader/->AddHit :loading-price-information))))))
 
 (tuck/define-event UserSelectedResult [result]
   {}
   (store-in app [:search :selected] result))
 
-(tuck/define-event AddAreaOfOperation [selected]
+(tuck/define-event AddOperatingArea [selected]
   {}
-  (update-in app [:taxi-ui :pricing-details :price-information :areas-of-operation] conj selected))
+  (update-in app [:taxi-ui :pricing-details :price-information :operating-areas] conj selected))
+
+(tuck/define-event RemoveOperatingArea [selected]
+  {}
+  (update-in
+    app
+    [:taxi-ui :pricing-details :price-information :operating-areas]
+    (fn [areas removable]
+      (letfn [(key-matches [k m1 m2]
+                (and (some? (k m1))
+                     (= (k m1)
+                        (k m2))))]
+        (filter
+          (fn [stored]
+            (not (or (key-matches :ote.db.transport-service/id stored removable)
+                (key-matches :ote.db.places/id stored removable))))
+          areas)))
+      selected))
 
 (tuck/define-event StorePrice [id value]
   {}
@@ -95,7 +119,10 @@
                 price-info
                 {:on-success (tuck/send-async! ->SavePriceInformationResponse)
                  :on-failure (tuck/send-async! ->SavePriceInformationFailed)})
-    app))
+    (tuck/fx
+      app
+      (fn [e!]
+        (e! (->LoadPriceInformation))))))
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
   [(loader/->RemoveHit :page-loading)
