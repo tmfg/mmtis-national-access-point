@@ -11,7 +11,8 @@
             [ote.db.tx :as tx]
             [clojure.string :as str]
             [specql.core :as specql]
-            [specql.op :as op]))
+            [specql.op :as op]
+            [ote.util.db :as db-util]))
 
 (defqueries "ote/services/taxiui_service.sql")
 
@@ -82,8 +83,17 @@
 
 (defn fetch-pricing-statistics
   [db {:keys [column direction]}]
-  (vec (list-pricing-statistics db {:column    (csk/->snake_case_string (or column :start-price-daytime))
-                                    :direction (= direction :ascending)})))
+  (log/info "fetch-pricing-statistics ::" column " " direction)
+  (let [secondary-columns   #{:name :operating-areas}
+        secondary-column    (get secondary-columns column)
+        primary-column      (when-not secondary-column column)
+        primary-direction   (when primary-column direction)
+        secondary-direction (when secondary-column direction)]
+    (vec (->> (list-pricing-statistics db {:primary-column      (some-> primary-column csk/->snake_case_string)
+                                           :primary-direction   (= primary-direction :ascending)
+                                           :secondary-column    (some-> secondary-column csk/->kebab-case-string)
+                                           :secondary-direction (= secondary-direction :ascending)})
+              (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))))))))
 
 (defrecord TaxiUIService []
   component/Lifecycle
