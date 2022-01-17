@@ -83,7 +83,6 @@
 
 (defn fetch-pricing-statistics
   [db {:keys [column direction]}]
-  (log/info "fetch-pricing-statistics ::" column " " direction)
   (let [secondary-columns   #{:name :operating-areas}
         secondary-column    (get secondary-columns column)
         primary-column      (when-not secondary-column column)
