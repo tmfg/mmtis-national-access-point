@@ -43,16 +43,21 @@
 
 (tuck/define-event LoadPriceInformationResponse [response]
   {}
-  (-> app
-      (clear [:price-information])
-      (store-prices (:prices response))
-      (store-operating-areas (:operating-areas response))))
+  (tuck/fx
+    (-> app
+        (clear [:price-information])
+        (store-prices (:prices response))
+        (store-operating-areas (:operating-areas response)))
+    (fn [e!]
+      (e! (loader/->RemoveHit :loading-price-information)))))
 
 
 (tuck/define-event LoadPriceInformationFailed [response]
   {}
-  ;TODO: something?
-  app)
+  (tuck/fx
+    app
+    (fn [e!]
+      (e! (loader/->RemoveHit :loading-price-information)))))
 
 (tuck/define-event LoadPriceInformation []
   {}
@@ -62,8 +67,10 @@
                  :service-id  service-id}
                 {:on-success (tuck/send-async! ->LoadPriceInformationResponse)
                  :on-failure (tuck/send-async! ->LoadPriceInformationFailed)})
-    ; TODO: could add loading indicator flash thingy here, now just returns app to keep things working
-    app))
+    (tuck/fx
+      app
+      (fn [e!]
+        (e! (loader/->AddHit :loading-price-information))))))
 
 (tuck/define-event UserSelectedResult [result]
   {}
@@ -112,7 +119,10 @@
                 price-info
                 {:on-success (tuck/send-async! ->SavePriceInformationResponse)
                  :on-failure (tuck/send-async! ->SavePriceInformationFailed)})
-    app))
+    (tuck/fx
+      app
+      (fn [e!]
+        (e! (->LoadPriceInformation))))))
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
   [(loader/->RemoveHit :page-loading)

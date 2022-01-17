@@ -16,7 +16,8 @@
 
 (def spacer {:width "1em"})
 
-(def area-pills {:display "flex"})
+(def area-pills {:display "flex"
+                 :flex-wrap "wrap"})
 
 (def autocomplete-result {:white-space   "nowrap"
                           :overflow      "hidden"
