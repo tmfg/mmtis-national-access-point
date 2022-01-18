@@ -34,4 +34,4 @@
        (doall
          (for [label (-> (get-in app path) keys)]
            ^{:key (str "loading-" label)}
-           [:span (tr [:taxi-ui :loader label])]))])))
+           [:h3 (tr [:taxi-ui :loader label])]))])))
