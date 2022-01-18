@@ -27,6 +27,9 @@ END
 $func$
 LANGUAGE plpgsql;
 
+-- function needs to be dropped in case its return type changes, simple replace won't work in such case
+DROP FUNCTION IF EXISTS list_taxi_statistics;
+
 CREATE OR REPLACE FUNCTION list_taxi_statistics(
     primary_ordering_column TEXT,
     primary_ordering_direction BOOLEAN,
@@ -42,7 +45,8 @@ CREATE OR REPLACE FUNCTION list_taxi_statistics(
                       "start-price-weekend" numeric,
                       "price-per-minute" numeric,
                       "price-per-kilometer" numeric,
-                      "operating-areas" text[]
+                      "operating-areas" text[],
+                      "example-trip" numeric
                   ) AS
 $func$
 BEGIN
@@ -60,7 +64,8 @@ BEGIN
                   FROM operation_area oa,
                        unnest(description) AS oa_d
                  WHERE oa."transport-service-id" = l."service_id"
-                   AND "primary?" = TRUE) AS "operating-areas"
+                   AND "primary?" = TRUE) AS "operating-areas",
+               (l.start_price_daytime + (l.price_per_minute * 15) + (l.price_per_kilometer * 10)) AS "example-trip"
           FROM list_taxi_pricing_statistics('
                              || (CASE WHEN primary_ordering_column IS NULL
                                       THEN 'NULL'

@@ -30,7 +30,7 @@
   [e! companies]
   (let [state (r/atom {:columns [{:label :name                :sortable? true   :renderer str}
                                  {:label :updated             :sortable? false  :renderer (partial formatters/street-light 0 6 12)}
-                                 #_{:label :example-trip      :sortable? true   :renderer formatters/currency}
+                                 {:label :example-trip        :sortable? true   :renderer formatters/currency}
                                  {:label :start-price-daytime :sortable? true   :renderer formatters/currency}
                                  {:label :price-per-kilometer :sortable? true   :renderer formatters/currency}
                                  {:label :price-per-minute    :sortable? true   :renderer formatters/currency}

@@ -92,7 +92,7 @@
 
 (defn fetch-pricing-statistics
   [db {:keys [column direction]}]
-  (let [secondary-columns   #{:name :operating-areas}
+  (let [secondary-columns   #{:name :operating-areas :example-trip}
         secondary-column    (get secondary-columns column)
         primary-column      (when-not secondary-column column)
         primary-direction   (when primary-column direction)
