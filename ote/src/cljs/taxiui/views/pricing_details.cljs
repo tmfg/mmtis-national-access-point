@@ -97,6 +97,8 @@
 
      [:h2 "Yrityksesi hintatiedot"]
 
+     [:h3 "Hinnasto"]
+
      [:section (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 1))
        [pricing-input e! app 1 :start-price-daytime "Aloitus" "(arkipäivisin)"]
@@ -107,7 +109,17 @@
        [pricing-input e! app 2 :start-price-weekend "Aloitus" "(viikonloppuna)"]
        [pricing-input e! app 4 :price-per-kilometer "Matka" "(hinta per kilometri)"]]]
 
-     [:h3 "Toiminta-alueet"]  ; TODO: design uses singular form, but logically this should be plural
+     [:h3 "Apuvälineet ja palvelut"]
+
+     [:section (stylefy/use-style styles/flex-columns)
+      [:div (stylefy/use-style (styles/flex-column 1))
+       [pricing-input e! app 5 :accessibility-tool-wheelchair "Apuvälineet," "pyörätuoli"]
+       [pricing-input e! app 7 :cargo-large-luggage "Tilaa vievät" "matkatavarat"]]
+      [:div (stylefy/use-style styles/spacer)]
+      [:div (stylefy/use-style (styles/flex-column 1))
+       [pricing-input e! app 6 :accessibility-tool-walker "Apuvälineet," "rollaattori"]]]
+
+     [:h3 "Toiminta-alueet"]
      ; pills here
      [:section
       [:div (stylefy/use-style styles/area-pills)
