@@ -61,7 +61,17 @@ BEGIN
                        unnest(description) AS oa_d
                  WHERE oa."transport-service-id" = l."service_id"
                    AND "primary?" = TRUE) AS "operating-areas"
-          FROM list_taxi_pricing_statistics(' || (CASE WHEN primary_ordering_column IS NULL THEN 'NULL' ELSE '''' || primary_ordering_column || '''' END) || ', ' || (CASE WHEN primary_ordering_direction IS NULL THEN 'NULL' ELSE '''' || primary_ordering_direction || '''' END) || ') l
+          FROM list_taxi_pricing_statistics('
+                             || (CASE WHEN primary_ordering_column IS NULL
+                                      THEN 'NULL'
+                                      ELSE '''' || primary_ordering_column || ''''
+                                 END)
+                             || ', '
+                             || (CASE WHEN primary_ordering_direction IS NULL
+                                      THEN 'NULL'
+                                      ELSE '''' || primary_ordering_direction || ''''
+                                 END)
+                             || ') l
           JOIN "transport-service" s ON l."service_id" = s."id"
           JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
          ' || (CASE WHEN secondary_ordering_column IS NOT NULL AND secondary_ordering_direction IS NOT NULL
