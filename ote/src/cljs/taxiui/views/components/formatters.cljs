@@ -1,6 +1,7 @@
 (ns taxiui.views.components.formatters
   "Various single value decorator formatters, such as pretty formatting for currencies"
-  (:require [ote.theme.colors :as colors]))
+  (:require [ote.theme.colors :as colors]
+            [clojure.string :as str]))
 
 (defn currency
   "Formats given value as euros as per Finnish locale. Tries to normalize decimal delimiter."
@@ -24,3 +25,8 @@
                                       (< value high)   colors/basic-yellow
                                       :else            colors/basic-red)
                   }}])
+
+(defn joining
+  [delimiter renderer]
+  (fn [s]
+    (str/join delimiter (map renderer s))))

@@ -146,8 +146,7 @@
                  [alandipert/storage-atom "2.0.1"]
 
                  ; A Clojure[Script] library for word case conversions - Eclipse Public License 1.0
-                 [camel-snake-kebab "0.4.2"]
-                 ]
+                 [camel-snake-kebab "0.4.2"]]
   :profiles {:uberjar {:aot :all
 
                        ;; Prevent uberjar from cleaning cljs generated files
