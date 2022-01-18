@@ -112,7 +112,10 @@
 (tuck/define-event SavePriceInformationResponse [response]
   {}
   (js/console.log (str "SavePriceInformationResponse Got response: " response))
-  app)
+  (tuck/fx
+    app
+    (fn [e!]
+      (e! (->LoadPriceInformation)))))
 
 (tuck/define-event SavePriceInformationFailed [response]
   {}
@@ -126,10 +129,7 @@
                 price-info
                 {:on-success (tuck/send-async! ->SavePriceInformationResponse)
                  :on-failure (tuck/send-async! ->SavePriceInformationFailed)})
-    (tuck/fx
-      app
-      (fn [e!]
-        (e! (->LoadPriceInformation))))))
+    app))
 
 (defmethod routes/on-navigate-event :taxi-ui/pricing-details [{params :params}]
   [(loader/->RemoveHit :page-loading)
