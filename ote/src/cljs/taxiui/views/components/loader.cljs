@@ -21,7 +21,7 @@
       [:div (stylefy/use-style {:z-index          1985
                                 :height           "100vh"
                                 :width            "100vw"
-                                :position         "absolute"
+                                :position         "fixed"
                                 :background-color colors/basic-white
                                 :display          (if show? "flex" "none")
                                 :flex-direction   "column"
