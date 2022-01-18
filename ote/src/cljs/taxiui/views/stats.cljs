@@ -17,8 +17,8 @@
           (for [company companies]
     (into ^{:key (str/join "-" ["row" (:operator-id company) (:service-id company) (:name company)])} [:tr (stylefy/use-style styles/table-row)]
           (doall
-            (for [{:keys [label renderer]} columns]
-              [:td (stylefy/use-style styles/table-cell)
+            (for [{:keys [label renderer styles]} columns]
+              [:td (stylefy/use-style (merge styles/table-cell styles))
                (renderer (get company label))])))))))
 
 (defn- sort-direction-transitions
@@ -28,7 +28,7 @@
 
 (defn- table
   [e! companies]
-  (let [state (r/atom {:columns [{:label :name                :sortable? true   :renderer str}
+  (let [state (r/atom {:columns [{:label :name                :sortable? true   :renderer str :styles {:width "16em"}}
                                  {:label :updated             :sortable? false  :renderer (partial formatters/street-light 0 6 12)}
                                  {:label :example-trip        :sortable? true   :renderer formatters/currency}
                                  {:label :start-price-daytime :sortable? true   :renderer formatters/currency}
