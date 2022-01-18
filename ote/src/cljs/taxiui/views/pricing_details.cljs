@@ -11,14 +11,15 @@
             [re-svg-icons.feather-icons :as feather-icons]
             [taxiui.app.routes :as routes]
             [taxiui.theme :as theme]
+            [ote.localization :refer [tr]]
             [ote.theme.colors :as colors]
             [reagent.core :as r]))
 
 (defn- pricing-input
-  [e! app tab-index id main-title subtitle]
+  [e! app tab-index id]
   [forms/input
    id
-   [main-title subtitle]
+   [(tr [:taxi-ui :pricing-details :inputs id :main-title]) (tr [:taxi-ui :pricing-details :inputs id :subtitle])]
    (merge {:type       "text"
            :input-mode "decimal"
            :tabIndex   tab-index
@@ -67,7 +68,7 @@
 
 (defn- autocomplete-input
   [e! search-results]
-    [forms/input :operating-areas "Lisää toiminta-alue"
+    [forms/input :operating-areas (tr [:taxi-ui :pricing-details :add-operating-area])
      ; TODO: Extract this function + parameterize to work based on given elements, not inlined
      {:on-click (fn [e]
                   (.preventDefault e)
@@ -93,21 +94,33 @@
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
      [link e! :taxi-ui/front-page nil {}
-      [:span [feather-icons/arrow-left] " Palaa omiin palvelutietoihin"]]
+      [:span [feather-icons/arrow-left] (tr [:taxi-ui :pricing-details :return-to-front-page])]]
 
-     [:h2 "Yrityksesi hintatiedot"]
+     [:h2 (tr [:taxi-ui :pricing-details :page-main-title])]
+
+     [:h3 (tr [:taxi-ui :pricing-details :sections :prices :title])]
 
      [:section (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! app 1 :start-price-daytime "Aloitus" "(arkipäivisin)"]
-       [pricing-input e! app 3 :start-price-nighttime "Aloitus" "(öisin)"]
-       [pricing-input e! app 5 :price-per-minute "Matka" "(hinta per minuutti)"]]
+       [pricing-input e! app 1 :start-price-daytime]
+       [pricing-input e! app 3 :start-price-nighttime]
+       [pricing-input e! app 5 :price-per-minute]]
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! app 2 :start-price-weekend "Aloitus" "(viikonloppuna)"]
-       [pricing-input e! app 4 :price-per-kilometer "Matka" "(hinta per kilometri)"]]]
+       [pricing-input e! app 2 :start-price-weekend]
+       [pricing-input e! app 4 :price-per-kilometer]]]
 
-     [:h3 "Toiminta-alueet"]  ; TODO: design uses singular form, but logically this should be plural
+     [:h3 (tr [:taxi-ui :pricing-details :sections :tools-and-services :title])]
+
+     [:section (stylefy/use-style styles/flex-columns)
+      [:div (stylefy/use-style (styles/flex-column 1))
+       [pricing-input e! app 5 :accessibility-tool-wheelchair]
+       [pricing-input e! app 7 :cargo-large-luggage]]
+      [:div (stylefy/use-style styles/spacer)]
+      [:div (stylefy/use-style (styles/flex-column 1))
+       [pricing-input e! app 6 :accessibility-tool-walker]]]
+
+     [:h3 (tr [:taxi-ui :pricing-details :sections :operating-areas :title])]
      ; pills here
      [:section
       [:div (stylefy/use-style styles/area-pills)
@@ -130,11 +143,17 @@
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
        ; TODO: the actions here shouldn't be directly hardcoded to specific path in app
-       [forms/button :add-button "Lisää" {:styles styles/secondary-button
-                                          :type "button"
-                                          :on-click (fn [e]
-                                                      (e! (controller/->AddOperatingArea (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
-      [forms/button :save-button "Tallenna" {:styles styles/primary-button
-                                             :type "button"
-                                             :on-click (fn [e]
-                                                         (e! (controller/->SavePriceInformation (get-in app [:taxi-ui :pricing-details :price-information]))))}]]]))
+       [forms/button
+        :add-button
+        (tr [:taxi-ui :pricing-details :sections :operating-areas :add-button])
+        {:styles styles/secondary-button
+         :type "button"
+         :on-click (fn [e]
+                     (e! (controller/->AddOperatingArea (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
+      [forms/button
+       :save-button
+       (tr [:taxi-ui :pricing-details :sections :operating-areas :save-button])
+       {:styles styles/primary-button
+        :type "button"
+        :on-click (fn [e]
+                    (e! (controller/->SavePriceInformation (get-in app [:taxi-ui :pricing-details :price-information]))))}]]]))

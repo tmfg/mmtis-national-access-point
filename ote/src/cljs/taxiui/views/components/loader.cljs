@@ -21,7 +21,7 @@
       [:div (stylefy/use-style {:z-index          1985
                                 :height           "100vh"
                                 :width            "100vw"
-                                :position         "absolute"
+                                :position         "fixed"
                                 :background-color colors/basic-white
                                 :display          (if show? "flex" "none")
                                 :flex-direction   "column"
@@ -34,4 +34,4 @@
        (doall
          (for [label (-> (get-in app path) keys)]
            ^{:key (str "loading-" label)}
-           [:span (tr [:taxi-ui :loader label])]))])))
+           [:h3 (tr [:taxi-ui :loader label])]))])))

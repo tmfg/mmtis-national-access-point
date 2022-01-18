@@ -1758,5 +1758,21 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                    :price-per-minute    "Matka (per min)"
                    :operating-areas     "Toiminta-alue (ensisijainen)"}
            :loader {:page-loading              "Ladataan..."
-                    :loading-price-information "Ladataan hintatietoja..."}}
+                    :loading-price-information "Ladataan hintatietoja..."}
+           :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}
+                                      :start-price-nighttime         {:main-title "Aloitus"       :subtitle "(öisin)"}
+                                      :start-price-weekend           {:main-title "Aloitus"       :subtitle "(viikonloppuna)"}
+                                      :price-per-minute              {:main-title "Matka"         :subtitle "(hinta per minuutti)"}
+                                      :price-per-kilometer           {:main-title "Matka"         :subtitle "(hinta per kilometri)"}
+                                      :accessibility-tool-wheelchair {:main-title "Apuvälineet,"  :subtitle "pyörätuoli"}
+                                      :accessibility-tool-walker     {:main-title "Apuvälineet,"  :subtitle "rollaattori"}
+                                      :cargo-large-luggage           {:main-title "Tilaa vievät"  :subtitle "matkatavarat"}}
+                             :add-operating-area            "Lisää toiminta-alue"
+                             :page-main-title               "Yrityksesi hintatiedot"
+                             :return-to-front-page          " Palaa omiin palvelutietoihin"
+                             :sections {:prices             {:title "Hinnasto"}
+                                        :tools-and-services {:title "Apuvälineet ja palvelut"}
+                                        :operating-areas    {:title       "Toiminta-alueet"
+                                                             :add-button  "Lisää"
+                                                             :save-button "Tallenna"}}}}
  }

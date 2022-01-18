@@ -35,7 +35,14 @@
     (fn [app [identifier price]]
       (store-in app [:price-information :prices identifier] price))
     app
-    (select-keys prices [:start-price-daytime :start-price-nighttime :start-price-weekend :price-per-minute :price-per-kilometer])))
+    (select-keys prices [:start-price-daytime
+                         :start-price-nighttime
+                         :start-price-weekend
+                         :price-per-minute
+                         :price-per-kilometer
+                         :accessibility-tool-wheelchair
+                         :accessibility-tool-walker
+                         :cargo-large-luggage])))
 
 (defn- store-operating-areas
   [app operating-areas]

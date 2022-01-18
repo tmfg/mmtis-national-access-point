@@ -58,7 +58,16 @@
         db
         (let [service-id                       (Integer/parseInt service-id)
               {:keys [prices operating-areas]} price-info]
-          (insert-price-information! db (into {:service-id service-id}
+          (insert-price-information! db (into {:service-id service-id
+                                               ; all prices default to zero to avoid null checking on the query side
+                                               :start-price-daytime           0
+                                               :start-price-nighttime         0
+                                               :start-price-weekend           0
+                                               :price-per-minute              0
+                                               :price-per-kilometer           0
+                                               :accessibility-tool-wheelchair 0
+                                               :accessibility-tool-walker     0
+                                               :cargo-large-luggage           0}
                                               (map (fn [[k v]] [k (BigDecimal. ^String v)]) prices)))
           (when operating-areas
             (let [places (->> operating-areas
