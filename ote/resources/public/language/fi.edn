@@ -1751,12 +1751,13 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :finap "NAP"}
 
  ;; Taxi UI translations
- :taxi-ui {:stats {:name                "Yritys"
-                   :example-trip        "Esimerkkimatka"
-                   :start-price-daytime "Aloitus (06-18)"
-                   :price-per-kilometer "Matka (per km)"
-                   :price-per-minute    "Matka (per min)"
-                   :operating-areas     "Toiminta-alue (ensisijainen)"}
+ :taxi-ui {:stats {:page-main-title "Kokonaiskatsaus"
+                   :columns         {:name                "Yritys"
+                                     :example-trip        "Esimerkkimatka"
+                                     :start-price-daytime "Aloitus (06-18)"
+                                     :price-per-kilometer "Matka (per km)"
+                                     :price-per-minute    "Matka (per min)"
+                                     :operating-areas     "Toiminta-alue (ensisijainen)"}}
            :loader {:page-loading              "Ladataan..."
                     :loading-price-information "Ladataan hintatietoja..."}
            :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}

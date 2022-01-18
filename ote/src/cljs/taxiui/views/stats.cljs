@@ -47,8 +47,7 @@
              (for [{:keys [label sortable?]} columns]
                ^{:key (str "col-" label)}
                [:th (stylefy.core/use-style styles/table-header)
-                [:span (stylefy/use-style styles/table-header-title) (tr [:taxi-ui :stats label])
-                 ; TODO: linkify/persist sort state to reagent component
+                [:span (stylefy/use-style styles/table-header-title) (tr [:taxi-ui :stats :columns label])
                  (when sortable?
                    (let [{:keys [column direction]} sorting]
                      [:a (stylefy/use-style styles/table-header-sorts
@@ -79,5 +78,5 @@
   [_ _]
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
-     [:h2 "Kokonaiskatsaus"]
+     [:h2 (tr [:taxi-ui :stats :page-main-title])]
      [table e! (get-in app [:taxi-ui :stats :companies])]]))
