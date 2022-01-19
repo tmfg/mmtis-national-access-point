@@ -35,5 +35,9 @@
               :on-failure (tuck/send-async! ->LoadStatisticsFailed)})
   app)
 
+(tuck/define-event SetFilter [id value]
+  {}
+  (assoc-in app [:taxi-ui :stats :filters id] value))
+
 (defmethod routes/on-navigate-event :taxi-ui/stats [{params :params}]
   [(->LoadStatistics params)])

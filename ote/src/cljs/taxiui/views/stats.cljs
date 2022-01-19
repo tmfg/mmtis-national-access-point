@@ -8,7 +8,8 @@
             [re-svg-icons.feather-icons :as feather-icons]
             [ote.theme.colors :as colors]
             [reagent.core :as r]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [taxiui.views.components.forms :as forms]))
 
 (defn- table-rows
   [columns companies]
@@ -74,9 +75,55 @@
                                                               :else colors/basic-gray)})]))]]))]]
          [table-rows columns companies]]))))
 
+(defn- filter-input
+  [e! app title subtitle filter-element]
+  [:div {:style {:display "flex"
+                 :flex-direction "column"}}
+   [:span {:style {:font-weight "700"
+                   :min-height "1.5em"}} title]
+   [:span {:style {:font-weight "700"
+                   :min-height "1.5em"}} subtitle]
+   [:div
+    filter-element]])
+
+(defn- age-filter
+  [e! id radio-group-id age]
+  [:span {:style {:display "flex"
+                  :align-items "center"
+                  :padding-bottom "0.4em"}}
+   [formatters/street-light 0 6 12 age]
+   [:label {:for id
+            :style {:padding-left "0.4em" :padding-right "0.4em"}} (tr [:taxi-ui :stats :sections :filters id])]
+   [:input {:id id
+            :name radio-group-id
+            :type "radio"
+            :value id
+            :style {:margin-left "auto"}
+            :on-click (fn [e]
+                        (e! (controller/->SetFilter :age-filter id)))
+            }]])
+
+(defn- filters
+  [e! app]
+  [:section {:style {:display "flex"}}
+   [filter-input e! app "Hintatiedot päivitetty" ""
+    [:div {:style {:display "flex"
+                   :flex-direction "column"}}
+     [age-filter e! :within-six-months :age-filter 0]
+     [age-filter e! :within-one-year :age-filter 6]
+     [age-filter e! :over-year-ago :age-filter 12]]]
+
+   #_[filter-input e! app "Hae yritystä nimellä" ""]
+
+   #_[filter-input e! app "Toiminta-alue" "(kuntakoodeittain)"]])
+
 (defn stats
   [_ _]
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
      [:h2 (tr [:taxi-ui :stats :page-main-title])]
+
+     [:h2 (tr [:taxi-ui :stats :sections :filters :title])]
+     [filters e! app]
+
      [table e! (get-in app [:taxi-ui :stats :companies])]]))
