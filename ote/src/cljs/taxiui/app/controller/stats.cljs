@@ -24,7 +24,6 @@
 
 (tuck/define-event LoadStatisticsFailed [response]
   {}
-  (js/console.log (str "LoadStatisticsFailed :: " response))
   app)
 
 (tuck/define-event LoadStatistics []

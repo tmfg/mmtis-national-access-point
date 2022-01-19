@@ -111,7 +111,6 @@
 
 (tuck/define-event SavePriceInformationResponse [response]
   {}
-  (js/console.log (str "SavePriceInformationResponse Got response: " response))
   (tuck/fx
     app
     (fn [e!]
@@ -119,7 +118,6 @@
 
 (tuck/define-event SavePriceInformationFailed [response]
   {}
-  (js/console.log (str "SavePriceInformationFailed to get response: " response))
   app)
 
 (tuck/define-event SavePriceInformation [price-info]
