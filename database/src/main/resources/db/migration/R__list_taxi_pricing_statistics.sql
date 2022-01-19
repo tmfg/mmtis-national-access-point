@@ -49,7 +49,21 @@ CREATE OR REPLACE FUNCTION list_taxi_statistics(
                       "example-trip" numeric
                   ) AS
 $func$
+DECLARE
+    inner_ordering_column TEXT;
+    inner_ordering_direction TEXT;
 BEGIN
+    inner_ordering_column := (CASE
+                                  WHEN primary_ordering_column IS NULL
+                                      THEN 'NULL'
+                                  ELSE '''' || primary_ordering_column || ''''
+                             END);
+    inner_ordering_direction := (CASE
+                                     WHEN primary_ordering_direction IS NULL
+                                         THEN 'NULL'
+                                     ELSE '''' || primary_ordering_direction || ''''
+                                END);
+
     RETURN QUERY EXECUTE '
         SELECT o.id AS "operator-id",
                s.id AS "service-id",
@@ -66,17 +80,7 @@ BEGIN
                  WHERE oa."transport-service-id" = l."service_id"
                    AND "primary?" = TRUE) AS "operating-areas",
                (l.start_price_daytime + (l.price_per_minute * 15) + (l.price_per_kilometer * 10)) AS "example-trip"
-          FROM list_taxi_pricing_statistics('
-                             || (CASE WHEN primary_ordering_column IS NULL
-                                      THEN 'NULL'
-                                      ELSE '''' || primary_ordering_column || ''''
-                                 END)
-                             || ', '
-                             || (CASE WHEN primary_ordering_direction IS NULL
-                                      THEN 'NULL'
-                                      ELSE '''' || primary_ordering_direction || ''''
-                                 END)
-                             || ') l
+          FROM list_taxi_pricing_statistics(' || inner_ordering_column || ', ' || inner_ordering_direction || ') l
           JOIN "transport-service" s ON l."service_id" = s."id"
           JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
          ' || (CASE WHEN secondary_ordering_column IS NOT NULL AND secondary_ordering_direction IS NOT NULL
