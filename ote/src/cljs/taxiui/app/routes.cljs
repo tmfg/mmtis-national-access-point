@@ -33,14 +33,19 @@
   Route parameters are under the :params key."
   :page)
 
-(defmethod on-navigate-event :default [_] nil)
+(defmethod on-navigate-event :default [page-params] nil)
 
 (defmulti on-leave-event
-          "Determine event(s) to be run when user navigates away from the give route.
-          Return values identical to on-navigate-event."
-          :page)
+  "Determine event(s) to be run when user navigates away from the give route.
+  Return values identical to on-navigate-event."
+  :page)
 
-(defmethod on-leave-event :default [_] nil)
+(tuck/define-event ClearPageData [page]
+                   {}
+                   (update app :taxi-ui dissoc (-> (name page) keyword)))
+
+(defmethod on-leave-event :default [page-params]
+  (->ClearPageData (:page page-params)))
 
 (defn requires-admin? [app]
   (and (contains? admin-required (:page app))
@@ -57,7 +62,7 @@
 
 (defn- send-startup-events [event]
   (let [e!     (tuck/control state/app)
-        events (->> (if (not (vector? event)) [event] event)
+        events (->> (if (not (vector? event)) [event] (flatten event))
                     (filter some?))]
     (doseq [event events
             :when event]
@@ -91,7 +96,10 @@
              (.setTimeout
                js/window
                (fn []
-                 (send-startup-events (on-navigate-event navigation-data)))
+                 (send-startup-events
+                   [(when-not (= route-name (:page orig-app))
+                      (on-leave-event    (select-keys orig-app [:page :query :params])))
+                    (on-navigate-event navigation-data)]))
                0)
              (if (not-authorized? app)
                (force-login! orig-app navigation-data)
