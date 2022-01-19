@@ -1758,10 +1758,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                      :price-per-kilometer "Matka (per km)"
                                      :price-per-minute    "Matka (per min)"
                                      :operating-areas     "Toiminta-alueet (ensisijainen)"}
-                   :sections {:filters {:title "Suodata hakua"
-                                        :within-six-months "Kuuden kuukauden sisällä"
-                                        :within-one-year   "Vuoden sisällä"
-                                        :over-year-ago     "Yli vuosi sitten"}}}
+                   :sections {:filters {:title               "Suodata hakua"
+                                        :within-six-months   "Kuuden kuukauden sisällä"
+                                        :within-one-year     "Vuoden sisällä"
+                                        :over-year-ago       "Yli vuosi sitten"
+                                        :prices-updated-last "Hintatiedot päivitetty"
+                                        :company-by-name     "Hae yritystä nimellä"}}}
            :loader {:page-loading              "Ladataan..."
                     :loading-price-information "Ladataan hintatietoja..."}
            :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}

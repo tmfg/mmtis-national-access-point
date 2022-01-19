@@ -1,5 +1,6 @@
 (ns taxiui.views.stats
-  (:require [ote.localization :refer [tr tr-key]]
+  (:require [goog.functions :as gf]
+            [ote.localization :refer [tr tr-key]]
             [stylefy.core :as stylefy]
             [taxiui.app.controller.stats :as controller]
             [taxiui.styles.stats :as styles]
@@ -79,12 +80,13 @@
 (defn- filter-input
   [e! app title subtitle filter-element]
   [:div {:style {:display "flex"
-                 :flex-direction "column"}}
+                 :flex-direction "column"
+                 :padding-right "2em"}}
    [:span {:style {:font-weight "700"
                    :min-height "1.5em"}} title]
    [:span {:style {:font-weight "700"
                    :min-height "1.5em"}} subtitle]
-   [:div
+   [:div {:style {:margin-top "auto"}}
     filter-element]])
 
 (defn- age-filter
@@ -101,21 +103,29 @@
             :value id
             :style {:margin-left "auto"}
             :on-click (fn [e]
-                        (e! (controller/->SetFilter :age-filter id))
-                        (e! (controller/->LoadStatistics)))
+                        (e! (controller/->SetFilter :age-filter id)))
             }]])
+
+(def set-filter (goog.functions.debounce (fn [e! id value]
+                               (e! (controller/->SetFilter id value))) 500))
 
 (defn- filters
   [e! app]
   [:section {:style {:display "flex"}}
-   [filter-input e! app "Hintatiedot päivitetty" ""
+   [filter-input e! app (tr [:taxi-ui :stats :sections :filters :prices-updated-last]) ""
     [:div {:style {:display "flex"
                    :flex-direction "column"}}
      [age-filter e! :within-six-months :age-filter 0]
      [age-filter e! :within-one-year :age-filter 6]
      [age-filter e! :over-year-ago :age-filter 12]]]
 
-   #_[filter-input e! app "Hae yritystä nimellä" ""]
+   [filter-input e! app (tr [:taxi-ui :stats :sections :filters :company-by-name]) ""
+    [:div {:style {:padding-bottom "0.4em"}}
+     [forms/simple-input
+      :name-filter
+      {:styles {:margin-top     "auto"
+                :padding-bottom "0.4em"}
+       :on-change #(set-filter e! :name (-> % .-target .-value))}]]]
 
    #_[filter-input e! app "Toiminta-alue" "(kuntakoodeittain)"]])
 
@@ -123,7 +133,8 @@
   [_ _]
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
-     [:h2 (tr [:taxi-ui :stats :page-main-title])]
+     ; this title is reserved for the statistics filter boxes, not the table itself
+     #_[:h2 (tr [:taxi-ui :stats :page-main-title])]
 
      [:h2 (tr [:taxi-ui :stats :sections :filters :title])]
      [filters e! app]

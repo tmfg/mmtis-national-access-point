@@ -38,7 +38,10 @@
 
 (tuck/define-event SetFilter [id value]
   {}
-  (assoc-in app [:taxi-ui :stats :filters id] value))
+  (tuck/fx
+    (assoc-in app [:taxi-ui :stats :filters id] value)
+    (fn [e!]
+      (e! (->LoadStatistics)))))
 
 (tuck/define-event SetSorting [sorting]
   {}

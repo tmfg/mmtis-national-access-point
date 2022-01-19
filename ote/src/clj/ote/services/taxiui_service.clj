@@ -110,7 +110,8 @@
                                            :primary-direction   (= primary-direction :ascending)
                                            :secondary-column    (some-> secondary-column csk/->kebab-case-string)
                                            :secondary-direction (= secondary-direction :ascending)
-                                           :age-filter          (age-filter filters)})
+                                           :age-filter          (age-filter filters)
+                                           :name-filter         (str "%" (or (:name filters) "") "%")})
               (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))))))))
 
 (defrecord TaxiUIService []

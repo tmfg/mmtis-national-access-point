@@ -36,4 +36,5 @@ SELECT *
             WHEN EXTRACT(YEAR FROM AGE(timestamp - (:age-filter)::INTERVAL)) >= 1
                 THEN timestamp < NOW() - INTERVAL '1 year'
             ELSE timestamp > NOW() - (:age-filter)::INTERVAL
-     END);
+     END)
+   AND name ILIKE :name-filter;
