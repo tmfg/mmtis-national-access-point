@@ -90,17 +90,27 @@
               (some->> (:unknown-places places)
                        (log/warnf "Detected unknown places while updating %s/%s details! %s" operator-id service-id)))))))))
 
+(defn- age-filter
+  "Returns age filter as PostgreSQL INTERVAL compatible string."
+  [filters]
+  (case (:age-filter filters)
+    :within-six-months "6 months"
+    :within-one-year   "11 months 27 days"  ; this is a minor hack to allow easy "diff >= 1 year" selection in SQL
+    "1 year"))
+
 (defn fetch-pricing-statistics
-  [db {:keys [column direction]}]
-  (let [secondary-columns   #{:name :operating-areas :example-trip}
-        secondary-column    (get secondary-columns column)
-        primary-column      (when-not secondary-column column)
-        primary-direction   (when primary-column direction)
-        secondary-direction (when secondary-column direction)]
+  [db {:keys [sorting filters]}]
+  (let [{:keys [column direction]} sorting
+        secondary-columns          #{:name :operating-areas :example-trip}
+        secondary-column           (get secondary-columns column)
+        primary-column             (when-not secondary-column column)
+        primary-direction          (when primary-column direction)
+        secondary-direction        (when secondary-column direction)]
     (vec (->> (list-pricing-statistics db {:primary-column      (some-> primary-column csk/->snake_case_string)
                                            :primary-direction   (= primary-direction :ascending)
                                            :secondary-column    (some-> secondary-column csk/->kebab-case-string)
-                                           :secondary-direction (= secondary-direction :ascending)})
+                                           :secondary-direction (= secondary-direction :ascending)
+                                           :age-filter          (age-filter filters)})
               (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))))))))
 
 (defrecord TaxiUIService []
@@ -112,7 +122,6 @@
                   (routes
                     (POST "/taxiui/price-info" {user      :user
                                                form-data :body}
-                      (log/info "form data " form-data)
                       (http/transit-response
                         (fetch-priceinfo-for-service db user (http/transit-request form-data))))
 
@@ -124,7 +133,6 @@
 
                     ^:unauthenticated
                     (POST "/taxiui/statistics" {form-data :body}
-                      (log/info "form data " form-data)
                       (http/transit-response
                         (fetch-pricing-statistics db (http/transit-request form-data))))))))
 

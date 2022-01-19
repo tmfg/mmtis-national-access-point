@@ -60,7 +60,8 @@
                                                           (swap! state update-in [:sorting :direction] #(if (= label column)
                                                                                                           (sort-direction-transitions direction)
                                                                                                           :ascending))
-                                                          (e! (controller/->LoadStatistics (get @state :sorting)))))})
+                                                          (e! (controller/->SetSorting (get @state :sorting)))
+                                                          (e! (controller/->LoadStatistics))))})
                       (feather-icons/chevron-up {:height  ".75em"
                                                  :viewBox "0 6 24 12"
                                                  :stroke  (cond
@@ -100,7 +101,8 @@
             :value id
             :style {:margin-left "auto"}
             :on-click (fn [e]
-                        (e! (controller/->SetFilter :age-filter id)))
+                        (e! (controller/->SetFilter :age-filter id))
+                        (e! (controller/->LoadStatistics)))
             }]])
 
 (defn- filters
