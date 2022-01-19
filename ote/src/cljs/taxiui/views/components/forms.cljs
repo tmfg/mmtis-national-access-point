@@ -41,8 +41,8 @@
       (vector? label) [:label {:for id} (first label) [:br] (second label)]
       (string? label) [:label {:for id} label])]
    (let [extra-styles (:styles props)
-         all-styles (deep-merge styles extra-styles)
-         props (merge (stylefy/use-style all-styles) (dissoc props :styles) {:id id})]
+         all-styles   (deep-merge styles extra-styles)
+         props        (merge (stylefy/use-style all-styles) (dissoc props :styles) {:id id})]
      (if (some? inner-content)
        [el props inner-content]
        [el props]))
@@ -57,3 +57,11 @@
   ([id label] (button id label nil))
   ([id label props]
    (form-element :button id nil button-element props label nil)))
+
+(defn simple-input
+  "Simple input-box only input, defaults to text, is styled similarly to all other inputs on the site."
+  [id props]
+  (let [extra-styles (:styles props)
+        all-styles   (deep-merge input-element extra-styles)
+        props        (merge (stylefy/use-style all-styles) (dissoc props :styles) {:id id})]
+    [:input props]))
