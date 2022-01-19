@@ -12,7 +12,7 @@
   (->> statistics
        (map
          #(-> % (set/rename-keys {:timestamp :updated})))
-       (map #(update % :updated (fn [ts] (time/in-months (time/interval (time/minus (tc/from-date ts) (time/months (rand-int 24))) (time/now))))))))
+       (map #(update % :updated (fn [ts] (time/in-months (time/interval (tc/from-date ts) (time/now))))))))
 
 (tuck/define-event LoadStatisticsResponse [response]
   {}
@@ -27,13 +27,22 @@
   (js/console.log (str "LoadStatisticsFailed :: " response))
   app)
 
-(tuck/define-event LoadStatistics [params]
+(tuck/define-event LoadStatistics []
   {}
   (comm/post! (str "taxiui/statistics")
-              params
+              {:sorting (get-in app [:taxi-ui :stats :sorting])
+               :filters (get-in app [:taxi-ui :stats :filters])}
               {:on-success (tuck/send-async! ->LoadStatisticsResponse)
               :on-failure (tuck/send-async! ->LoadStatisticsFailed)})
   app)
 
+(tuck/define-event SetFilter [id value]
+  {}
+  (assoc-in app [:taxi-ui :stats :filters id] value))
+
+(tuck/define-event SetSorting [sorting]
+  {}
+  (assoc-in app [:taxi-ui :stats :sorting] sorting))
+
 (defmethod routes/on-navigate-event :taxi-ui/stats [{params :params}]
-  [(->LoadStatistics params)])
+  [(->LoadStatistics)])

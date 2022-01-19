@@ -30,4 +30,10 @@ SELECT id,
  LIMIT 1;
 
 -- name: list-pricing-statistics
-SELECT * FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction);
+SELECT *
+  FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction)
+ WHERE (CASE
+            WHEN EXTRACT(YEAR FROM AGE(timestamp - (:age-filter)::INTERVAL)) >= 1
+                THEN timestamp < NOW() - INTERVAL '1 year'
+            ELSE timestamp > NOW() - (:age-filter)::INTERVAL
+     END);
