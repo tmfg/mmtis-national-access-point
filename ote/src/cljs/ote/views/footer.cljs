@@ -11,7 +11,7 @@
                            ["en" "In English"]])
 
 (def ^:private legal-links
-  {:fi [{:href "https://www.fintraffic.fi/fi/fintraffic/tietosuoja" :label "Tietosuoja"}
+  {:fi [{:href "https://www.fintraffic.fi/fi/ekosysteemi-tietosuoja" :label "Tietosuoja"}
         {:href "https://www.fintraffic.fi/fi/palaute" :label "Palaute"}
         {:href "https://www.fintraffic.fi/fi/yhteystiedot" :label "Yhteystiedot"}
         {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste" :label "Saavutettavuus"}]
