@@ -28,7 +28,7 @@ $func$
 LANGUAGE plpgsql;
 
 -- function needs to be dropped in case its return type changes, simple replace won't work in such case
-DROP FUNCTION IF EXISTS list_taxi_statistics;
+DROP FUNCTION IF EXISTS list_taxi_statistics(TEXT, BOOLEAN, TEXT, BOOLEAN);
 
 CREATE OR REPLACE FUNCTION list_taxi_statistics(
     primary_ordering_column TEXT,
