@@ -1763,7 +1763,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                         :within-one-year     "Vuoden sisällä"
                                         :over-year-ago       "Yli vuosi sitten"
                                         :prices-updated-last "Hintatiedot päivitetty"
-                                        :company-by-name     "Hae yritystä nimellä"}}}
+                                        :company-by-name     "Hae yritystä nimellä"
+                                        :add-operating-area  "Lisää toiminta-alue"}}}
            :loader {:page-loading              "Ladataan..."
                     :loading-price-information "Ladataan hintatietoja..."}
            :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}

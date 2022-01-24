@@ -109,6 +109,12 @@
 (def set-filter (goog.functions.debounce (fn [e! id value]
                                (e! (controller/->SetFilter id value))) 500))
 
+(defn- nudger
+  "Nudges content upwards ever so slightly; meant for form input filters which have alternate box sizing set to be able
+  to style them more cleanly."
+  [c]
+  [:div {:style {:padding-bottom "0.4em"}} c])
+
 (defn- filters
   [e! app]
   [:section {:style {:display "flex"}}
@@ -120,14 +126,24 @@
      [age-filter e! :over-year-ago :age-filter 12]]]
 
    [filter-input e! app (tr [:taxi-ui :stats :sections :filters :company-by-name]) ""
-    [:div {:style {:padding-bottom "0.4em"}}
+    [nudger
      [forms/simple-input
       :name-filter
       {:styles {:margin-top     "auto"
                 :padding-bottom "0.4em"}
        :on-change #(set-filter e! :name (-> % .-target .-value))}]]]
 
-   #_[filter-input e! app "Toiminta-alue" "(kuntakoodeittain)"]])
+   [filter-input e! app "Toiminta-alue" "(kuntakoodeittain)"
+    [nudger
+     [forms/autocomplete-input
+      e!
+      app
+      :testing
+      [:taxi-ui :stats :area-selector]
+      [:taxi-ui :stats :sections :filters]
+      (fn [term] {:method :post :url "/taxiui/operating-areas" :params {:filter term}})
+      (fn [results] (map (fn [result] (clojure.set/rename-keys result {:place :label})) results))
+      (fn [selected] (e! (controller/->SetFilter :area-filter selected)))]]]])
 
 (defn stats
   [_ _]

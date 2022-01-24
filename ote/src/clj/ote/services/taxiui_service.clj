@@ -98,6 +98,10 @@
     :within-one-year   "11 months 27 days"  ; this is a minor hack to allow easy "diff >= 1 year" selection in SQL
     "1 year"))
 
+(defn- area-filter
+  [filters]
+  (-> filters :area-filter :label))
+
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
   (let [{:keys [column direction]} sorting
@@ -111,8 +115,13 @@
                                            :secondary-column    (some-> secondary-column csk/->kebab-case-string)
                                            :secondary-direction (= secondary-direction :ascending)
                                            :age-filter          (age-filter filters)
-                                           :name-filter         (str "%" (or (:name filters) "") "%")})
+                                           :name-filter         (str "%" (or (:name filters) "") "%")
+                                           :area-filter         (area-filter filters)})
               (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))))))))
+
+(defn fetch-operating-areas
+  [db {filter :filter}]
+  (vec (list-operating-areas db {:term (str "%" filter "%")})))
 
 (defrecord TaxiUIService []
   component/Lifecycle
@@ -135,7 +144,12 @@
                     ^:unauthenticated
                     (POST "/taxiui/statistics" {form-data :body}
                       (http/transit-response
-                        (fetch-pricing-statistics db (http/transit-request form-data))))))))
+                        (fetch-pricing-statistics db (http/transit-request form-data))))
+
+                    ^:unauthenticated
+                    (POST "/taxiui/operating-areas" {form-data :body}
+                      (http/transit-response
+                        (fetch-operating-areas db (http/transit-request form-data))))))))
 
   (stop [{stop ::stop :as this}]
     (stop)
