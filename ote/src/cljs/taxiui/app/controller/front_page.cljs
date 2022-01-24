@@ -129,7 +129,7 @@
   CloseTermsAndPrivacyResponse
   (process-event [{response :response email :email} app]
     (localstorage/add-item! (keyword (str email "-tos-ok")) true)
-    (routes/navigate! (:page app))
+    (routes/navigate! (:taxi-ui/page app))
     (assoc-in app [:user :tos-ok] true))
 
   CloseTermsAndPrivacy
@@ -137,7 +137,7 @@
     (if (nil? user)
       (do
         (localstorage/add-item! :tos-ok true)
-        (routes/navigate! (:page app)))
+        (routes/navigate! (:taxi-ui/page app)))
       (comm/post! "register/tos" {:user-email (:email user)}
                   {:on-success (tuck/send-async! ->CloseTermsAndPrivacyResponse (:email user))
                    :on-failure (tuck/send-async! ->ServerError)}))

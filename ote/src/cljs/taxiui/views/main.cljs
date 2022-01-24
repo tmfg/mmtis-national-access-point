@@ -23,11 +23,11 @@
      [devtools/env-warning]
      ; TODO: add test env warning for Taxi UI hereabouts
      ; TODO: add cookie banner to this index
-     (case (:page app)
+     (case (:taxi-ui/page app)
        ;  see taxiui.app.routes for more in-depth documentation
        :taxi-ui/front-page      [fp/front-page e! app]
        :taxi-ui/login           [l/login e! app]
        :taxi-ui/pricing-details [pd/pricing-details e! app]
        :taxi-ui/stats           [s/stats e! app]
-       [:div (tr [:common-texts :no-such-page]) (pr-str (:page app))])
+       [:div (tr [:common-texts :no-such-page]) (pr-str (:taxi-ui/page app))])
      [devtools/debug-state app]]))

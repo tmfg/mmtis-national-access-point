@@ -91,13 +91,13 @@
 (defn linkify
   ([url label]
    (linkify url label nil))
-  ([url label {:keys [icon target style hide-external-icon? on-click] :as props}]
+  ([url label {:keys [icon target style hide-external-icon? force-external-icon? on-click] :as props}]
    (let [a-props         (dissoc
                            (if (= target "_blank")
                              ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
                              (assoc props :rel "noopener noreferrer")
                              props)
-                           :icon :style :hide-external-icon?)
+                           :icon :style :hide-external-icon? :force-external-icon?)
          [url external?] (sanitize-url url)
          on-click-fn     (if (and external?
                                   (not (trusted-url? url)))
@@ -114,7 +114,7 @@
           (if icon
             [icon-link icon label]
             label)
-          (when (and external?
+          (when (and (or external? force-external-icon?)
                      (not hide-external-icon?))
             [feather-icons/external-link (stylefy/use-style style-base/inline-icon)])])))
 
