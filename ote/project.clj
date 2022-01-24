@@ -106,7 +106,7 @@
                  ;; Time - Eclipse Public License 1.0
                  [com.andrewmcveigh/cljs-time "0.5.0"]
                  ;; java-time - MIT
-                 [clojure.java-time "0.3.2"]
+                 [clojure.java-time "0.3.3"]
 
                  ;; HTML/XML generation from Clojure data - Eclipse Public License 1.0
                  [hiccup "1.0.5"]
