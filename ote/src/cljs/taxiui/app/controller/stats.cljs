@@ -32,7 +32,7 @@
               {:sorting (get-in app [:taxi-ui :stats :sorting])
                :filters (get-in app [:taxi-ui :stats :filters])}
               {:on-success (tuck/send-async! ->LoadStatisticsResponse)
-              :on-failure (tuck/send-async! ->LoadStatisticsFailed)})
+               :on-failure (tuck/send-async! ->LoadStatisticsFailed)})
   app)
 
 (tuck/define-event SetFilter [id value]

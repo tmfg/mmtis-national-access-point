@@ -37,7 +37,7 @@ SELECT *
              ELSE timestamp > NOW() - (:age-filter)::INTERVAL
         END)
    AND name ILIKE :name-filter
-   AND (CASE WHEN (:area-filter = '') IS NOT TRUE
+   AND (CASE WHEN (:area-filter)::text IS NOT NULL AND (:area-filter)::text = '' IS NOT TRUE
              THEN EXISTS (SELECT FROM unnest("operating-areas") areas WHERE areas = :area-filter)
              ELSE TRUE
         END);

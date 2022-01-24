@@ -96,7 +96,8 @@
   (case (:age-filter filters)
     :within-six-months "6 months"
     :within-one-year   "11 months 27 days"  ; this is a minor hack to allow easy "diff >= 1 year" selection in SQL
-    "1 year"))
+    :over-year-ago     "1 year"
+    "6 months"))  ; default is same as :within-six-months
 
 (defn- area-filter
   [filters]
