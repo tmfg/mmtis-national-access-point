@@ -240,11 +240,7 @@
          {:style    (merge style-topnav/bottombar-dropdown-link
                            {:display     "inline-flex"
                             :align-items "center"})
-          :target   "_blank"}]
-        #_[bottombar-simplelink e! app {:label              (tr [:taxi-ui :cross-promo :main-site-header])
-                                      :href               "#/taxi-ui"
-                                      :menu-click-handler #(do (taxiui-routes/navigate! :taxi-ui/front-page)
-                                                               (e! (fp-controller/->CloseHeaderMenus)))}])
+          :target   "_blank"}])
      ]
 
      ; right aligned entries
