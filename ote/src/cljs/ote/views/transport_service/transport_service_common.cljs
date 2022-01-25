@@ -26,7 +26,8 @@
             [ote.app.controller.flags :as flags]
             [ote.views.place-search :as place-search]
             [ote.views.place-search :as place-search]
-            [ote.app.controller.admin-validation :as admin-validation]))
+            [ote.app.controller.admin-validation :as admin-validation]
+            [taxiui.app.routes :as taxiui-router]))
 
 (defn advance-reservation-group
   "Creates a form group for in advance reservation.
@@ -973,6 +974,27 @@
                         (if (= sub-type :taxi)
                           false
                           true))}))
+
+(defn taxi-pricing-info [operator-id service-id]
+  (form/group
+    {:label (tr [:taxi-ui :cross-promo :service-editor :title])
+     :columns 3
+     :layout :row
+     :card? false
+     :top-border true}
+
+    {:name        :netex-info-text
+     :type        :component
+     :full-width? true
+     :component   (fn [_]
+                    [:div {:style {:margin-top "1rem"}}
+                     (tr [:taxi-ui :cross-promo :service-editor :instructions])
+                     [linkify
+                      (str "/taxiui#" (taxiui-router/resolve :taxi-ui/pricing-details {:operator-id operator-id
+                                                                                      :service-id  service-id}))
+                      (tr [:taxi-ui :cross-promo :service-editor :link-to-taxiui-text])
+                      {:target               "_blank"
+                       :force-external-icon? true}]])}))
 
 (defn place-search-dirty-event [e!]
   ;; To set transport service form dirty when adding / removing places using the place-search component,

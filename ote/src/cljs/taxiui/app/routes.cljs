@@ -31,34 +31,34 @@
   Returns a single Tuck event or a vector of Tuck events to be applied
   to the app state. Takes a map containing the navigation data as parameter.
   Route parameters are under the :params key."
-  :page)
+  :taxi-ui/page)
 
 (defmethod on-navigate-event :default [page-params] nil)
 
 (defmulti on-leave-event
   "Determine event(s) to be run when user navigates away from the give route.
   Return values identical to on-navigate-event."
-  :page)
+  :taxi-ui/page)
 
 (tuck/define-event ClearPageData [page]
                    {}
                    (update app :taxi-ui dissoc (-> (name page) keyword)))
 
 (defmethod on-leave-event :default [page-params]
-  (->ClearPageData (:page page-params)))
+  (->ClearPageData (:taxi-ui/page page-params)))
 
 (defn requires-admin? [app]
-  (and (contains? admin-required (:page app))
+  (and (contains? admin-required (:taxi-ui/page app))
        (not (get-in app [:user :admin?]))))
 
 (defn requires-transit-authority? [app]
-  (and (contains? transit-authority-required (:page app))
+  (and (contains? transit-authority-required (:taxi-ui/page app))
        (not (get-in app [:user :transit-authority?]))))
 
 (defn requires-authentication? [app]
   (and
        (not (user-logged-in? app))
-       (contains? auth-required (:page app))))
+       (contains? auth-required (:taxi-ui/page app))))
 
 (defn- send-startup-events [event]
   (let [e!     (tuck/control state/app)
@@ -87,7 +87,7 @@
 (defn on-navigate [go-to-url-event route-name params query]
   (swap! state/app
          (fn [app]
-           (let [navigation-data {:page   route-name
+           (let [navigation-data {:taxi-ui/page   route-name
                                   :params params
                                   :query  query
                                   :url    js/window.location.href}
@@ -97,8 +97,8 @@
                js/window
                (fn []
                  (send-startup-events
-                   [(when-not (= route-name (:page orig-app))
-                      (on-leave-event    (select-keys orig-app [:page :query :params])))
+                   [(when-not (= route-name (:taxi-ui/page orig-app))
+                      (on-leave-event    (select-keys orig-app [:taxi-ui/page :query :params])))
                     (on-navigate-event navigation-data)]))
                0)
              (if (not-authorized? app)

@@ -12,3 +12,6 @@
 
 (defn user-logged-in? [app]
   (not-empty (get-in app [:user])))
+
+(defn user-operates-service-type? [app service-type]
+  (some #(= (:ote.db.transport-service/sub-type %) service-type) (:transport-service-vector app)))

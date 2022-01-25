@@ -1,6 +1,7 @@
  (ns ote.views.transport-service.passenger-transportation
   "Required datas for passenger transportation provider"
-   (:require [ote.db.transport-service :as t-service]
+   (:require [ote.app.utils :refer [user-operates-service-type?]]
+             [ote.db.transport-service :as t-service]
              [ote.localization :refer [tr tr-key]]
              [ote.util.values :as values]
              [ote.ui.form :as form]
@@ -221,6 +222,9 @@
               (ts-common/companies-group e! in-validation? service-id db-file-key)
               (ts-common/brokerage-group e! in-validation?)
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation in-validation?)
+              (if (= (::t-service/sub-type service) :taxi)
+                (ts-common/taxi-pricing-info (-> app :transport-operator :ote.db.transport-operator/id) service-id)
+                (pricing-group (get service ::t-service/sub-type) in-validation?))
               (ts-common/external-interfaces e!
                                              (get service ::t-service/type)
                                              (get service ::t-service/sub-type)
@@ -239,7 +243,6 @@
                                      nil
                                      in-validation?)
               (accessibility-group in-validation?)
-              (pricing-group (get service ::t-service/sub-type) in-validation?)
               (ts-common/service-hours-group "passenger-transportation" false in-validation?)]
              form-options (transportation-form-options e! form-groups in-validation? app)]
     [:div

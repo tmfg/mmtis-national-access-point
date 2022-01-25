@@ -12,11 +12,12 @@
             [ote.localization :as localization]
             [ote.app.localstorage :as localstorage]
             [ote.app.routes :as routes]
-            [ote.app.utils :refer [user-logged-in?]]
+            [ote.app.utils :refer [user-logged-in? user-operates-service-type?]]
             [ote.ui.common :as common :refer [linkify]]
             [ote.style.base :as style-base]
             [ote.style.topnav :as style-topnav]
             [ote.style.base :as base]
+            [ote.theme.colors :as colors]
             [ote.app.controller.flags :as flags]
             [ote.app.controller.login :as login]
             [ote.app.controller.front-page :as fp-controller]
@@ -24,7 +25,8 @@
             [ote.views.footer :as footer]
             [ote.views.front-page :as fp]
             [ote.views.transport-operator :as to]
-            [re-svg-icons.feather-icons :as feather-icons]))
+            [re-svg-icons.feather-icons :as feather-icons]
+            [taxiui.app.routes :as taxiui-router]))
 
 (defn esc-press-listener [e! app]
   "Listens to keydown events on document. If esc is clicked call CloseHeaderMenus"
@@ -75,15 +77,18 @@
                                                       {:display "none"}))) ;; Todo jotain mobiilissa psks
                 {:id (str (name tag) "-menu")})
      (doall
-       (for [{:keys [key label href target] :or {href "#"}} (filter some? entries)]
+       (for [{:keys [key label href target force-external-icon?] :or {href "#"}} (filter some? entries)]
          ^{:key (str "link_" (name tag) "_" (name key))}  ; TODO: slugify
          [:li (stylefy/use-style style-topnav/bottombar-dropdown-item)
           [common/linkify
            href
            (str label)
-           {:key      (name key)
-            :style    style-topnav/bottombar-dropdown-link
-            :on-click #(entry-click-handler % {:key key :label label :href href})}]]))]
+           (merge {:key      (name key)
+                   :style    style-topnav/bottombar-dropdown-link
+                   :on-click #(entry-click-handler % {:key key :label label :href href})
+                   :force-external-icon? force-external-icon?}
+                  (when target {:target target})
+                  (when force-external-icon?) {:force-external-icon? force-external-icon?})]]))]
     ]))
 
 (defn bottombar-simplelink [e! app options]
@@ -136,7 +141,7 @@
 
       [bottombar-spacer]
 
-      [bottombar-dropdown e! app desktop? {:tag     :updates
+      [bottombar-dropdown e! app desktop? {:tag                 :updates
                                            :entries             [{:key   :updates
                                                                   :label (tr [:common-texts :updates-menu-updates])}]
                                            :label               (tr [:common-texts :navigation-updates-menu])
@@ -190,6 +195,12 @@
                                                                    {:key :own-services
                                                                     :label (tr [:document-title :own-services])
                                                                     :href "#/own-services"}
+                                                                   (when (user-operates-service-type? app :taxi)
+                                                                     {:key :taxiui_statistics
+                                                                      :label (tr [:taxi-ui :cross-promo :myservices-statistics-link])
+                                                                      :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
+                                                                      :force-external-icon? true
+                                                                      :target "_blank"})
                                                                    {:key :routes
                                                                     :label (tr [:common-texts :navigation-route])
                                                                     :href "#/routes"}
@@ -215,6 +226,21 @@
                                       :href               "#/services"
                                       :menu-click-handler #(do (routes/navigate! :services)
                                                                (e! (fp-controller/->CloseHeaderMenus)))}])
+
+      (when (and (user-logged-in? app)
+                 (user-operates-service-type? app :taxi))
+        [common/linkify
+         "/taxiui"
+         [:span
+          {:style {:background-color colors/primary-background-color
+                   :color            colors/primary-text-color
+                   :padding          ".3em .6em .3em .6em"
+                   :border-radius    ".5em"}}
+          (tr [:taxi-ui :cross-promo :main-site-header])]
+         {:style    (merge style-topnav/bottombar-dropdown-link
+                           {:display     "inline-flex"
+                            :align-items "center"})
+          :target   "_blank"}])
      ]
 
      ; right aligned entries

@@ -1751,7 +1751,12 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :finap "NAP"}
 
  ;; Taxi UI translations
- :taxi-ui {:stats {:page-main-title "Kokonaiskatsaus"
+ :taxi-ui {:cross-promo {:main-site-header           "Uusi hintojen syöttöpalvelu"
+                         :myservices-statistics-link "Taksipalveluiden hintatilastot"
+                         :service-editor {:title               "Hintatiedot"
+                                          :instructions        "Taksien palveluhintojen syöttämiseen on nyt uusi palvelu, johon pääset seuraamalla "
+                                          :link-to-taxiui-text "tätä linkkiä."}}
+           :stats {:page-main-title "Kokonaiskatsaus"
                    :columns         {:name                "Yritys"
                                      :example-trip        "Esimerkkimatka"
                                      :start-price-daytime "Aloitus (06-18)"
