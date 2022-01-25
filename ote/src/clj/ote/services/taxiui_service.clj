@@ -122,7 +122,6 @@
 
 (defn fetch-operating-areas
   [db {filter :filter}]
-  ; TODO auth checks
   (vec (list-operating-areas db {:term (str "%" filter "%")})))
 
 (defn fetch-service-summaries
