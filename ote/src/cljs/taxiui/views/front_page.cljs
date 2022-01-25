@@ -12,6 +12,7 @@
             [taxiui.views.components.link :refer [link]]
             [taxiui.app.routes :as routes]
             [taxiui.theme :as theme]
+            [ote.localization :refer [tr]]
             [ote.theme.colors :as colors]))
 
 (let [host (.-host (.-location js/document))]
@@ -32,7 +33,6 @@
                                  :width        "50"
                                  :height       "100"
                                  :viewBox      "6 0 12 24"})])
-
 
 (defn front-page
   [_ _]
@@ -55,30 +55,39 @@
        [panel-arrow]]]]
 
     (doall
-      (for [service (:transport-service-vector app)
-            :when   (= :taxi (:ote.db.transport-service/sub-type service))]
-        ^{:key (str "price_infobox_" (:ote.db.transport-service/id service))}
+      (for [service (get-in app [:taxi-ui :front-page :services])]
+        ^{:key (str "price_infobox_" (:service-id service))}
         [link
          e!
          :taxi-ui/pricing-details
-         {:operator-id (get-in app [:transport-operator :ote.db.transport-operator/id])
-          :service-id  (:ote.db.transport-service/id service)}
+         {:operator-id (:operator-id service)
+          :service-id  (:service-id service)}
          styles/info-box-link
 
          [:section (stylefy/use-style styles/info-box)
-          [:h4 (stylefy/use-style styles/info-section-title) (str (:ote.db.transport-service/name service) " hintatiedot")]
+          [:h4 (stylefy/use-style styles/info-section-title) (str (:service-name service) (tr [:taxi-ui :front-page :sections :service-summary :price-information-header]))]
           [:div (stylefy/use-style styles/pricing-details)
            [:div.logo {:style {:grid-area "logo"}}]
-           [:h5 (stylefy/use-style styles/price-box-title)
-            "Hintatiedot päivitetty 23.12.2021"]
-           [:div (stylefy/use-style styles/example-price-title) "Esimerkkimatka (10 km + 15 min)"]
-           [:div (stylefy/use-style styles/example-prices)
-            [:span (formatters/currency 36.90)]
-            [:span (stylefy/use-style styles/flex-right-aligned)
-             [:span (str (formatters/currency 1.5) "/km")]
-             [:span (stylefy/use-style styles/currency-breather) (str (formatters/currency 1) "/min")]]]
+           (if (:updated service)
+             [:h5 (stylefy/use-style styles/price-box-title)
+              (tr [:taxi-ui :front-page :sections :service-summary :information-last-updated]) (:updated service)]
+             [:h5 (stylefy/use-style styles/price-box-title)
+              (tr [:taxi-ui :front-page :sections :service-summary :information-never-updated])])
+           [:div (stylefy/use-style styles/example-price-title) (tr [:taxi-ui :front-page :sections :service-summary :example-trip])]
+
+           (if (:example-trip service)
+             [:div (stylefy/use-style styles/example-prices)
+              [:span (formatters/currency (:example-trip service))]
+              [:span (stylefy/use-style styles/flex-right-aligned)
+               [:span (str (formatters/currency (:price-per-kilometer service)) (tr [:taxi-ui :front-page :sections :service-summary :per-kilometer]))]
+               [:span (stylefy/use-style styles/currency-breather) (str (formatters/currency (:price-per-minute service)) (tr [:taxi-ui :front-page :sections :service-summary :per-minute]))]]]
+
+             [:div (stylefy/use-style styles/example-prices)
+              [:span (tr [:taxi-ui :front-page :sections :service-summary :prices-not-added-yet])]])
+
            [:div (stylefy/use-style styles/area-pills)
-            [pill "hips" {:filled? true}]
-            [pill "hops"]
-            [pill "kops"]]
+            (doall
+              (for [area (:operating-areas service)]
+                ^{:key (str "service_" (:service-id service) "_area_" area)}
+                [pill area]))]
            [panel-arrow]]]]))]))

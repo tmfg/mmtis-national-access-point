@@ -43,9 +43,10 @@
                     breather-padding
                     breather-margin))
 
-(def area-pills (-> {:grid-area "area-pills"
-                     :display   "flex"
-                     :gap       "1em"}
+(def area-pills (-> {:grid-area  "area-pills"
+                     :display    "flex"
+                     :flex-wrap  "wrap"
+                     :column-gap "0.5em"}
                     breather-padding
                     breather-margin))
 
