@@ -48,3 +48,20 @@ SELECT DISTINCT (oa_d.text) AS place
        UNNEST(description) oa_d
  WHERE oa_d.text ILIKE :term
  ORDER BY place;
+
+-- name: list-service-summaries
+   SELECT o."id" AS "operator-id",
+          s."id" AS "service-id",
+          o."name" AS "operator-name",
+          s."name" AS "service-name",
+          st.timestamp,
+          st."example-trip",
+          st."price-per-kilometer",
+          st."price-per-minute",
+          st."operating-areas"
+     FROM "transport-operator" o
+LEFT JOIN "transport-service" s ON s."transport-operator-id" = o.id
+LEFT JOIN list_taxi_statistics(null, null, null, null) st ON st."service-id" = s."id"
+    WHERE o."id" IN (:operator-ids)
+      AND s."sub-type" = 'taxi'
+    ORDER BY "operator-id", "service-id";

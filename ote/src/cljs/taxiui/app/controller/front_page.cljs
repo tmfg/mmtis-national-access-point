@@ -7,7 +7,10 @@
             [reagent.core :as r]
             [taxiui.app.controller.loader :as loader]
             [taxiui.app.routes :as routes]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck]
+            [cljs-time.format :as tf]
+            [cljs-time.coerce :as tc]
+            [clojure.set :as set]))
 
 ;;Change page event. Give parameter in key format e.g: :front-page, :transport-operator, :transport-service
 (defrecord ChangePage [given-page params])
@@ -143,5 +146,34 @@
                    :on-failure (tuck/send-async! ->ServerError)}))
     (assoc app :tos-ok true)))
 
+(def simple-date (tf/formatter "d.M.yyyy"))
+
+(defn- sanitize
+  [services]
+  (->> services
+       (map
+         #(-> % (set/rename-keys {:timestamp :updated})))
+       (map #(update % :updated (fn [ts] (some->> ts (tc/from-date) (tf/unparse simple-date)))))))
+
+(tuck/define-event LoadFrontPageSummariesResponse [response]
+  {}
+  (let [sanitized (sanitize response)]
+   (tuck/fx
+     (assoc-in app [:taxi-ui :front-page :services] sanitized)
+     (fn [e!]
+       (e! (loader/->RemoveHit :page-loading))))))
+
+(tuck/define-event LoadFrontPageSummariesFailed [response]
+  {}
+  app)
+
+(tuck/define-event LoadFrontPageSummaries []
+  {}
+  (comm/post! (str "taxiui/service-summaries")
+              {}
+              {:on-success (tuck/send-async! ->LoadFrontPageSummariesResponse)
+               :on-failure (tuck/send-async! ->LoadFrontPageSummariesFailed)})
+  app)
+
 (defmethod routes/on-navigate-event :taxi-ui/front-page [{params :params}]
-  (loader/->RemoveHit :page-loading))
+  (->LoadFrontPageSummaries))

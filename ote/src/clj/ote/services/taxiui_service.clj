@@ -104,6 +104,7 @@
 
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
+  ; TODO auth checks
   (let [{:keys [column direction]} sorting
         secondary-columns          #{:name :operating-areas :example-trip}
         secondary-column           (get secondary-columns column)
@@ -121,7 +122,21 @@
 
 (defn fetch-operating-areas
   [db {filter :filter}]
+  ; TODO auth checks
   (vec (list-operating-areas db {:term (str "%" filter "%")})))
+
+(defn fetch-service-summaries
+  [db user {}]
+  [{:id "service-id-num"
+    :name "namenamename"
+    :updated "23.12.2021"
+    :example-trip 36.90
+    :price-per-kilometer 1.5
+    :price-per-minute 1
+    :operating-areas [{:label "Jokualue" :primary? true}]}]
+  (let [groups (authorization/user-transport-operators db user)]
+    (vec (->> (list-service-summaries db {:operator-ids groups})
+              (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))))
 
 (defrecord TaxiUIService []
   component/Lifecycle
@@ -149,7 +164,12 @@
                     ^:unauthenticated
                     (POST "/taxiui/operating-areas" {form-data :body}
                       (http/transit-response
-                        (fetch-operating-areas db (http/transit-request form-data))))))))
+                        (fetch-operating-areas db (http/transit-request form-data))))
+
+                    (POST "/taxiui/service-summaries" {user      :user
+                                                       form-data :body}
+                      (http/transit-response
+                        (fetch-service-summaries db user (http/transit-request form-data))))))))
 
   (stop [{stop ::stop :as this}]
     (stop)
