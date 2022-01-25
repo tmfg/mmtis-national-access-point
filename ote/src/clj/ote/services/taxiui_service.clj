@@ -127,13 +127,6 @@
 
 (defn fetch-service-summaries
   [db user {}]
-  [{:id "service-id-num"
-    :name "namenamename"
-    :updated "23.12.2021"
-    :example-trip 36.90
-    :price-per-kilometer 1.5
-    :price-per-minute 1
-    :operating-areas [{:label "Jokualue" :primary? true}]}]
   (let [groups (authorization/user-transport-operators db user)]
     (vec (->> (list-service-summaries db {:operator-ids groups})
               (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))))
