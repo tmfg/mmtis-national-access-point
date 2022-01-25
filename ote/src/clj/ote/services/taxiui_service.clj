@@ -156,12 +156,10 @@
                          (http/transit-response
                            (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
 
-                    ^:unauthenticated
                     (POST "/taxiui/statistics" {form-data :body}
                       (http/transit-response
                         (fetch-pricing-statistics db (http/transit-request form-data))))
 
-                    ^:unauthenticated
                     (POST "/taxiui/operating-areas" {form-data :body}
                       (http/transit-response
                         (fetch-operating-areas db (http/transit-request form-data))))
