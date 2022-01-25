@@ -33,7 +33,18 @@ SELECT id,
 SELECT *
   FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction)
  WHERE (CASE WHEN EXTRACT(YEAR FROM (:age-filter)::interval) > 0
-                THEN timestamp < NOW() - INTERVAL '1 year'
-            ELSE timestamp > NOW() - (:age-filter)::INTERVAL
-     END)
-   AND name ILIKE :name-filter;
+             THEN timestamp < NOW() - INTERVAL '1 year'
+             ELSE timestamp > NOW() - (:age-filter)::INTERVAL
+        END)
+   AND name ILIKE :name-filter
+   AND (CASE WHEN (:area-filter = '') IS NOT TRUE
+             THEN EXISTS (SELECT FROM unnest("operating-areas") areas WHERE areas = :area-filter)
+             ELSE TRUE
+        END);
+
+-- name: list-operating-areas
+SELECT DISTINCT (oa_d.text) AS place
+  FROM operation_area oa,
+       UNNEST(description) oa_d
+ WHERE oa_d.text ILIKE :term
+ ORDER BY place;
