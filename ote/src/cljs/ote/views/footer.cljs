@@ -18,7 +18,7 @@
    :sv [{:href "https://www.fintraffic.fi/sv/fintraffic/kontaktuppgifter" :label "Kontaktinformation"}
         {:href "https://www.fintraffic.fi/fi/ekosysteemi-tietosuoja" :label "Dataskydd"}]
    :en [{:href "https://www.fintraffic.fi/en/fintraffic/contact-information-and-invoicing-instructions" :label "Contact information"}
-        {:href "https://www.fintraffic.fi/en/fintraffic/privacy-policy" :label "Privacy policy"}]})
+        {:href "https://www.fintraffic.fi/fi/ekosysteemi-tietosuoja" :label "Privacy policy"}]})
 
 (defn footer []
   [:footer (stylefy/use-style footer-styles/footer)
