@@ -29,7 +29,7 @@
 (defqueries "ote/services/login.sql")
 
 (defn- unix-epoch []
-  ;; Returns a zoned time date that can later be
+  ;; Returns a zoned date-time that can later be
   ;; formatted as: "Thu, 1 Jan 1970 00:00:00 GMT"
   (java-time.zone/zoned-date-time 1970 "UTC"))
 
