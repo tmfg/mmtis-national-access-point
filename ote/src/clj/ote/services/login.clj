@@ -7,6 +7,7 @@
             [compojure.core :refer [routes POST wrap-routes]]
             [ote.nap.cookie :as cookie]
             [ote.nap.users :as users]
+            [java-time :as java-time]
             [jeesql.core :refer [defqueries]]
             [ote.util.encrypt :as encrypt]
             [ote.services.transport-operator :as transport-operator]
@@ -27,16 +28,22 @@
 
 (defqueries "ote/services/login.sql")
 
-(defn- with-auth-tkt [response auth-tkt-value domain]
-  (update response :headers
-          assoc "Set-Cookie" (if (nil? domain)
-                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly")]
-                               ;; Three cookies are required to match ckan cookie configuration
-                               [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Secure")
-                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
-                                     "; Domain=" domain "; Secure")
-                                (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
-                                     "; Domain=." domain "; Secure")])))
+(defn- unix-epoch []
+  ;; Returns a zoned time date that can later be
+  ;; formatted as: "Thu, 1 Jan 1970 00:00:00 GMT"
+  (java-time.zone/zoned-date-time 1970 "UTC"))
+
+(defn- with-auth-tkt [response auth-tkt-value domain expiry-timestamp is-deleted]
+  (let [timestamp-string (java-time.format/format :rfc-1123-date-time (if is-deleted (unix-epoch) expiry-timestamp))]
+    (update response :headers
+            assoc "Set-Cookie" (if (nil? domain)
+                                 [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Expires=" timestamp-string)]
+                                 ;; Three cookies are required to match ckan cookie configuration
+                                 [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Secure; Expires=" timestamp-string)
+                                  (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                       "; Domain=" domain "; Secure; Expires=" timestamp-string)
+                                  (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                       "; Domain=." domain "; Secure; Expires=" timestamp-string)]))))
 
 (defn login [db auth-tkt-config
              {:keys [email password] :as credentials}]
@@ -45,19 +52,28 @@
           (encrypt/passlib->buddy (:password login-info)))
       (if (:email-confirmed? login-info)                    ;;If email not confirmed send proper error
         ;; User was found and password is correct, return user info
-        (with-auth-tkt
-          (http/transit-response
-            {:success? true
-             :session-data
-             (let [user (users/find-user db (:id login-info))]
-               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
-            200)
-          (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
-            {:digest-algorithm (:digest-algorithm auth-tkt-config)
-             :timestamp (java.util.Date.)
-             :user-id (:id login-info)
-             :user-data ""})
-          (:domain auth-tkt-config))
+        (let [current-zoned-timestamp (java-time.zone/with-zone-same-instant (java-time.zone/zoned-date-time) "UTC")]
+          (with-auth-tkt
+            (http/transit-response
+              {:success? true
+               :session-data
+               (let [user (users/find-user db (:id login-info))]
+                 (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+              200)
+            (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
+                            {:digest-algorithm (:digest-algorithm auth-tkt-config)
+                             :timestamp        (java.util.Date.)
+                             :user-id          (:id login-info)
+                             :user-data        {:session-start-timestamp current-zoned-timestamp}})
+            (:domain auth-tkt-config)
+            ;; Timestamp for cookie expiration.
+            (let
+              ; Define the session duration here.
+              [session-duration-in-hours 8]                 ; Define the session duration here!
+              ;; If you want to use minutes or seconds instead of hours,
+              ;; change the line before and after this to match the unit in use.
+              (.plus current-zoned-timestamp (java-time.amount/hours session-duration-in-hours)))
+            false))
 
         (http/transit-response {:error :unconfirmed-email} 401)) ;; This could be 403 instead
       ;; Login shall indicate error in a general way and not reveal which credential was invalid
@@ -65,7 +81,7 @@
     (http/transit-response {:error :login-error} 400)))
 
 (defn- logout [auth-tkt-config]
-  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config)))
+  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config) (unix-epoch) true))
 
 (defn- request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
