@@ -366,7 +366,7 @@
         ;; "companycsv" [companycsv/company-csv-list e! app] - Take csv file upload functionality off for now
         "operators" [operator-list e! app]
         "interfaces" [interfaces/interface-list e! app]
-        "reports" [report-view/reports  e! app]
+        "reports" [report-view/reports e! app]
         "sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex e! app]
         ;;default
