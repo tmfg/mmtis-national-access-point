@@ -16,7 +16,7 @@
         {:href "https://www.fintraffic.fi/fi/yhteystiedot" :label "Yhteystiedot"}
         {:href "https://www.fintraffic.fi/fi/fintraffic/saavutettavuusseloste" :label "Saavutettavuus"}]
    :sv [{:href "https://www.fintraffic.fi/sv/fintraffic/kontaktuppgifter" :label "Kontaktinformation"}
-        {:href "https://www.fintraffic.fi/sv/fintraffic/dataskydd" :label "Dataskydd"}]
+        {:href "https://www.fintraffic.fi/fi/ekosysteemi-tietosuoja" :label "Dataskydd"}]
    :en [{:href "https://www.fintraffic.fi/en/fintraffic/contact-information-and-invoicing-instructions" :label "Contact information"}
         {:href "https://www.fintraffic.fi/en/fintraffic/privacy-policy" :label "Privacy policy"}]})
 
