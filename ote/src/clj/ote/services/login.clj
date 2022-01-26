@@ -37,12 +37,12 @@
   (let [timestamp-string (java-time.format/format :rfc-1123-date-time (if is-deleted (unix-epoch) expiry-timestamp))]
     (update response :headers
             assoc "Set-Cookie" (if (nil? domain)
-                                 [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Expires=" timestamp-string)]
+                                 [(str "auth_tkt=" auth-tkt-value (if is-deleted "; token=" "") "; Path=/; HttpOnly; Expires=" timestamp-string)]
                                  ;; Three cookies are required to match ckan cookie configuration
-                                 [(str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly; Secure; Expires=" timestamp-string)
-                                  (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                 [(str "auth_tkt=" auth-tkt-value (if is-deleted "; token=" "") "; Path=/; HttpOnly; Secure; Expires=" timestamp-string)
+                                  (str "auth_tkt=" auth-tkt-value (if is-deleted "; token=" "") "; Path=/; HttpOnly"
                                        "; Domain=" domain "; Secure; Expires=" timestamp-string)
-                                  (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
+                                  (str "auth_tkt=" auth-tkt-value (if is-deleted "; token=" "") "; Path=/; HttpOnly"
                                        "; Domain=." domain "; Secure; Expires=" timestamp-string)]))))
 
 (defn login [db auth-tkt-config
