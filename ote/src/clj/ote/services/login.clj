@@ -66,13 +66,10 @@
                              :user-id          (:id login-info)
                              :user-data        {:session-start-timestamp current-zoned-timestamp}})
             (:domain auth-tkt-config)
-            ;; Timestamp for cookie expiration.
-            (let
-              ; Define the session duration here.
-              [session-duration-in-hours 8]                 ; Define the session duration here!
-              ;; If you want to use minutes or seconds instead of hours,
-              ;; change the line before and after this to match the unit in use.
-              (.plus current-zoned-timestamp (java-time.amount/hours session-duration-in-hours)))
+            ; Define the absolute session timeout in hours.
+            ; If you want to use minutes or seconds instead of hours,
+            ; change the line below to match the unit in use.
+            (.plus current-zoned-timestamp (java-time.amount/hours 8))
             false))
 
         (http/transit-response {:error :unconfirmed-email} 401)) ;; This could be 403 instead
