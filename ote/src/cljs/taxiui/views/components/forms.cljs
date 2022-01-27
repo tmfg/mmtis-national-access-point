@@ -35,12 +35,10 @@
                                           :background-color colors/basic-white})
                                   (theme/breather-padding)))
 
-(def ^:private input-wrapper {:padding-bottom "1.5em"})
-
 (defn- form-element
   "Creates an accessible form element container with fancy label and optional content."
   [el id label styles props inner-content post-content]
-  [:div (stylefy/use-style input-wrapper)
+  [:div
    [:h5
     (cond
       (nil? label) [:br]  ; this simulates empty header line, which aligns form elements when placed together
@@ -121,7 +119,6 @@
                  :display          "none"}
          :id results-id}
     (let [results (get-in app (conj storage-path :results))]
-      (js/console.log (str "search results >> " results))
       (doall
         (for [[index result] (map-indexed vector results)
               :when (some? results)]
@@ -158,7 +155,10 @@
                       false)))
       :on-blur  (fn [e]
                   (when-not (.contains (.. e -currentTarget -parentElement) (.. e -relatedTarget))
-                    (set! (.. (.getElementById js/document results-id) -style -display) "none")))
+                    (set! (.. (.getElementById js/document results-id) -style -display) "none"))
+                  (when (str/blank? (.. e -target -value))
+                    (e! (->UserSelectedResult selected-fn (conj storage-path :selected) nil))
+                    (selected-fn nil)))
       :on-input (fn [e]
                   (search e! search-fn result-fn storage-path (.. e -target -value)))}
      [autocomplete-results e! app selected-fn autocomplete-input-id result-container-id results-id storage-path]]))

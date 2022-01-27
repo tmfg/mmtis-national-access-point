@@ -15,6 +15,11 @@
             [ote.theme.colors :as colors]
             [reagent.core :as r]))
 
+(defn- input-spacer
+  "Purpose of this element is to push the inputs apart a bit to make the UI lighter."
+  []
+  [:div {:style {:padding-bottom "1.5em"}} " "])
+
 (defn- pricing-input
   [e! app tab-index id]
   [forms/input
@@ -34,7 +39,7 @@
           (when-let [existing-price (get-in app [:taxi-ui :pricing-details :price-information :prices id])]
             {:data-rawvalue existing-price
              :placeholder   (formatters/currency existing-price)}))
-   nil])
+   (input-spacer)])
 
 (defn- autocomplete-results
   [e! results]
