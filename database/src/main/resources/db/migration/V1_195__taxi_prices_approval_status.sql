@@ -5,6 +5,3 @@ ALTER TABLE taxi_service_prices
     ADD COLUMN "approved?"   TIMESTAMP,
     ADD COLUMN "approved-by" TEXT,
     ADD FOREIGN KEY ("approved-by") REFERENCES "user" (id);
-
--- doing this separately means existing rows won't be auto-approved
-ALTER TABLE taxi_service_prices ALTER "approved?" SET DEFAULT NOW();
