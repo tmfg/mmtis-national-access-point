@@ -54,7 +54,7 @@
       {:on-success (tuck/send-async! ->ApproveByIdsResponse)
        :on-failure (tuck/send-async! ->ServerError)})
     (-> app
-        (update-in [:admin :taxi-prices] dissoc :selected :results)
+        (update-in [:admin :taxi-prices] dissoc :results)
         (update-in [:admin :taxi-prices] assoc :loading? true)))
 
   ApproveByIdsResponse
