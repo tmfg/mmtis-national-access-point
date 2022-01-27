@@ -105,7 +105,6 @@
 
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
-  ; TODO auth checks
   (let [{:keys [column direction]} sorting
         secondary-columns          #{:name :operating-areas :example-trip}
         secondary-column           (get secondary-columns column)
@@ -134,8 +133,10 @@
 (defn fetch-unapproved-prices
   [db user]
   ; TODO: check admin privileges for user
-  (vec (->> (list-unapproved-prices db)
-            (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %)))))))
+  (if (authorization/admin? user)
+    (vec (->> (list-unapproved-prices db)
+              (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))
+    (log/warn (str "Non-admin user " (authorization/user-id user) " tried to list unapproved pricings"))))
 
 (defn mark-prices-approved
   [db user {pricing-ids :pricing-ids}]
