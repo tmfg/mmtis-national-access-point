@@ -130,6 +130,19 @@
     (vec (->> (list-service-summaries db {:operator-ids groups})
               (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))))
 
+(defn fetch-unapproved-prices
+  [db user]
+  ; TODO: check admin privileges for user
+  (vec (->> (list-unapproved-prices db)
+            (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %)))))))
+
+(defn mark-prices-approved
+  [db user {pricing-ids :pricing-ids}]
+  (if (authorization/admin? user)
+    (update-approved-status! db {:pricing-ids (filter some? pricing-ids)
+                                 :user-id     (authorization/user-id user)})
+    (log/warn (str "Non-admin user " (authorization/user-id user) " tried to approve pricings " pricing-ids))))
+
 (defrecord TaxiUIService []
   component/Lifecycle
   (start [{db :db http :http :as this}]
@@ -159,7 +172,17 @@
                     (POST "/taxiui/service-summaries" {user      :user
                                                        form-data :body}
                       (http/transit-response
-                        (fetch-service-summaries db user (http/transit-request form-data))))))))
+                        (fetch-service-summaries db user (http/transit-request form-data))))
+
+                    (GET "/taxiui/approvals" {user :user}
+                      (http/transit-response
+                        (fetch-unapproved-prices db user)))
+
+                    (POST "/taxiui/approvals" {user      :user
+                                               form-data :body}
+                      (http/transit-response
+                        (mark-prices-approved db user (http/transit-request form-data))))
+                    ))))
 
   (stop [{stop ::stop :as this}]
     (stop)

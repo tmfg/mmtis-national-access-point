@@ -11,11 +11,11 @@
   Assumes that first tab is selected by default."
 
   [tabs {:keys [update-fn selected-tab] :as actions}]
-  [:div.tab {:style {:padding-bottom "40px" :display "flex" :flex-flow "row nowrap"}}
+  [:div.tab {:style {:padding-bottom "40px" :display "flex" :flex-flow "row wrap"}}
     (doall
       (for [{:keys [label value]} tabs]
         ^{:key (str label)}
-        [:div {:style {:flex "1 0"}
+        [:div {:style {:margin-bottom "1px"}
                :on-click #(update-fn value)}
          [:div (if (or (= value selected-tab) (and (nil? selected-tab) (= value (:value (first tabs)))))
                   (stylefy/use-style style-tabs/tab-selected)

@@ -31,13 +31,13 @@ SELECT id,
 
 -- name: list-pricing-statistics
 SELECT *
-  FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction)
+  FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction, true)
  WHERE (CASE WHEN EXTRACT(YEAR FROM (:age-filter)::interval) > 0
              THEN timestamp < NOW() - INTERVAL '1 year'
              ELSE timestamp > NOW() - (:age-filter)::INTERVAL
         END)
    AND name ILIKE :name-filter
-   AND (CASE WHEN (:area-filter = '') IS NOT TRUE
+   AND (CASE WHEN (:area-filter)::text IS NOT NULL AND (:area-filter = '') IS NOT TRUE
              THEN EXISTS (SELECT FROM unnest("operating-areas") areas WHERE areas = :area-filter)
              ELSE TRUE
         END);
@@ -61,7 +61,17 @@ SELECT DISTINCT (oa_d.text) AS place
           st."operating-areas"
      FROM "transport-operator" o
 LEFT JOIN "transport-service" s ON s."transport-operator-id" = o.id
-LEFT JOIN list_taxi_statistics(null, null, null, null) st ON st."service-id" = s."id"
+LEFT JOIN list_taxi_statistics(null, null, null, null, false) st ON st."service-id" = s."id"
     WHERE o."id" IN (:operator-ids)
       AND s."sub-type" = 'taxi'
     ORDER BY "operator-id", "service-id";
+
+-- name: list-unapproved-prices
+SELECT *
+  FROM list_taxi_statistics(null, null, null, null, false)
+ ORDER BY "operator-id", "service-id";
+
+-- name: update-approved-status!
+UPDATE taxi_service_prices
+   SET "approved-by" = :user-id, "approved?" = NOW()
+ WHERE id IN (:pricing-ids)

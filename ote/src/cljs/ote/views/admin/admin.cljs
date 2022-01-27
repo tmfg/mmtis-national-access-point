@@ -22,6 +22,7 @@
             [ote.views.admin.service-list :as service-list]
             [ote.views.admin.validate-service :as validate-view]
             [ote.views.admin.sea-routes :as sea-routes]
+            [ote.views.admin.taxi-prices :as taxi-prices]
             [ote.views.admin.netex :as netex]
             [ote.views.admin.company-csv :as companycsv]))
 
@@ -323,10 +324,11 @@
               {:label "Rajapinnat" :value "interfaces"}
               {:label "CSV Raportit" :value "reports"}
               {:label "Merireitit" :value "sea-routes"}
-              {:label "Netex" :value "netex"}]
+              {:label "Netex" :value "netex"}
+              {:label "Taksien hintatiedot" :value "taxi-prices"}]
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
-     [:div {:style {:position "absolute" :top "90px" :right "20px"}}
+     [:div {:style {:position "absolute" :right "20px"}}
       [:a (merge {:href "/#/admin/detected-changes/detect-changes"
                   :style {:margin-right "2rem"}
                   :id "admin-transit-changes-settings-btn"
@@ -356,7 +358,9 @@
        (when (= "sea-routes" selected-tab)
          [sea-routes/sea-routes-page-controls e! app])
        (when (= "netex" selected-tab)
-         [netex/netex-page-controls e! app])]]
+         [netex/netex-page-controls e! app])
+       (when (= "taxi-prices" selected-tab)
+         [taxi-prices/page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
         "validation" [validate-view/validate-services e! app]
@@ -369,5 +373,6 @@
         "reports" [report-view/reports e! app]
         "sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex e! app]
+        "taxi-prices" [taxi-prices/taxi-prices e! app]
         ;;default
         [validate-view/validate-services e! app])]]))

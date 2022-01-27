@@ -13,7 +13,8 @@
             [ote.time :as time]
             [ote.app.routes :as routes]
             [ote.app.controller.common :refer [->ServerError]]
-            [ote.app.controller.admin-validation :as admin-validation]))
+            [ote.app.controller.admin-validation :as admin-validation]
+            [ote.app.controller.taxi-prices :as taxi-prices]))
 
 (defn- update-service-by-id [app id update-fn & args]
   (update-in app [:service-search :results]
@@ -543,7 +544,8 @@
     (assoc-in app [:admin :tab :admin-page] tab-value)))
 
 (defmethod routes/on-navigate-event :admin [{params :params}]
-  (admin-validation/->LoadValidationServices))
+  [(admin-validation/->LoadValidationServices)
+   (taxi-prices/->LoadTaxiPrices)])
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])
