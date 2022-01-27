@@ -21,7 +21,7 @@
 
 (defn breather-padding
   [styles]
-  (assoc styles :padding "0.2em 0em 0.2em 0.2em"))
+  (assoc styles :padding "0.2em 0.2em 0.2em 0.2em"))
 
 (def main-container
   "All pages should be wrapped by an element, ideally `[:main ...]` which uses this style."

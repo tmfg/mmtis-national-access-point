@@ -94,7 +94,8 @@
   (fn [e! app]
     [:main (stylefy/use-style theme/main-container)
      [link e! :taxi-ui/front-page nil {}
-      [:span [feather-icons/arrow-left] (tr [:taxi-ui :pricing-details :return-to-front-page])]]
+      [:span (stylefy/use-style styles/back-link-wrapper)
+       [feather-icons/arrow-left] (tr [:taxi-ui :pricing-details :return-to-front-page])]]
 
      [:h2 (tr [:taxi-ui :pricing-details :page-main-title])]
 

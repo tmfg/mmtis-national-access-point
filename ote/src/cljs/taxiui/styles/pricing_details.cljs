@@ -14,7 +14,7 @@
   [width]
   {:flex (str width)})
 
-(def spacer {:width "1em"})
+(def spacer {:width "1.5em"})
 
 (def area-pills {:display "flex"
                  :flex-wrap "wrap"})
@@ -40,3 +40,7 @@
                        :background-color colors/basic-white
                        ::stylefy/mode    {:hover {:color            colors/primary-text-color
                                                   :background-color colors/accessible-gray}}})
+
+(def back-link-wrapper (-> {:display "inline-flex"
+                            :align-items "center"}
+                           (theme/breather-margin)))

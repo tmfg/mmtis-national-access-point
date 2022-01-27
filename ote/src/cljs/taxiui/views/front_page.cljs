@@ -77,7 +77,7 @@
 
            (if (:example-trip service)
              [:div (stylefy/use-style styles/example-prices)
-              [:span (formatters/currency (:example-trip service))]
+              [:span (stylefy/use-style styles/example-trip-text) (formatters/currency (:example-trip service))]
               [:span (stylefy/use-style styles/flex-right-aligned)
                [:span (str (formatters/currency (:price-per-kilometer service)) (tr [:taxi-ui :front-page :sections :service-summary :per-kilometer]))]
                [:span (stylefy/use-style styles/currency-breather) (str (formatters/currency (:price-per-minute service)) (tr [:taxi-ui :front-page :sections :service-summary :per-minute]))]]]
