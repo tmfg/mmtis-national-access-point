@@ -50,16 +50,21 @@
                     breather-padding
                     breather-margin))
 
-(def example-price-title (-> {:grid-area "example-trip"}
+(def example-price-title (-> {:grid-area "example-trip"
+                              :font-size ".8em"}
                              breather-padding
                              breather-margin))
 
 (def example-prices (-> {:grid-area "prices"
-                         :display "flex"}
-                        breather-padding
-                        breather-margin))
+                         :display "flex"
+                         :align-items "flex-end"}
+                        breather-padding))
 
-(def flex-right-aligned {:margin-left "auto"})
+(def example-trip-text {:font-size "2em"
+                        :font-weight "700"})
+
+(def flex-right-aligned {:margin-left "auto"
+                         :padding-bottom ".4em"})
 
 (def price-box-title (-> {:grid-area "price-information"
                           :font-weight "600"}

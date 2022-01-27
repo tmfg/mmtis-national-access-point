@@ -19,25 +19,28 @@
                                     :border-color  colors/basic-gray
                                     :border-radius "0.3em"
                                     :height        "3rem"
-                                    :font-size     "1.5em"
+                                    :font-size     "1.3em"
+                                    :font-weight   "600"
                                     :width         "100%"
                                     :box-sizing    "border-box"
                                     ::stylefy/mode {:focus {:outline-width "0"}}})
 
 (def ^:private input-element (-> (deep-merge scaling-and-borders
-                                             {::stylefy/mode {"::placeholder" {:color   colors/accessible-black
-                                                                               :opacity 1}}})
-                                 (theme/breather-padding)))
+                                             {:padding-left "0.6em"
+                                              ::stylefy/mode {"::placeholder" {:color   colors/accessible-black
+                                                                               :opacity 1}}})))
 
 (def ^:private button-element (-> (merge scaling-and-borders
                                          {:border-color colors/basic-black
                                           :background-color colors/basic-white})
                                   (theme/breather-padding)))
 
+(def ^:private input-wrapper {:padding-bottom "1.5em"})
+
 (defn- form-element
   "Creates an accessible form element container with fancy label and optional content."
   [el id label styles props inner-content post-content]
-  [:div
+  [:div (stylefy/use-style input-wrapper)
    [:h5
     (cond
       (nil? label) [:br]  ; this simulates empty header line, which aligns form elements when placed together

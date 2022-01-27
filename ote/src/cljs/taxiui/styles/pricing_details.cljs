@@ -14,7 +14,7 @@
   [width]
   {:flex (str width)})
 
-(def spacer {:width "1em"})
+(def spacer {:width "1.5em"})
 
 (def area-pills {:display "flex"
                  :flex-wrap "wrap"})
