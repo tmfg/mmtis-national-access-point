@@ -138,7 +138,7 @@
      [forms/autocomplete-input
       e!
       app
-      :testing
+      :area-filter
       [:taxi-ui :stats :area-selector]
       [:taxi-ui :stats :sections :filters]
       (fn [term] {:method :post :url "/taxiui/operating-areas" :params {:filter term}})

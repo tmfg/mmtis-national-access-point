@@ -121,7 +121,6 @@
                  :display          "none"}
          :id results-id}
     (let [results (get-in app (conj storage-path :results))]
-      (js/console.log (str "search results >> " results))
       (doall
         (for [[index result] (map-indexed vector results)
               :when (some? results)]
@@ -158,7 +157,10 @@
                       false)))
       :on-blur  (fn [e]
                   (when-not (.contains (.. e -currentTarget -parentElement) (.. e -relatedTarget))
-                    (set! (.. (.getElementById js/document results-id) -style -display) "none")))
+                    (set! (.. (.getElementById js/document results-id) -style -display) "none"))
+                  (when (str/blank? (.. e -target -value))
+                    (e! (->UserSelectedResult selected-fn (conj storage-path :selected) nil))
+                    (selected-fn nil)))
       :on-input (fn [e]
                   (search e! search-fn result-fn storage-path (.. e -target -value)))}
      [autocomplete-results e! app selected-fn autocomplete-input-id result-container-id results-id storage-path]]))
