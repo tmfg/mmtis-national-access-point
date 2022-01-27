@@ -1740,4 +1740,51 @@ You can also draw the operating area or point to the map with drawing tools. You
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}
+
+ ;; Taxi UI translations
+ :taxi-ui {:cross-promo {:main-site-header           "Uusi hintojen syöttöpalvelu"
+                         :myservices-statistics-link "Taksipalveluiden hintatilastot"
+                         :service-editor {:title               "Hintatiedot"
+                                          :instructions        "Fare information for the taxis should be now reported through new simplified tool "
+                                          :link-to-taxiui-text "by following this link."}}
+           :front-page {:sections {:service-summary {:price-information-header  " fare information"
+                                                     :information-last-updated  "Fare information updated "
+                                                     :information-never-updated "Hintatietoja ei annettu"
+                                                     :example-trip              "Example trip (10 km + 15 min)"
+                                                     :per-kilometer             "/km"
+                                                     :per-minute                "/min"
+                                                     :prices-not-added-yet      "Fare information for the service is not available"}}}
+           :stats {:page-main-title "Kokonaiskatsaus"
+                   :columns         {:name                "Yritys"
+                                     :example-trip        "Example trip"
+                                     :start-price-daytime "Aloitus (arkipäivisin)"
+                                     :price-per-kilometer "Matka (per km)"
+                                     :price-per-minute    "Matka (per min)"
+                                     :operating-areas     "Toiminta-alueet (ensisijainen)"}
+                   :sections {:filters {:title               "Suodata hakua"
+                                        :within-six-months   "Kuuden kuukauden sisällä"
+                                        :within-one-year     "Vuoden sisällä"
+                                        :over-year-ago       "Yli vuosi sitten"
+                                        :prices-updated-last "Hintatiedot päivitetty"
+                                        :company-by-name     "Hae yritystä nimellä"
+                                        :add-operating-area  "Lisää toiminta-alue"}}}
+           :loader {:page-loading              "Ladataan..."
+                    :loading-price-information "Ladataan hintatietoja..."}
+           :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}
+                                      :start-price-nighttime         {:main-title "Aloitus"       :subtitle "(öisin)"}
+                                      :start-price-weekend           {:main-title "Aloitus"       :subtitle "(viikonloppuna)"}
+                                      :price-per-minute              {:main-title "Matka"         :subtitle "(hinta per minuutti)"}
+                                      :price-per-kilometer           {:main-title "Matka"         :subtitle "(hinta per kilometri)"}
+                                      :accessibility-tool-wheelchair {:main-title "Apuvälineet,"  :subtitle "pyörätuoli"}
+                                      :accessibility-tool-walker     {:main-title "Apuvälineet,"  :subtitle "rollaattori"}
+                                      :cargo-large-luggage           {:main-title "Tilaa vievät"  :subtitle "matkatavarat"}}
+                             :add-operating-area            "Lisää toiminta-alue"
+                             :page-main-title               "Yrityksesi hintatiedot"
+                             :return-to-front-page          " Back to own services"
+                             :sections {:prices             {:title "Hinnasto"}
+                                        :tools-and-services {:title "Apuvälineet ja palvelut"}
+                                        :operating-areas    {:title       "Toiminta-alueet"
+                                                             :add-button  "Lisää"
+                                                             :save-button "Tallenna"}}}}
  }
+

@@ -1766,7 +1766,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :stats {:page-main-title "Kokonaiskatsaus"
                    :columns         {:name                "Yritys"
                                      :example-trip        "Esimerkkimatka"
-                                     :start-price-daytime "Aloitus (06-18)"
+                                     :start-price-daytime "Aloitus (arkipäivisin)"
                                      :price-per-kilometer "Matka (per km)"
                                      :price-per-minute    "Matka (per min)"
                                      :operating-areas     "Toiminta-alueet (ensisijainen)"}

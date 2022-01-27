@@ -1743,4 +1743,50 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}
+
+ ;; Taxi UI translations
+ :taxi-ui {:cross-promo {:main-site-header           "Uusi hintojen syöttöpalvelu"
+                         :myservices-statistics-link "Taksipalveluiden hintatilastot"
+                         :service-editor {:title               "Hintatiedot"
+                                          :instructions        "Prisinformation för taxibilarna ska nu redovisas genom nytt förenklat verktyg "
+                                          :link-to-taxiui-text "tätä linkkiä."}}
+           :front-page {:sections {:service-summary {:price-information-header  "prisinformation"
+                                                     :information-last-updated  "Prisinformation uppdaterad "
+                                                     :information-never-updated "Hintatietoja ei annettu"
+                                                     :example-trip              "Exempelresan (10 km + 15 min)"
+                                                     :per-kilometer             "/km"
+                                                     :per-minute                "/min"
+                                                     :prices-not-added-yet      "Prisinformation för tjänsten är inte tillgänglig"}}}
+           :stats {:page-main-title "Kokonaiskatsaus"
+                   :columns         {:name                "Företag"
+                                     :example-trip        "Exempelresan"
+                                     :start-price-daytime "Börjän på vardagar"
+                                     :price-per-kilometer "Sträcke €/km"
+                                     :price-per-minute    "Tid €/min"
+                                     :operating-areas     "Verksamhetsområde"}
+                   :sections {:filters {:title               "Filtrera din sökning"
+                                        :within-six-months   "Inom 6 månader"
+                                        :within-one-year     "Inom ett år"
+                                        :over-year-ago       "Över att år sedan"
+                                        :prices-updated-last "Hintatiedot päivitetty"
+                                        :company-by-name     "Sök efter ett företag med namn"
+                                        :add-operating-area  "Lägga till verksamhetsområde"}}}
+           :loader {:page-loading              "Ladataan..."
+                    :loading-price-information "Ladataan hintatietoja..."}
+           :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}
+                                      :start-price-nighttime         {:main-title "Börjän"       :subtitle "(på natten)"}
+                                      :start-price-weekend           {:main-title "Börjän"       :subtitle "(på veckoslut)"}
+                                      :price-per-minute              {:main-title "Matka"         :subtitle "(hinta per minuutti)"}
+                                      :price-per-kilometer           {:main-title "Matka"         :subtitle "(hinta per kilometri)"}
+                                      :accessibility-tool-wheelchair {:main-title "Assistans,"  :subtitle "rullstol"}
+                                      :accessibility-tool-walker     {:main-title "Assistans,"  :subtitle "rollator"}
+                                      :cargo-large-luggage           {:main-title "Stort bagage"  :subtitle ""}}
+                             :add-operating-area            "Lisää toiminta-alue"
+                             :page-main-title               "Yrityksesi hintatiedot"
+                             :return-to-front-page          " Tillbaka egna tjänsteuppgidter"
+                             :sections {:prices             {:title "Hinnasto"}
+                                        :tools-and-services {:title "Apuvälineet ja palvelut"}
+                                        :operating-areas    {:title       "Toiminta-alueet"
+                                                             :add-button  "Lisää"
+                                                             :save-button "Tallenna"}}}}
  }
