@@ -28,13 +28,13 @@
 
 (defqueries "ote/services/login.sql")
 
-(defn ^:private unix-epoch []
+(def ^:private unix-epoch
   ;; Returns a zoned date-time that can later be
   ;; formatted as: "Thu, 1 Jan 1970 00:00:00 GMT"
   (java-time.zone/zoned-date-time 1970 "UTC"))
 
 (defn- with-auth-tkt [response auth-tkt-value domain expiry-timestamp is-deleted]
-  (let [timestamp-string (java-time.format/format :rfc-1123-date-time (if is-deleted (unix-epoch) expiry-timestamp))]
+  (let [timestamp-string (java-time.format/format :rfc-1123-date-time (if is-deleted unix-epoch expiry-timestamp))]
     (update response :headers
             assoc "Set-Cookie" (if (nil? domain)
                                  [(str "auth_tkt=" auth-tkt-value (if is-deleted "; token=" "") "; Path=/; HttpOnly; Expires=" timestamp-string)]
@@ -78,7 +78,7 @@
     (http/transit-response {:error :login-error} 400)))
 
 (defn- logout [auth-tkt-config]
-  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config) (unix-epoch) true))
+  (with-auth-tkt (http/transit-response :ok) "" (:domain auth-tkt-config) unix-epoch true))
 
 (defn- request-password-reset! [db {:keys [email]}]
   (tx/with-transaction db
