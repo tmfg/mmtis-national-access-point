@@ -40,3 +40,7 @@
                        :background-color colors/basic-white
                        ::stylefy/mode    {:hover {:color            colors/primary-text-color
                                                   :background-color colors/accessible-gray}}})
+
+(def back-link-wrapper (-> {:display "inline-flex"
+                            :align-items "center"}
+                           (theme/breather-margin)))
