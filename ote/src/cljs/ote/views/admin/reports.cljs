@@ -5,7 +5,7 @@
             [ote.ui.common :refer [linkify]]
             [ote.style.base :as style-base]))
 
-(defn reports [e!]
+(defn reports[e!]
   [:div
    [:h2 "Palveluntuottajaraportit"]
    [:div (stylefy/use-style (style-base/flex-container "column"))
