@@ -11,9 +11,9 @@
 (defrecord ApproveByIds [pricing-ids])
 (defrecord ApproveByIdsResponse [response])
 
-(def every-5min (* 1000 60 1))
+(def every-1min (* 1000 60 1))
 (def is-validation-running? (atom false))
-(defmethod tuck-effect/process-effect :adminTaxiPricesEvery5min [e! {:keys [on-success on-failure]}]
+(defmethod tuck-effect/process-effect :adminTaxiPricesEvery1min [e! {:keys [on-success on-failure]}]
   (when (= false @is-validation-running?)
     (reset! is-validation-running? true)
     (.setInterval js/window (fn [_]
@@ -21,7 +21,7 @@
                                 (comm/get! "taxiui/approvals"
                                            {:on-success on-success
                                             :on-failure on-failure})))
-                  every-5min)))
+                  every-1min)))
 
 (defn- load-prices-to-approve []
   (comm/get! "taxiui/approvals"
@@ -36,7 +36,7 @@
       ;; Load services immediately
       (load-prices-to-approve)
       ;; And start timer
-      (tuck/fx app {:tuck.effect/type :adminTaxiPricesEvery5min
+      (tuck/fx app {:tuck.effect/type :adminTaxiPricesEvery1min
                     :on-success (tuck/send-async! ->LoadTaxiPricesResponse)
                     :on-failure (tuck/send-async! ->ServerError)})))
 
