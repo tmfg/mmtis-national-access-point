@@ -50,21 +50,27 @@ SELECT DISTINCT (oa_d.text) AS place
  ORDER BY place;
 
 -- name: list-service-summaries
-   SELECT o."id" AS "operator-id",
-          s."id" AS "service-id",
-          o."name" AS "operator-name",
-          s."name" AS "service-name",
-          st.timestamp,
-          st."example-trip",
-          st."price-per-kilometer",
-          st."price-per-minute",
-          st."operating-areas"
-     FROM "transport-operator" o
-LEFT JOIN "transport-service" s ON s."transport-operator-id" = o.id
-LEFT JOIN list_taxi_statistics(null, null, null, null, false) st ON st."service-id" = s."id"
-    WHERE o."id" IN (:operator-ids)
-      AND s."sub-type" = 'taxi'
-    ORDER BY "operator-id", "service-id";
+SELECT o."id" AS "operator-id",
+       s."id" AS "service-id",
+       o."name" AS "operator-name",
+       s."name" AS "service-name",
+       st.timestamp,
+       (st.start_price_daytime + (st.price_per_minute * 15) + (st.price_per_kilometer * 10)) AS "example-trip",
+       st."price_per_kilometer" AS "price-per-kilometer",
+       st."price_per_minute" AS "price-per-minute",
+       (SELECT array_agg(oa_d.text)
+          FROM operation_area oa,
+               unnest(description) AS oa_d
+         WHERE oa."transport-service-id" = st."service_id"
+           AND "primary?" = TRUE) AS "operating-areas"
+  FROM "transport-operator" o
+           LEFT JOIN "transport-service" s ON s."transport-operator-id" = o.id
+           LEFT JOIN (SELECT DISTINCT ON (service_id) *
+                        FROM taxi_service_prices
+                       ORDER BY service_id) st ON st."service_id" = s."id"
+ WHERE o."id" IN (:operator-ids)
+   AND s."sub-type" = 'taxi'
+ ORDER BY "operator-id", "service-id";
 
 -- name: list-unapproved-prices
 SELECT *
