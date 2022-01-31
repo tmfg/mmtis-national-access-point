@@ -32,7 +32,7 @@ ALTER TABLE "netex-conversion"
 
 ALTER TABLE "netex-conversion"
     DROP CONSTRAINT IF EXISTS "validation-file-error-max-length",
-    ADD CONSTRAINT "validation-file-error-max-length" CHECK (CHAR_LENGTH("validation-file-error") <= 50000);
+    ADD CONSTRAINT "validation-file-error-max-length" CHECK (CHAR_LENGTH("validation-file-error") <= 100000);
 
 ALTER TABLE "gtfs-agency"
     DROP CONSTRAINT IF EXISTS "agency-id-max-length",
