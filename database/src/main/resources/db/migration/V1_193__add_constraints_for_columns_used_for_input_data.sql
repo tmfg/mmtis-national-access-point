@@ -194,10 +194,6 @@ ALTER TABLE "gtfs-transit-changes"
     DROP CONSTRAINT IF EXISTS "route-changes-old-max-length",
     ADD CONSTRAINT "route-changes-old-max-length" CHECK (ARRAY_LENGTH("route-changes-old", 1) <= 5000);
 
-ALTER TABLE "gtfs-transit-changes"
-    DROP CONSTRAINT IF EXISTS "package-ids-max-length",
-    ADD CONSTRAINT "package-ids-max-length" CHECK (ARRAY_LENGTH("package-ids", 1) <= 100);
-
 ALTER TABLE "gtfs-trip"
     DROP CONSTRAINT IF EXISTS "trips-max-length",
     ADD CONSTRAINT "trips-max-length" CHECK (ARRAY_LENGTH("trips", 1) <= 1000);
