@@ -195,12 +195,11 @@
                                                                    {:key :own-services
                                                                     :label (tr [:document-title :own-services])
                                                                     :href "#/own-services"}
-                                                                   (when (user-operates-service-type? app :taxi)
-                                                                     {:key :taxiui_statistics
-                                                                      :label (tr [:taxi-ui :cross-promo :myservices-statistics-link])
-                                                                      :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
-                                                                      :force-external-icon? true
-                                                                      :target "_blank"})
+                                                                   {:key :taxiui_statistics
+                                                                    :label (tr [:taxi-ui :cross-promo :myservices-statistics-link])
+                                                                    :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
+                                                                    :force-external-icon? true
+                                                                    :target "_blank"}
                                                                    {:key :routes
                                                                     :label (tr [:common-texts :navigation-route])
                                                                     :href "#/routes"}
