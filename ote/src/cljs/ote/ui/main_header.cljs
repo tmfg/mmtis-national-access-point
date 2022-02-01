@@ -209,9 +209,10 @@
                                                                    {:key :authority-pre-notices
                                                                     :label (tr [:common-texts :navigation-authority-pre-notices])
                                                                     :href "#/authority-pre-notices"}
-                                                                   {:key :admin
-                                                                    :label (tr [:document-title :admin])
-                                                                    :href "#/admin"}
+                                                                   (when (some-> app :user :admin?)
+                                                                     {:key :admin
+                                                                      :label (tr [:document-title :admin])
+                                                                      :href "#/admin"})
                                                                    {:key :monitor
                                                                     :label (tr [:document-title :monitor])
                                                                     :href "#/monitor"}]
