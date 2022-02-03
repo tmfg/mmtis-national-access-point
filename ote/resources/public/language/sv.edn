@@ -1743,4 +1743,50 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}
+
+ ;; Taxi UI translations
+ :taxi-ui {:cross-promo {:main-site-header           "Ny tjänst för prisinmatning"
+                         :myservices-statistics-link "Taxiprisstatistik"
+                         :service-editor {:title               "Prisstatistik"
+                                          :instructions        "Prisinformation för taxibilarna ska nu redovisas genom nytt förenklat verktyg "
+                                          :link-to-taxiui-text "genom denna länk."}}
+           :front-page {:sections {:service-summary {:price-information-header  "prisinformation"
+                                                     :information-last-updated  "Prisinformation uppdaterad "
+                                                     :information-never-updated "Ingen prisinformation har lagts ännu"
+                                                     :example-trip              "Exempelresan (10 km + 15 min)"
+                                                     :per-kilometer             "/km"
+                                                     :per-minute                "/min"
+                                                     :prices-not-added-yet      "Prisinformation för tjänsten är inte tillgänglig"}}}
+           :stats {:page-main-title "Alla tjänster"
+                   :columns         {:name                "Företag"
+                                     :example-trip        "Exempel resan"
+                                     :start-price-daytime "Börjän på vardagar"
+                                     :price-per-kilometer "Sträcke €/km"
+                                     :price-per-minute    "Tid €/min"
+                                     :operating-areas     "Verksamhetsområde"}
+                   :sections {:filters {:title               "Filtrera din sökning"
+                                        :within-six-months   "Inom 6 månader"
+                                        :within-one-year     "Inom ett år"
+                                        :over-year-ago       "Över att år sedan"
+                                        :prices-updated-last "Prisinofrmation uppdaterad"
+                                        :company-by-name     "Sök efter ett företag med namn"
+                                        :add-operating-area  "Lägga till verksamhetsområde"}}}
+           :loader {:page-loading              "Laddar"
+                    :loading-price-information "Laddar prisinformation"}
+           :pricing-details {:inputs {:start-price-daytime           {:main-title "Början"       :subtitle "(på vardagar)"}
+                                      :start-price-nighttime         {:main-title "Börjän"       :subtitle "(på natten)"}
+                                      :start-price-weekend           {:main-title "Börjän"       :subtitle "(på veckoslut)"}
+                                      :price-per-minute              {:main-title "Pris"         :subtitle "(€/min)"}
+                                      :price-per-kilometer           {:main-title "Pris"         :subtitle "(€/km)"}
+                                      :accessibility-tool-wheelchair {:main-title "Assistans,"  :subtitle "rullstol"}
+                                      :accessibility-tool-walker     {:main-title "Assistans,"  :subtitle "rollator"}
+                                      :cargo-large-luggage           {:main-title "Stort bagage"  :subtitle ""}}
+                             :add-operating-area            "lägga till verksamhetsområde"
+                             :page-main-title               "Prisinformation för ditt företag"
+                             :return-to-front-page          " Tillbaka egna tjänsteuppgidter"
+                             :sections {:prices             {:title "Prislista"}
+                                        :tools-and-services {:title "Hjälpmedel och tjänster"}
+                                        :operating-areas    {:title       "Verksamhetsområde"
+                                                             :add-button  "Lägg till"
+                                                             :save-button "Spara"}}}}
  }

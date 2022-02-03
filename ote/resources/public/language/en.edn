@@ -1740,4 +1740,51 @@ You can also draw the operating area or point to the map with drawing tools. You
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}
+
+ ;; Taxi UI translations
+ :taxi-ui {:cross-promo {:main-site-header           "New service for price input"
+                         :myservices-statistics-link "Taxi price statistics"
+                         :service-editor {:title               "Fare information"
+                                          :instructions        "Fare information for the taxis should be now reported through new simplified tool "
+                                          :link-to-taxiui-text "by following this link."}}
+           :front-page {:sections {:service-summary {:price-information-header  " fare information"
+                                                     :information-last-updated  "Fare information updated "
+                                                     :information-never-updated "No valid fare information"
+                                                     :example-trip              "Example trip (10 km + 15 min)"
+                                                     :per-kilometer             "/km"
+                                                     :per-minute                "/min"
+                                                     :prices-not-added-yet      "Fare information for the service is not available"}}}
+           :stats {:page-main-title "All Services"
+                   :columns         {:name                "Company"
+                                     :example-trip        "Example trip"
+                                     :start-price-daytime "Start fare (Weekdays)"
+                                     :price-per-kilometer "Travel fare (per km)"
+                                     :price-per-minute    "Travel fare (per min)"
+                                     :operating-areas     "Operating areas (priority)"}
+                   :sections {:filters {:title               "Filter search"
+                                        :within-six-months   "Within six months"
+                                        :within-one-year     "Within one year"
+                                        :over-year-ago       "Over year ago"
+                                        :prices-updated-last "Prices last updated"
+                                        :company-by-name     "Search company by name"
+                                        :add-operating-area  "Add operating area"}}}
+           :loader {:page-loading              "Loading"
+                    :loading-price-information "Loading fare information"}
+           :pricing-details {:inputs {:start-price-daytime           {:main-title "Start"           :subtitle "(Weekdays)"}
+                                      :start-price-nighttime         {:main-title "Start"           :subtitle "(At night)"}
+                                      :start-price-weekend           {:main-title "Start"           :subtitle "(At weekend)"}
+                                      :price-per-minute              {:main-title "Travel"          :subtitle "(fare per minuutti)"}
+                                      :price-per-kilometer           {:main-title "Travel"          :subtitle "(fare per kilometri)"}
+                                      :accessibility-tool-wheelchair {:main-title "Accessibility,"  :subtitle "wheelchair"}
+                                      :accessibility-tool-walker     {:main-title "Accessibility,"  :subtitle "walker"}
+                                      :cargo-large-luggage           {:main-title "Service"         :subtitle "large luggage"}}
+                             :add-operating-area            "Add operating area for the company"
+                             :page-main-title               "Company fare information"
+                             :return-to-front-page          " Back to All Services"
+                             :sections {:prices             {:title "Fares"}
+                                        :tools-and-services {:title "Accessibility and services"}
+                                        :operating-areas    {:title       "Operating areas"
+                                                             :add-button  "Add"
+                                                             :save-button "Save"}}}}
  }
+
