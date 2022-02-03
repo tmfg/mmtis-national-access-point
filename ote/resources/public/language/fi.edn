@@ -1779,14 +1779,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                         :add-operating-area  "Lisää toiminta-alue"}}}
            :loader {:page-loading              "Ladataan..."
                     :loading-price-information "Ladataan hintatietoja..."}
-           :pricing-details {:inputs {:start-price-daytime           {:main-title "Aloitus"       :subtitle "(arkipäivisin)"}
-                                      :start-price-nighttime         {:main-title "Aloitus"       :subtitle "(öisin)"}
-                                      :start-price-weekend           {:main-title "Aloitus"       :subtitle "(viikonloppuna)"}
-                                      :price-per-minute              {:main-title "Matka"         :subtitle "(hinta per minuutti)"}
-                                      :price-per-kilometer           {:main-title "Matka"         :subtitle "(hinta per kilometri)"}
-                                      :accessibility-tool-wheelchair {:main-title "Apuvälineet,"  :subtitle "pyörätuoli"}
-                                      :accessibility-tool-walker     {:main-title "Apuvälineet,"  :subtitle "rollaattori"}
-                                      :cargo-large-luggage           {:main-title "Tilaa vievät"  :subtitle "matkatavarat"}}
+           :pricing-details {:inputs {:start-price-daytime              {:main-title "Aloitus"      :subtitle "(arkipäivisin)"}
+                                      :start-price-nighttime            {:main-title "Aloitus"      :subtitle "(öisin)"}
+                                      :start-price-weekend              {:main-title "Aloitus"      :subtitle "(viikonloppuna)"}
+                                      :price-per-minute                 {:main-title "Matka"        :subtitle "(hinta per minuutti)"}
+                                      :price-per-kilometer              {:main-title "Matka"        :subtitle "(hinta per kilometri)"}
+                                      :accessibility-service-stairs     {:main-title "Avustaminen," :subtitle "Porrasveto"}
+                                      :accessibility-service-stretchers {:main-title "Apuvälineet," :subtitle "Paariasennus"}
+                                      :accessibility-service-fare       {:main-title "Avustaminen," :subtitle "Kertalisä"}}
                              :add-operating-area            "Lisää toiminta-alue"
                              :page-main-title               "Yrityksesi hintatiedot"
                              :return-to-front-page          " Palaa omiin palvelutietoihin"

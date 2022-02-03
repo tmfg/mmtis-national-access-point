@@ -91,9 +91,9 @@ BEGIN
                l.start_price_weekend AS "start-price-weekend",
                l.price_per_minute AS "price-per-minute",
                l.price_per_kilometer AS "price-per-kilometer",
-               l."accessibility_tool_wheelchair" AS "wheelchair",
-               l."accessibility_tool_walker" AS "walker",
-               l."cargo_large_luggage" AS "large-luggage",
+               l."accessibility_service_stairs" AS "accessibility-service-stairs",
+               l."accessibility_service_stretchers" AS "accessibility-service-stretchers",
+               l."accessibility_service_fare" AS "accessibility-service-fare",
                l."approved?" AS "approved?",
                l."approved-by" AS "approved-by",
                (SELECT array_agg(oa_d.text)

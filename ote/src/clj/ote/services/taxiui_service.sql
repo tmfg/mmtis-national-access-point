@@ -1,16 +1,16 @@
 -- name: insert-price-information!
 INSERT INTO taxi_service_prices(service_id, start_price_daytime, start_price_nighttime, start_price_weekend,
-                                price_per_minute, price_per_kilometer, accessibility_tool_wheelchair,
-                                accessibility_tool_walker, cargo_large_luggage, timestamp)
+                                price_per_minute, price_per_kilometer, accessibility_service_stairs,
+                                accessibility_service_stretchers, accessibility_service_fare, timestamp)
 VALUES (:service-id,
         :start-price-daytime,
         :start-price-nighttime,
         :start-price-weekend,
         :price-per-minute,
         :price-per-kilometer,
-        :accessibility-tool-wheelchair,
-        :accessibility-tool-walker,
-        :cargo-large-luggage,
+        :accessibility-service-stairs,
+        :accessibility-service-stretchers,
+        :accessibility-service-fare,
         NOW());
 
 -- name: select-price-information
@@ -21,9 +21,9 @@ SELECT id,
        start_price_weekend,
        price_per_minute,
        price_per_kilometer,
-       accessibility_tool_wheelchair,
-       accessibility_tool_walker,
-       cargo_large_luggage
+       accessibility_service_stairs,
+       accessibility_service_stretchers,
+       accessibility_service_fare
   FROM taxi_service_prices
  WHERE service_id = :service-id
  ORDER BY timestamp DESC

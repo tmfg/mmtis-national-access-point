@@ -120,11 +120,11 @@
 
      [:section (stylefy/use-style styles/flex-columns)
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! app 5 :accessibility-tool-wheelchair]
-       [pricing-input e! app 7 :cargo-large-luggage]]
+       [pricing-input e! app 5 :accessibility-service-stairs]
+       [pricing-input e! app 7 :accessibility-service-fare]]
       [:div (stylefy/use-style styles/spacer)]
       [:div (stylefy/use-style (styles/flex-column 1))
-       [pricing-input e! app 6 :accessibility-tool-walker]]]
+       [pricing-input e! app 6 :accessibility-service-stretchers]]]
 
      [:h3 (tr [:taxi-ui :pricing-details :sections :operating-areas :title])]
      ; pills here

@@ -1770,14 +1770,14 @@ You can also draw the operating area or point to the map with drawing tools. You
                                         :add-operating-area  "Add operating area"}}}
            :loader {:page-loading              "Loading"
                     :loading-price-information "Loading fare information"}
-           :pricing-details {:inputs {:start-price-daytime           {:main-title "Start"           :subtitle "(Weekdays)"}
-                                      :start-price-nighttime         {:main-title "Start"           :subtitle "(At night)"}
-                                      :start-price-weekend           {:main-title "Start"           :subtitle "(At weekend)"}
-                                      :price-per-minute              {:main-title "Travel"          :subtitle "(fare per minuutti)"}
-                                      :price-per-kilometer           {:main-title "Travel"          :subtitle "(fare per kilometri)"}
-                                      :accessibility-tool-wheelchair {:main-title "Accessibility,"  :subtitle "wheelchair"}
-                                      :accessibility-tool-walker     {:main-title "Accessibility,"  :subtitle "walker"}
-                                      :cargo-large-luggage           {:main-title "Service"         :subtitle "large luggage"}}
+           :pricing-details {:inputs {:start-price-daytime              {:main-title "Start"          :subtitle "(Weekdays)"}
+                                      :start-price-nighttime            {:main-title "Start"          :subtitle "(At night)"}
+                                      :start-price-weekend              {:main-title "Start"          :subtitle "(At weekend)"}
+                                      :price-per-minute                 {:main-title "Travel"         :subtitle "(€/min)"}
+                                      :price-per-kilometer              {:main-title "Travel"         :subtitle "(€/km)"}
+                                      :accessibility-service-stairs     {:main-title "Assistance,"    :subtitle "Wheelchair assistance"}
+                                      :accessibility-service-stretchers {:main-title "Accessibility," :subtitle "Stretcher assistance"}
+                                      :accessibility-service-fare       {:main-title "Assistance,"    :subtitle "Fare"}}
                              :add-operating-area            "Add operating area for the company"
                              :page-main-title               "Company fare information"
                              :return-to-front-page          " Back to All Services"

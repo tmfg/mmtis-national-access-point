@@ -1773,14 +1773,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                         :add-operating-area  "Lägga till verksamhetsområde"}}}
            :loader {:page-loading              "Laddar"
                     :loading-price-information "Laddar prisinformation"}
-           :pricing-details {:inputs {:start-price-daytime           {:main-title "Början"       :subtitle "(på vardagar)"}
-                                      :start-price-nighttime         {:main-title "Börjän"       :subtitle "(på natten)"}
-                                      :start-price-weekend           {:main-title "Börjän"       :subtitle "(på veckoslut)"}
-                                      :price-per-minute              {:main-title "Pris"         :subtitle "(€/min)"}
-                                      :price-per-kilometer           {:main-title "Pris"         :subtitle "(€/km)"}
-                                      :accessibility-tool-wheelchair {:main-title "Assistans,"  :subtitle "rullstol"}
-                                      :accessibility-tool-walker     {:main-title "Assistans,"  :subtitle "rollator"}
-                                      :cargo-large-luggage           {:main-title "Stort bagage"  :subtitle ""}}
+           :pricing-details {:inputs {:start-price-daytime              {:main-title "Början"          :subtitle "(på vardagar)"}
+                                      :start-price-nighttime            {:main-title "Börjän"          :subtitle "(på natten)"}
+                                      :start-price-weekend              {:main-title "Börjän"          :subtitle "(på veckoslut)"}
+                                      :price-per-minute                 {:main-title "Pris"            :subtitle "(€/min)"}
+                                      :price-per-kilometer              {:main-title "Pris"            :subtitle "(€/km)"}
+                                      :accessibility-service-stairs     {:main-title "Assistans,"      :subtitle "Trappassistans"}
+                                      :accessibility-service-stretchers {:main-title "Tillgänglighet," :subtitle "Installation av bår"}
+                                      :accessibility-service-fare       {:main-title "Assistans,"      :subtitle "Taxa"}}
                              :add-operating-area            "lägga till verksamhetsområde"
                              :page-main-title               "Prisinformation för ditt företag"
                              :return-to-front-page          " Tillbaka egna tjänsteuppgidter"
