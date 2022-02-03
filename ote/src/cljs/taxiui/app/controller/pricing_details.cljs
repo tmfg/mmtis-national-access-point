@@ -40,9 +40,9 @@
                          :start-price-weekend
                          :price-per-minute
                          :price-per-kilometer
-                         :accessibility-tool-wheelchair
-                         :accessibility-tool-walker
-                         :cargo-large-luggage])))
+                         :accessibility-service-stairs
+                         :accessibility-service-stretchers
+                         :accessibility-service-fare])))
 
 (defn- store-operating-areas
   [app operating-areas]
