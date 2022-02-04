@@ -21,7 +21,7 @@ job('OTE build from master') {
 
     steps {
 
-        shell('cp "${changelog_html}" ote/resources/public/')
+        shell('mkdir -p  ote/resources/public/ && cp "${changelog_html}" ote/resources/public/')
 
         shell('sh database/testdb.sh')
 
