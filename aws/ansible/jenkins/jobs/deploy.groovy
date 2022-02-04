@@ -5,7 +5,7 @@ job('Deploy OTE') {
         choiceParam('ENV', ['staging','production']);
     }
     scm {
-        git('https://github.com/finnishtransportagency/mmtis-national-access-point.git','*/master')
+        git('https://github.com/tmfg/mmtis-national-access-point.git','*/master')
     }
 
     environmentVariables {
