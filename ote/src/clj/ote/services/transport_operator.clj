@@ -317,6 +317,16 @@
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
 (defn manage-adding-users-to-operator [email db requester operator form-data]
+  ; -- 1) tehdään uusi group 'Traficom Viranomaisryhmä'
+  ; -- 2) tarvitaan uusi group_extra käyttäjähallinnalle, joka annetaan uudelle ryhmälle. avaimelle nimi vaikka `authority-group-admin?`
+  ; -- 3) kerätään member-tauluun jäseniä ja heitetään huulta
+  ;
+  ; -- member.table_id == user.id
+  ; TODO: change `transit-authority-group-id` to use the new key instead of `transit-authority?` here
+  ; TODO: need separate admin panel for managing the group; we do NOT want to make Traficom operator
+  ; TODO: add all existing @traficom.fi people to the new group
+  ; TODO: hide link/UI for adding new people from all non-traficom people
+  ; TODO: add `authority-group-admin?` to app-db [:user :authority-group-admin?]
   (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
         new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id (::t-operator/group-id operator)
@@ -325,8 +335,8 @@
                        (specql/fetch db ::user/user-token
                                      #{::user/user-email}
                                      {::user/ckan-group-id ckan-group-id
-                                      ::user/user-email (:email form-data)
-                                      ::user/expiration (op/>= (tc/to-sql-date (t/now)))}))
+                                      ::user/user-email    (:email form-data)
+                                      ::user/expiration    (op/>= (tc/to-sql-date (t/now)))}))
         new-member-is-operator-member (some #(= (:user_id new-member) (:id %)) operator-users)
 
         ;; If member exists, add it to the organization if not, invite
