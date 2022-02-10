@@ -23,9 +23,9 @@
 
  :email {:server
          {;; Hostname of the STMP server. Optional if running locally.
-          :host nil
+          :host "localhost"
           ;; Port of the SMTP server. Numerous contextual defaults exists. E.g. when using :ssl or :tsl settings.
-          :port nil
+          :port 1025  ; this value is for local fakesmtpserver
           ;; Port is set to 465 is ssl is true
           :ssl false
           ;; Port is set to 25 if tsl is true

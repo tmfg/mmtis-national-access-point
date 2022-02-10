@@ -22,4 +22,12 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-
+  fake-smtp-server:
+    restart: always
+    container_name: napotefakesmtp
+    image: reachfive/fake-smtp-server:latest
+    networks:
+      - napote
+    ports:
+      - "127.0.0.1:1025:1025"  # SMTP listen port
+      - "127.0.0.1:1080:1080"  # HTTP server port for API (http://localhost:1080/api/emails)
