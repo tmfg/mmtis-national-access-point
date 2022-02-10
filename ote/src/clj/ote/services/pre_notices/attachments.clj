@@ -144,7 +144,8 @@
 (defn- attachment-info [db user pre-notice-attachment-id]
   (let [can-view-all-attachments?
         (or (authorization/admin? user)
-            (users/is-transit-authority-user? db {:user-id (authorization/user-id user)}))]
+            (users/has-group-attribute? db {:user-id (authorization/user-id user)
+                                            :group-attribute "transit-authority?"}))]
     (first
       (specql/fetch db ::transit/pre-notice-attachment
                     #{::transit/id ::transit/attachment-file-name}

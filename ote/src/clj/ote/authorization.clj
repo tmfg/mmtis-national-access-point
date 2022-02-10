@@ -73,7 +73,8 @@
 
 (defn with-transit-authority-check
   [db user body-fn]
-  (if-not (users/is-transit-authority-user? db {:user-id (user-id user)})
+  (if-not (users/has-group-attribute? db {:user-id         (user-id user)
+                                          :group-attribute "transit-authority?"})
     (do
       (log/warn "User" user "tried to access backend that is restricted to transport authority users.")
       {:status 403 :body "Forbidden"})

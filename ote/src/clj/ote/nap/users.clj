@@ -22,9 +22,12 @@
     (when user
       (-> user
           (assoc-in [:user :transit-authority?]
-                    (is-transit-authority-user? db {:user-id (get-in user [:user :id])}))
+                    (has-group-attribute? db {:user-id         (get-in user [:user :id])
+                                              :group-attribute "transit-authority?"}))
+          (assoc-in [:user :authority-group-admin?]
+                    (has-group-attribute? db {:user-id         (get-in user [:user :id])
+                                              :group-attribute "authority-group-admin?"}))
           (assoc :groups (map :group rows))))))
-
 
 (defn wrap-user-info
   "Ring middleware to fetch user info based on :user-id."

@@ -88,12 +88,12 @@ SELECT u.id as id,
                                      WHERE ge.key = 'transit-authority?'
                                        AND ge.value = 'true'));
 
--- name: is-transit-authority-user?
+-- name: has-group-attribute?
 -- single?: true
--- Given a user id, check if the user belongs to a transit authority group
+-- Given a user id and group attribute check if the user has the trait through any group membership.
 SELECT EXISTS(SELECT ge.id
                 FROM group_extra ge
-               WHERE ge.key='transit-authority?' AND
+               WHERE ge.key=:group-attribute AND
                      ge.value='true' AND
                      ge.group_id IN (SELECT m.group_id
                                        FROM "member" m

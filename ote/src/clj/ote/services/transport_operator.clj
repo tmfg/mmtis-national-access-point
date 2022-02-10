@@ -326,7 +326,6 @@
   ; TODO: need separate admin panel for managing the group; we do NOT want to make Traficom operator
   ; TODO: add all existing @traficom.fi people to the new group
   ; TODO: hide link/UI for adding new people from all non-traficom people
-  ; TODO: add `authority-group-admin?` to app-db [:user :authority-group-admin?]
   (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
         new-member (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id (::t-operator/group-id operator)
