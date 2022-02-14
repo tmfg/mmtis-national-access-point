@@ -323,7 +323,6 @@
   ;
   ; -- member.table_id == user.id
   ; TODO: change `transit-authority-group-id` to use the new key instead of `transit-authority?` here
-  ; TODO: need separate admin panel for managing the group; we do NOT want to make Traficom operator
   ; TODO: add all existing @traficom.fi people to the new group
   ; TODO: hide link/UI for adding new people from all non-traficom people
   (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))

@@ -14,6 +14,7 @@
             [ote.app.routes :as routes]
             [ote.app.controller.common :refer [->ServerError]]
             [ote.app.controller.admin-validation :as admin-validation]
+            [ote.app.controller.authority-group-admin :as authority-group-admin]
             [ote.app.controller.taxi-prices :as taxi-prices]))
 
 (defn- update-service-by-id [app id update-fn & args]
@@ -545,7 +546,10 @@
 
 (defmethod routes/on-navigate-event :admin [{params :params}]
   [(admin-validation/->LoadValidationServices)
-   (taxi-prices/->LoadTaxiPrices)])
+   (taxi-prices/->LoadTaxiPrices)
+   ; TODO: When user == authority group admin...
+   (authority-group-admin/->LoadAuthorityGroupDetails)
+   ])
 
 (defn format-interface-content-values [value-array]
   (let [data-content-value #(tr [:enums ::t-service/interface-data-content %])

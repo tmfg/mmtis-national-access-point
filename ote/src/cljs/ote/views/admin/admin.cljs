@@ -16,6 +16,7 @@
             [ote.ui.form-fields :as form-fields]
             [ote.app.controller.admin :as admin-controller]
             [ote.app.controller.front-page :as fp]
+            [ote.views.admin.authority-group-admin :as authority-group-admin]
             [ote.views.admin.interfaces :as interfaces]
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
@@ -325,7 +326,8 @@
               {:label "CSV Raportit" :value "reports"}
               {:label "Merireitit" :value "sea-routes"}
               {:label "Netex" :value "netex"}
-              {:label "Taksien hintatiedot" :value "taxi-prices"}]
+              {:label "Taksien hintatiedot" :value "taxi-prices"}
+              {:label "Viranomaisryhmän hallinta" :value "authority-group-admin"}]
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
      [:div {:style {:position "absolute" :right "20px"}}
@@ -360,7 +362,10 @@
        (when (= "netex" selected-tab)
          [netex/netex-page-controls e! app])
        (when (= "taxi-prices" selected-tab)
-         [taxi-prices/page-controls e! app])]]
+         [taxi-prices/page-controls e! app])
+       (when (and (= "authority-group-admin" selected-tab)
+                  (= true (get-in app [:user :authority-group-admin?])))
+         [authority-group-admin/page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
         "validation" [validate-view/validate-services e! app]
@@ -374,5 +379,6 @@
         "sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex e! app]
         "taxi-prices" [taxi-prices/taxi-prices e! app]
+        "authority-group-admin" [authority-group-admin/authority-group-admin e! app]
         ;;default
         [validate-view/validate-services e! app])]]))
