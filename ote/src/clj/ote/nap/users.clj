@@ -41,3 +41,7 @@
         (do (log/info "No user info, return 401")
             {:status 401
              :body "Unknown user"})))))
+
+(defn fetch-authority-group-admin-id
+  [db]
+  (authority-group-admin-id db))

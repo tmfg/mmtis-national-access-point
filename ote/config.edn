@@ -72,7 +72,4 @@
  :netex {:chouette-path "/opt/chouette/"
          :conversion-work-path "/tmp/ote/netex-conversion/"
          :bucket "napote-netex-localdev"}
-
- ; Authority administration group id, hardcoded to guard against abuse
- :authority-group-id "79046442-ad25-4865-a174-ec199a4b39c4"
  }

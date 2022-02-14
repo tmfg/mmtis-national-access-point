@@ -52,7 +52,7 @@
              (let [user (users/find-user db (:id login-info))]
                (merge (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user))
                       ; TODO: Add only if permissions
-                      {:authority-group-id authority-group-id}))}
+                      {:authority-group-id (users/fetch-authority-group-admin-id db)}))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
