@@ -14,7 +14,8 @@
   (system-fixture
    :login (component/using
            (sut/->LoginService {:shared-secret "test"
-                                :digest-algorithm "MD5"})
+                                :digest-algorithm "MD5"}
+                               "FAKEIDFAKEIDFAKEID")
            [:http :db :email])))
 
 (defspec base64<->hex

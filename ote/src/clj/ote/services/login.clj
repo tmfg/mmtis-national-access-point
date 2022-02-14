@@ -38,7 +38,7 @@
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
                                      "; Domain=." domain "; Secure")])))
 
-(defn login [db auth-tkt-config
+(defn login [db auth-tkt-config authority-group-id
              {:keys [email password] :as credentials}]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
@@ -50,7 +50,9 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+               (merge (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user))
+                      ; TODO: Add only if permissions
+                      {:authority-group-id authority-group-id}))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
@@ -132,12 +134,12 @@
             {:success? false :error :password-reset-request-not-found}))))))
 
 (define-service-component LoginService
-  {:fields [auth-tkt-config]
+  {:fields [auth-tkt-config authority-group-id]
    :dependencies {email :email}}
 
   ^:unauthenticated
   (-> (POST "/login" {form-data :body}
-        (#'login db auth-tkt-config
+        (#'login db auth-tkt-config authority-group-id
           (http/transit-request form-data)))
       (wrap-routes throttler/throttle))
 

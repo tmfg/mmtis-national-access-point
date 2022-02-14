@@ -100,7 +100,7 @@
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
 
    :login (component/using
-           (login-service/->LoginService (get-in config [:http :auth-tkt]))
+           (login-service/->LoginService (get-in config [:http :auth-tkt]) (get config :authority-group-id))
            [:db :http :email])
 
    :admin (component/using
