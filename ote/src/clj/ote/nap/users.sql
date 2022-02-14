@@ -108,6 +108,13 @@ SELECT group_id
  WHERE key = 'transit-authority?'
    AND value = 'true';
 
+-- name: authority-group-admin-id
+-- single?: true
+SELECT group_id
+  FROM group_extra
+ WHERE key = 'authority-group-admin?'
+   AND value = 'true';
+
 -- name: search-user-operators-and-members
 -- Find users operators and their members and get only admin users.
 SELECT g.title as "operator-name",

@@ -322,19 +322,17 @@
   ; -- 3) kerätään member-tauluun jäseniä ja heitetään huulta
   ;
   ; -- member.table_id == user.id
-  ; TODO: change `transit-authority-group-id` to use the new key instead of `transit-authority?` here
   ; TODO: add all existing @traficom.fi people to the new group
-  ; TODO: hide link/UI for adding new people from all non-traficom people
-  (let [authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
-        new-member (first (fetch-user-by-email db {:email (:email form-data)}))
-        ckan-group-id (::t-operator/group-id operator)
+  (let [authority?     (= (::t-operator/group-id operator) (authority-group-admin-id db))
+        new-member     (first (fetch-user-by-email db {:email (:email form-data)}))
+        ckan-group-id  (::t-operator/group-id operator)
         operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
-        not-invited? (empty?
-                       (specql/fetch db ::user/user-token
-                                     #{::user/user-email}
-                                     {::user/ckan-group-id ckan-group-id
-                                      ::user/user-email    (:email form-data)
-                                      ::user/expiration    (op/>= (tc/to-sql-date (t/now)))}))
+        not-invited?   (empty?
+                         (specql/fetch db ::user/user-token
+                                       #{::user/user-email}
+                                       {::user/ckan-group-id ckan-group-id
+                                        ::user/user-email    (:email form-data)
+                                        ::user/expiration    (op/>= (tc/to-sql-date (t/now)))}))
         new-member-is-operator-member (some #(= (:user_id new-member) (:id %)) operator-users)
 
         ;; If member exists, add it to the organization if not, invite

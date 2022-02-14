@@ -110,7 +110,8 @@
      (if loaded?
        [:div
         [access-table e! access-users (get-in state [:params :ckan-group-id])]
-        [invite-member e! access-state (get-in state [:params :ckan-group-id])]]
+        (when (= true (get-in state [:user :authority-group-admin?]))
+          [invite-member e! access-state (get-in state [:params :ckan-group-id])])]
        [prog/circular-progress (tr [:common-texts :loading])])
      [remove-modal e! (:open? confirm) confirm operator-name]]))
 
