@@ -323,6 +323,7 @@
   ;
   ; -- member.table_id == user.id
   ; TODO: add all existing @traficom.fi people to the new group
+  ; TODO: rethink logic around authority? to ensure it actually does block the operations for non-authority users
   (let [authority?     (= (::t-operator/group-id operator) (authority-group-admin-id db))
         new-member     (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id  (::t-operator/group-id operator)
@@ -400,6 +401,7 @@
                    {::auditlog/name "removed-user-id", ::auditlog/value (str (:id form-data))}]
                   ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
                   ::auditlog/created-by (get-in user [:user :id])}
+
         user-count (count (specql/fetch db ::user/member
                                         #{::user/group_id}
                                         {::user/group_id ckan-group-id}))
