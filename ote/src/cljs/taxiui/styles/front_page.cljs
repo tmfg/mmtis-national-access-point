@@ -2,7 +2,7 @@
   (:require [ote.theme.colors :as colors]
             [taxiui.theme :as theme :refer [breather-margin breather-padding grid-template-areas]]))
 
-(def info-box {})
+(def info-box {:margin-top "1.125em"})
 
 (def info-section-title (-> {:font-weight "600"}
                             breather-margin))
@@ -27,7 +27,8 @@
                           :grid-template-rows    "auto auto auto auto"
                           :gap                   "0px 0px"
                           :border                (str "0.0625em solid " colors/light-gray)
-                          :border-radius         "0.3em"}
+                          :border-radius         "0.3em"
+                          :padding               "0.25rem"}
                          (grid-template-areas ["logo price-information arrow"
                                                ". example-trip arrow"
                                                ". prices arrow"
