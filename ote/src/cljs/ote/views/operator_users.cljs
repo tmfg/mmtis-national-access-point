@@ -38,7 +38,7 @@
        {:user-email (get-in row-info [:member :email]) :operator-name operator-name})]))
 
 (defn access-table
-  [e! users operator-id]
+  [e! user users operator-id]
   [:div#user-table-container
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
@@ -61,14 +61,15 @@
      {:name (tr [:front-page :table-header-actions])
       :read identity
       :format (fn [member]
-                [:button#remove-member (merge
-                                         {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
-                                         (stylefy/use-style
-                                           (merge style-buttons/svg-button
-                                             {:display "flex"
-                                              :align-items "center"})))
-                 [ic/action-delete]
-                 (tr [:buttons :delete])])}]
+                (when (:authority-group-admin? user)
+                  [:button#remove-member (merge
+                                           {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
+                                           (stylefy/use-style
+                                             (merge style-buttons/svg-button
+                                               {:display "flex"
+                                                :align-items "center"})))
+                   [ic/action-delete]
+                   (tr [:buttons :delete])]))}]
     users]])
 
 (defn invite-member
@@ -109,7 +110,7 @@
      [:h2 operator-name]
      (if loaded?
        [:div
-        [access-table e! access-users (get-in state [:params :ckan-group-id])]
+        [access-table e! (get state :user) access-users (get-in state [:params :ckan-group-id])]
         (when (= true (get-in state [:user :authority-group-admin?]))
           [invite-member e! access-state (get-in state [:params :ckan-group-id])])]
        [prog/circular-progress (tr [:common-texts :loading])])

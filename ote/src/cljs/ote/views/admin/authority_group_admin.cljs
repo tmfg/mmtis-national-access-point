@@ -44,6 +44,6 @@
        [:h2 operator-name]
        (if loaded?
          [:div
-          [ou-v/access-table e! access-users (get-in state [:params :ckan-group-id])]]
+          [ou-v/access-table e! (get state :user) access-users (get-in state [:params :ckan-group-id])]]
          [prog/circular-progress (tr [:common-texts :loading])])
        [ou-v/remove-modal e! (:open? confirm) confirm operator-name]])))
