@@ -15,21 +15,19 @@
                                                   (fn [v] (.getTime v))
                                                   (fn [v] (str (.getTime v)))))
 
-(defonce app (local-storage
-               (r/atom {;; current page
-                        ;; see ote.app.routes
-                        :page :front-page
-                        :params nil ; parameters from url route
-                        :query nil ; query parameters from url (like "?foo=bar")
+(defonce app (r/atom {;; current page
+                      ;; see ote.app.routes
+                      :page :front-page
+                      :params nil ; parameters from url route
+                      :query nil ; query parameters from url (like "?foo=bar")
 
-                         :user {} ;; No user data by default
+                       :user {} ;; No user data by default
 
-                        ;; Currently selected / edited transport operator (company basic info)
-                        :transport-operator nil
+                      ;; Currently selected / edited transport operator (company basic info)
+                      :transport-operator nil
 
-                        ;; Currently selected / edited transport service
-                        :transport-service {}})
-               :nap))
+                      ;; Currently selected / edited transport service
+                      :transport-service {}}))
 
 ;; Separate app state for viewer mode
 (defonce viewer (r/atom {:loading? true
