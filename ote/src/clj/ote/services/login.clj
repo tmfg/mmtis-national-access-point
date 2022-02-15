@@ -38,8 +38,7 @@
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
                                      "; Domain=." domain "; Secure")])))
 
-(defn login [db auth-tkt-config authority-group-id
-             {:keys [email password] :as credentials}]
+(defn login [db auth-tkt-config {:keys [email password] :as credentials}]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
           (encrypt/passlib->buddy (:password login-info)))
@@ -134,12 +133,12 @@
             {:success? false :error :password-reset-request-not-found}))))))
 
 (define-service-component LoginService
-  {:fields [auth-tkt-config authority-group-id]
+  {:fields [auth-tkt-config]
    :dependencies {email :email}}
 
   ^:unauthenticated
   (-> (POST "/login" {form-data :body}
-        (#'login db auth-tkt-config authority-group-id
+        (#'login db auth-tkt-config
           (http/transit-request form-data)))
       (wrap-routes throttler/throttle))
 
