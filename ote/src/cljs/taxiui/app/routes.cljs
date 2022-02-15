@@ -1,5 +1,6 @@
 (ns taxiui.app.routes
   "Routes for the frontend app."
+  (:refer-clojure :exclude [resolve])
   (:require [bide.core :as r]
             [ote.app.state :as state]
             [ote.app.utils :refer [user-logged-in?]]
@@ -41,8 +42,13 @@
   :taxi-ui/page)
 
 (tuck/define-event ClearPageData [page]
-                   {}
-                   (update app :taxi-ui dissoc (-> (name page) keyword)))
+  {}
+  (if-not (nil? page)
+    (let [page (-> (name page) keyword)]
+      (if (some? (get-in app [:taxi-ui page]))
+        (update app :taxi-ui dissoc page)
+        app))
+    app))
 
 (defmethod on-leave-event :default [page-params]
   (->ClearPageData (:taxi-ui/page page-params)))
