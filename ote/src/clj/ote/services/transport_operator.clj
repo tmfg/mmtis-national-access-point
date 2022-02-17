@@ -317,12 +317,6 @@
         (log/warn (str "Error while inviting " user-email " ") e)))))
 
 (defn manage-adding-users-to-operator [email db requester operator form-data]
-  ; -- 1) tehdään uusi group 'Traficom Viranomaisryhmä'
-  ; -- 2) tarvitaan uusi group_extra käyttäjähallinnalle, joka annetaan uudelle ryhmälle. avaimelle nimi vaikka `authority-group-admin?`
-  ; -- 3) kerätään member-tauluun jäseniä ja heitetään huulta
-  ;
-  ; -- member.table_id == user.id
-  ; TODO: add all existing @traficom.fi people to the new group
   (let [transit-authority?            (= (::t-operator/group-id operator) (transit-authority-group-id db))
         allowed-to-manage?            (and (authorization/admin? requester)
                                            (if transit-authority?
