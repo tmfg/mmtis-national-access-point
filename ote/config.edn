@@ -34,7 +34,7 @@
           :pass nil}
 
          ;; Common message opts
-         :msg {:from "NAP"}}
+         :msg {:from "noreply-dev@testi.finap.fi"}}
 
  :places {:finnish-municipalities
           {:type :shapefile
