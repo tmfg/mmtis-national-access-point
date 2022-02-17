@@ -15,6 +15,11 @@
 (defn admin? [user]
   (boolean (get-in user [:user :admin?])))
 
+(defn member-of-group? [user ckan-group-id]
+  (boolean (some
+             #(= (:id %) ckan-group-id)
+             (:groups user))))
+
 (defn user-id [user]
   (get-in user [:user :id]))
 
@@ -28,13 +33,12 @@
 
 (defn with-group-check
   [db user ckan-group-id body-fn]
-  (let [allowed? (some
-                   #(= (:id %) ckan-group-id)
-                   (:groups user))
-        is-admin? (get-in user [:user :admin?])
-        access-denied (do
-                        (log/warn "User " user " tried to access transport-operator-id " ckan-group-id
-                          ", allowed transport operators: " ckan-group-id)
+  (let [groups        (into #{} (map :id (:groups user)))
+        allowed?      (contains? groups ckan-group-id)
+        is-admin?     (get-in user [:user :admin?])
+        access-denied #(do
+                        (log/warn (str "User " user " tried to access transport-operator-id " ckan-group-id
+                          ", allowed groups: " groups))
                         {:status 403 :body "Forbidden"})]
     (cond
       (and
@@ -50,11 +54,11 @@
   Runs body-fn if user has access, otherwise returns an HTTP error response and logs a warning."
   [db user transport-operator-id body-fn]
   (let [allowed-operators (user-transport-operators db user)
-        is-admin? (get-in user [:user :admin?])
-        access-denied #(do
-                         (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
-                           ", allowed transport operators: " allowed-operators)
-                         {:status 403 :body "Forbidden"})]
+        is-admin?         (get-in user [:user :admin?])
+        access-denied     #(do
+                             (log/warn "User " user " tried to access transport-operator-id " transport-operator-id
+                               ", allowed transport operators: " allowed-operators)
+                             {:status 403 :body "Forbidden"})]
     (cond
       (nil? transport-operator-id)
       (access-denied)

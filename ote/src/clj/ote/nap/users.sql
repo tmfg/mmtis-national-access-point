@@ -9,7 +9,9 @@
            u."accepted-tos?" as "user_accepted-tos?",
            g.id as group_id,
            g.name as group_name,
-           g.title as group_title
+           g.title as group_title,
+           (SELECT EXISTS(SELECT ge.id FROM group_extra ge WHERE ge.key='transit-authority?' AND ge.group_id = g.id)) as "group_transit-authority?",
+           (SELECT EXISTS(SELECT ge.id FROM group_extra ge WHERE ge.key='authority-group-admin?' AND ge.group_id = g.id)) as "group_authority-group-admin?"
       FROM "user" u
  LEFT JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
  LEFT JOIN "group" g ON g.id = m.group_id

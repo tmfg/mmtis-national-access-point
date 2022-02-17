@@ -323,31 +323,41 @@
   ;
   ; -- member.table_id == user.id
   ; TODO: add all existing @traficom.fi people to the new group
-  ; TODO: rethink logic around authority? to ensure it actually does block the operations for non-authority users
-  (let [authority?     (= (::t-operator/group-id operator) (authority-group-admin-id db))
-        new-member     (first (fetch-user-by-email db {:email (:email form-data)}))
-        ckan-group-id  (::t-operator/group-id operator)
-        operator-users (fetch-operator-users db {:ckan-group-id ckan-group-id})
-        not-invited?   (empty?
-                         (specql/fetch db ::user/user-token
-                                       #{::user/user-email}
-                                       {::user/ckan-group-id ckan-group-id
-                                        ::user/user-email    (:email form-data)
-                                        ::user/expiration    (op/>= (tc/to-sql-date (t/now)))}))
+  (let [transit-authority?            (= (::t-operator/group-id operator) (transit-authority-group-id db))
+        allowed-to-manage?            (and (authorization/admin? requester)
+                                           (if transit-authority?
+                                             (authorization/member-of-group? requester (authority-group-admin-id db))
+                                             true))
+        new-member                    (first (fetch-user-by-email db {:email (:email form-data)}))
+        ckan-group-id                 (::t-operator/group-id operator)
+        operator-users                (fetch-operator-users db {:ckan-group-id ckan-group-id})
+        not-invited?                  (empty?
+                                        (specql/fetch db ::user/user-token
+                                                      #{::user/user-email}
+                                                      {::user/ckan-group-id ckan-group-id
+                                                       ::user/user-email    (:email form-data)
+                                                       ::user/expiration    (op/>= (tc/to-sql-date (t/now)))}))
         new-member-is-operator-member (some #(= (:user_id new-member) (:id %)) operator-users)
 
         ;; If member exists, add it to the organization if not, invite
         response (cond
                    ;; Existing new-member, existing operator
-                   (and (not new-member-is-operator-member) (not (empty? new-member)) (not (empty? operator)))
-                   (add-user-to-operator email db new-member requester operator authority?)
+                   (and allowed-to-manage?
+                        (not new-member-is-operator-member)
+                        (not (empty? new-member))
+                        (not (empty? operator)))
+                   (add-user-to-operator email db new-member requester operator transit-authority?)
 
                    ;; new new-member, existing operator -> invite new-member
-                   (and (empty? new-member) (not (empty? operator)) not-invited?)
-                   (invite-new-user email db requester operator (:email form-data) authority?)
+                   (and allowed-to-manage?
+                        (empty? new-member)
+                        (not (empty? operator))
+                        not-invited?)
+                   (invite-new-user email db requester operator (:email form-data) transit-authority?)
 
                    ;; new-member is already a member
-                   (and (not (empty? new-member)) new-member-is-operator-member)
+                   (and (not (empty? new-member))
+                        new-member-is-operator-member)
                    {:error :already-member}
 
                    (not not-invited?)
@@ -363,9 +373,16 @@
 
 (defn remove-token-from-operator
   [db user ckan-group-id form-data operator]
-  (let [delete-count (specql/delete! db ::user/user-token
-                                     {::user/token (:token form-data)
-                                      ::user/ckan-group-id ckan-group-id})]
+  (let [transit-authority? (= ckan-group-id (transit-authority-group-id db))
+        allowed-to-manage? (and (authorization/admin? user)
+                                (if transit-authority?
+                                  (authorization/member-of-group? user (authority-group-admin-id db))
+                                  true))
+        delete-count (if allowed-to-manage?
+                       (specql/delete! db ::user/user-token
+                                       {::user/token (:token form-data)
+                                        ::user/ckan-group-id ckan-group-id})
+                       0)]
 
     (log/info "Token deleted by " (get-in user [:user :email]) ". From operator " (::t-operator/title operator))
     (if (= 0 delete-count)
@@ -378,11 +395,30 @@
                        (specql/columns ::t-operator/group)
                        {::t-operator/group-id ckan-group-id})))
 
+(defn- as-authorization-groups
+  "Converts operator base data into authorization group lookup by group id.
+
+  This is a sort-of-a-hack around the fact that CKAN groups are used directly as both operators and authorization groups.
+  The resulting data structure is a lookup by id which is meant to be easily consumed on the frontend.
+
+  ```clojure
+  {groupid -> {extra? truth}}
+  ```"
+  [user groups]
+  (assoc
+    user
+    :groups
+    (reduce
+      (fn [all group]
+        (assoc all (:id group) (dissoc group :id)))
+      {}
+      groups)))
+
 (defn get-user-transport-operators-with-services [db groups user]
   (let [operators (keep #(get-transport-operator db {::t-operator/ckan-group-id (:id %)}) groups)
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (transport-service/get-transport-services db operator-ids)]
-    {:user (dissoc user :apikey :id)
+    {:user (-> user (dissoc :apikey :id) (as-authorization-groups groups))
      :transport-operators
      (map (fn [{id ::t-operator/id :as operator}]
             {:transport-operator operator
@@ -393,27 +429,37 @@
 
 (defn remove-member-from-operator
   [db user operator form-data]
-  (let [ckan-group-id (::t-operator/group-id operator)
-        auditlog {::auditlog/event-type :remove-member-from-operator
-                  ::auditlog/event-attributes
-                  [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
-                   {::auditlog/name "transport-group-title", ::auditlog/value (str (::t-operator/title operator))}
-                   {::auditlog/name "removed-user-id", ::auditlog/value (str (:id form-data))}]
-                  ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
-                  ::auditlog/created-by (get-in user [:user :id])}
+  (let [transit-authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
+        allowed-to-manage? (and (authorization/admin? user)
+                                (if transit-authority?
+                                  (authorization/member-of-group? user (authority-group-admin-id db))
+                                  true))
+        ckan-group-id      (::t-operator/group-id operator)
+        auditlog           {::auditlog/event-type :remove-member-from-operator
+                            ::auditlog/event-attributes
+                            [{::auditlog/name "transport-group-id", ::auditlog/value (str (::t-operator/group-id operator))},
+                             {::auditlog/name "transport-group-title", ::auditlog/value (str (::t-operator/title operator))}
+                             {::auditlog/name "removed-user-id", ::auditlog/value (str (:id form-data))}]
+                            ::auditlog/event-timestamp (java.sql.Timestamp. (System/currentTimeMillis))
+                            ::auditlog/created-by (get-in user [:user :id])}
 
-        user-count (count (specql/fetch db ::user/member
-                                        #{::user/group_id}
-                                        {::user/group_id ckan-group-id}))
-        delete-count (if (= user-count 1)
-                       0
-                       (specql/delete! db ::user/member
-                                       {::user/table_id (:id form-data)
-                                        ::user/group_id ckan-group-id}))]
+        user-count         (count (specql/fetch db ::user/member
+                                                #{::user/group_id}
+                                                {::user/group_id ckan-group-id}))
+        delete-clauses     (filterv
+                             (complement nil?)
+                             [(when (nil? (:id form-data)) :no-member-email-available)
+                              (when (= user-count 1) :only-one-member)
+                              (when (not allowed-to-manage?) :not-an-admin)])
+        delete-count       (if (some? delete-clauses)
+                             0
+                             (specql/delete! db ::user/member
+                                             {::user/table_id (:id form-data)
+                                              ::user/group_id ckan-group-id}))]
 
     (if (= 0 delete-count)
       (do
-        (log/warn "Member removal failed for operator: " (str (::t-operator/name operator)) " with user: " (str (:email form-data)))
+        (log/warn (str "Member removal failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
         (http/transit-response "Removal unsuccessful" 400))
       (do
         (specql/insert! db ::auditlog/auditlog auditlog)

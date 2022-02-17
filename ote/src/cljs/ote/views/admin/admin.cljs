@@ -316,18 +316,20 @@
        [:div "Hakuehdoilla ei löydy yrityksiä"])]))
 
 (defn admin-panel [e! app]
-  (let [tabs [{:label "Tarkistettavat palvelut" :value "validation"}
-              {:label "Käyttäjä" :value "users"}
-              {:label "Palvelut" :value "services"}
-              {:label "Y-tunnus raportti" :value "businessid"}
-              ;;{:label "Yritys csv:t" :value "companycsv"} - Stop copying csv:s to s3
-              {:label "Palveluntuottajat" :value "operators"}
-              {:label "Rajapinnat" :value "interfaces"}
-              {:label "CSV Raportit" :value "reports"}
-              {:label "Merireitit" :value "sea-routes"}
-              {:label "Netex" :value "netex"}
-              {:label "Taksien hintatiedot" :value "taxi-prices"}
-              {:label "Viranomaisryhmän hallinta" :value "authority-group-admin"}]
+  (let [tabs (filter
+               (complement nil?)
+               [{:label "Tarkistettavat palvelut" :value "validation"}
+                {:label "Käyttäjä" :value "users"}
+                {:label "Palvelut" :value "services"}
+                {:label "Y-tunnus raportti" :value "businessid"}
+                ;;{:label "Yritys csv:t" :value "companycsv"} - Stop copying csv:s to s3
+                {:label "Palveluntuottajat" :value "operators"}
+                {:label "Rajapinnat" :value "interfaces"}
+                {:label "CSV Raportit" :value "reports"}
+                {:label "Merireitit" :value "sea-routes"}
+                {:label "Netex" :value "netex"}
+                {:label "Taksien hintatiedot" :value "taxi-prices"}
+                (when (get-in app [:user :authority-group-admin?]) {:label "Viranomaisryhmän hallinta" :value "authority-group-admin"})])
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
      [:div {:style {:position "absolute" :right "20px"}}
