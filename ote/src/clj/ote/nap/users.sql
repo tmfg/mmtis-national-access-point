@@ -9,7 +9,9 @@
            u."accepted-tos?" as "user_accepted-tos?",
            g.id as group_id,
            g.name as group_name,
-           g.title as group_title
+           g.title as group_title,
+           (SELECT EXISTS(SELECT ge.id FROM group_extra ge WHERE ge.key='transit-authority?' AND ge.group_id = g.id)) as "group_transit-authority?",
+           (SELECT EXISTS(SELECT ge.id FROM group_extra ge WHERE ge.key='authority-group-admin?' AND ge.group_id = g.id)) as "group_authority-group-admin?"
       FROM "user" u
  LEFT JOIN "member" m ON (m.table_name='user' AND m.state='active' AND m.table_id=u.id)
  LEFT JOIN "group" g ON g.id = m.group_id
@@ -88,12 +90,12 @@ SELECT u.id as id,
                                      WHERE ge.key = 'transit-authority?'
                                        AND ge.value = 'true'));
 
--- name: is-transit-authority-user?
+-- name: has-group-attribute?
 -- single?: true
--- Given a user id, check if the user belongs to a transit authority group
+-- Given a user id and group attribute check if the user has the trait through any group membership.
 SELECT EXISTS(SELECT ge.id
                 FROM group_extra ge
-               WHERE ge.key='transit-authority?' AND
+               WHERE ge.key=:group-attribute AND
                      ge.value='true' AND
                      ge.group_id IN (SELECT m.group_id
                                        FROM "member" m
@@ -106,6 +108,13 @@ SELECT EXISTS(SELECT ge.id
 SELECT group_id
   FROM group_extra
  WHERE key = 'transit-authority?'
+   AND value = 'true';
+
+-- name: authority-group-admin-id
+-- single?: true
+SELECT group_id
+  FROM group_extra
+ WHERE key = 'authority-group-admin?'
    AND value = 'true';
 
 -- name: search-user-operators-and-members

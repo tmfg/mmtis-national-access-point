@@ -24,4 +24,3 @@ laundry_password: "{{vault_laundry_password}}"
 netex_chouette_path: "/opt/chouette/"
 netex_conversion_work_path: "/tmp/ote/netex-conversion/"
 netex_bucket: "napote-netex"
-

@@ -712,6 +712,10 @@
                       {:gtfs/transport-service-id service-id})]
     (http/transit-response packages 200)))
 
+(defn get-authority-group-details
+  [db authority-group-id]
+  (ote.services.transport-operator/operator-users-response db authority-group-id))
+
 (defn- admin-routes [db config]
   (routes
 
@@ -816,6 +820,10 @@
                                          user :user}
       (require-admin-user "/admin/service-gtfs-packages/:service-id" (:user user))
           (list-service-gtfs-packages db (Long/parseLong service-id)))
+
+    (GET "/admin/authority-group" {user :user}
+      (require-admin-user "/admin/authority-group" (:user user))
+      (get-authority-group-details db (:authority-group-id config)))
 
     ;; For development purposes only - remove/hide before pr
     #_(GET "/admin/html-email" req

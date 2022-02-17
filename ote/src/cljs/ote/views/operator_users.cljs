@@ -37,8 +37,20 @@
      (tr [:transport-users-page :remove-dialog-text]
        {:user-email (get-in row-info [:member :email]) :operator-name operator-name})]))
 
+(defn- allowed-to-manage?
+  [state]
+  (let [group-id               (get-in state [:params :ckan-group-id])
+        authority-group-id     (get state :authority-group-id)
+        sysadmin?              (get-in state [:user :admin?])
+        transit-authority?     (some-> state :user :groups (get group-id) :transit-authority?)
+        authority-group-admin? (some-> state :user :groups (get authority-group-id) :authority-group-admin?)]
+    (or sysadmin?
+        (if transit-authority?
+          authority-group-admin?
+          true))))
+
 (defn access-table
-  [e! users operator-id]
+  [e! state user users operator-id]
   [:div#user-table-container
    [:h3 (tr [:transport-users-page :members])]
    [table/table {:stripedRows true
@@ -61,14 +73,15 @@
      {:name (tr [:front-page :table-header-actions])
       :read identity
       :format (fn [member]
-                [:button#remove-member (merge
-                                         {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
-                                         (stylefy/use-style
-                                           (merge style-buttons/svg-button
-                                             {:display "flex"
-                                              :align-items "center"})))
-                 [ic/action-delete]
-                 (tr [:buttons :delete])])}]
+                (when (allowed-to-manage? state)
+                  [:button#remove-member (merge
+                                           {:on-click #(e! (ou/->OpenConfirmationDialog member operator-id))}
+                                           (stylefy/use-style
+                                             (merge style-buttons/svg-button
+                                               {:display "flex"
+                                                :align-items "center"})))
+                   [ic/action-delete]
+                   (tr [:buttons :delete])]))}]
     users]])
 
 (defn invite-member
@@ -109,8 +122,9 @@
      [:h2 operator-name]
      (if loaded?
        [:div
-        [access-table e! access-users (get-in state [:params :ckan-group-id])]
-        [invite-member e! access-state (get-in state [:params :ckan-group-id])]]
+        [access-table e! state (get state :user) access-users (get-in state [:params :ckan-group-id])]
+        (when (allowed-to-manage? state)
+          [invite-member e! access-state (get-in state [:params :ckan-group-id])])]
        [prog/circular-progress (tr [:common-texts :loading])])
      [remove-modal e! (:open? confirm) confirm operator-name]]))
 

@@ -61,6 +61,15 @@
                  :transport-operator (:transport-operator selected-operator)
                  :transport-service-vector (:transport-service-vector selected-operator))))))
 
+(defn- update-authority-group
+  "Authority group is the CKAN operator id for the special authority group for administering the entire service.
+  This id is kept hidden on all levels unless the user is an actual admin, which is why this extra logic is built
+  around associating the value to browser state."
+  [app authority-group-id]
+  (if-not (nil? authority-group-id)
+    (assoc app :authority-group-id authority-group-id)
+    app))
+
 (defn- login-navigate->page
   ([app response]
    (login-navigate->page app response (tr [:common-texts :logged-in])))
@@ -81,9 +90,10 @@
      (when tos-ok?
        (localstorage/add-item! (keyword (str (get-in response [:session-data :user :email]) "-tos-ok")) true))
      (-> app
-       (dissoc :login)
-       (update-transport-operator-data (:session-data response))
-       (assoc :flash-message flash-message)))))
+         (dissoc :login)
+         (update-transport-operator-data (:session-data response))
+         (update-authority-group (get-in response [:session-data :authority-group-id]))
+         (assoc :flash-message flash-message)))))
 
 (extend-protocol tuck/Event
 

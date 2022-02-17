@@ -108,3 +108,8 @@ VALUES
 INSERT INTO "public"."group_extra"("id","group_id","key","value","state","revision_id")
 VALUES
 (E'ely-group-extra',E'79046442-ad25-4865-a174-ec199a4b39c4',E'transit-authority?',E'true',NULL,NULL);
+
+-- Make the test operator also an "authority group admin" for easier testing
+INSERT INTO "public"."group_extra"("id","group_id","key","value","state","revision_id")
+VALUES
+(E'ely-group-extra',E'79046442-ad25-4865-a174-ec199a4b39c4',E'authority-group-admin?',E'true',NULL,NULL);

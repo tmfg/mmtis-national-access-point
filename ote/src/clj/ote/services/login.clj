@@ -38,8 +38,7 @@
                                 (str "auth_tkt=" auth-tkt-value "; Path=/; HttpOnly"
                                      "; Domain=." domain "; Secure")])))
 
-(defn login [db auth-tkt-config
-             {:keys [email password] :as credentials}]
+(defn login [db auth-tkt-config {:keys [email password] :as credentials}]
   (if-let [login-info (first (fetch-login-info db {:email email}))]
     (if (hashers/check password
           (encrypt/passlib->buddy (:password login-info)))
@@ -50,13 +49,15 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
+               (merge (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user))
+                      ; TODO: Add only if permissions
+                      {:authority-group-id (users/fetch-authority-group-admin-id db)}))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
-             :timestamp (java.util.Date.)
-             :user-id (:id login-info)
-             :user-data ""})
+             :timestamp        (java.util.Date.)
+             :user-id          (:id login-info)
+             :user-data        ""})
           (:domain auth-tkt-config))
 
         (http/transit-response {:error :unconfirmed-email} 401)) ;; This could be 403 instead
@@ -80,13 +81,14 @@
   (log/debug "Sending password reset email to " user)
   (localization/with-language language
                               (email/send! email
-                                           {:to (:email user)
+                                           {:to      (:email user)
                                             :subject (tr [:email-templates :password-reset :subject])
-                                            :body [{:type "text/html;charset=utf-8" :content (str email-template/html-header
-                                                                                                  (html (email-template/reset-password
-                                                                                                          (tr [:email-templates :password-reset :subject])
-                                                                                                          (::user/reset-key password-reset-request)
-                                                                                                          user)))}]})))
+                                            :body    [{:type "text/html;charset=utf-8"
+                                                       :content (str email-template/html-header
+                                                                     (html (email-template/reset-password
+                                                                             (tr [:email-templates :password-reset :subject])
+                                                                             (::user/reset-key password-reset-request)
+                                                                             user)))}]})))
 
 (defn request-password-reset [db email form-data]
   (with-throttle-ms 1000 ; always take 1sec to prevent spamming requests
