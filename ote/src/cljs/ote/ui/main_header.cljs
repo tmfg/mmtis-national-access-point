@@ -108,6 +108,11 @@
   []
   [:span (stylefy/use-style style-topnav/bottombar-spacer)])
 
+(defn user-is?
+  [app kind]
+  (= true (or (some-> app :user :admin?)
+              (some-> app :user kind))))
+
 (defn nap-bottombar [e! app desktop?]
   (let [menu-open? (get-in app [:ote-service-flags :mobile-bottom-menu-open])]
     [:div (stylefy/use-style style-topnav/header-bottombar)
@@ -206,16 +211,18 @@
                                                                    {:key :pre-notices
                                                                     :label (tr [:common-texts :navigation-pre-notice])
                                                                     :href "#/pre-notices"}
-                                                                   {:key :authority-pre-notices
-                                                                    :label (tr [:common-texts :navigation-authority-pre-notices])
-                                                                    :href "#/authority-pre-notices"}
-                                                                   (when (some-> app :user :admin?)
+                                                                   (when (user-is? app :authority-group-admin?)
+                                                                     {:key :authority-pre-notices
+                                                                      :label (tr [:common-texts :navigation-authority-pre-notices])
+                                                                      :href "#/authority-pre-notices"})
+                                                                   (when (user-is? app :authority-group-admin?)
                                                                      {:key :admin
                                                                       :label (tr [:document-title :admin])
                                                                       :href "#/admin"})
-                                                                   {:key :monitor
-                                                                    :label (tr [:document-title :monitor])
-                                                                    :href "#/monitor"}]
+                                                                   (when (user-is? app :authority-group-admin?)
+                                                                     {:key :monitor
+                                                                      :label (tr [:document-title :monitor])
+                                                                      :href "#/monitor"})]
                                              :label               (tr [:common-texts :navigation-my-services-menu])
                                              :state-flag          [:ote-service-flags :my-services-menu-open]
                                              :menu-click-handler  #(e! (fp-controller/->ToggleMyServicesMenu))
