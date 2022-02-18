@@ -14,7 +14,6 @@
 
   LoadAuthorityGroupDetailsResponse
   (process-event [{response :response} app]
-    (js/console.log (str "LoadAuthorityGroupDetailsResponse :: " response))
     (assoc-in app [:admin :authority-group] response))
 
   LoadAuthorityGroupDetails
