@@ -329,7 +329,7 @@
                 {:label "Merireitit" :value "sea-routes"}
                 {:label "Netex" :value "netex"}
                 {:label "Taksien hintatiedot" :value "taxi-prices"}
-                (when (get-in app [:user :authority-group-admin?]) {:label "Viranomaisryhmän hallinta" :value "authority-group-admin"})])
+                (when (get-in app [:user :authority-group-admin?]) {:label "Ylläpitoryhmän hallinta" :value "authority-group-admin"})])
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
      [:div {:style {:position "absolute" :right "20px"}}

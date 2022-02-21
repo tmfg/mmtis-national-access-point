@@ -318,10 +318,10 @@
 
 (defn manage-adding-users-to-operator [email db requester operator form-data]
   (let [transit-authority?            (= (::t-operator/group-id operator) (transit-authority-group-id db))
-        allowed-to-manage?            (and (authorization/admin? requester)
-                                           (if transit-authority?
-                                             (authorization/member-of-group? requester (authority-group-admin-id db))
-                                             true))
+        allowed-to-manage?            (or (authorization/admin? requester)
+                                          (if transit-authority?
+                                            (authorization/member-of-group? requester (authority-group-admin-id db))
+                                            true))
         new-member                    (first (fetch-user-by-email db {:email (:email form-data)}))
         ckan-group-id                 (::t-operator/group-id operator)
         operator-users                (fetch-operator-users db {:ckan-group-id ckan-group-id})

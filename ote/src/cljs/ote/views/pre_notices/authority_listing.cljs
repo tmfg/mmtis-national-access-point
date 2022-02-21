@@ -184,9 +184,10 @@
 
 (defn pre-notices [e! {:keys [pre-notices pre-notice-dialog pre-notice-users-dialog?] :as app}]
   [:div.authority-pre-notices
-   [ui/flat-button {:label "Kutsu käyttäjiä"
-                    :primary true
-                    :on-click #(e! (pre-notice/->MoveToAuthorityGroupPage))}]
+   (when (= true (get-in app [:user :authority-group-admin?]))
+     [ui/flat-button {:label "Kutsu käyttäjiä"
+                      :primary true
+                      :on-click #(e! (pre-notice/->MoveToAuthorityGroupPage))}])
    [pre-notices-listing e! pre-notices]
    (when pre-notice-dialog
      [pre-notice-view e! pre-notice-dialog])])
