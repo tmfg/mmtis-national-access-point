@@ -413,6 +413,7 @@
         operator-ids (into #{} (map ::t-operator/id) operators)
         operator-services (transport-service/get-transport-services db operator-ids)]
     {:user (-> user (dissoc :apikey :id) (as-authorization-groups groups))
+     :authority-group-id (authority-group-admin-id db)
      :transport-operators
      (map (fn [{id ::t-operator/id :as operator}]
             {:transport-operator operator

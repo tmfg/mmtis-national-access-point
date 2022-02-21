@@ -49,10 +49,7 @@
             {:success? true
              :session-data
              (let [user (users/find-user db (:id login-info))]
-               (merge (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user))
-                      ; TODO: Add only if permissions
-                      (when (= true (get user :authority-group-admin?))
-                        {:authority-group-id (users/fetch-authority-group-admin-id db)})))}
+               (transport-operator/get-user-transport-operators-with-services db (:groups user) (:user user)))}
             200)
           (cookie/unparse "0.0.0.0" (:shared-secret auth-tkt-config)
             {:digest-algorithm (:digest-algorithm auth-tkt-config)
