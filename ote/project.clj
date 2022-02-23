@@ -142,9 +142,6 @@
                  ;; Chouette command line tool - CeCILL-B
                  ;; Firejail - GNU General Public License, version 2
 
-                 ;; ClojureScript atoms backed by HTML5 web storage. - Eclipse Public License 1.0
-                 [alandipert/storage-atom "2.0.1"]
-
                  ; A Clojure[Script] library for word case conversions - Eclipse Public License 1.0
                  [camel-snake-kebab "0.4.2"]]
   :profiles {:uberjar {:aot :all
