@@ -28,9 +28,18 @@
          :transport-operator-data-loaded? true
          :user nil))
 
+(defn- update-authority-group
+  "Authority group is the CKAN operator id for the special authority group for administering the entire service.
+  This id is kept hidden on all levels unless the user is an actual admin, which is why this extra logic is built
+  around associating the value to browser state."
+  [app authority-group-id]
+  (if-not (nil? authority-group-id)
+    (assoc app :authority-group-id authority-group-id)
+    app))
+
 (defn update-transport-operator-data
   [{:keys [page ckan-organization-id transport-operator] :as app}
-   {:keys [user transport-operators] :as response}]
+   {:keys [authority-group-id user transport-operators] :as response}]
 
   (let [app (assoc app
                    :transport-operator-data-loaded? true
@@ -55,20 +64,13 @@
                                           %)
                                        transport-operators)
                                  (first transport-operators))]
-
-          (assoc app
-                 :transport-operators-with-services transport-operators
-                 :transport-operator (:transport-operator selected-operator)
-                 :transport-service-vector (:transport-service-vector selected-operator))))))
-
-(defn- update-authority-group
-  "Authority group is the CKAN operator id for the special authority group for administering the entire service.
-  This id is kept hidden on all levels unless the user is an actual admin, which is why this extra logic is built
-  around associating the value to browser state."
-  [app authority-group-id]
-  (if-not (nil? authority-group-id)
-    (assoc app :authority-group-id authority-group-id)
-    app))
+          (-> app
+              (assoc :authority-group-id authority-group-id
+                     :transport-operators-with-services transport-operators
+                     :transport-operator (:transport-operator selected-operator)
+                     :transport-service-vector (:transport-service-vector selected-operator))
+              (update-authority-group authority-group-id))
+          ))))
 
 (defn- login-navigate->page
   ([app response]
