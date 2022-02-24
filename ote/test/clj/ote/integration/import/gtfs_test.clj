@@ -35,24 +35,35 @@
                               :id               789
                               :data-content     nil})
 
-(deftest required-files-are-present
+(defn process-transit-package [source-zip]
+  (gtfs/download-and-store-transit-package :gtfs
+                                           {}
+                                           db
+                                           (merge common-interface-params
+                                                  {:url source-zip})
+                                           false
+                                           true))
 
-  (let [required-files {"agency.txt"   "gtfs/import/agency_empty.txt"
-                        "stops.txt"    "gtfs/import/stops_empty.txt"
-                        "calendar.txt" "gtfs/import/calendar_empty.txt"
-                        "trips.txt"    "gtfs/import/trips_empty.txt"}
-        gtfs-files {::missing-files (ziptools/create "missing-files.zip" (random-sample required-files))}
-        #_#_required-files2 ["agency.txt" "stops.txt" "calendar_dates.txt" "trips.txt"]]
+(deftest required-files-are-present
+  (let [required-files-set1 {"agency.txt"         "gtfs/import/agency_empty.txt"
+                             "stops.txt"          "gtfs/import/stops_empty.txt"
+                             "calendar.txt"       "gtfs/import/calendar_empty.txt"
+                             "trips.txt"          "gtfs/import/trips_empty.txt"}
+        required-files-set2 {"agency.txt"         "gtfs/import/agency_empty.txt"
+                             "stops.txt"          "gtfs/import/stops_empty.txt"
+                             "calendar_dates.txt" "gtfs/import/calendar_dates_empty.txt"
+                             "trips.txt"          "gtfs/import/trips_empty.txt"}
+        gtfs-files {::missing-files-1 (ziptools/create "missing-files.zip" (random-sample required-files-set1))
+                    ::missing-files-2 (ziptools/create "missing-files.zip" (random-sample required-files-set2))}]
+
     (with-redefs [http-client/get (fn [url & [req & r]]
-                                    (if (= url ::missing-files)
+                                    (if (= (gtfs-files url)
                                       {:body (Files/readAllBytes (.toPath (gtfs-files url)))}
-                                      (log/warn "Unknown call" url req r)))]
+                                      (log/warn "Unexpected HTTP client GET with params" url req r)))]
 
       (testing "missing files are reported"
-        (is (= true (gtfs/download-and-store-transit-package :gtfs
-                                                             {}
-                                                             db
-                                                             (merge common-interface-params
-                                                                    {:url ::missing-files})
-                                                             false
-                                                             true)))))))
+        (is (= true (process-transit-package ::missing-files-1)))
+        (is (= true (process-transit-package ::missing-files-2)))
+        )
+
+      (testing "empty content in GTFS files are reported"))))
