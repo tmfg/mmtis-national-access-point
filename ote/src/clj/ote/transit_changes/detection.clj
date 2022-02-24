@@ -978,7 +978,7 @@
   "Input: route-list-with-week-hashes = sequence of routes with their traffic weeks
   Output: Sequence of change-maps, each describing a traffic change of a route or ongoing traffic without changes."
   [^LocalDate analysis-date all-routes route-list-with-week-hashes]
-  (let [_ (println "detect-changes-for-all-routes :: analysis-date" (pr-str analysis-date))]
+  (let [_ (log/debug "detect-changes-for-all-routes :: analysis-date" (pr-str analysis-date))]
     (vec (mapcat
            #(route-change-maps % all-routes analysis-date)
            route-list-with-week-hashes))))
