@@ -150,7 +150,8 @@
                        :auto-clean false}
              :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
                                   [webjure/json-schema "0.7.4"]]
-                   :test-paths ["test/clj"]}}
+                   :test-paths ["test/clj"]
+                   :resource-paths ["test_resources"]}}
 
   :repositories [["osgeo-release" "https://repo.osgeo.org/repository/release/"]
                  ["osgeo" "https://download.osgeo.org/webdav/geotools/"]

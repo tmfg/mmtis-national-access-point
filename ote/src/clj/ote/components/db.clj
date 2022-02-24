@@ -5,7 +5,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]))
 
-(defn- hikari-datasource [{:keys [url username password] :as config}]
+(defn hikari-datasource [{:keys [url username password] :as config}]
   (HikariDataSource.
    (doto (HikariConfig.)
      (.setJdbcUrl url)
