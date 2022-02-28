@@ -425,10 +425,10 @@
 (defn remove-member-from-operator
   [db user operator form-data]
   (let [transit-authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
-        allowed-to-manage? (and (authorization/admin? user)
-                                (if transit-authority?
-                                  (authorization/member-of-group? user (authority-group-admin-id db))
-                                  true))
+        allowed-to-manage? (or (authorization/admin? user)
+                               (if transit-authority?
+                                 (authorization/member-of-group? user (authority-group-admin-id db))
+                                 true))
         ckan-group-id      (::t-operator/group-id operator)
         auditlog           {::auditlog/event-type :remove-member-from-operator
                             ::auditlog/event-attributes
