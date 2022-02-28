@@ -425,10 +425,10 @@
 (defn remove-member-from-operator
   [db user operator form-data]
   (let [transit-authority? (= (::t-operator/group-id operator) (transit-authority-group-id db))
-        allowed-to-manage? (and (authorization/admin? user)
-                                (if transit-authority?
-                                  (authorization/member-of-group? user (authority-group-admin-id db))
-                                  true))
+        allowed-to-manage? (or (authorization/admin? user)
+                               (if transit-authority?
+                                 (authorization/member-of-group? user (authority-group-admin-id db))
+                                 true))
         ckan-group-id      (::t-operator/group-id operator)
         auditlog           {::auditlog/event-type :remove-member-from-operator
                             ::auditlog/event-attributes
@@ -446,7 +446,7 @@
                              [(when (nil? (:id form-data)) :no-member-email-available)
                               (when (= user-count 1) :only-one-member)
                               (when (not allowed-to-manage?) :not-an-admin)])
-        delete-count       (if (some? delete-clauses)
+        delete-count       (if-not (empty? delete-clauses)
                              0
                              (specql/delete! db ::user/member
                                              {::user/table_id (:id form-data)
@@ -454,7 +454,7 @@
 
     (if (= 0 delete-count)
       (do
-        (log/warn (str "Member removal failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
+        (log/warn (str "Member removal by " (get-in usert [:user :email]) " (" (get-in usert [:user :id]) ") failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
         (http/transit-response "Removal unsuccessful" 400))
       (do
         (specql/insert! db ::auditlog/auditlog auditlog)
