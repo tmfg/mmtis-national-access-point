@@ -40,7 +40,10 @@
   ["hash-recalculation" :gtfs/hash-recalculation
    {"id" :gtfs/recalculation-id}]
   ["detected-change-history" :gtfs/detected-change-history]
-  ["detection-holidays" :gtfs/detection-holidays])
+  ["detection-holidays" :gtfs/detection-holidays]
+
+  ["gtfs_import_report" :gtfs-import/report
+   ])
 
 #?(:clj
    (def ^:const int4range-pattern

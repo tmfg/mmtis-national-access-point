@@ -145,16 +145,27 @@
            ;; Copy stop times to a temp file, we need to process it last
            (with-open [output (io/output-stream stop-times-file)]
              (io/copy input output))
-           (when-let [db-table-name (db-table-name name)]
+           (if-let [db-table-name (db-table-name name)]
              (let [file-type (gtfs-spec/name->keyword name)
                    file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))
                    file-data (if intercept-fn
                                (intercept-fn file-type file-data)
                                file-data)]
                (log/debug file-type " file: " name " PARSED.")
-               (doseq [fk (process-rows file-type file-data)]
-                 (when (and db-table-name (seq fk))
-                   (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
+               (let [rows (process-rows file-type file-data)]
+                 (when (= 0 (count rows))
+                   (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                                           :gtfs-import/description (str "No data rows in file " name " of type " file-type)
+                                                           :gtfs-import/error       (.getBytes (str file-data))
+                                                           :gtfs-import/severity    "error"}))
+                 (doseq [fk rows]
+                   (when (and db-table-name (seq fk))
+                     (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
+             ; record unknown file name
+             (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                                     :gtfs-import/description (str "Unknown file " name " in GTFS package, no processing done")
+                                                     :gtfs-import/error       (.getBytes "")
+                                                     :gtfs-import/severity    "warning"})))))
 
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
@@ -231,7 +242,7 @@
 
 (defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
   (let [file-list (list-zip byte-array-input)]
-
+    (log/debug "Files in ZIP" file-list)
     (when-not (or
                 (every? file-list ["agency.txt" "stops.txt" "calendar.txt" "trips.txt"])
                 (every? file-list ["agency.txt" "stops.txt" "calendar_dates.txt" "trips.txt"]))
@@ -295,7 +306,7 @@
   (when interface-id
      (first
       (specql/fetch db :gtfs/package
-                    #{:gtfs/etag :gtfs/sha256}
+                    #{:gtfs/id :gtfs/etag :gtfs/sha256}
                     {:gtfs/external-interface-description-id interface-id
                      :gtfs/deleted? false}
                     {::specql/order-by :gtfs/created
@@ -338,7 +349,8 @@
                                          :gtfs/external-interface-description-id id})]
             (when upload-s3?
               (s3/put-object (:bucket gtfs-config)
-                             filename (java.io.ByteArrayInputStream. gtfs-file)
+                             filename
+                             (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
               (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
@@ -346,7 +358,7 @@
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id
                                ::t-service/transport-service-id ts-id
-                               ::t-service/download-status :success
+                               ::t-service/download-status :success  ; TODO: status should be dependent on number of errors
                                ::t-service/package-id (:gtfs/id package)
                                ::t-service/url url
                                ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})))
@@ -363,6 +375,7 @@
        :external-interface-description-id id
        :external-interface-data-content data-content
        :service-id ts-id
+       :package-id (:gtfs/id (interface-latest-package db id))  ; re-fetch package to make sure we have the latest
        :operator-name operator-name})))
 
 (defrecord GTFSImport [config]
