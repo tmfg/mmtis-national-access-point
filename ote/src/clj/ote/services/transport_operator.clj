@@ -454,7 +454,7 @@
 
     (if (= 0 delete-count)
       (do
-        (log/warn (str "Member removal by " (get-in usert [:user :email]) " (" (get-in usert [:user :id]) ") failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
+        (log/warn (str "Member removal by " (get-in user [:user :email]) " (" (get-in user [:user :id]) ") failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
         (http/transit-response "Removal unsuccessful" 400))
       (do
         (specql/insert! db ::auditlog/auditlog auditlog)
