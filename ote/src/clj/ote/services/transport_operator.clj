@@ -446,7 +446,7 @@
                              [(when (nil? (:id form-data)) :no-member-email-available)
                               (when (= user-count 1) :only-one-member)
                               (when (not allowed-to-manage?) :not-an-admin)])
-        delete-count       (if (some? delete-clauses)
+        delete-count       (if-not (empty? delete-clauses)
                              0
                              (specql/delete! db ::user/member
                                              {::user/table_id (:id form-data)
@@ -454,7 +454,7 @@
 
     (if (= 0 delete-count)
       (do
-        (log/warn (str "Member removal failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
+        (log/warn (str "Member removal by " (get-in usert [:user :email]) " (" (get-in usert [:user :id]) ") failed for operator: " (or (::t-operator/name operator) (::t-operator/group-name operator) (::t-operator/title operator)) " with user: " (:email form-data) ", reasons: " delete-clauses))
         (http/transit-response "Removal unsuccessful" 400))
       (do
         (specql/insert! db ::auditlog/auditlog auditlog)
