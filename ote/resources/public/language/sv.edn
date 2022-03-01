@@ -5,6 +5,7 @@
   :operators "Tjänsteproducenter"
   :own-services "Egna tjänsteuppgifter"
   :admin "Admin"
+  :admin-detected-changes "Förändrings detektering inställningar"
   :monitor "Övervakning"}
 
  ;; Labels for database fields

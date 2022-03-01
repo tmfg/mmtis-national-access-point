@@ -58,12 +58,13 @@
     true
     true))
 
-#_(deftest test-package-creation
-  (let [empty-package (create-zip "empty-package")]
-    (testing "empty-package is created"
-      (println "empty? " (.getPath empty-package))
+(deftest test-package-creation
+  (let [empty-package (create-zip "empty-package" [])]
+    (testing "empty package is created"
       (is (= true (str/ends-with? (.getPath empty-package) "empty.zip")))
-      (is (= true (.exists empty-package))))))
+      (is (= true (.exists empty-package)))
+
+      (is (= true (empty? (zip/list-zip empty-package)))))))
 
 (deftest required-files-are-present
   (let [required-empty-1 [{:name "agency.txt"   :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt [])}

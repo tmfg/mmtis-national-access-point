@@ -5,6 +5,7 @@
   :operators "Transport operators"
   :own-services "Own transport services"
   :admin "Adminstration panel"
+  :admin-detected-changes "Change detection settings"
   :monitor "Monitor view"}
 
  ;; Labels for database fields
