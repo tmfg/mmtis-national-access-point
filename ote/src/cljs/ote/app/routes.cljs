@@ -65,6 +65,7 @@
     ["/admin/detected-changes/detect-changes" :admin-detected-changes]
     ["/admin/detected-changes/route-id" :admin-route-id]
     ["/admin/detected-changes/upload" :admin-upload-gtfs]
+    ["/admin/detected-changes/import-reports" :admin-gtfs-import-reports]
     ["/admin/detected-changes/commercial" :admin-commercial-services]
     ["/admin/detected-changes/exception-days" :admin-exception-days]
     ["/admin/:admin-page" :admin]
@@ -81,7 +82,7 @@
 ;; Add pages that needs :transit-authority? authenticating to this list
 (def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes :monitor})
 
-(def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-commercial-services :admin-exception-days :user-edit})
+(def admin-required #{:admin :admin-detected-changes :admin-route-id :admin-upload-gtfs :admin-gtfs-import-reports :admin-commercial-services :admin-exception-days :user-edit})
 
 (defmulti on-navigate-event
   "Determine event(s) to be run when user navigates to a given route.

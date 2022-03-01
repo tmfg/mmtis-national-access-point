@@ -54,6 +54,17 @@
               :on-failure (tuck/send-async! ->ServerError)})
   app)
 
+(define-event LoadGtfsImportReportsResponse [response]
+  {}
+  (assoc-in app [:admin :transit-changes :gtfs-import-reports] response))
+
+(define-event LoadGtfsImportReports []
+  {}
+  (comm/get! "transit-changes/load-gtfs-import-reports"
+             {:on-success (tuck/send-async! ->LoadGtfsImportReportsResponse)
+              :on-failure (tuck/send-async! ->ServerError)})
+  app)
+
 (defmethod routes/on-navigate-event :admin-detected-changes [{params :params}]
   (->LoadHashRecalculations))
 
@@ -62,6 +73,9 @@
 
 (defmethod routes/on-navigate-event :admin-route-id [_]
   (->LoadRouteHashServices))
+
+(defmethod routes/on-navigate-event :admin-gtfs-import-reports [_]
+  (->LoadGtfsImportReports))
 
 (define-event ChangeDetectionTab [tab-value]
   {}

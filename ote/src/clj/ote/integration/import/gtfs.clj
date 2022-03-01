@@ -132,7 +132,6 @@
                                     :stop-times stop-times}))
           (recur (inc i) ps))))))
 
-
 (defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn interface-url import-date]
   ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
@@ -147,7 +146,7 @@
              (io/copy input output))
            (if-let [db-table-name (db-table-name name)]
              (let [file-type (gtfs-spec/name->keyword name)
-                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))
+                   file-data (gtfs-parse/parse-gtfs-file db package-id file-type (io/reader input))
                    file-data (if intercept-fn
                                (intercept-fn file-type file-data)
                                file-data)]
@@ -156,14 +155,14 @@
                  (when (= 0 (count rows))
                    (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
                                                            :gtfs-import/description (str "No data rows in file " name " of type " file-type)
-                                                           :gtfs-import/error       (.getBytes (str file-data))
+                                                           :gtfs-import/error       (.getBytes "")
                                                            :gtfs-import/severity    "error"}))
                  (doseq [fk rows]
                    (when (and db-table-name (seq fk))
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
              ; record unknown file name
              (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                     :gtfs-import/description (str "Unknown file " name " in GTFS package, no processing done")
+                                                     :gtfs-import/description (str "Unknown file " name " in GTFS package, not processed")
                                                      :gtfs-import/error       (.getBytes "")
                                                      :gtfs-import/severity    "warning"})))))
 
@@ -333,7 +332,12 @@
         gtfs-file (:body response)]
 
     (if (nil? gtfs-file)
-      (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
+      (do
+        (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
+        (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:package-id latest-package)
+                                                :gtfs-import/description (str "Cannot create new GTFS import, " url " returned empty body as response when loading GTFS zip")
+                                                :gtfs-import/error       (.getBytes "")
+                                                :gtfs-import/severity    "error"}))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
