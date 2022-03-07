@@ -21,7 +21,8 @@
             [ote.ui.info :as info]
             [ote.ui.notification :as notification]
             [ote.app.controller.admin-transit-changes :as admin-transit-changes]
-            [ote.ui.common :as common-ui]))
+            [ote.ui.common :as common-ui]
+            [ote.theme.colors :as colors]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -491,6 +492,9 @@
       [ui/table-body {:display-row-checkbox false}
        (doall
          (for [report reports]
+           (let [[severity-text-color severity-bg-color] (case (:gtfs-import/severity report)
+                                                           "warning" [colors/accessible-black colors/basic-yellow]
+                                                           "error"   [colors/primary-text-color colors/accessible-red])]
            ^{:key (:gtfs-import/id report)}
            [ui/table-row {:selectable false}
             [ui/table-row-column {:style {:width "20%"}}
@@ -501,7 +505,9 @@
             [ui/table-row-column {:style {:width "5%"}} (get-in report [:gtfs-import/package_id :gtfs/id])]
             [ui/table-row-column {:style {:width "45%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
             [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
-            [ui/table-row-column {:style {:width "10%"}} (:gtfs-import/severity report)]]))]]]))
+            [ui/table-row-column {:style {:width            "10%"
+                                          :background-color severity-bg-color
+                                          :color            severity-text-color}} (:gtfs-import/severity report)]])))]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
