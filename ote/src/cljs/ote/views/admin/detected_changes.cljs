@@ -485,8 +485,8 @@
                         :display-select-all false}
        [ui/table-row
         [ui/table-header-column {:style {:width "20%"}} "Palvelu"]
-        [ui/table-header-column {:style {:width "5%"}} "Paketti"]
-        [ui/table-header-column {:style {:width "45%"}} "Kuvaus"]
+        [ui/table-header-column {:style {:width "18%"}} "Paketti"]
+        [ui/table-header-column {:style {:width "32%"}} "Kuvaus"]
         [ui/table-header-column {:style {:width "20%"}} "Tarkka virhe"]
         [ui/table-header-column {:style {:width "10%"}} "Vakavuus"]]]
       [ui/table-body {:display-row-checkbox false}
@@ -502,8 +502,12 @@
               (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
               (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
               {:target "_blank"}]]
-            [ui/table-row-column {:style {:width "5%"}} (get-in report [:gtfs-import/package_id :gtfs/id])]
-            [ui/table-row-column {:style {:width "45%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
+            [ui/table-row-column {:style {:width "18%"}}
+             (str
+               (get-in report [:gtfs-import/package_id :gtfs/id])
+               " - "
+               (.toLocaleString (get-in report [:gtfs-import/package_id :gtfs/created])))]
+            [ui/table-row-column {:style {:width "32%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
             [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
             [ui/table-row-column {:style {:width            "10%"
                                           :background-color severity-bg-color

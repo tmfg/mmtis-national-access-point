@@ -125,7 +125,7 @@
         db
         :gtfs-import/report
         #{:gtfs-import/id
-          [:gtfs-import/package_id #{:gtfs/id :gtfs/transport-operator-id :gtfs/transport-service-id}]
+          [:gtfs-import/package_id #{:gtfs/id :gtfs/transport-operator-id :gtfs/transport-service-id :gtfs/created}]
           :gtfs-import/description
           :gtfs-import/error
           :gtfs-import/severity}
