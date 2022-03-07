@@ -20,7 +20,8 @@
             [ote.ui.tabs :as tabs]
             [ote.ui.info :as info]
             [ote.ui.notification :as notification]
-            [ote.app.controller.admin-transit-changes :as admin-transit-changes]))
+            [ote.app.controller.admin-transit-changes :as admin-transit-changes]
+            [ote.ui.common :as common-ui]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -482,10 +483,9 @@
       [ui/table-header {:adjust-for-checkbox false
                         :display-select-all false}
        [ui/table-row
-        [ui/table-header-column {:style {:width "15%"}} "Palveluntuottaja"]
-        [ui/table-header-column {:style {:width "15%"}} "Nimi"]
+        [ui/table-header-column {:style {:width "20%"}} "Palvelu"]
         [ui/table-header-column {:style {:width "5%"}} "Paketti"]
-        [ui/table-header-column {:style {:width "35%"}} "Kuvaus"]
+        [ui/table-header-column {:style {:width "45%"}} "Kuvaus"]
         [ui/table-header-column {:style {:width "20%"}} "Tarkka virhe"]
         [ui/table-header-column {:style {:width "10%"}} "Vakavuus"]]]
       [ui/table-body {:display-row-checkbox false}
@@ -493,10 +493,13 @@
          (for [report reports]
            ^{:key (:gtfs-import/id report)}
            [ui/table-row {:selectable false}
-            [ui/table-row-column {:style {:width "15%"}} (get-in report [:gtfs-package/transport-operator ::t-operator/name])]
-            [ui/table-row-column {:style {:width "15%"}} (get-in report [:gtfs-package/transport-service ::t-service/name])]
+            [ui/table-row-column {:style {:width "20%"}}
+             [common-ui/linkify
+              (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
+              (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
+              {:target "_blank"}]]
             [ui/table-row-column {:style {:width "5%"}} (get-in report [:gtfs-import/package_id :gtfs/id])]
-            [ui/table-row-column {:style {:width "35%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
+            [ui/table-row-column {:style {:width "45%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
             [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
             [ui/table-row-column {:style {:width "10%"}} (:gtfs-import/severity report)]]))]]]))
 
