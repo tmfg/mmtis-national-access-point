@@ -104,7 +104,15 @@
   (let [;; Read all trips into memory (mapping from trip id to the row and index for update)
         trip-id->update-info (into {}
                                    (map (juxt :trip-id identity))
-                                   (gtfs-trip-id-and-index db {:package-id package-id}))]
+                                   (gtfs-trip-id-and-index db {:package-id package-id}))
+        all-stop-times       (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt (io/reader stop-times-file))]
+    (when (empty? all-stop-times)
+      ; This is almost a copy-paste from a bit lower in this same namespace, the description is chosen so that it
+      ; matches with the other one.
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
+                                              :gtfs-import/error       (.getBytes "")
+                                              :gtfs-import/severity    "error"}))
     (loop [i 0
 
            ;; Stop times file should have stops with the same trip id on consecutive lines
@@ -112,8 +120,7 @@
            ;; the same trip id.
            [p & ps] (partition-by
                      :gtfs/trip-id
-                     (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt
-                                                 (io/reader stop-times-file)))]
+                     all-stop-times)]
       (when p
         (when (zero? (mod i 1000))
           (log/debug "Trip partitions stored: " i "/" (count ps)))
@@ -237,26 +244,34 @@
       nil)))
 
 (defmulti validate-interface-zip-package
-          (fn [type _] type))
+          (fn [type _ _ _] type))
 
-(defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
-  (let [file-list (list-zip byte-array-input)]
+(defmethod validate-interface-zip-package :gtfs [_ db package-id byte-array-input]
+  (let [expected-files #{"agency.txt" "stops.txt" "stop_times.txt" "calendar_dates.txt" "routes.txt" "trips.txt"}
+        file-list      (list-zip byte-array-input)
+        missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
-    (when-not (or
-                (every? file-list ["agency.txt" "stops.txt" "calendar.txt" "trips.txt"])
-                (every? file-list ["agency.txt" "stops.txt" "calendar_dates.txt" "trips.txt"]))
-      (throw (ex-info "Missing required files in gtfs zip file" {:file-names file-list})))))
+    (when-not (empty? missing-files)
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description "Missing required files in GTFS ZIP file"
+                                              :gtfs-import/error       (.getBytes (pr-str {:expected-files expected-files
+                                                                                           :file-list      file-list
+                                                                                           :missing-files  missing-files}))
+                                              :gtfs-import/severity    "error"})
+      (throw (ex-info (str "Missing required files in gtfs zip file, missing " missing-files) {:expected-files expected-files
+                                                                 :file-list      file-list
+                                                                 :missing-files  missing-files})))))
 
-(defmethod validate-interface-zip-package :kalkati [_ byte-array-input]
+(defmethod validate-interface-zip-package :kalkati [_ db package-id byte-array-input]
   (let [file-list (list-zip byte-array-input)]
 
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
 
-(defn check-interface-zip [type db interface-id url byte-array-data service-id]
+(defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
-    (validate-interface-zip-package type byte-array-data)
+    (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
       (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
@@ -266,18 +281,18 @@
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
                        ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      (throw (ex-info (str "Invalid interface package: " (.getMessage e)) {})))))
+      (throw (ex-info (str "Invalid interface package") {} e)))))
 
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
           Returns a response map or nil if it has not been modified."
-          (fn [type _ _ _ _ _ _ _] type))
+          (fn [type _ _ _ _ _ _ _ _] type))
 
-(defmethod load-transit-interface-url :gtfs [type db interface-id service-id url last-import-date saved-etag force-download?]
+(defmethod load-transit-interface-url :gtfs [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         response
 
         ;; Return nil response in case of error
@@ -287,11 +302,11 @@
       ;; Return nil response in case of error
       nil)))
 
-(defmethod load-transit-interface-url :kalkati [type db interface-id service-id url last-import-date saved-etag force-download?]
+(defmethod load-transit-interface-url :kalkati [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         (update response :body kalkati-to-gtfs/convert-bytes)
 
         ;; Return nil response in case of error
@@ -326,7 +341,7 @@
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
         _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
-        response (load-transit-interface-url interface-type db id ts-id url last-import-date
+        response (load-transit-interface-url interface-type db (:gtfs/id latest-package) id ts-id url last-import-date
                                              (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
