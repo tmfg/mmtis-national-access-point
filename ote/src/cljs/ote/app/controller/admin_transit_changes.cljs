@@ -56,7 +56,9 @@
 
 (define-event LoadGtfsImportReportsResponse [response]
   {}
-  (assoc-in app [:admin :transit-changes :gtfs-import-reports] response))
+  (-> app
+      (assoc-in [:admin :transit-changes :gtfs-import-reports :reports] response)
+      (assoc-in [:admin :transit-changes :gtfs-import-reports :filters] {:gtfs-import/severity #{"error"}})))
 
 (define-event LoadGtfsImportReports []
   {}
@@ -64,6 +66,14 @@
              {:on-success (tuck/send-async! ->LoadGtfsImportReportsResponse)
               :on-failure (tuck/send-async! ->ServerError)})
   app)
+
+(define-event FlipReportFilter [filter-key flip-value]
+  {}
+  (update-in app [:admin :transit-changes :gtfs-import-reports :filters filter-key]
+             (fn [filter]
+               (if (get filter flip-value)
+                 (disj filter flip-value)
+                 (conj filter flip-value)))))
 
 (defmethod routes/on-navigate-event :admin-detected-changes [{params :params}]
   (->LoadHashRecalculations))

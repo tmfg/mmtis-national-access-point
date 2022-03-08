@@ -476,13 +476,29 @@
         (get-in app-state [:admin :transit-changes :upload-gtfs])]
        [:div "Anna sellaisen palvelun id, jolla on rajapintoja"])]))
 
+(defn filter-checkbox
+  [e! filters filter-key flip-value label]
+  (let [checkbox-name (str "select-" flip-value)]
+    [:div
+     [:input {:type            "checkbox"
+              :name            checkbox-name
+              :default-checked (contains? (get filters filter-key) flip-value)
+              :on-click        #(e! (admin-transit-changes/->FlipReportFilter filter-key flip-value))}]
+     [:label {:for checkbox-name} label]]))
+
 (defn gtfs-import-reports
   [e! app-state]
-  (let [reports (get-in app-state [:admin :transit-changes :gtfs-import-reports])]
+  (let [{:keys [reports filters]} (get-in app-state [:admin :transit-changes :gtfs-import-reports])
+        reports (filter #(contains? (get filters :gtfs-import/severity) (:gtfs-import/severity %)) reports)]
     [:div
+     [:h2 "Suodattimet"]
+     [:div {:style {:padding-bottom "1em"}}
+      [:h3 "Vakavuus"]
+      [filter-checkbox e! filters :gtfs-import/severity "error" "Näytä error-tason ongelmat"]
+      [filter-checkbox e! filters :gtfs-import/severity "warning" "Näytä warning-tason ongelmat"]]
      [ui/table {:selectable false}
       [ui/table-header {:adjust-for-checkbox false
-                        :display-select-all false}
+                        :display-select-all  false}
        [ui/table-row
         [ui/table-header-column {:style {:width "20%"}} "Palvelu"]
         [ui/table-header-column {:style {:width "18%"}} "Paketti"]
@@ -494,24 +510,24 @@
          (for [report reports]
            (let [[severity-text-color severity-bg-color] (case (:gtfs-import/severity report)
                                                            "warning" [colors/accessible-black colors/basic-yellow]
-                                                           "error"   [colors/primary-text-color colors/accessible-red])]
-           ^{:key (:gtfs-import/id report)}
-           [ui/table-row {:selectable false}
-            [ui/table-row-column {:style {:width "20%"}}
-             [common-ui/linkify
-              (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
-              (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
-              {:target "_blank"}]]
-            [ui/table-row-column {:style {:width "18%"}}
-             (str
-               (get-in report [:gtfs-import/package_id :gtfs/id])
-               " - "
-               (.toLocaleString (get-in report [:gtfs-import/package_id :gtfs/created])))]
-            [ui/table-row-column {:style {:width "32%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
-            [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
-            [ui/table-row-column {:style {:width            "10%"
-                                          :background-color severity-bg-color
-                                          :color            severity-text-color}} (:gtfs-import/severity report)]])))]]]))
+                                                           "error" [colors/primary-text-color colors/accessible-red])]
+             ^{:key (:gtfs-import/id report)}
+             [ui/table-row {:selectable false}
+              [ui/table-row-column {:style {:width "20%"}}
+               [common-ui/linkify
+                (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
+                (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
+                {:target "_blank"}]]
+              [ui/table-row-column {:style {:width "18%"}}
+               (str
+                 (get-in report [:gtfs-import/package_id :gtfs/id])
+                 " - "
+                 (.toLocaleString (get-in report [:gtfs-import/package_id :gtfs/created])))]
+              [ui/table-row-column {:style {:width "32%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
+              [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
+              [ui/table-row-column {:style {:width            "10%"
+                                            :background-color severity-bg-color
+                                            :color            severity-text-color}} (:gtfs-import/severity report)]])))]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
@@ -533,7 +549,7 @@
           [:div
            [tabs/tabs tabs {:update-fn #(e! (admin-transit-changes/->ChangeDetectionTab %))
                             :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
-           [:div.container {:style {:margin-top "20px"}}
+           [:div.container
             (case selected-tab
               "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
               "admin-route-id" [route-id e! app-state recalc?]
