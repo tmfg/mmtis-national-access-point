@@ -7,6 +7,7 @@
             [ote.localization :refer [tr tr-key]]
             [cljs-time.core :as t]
             [ote.time :as time]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.style.base :as style-base]
             [ote.style.admin :as style-admin]
@@ -19,7 +20,9 @@
             [ote.ui.tabs :as tabs]
             [ote.ui.info :as info]
             [ote.ui.notification :as notification]
-            [ote.app.controller.admin-transit-changes :as admin-transit-changes]))
+            [ote.app.controller.admin-transit-changes :as admin-transit-changes]
+            [ote.ui.common :as common-ui]
+            [ote.theme.colors :as colors]))
 
 (defn hash-recalculation-warning
   "When hash calculation is on going we need to block users to start it again."
@@ -473,6 +476,59 @@
         (get-in app-state [:admin :transit-changes :upload-gtfs])]
        [:div "Anna sellaisen palvelun id, jolla on rajapintoja"])]))
 
+(defn filter-checkbox
+  [e! filters filter-key flip-value label]
+  (let [checkbox-name (str "select-" flip-value)]
+    [:div
+     [:input {:type            "checkbox"
+              :name            checkbox-name
+              :default-checked (contains? (get filters filter-key) flip-value)
+              :on-click        #(e! (admin-transit-changes/->FlipReportFilter filter-key flip-value))}]
+     [:label {:for checkbox-name} label]]))
+
+(defn gtfs-import-reports
+  [e! app-state]
+  (let [{:keys [reports filters]} (get-in app-state [:admin :transit-changes :gtfs-import-reports])
+        reports (filter #(contains? (get filters :gtfs-import/severity) (:gtfs-import/severity %)) reports)]
+    [:div
+     [:h2 "Suodattimet"]
+     [:div {:style {:padding-bottom "1em"}}
+      [:h3 "Vakavuus"]
+      [filter-checkbox e! filters :gtfs-import/severity "error" "Näytä error-tason ongelmat"]
+      [filter-checkbox e! filters :gtfs-import/severity "warning" "Näytä warning-tason ongelmat"]]
+     [ui/table {:selectable false}
+      [ui/table-header {:adjust-for-checkbox false
+                        :display-select-all  false}
+       [ui/table-row
+        [ui/table-header-column {:style {:width "20%"}} "Palvelu"]
+        [ui/table-header-column {:style {:width "18%"}} "Paketti"]
+        [ui/table-header-column {:style {:width "32%"}} "Kuvaus"]
+        [ui/table-header-column {:style {:width "20%"}} "Tarkka virhe"]
+        [ui/table-header-column {:style {:width "10%"}} "Vakavuus"]]]
+      [ui/table-body {:display-row-checkbox false}
+       (doall
+         (for [report reports]
+           (let [[severity-text-color severity-bg-color] (case (:gtfs-import/severity report)
+                                                           "warning" [colors/accessible-black colors/basic-yellow]
+                                                           "error" [colors/primary-text-color colors/accessible-red])]
+             ^{:key (:gtfs-import/id report)}
+             [ui/table-row {:selectable false}
+              [ui/table-row-column {:style {:width "20%"}}
+               [common-ui/linkify
+                (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
+                (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
+                {:target "_blank"}]]
+              [ui/table-row-column {:style {:width "18%"}}
+               (str
+                 (get-in report [:gtfs-import/package_id :gtfs/id])
+                 " - "
+                 (.toLocaleString (get-in report [:gtfs-import/package_id :gtfs/created])))]
+              [ui/table-row-column {:style {:width "32%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
+              [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
+              [ui/table-row-column {:style {:width            "10%"
+                                            :background-color severity-bg-color
+                                            :color            severity-text-color}} (:gtfs-import/severity report)]])))]]]))
+
 (defn configure-detected-changes [e! app-state]
   (r/create-class
     {:component-will-mount #(e! (admin-transit-changes/->InitAdminDetectedChanges))
@@ -480,24 +536,25 @@
      (fn [e! app-state]
        (let [tabs [{:label "Tunnista muutokset" :value "admin-detected-changes"}
                    {:label "Reitin tunnistus" :value "admin-route-id"}
-                   {:label "Lataa gtfs" :value "admin-upload-gtfs"}
+                   {:label "Lataa GTFS" :value "admin-upload-gtfs"}
+                   {:label "GTFS virhesanomat" :value "admin-gtfs-import-reports"}
                    {:label "Sopimusliikenne" :value "admin-commercial-services"}
                    {:label "Poikkeuspäivät" :value "admin-exception-days"}]
              selected-tab (or (get-in app-state [:admin :transit-changes :tab]) "admin-detected-changes")
              recalc? (some? (get-in app-state [:admin :transit-changes :hash-recalculations]))]
          [:div
-          [common/back-link-with-event :admin "Takaisin ylläpitopaneelin etusivulle"]
           [:h2 "Muutostunnistukseen liittyviä työkaluja"]
 
           ;; If hash recalculations are ongoing disable some of the tabs
           [:div
            [tabs/tabs tabs {:update-fn #(e! (admin-transit-changes/->ChangeDetectionTab %))
                             :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
-           [:div.container {:style {:margin-top "20px"}}
+           [:div.container
             (case selected-tab
               "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
               "admin-route-id" [route-id e! app-state recalc?]
               "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
+              "admin-gtfs-import-reports" [gtfs-import-reports e! app-state]
               "admin-commercial-services" [contract-traffic e! app-state]
               "admin-exception-days" [admin-exception-days e! app-state]
               ;;default

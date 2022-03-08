@@ -182,7 +182,7 @@
           error-files (->> action_report
                            :files
                            (filter #(= "NOK" (:status %)))
-                           (map :name))]
+                           (mapv :name))]
 
       (if (and (= "OK" result) (empty? error-files))
         true

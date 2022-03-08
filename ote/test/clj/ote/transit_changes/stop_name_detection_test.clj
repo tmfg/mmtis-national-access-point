@@ -59,7 +59,6 @@
   (let [result (detection/compare-selected-trips
                  p1 p2-change-stop-name
                  (d 2018 11 7) (d 2019 01 02))]
-    (println "tulo \n " (pr-str result))
     (is (= (:added-trips result) 0))
     (is (= (:removed-trips result) 0))
     (is (= (:stop-seq-changes (first (:trip-changes result))) 0))

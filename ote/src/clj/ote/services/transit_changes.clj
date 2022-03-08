@@ -9,6 +9,7 @@
 
             [ote.util.db :refer [PgArray->vec]]
             [ote.db.places :as places]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
 
             [ote.components.service :refer [define-service-component]]
@@ -118,6 +119,36 @@
 (defn services-with-route-hash-id [db]
   (fetch-services-with-route-hash-id db))
 
+(defn load-gtfs-import-reports
+  [db]
+  (->> (specql/fetch
+        db
+        :gtfs-import/report
+        #{:gtfs-import/id
+          [:gtfs-import/package_id #{:gtfs/id :gtfs/transport-operator-id :gtfs/transport-service-id :gtfs/created}]
+          :gtfs-import/description
+          :gtfs-import/error
+          :gtfs-import/severity}
+        {})
+      ; JOINs need to be done manually like so because the relevant specql tables are defined through multiple contexts
+      ; which cannot cross-reference each other
+      (map (fn [row]
+             (let [operator-id (get-in row [:gtfs-import/package_id :gtfs/transport-operator-id])
+                   service-id  (get-in row [:gtfs-import/package_id :gtfs/transport-service-id])]
+               (-> row
+                   (assoc :gtfs-package/transport-operator
+                          (first (specql/fetch db
+                                               ::t-operator/transport-operator
+                                               #{::t-operator/id ::t-operator/name}
+                                               {::t-operator/id operator-id})))
+                   (assoc :gtfs-package/transport-service
+                          (first (specql/fetch db
+                                               ::t-service/transport-service
+                                               #{::t-service/id ::t-service/name}
+                                               {::t-service/id service-id})))
+                   (update :gtfs-import/error #(String. %))))))
+       ))
+
 (define-service-component TransitChanges {:fields [config]}
 
   ^{:unauthenticated false :format :transit}
@@ -174,6 +205,11 @@
   (GET "/transit-changes/load-services-with-route-hash-id" req
     (when (authorization/admin? (:user req))
       (http/transit-response (services-with-route-hash-id db))))
+
+  ;; Load services and their route-hash-id-type
+  (GET "/transit-changes/load-gtfs-import-reports" req
+    (when (authorization/admin? (:user req))
+      (http/transit-response (load-gtfs-import-reports db))))
 
   ;; Force change detection for all services
   (POST "/transit-changes/force-detect/" req

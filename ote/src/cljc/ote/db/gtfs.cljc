@@ -1,6 +1,8 @@
 (ns ote.db.gtfs
   "Datamodel for gtfs related tables"
   (:require [clojure.spec.alpha :as s]
+            [ote.db.transport-operator :as transport-operator]
+            [ote.db.transport-service :as transport-service]
             [ote.gtfs.spec]
             [ote.time :as time]
             [ote.gtfs.parse :as gtfs-parse]
@@ -40,7 +42,9 @@
   ["hash-recalculation" :gtfs/hash-recalculation
    {"id" :gtfs/recalculation-id}]
   ["detected-change-history" :gtfs/detected-change-history]
-  ["detection-holidays" :gtfs/detection-holidays])
+  ["detection-holidays" :gtfs/detection-holidays]
+
+  ["gtfs_import_report" :gtfs-import/report {:gtfs-import/package_id (specql.rel/has-one :gtfs-import/package_id :gtfs/package :gtfs/id)}])
 
 #?(:clj
    (def ^:const int4range-pattern

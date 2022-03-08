@@ -6,6 +6,7 @@
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [ote.time :as time]
+            #?(:clj [specql.core :as specql])
             #?(:cljs [goog.string :as gstr])
             [taoensso.timbre :as log]))
 
@@ -137,33 +138,39 @@ This is only called with GTFS field names and cannot grow unbounded."}
   "Parse GTFS file of `gtfs-file-type` from `content`.
   Content may be a string or a reader. Returns a lazy sequence
   of parsed items."
-  [gtfs-file-type content]
-  (let [[header & rows] (csv/read-csv content)
-        {fields :fields} (file-info gtfs-file-type)
-        allowed-fields (into #{} fields)
-        content-fields (into []
-                             (map #(keyword "gtfs"
-                                            (-> %
-                                                (str/replace #"\uFEFF" "")
-                                                (str/replace #"_" "-"))))
-                             header)]
-    (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
-      (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields))
-    (for [row rows]
-      (into {}
-           (remove nil?
-                   (map (fn [field value]
-                          (when (and (allowed-fields field)
-                                     (not (str/blank? value)))
-                            [field (gtfs->clj (field-spec-description field) value)]))
-                        content-fields row))))))
-
+  ([gtfs-file-type content]
+   (parse-gtfs-file nil nil gtfs-file-type content))
+  ([db package-id gtfs-file-type content]
+   (let [[header & rows] (csv/read-csv content)
+         {fields :fields} (file-info gtfs-file-type)
+         allowed-fields (into #{} fields)
+         content-fields (into []
+                              (map #(keyword "gtfs"
+                                             (-> %
+                                                 (str/replace #"\uFEFF" "")
+                                                 (str/replace #"_" "-"))))
+                              header)]
+     (when (and (some? db) (some? package-id))
+       (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
+         (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields)
+         #?(:clj (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                                         :gtfs-import/description (str "GTFS file " gtfs-file-type " contains unknown fields")
+                                                         :gtfs-import/error       (.getBytes (str unknown-fields))
+                                                         :gtfs-import/severity    "warning"}))))
+     (for [row rows]
+       (into {}
+            (remove nil?
+                    (map (fn [field value]
+                           (when (and (allowed-fields field)
+                                      (not (str/blank? value)))
+                             [field (gtfs->clj (field-spec-description field) value)]))
+                         content-fields row)))))))
 
 (defn unparse-gtfs-file [gtfs-file-type content]
   (let [{:keys [header fields]} (file-info gtfs-file-type)]
     (try
       ;; If we have no content, do not try to create file data.
-      (when (seq (first content))
+      (when true #_(seq (first content))
         (str header "\n"
              (csv->string
                (mapv (fn [row]

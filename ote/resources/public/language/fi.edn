@@ -5,6 +5,7 @@
   :operators "Palveluntuottajat"
   :own-services "Omat palvelutiedot"
   :admin "Ylläpitopaneeli"
+  :admin-detected-changes "Muutostunnistuksen asetukset"
   :monitor "Valvontanäkymä"}
 
  ;; Labels for database fields

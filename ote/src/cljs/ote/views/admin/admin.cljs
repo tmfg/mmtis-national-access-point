@@ -332,17 +332,6 @@
                 (when (get-in app [:user :authority-group-admin?]) {:label "Ylläpitoryhmän hallinta" :value "authority-group-admin"})])
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
-     [:div {:style {:position "absolute" :right "20px"}}
-      [:a (merge {:href "/#/admin/detected-changes/detect-changes"
-                  :style {:margin-right "2rem"}
-                  :id "admin-transit-changes-settings-btn"
-                  :on-click #(do
-                               (.preventDefault %)
-                               (e! (fp/->ChangePage :admin-detected-changes nil)))}
-                 (stylefy/use-style style-base/blue-link-with-icon))
-       [ic/action-settings]
-       [:span {:style {:padding-left "0.5rem"}}
-        "Muutostunnistuksen asetukset"]]]
      [page/page-controls "" "Ylläpitopaneeli"
       [:div {:style {:padding-bottom "20px"}}
        [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))

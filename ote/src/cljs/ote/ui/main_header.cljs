@@ -220,6 +220,10 @@
                                                                       :label (tr [:document-title :admin])
                                                                       :href "#/admin"})
                                                                    (when (user-is? app :authority-group-admin?)
+                                                                     {:key :admin-detected-changes
+                                                                      :label (tr [:document-title :admin-detected-changes])
+                                                                      :href "#/admin/detected-changes/detect-changes"})
+                                                                   (when (user-is? app :authority-group-admin?)
                                                                      {:key :monitor
                                                                       :label (tr [:document-title :monitor])
                                                                       :href "#/monitor"})]

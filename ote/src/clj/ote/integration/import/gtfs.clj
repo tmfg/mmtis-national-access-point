@@ -104,7 +104,15 @@
   (let [;; Read all trips into memory (mapping from trip id to the row and index for update)
         trip-id->update-info (into {}
                                    (map (juxt :trip-id identity))
-                                   (gtfs-trip-id-and-index db {:package-id package-id}))]
+                                   (gtfs-trip-id-and-index db {:package-id package-id}))
+        all-stop-times       (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt (io/reader stop-times-file))]
+    (when (empty? all-stop-times)
+      ; This is almost a copy-paste from a bit lower in this same namespace, the description is chosen so that it
+      ; matches with the other one.
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
+                                              :gtfs-import/error       (.getBytes "")
+                                              :gtfs-import/severity    "error"}))
     (loop [i 0
 
            ;; Stop times file should have stops with the same trip id on consecutive lines
@@ -112,8 +120,7 @@
            ;; the same trip id.
            [p & ps] (partition-by
                      :gtfs/trip-id
-                     (gtfs-parse/parse-gtfs-file :gtfs/stop-times-txt
-                                                 (io/reader stop-times-file)))]
+                     all-stop-times)]
       (when p
         (when (zero? (mod i 1000))
           (log/debug "Trip partitions stored: " i "/" (count ps)))
@@ -132,7 +139,6 @@
                                     :stop-times stop-times}))
           (recur (inc i) ps))))))
 
-
 (defn save-gtfs-to-db [db gtfs-file package-id interface-id service-id intercept-fn interface-url import-date]
   ;; intercept-fn is for tests, when we want to rewrite dates in incoming data
   (log/debug "Save-gtfs-to-db - package-id: " package-id " interface-id " interface-id)
@@ -145,16 +151,27 @@
            ;; Copy stop times to a temp file, we need to process it last
            (with-open [output (io/output-stream stop-times-file)]
              (io/copy input output))
-           (when-let [db-table-name (db-table-name name)]
+           (if-let [db-table-name (db-table-name name)]
              (let [file-type (gtfs-spec/name->keyword name)
-                   file-data (gtfs-parse/parse-gtfs-file file-type (io/reader input))
+                   file-data (gtfs-parse/parse-gtfs-file db package-id file-type (io/reader input))
                    file-data (if intercept-fn
                                (intercept-fn file-type file-data)
                                file-data)]
                (log/debug file-type " file: " name " PARSED.")
-               (doseq [fk (process-rows file-type file-data)]
-                 (when (and db-table-name (seq fk))
-                   (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id)))))))))
+               (let [rows (process-rows file-type file-data)]
+                 (when (= 0 (count rows))
+                   (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                                           :gtfs-import/description (str "No data rows in file " name " of type " file-type)
+                                                           :gtfs-import/error       (.getBytes "")
+                                                           :gtfs-import/severity    "error"}))
+                 (doseq [fk rows]
+                   (when (and db-table-name (seq fk))
+                     (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
+             ; record unknown file name
+             (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                                     :gtfs-import/description (str "Unknown file " name " in GTFS package, not processed")
+                                                     :gtfs-import/error       (.getBytes "")
+                                                     :gtfs-import/severity    "warning"})))))
 
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
@@ -227,26 +244,34 @@
       nil)))
 
 (defmulti validate-interface-zip-package
-          (fn [type _] type))
+          (fn [type _ _ _] type))
 
-(defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
-  (let [file-list (list-zip byte-array-input)]
+(defmethod validate-interface-zip-package :gtfs [_ db package-id byte-array-input]
+  (let [expected-files #{"agency.txt" "stops.txt" "stop_times.txt" "calendar_dates.txt" "routes.txt" "trips.txt"}
+        file-list      (list-zip byte-array-input)
+        missing-files  (clojure.set/difference expected-files (set file-list))]
+    (log/debug "Files in ZIP" file-list)
+    (when-not (empty? missing-files)
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description "Missing required files in GTFS ZIP file"
+                                              :gtfs-import/error       (.getBytes (pr-str {:expected-files expected-files
+                                                                                           :file-list      file-list
+                                                                                           :missing-files  missing-files}))
+                                              :gtfs-import/severity    "error"})
+      (throw (ex-info (str "Missing required files in gtfs zip file, missing " missing-files) {:expected-files expected-files
+                                                                 :file-list      file-list
+                                                                 :missing-files  missing-files})))))
 
-    (when-not (or
-                (every? file-list ["agency.txt" "stops.txt" "calendar.txt" "trips.txt"])
-                (every? file-list ["agency.txt" "stops.txt" "calendar_dates.txt" "trips.txt"]))
-      (throw (ex-info "Missing required files in gtfs zip file" {:file-names file-list})))))
-
-(defmethod validate-interface-zip-package :kalkati [_ byte-array-input]
+(defmethod validate-interface-zip-package :kalkati [_ db package-id byte-array-input]
   (let [file-list (list-zip byte-array-input)]
 
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
 
-(defn check-interface-zip [type db interface-id url byte-array-data service-id]
+(defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
-    (validate-interface-zip-package type byte-array-data)
+    (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
       (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
@@ -256,18 +281,18 @@
                        ::t-service/download-status :failure
                        ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
                        ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      (throw (ex-info (str "Invalid interface package: " (.getMessage e)) {})))))
+      (throw (ex-info (str "Invalid interface package") {} e)))))
 
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
           Returns a response map or nil if it has not been modified."
-          (fn [type _ _ _ _ _ _ _] type))
+          (fn [type _ _ _ _ _ _ _ _] type))
 
-(defmethod load-transit-interface-url :gtfs [type db interface-id service-id url last-import-date saved-etag force-download?]
+(defmethod load-transit-interface-url :gtfs [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         response
 
         ;; Return nil response in case of error
@@ -277,11 +302,11 @@
       ;; Return nil response in case of error
       nil)))
 
-(defmethod load-transit-interface-url :kalkati [type db interface-id service-id url last-import-date saved-etag force-download?]
+(defmethod load-transit-interface-url :kalkati [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
   (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
-        (check-interface-zip type db interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
         (update response :body kalkati-to-gtfs/convert-bytes)
 
         ;; Return nil response in case of error
@@ -295,7 +320,7 @@
   (when interface-id
      (first
       (specql/fetch db :gtfs/package
-                    #{:gtfs/etag :gtfs/sha256}
+                    #{:gtfs/id :gtfs/etag :gtfs/sha256}
                     {:gtfs/external-interface-description-id interface-id
                      :gtfs/deleted? false}
                     {::specql/order-by :gtfs/created
@@ -316,13 +341,19 @@
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
         _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
-        response (load-transit-interface-url interface-type db id ts-id url last-import-date
+        response (load-transit-interface-url interface-type db (:gtfs/id latest-package) id ts-id url last-import-date
                                              (:gtfs/etag latest-package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
     (if (nil? gtfs-file)
-      (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
+      (do
+        (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
+        (when (some? latest-package)
+          (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:gtfs/id latest-package)
+                                                  :gtfs-import/description (str "Cannot create new GTFS import, " url " returned empty body as response when loading GTFS zip")
+                                                  :gtfs-import/error       (.getBytes "")
+                                                  :gtfs-import/severity    "error"})))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
@@ -338,7 +369,8 @@
                                          :gtfs/external-interface-description-id id})]
             (when upload-s3?
               (s3/put-object (:bucket gtfs-config)
-                             filename (java.io.ByteArrayInputStream. gtfs-file)
+                             filename
+                             (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
               (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
@@ -346,7 +378,7 @@
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id
                                ::t-service/transport-service-id ts-id
-                               ::t-service/download-status :success
+                               ::t-service/download-status :success  ; TODO: status should be dependent on number of errors
                                ::t-service/package-id (:gtfs/id package)
                                ::t-service/url url
                                ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})))
@@ -363,6 +395,7 @@
        :external-interface-description-id id
        :external-interface-data-content data-content
        :service-id ts-id
+       :package-id (:gtfs/id (interface-latest-package db id))  ; re-fetch package to make sure we have the latest
        :operator-name operator-name})))
 
 (defrecord GTFSImport [config]
