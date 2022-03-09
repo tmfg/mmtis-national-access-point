@@ -56,16 +56,14 @@
 
 (define-event LoadGtfsImportReportsResponse [response]
   {}
-  (-> app
-      (assoc-in [:admin :transit-changes :gtfs-import-reports :reports] response)
-      (assoc-in [:admin :transit-changes :gtfs-import-reports :filters] {:gtfs-import/severity #{"error"}})))
+  (assoc-in app [:admin :transit-changes :gtfs-import-reports :reports] response))
 
 (define-event LoadGtfsImportReports []
   {}
   (comm/get! "transit-changes/load-gtfs-import-reports"
              {:on-success (tuck/send-async! ->LoadGtfsImportReportsResponse)
               :on-failure (tuck/send-async! ->ServerError)})
-  app)
+  (assoc-in app [:admin :transit-changes :gtfs-import-reports :filters] {:gtfs-import/severity #{"error"}}))
 
 (define-event FlipReportFilter [filter-key flip-value]
   {}

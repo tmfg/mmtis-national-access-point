@@ -489,7 +489,8 @@
 (defn gtfs-import-reports
   [e! app-state]
   (let [{:keys [reports filters]} (get-in app-state [:admin :transit-changes :gtfs-import-reports])
-        reports (filter #(contains? (get filters :gtfs-import/severity) (:gtfs-import/severity %)) reports)]
+        reports (filter #(contains? (get filters :gtfs-import/severity) (get-in % [:gtfs-import-report :severity])) reports)]
+    (js/console.log (str "reports" reports))
     [:div
      [:h2 "Suodattimet"]
      [:div {:style {:padding-bottom "1em"}}
@@ -508,26 +509,27 @@
       [ui/table-body {:display-row-checkbox false}
        (doall
          (for [report reports]
-           (let [[severity-text-color severity-bg-color] (case (:gtfs-import/severity report)
+           (let [[severity-text-color severity-bg-color] (case (get-in report [:gtfs-import-report :severity])
                                                            "warning" [colors/accessible-black colors/basic-yellow]
                                                            "error" [colors/primary-text-color colors/accessible-red])]
-             ^{:key (:gtfs-import/id report)}
+             (js/console.log (str "report: " report))
+             ^{:key (get-in report [:gtfs-import-report :id])}
              [ui/table-row {:selectable false}
               [ui/table-row-column {:style {:width "20%"}}
                [common-ui/linkify
-                (str "/#/service/" (get-in report [:gtfs-package/transport-operator ::t-operator/id]) "/" (get-in report [:gtfs-package/transport-service ::t-service/id]))
-                (str (get-in report [:gtfs-package/transport-operator ::t-operator/name]) " / " (get-in report [:gtfs-package/transport-service ::t-service/name]))
+                (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
+                (str (get-in report [:transport-operator :name]) " / " (get-in report [:transport-service :name]))
                 {:target "_blank"}]]
               [ui/table-row-column {:style {:width "18%"}}
                (str
-                 (get-in report [:gtfs-import/package_id :gtfs/id])
+                 (get-in report [:gtfs-package :id])
                  " - "
-                 (.toLocaleString (get-in report [:gtfs-import/package_id :gtfs/created])))]
-              [ui/table-row-column {:style {:width "32%"} :title (:gtfs-import/description report)} (:gtfs-import/description report)]
-              [ui/table-row-column {:style {:width "20%"} :title (:gtfs-import/error report)} (:gtfs-import/error report)]
+                 (.toLocaleString (get-in report [:gtfs-package :created])))]
+              [ui/table-row-column {:style {:width "32%"} :title (get-in report [:gtfs-import-report :description])} (get-in report [:gtfs-import-report :description])]
+              [ui/table-row-column {:style {:width "20%"} :title (get-in report [:gtfs-import-report :error])} (get-in report [:gtfs-import-report :error] )]
               [ui/table-row-column {:style {:width            "10%"
                                             :background-color severity-bg-color
-                                            :color            severity-text-color}} (:gtfs-import/severity report)]])))]]]))
+                                            :color            severity-text-color}} (get-in report [:gtfs-import-report :severity])]])))]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
