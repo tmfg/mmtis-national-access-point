@@ -123,7 +123,8 @@
 (defn load-gtfs-import-reports
   [db]
   (->> (fetch-import-reports-for-latest-packages db)
-       (map db-utils/underscore->structure)))
+       (map (comp db-utils/underscore->structure
+                  #(update % :gtfs-import-report_error (fn [v] (String. v)))))))
 
 (define-service-component TransitChanges {:fields [config]}
 
