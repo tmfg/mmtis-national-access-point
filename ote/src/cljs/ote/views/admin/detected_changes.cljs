@@ -480,17 +480,20 @@
   [e! filters filter-key flip-value label]
   (let [checkbox-name (str "select-" flip-value)]
     [:div
-     [:input {:type            "checkbox"
-              :name            checkbox-name
-              :default-checked (contains? (get filters filter-key) flip-value)
-              :on-click        #(e! (admin-transit-changes/->FlipReportFilter filter-key flip-value))}]
+     [:input {:type      "checkbox"
+              :id        checkbox-name
+              :name      checkbox-name
+              :checked   (contains? (get filters filter-key) flip-value)
+              :on-change #(e! (admin-transit-changes/->FlipReportFilter filter-key flip-value))}]
      [:label {:for checkbox-name} label]]))
 
 (defn gtfs-import-reports
   [e! app-state]
   (let [{:keys [reports filters]} (get-in app-state [:admin :transit-changes :gtfs-import-reports])
-        reports (filter #(contains? (get filters :gtfs-import/severity) (get-in % [:gtfs-import-report :severity])) reports)]
-    (js/console.log (str "reports" reports))
+        reports                   (filter #(contains? (get filters :gtfs-import/severity)
+                                                      (get-in % [:gtfs-import-report :severity]))
+                                          reports)]
+
     [:div
      [:h2 "Suodattimet"]
      [:div {:style {:padding-bottom "1em"}}
@@ -567,11 +570,11 @@
                             :selected-tab (get-in app-state [:admin :transit-changes :tab])}]
            [:div.container
             (case selected-tab
-              "admin-detected-changes" (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
-              "admin-route-id" [route-id e! app-state recalc?]
-              "admin-upload-gtfs" (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
+              "admin-detected-changes"    (if recalc? [hash-recalculation-warning e! app-state] [detect-changes e! app-state])
+              "admin-route-id"            [route-id e! app-state recalc?]
+              "admin-upload-gtfs"         (if recalc? [hash-recalculation-warning e! app-state] [upload-gtfs e! app-state])
               "admin-gtfs-import-reports" [gtfs-import-reports e! app-state]
               "admin-commercial-services" [contract-traffic e! app-state]
-              "admin-exception-days" [admin-exception-days e! app-state]
+              "admin-exception-days"      [admin-exception-days e! app-state]
               ;;default
               [detect-changes e! app-state])]]]))}))
