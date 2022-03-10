@@ -512,24 +512,38 @@
            (let [[severity-text-color severity-bg-color] (case (get-in report [:gtfs-import-report :severity])
                                                            "warning" [colors/accessible-black colors/basic-yellow]
                                                            "error" [colors/primary-text-color colors/accessible-red])]
-             (js/console.log (str "report: " report))
+
              ^{:key (get-in report [:gtfs-import-report :id])}
-             [ui/table-row {:selectable false}
+             [ui/table-row
+              {:selectable false}
               [ui/table-row-column {:style {:width "20%"}}
                [common-ui/linkify
                 (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
                 (str (get-in report [:transport-operator :name]) " / " (get-in report [:transport-service :name]))
                 {:target "_blank"}]]
-              [ui/table-row-column {:style {:width "18%"}}
+
+              [ui/table-row-column
+               {:style {:width "18%"}}
                (str
                  (get-in report [:gtfs-package :id])
                  " - "
                  (.toLocaleString (get-in report [:gtfs-package :created])))]
-              [ui/table-row-column {:style {:width "32%"} :title (get-in report [:gtfs-import-report :description])} (get-in report [:gtfs-import-report :description])]
-              [ui/table-row-column {:style {:width "20%"} :title (get-in report [:gtfs-import-report :error])} (get-in report [:gtfs-import-report :error] )]
-              [ui/table-row-column {:style {:width            "10%"
-                                            :background-color severity-bg-color
-                                            :color            severity-text-color}} (get-in report [:gtfs-import-report :severity])]])))]]]))
+
+              [ui/table-row-column
+               {:style {:width "32%" :white-space "normal" :text-overflow "" :overflow "visible"}
+                :title (get-in report [:gtfs-import-report :description])}
+               (get-in report [:gtfs-import-report :description])]
+
+              [ui/table-row-column
+               {:style {:width "20%" :white-space "normal" :text-overflow "" :overflow "visible"}
+                :title (get-in report [:gtfs-import-report :error])}
+               (get-in report [:gtfs-import-report :error])]
+
+              [ui/table-row-column
+               {:style {:width            "10%"
+                        :background-color severity-bg-color
+                        :color            severity-text-color}}
+               (get-in report [:gtfs-import-report :severity])]])))]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
