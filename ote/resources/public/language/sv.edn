@@ -1773,7 +1773,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                         :company-by-name     "Sök efter ett företag med namn"
                                         :add-operating-area  "Lägga till verksamhetsområde"}}}
            :loader {:page-loading              "Laddar"
-                    :loading-price-information "Laddar prisinformation"}
+                    :loading-price-information "Laddar prisinformation"
+                    :save-prices-successful    "Prisinformation sparad!"}
            :pricing-details {:inputs {:start-price-daytime              {:main-title "Början"          :subtitle "(på vardagar)"}
                                       :start-price-nighttime            {:main-title "Börjän"          :subtitle "(på natten)"}
                                       :start-price-weekend              {:main-title "Börjän"          :subtitle "(på veckoslut)"}

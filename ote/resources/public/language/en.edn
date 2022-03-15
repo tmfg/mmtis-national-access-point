@@ -1770,7 +1770,8 @@ You can also draw the operating area or point to the map with drawing tools. You
                                         :company-by-name     "Search company by name"
                                         :add-operating-area  "Add operating area"}}}
            :loader {:page-loading              "Loading"
-                    :loading-price-information "Loading fare information"}
+                    :loading-price-information "Loading fare information"
+                    :save-prices-successful    "Fare information saved successfully!"}
            :pricing-details {:inputs {:start-price-daytime              {:main-title "Start"          :subtitle "(Weekdays)"}
                                       :start-price-nighttime            {:main-title "Start"          :subtitle "(At night)"}
                                       :start-price-weekend              {:main-title "Start"          :subtitle "(At weekend)"}

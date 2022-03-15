@@ -1779,7 +1779,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                         :company-by-name     "Hae yritystä nimellä"
                                         :add-operating-area  "Lisää toiminta-alue"}}}
            :loader {:page-loading              "Ladataan..."
-                    :loading-price-information "Ladataan hintatietoja..."}
+                    :loading-price-information "Ladataan hintatietoja..."
+                    :save-prices-successful    "Hintatiedot tallennettu onnistuneesti!"}
            :pricing-details {:inputs {:start-price-daytime              {:main-title "Aloitus"      :subtitle "(arkipäivisin)"}
                                       :start-price-nighttime            {:main-title "Aloitus"      :subtitle "(öisin)"}
                                       :start-price-weekend              {:main-title "Aloitus"      :subtitle "(viikonloppuna)"}
