@@ -18,18 +18,12 @@
 
 (def db {:datasource (db/hikari-datasource ote.test/test-db-config)})
 
-(defn with-transaction [f]
-  (jdbc/with-db-transaction [tx db]
-    (jdbc/db-set-rollback-only! tx)
-    (f)))
-
 (defn test-db
   [f]
   (f)
   (.close (:datasource db)))
 
 (use-fixtures :once test-db)
-(use-fixtures :each with-transaction)
 
 (defn- create-zip
   "Creates a ZIP file for use in testing."
@@ -72,15 +66,15 @@
     (fn [r]
       (if (some? result)
         (= (:package-id result)
-           (get-in r [:gtfs-import/package_id :gtfs/id]))
+           (get-in r [:gtfs-package :id]))
         true))
     (transit-changes/load-gtfs-import-reports db)))
 
 (defn- assert-report
   "Take the first report from reports, assert its contents, return rest of the reports for threading."
   [reports expected-description expected-severity]
-  (let [{:gtfs-import/keys [description error severity]
-         :gtfs-package/keys [transport-operator transport-service]} (first reports)]
+  (let [{:keys [gtfs-import-report gtfs-package transport-operator transport-service]} (first reports)
+        {:keys [description error severity]} gtfs-import-report]
     (is (= expected-severity severity))
     (is (str/starts-with? expected-description description)))
   (rest reports))
@@ -99,7 +93,6 @@
     (testing "empty package is created"
       (is (= true (str/ends-with? (.getPath empty-package) "empty.zip")))
       (is (= true (.exists empty-package)))
-
       (is (= true (empty? (zip/list-zip (io/input-stream empty-package))))))))
 
 (deftest gtfs-packages-tests
