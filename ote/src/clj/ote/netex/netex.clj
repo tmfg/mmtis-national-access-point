@@ -295,7 +295,7 @@
 (defn set-conversion-status!
   "Resolves operation result based on input args and updates status to db.
   Return: On successful conversion true, on failure false"
-  [{:keys [netex-filepath s3-filename input-report-file validation-report-file]}
+  [{:keys [netex-filepath s3-filename input-report-file validation-report-file package-id]}
    db
    {:keys [service-id external-interface-description-id external-interface-data-content] :as conversion-meta}]
   (let [result (if (clojure.string/blank? netex-filepath)
@@ -305,6 +305,16 @@
                    " result = " result
                    ", s3-filename = " s3-filename
                    ", conversion-meta=" conversion-meta))
+    (when (some? input-report-file)
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description (str "NeTEx conversion input produced non-empty report")
+                                              :gtfs-import/error       (.getBytes input-report-file)
+                                              :gtfs-import/severity    "warning"}))
+    (when (some? validation-report-file)
+      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
+                                              :gtfs-import/description (str "NeTEx conversion validation failed")
+                                              :gtfs-import/error       (.getBytes input-report-file)
+                                              :gtfs-import/severity    "error"}))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
                     {::netex/transport-service-id service-id
@@ -314,7 +324,8 @@
                      ::netex/status result
                      ::netex/data-content (set (mapv keyword external-interface-data-content))
                      ::netex/input-file-error input-report-file
-                     ::netex/validation-file-error validation-report-file})
+                     ::netex/validation-file-error validation-report-file
+                     ::netex/package_id package-id})
     (= :ok result)))
 
 (defn gtfs->netex-and-set-status!
