@@ -349,11 +349,14 @@
     (if (nil? gtfs-file)
       (do
         (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
-        (when (some? latest-package)
+        (when (and (some? latest-package)
+                   ; if response exists but gtfs-file is nil, it means response was actually empty
+                   ; without this check this would also log error for 304s, wherein entire response is `nil` on purpose
+                   (some? response))
           (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:gtfs/id latest-package)
                                                   :gtfs-import/description (str "Cannot create new GTFS import, " url " returned empty body as response when loading GTFS zip")
                                                   :gtfs-import/error       (.getBytes "")
-                                                  :gtfs-import/severity    "error"})))
+                                                  :gtfs-import/severity    "warning"})))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
