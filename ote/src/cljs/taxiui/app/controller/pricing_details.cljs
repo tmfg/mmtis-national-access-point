@@ -77,7 +77,7 @@
     (tuck/fx
       app
       (fn [e!]
-        (e! (loader/->AddHit :loading-price-information))))))
+        (e! (loader/->AddHit :loading-price-information {:type :info-progress}))))))
 
 (tuck/define-event UserSelectedResult [result]
   {}
@@ -114,7 +114,10 @@
   (tuck/fx
     app
     (fn [e!]
-      (e! (->LoadPriceInformation)))))
+      (e! (->LoadPriceInformation))
+      (e! (loader/->ShowSplashMessage 5000 :save-prices-successful {:type   :info-successful
+                                                                    :phase :fade-in
+                                                                    :speed 400})))))
 
 (tuck/define-event SavePriceInformationFailed [response]
   {}

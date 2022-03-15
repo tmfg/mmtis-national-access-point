@@ -11,6 +11,6 @@
               :on-click #(do
                            (.preventDefault %)
                            (e! (fp-controller/->ChangePage page params))
-                           (e! (loader/->AddHit :page-loading)))})
+                           (e! (loader/->AddHit :page-loading {:type :info-progress})))})
    children])
 
