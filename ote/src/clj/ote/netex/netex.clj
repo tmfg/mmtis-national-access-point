@@ -313,7 +313,7 @@
     (when (some? validation-report-file)
       (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
                                               :gtfs-import/description (str "NeTEx conversion validation failed")
-                                              :gtfs-import/error       (.getBytes input-report-file)
+                                              :gtfs-import/error       (.getBytes validation-report-file)
                                               :gtfs-import/severity    "error"}))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
