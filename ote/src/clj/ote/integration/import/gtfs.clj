@@ -169,8 +169,8 @@
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
              ; record unknown file name
              (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                     :gtfs-import/description (str "Unknown file " name " in GTFS package, not processed")
-                                                     :gtfs-import/error       (.getBytes "")
+                                                     :gtfs-import/description (str "Unexpected file in GTFS package")
+                                                     :gtfs-import/error       (.getBytes (str name " not processed"))
                                                      :gtfs-import/severity    "warning"})))))
 
       ;; Handle stop times
@@ -354,8 +354,8 @@
                    ; without this check this would also log error for 304s, wherein entire response is `nil` on purpose
                    (some? response))
           (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:gtfs/id latest-package)
-                                                  :gtfs-import/description (str "Cannot create new GTFS import, " url " returned empty body as response when loading GTFS zip")
-                                                  :gtfs-import/error       (.getBytes "")
+                                                  :gtfs-import/description (str "Cannot create new GTFS import")
+                                                  :gtfs-import/error       (.getBytes (str url " returned empty body as response when loading GTFS zip"))
                                                   :gtfs-import/severity    "warning"})))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
