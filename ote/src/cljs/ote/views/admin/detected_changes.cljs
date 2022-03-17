@@ -487,6 +487,72 @@
               :on-change #(e! (admin-transit-changes/->FlipReportFilter filter-key flip-value))}]
      [:label {:for checkbox-name} label]]))
 
+(defn- report-row
+  [report]
+  (let [[severity-text-color severity-bg-color] (case (get-in report [:gtfs-import-report :severity])
+                                                  "warning" [colors/accessible-black colors/basic-yellow]
+                                                  "error" [colors/primary-text-color colors/accessible-red])]
+    [
+    ^{:key (str (get-in report [:gtfs-import-report :id]) "_header")}
+    [ui/table-row
+     {:selectable false}
+     ; Palvelu
+     [ui/table-row-column
+      {:style   {:width   "15%"
+                 :padding "0 1em 0 1em"}
+       :rowSpan 2}
+      [common-ui/linkify
+       (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
+       [:span
+        (get-in report [:transport-operator :name])
+        [:br]
+        (get-in report [:transport-service :name])]
+       {:target "_blank"}]]
+
+     ; Tunnisteet
+     [ui/table-row-column
+      {:style   {:width   "15%"
+                 :padding "0 1em 0 1em"}
+       :rowSpan 2}
+      [:span
+       {:title (get-in report [:gtfs-package :id])}
+       (str "Paketti " (get-in report [:gtfs-package :id]))
+       [:br]
+       (.toLocaleString (get-in report [:gtfs-package :created]))]]
+
+     ; Kuvaus
+     [ui/table-row-column
+      {:style {:width         "60%"
+               :white-space   "normal"
+               :text-overflow ""
+               :overflow      "visible"
+               :padding       "0 1em 0 1em"}
+       :title (get-in report [:gtfs-import-report :description])}
+      (get-in report [:gtfs-import-report :description])]
+
+     ; Vakavuus
+     [ui/table-row-column
+      {:style   {:width            "10%"
+                 :padding          "0 1em 0 1em"
+                 :background-color severity-bg-color
+                 :color            severity-text-color
+                 :text-align "center"}
+       :rowSpan 2}
+      (get-in report [:gtfs-import-report :severity])]]
+
+     ^{:key (str (get-in report [:gtfs-import-report :id]) "_details")}
+     [ui/table-row
+      ; Tarkka virhe
+      [ui/table-row-column
+       {:style {:width         "70%"
+                :white-space   "normal"
+                :text-overflow ""
+                :overflow      "visible"
+                :padding       "0 1em 0 1em"}
+        :title (get-in report [:gtfs-import-report :error])}
+       (get-in report [:gtfs-import-report :error])]]
+     ]))
+
 (defn gtfs-import-reports
   [e! app-state]
   (let [{:keys [reports filters]} (get-in app-state [:admin :transit-changes :gtfs-import-reports])
@@ -504,49 +570,16 @@
       [ui/table-header {:adjust-for-checkbox false
                         :display-select-all  false}
        [ui/table-row
-        [ui/table-header-column {:style {:width "20%"}} "Palvelu"]
-        [ui/table-header-column {:style {:width "18%"}} "Paketti"]
-        [ui/table-header-column {:style {:width "32%"}} "Kuvaus"]
-        [ui/table-header-column {:style {:width "20%"}} "Tarkka virhe"]
+        [ui/table-header-column {:style {:width "15%"}} "Palvelu"]
+        [ui/table-header-column {:style {:width "15%"}} "Tunnisteet"]
+        [ui/table-header-column {:style {:width "60%"}} "Kuvaus ja tarkka virhe"]
         [ui/table-header-column {:style {:width "10%"}} "Vakavuus"]]]
       [ui/table-body {:display-row-checkbox false}
-       (doall
+       (mapcat report-row reports)
+       #_(doall
          (for [report reports]
-           (let [[severity-text-color severity-bg-color] (case (get-in report [:gtfs-import-report :severity])
-                                                           "warning" [colors/accessible-black colors/basic-yellow]
-                                                           "error" [colors/primary-text-color colors/accessible-red])]
-
-             ^{:key (get-in report [:gtfs-import-report :id])}
-             [ui/table-row
-              {:selectable false}
-              [ui/table-row-column {:style {:width "20%"}}
-               [common-ui/linkify
-                (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
-                (str (get-in report [:transport-operator :name]) " / " (get-in report [:transport-service :name]))
-                {:target "_blank"}]]
-
-              [ui/table-row-column
-               {:style {:width "18%"}}
-               (str
-                 (get-in report [:gtfs-package :id])
-                 " - "
-                 (.toLocaleString (get-in report [:gtfs-package :created])))]
-
-              [ui/table-row-column
-               {:style {:width "32%" :white-space "normal" :text-overflow "" :overflow "visible"}
-                :title (get-in report [:gtfs-import-report :description])}
-               (get-in report [:gtfs-import-report :description])]
-
-              [ui/table-row-column
-               {:style {:width "20%" :white-space "normal" :text-overflow "" :overflow "visible"}
-                :title (get-in report [:gtfs-import-report :error])}
-               (get-in report [:gtfs-import-report :error])]
-
-              [ui/table-row-column
-               {:style {:width            "10%"
-                        :background-color severity-bg-color
-                        :color            severity-text-color}}
-               (get-in report [:gtfs-import-report :severity])]])))]]]))
+           ^{:key (get-in report [:gtfs-import-report :id])}
+           [report-row report]))]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
