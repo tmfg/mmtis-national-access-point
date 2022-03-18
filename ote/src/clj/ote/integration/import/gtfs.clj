@@ -166,12 +166,7 @@
                                                            :gtfs-import/severity    "error"}))
                  (doseq [fk rows]
                    (when (and db-table-name (seq fk))
-                     (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))
-             ; record unknown file name
-             (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                     :gtfs-import/description (str "Unexpected file in GTFS package")
-                                                     :gtfs-import/error       (.getBytes (str name " not processed"))
-                                                     :gtfs-import/severity    "warning"})))))
+                     (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
 
       ;; Handle stop times
       (import-stop-times db package-id stop-times-file)
