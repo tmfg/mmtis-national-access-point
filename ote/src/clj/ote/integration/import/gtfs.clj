@@ -110,7 +110,7 @@
     (when (empty? all-stop-times)
       ; This is almost a copy-paste from a bit lower in this same namespace, the description is chosen so that it
       ; matches with the other one.
-      (report/gtfs-import-report! db "error" package-id nil
+      (report/gtfs-import-report! db "error" package-id
                                   (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
                                   (.getBytes "")))
     (loop [i 0
@@ -159,7 +159,7 @@
                (log/debug file-type " file: " name " PARSED.")
                (let [rows (process-rows file-type file-data)]
                  (when (= 0 (count rows))
-                   (report/gtfs-import-report! db "error" package-id interface-id
+                   (report/gtfs-import-report! db "error" package-id
                                                (str "No data rows in file " name " of type " file-type)
                                                (.getBytes "")))
                  (doseq [fk rows]
@@ -185,7 +185,7 @@
 
       (catch Exception e
         (log/warn "Error in save-gtfs-to-db" e)
-        (report/gtfs-import-report! db "warning" package-id interface-id
+        (report/gtfs-import-report! db "warning" package-id
                                     (str "Cannot create new GTFS import")
                                     (.getBytes (.getMessage e)))
         (specql/insert! db ::t-service/external-interface-download-status
@@ -247,7 +247,7 @@
         missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
     (when-not (empty? missing-files)
-      (report/gtfs-import-report! db "error" package-id nil
+      (report/gtfs-import-report! db "error" package-id
                                   "Missing required files in GTFS ZIP file"
                                   (.getBytes (pr-str {:expected-files expected-files
                                                       :file-list      file-list
@@ -271,7 +271,7 @@
       (let [message (str "Error when opening interface zip package from url" url ":" (.getMessage e))
             error   (str "Invalid interface package: " (.getMessage e))]
         (log/warn message)
-        (report/gtfs-import-report! db "warning" package-id interface-id message (.getBytes error))
+        (report/gtfs-import-report! db "warning" package-id message (.getBytes error))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id

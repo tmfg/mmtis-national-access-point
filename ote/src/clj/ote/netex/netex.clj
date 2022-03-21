@@ -307,11 +307,11 @@
                    ", s3-filename = " s3-filename
                    ", conversion-meta=" conversion-meta))
     (when (some? input-report-file)
-      (report/gtfs-import-report! db "warning" package-id external-interface-description-id
+      (report/gtfs-import-report! db "warning" package-id
                                   (str "NeTEx conversion input produced non-empty report")
                                   (.getBytes input-report-file)))
     (when (some? validation-report-file)
-      (report/gtfs-import-report! db "error" package-id external-interface-description-id
+      (report/gtfs-import-report! db "error" package-id
                                   (str "NeTEx conversion validation failed")
                                   (.getBytes validation-report-file)))
     (specql/upsert! db ::netex/netex-conversion

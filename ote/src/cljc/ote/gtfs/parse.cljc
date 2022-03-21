@@ -154,7 +154,7 @@ This is only called with GTFS field names and cannot grow unbounded."}
      (when (and (some? db) (some? package-id))
        (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
          (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields)
-         #?(:clj (report/gtfs-import-report! db "warning" package-id nil
+         #?(:clj (report/gtfs-import-report! db "warning" package-id
                                              (str "GTFS file " gtfs-file-type " contains unknown fields")
                                              (.getBytes (str unknown-fields))))))
      (for [row rows]
