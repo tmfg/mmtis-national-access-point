@@ -8,7 +8,8 @@
             [ote.time :as time]
             #?(:clj [specql.core :as specql])
             #?(:cljs [goog.string :as gstr])
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            #?(:clj [ote.integration.report :as report])))
 
 (defmulti gtfs->clj (fn [spec-description value]
                       spec-description))
@@ -153,10 +154,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
      (when (and (some? db) (some? package-id))
        (when-let [unknown-fields (seq (filter (complement allowed-fields) content-fields))]
          (log/warn "GTFS file " gtfs-file-type " contains unknown fields: " unknown-fields)
-         #?(:clj (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                         :gtfs-import/description (str "GTFS file " gtfs-file-type " contains unknown fields")
-                                                         :gtfs-import/error       (.getBytes (str unknown-fields))
-                                                         :gtfs-import/severity    "warning"}))))
+         #?(:clj (report/gtfs-import-report! db "warning" package-id nil
+                                             (str "GTFS file " gtfs-file-type " contains unknown fields")
+                                             (.getBytes (str unknown-fields))))))
      (for [row rows]
        (into {}
             (remove nil?

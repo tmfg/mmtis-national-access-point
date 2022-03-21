@@ -110,7 +110,7 @@
     (when (empty? all-stop-times)
       ; This is almost a copy-paste from a bit lower in this same namespace, the description is chosen so that it
       ; matches with the other one.
-      (report/gtfs-import-report! db "error" package-id
+      (report/gtfs-import-report! db "error" package-id nil
                                   (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
                                   (.getBytes "")))
     (loop [i 0
@@ -159,10 +159,9 @@
                (log/debug file-type " file: " name " PARSED.")
                (let [rows (process-rows file-type file-data)]
                  (when (= 0 (count rows))
-                   (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                           :gtfs-import/description (str "No data rows in file " name " of type " file-type)
-                                                           :gtfs-import/error       (.getBytes "")
-                                                           :gtfs-import/severity    "error"}))
+                   (report/gtfs-import-report! db "error" package-id interface-id
+                                               (str "No data rows in file " name " of type " file-type)
+                                               (.getBytes "")))
                  (doseq [fk rows]
                    (when (and db-table-name (seq fk))
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
@@ -246,7 +245,7 @@
         missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
     (when-not (empty? missing-files)
-      (report/gtfs-import-report! db "error" package-id
+      (report/gtfs-import-report! db "error" package-id nil
                                   "Missing required files in GTFS ZIP file"
                                   (.getBytes (pr-str {:expected-files expected-files
                                                       :file-list      file-list
@@ -346,10 +345,9 @@
                    ; if response exists but gtfs-file is nil, it means response was actually empty
                    ; without this check this would also log error for 304s, wherein entire response is `nil` on purpose
                    (some? response))
-          (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:gtfs/id latest-package)
-                                                  :gtfs-import/description (str "Cannot create new GTFS import")
-                                                  :gtfs-import/error       (.getBytes (str url " returned empty body as response when loading GTFS zip"))
-                                                  :gtfs-import/severity    "warning"})))
+          (report/gtfs-import-report! db "warning" (:gtfs/id latest-package) nil
+                                      (str "Cannot create new GTFS import")
+                                      (.getBytes (str url " returned empty body as response when loading GTFS zip")))))
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
