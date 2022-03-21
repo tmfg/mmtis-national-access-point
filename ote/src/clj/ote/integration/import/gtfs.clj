@@ -185,6 +185,9 @@
 
       (catch Exception e
         (log/warn "Error in save-gtfs-to-db" e)
+        (report/gtfs-import-report! db "warning" package-id interface-id
+                                    (str "Cannot create new GTFS import")
+                                    (.getBytes (.getMessage e)))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id
@@ -224,17 +227,17 @@
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
-      (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
-      (specql/insert! db ::t-service/external-interface-download-status
-                      {::t-service/external-interface-description-id interface-id
-                       ::t-service/transport-service-id service-id
-                       ::t-service/download-status :failure
-                       ::t-service/download-error (str "Error when loading gtfs package from url "
-                                                       url ": "
-                                                       (.getMessage e))
-                       ::t-service/url url
-                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      nil)))
+      (let [message (str "Error when loading gtfs package from url " url ": " (.getMessage e))]
+        (log/warn message)
+        (report/gtfs-import-report! db "warning" nil interface-id message (.getBytes ""))
+        (specql/insert! db ::t-service/external-interface-download-status
+                        {::t-service/external-interface-description-id interface-id
+                         ::t-service/transport-service-id service-id
+                         ::t-service/download-status :failure
+                         ::t-service/download-error message
+                         ::t-service/url url
+                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+      nil))))
 
 (defmulti validate-interface-zip-package
           (fn [type _ _ _] type))
@@ -266,14 +269,17 @@
     (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
-      (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
-      (specql/insert! db ::t-service/external-interface-download-status
-                      {::t-service/external-interface-description-id interface-id
-                       ::t-service/transport-service-id service-id
-                       ::t-service/download-status :failure
-                       ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
-                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      (throw (ex-info (str "Invalid interface package") {} e)))))
+      (let [message (str "Error when opening interface zip package from url" url ":" (.getMessage e))
+            error   (str "Invalid interface package: " (.getMessage e))]
+        (log/warn message)
+        (report/gtfs-import-report! db "warning" package-id interface-id message (.getBytes error))
+        (specql/insert! db ::t-service/external-interface-download-status
+                        {::t-service/external-interface-description-id interface-id
+                         ::t-service/transport-service-id service-id
+                         ::t-service/download-status :failure
+                         ::t-service/download-error error
+                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+        (throw (ex-info (str "Invalid interface package") {} e))))))
 
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
@@ -339,15 +345,7 @@
         gtfs-file (:body response)]
 
     (if (nil? gtfs-file)
-      (do
-        (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
-        (when (and (some? latest-package)
-                   ; if response exists but gtfs-file is nil, it means response was actually empty
-                   ; without this check this would also log error for 304s, wherein entire response is `nil` on purpose
-                   (some? response))
-          (report/gtfs-import-report! db "warning" (:gtfs/id latest-package) nil
-                                      (str "Cannot create new GTFS import")
-                                      (.getBytes (str url " returned empty body as response when loading GTFS zip")))))
+      (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
