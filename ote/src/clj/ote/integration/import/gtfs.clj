@@ -229,7 +229,6 @@
     (catch Exception e
       (let [message (str "Error when loading gtfs package from url " url ": " (.getMessage e))]
         (log/warn message)
-        (report/gtfs-import-report! db "warning" nil interface-id message (.getBytes ""))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id
