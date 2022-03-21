@@ -518,6 +518,8 @@
        {:title (get-in report [:gtfs-package :id])}
        (str "Paketti " (get-in report [:gtfs-package :id]))
        [:br]
+       (str "Rajapinta " (get-in report [:gtfs-package :external-interface-description-id]))
+       [:br]
        (.toLocaleString (get-in report [:gtfs-package :created]))]]
 
      ; Kuvaus
@@ -575,11 +577,7 @@
         [ui/table-header-column {:style {:width "60%"}} "Kuvaus ja tarkka virhe"]
         [ui/table-header-column {:style {:width "10%"}} "Vakavuus"]]]
       [ui/table-body {:display-row-checkbox false}
-       (mapcat report-row reports)
-       #_(doall
-         (for [report reports]
-           ^{:key (get-in report [:gtfs-import-report :id])}
-           [report-row report]))]]]))
+       (mapcat report-row reports)]]]))
 
 (defn configure-detected-changes [e! app-state]
   (r/create-class
