@@ -17,7 +17,8 @@
             [specql.impl.registry :refer [table-info-registry]]
             [jeesql.core :refer [defqueries]]
             [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
-            [ote.transit-changes.detection :as detection])
+            [ote.transit-changes.detection :as detection]
+            [ote.integration.report :as report])
   (:import (java.io File)))
 
 (defqueries "ote/integration/import/stop_times.sql")
@@ -109,12 +110,10 @@
     (when (empty? all-stop-times)
       ; This is almost a copy-paste from a bit lower in this same namespace, the description is chosen so that it
       ; matches with the other one.
-      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                              :gtfs-import/description (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
-                                              :gtfs-import/error       (.getBytes "")
-                                              :gtfs-import/severity    "error"}))
+      (report/gtfs-import-report! db "error" package-id
+                                  (str "No data rows in file stop_times.txt of type " :gtfs/stop-times-txt)
+                                  (.getBytes "")))
     (loop [i 0
-
            ;; Stop times file should have stops with the same trip id on consecutive lines
            ;; Partition returns a lazy sequence of groups of consecutive lines that have
            ;; the same trip id.
@@ -160,10 +159,9 @@
                (log/debug file-type " file: " name " PARSED.")
                (let [rows (process-rows file-type file-data)]
                  (when (= 0 (count rows))
-                   (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                                           :gtfs-import/description (str "No data rows in file " name " of type " file-type)
-                                                           :gtfs-import/error       (.getBytes "")
-                                                           :gtfs-import/severity    "error"}))
+                   (report/gtfs-import-report! db "error" package-id
+                                               (str "No data rows in file " name " of type " file-type)
+                                               (.getBytes "")))
                  (doseq [fk rows]
                    (when (and db-table-name (seq fk))
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
@@ -187,6 +185,9 @@
 
       (catch Exception e
         (log/warn "Error in save-gtfs-to-db" e)
+        (report/gtfs-import-report! db "warning" package-id
+                                    (str "Cannot create new GTFS import")
+                                    (.getBytes (.getMessage e)))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id
@@ -226,17 +227,16 @@
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
-      (log/warn "Error when loading gtfs package from url " url ": " (.getMessage e))
-      (specql/insert! db ::t-service/external-interface-download-status
-                      {::t-service/external-interface-description-id interface-id
-                       ::t-service/transport-service-id service-id
-                       ::t-service/download-status :failure
-                       ::t-service/download-error (str "Error when loading gtfs package from url "
-                                                       url ": "
-                                                       (.getMessage e))
-                       ::t-service/url url
-                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      nil)))
+      (let [message (str "Error when loading gtfs package from url " url ": " (.getMessage e))]
+        (log/warn message)
+        (specql/insert! db ::t-service/external-interface-download-status
+                        {::t-service/external-interface-description-id interface-id
+                         ::t-service/transport-service-id service-id
+                         ::t-service/download-status :failure
+                         ::t-service/download-error message
+                         ::t-service/url url
+                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+      nil))))
 
 (defmulti validate-interface-zip-package
           (fn [type _ _ _] type))
@@ -247,12 +247,11 @@
         missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
     (when-not (empty? missing-files)
-      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                              :gtfs-import/description "Missing required files in GTFS ZIP file"
-                                              :gtfs-import/error       (.getBytes (pr-str {:expected-files expected-files
-                                                                                           :file-list      file-list
-                                                                                           :missing-files  missing-files}))
-                                              :gtfs-import/severity    "error"})
+      (report/gtfs-import-report! db "error" package-id
+                                  "Missing required files in GTFS ZIP file"
+                                  (.getBytes (pr-str {:expected-files expected-files
+                                                      :file-list      file-list
+                                                      :missing-files  missing-files})))
       (throw (ex-info (str "Missing required files in gtfs zip file, missing " missing-files) {:expected-files expected-files
                                                                  :file-list      file-list
                                                                  :missing-files  missing-files})))))
@@ -269,14 +268,17 @@
     (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
-      (log/warn "Error when opening interface zip package from url" url ":" (.getMessage e))
-      (specql/insert! db ::t-service/external-interface-download-status
-                      {::t-service/external-interface-description-id interface-id
-                       ::t-service/transport-service-id service-id
-                       ::t-service/download-status :failure
-                       ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
-                       ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
-      (throw (ex-info (str "Invalid interface package") {} e)))))
+      (let [message (str "Error when opening interface zip package from url" url ":" (.getMessage e))
+            error   (str "Invalid interface package: " (.getMessage e))]
+        (log/warn message)
+        (report/gtfs-import-report! db "warning" package-id message (.getBytes error))
+        (specql/insert! db ::t-service/external-interface-download-status
+                        {::t-service/external-interface-description-id interface-id
+                         ::t-service/transport-service-id service-id
+                         ::t-service/download-status :failure
+                         ::t-service/download-error error
+                         ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
+        (throw (ex-info (str "Invalid interface package") {} e))))))
 
 (defmulti load-transit-interface-url
           "Load transit interface from URL. Dispatches on type.
@@ -342,16 +344,7 @@
         gtfs-file (:body response)]
 
     (if (nil? gtfs-file)
-      (do
-        (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
-        (when (and (some? latest-package)
-                   ; if response exists but gtfs-file is nil, it means response was actually empty
-                   ; without this check this would also log error for 304s, wherein entire response is `nil` on purpose
-                   (some? response))
-          (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  (:gtfs/id latest-package)
-                                                  :gtfs-import/description (str "Cannot create new GTFS import")
-                                                  :gtfs-import/error       (.getBytes (str url " returned empty body as response when loading GTFS zip"))
-                                                  :gtfs-import/severity    "warning"})))
+      (log/warn "GTFS: service-id = " ts-id ", Got empty body as response when loading gtfs, URL = '" url "'")
       (let [new-gtfs-hash (gtfs-hash gtfs-file)
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3

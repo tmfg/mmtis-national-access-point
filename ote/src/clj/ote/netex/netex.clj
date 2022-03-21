@@ -20,7 +20,8 @@
     [clojure.zip :as zip]
     [clojure.data.zip.xml :as z]
     [clojure.xml :as xml]
-    [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs])
+    [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
+    [ote.integration.report :as report])
   (:import (java.util TimeZone)))
 
 (def compose-default-locale
@@ -306,15 +307,13 @@
                    ", s3-filename = " s3-filename
                    ", conversion-meta=" conversion-meta))
     (when (some? input-report-file)
-      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                              :gtfs-import/description (str "NeTEx conversion input produced non-empty report")
-                                              :gtfs-import/error       (.getBytes input-report-file)
-                                              :gtfs-import/severity    "warning"}))
+      (report/gtfs-import-report! db "warning" package-id
+                                  (str "NeTEx conversion input produced non-empty report")
+                                  (.getBytes input-report-file)))
     (when (some? validation-report-file)
-      (specql/insert! db :gtfs-import/report {:gtfs-import/package_id  package-id
-                                              :gtfs-import/description (str "NeTEx conversion validation failed")
-                                              :gtfs-import/error       (.getBytes validation-report-file)
-                                              :gtfs-import/severity    "error"}))
+      (report/gtfs-import-report! db "error" package-id
+                                  (str "NeTEx conversion validation failed")
+                                  (.getBytes validation-report-file)))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
                     {::netex/transport-service-id service-id
