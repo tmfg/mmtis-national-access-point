@@ -50,24 +50,28 @@
    :id               789
    :data-content     nil})
 
-(defn- process-transit-package [source-zip]
+(defn- process-transit-package
+  [interface-id source-zip]
   (gtfs/download-and-store-transit-package
     :gtfs
     {}
     db
     (merge common-interface-params
-           {:url source-zip})
+           {:id interface-id
+            :url source-zip})
     true
     true))
 
 (defn- fetch-reports-for
-  [result]
+  [interface-id result]
   (filter
     (fn [r]
       (if (some? result)
         (= (:package-id result)
            (get-in r [:gtfs-package :id]))
-        true))
+        (if (some? interface-id)
+          (= interface-id (get-in r [:gtfs-package :external-interface-description-id]))
+          true)))
     (transit-changes/load-gtfs-import-reports db)))
 
 (defn- assert-report
@@ -76,7 +80,7 @@
   (let [{:keys [gtfs-import-report gtfs-package transport-operator transport-service]} (first reports)
         {:keys [description error severity]} gtfs-import-report]
     (is (= expected-severity severity))
-    (is (str/starts-with? expected-description description)))
+    (is (str/starts-with? description expected-description)))
   (rest reports))
 
 (defn gtfs-row
@@ -118,20 +122,24 @@
                   s3/put-object (fn [_ _ _ _] (comment "no-op on purpose"))]
 
       (testing "valid package doesn't generate reports"
-        (let [result  (process-transit-package "valid-content-1")
-              reports (fetch-reports-for result)]
+        (let [result  (process-transit-package 6001 "valid-content-1")
+              reports (fetch-reports-for 6001 result)]
           (is (= true (some? result)))
           (is (= 0 (count reports)))))
 
       (testing "missing files are reported"
-        (let [result  (process-transit-package "missing-files-1")
-              reports (fetch-reports-for result)]
+        (let [result  (process-transit-package 6101 "missing-files-1")
+              reports (fetch-reports-for 6101 result)]
+          ; `nil` is returned as result because missing files is considered a fatal error
+          ; I'd like to change this but because of legacy creep I don't have enough domain knowledge to change this.
+          ; So please heed my warning, if you see this test break, rollback and let it be.
           (is (= true (nil? result)))
-          (assert-report [(last reports)] "Cannot create new GTFS import, missing-files-1 returned empty body as response when loading GTFS zip" "error")))
+          ;  `reports` is all reports produced by all tests so far, last is the latest and the one we're interested of
+          (assert-report [(last reports)] "Error when opening interface zip package from url missing-files-1:Missing required files in GTFS zip file" "warning")))
 
       (testing "empty content in GTFS files are reported"
-        (let [result  (process-transit-package "required-empty-1")
-              reports (fetch-reports-for result)]
+        (let [result  (process-transit-package 6201 "required-empty-1")
+              reports (fetch-reports-for 6201 result)]
           (is (= 6 (count reports)))
           (-> reports
               (assert-report "No data rows in file agency.txt of type :gtfs/agency-txt" "error")
@@ -140,4 +148,25 @@
               (assert-report "No data rows in file routes.txt of type :gtfs/routes-txt" "error")
               (assert-report "No data rows in file trips.txt of type :gtfs/trips-txt" "error")
               ; stop times is a special file and is handled last because of trip id lookups
-              (assert-report "No data rows in file stop_times.txt of type :gtfs/stop-times-txt" "error")))))))
+              (assert-report "No data rows in file stop_times.txt of type :gtfs/stop-times-txt" "error"))))
+
+      (testing "uploading invalid package multiple times adds only one failure report to latest package"
+        (let [reports-before (fetch-reports-for 6301 nil)
+              results  (->> (range 5)
+                            (mapv (fn [_] (process-transit-package 6301 "missing-files-1"))))
+              reports-after (fetch-reports-for 6301 nil)]
+          (for [r results]
+            (is (= true (nil? r))))
+          ;  what's happening here:
+          ;   - at first, there's a set of reports already in database
+          ;   - adding five failures followed by one success
+          (is (= 1 (- (count reports-after) (count reports-before))))
+          (assert-report [(last reports-after)] "Error when opening interface zip package from url missing-files-1:Missing required files in GTFS zip file" "warning")))
+
+      (testing "uploading valid package after few failures results in empty report"
+        (let [results  (->> (range 3)
+                            (mapv (fn [_] (process-transit-package 6401 "missing-files-1"))))
+              result  (process-transit-package 6402 "valid-content-1")
+              reports (fetch-reports-for 6402 result)]
+          (is (= true (some? result)))
+          (is (= 0 (count reports))))))))

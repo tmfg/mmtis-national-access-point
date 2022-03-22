@@ -333,8 +333,15 @@
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
         _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
-        response (load-transit-interface-url interface-type db (:gtfs/id latest-package) id ts-id url last-import-date
-                                             (:gtfs/etag latest-package) force-download?)
+        package (specql/insert! db :gtfs/package
+                                {:gtfs/first_package (= 0 package-count)
+                                 :gtfs/transport-operator-id operator-id
+                                 :gtfs/transport-service-id ts-id
+                                 :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                 :gtfs/license license
+                                 :gtfs/external-interface-description-id id})
+        response (load-transit-interface-url interface-type db (:gtfs/id package) id ts-id url last-import-date
+                                             (:gtfs/etag package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
@@ -344,15 +351,8 @@
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
         (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
-          (let [package (specql/insert! db :gtfs/package
-                                        {:gtfs/sha256 new-gtfs-hash
-                                         :gtfs/first_package (= 0 package-count)
-                                         :gtfs/transport-operator-id operator-id
-                                         :gtfs/transport-service-id ts-id
-                                         :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
-                                         :gtfs/etag new-etag
-                                         :gtfs/license license
-                                         :gtfs/external-interface-description-id id})]
+          (let [_ (specql/update! db :gtfs/package {:gtfs/sha256 new-gtfs-hash
+                                                    :gtfs/etag new-etag} {:gtfs/id (:gtfs/id package)})]
             (when upload-s3?
               (s3/put-object (:bucket gtfs-config)
                              filename
