@@ -247,14 +247,10 @@
         missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
     (when-not (empty? missing-files)
-      (report/gtfs-import-report! db "error" package-id
-                                  "Missing required files in GTFS ZIP file"
-                                  (.getBytes (pr-str {:expected-files expected-files
-                                                      :file-list      file-list
-                                                      :missing-files  missing-files})))
-      (throw (ex-info (str "Missing required files in gtfs zip file, missing " missing-files) {:expected-files expected-files
-                                                                 :file-list      file-list
-                                                                 :missing-files  missing-files})))))
+      (throw (ex-info (str "Missing required files in GTFS zip file, missing " (seq missing-files))
+                      {:expected-files expected-files
+                       :file-list      file-list
+                       :missing-files  missing-files})))))
 
 (defmethod validate-interface-zip-package :kalkati [_ db package-id byte-array-input]
   (let [file-list (list-zip byte-array-input)]
@@ -262,21 +258,20 @@
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
-
 (defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
     (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
-      (let [message (str "Error when opening interface zip package from url" url ":" (.getMessage e))
+      (let [message (str "Error when opening interface zip package from url " url ":" (.getMessage e))
             error   (str "Invalid interface package: " (.getMessage e))]
         (log/warn message)
-        (report/gtfs-import-report! db "warning" package-id message (.getBytes error))
+        (report/gtfs-import-report! db "warning" package-id message (.getBytes (or (str (ex-data e)) error)))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id
                          ::t-service/download-status :failure
-                         ::t-service/download-error error
+                         ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
                          ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
         (throw (ex-info (str "Invalid interface package") {} e))))))
 
