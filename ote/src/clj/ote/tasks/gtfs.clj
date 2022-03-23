@@ -220,7 +220,7 @@ different-week-date value and skip all expired changes."
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
-  (start [{db :db :as this} email]
+  (start [{db :db email :email :as this}]
     (assoc this
       ::stop-tasks
       (if (feature/feature-enabled? config :gtfs-import)
