@@ -1,6 +1,7 @@
 (ns ote.integration.report
   "Centralized location for report logging for integration import processes"
   (:require [specql.core :as specql]
+            [jeesql.core :refer [defqueries]]
             [ote.db.utils :as db-utils]))
 
 (defqueries "ote/integration/report.sql")
