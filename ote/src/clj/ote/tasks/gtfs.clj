@@ -19,7 +19,11 @@
             [ote.time :as time]
             [ote.transit-changes.detection :as detection]
             [ote.config.transit-changes-config :as config-tc]
-            [ote.netex.netex :as netex])
+            [ote.netex.netex :as netex]
+            [ote.email :as email]
+            [ote.util.email-template :as email-template]
+            [ote.localization :as localization]
+            [hiccup.core :as hiccup])
   (:import (org.joda.time DateTimeZone DateTime)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -69,16 +73,30 @@
   (let [report (report/latest-import-reports-for-service-interface db service-id interface-id)]
     (when-not (empty? report)
       (let [service (some-> (specql/fetch db ::t-service/transport-service
-                                          #{::t-service/contact-email}
+                                          #{::t-service/contact-email
+                                            ::t-service/transport-operator-id}
                                           {::t-service/id service-id})
                             first)
+            _ (log/warn (str "service >> " service))
+            operator (some-> (specql/fetch db ::t-operator/transport-operator
+                                                     #{::t-operator/email}
+                                                     {::t-operator/id (::t-service/transport-operator-id service)}
+                              first))
             recipient (or (::t-service/contact-email service)
-                          (some-> (specql/fetch db ::t-operator/transport-operator
-                                                #{::t-operator/email}
-                                                {::t-operator/id (::t-service/transport-operator-id service)})
-                                  first
-                                  ::t-service/contact-email)
+                          (::t-operator/email operator)
                          "nap@fintraffic.fi")]
+        #_(localization/with-language
+          "fi"
+          (email/send! email {:to      "esko.suomi@solita.fi"
+                              :subject "Olenpa sähköposti"
+                              :body    [{:type    "text/html;charset=utf-8"
+                                         :content (str email-template/html-header
+                                                       (hiccup/html (email-template/validation-report
+                                                                      [:email-templates :validation-report :title]
+                                                                      operator
+                                                                      service
+                                                                      report)))}]}))
+
         (log/warn (str "Would send email to "
                        recipient
                        " containing "
@@ -86,8 +104,7 @@
                        " rows for service-id/interface-id "
                        service-id
                        "/"
-                       interface-id
-                       " using email instance " email))))))
+                       interface-id))))))
 
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
@@ -218,9 +235,14 @@ different-week-date value and skip all expired changes."
                            :gtfs/transport-service-id (:transport-service-id change-row)}))))
     (log/info "Detected change count recalculation ready!")))
 
+(def config-atom (atom nil))
+
 (defrecord GtfsTasks [at config]
   component/Lifecycle
   (start [{db :db email :email :as this}]
+    (reset! config-atom {:config config
+                         :db db
+                         :email email})
     (assoc this
       ::stop-tasks
       (if (feature/feature-enabled? config :gtfs-import)

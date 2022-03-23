@@ -382,3 +382,40 @@
                   [:br]
                   [:p (tr [:email-templates :password-reset :body8])]
                   (html-divider-border "100%")]))
+
+(defn- report-row [operator service report]
+  [[:a {:href (str (environment/base-url) "#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))} (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))]
+   (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))
+   (escape-html (str (get-in report [:gtfs-import-report :description])))
+   (escape-html (str (get-in report [:gtfs-import-report :error])))
+   (escape-html (str (get-in report [:gtfs-import-report :severity])))])
+
+(defn validation-report
+  [title operator service report]
+  (html-template {:show-email-settings? true} title
+                 [:div
+                  [:br]
+                  [:h1 {:class "headerText1"
+                        :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+                   "Palvelun ulkoisen rajapinnan automaattisessa GTFS-tuonnissa on havaittu virheitä"]
+
+
+                  [:div {:style "background-color:#FFFFFF"}
+                   (html-divider-border nil)
+                   [:p {:style "margin-bottom:  20px;"}
+                    [:h2 {:class "headerText2"
+                          :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
+                     "Havaitut virheet"]]
+
+                   (html-table
+                     [{:class "tg-lusz" :width "10%" :label "Palvelu"}
+                      {:class "tg-lusz" :width "10%" :label "Tunnisteet"}
+                      {:class "tg-lusz" :width "20%" :label "Kuvaus"}
+                      {:class "tg-lusz" :width "15%" :label "Virhe"}
+                      {:class "tg-lusz" :width "15%" :label "Vakavuus"}]
+                     (for [r report]
+                       (report-row operator service r)))
+                   [:br]
+                   (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")]
+
+                  (html-divider-border nil)]))

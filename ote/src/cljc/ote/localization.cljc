@@ -126,7 +126,7 @@
    (tr #?(:clj *language* :cljs @selected-language) message-path parameters))
   ([language message-path parameters]
    (let [language (get @loaded-languages language)]
-     (assert language (str "Language " language " has not been loaded."))
+     (assert language (str "Language " language " has not been loaded, cannot lookup translation for " message-path"."))
      (message (get-in language message-path) parameters))))
 
 (s/fdef tr-key
