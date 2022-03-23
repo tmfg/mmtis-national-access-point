@@ -20,6 +20,7 @@
 
             [ote.tasks.gtfs :as gtfs-tasks]
             [ote.integration.import.gtfs :as import]
+            [ote.integration.report :as report]
             [ote.transit-changes.detection :as detection]))
 
 (defqueries "ote/services/transit_changes.sql")
@@ -122,9 +123,7 @@
 
 (defn load-gtfs-import-reports
   [db]
-  (->> (fetch-import-reports-for-latest-packages db)
-       (map (comp db-utils/underscore->structure
-                  #(update % :gtfs-import-report_error (fn [v] (String. v)))))))
+  (report/latest-import-reports-for-all-packages db))
 
 (define-service-component TransitChanges {:fields [config]}
 

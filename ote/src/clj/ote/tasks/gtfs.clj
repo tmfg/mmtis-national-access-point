@@ -8,12 +8,14 @@
             [taoensso.timbre :as log]
             [specql.core :as specql]
             [ote.db.tx :as tx]
+            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.lock :as lock]
             [ote.util.db :as util-db]
             [ote.util.feature :as feature]
             [ote.tasks.util :as tasks-util]
             [ote.integration.import.gtfs :as import-gtfs]
+            [ote.integration.report :as report]
             [ote.time :as time]
             [ote.transit-changes.detection :as detection]
             [ote.config.transit-changes-config :as config-tc]
@@ -62,15 +64,40 @@
       (mark-gtfs-package-imported! db interface))
     interface))
 
+(defn email-validation-results
+  [db email service-id interface-id]
+  (let [report (report/latest-import-reports-for-service db service-id)]
+    (when-not (empty? report)
+      (let [service (some-> (specql/fetch db ::t-service/transport-service
+                                          #{::t-service/contact-email}
+                                          {::t-service/id service-id})
+                            first)
+            recipient (or (::t-service/contact-email service)
+                          (some-> (specql/fetch db ::t-operator/transport-operator
+                                                #{::t-operator/email}
+                                                {::t-operator/id (::t-service/transport-operator-id service)})
+                                  first
+                                  ::t-service/contact-email)
+                         "nap@fintraffic.fi")]
+        (log/warn (str "Would send email to "
+                       recipient
+                       " containing "
+                       (count report)
+                       " rows for service-id/interface-id "
+                       service-id
+                       "/"
+                       interface-id
+                       " using email instance " email))))))
+
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
 (defn update-one-gtfs!
   "Selects the given service id, or if none given then selects the next service with external interface with new
   content, downloads and stores the content.
   Return: on success nil, on failure a string containing error details."
-  ([config db upload-s3?]
-   (update-one-gtfs! config db upload-s3? nil nil))
-  ([config db upload-s3? service-id interface-id]
+  ([config db email upload-s3?]
+   (update-one-gtfs! config db email upload-s3? nil nil))
+  ([config db email upload-s3? service-id interface-id]
   ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
    (let [;; Load next gtfs package or package that is related to given service-id
@@ -103,7 +130,10 @@
 
         (catch Exception e
           (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
-      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id)))))
+      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id))
+     (when email
+       (email-validation-results db email service-id interface-id))
+     )))
 
 (def night-hours #{0 1 2 3 4})
 
@@ -190,7 +220,7 @@ different-week-date value and skip all expired changes."
 
 (defrecord GtfsTasks [at config]
   component/Lifecycle
-  (start [{db :db :as this}]
+  (start [{db :db :as this} email]
     (assoc this
       ::stop-tasks
       (if (feature/feature-enabled? config :gtfs-import)
@@ -198,7 +228,7 @@ different-week-date value and skip all expired changes."
            (filter night-time?
                    (drop 1 (periodic-seq (t/now) (t/minutes 1))))
            (fn [_]
-             (#'update-one-gtfs! config db true)))
+             (#'update-one-gtfs! config email db true)))
          (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task config db (time/now) false)))

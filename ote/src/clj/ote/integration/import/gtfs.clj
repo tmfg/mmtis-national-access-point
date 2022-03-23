@@ -19,7 +19,8 @@
             [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
             [ote.transit-changes.detection :as detection]
             [ote.integration.report :as report])
-  (:import (java.io File)))
+  (:import (java.io File)
+           (org.apache.commons.io FilenameUtils)))
 
 (defqueries "ote/integration/import/stop_times.sql")
 (defqueries "ote/integration/import/import_gtfs.sql")
@@ -375,14 +376,14 @@
     ;; returning nil signals failure
     (when gtfs-file
       (log/debug (str "GTFS: service-id = " ts-id ", File imported and uploaded successfully, file = " filename))
-      {:gtfs-file gtfs-file
-       :gtfs-filename filename
-       :gtfs-basename (org.apache.commons.io.FilenameUtils/getBaseName filename)
+      {:gtfs-file                         gtfs-file
+       :gtfs-filename                     filename
+       :gtfs-basename                     (FilenameUtils/getBaseName filename)
        :external-interface-description-id id
-       :external-interface-data-content data-content
-       :service-id ts-id
-       :package-id (:gtfs/id (interface-latest-package db id))  ; re-fetch package to make sure we have the latest
-       :operator-name operator-name})))
+       :external-interface-data-content   data-content
+       :service-id                        ts-id
+       :package-id                        (:gtfs/id package)
+       :operator-name                     operator-name})))
 
 (defrecord GTFSImport [config]
   component/Lifecycle
