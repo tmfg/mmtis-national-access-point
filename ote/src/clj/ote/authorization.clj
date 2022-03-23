@@ -52,7 +52,7 @@
 (defn with-transport-operator-check
   "Check that user has access (belongs to) the given transport operator.
   Runs body-fn if user has access, otherwise returns an HTTP error response and logs a warning."
-  [db user transport-operator-id body-fn]
+  [db user ^long transport-operator-id body-fn]
   (let [allowed-operators (user-transport-operators db user)
         is-admin?         (get-in user [:user :admin?])
         access-denied     #(do

@@ -19,7 +19,8 @@
             [ote.gtfs.kalkati-to-gtfs :as kalkati-to-gtfs]
             [ote.transit-changes.detection :as detection]
             [ote.integration.report :as report])
-  (:import (java.io File)))
+  (:import (java.io File)
+           (org.apache.commons.io FilenameUtils)))
 
 (defqueries "ote/integration/import/stop_times.sql")
 (defqueries "ote/integration/import/import_gtfs.sql")
@@ -247,14 +248,10 @@
         missing-files  (clojure.set/difference expected-files (set file-list))]
     (log/debug "Files in ZIP" file-list)
     (when-not (empty? missing-files)
-      (report/gtfs-import-report! db "error" package-id
-                                  "Missing required files in GTFS ZIP file"
-                                  (.getBytes (pr-str {:expected-files expected-files
-                                                      :file-list      file-list
-                                                      :missing-files  missing-files})))
-      (throw (ex-info (str "Missing required files in gtfs zip file, missing " missing-files) {:expected-files expected-files
-                                                                 :file-list      file-list
-                                                                 :missing-files  missing-files})))))
+      (throw (ex-info (str "Missing required files in GTFS zip file, missing " (seq missing-files))
+                      {:expected-files expected-files
+                       :file-list      file-list
+                       :missing-files  missing-files})))))
 
 (defmethod validate-interface-zip-package :kalkati [_ db package-id byte-array-input]
   (let [file-list (list-zip byte-array-input)]
@@ -262,21 +259,20 @@
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
-
 (defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
     (validate-interface-zip-package type db package-id byte-array-data)
 
     (catch Exception e
-      (let [message (str "Error when opening interface zip package from url" url ":" (.getMessage e))
+      (let [message (str "Error when opening interface zip package from url " url ":" (.getMessage e))
             error   (str "Invalid interface package: " (.getMessage e))]
         (log/warn message)
-        (report/gtfs-import-report! db "warning" package-id message (.getBytes error))
+        (report/gtfs-import-report! db "warning" package-id message (.getBytes (or (str (ex-data e)) error)))
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
                          ::t-service/transport-service-id service-id
                          ::t-service/download-status :failure
-                         ::t-service/download-error error
+                         ::t-service/download-error (str "Invalid interface package: " (.getMessage e))
                          ::t-service/created (java.sql.Timestamp. (System/currentTimeMillis))})
         (throw (ex-info (str "Invalid interface package") {} e))))))
 
@@ -338,8 +334,15 @@
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
         _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
-        response (load-transit-interface-url interface-type db (:gtfs/id latest-package) id ts-id url last-import-date
-                                             (:gtfs/etag latest-package) force-download?)
+        package (specql/insert! db :gtfs/package
+                                {:gtfs/first_package (= 0 package-count)
+                                 :gtfs/transport-operator-id operator-id
+                                 :gtfs/transport-service-id ts-id
+                                 :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                                 :gtfs/license license
+                                 :gtfs/external-interface-description-id id})
+        response (load-transit-interface-url interface-type db (:gtfs/id package) id ts-id url last-import-date
+                                             (:gtfs/etag package) force-download?)
         new-etag (get-in response [:headers :etag])
         gtfs-file (:body response)]
 
@@ -349,15 +352,8 @@
             old-gtfs-hash (:gtfs/sha256 latest-package)]
         ;; IF hash doesn't match, save new and upload file to s3
         (if (or force-download? (nil? old-gtfs-hash) (not= old-gtfs-hash new-gtfs-hash))
-          (let [package (specql/insert! db :gtfs/package
-                                        {:gtfs/sha256 new-gtfs-hash
-                                         :gtfs/first_package (= 0 package-count)
-                                         :gtfs/transport-operator-id operator-id
-                                         :gtfs/transport-service-id ts-id
-                                         :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
-                                         :gtfs/etag new-etag
-                                         :gtfs/license license
-                                         :gtfs/external-interface-description-id id})]
+          (let [_ (specql/update! db :gtfs/package {:gtfs/sha256 new-gtfs-hash
+                                                    :gtfs/etag new-etag} {:gtfs/id (:gtfs/id package)})]
             (when upload-s3?
               (s3/put-object (:bucket gtfs-config)
                              filename
@@ -380,14 +376,14 @@
     ;; returning nil signals failure
     (when gtfs-file
       (log/debug (str "GTFS: service-id = " ts-id ", File imported and uploaded successfully, file = " filename))
-      {:gtfs-file gtfs-file
-       :gtfs-filename filename
-       :gtfs-basename (org.apache.commons.io.FilenameUtils/getBaseName filename)
+      {:gtfs-file                         gtfs-file
+       :gtfs-filename                     filename
+       :gtfs-basename                     (FilenameUtils/getBaseName filename)
        :external-interface-description-id id
-       :external-interface-data-content data-content
-       :service-id ts-id
-       :package-id (:gtfs/id (interface-latest-package db id))  ; re-fetch package to make sure we have the latest
-       :operator-name operator-name})))
+       :external-interface-data-content   data-content
+       :service-id                        ts-id
+       :package-id                        (:gtfs/id package)
+       :operator-name                     operator-name})))
 
 (defrecord GTFSImport [config]
   component/Lifecycle

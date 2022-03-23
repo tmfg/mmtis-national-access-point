@@ -24,6 +24,53 @@
     [ote.integration.report :as report])
   (:import (java.util TimeZone)))
 
+(def ^:private netex-validation-phases
+  "Sourced from https://github.com/entur/chouette-projects-i18n/blob/master/locales/en.yml"
+  {"1-GTFS-CSV-1" "Valid .zip Archive and files"
+   "1-GTFS-CSV-2" "Valid UTF-8 CSV header line"
+   "1-GTFS-CSV-3" "Presence of header"
+   "1-GTFS-CSV-4" "Valid header definition"
+   "1-GTFS-CSV-5" "Valid UTF-8 CSV data line"
+   "1-GTFS-CSV-6" "No HTML tags"
+   "1-GTFS-CSV-7" "No header/trailer spaces"
+   "1-GTFS-Calendar-1" "At least one weekday"
+   "1-GTFS-Calendar-2" "end_date after start_data"
+   "1-GTFS-Common-1"  "Required files are present"
+   "1-GTFS-Common-10" "Presence of agency_id"
+   "1-GTFS-Common-11" "Unknown columns"
+   "1-GTFS-Common-12" "Data in Required columns"
+   "1-GTFS-Common-13" "Data in agency_id in case of several agencies"
+   "1-GTFS-Common-14" "Data in agency_id"
+   "1-GTFS-Common-15" "Conditional values for arrival and departure times, transfer_times"
+   "1-GTFS-Common-16" "Valid data types"
+   "1-GTFS-Common-2" "Presence of calendar_dates and/or calendars"
+   "1-GTFS-Common-3" "Check for optional files"
+   "1-GTFS-Common-4" "Presence of other files"
+   "1-GTFS-Common-5" "Presence of data in files"
+   "1-GTFS-Common-6" "Presence of data in calendar files"
+   "1-GTFS-Common-7" "Presence of data in optional files"
+   "1-GTFS-Common-8" "Unique Identifiers"
+   "1-GTFS-Common-9" "Presence of Required columns"
+   "1-GTFS-Route-1" "Presence of column route_short_name or else route_long_name"
+   "1-GTFS-Route-2" "Presence of data for route_short_name or else route_long_name"
+   "2-GTFS-Common-1" "Existence of external references"
+   "2-GTFS-Common-2" "Usage of IDs"
+   "2-GTFS-Common-3" "Uniqueness of objects"
+   "2-GTFS-Common-4" "No repeated field values"
+   "2-GTFS-Route-1" "route_short_name and route_long_name shall be different"
+   "2-GTFS-Route-2" "Non inclusion de route_short_name dans route_long_name"
+   "2-GTFS-Route-3" "Contrast between colors"
+   "2-GTFS-Route-4" "No 2 routes have identical route_short_name and route_long_name values, but reversed"
+   "2-GTFS-Stop-1" "location_type of parent_station stops"
+   "2-GTFS-Stop-2" "Contrôle de l'usage de la colonne location_type"
+   "2-GTFS-Stop-3" "stop_name et stop_desc non confondus"
+   "2-GTFS-Stop-4" "Station without stations"})
+
+(defn expand-netex-validation-report
+  [json]
+  (->> (get-in (cheshire/parse-string json true) [:validation_report :errors])
+       (map #(update % :test_id netex-validation-phases))))
+
 (def compose-default-locale
   (let [country-code "fi"
         new-date (new java.util.Date)
@@ -36,8 +83,9 @@
      :current-offset current-offset
      :summer-offset summer-offset}))
 
-(defn post-process-default-locale! [netext-xml-file]
+(defn post-process-default-locale!
   "Change language-code fr to fi. Timezone offset to europe/helsinki (-2) and summer time timezone offset to europe/helsinki (-3)"
+  [netext-xml-file]
   (let [_ (log/debug "processing - " (:name netext-xml-file))
         default-locale compose-default-locale
         zipper-file (kalkati-to-gtfs/kalkati-zipper (java.io.ByteArrayInputStream. (.getBytes (:data netext-xml-file) "UTF-8")))
@@ -293,6 +341,51 @@
       (s3/put-object bucket filename (io/file filepath))
       filename)))
 
+(defmulti netex-validation-error :error_id)
+
+(defmethod netex-validation-error "1_gtfs_csv_3"
+  [error]
+  (format "%s is missing the header row" (:error_value error)))
+
+(defmethod netex-validation-error "1_gtfs_common_3"
+  [error]
+  (format "Optional file %s is not present." (:error_value error)))
+
+(defmethod netex-validation-error "1_gtfs_common_4"
+  [error]
+  (format "Unexpected file %s present in GTFS package" (:error_value error)))
+
+(defmethod netex-validation-error "1_gtfs_common_8"
+  [error]
+  (let [{:keys [source error_value reference_value]}   error
+        {:keys [filename, line_number, column_number]} (:file source)]
+    (format "%s contains the value %s for key %s multiple times, starting at line %s, column %s."
+            filename error_value reference_value line_number column_number)))
+
+
+(defmethod netex-validation-error "1_gtfs_common_11"
+  [error]
+  (let [{:keys [source error_value]} error
+        {:keys [filename]}           (:file source)]
+    (format "%s contains unknown column %s"
+            filename error_value)))
+
+(defmethod netex-validation-error "1_gtfs_common_12"
+  [error]
+  (let [{:keys [source error_value reference_value]}   error
+        {:keys [filename, line_number, column_number]} (:file source)]
+    (format "%s is missing required value for column %s on line %s, column %s"
+            filename error_value line_number column_number)))
+
+(defmethod netex-validation-error "2_gtfs_stop_4"
+  [error]
+  (let [{:keys [source error_value reference_value]}   error
+        {:keys [filename, line_number, column_number]} (:file source)]
+    (format "%s contains a station %s without stations at line %s, column %s"
+            filename error_value line_number column_number)))
+
+(defmethod netex-validation-error :default [x] (str x))
+
 (defn set-conversion-status!
   "Resolves operation result based on input args and updates status to db.
   Return: On successful conversion true, on failure false"
@@ -311,9 +404,10 @@
                                   (str "NeTEx conversion input produced non-empty report")
                                   (.getBytes input-report-file)))
     (when (some? validation-report-file)
-      (report/gtfs-import-report! db "error" package-id
-                                  (str "NeTEx conversion validation failed")
-                                  (.getBytes validation-report-file)))
+      (for [r (expand-netex-validation-report validation-report-file)]
+        (report/gtfs-import-report! db "error" package-id
+                                    (str "NeTEx conversion validation failed")
+                                    (.getBytes (netex-validation-error r)))))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
                     {::netex/transport-service-id service-id
