@@ -77,7 +77,6 @@
                                             ::t-service/transport-operator-id}
                                           {::t-service/id service-id})
                             first)
-            _ (log/warn (str "service >> " service))
             operator (some-> (specql/fetch db ::t-operator/transport-operator
                                                      #{::t-operator/email}
                                                      {::t-operator/id (::t-service/transport-operator-id service)}
