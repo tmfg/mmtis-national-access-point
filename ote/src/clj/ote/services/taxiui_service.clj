@@ -16,12 +16,18 @@
 
 (defqueries "ote/services/taxiui_service.sql")
 
+(defn- unknown->long
+  [u]
+  (if (= String (type u))
+    (Long/parseLong u)
+    u))
+
 (defn fetch-priceinfo-for-service
   [db user {service-id  :service-id
             operator-id :operator-id :as form-data}]
   (log/info (str "fetch-priceinfo-for-service " form-data))
   (authorization/with-transport-operator-check
-    db user operator-id
+    db user (unknown->long operator-id)
     (fn []
       (let [service-id (Integer/parseInt service-id)
             r (->> (select-price-information db {:service-id service-id})
@@ -43,16 +49,16 @@
 
 (defn- keep-service-operation-areas
   [db service-id areas-to-keep]
-    (when-not (empty? areas-to-keep)
-      (specql/delete! db :ote.db.transport-service/operation_area
-                      (merge
-                        {:ote.db.transport-service/transport-service-id service-id}
-                        {:ote.db.transport-service/id (op/not (op/in areas-to-keep))}))))
+  (when-not (empty? areas-to-keep)
+    (specql/delete! db :ote.db.transport-service/operation_area
+                    (merge
+                      {:ote.db.transport-service/transport-service-id service-id}
+                      {:ote.db.transport-service/id (op/not (op/in areas-to-keep))}))))
 
 (defn update-priceinfo-for-service
   [db user operator-id service-id price-info]
   (authorization/with-transport-operator-check
-    db user operator-id
+    db user (unknown->long operator-id)
     (fn []
       (tx/with-transaction
         db
@@ -83,8 +89,8 @@
 
               (some->> (:new-places places)
                        (mapv (fn [place]
-                              (merge (places/place-by-id db (:ote.db.places/id place))
-                                     {:ote.db.places/primary? true})))
+                               (merge (places/place-by-id db (:ote.db.places/id place))
+                                      {:ote.db.places/primary? true})))
                        (store-new-operation-areas db service-id))
 
               (some->> (:unknown-places places)
@@ -153,15 +159,15 @@
                   http
                   (routes
                     (POST "/taxiui/price-info" {user      :user
-                                               form-data :body}
+                                                form-data :body}
                       (http/transit-response
                         (fetch-priceinfo-for-service db user (http/transit-request form-data))))
 
                     (POST "/taxiui/price-info/:operator-id/:service-id" {{:keys [operator-id service-id]} :params
                                                                          user                             :user
                                                                          form-data                        :body}
-                         (http/transit-response
-                           (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
+                      (http/transit-response
+                        (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
 
                     (POST "/taxiui/statistics" {form-data :body}
                       (http/transit-response
