@@ -66,7 +66,7 @@
 
 (defn email-validation-results
   [db email service-id interface-id]
-  (let [report (report/latest-import-reports-for-service db service-id)]
+  (let [report (report/latest-import-reports-for-service-interface db service-id interface-id)]
     (when-not (empty? report)
       (let [service (some-> (specql/fetch db ::t-service/transport-service
                                           #{::t-service/contact-email}

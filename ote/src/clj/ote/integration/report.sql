@@ -18,7 +18,7 @@ SELECT "gp".id                                  AS "gtfs-package_id",
                               FROM gtfs_package "gp"
                              ORDER BY "gp"."transport-service-id", "gp".id DESC)
 
--- name fetch-latest-import-reports-for-service
+-- name: fetch-latest-import-reports-for-service
 SELECT "gp".id                                  AS "gtfs-package_id",
       "gp".created                             AS "gtfs-package_created",
       "gp"."external-interface-description-id" AS "gtfs-package_external-interface-description-id",
