@@ -17,8 +17,6 @@
                   {:href "css/nprogress.css"}
                   {:href "css/balloon.css"}
                   {:href "css/styles.css"}
-                  {:href "https://fonts.googleapis.com/css?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900"
-                   :rel "stylesheet"}
                   {:href "https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
                    :integrity "sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="}
                   {:href "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.12/leaflet.draw.css"}

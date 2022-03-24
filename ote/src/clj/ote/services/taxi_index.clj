@@ -15,14 +15,7 @@
 (def stylesheets [; Normalize CSS across browsers to be visually similar, works as base for all other styles
                   {:href "css/taxiui/normalize.css"}
                   ; Taxi UI global base definitions
-                  {:href "css/taxiui/styles.css"}
-                  ; Google fonts preconnects, improves performance
-                  {:rel "preconnect" :href "https://fonts.googleapis.com"}
-                  {:rel "preconnect" :href "https://fonts.gstatic.com" :crossorigin "true"}
-                  ; Fintraffic primary font
-                  {:href "https://fonts.googleapis.com/css?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900" :rel "stylesheet"}
-                  ; Fintraffic secondary font
-                  {:href "https://fonts.googleapis.com/css2?family=Piazzolla:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" :rel "stylesheet"}])
+                  {:href "css/taxiui/styles.css"}])
 
 (defn ote-js-location [dev-mode?]
   (str "js/ote"
