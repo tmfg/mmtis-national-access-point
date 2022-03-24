@@ -249,7 +249,7 @@ different-week-date value and skip all expired changes."
            (filter night-time?
                    (drop 1 (periodic-seq (t/now) (t/minutes 1))))
            (fn [_]
-             (#'update-one-gtfs! config email db true)))
+             (#'update-one-gtfs! config db email true)))
          (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task config db (time/now) false)))
