@@ -1,5 +1,6 @@
 (ns ote.services.transit-changes
-  (:require [compojure.core :refer [GET POST DELETE]]
+  (:require [compojure.core :refer [routes GET POST DELETE]]
+            [com.stuartsierra.component :as component]
             [jeesql.core :refer [defqueries]]
             [clojure.string :as str]
             [clojure.set :as set]
@@ -125,96 +126,107 @@
   [db]
   (report/latest-import-reports-for-all-packages db))
 
-(define-service-component TransitChanges {:fields [config]}
+(defn transit-changes-routes
+  [config db email]
+  (routes
+    (GET "/transit-changes/current" {user :user :as request}
+      (or (authorization/transit-authority-authorization-response user)
+          (list-current-changes db)))
 
-  ^{:unauthenticated false :format :transit}
-  (GET "/transit-changes/current" {user :user :as request}
-    (or (authorization/transit-authority-authorization-response user)
-        (list-current-changes db)))
-
-  (GET "/transit-changes/hash-calculation/" {user :user :as request}
-    (when (authorization/admin? user)
-      (http/transit-response (detection/hash-recalculations db))))
-
-  (DELETE "/transit-changes/hash-calculation" {user :user :as request}
-    (when (authorization/admin? user)
-      (http/transit-response (detection/reset-last-hash-recalculations db))))
-
-  ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
-  (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
-    (when (authorization/admin? user)
-      ;; Start slow process in other thread
-      (future
-        (cond
-          (= scope "month")
-          (detection/calculate-monthly-date-hashes-for-packages
-            db (:user user) (= "true" is-future))
-          (= scope "day")
-          (detection/calculate-date-hashes-for-all-packages
-            db (:user user) (= "true" is-future))
-          (= scope "contract")
-          (detection/calculate-date-hashes-for-contract-traffic
-            db (:user user) (= "true" is-future))))
-      ;; But give thumbs up
-      (http/transit-response
-        {:status 200
-         :body "OK"})))
-
-  ;; Calculate date-hashes for given service-id and package-count
-  (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
-    (when (authorization/admin? user)
-      (do
-        ;; Calculate date hashes in other thread
-        (future
-          (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
-          ;; Detect changes for service
-          (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)]))
-        "OK")))
-
-  ;; Calculate route-hash-id for given service-id and package-count
-  (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
-    (when (authorization/admin? user)
-      (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
-      "OK"))
-
-  ;; Load services and their route-hash-id-type
-  (GET "/transit-changes/load-services-with-route-hash-id" req
-    (when (authorization/admin? (:user req))
-      (http/transit-response (services-with-route-hash-id db))))
-
-  ;; Load services and their route-hash-id-type
-  (GET "/transit-changes/load-gtfs-import-reports" req
-    (when (authorization/admin? (:user req))
-      (http/transit-response (load-gtfs-import-reports db))))
-
-  ;; Force change detection for all services
-  (POST "/transit-changes/force-detect/" req
-    (when (authorization/admin? (:user req))
-      (gtfs-tasks/detect-new-changes-task config db (time/now) true)
-      "OK"))
-
-  ;; Force change detection for single service
-  (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
-                                                     user :user}
-    (when (authorization/admin? user)
-      (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)])
-      "OK"))
-
-  ;; Force change detection for single service
-  (POST "/transit-changes/force-detect-for-date/:service-id/:detection-date" {{:keys [service-id detection-date]} :params
-                                                     user :user}
-    (let [detection-date (time/date-string->date-time detection-date)]
+    (GET "/transit-changes/hash-calculation/" {user :user :as request}
       (when (authorization/admin? user)
-        (gtfs-tasks/detect-new-changes-task config db detection-date true [(Long/parseLong service-id)])
-        "OK")))
+        (http/transit-response (detection/hash-recalculations db))))
 
-  ;; Force gtfs package download for given service
-  (POST "/transit-changes/force-interface-import/:service-id/:interface-id" {{:keys [service-id interface-id]} :params
-                                                               user :user}
-    (if (authorization/admin? user)
-      (if-let [result-error (gtfs-tasks/update-one-gtfs! config db true
-                                                         (Long/parseLong service-id)
-                                                         (Long/parseLong interface-id))]
-        (http/transit-response result-error 409)
-        (http/transit-response nil 200))
-      (http/transit-response nil 401))))
+    (DELETE "/transit-changes/hash-calculation" {user :user :as request}
+      (when (authorization/admin? user)
+        (http/transit-response (detection/reset-last-hash-recalculations db))))
+
+    ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
+    (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
+      (when (authorization/admin? user)
+        ;; Start slow process in other thread
+        (future
+          (cond
+            (= scope "month")
+            (detection/calculate-monthly-date-hashes-for-packages
+              db (:user user) (= "true" is-future))
+            (= scope "day")
+            (detection/calculate-date-hashes-for-all-packages
+              db (:user user) (= "true" is-future))
+            (= scope "contract")
+            (detection/calculate-date-hashes-for-contract-traffic
+              db (:user user) (= "true" is-future))))
+        ;; But give thumbs up
+        (http/transit-response
+          {:status 200
+           :body   "OK"})))
+
+    ;; Calculate date-hashes for given service-id and package-count
+    (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
+      (when (authorization/admin? user)
+        (do
+          ;; Calculate date hashes in other thread
+          (future
+            (detection/calculate-package-hashes-for-service db (Long/parseLong service-id) (Long/parseLong package-count) (:user user))
+            ;; Detect changes for service
+            (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)]))
+          "OK")))
+
+    ;; Calculate route-hash-id for given service-id and package-count
+    (GET "/transit-changes/force-calculate-route-hash-id/:service-id/:package-count/:type" [service-id package-count type :as {user :user}]
+      (when (authorization/admin? user)
+        (detection/calculate-route-hash-id-for-service db (Long/parseLong service-id) (Long/parseLong package-count) type)
+        "OK"))
+
+    ;; Load services and their route-hash-id-type
+    (GET "/transit-changes/load-services-with-route-hash-id" req
+      (when (authorization/admin? (:user req))
+        (http/transit-response (services-with-route-hash-id db))))
+
+    ;; Load services and their route-hash-id-type
+    (GET "/transit-changes/load-gtfs-import-reports" req
+      (when (authorization/admin? (:user req))
+        (http/transit-response (load-gtfs-import-reports db))))
+
+    ;; Force change detection for all services
+    (POST "/transit-changes/force-detect/" req
+      (when (authorization/admin? (:user req))
+        (gtfs-tasks/detect-new-changes-task config db (time/now) true)
+        "OK"))
+
+    ;; Force change detection for single service
+    (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
+                                                       user                 :user}
+      (when (authorization/admin? user)
+        (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)])
+        "OK"))
+
+    ;; Force change detection for single service
+    (POST "/transit-changes/force-detect-for-date/:service-id/:detection-date" {{:keys [service-id detection-date]} :params
+                                                                                user                                :user}
+      (let [detection-date (time/date-string->date-time detection-date)]
+        (when (authorization/admin? user)
+          (gtfs-tasks/detect-new-changes-task config db detection-date true [(Long/parseLong service-id)])
+          "OK")))
+
+    ;; Force gtfs package download for given service
+    (POST "/transit-changes/force-interface-import/:service-id/:interface-id" {{:keys [service-id interface-id]} :params
+                                                                               user                              :user}
+      (if (authorization/admin? user)
+        (if-let [result-error (gtfs-tasks/update-one-gtfs! config db email true
+                                                           (Long/parseLong service-id)
+                                                           (Long/parseLong interface-id))]
+          (http/transit-response result-error 409)
+          (http/transit-response nil 200))
+        (http/transit-response nil 401)))))
+
+(defrecord TransitChanges [config]
+  component/Lifecycle
+  (start [{:keys [db http email] :as this}]
+    (assoc
+      this ::stop
+           [(http/publish! http {:authenticated? true} (transit-changes-routes config db email))]))
+  (stop [{stop ::stop :as this}]
+    (doseq [s stop]
+      (s))
+    (dissoc this ::stop)))
