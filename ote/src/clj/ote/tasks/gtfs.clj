@@ -234,14 +234,9 @@ different-week-date value and skip all expired changes."
                            :gtfs/transport-service-id (:transport-service-id change-row)}))))
     (log/info "Detected change count recalculation ready!")))
 
-(def config-atom (atom nil))
-
 (defrecord GtfsTasks [at config]
   component/Lifecycle
   (start [{db :db email :email :as this}]
-    (reset! config-atom {:config config
-                         :db db
-                         :email email})
     (assoc this
       ::stop-tasks
       (if (feature/feature-enabled? config :gtfs-import)
