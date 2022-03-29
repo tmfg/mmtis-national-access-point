@@ -1475,7 +1475,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :help-desk-phone " eller 029 534 6705 (Mån-Fre kl 9-15)"}
   :email-verification {:verification-message "Hej. Tack för att du registrerade dig i NAP-tjänsten! För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress. Du kan verifiera adressen genom att klicka nedan."
                        :verify-email "Verifiera e-postadress"
-                       :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}}
+                       :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}
+  :validation-report {:title "Automatisk import av externt gränssnitt misslyckades"}}
 
  :country-list
  {:A "Välj"

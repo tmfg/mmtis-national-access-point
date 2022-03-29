@@ -1482,7 +1482,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
                        :verify-email "Todenna sähköpostiosoite"
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}
-  :validation-report {:title "Moi miten menee"}}
+  :validation-report {:title "Ulkoisen rajapinnan automatisoitu tuonti epäonnistui"}}
 
  :country-list
  {:A "Valitse"

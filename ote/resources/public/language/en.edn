@@ -1472,7 +1472,8 @@ You can also draw the operating area or point to the map with drawing tools. You
            :help-desk-phone " or +358 29 534 5454 (Mon-Fri 9am-3pm)"}
   :email-verification {:verification-message "Dear recipient, Thank you for registering with the NAP service! Before you can start using the service, please verify your email address by clicking on the button below."
                        :verify-email "Verify your email address"
-                       :if-not-registered "If you have not recently registered with the NAP service, you can ignore this message."}}
+                       :if-not-registered "If you have not recently registered with the NAP service, you can ignore this message."}
+  :validation-report {:title "Automated import of external interface failed" }}
 
  :country-list
  {:A "Select"

@@ -385,7 +385,11 @@
 
 (defn- report-row [operator service report]
   [[:a {:href (str (environment/base-url) "#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))} (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))]
-   (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))
+   (escape-html (str "Paketti " (get-in report [:gtfs-package :id])
+                ", "
+                "Rajapinta " (get-in report [:gtfs-package :external-interface-description-id])
+                ", "
+                (get-in report [:gtfs-package :created])))
    (escape-html (str (get-in report [:gtfs-import-report :description])))
    (escape-html (str (get-in report [:gtfs-import-report :error])))
    (escape-html (str (get-in report [:gtfs-import-report :severity])))])
