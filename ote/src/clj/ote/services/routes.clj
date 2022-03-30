@@ -376,9 +376,7 @@
   (routes
    (GET "/transit/stops.json" {user :user}
      (or (service-state-response db (:user user))
-         {:status 200
-          :headers {"Content-Type" "application/vnd.geo+json"}
-          :body (stops-geojson db)}))))
+         (http/geojson-response (stops-geojson db))))))
 
 (defrecord Routes [nap-config]
   component/Lifecycle

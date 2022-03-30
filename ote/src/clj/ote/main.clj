@@ -30,6 +30,7 @@
             [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.export.csv :as export-csv]
             [ote.integration.export.netex :as export-netex]
+            [ote.integration.export.gtfs-flex :as export-gtfsflex]
 
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.import.kalkati :as import-kalkati]
@@ -95,6 +96,7 @@
    :export-netex (component/using (export-netex/->NeTExExport config) [:db :http])
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
+   :export-gtfsflex (component/using (export-gtfsflex/->GTFSFlexExport config) [:db :http])
 
    ;; Integration: Fetch company data from YTJ
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])

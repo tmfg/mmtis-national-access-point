@@ -1,5 +1,5 @@
 (ns ote.gtfs.spec
-  "Define clojure.spec for GTFS data. All GTFS keys are under :gtfs namespace."
+  "Define clojure.spec for GTFS and GTFS Flex data. All GTFS keys are under :gtfs namespace."
   (:require [clojure.spec.alpha :as s]
             [ote.time :as time :refer [time?]]))
 
@@ -184,6 +184,45 @@
    :gtfs/timepoint])
 
 (def stop-times-txt-header "trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec for extended stop_times.txt used by GTFS Flex
+
+(s/def :gtfs-flex/stop-times-txt
+  (s/coll-of :gtfs-flex/stop-times))
+
+(s/def :gtfs-flex/stop-times
+  (s/keys :req  [:gtfs/trip-id
+                 :gtfs/arrival-time
+                 :gtfs/departure-time
+                 :gtfs/stop-id
+                 :gtfs/stop-sequence]
+          :opt  [:gtfs/stop-headsign
+                 :gtfs/pickup-type
+                 :gtfs/drop-off-type
+                 :gtfs/shape-dist-traveled
+                 :gtfs/timepoint
+                 :gtfs-flex/start_pickup_dropoff_window
+                 :gtfs-flex/end_pickup_dropoff_window
+                 :gtfs-flex/mean_duration_factor
+                 :gtfs-flex/mean_duration_offset
+                 :gtfs-flex/safe_duration_factor
+                 :gtfs-flex/safe_duration_offset]))
+
+(s/def :gtfs/shape-dist-traveled nat-int?)
+(s/def :gtfs/stop-sequence nat-int?)
+
+(def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file with GTFS Flex extensions"}
+  flex-stop-times-txt-fields
+  (into stop-times-txt-fields
+        [:gtfs-flex/start_pickup_dropoff_window
+         :gtfs-flex/end_pickup_dropoff_window
+         :gtfs-flex/mean_duration_factor
+         :gtfs-flex/mean_duration_offset
+         :gtfs-flex/safe_duration_factor
+         :gtfs-flex/safe_duration_offset]))
+
+(def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_dropoff_window,end_pickup_dropoff_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for calendar.txt

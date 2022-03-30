@@ -23,11 +23,6 @@
 
 (declare export-geojson)
 
-(defn- json-response [data]
-  {:status 200
-   :headers {"Content-Type" "application/vnd.geo+json"}
-   :body data})
-
 (defn- feature-collection [geometry properties]
   {:type "FeatureCollection"
    :features [{:type "Feature"
@@ -75,10 +70,8 @@
           first))
     service))
 
-(defn- export-geojson [db config transport-operator-id transport-service-id]
-  (let [areas (seq
-                (fetch-operation-area-for-service db
-                                                  {:transport-service-id transport-service-id}))
+(defn export-geojson [db config transport-operator-id transport-service-id]
+  (let [areas (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
         operator (when areas
                    (-> (first
                          (specql/fetch db
@@ -108,7 +101,7 @@
                                 {:transport-operator operator
                                  :transport-service service}))
           (cheshire/encode {:key-fn name})
-          json-response)
+          http/geojson-response)
       {:status 404
        :body "GeoJSON for service not found."})))
 
@@ -228,7 +221,6 @@
                :properties {"transport-operator" transport-operator-schema
                             "transport-service" transport-service-schema}}
               "geometry" {:type "object"}}}}}})
-
 
 (define-service-component GeoJSONExport {:fields [config]}
   ^:unauthenticated
