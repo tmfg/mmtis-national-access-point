@@ -75,10 +75,8 @@
           first))
     service))
 
-(defn- export-geojson [db config transport-operator-id transport-service-id]
-  (let [areas (seq
-                (fetch-operation-area-for-service db
-                                                  {:transport-service-id transport-service-id}))
+(defn export-geojson [db config transport-operator-id transport-service-id]
+  (let [areas (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
         operator (when areas
                    (-> (first
                          (specql/fetch db

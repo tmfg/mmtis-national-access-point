@@ -35,7 +35,7 @@
     (stop)
     (dissoc this ::stop)))
 
-(defn- fetch-sea-routes-published
+(defn fetch-sea-routes-published
   "Return the currently available published sea routes of the given transport operator."
   [db transport-operator-id]
   (let [routes (fetch db ::transit/route
@@ -60,12 +60,20 @@
                                             ::t-operator/homepage ::t-operator/phone
                                             ::t-operator/email})
 
+(defn get-transport-operator
+  [db transport-operator-id]
+  (first (fetch db ::t-operator/transport-operator
+                transport-operator-columns
+                {::t-operator/id transport-operator-id})))
+
+(defn get-sea-routes
+  [db transport-operator-id]
+  (map #(update % ::transit/name (flip t-service/localized-text-with-fallback) *language*)
+       (fetch-sea-routes-published db transport-operator-id)))
+
 (defn export-sea-gtfs [db transport-operator-id]
-  (let [transport-operator (first (fetch db ::t-operator/transport-operator
-                                         transport-operator-columns
-                                         {::t-operator/id transport-operator-id}))
-        routes (map #(update % ::transit/name (flip t-service/localized-text-with-fallback) *language*)
-                    (fetch-sea-routes-published db transport-operator-id))]
+  (let [transport-operator (get-transport-operator db transport-operator-id)
+        routes             (get-sea-routes db transport-operator-id)]
     {:status 200
      :headers {"Content-Type" "application/zip"
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
