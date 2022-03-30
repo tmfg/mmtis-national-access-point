@@ -30,7 +30,7 @@
      url))
 
 
-(defn- agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
+(defn agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
   [{:gtfs/agency-id id
     :gtfs/agency-name name
     :gtfs/agency-url (ensure-has-protocol homepage transport-operator)
@@ -39,7 +39,7 @@
     :gtfs/agency-phone phone
     :gtfs/agency-email email}])
 
-(defn- stops-txt [stops]
+(defn stops-txt [stops]
   (for [[id {::transit/keys [name location stop-type]}] stops]
     {:gtfs/stop-id id
      :gtfs/stop-name (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
@@ -47,7 +47,7 @@
      :gtfs/stop-lat (.-y (.getGeometry location))
      :gtfs/stop-lon (.-x (.getGeometry location))}))
 
-(defn- sea-routes-txt [transport-operator-id routes]
+(defn sea-routes-txt [transport-operator-id routes]
   (for [{::transit/keys [route-id name route-type]} routes]
     {:gtfs/route-id route-id
      :gtfs/route-short-name ""
@@ -130,7 +130,7 @@
         (services-with-removed-dates service-removed-dates)
         (services-with-added-dates service-added-dates))))
 
-(defn- sea-trips-txt [routes]
+(defn sea-trips-txt [routes]
   (try
     (mapcat
       (fn [{::transit/keys [route-id trips]
@@ -158,14 +158,14 @@
       (.printStackTrace e)
       (log/warn "Error generating GTFS file content for trips" e))))
 
-(defn- calendar-txt [routes]
+(defn calendar-txt [routes]
   (mapcat
     (fn [{services :services}]
       (mapcat #(for [service %]
                  (select-keys service gtfs-spec/calendar-txt-fields)) services))
     routes))
 
-(defn- calendar-dates-txt [routes]
+(defn calendar-dates-txt [routes]
   (mapcat
     (fn [{services :services}]
       (mapcat
@@ -214,7 +214,7 @@
     routes-trips))
 
 #?(:clj
-   (defn- sea-stop-times-txt [routes trips]
+   (defn sea-stop-times-txt [routes trips]
      (try
        (mapcat
          (fn [{::transit/keys [route-id stops]}]
@@ -257,15 +257,15 @@
             [{:name "agency.txt"
               :data (unparser :gtfs/agency-txt (agency-txt transport-operator))}
              {:name "stops.txt"
-              :data (unparser  :gtfs/stops-txt (stops-txt stops-by-code))}
+              :data (unparser :gtfs/stops-txt (stops-txt stops-by-code))}
              {:name "stop_times.txt"
-              :data (unparser  :gtfs/stop-times-txt (sea-stop-times-txt routes trips))}
+              :data (unparser :gtfs/stop-times-txt (sea-stop-times-txt routes trips))}
              {:name "routes.txt"
               :data (unparser
                       :gtfs/routes-txt
                       (sea-routes-txt (::t-operator/id transport-operator) routes))}
              {:name "trips.txt"
-              :data (unparser  :gtfs/trips-txt trips-txt)}
+              :data (unparser :gtfs/trips-txt trips-txt)}
              {:name "calendar.txt"
               :data (unparser :gtfs/calendar-txt (calendar-txt routes))}
              {:name "calendar_dates.txt"
