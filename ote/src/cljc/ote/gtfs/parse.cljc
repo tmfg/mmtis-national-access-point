@@ -133,7 +133,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
    :gtfs/calendar-dates-txt {:header gtfs-spec/calendar-dates-txt-header
                              :fields gtfs-spec/calendar-dates-txt-fields}
    :gtfs/shapes-txt {:header gtfs-spec/shapes-txt-header
-                     :fields gtfs-spec/shapes-txt-fields}})
+                     :fields gtfs-spec/shapes-txt-fields}
+   :gtfs-flex/stop-times-txt {:header gtfs-spec/flex-stop-times-txt-header
+                              :fields gtfs-spec/flex-stop-times-txt-fields}})
 
 (defn parse-gtfs-file
   "Parse GTFS file of `gtfs-file-type` from `content`.
