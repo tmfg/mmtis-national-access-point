@@ -402,7 +402,7 @@
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   "Saatte tämän viestin, koska olette ilmoittautuneet Fintrafficin NAP-viranomaispalvelussa joukkoliikenteen palveluntarjoajaksi, ja tarjoamassanne joukkoliikenneaineistossa on havaittu virheitä."]
+                   "Saitte tämän viestin, koska olette julkaisseet Fintrafficin liikennepalvelukatalogissa ja reitti- ja aikataulutiedoissanne on havaittu automaattitarkastuksessa seuraavat virheet."]
 
 
                   [:div {:style "background-color:#FFFFFF"}
