@@ -184,6 +184,7 @@
     [:center
      [:div.whiteBackground.spacing-left-right
       [:a {:href (str (environment/base-url))}
+       ; TODO: Should update the logo, but we don't have a new asset yet
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
               :width "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
 
@@ -200,7 +201,7 @@
       [:p
        [:a {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
             :href "mailto:nap@fintraffic.fi"} (tr [:email-templates :footer :help-desk-email])]
-       [:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       #_[:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         (tr [:email-templates :footer :help-desk-phone])]]
       [:br]
       (when show-email-settings?
@@ -401,7 +402,7 @@
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   "Palvelun ulkoisen rajapinnan automaattisessa GTFS-tuonnissa on havaittu virheitä"]
+                   "Saatte tämän viestin, koska olette ilmoittautuneet Fintrafficin NAP-viranomaispalvelussa joukkoliikenteen palveluntarjoajaksi, ja tarjoamassanne joukkoliikenneaineistossa on havaittu virheitä."]
 
 
                   [:div {:style "background-color:#FFFFFF"}
@@ -419,7 +420,6 @@
                       {:class "tg-lusz" :width "15%" :label "Vakavuus"}]
                      (for [r report]
                        (report-row operator service r)))
-                   [:br]
-                   (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")]
+                   [:br]]
 
                   (html-divider-border nil)]))
