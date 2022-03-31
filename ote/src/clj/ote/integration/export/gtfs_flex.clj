@@ -86,14 +86,22 @@
 (defn export-gtfs-flex
   [db config transport-operator-id transport-service-id]
 
-  (let [transport-operator (gtfs/get-transport-operator db transport-operator-id)
+  (let [; load raw data and structures
+        transport-operator (gtfs/get-transport-operator db transport-operator-id)
         areas              (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
         routes             (gtfs/get-sea-routes db transport-operator-id)
+        ; generate/convert file specific data structures
         trips              (gtfs-transform/sea-trips-txt routes)
+        agency-txt         (gtfs-transform/agency-txt transport-operator)
+        routes-txt         (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes)
+        calendar-txt       (gtfs-transform/calendar-txt routes)
+        calendar-dates-txt (gtfs-transform/calendar-dates-txt routes)
         trips-txt          (map #(dissoc % :stoptimes) trips)
-        geojson            (when-not (empty? areas)
+        locations-geojson  (when-not (empty? areas)
                              (-> (->geojson-feature-collection areas)
-                                 (cheshire/encode {:key-fn name})))]
+                                 (cheshire/encode {:key-fn name})))
+        stop-times-txt     (concat (gtfs-transform/sea-stop-times-txt routes trips)
+                                   (->static-schedule areas))]
 
     (log/warn "Areas: " areas)
     {:status  200
@@ -101,24 +109,21 @@
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
      :body    (ring-io/piped-input-stream
                 (->> [{:name "agency.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/agency-txt (gtfs-transform/agency-txt transport-operator))}
+                       :data (parse/unparse-gtfs-file :gtfs/agency-txt agency-txt)}
                       {:name "routes.txt"
-                       :data (parse/unparse-gtfs-file
-                               :gtfs/routes-txt
-                               (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/routes-txt routes-txt)}
                       {:name "trips.txt"
                        :data (parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
                       {:name "calendar.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/calendar-txt (gtfs-transform/calendar-txt routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/calendar-txt calendar-txt)}
                       {:name "calendar_dates.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt (gtfs-transform/calendar-dates-txt routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates-txt)}
                       {:name "locations.geojson"
-                       :data geojson}
+                       :data locations-geojson}
                       {:name "location_groups.txt"
                        :data ""}
                       {:name "stop_times.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt (concat (gtfs-transform/sea-stop-times-txt routes trips)
-                                                                                        (->static-schedule areas)))}]
+                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt stop-times-txt)}]
                      (partial zip-content)))}
     ; TODO: Hardcode 24h eternal (+5 years) schedule
     ))
