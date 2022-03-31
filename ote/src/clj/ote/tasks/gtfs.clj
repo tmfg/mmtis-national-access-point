@@ -81,10 +81,10 @@
                                                      #{::t-operator/email}
                                                      {::t-operator/id (::t-service/transport-operator-id service)}
                               first))
-            recipient (or (::t-service/contact-email service)
+            recipient "nap@fintraffic.fi" #_(or (::t-service/contact-email service)
                           (::t-operator/email operator)
                          "nap@fintraffic.fi")]
-        #_(localization/with-language
+        (localization/with-language
           "fi"
           (email/send! email {:to      recipient
                               :subject (localization/tr [:email-templates :validation-report :title])
@@ -96,7 +96,7 @@
                                                                       service
                                                                       report)))}]}))
 
-        (log/warn (str "Would send email to "
+        (log/info (str "Sent email to "
                        recipient
                        " containing "
                        (count report)
