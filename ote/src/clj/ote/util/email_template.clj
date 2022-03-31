@@ -184,6 +184,7 @@
     [:center
      [:div.whiteBackground.spacing-left-right
       [:a {:href (str (environment/base-url))}
+       ; TODO: Should update the logo, but we don't have a new asset yet
        [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
               :width "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
 
@@ -200,7 +201,7 @@
       [:p
        [:a {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
             :href "mailto:nap@fintraffic.fi"} (tr [:email-templates :footer :help-desk-email])]
-       [:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
+       #_[:span {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"}
         (tr [:email-templates :footer :help-desk-phone])]]
       [:br]
       (when show-email-settings?
@@ -385,7 +386,11 @@
 
 (defn- report-row [operator service report]
   [[:a {:href (str (environment/base-url) "#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))} (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))]
-   (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))
+   (escape-html (str "Paketti " (get-in report [:gtfs-package :id])
+                ", "
+                "Rajapinta " (get-in report [:gtfs-package :external-interface-description-id])
+                ", "
+                (get-in report [:gtfs-package :created])))
    (escape-html (str (get-in report [:gtfs-import-report :description])))
    (escape-html (str (get-in report [:gtfs-import-report :error])))
    (escape-html (str (get-in report [:gtfs-import-report :severity])))])
@@ -397,7 +402,7 @@
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   "Palvelun ulkoisen rajapinnan automaattisessa GTFS-tuonnissa on havaittu virheitä"]
+                   "Saitte tämän viestin, koska olette julkaisseet Fintrafficin liikennepalvelukatalogissa ja reitti- ja aikataulutiedoissanne on havaittu automaattitarkastuksessa seuraavat virheet."]
 
 
                   [:div {:style "background-color:#FFFFFF"}
@@ -415,7 +420,6 @@
                       {:class "tg-lusz" :width "15%" :label "Vakavuus"}]
                      (for [r report]
                        (report-row operator service r)))
-                   [:br]
-                   (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")]
+                   [:br]]
 
                   (html-divider-border nil)]))

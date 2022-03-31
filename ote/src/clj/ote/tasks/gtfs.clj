@@ -81,13 +81,13 @@
                                                      #{::t-operator/email}
                                                      {::t-operator/id (::t-service/transport-operator-id service)}
                               first))
-            recipient (or (::t-service/contact-email service)
+            recipient "nap@fintraffic.fi" #_(or (::t-service/contact-email service)
                           (::t-operator/email operator)
                          "nap@fintraffic.fi")]
-        #_(localization/with-language
+        (localization/with-language
           "fi"
-          (email/send! email {:to      "esko.suomi@solita.fi"
-                              :subject "Olenpa sähköposti"
+          (email/send! email {:to      recipient
+                              :subject (localization/tr [:email-templates :validation-report :title])
                               :body    [{:type    "text/html;charset=utf-8"
                                          :content (str email-template/html-header
                                                        (hiccup/html (email-template/validation-report
@@ -96,7 +96,7 @@
                                                                       service
                                                                       report)))}]}))
 
-        (log/warn (str "Would send email to "
+        (log/info (str "Sent email to "
                        recipient
                        " containing "
                        (count report)
@@ -147,7 +147,7 @@
         (catch Exception e
           (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
       (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id))
-     (when email
+     (when (some? email)
        (email-validation-results db email service-id interface-id))
      )))
 
