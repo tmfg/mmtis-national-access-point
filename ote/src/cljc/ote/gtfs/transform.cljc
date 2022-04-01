@@ -134,29 +134,27 @@
   (try
     (mapcat
       (fn [{::transit/keys [route-id trips]
-            services :services :as route}]
+            services       :services :as route}]
         (reduce concat
                 (map-indexed
                   (fn [i {::transit/keys [service-calendar-idx] :as trip}]
-                    (let []
-                      (map-indexed
-                        (fn [calendar-index {service-id :gtfs/service-id}]
-                          (let [
-                                ]
-                            {:gtfs/route-id route-id
-                             :gtfs/trip-id (str route-id "_" i "_" calendar-index)
-                             :gtfs/service-id (or service-id 0)
 
-                             ;; Add stoptimes to enable adding them to stoptimes file. They are
-                             ;; removed later from this trip-txt vector
-                             :stoptimes (:ote.db.transit/stop-times trip)
-                             }))
-                        (nth services service-calendar-idx))))
+                    (map-indexed
+                      (fn [calendar-index {service-id :gtfs/service-id}]
+
+                        {:gtfs/route-id   route-id
+                         :gtfs/trip-id    (str route-id "_" i "_" calendar-index)
+                         :gtfs/service-id (or service-id 0)
+
+                         ;; Add stoptimes to enable adding them to stoptimes file. They are
+                         ;; removed later from this trip-txt vector
+                         :stoptimes       (:ote.db.transit/stop-times trip)
+                         })
+                      (nth services service-calendar-idx)))
                   trips)))
       routes)
     (catch #?(:cljs js/Object :clj Exception) e
-      (.printStackTrace e)
-      (log/warn "Error generating GTFS file content for trips" e))))
+      (log/warn e "Error generating GTFS file content for trips"))))
 
 (defn calendar-txt [routes]
   (mapcat
