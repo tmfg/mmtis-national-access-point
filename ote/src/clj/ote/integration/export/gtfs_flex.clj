@@ -13,7 +13,7 @@
             [ote.components.http :as http]
             [ote.gtfs.parse :as parse]
             [ote.gtfs.transform :as gtfs-transform]
-            [ote.services.transport-operator :as t-operator]
+            [ote.db.transport-operator :as t-operator]
             [ote.integration.export.geojson :as geojson]
             [ote.integration.export.gtfs :as gtfs]
             [ote.util.transport-operator-util :as op-util]
@@ -184,7 +184,7 @@
                       {:name "locations.geojson"
                        :data flex-locations}
                       {:name "location_groups.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt calendar-dates-txt)}
+                       :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt flex-location-groups)}
                       {:name "stop_times.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}]
                      (partial zip-content)))})))
