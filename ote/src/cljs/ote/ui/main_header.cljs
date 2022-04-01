@@ -147,8 +147,10 @@
       [bottombar-spacer]
 
       [bottombar-dropdown e! app desktop? {:tag                 :updates
-                                           :entries             [{:key   :updates
-                                                                  :label (tr [:common-texts :updates-menu-updates])}]
+                                           :entries             [{:key    :updates
+                                                                  :label  (tr [:common-texts :updates-menu-updates])
+                                                                  :href   "https://www.fintraffic.fi/fi/fintraffic/tiedotteet"
+                                                                  :target "_blank"}]
                                            :label               (tr [:common-texts :navigation-updates-menu])
                                            :state-flag          [:ote-service-flags :navigation-updates-menu]
                                            :menu-click-handler  #(e! (fp-controller/->ToggleUpdatesMenu))
