@@ -96,7 +96,7 @@
   [route-id route-type transport-operator-id]
   {:gtfs/route-id         route-id
    :gtfs/route-short-name ""
-   :gtfs/route-long-name  name
+   :gtfs/route-long-name  ""
    :gtfs/route-type (case route-type
                       :light-rail "0"
                       :subway "1"
@@ -160,7 +160,7 @@
           flex-routes       (conj gtfs-routes
                                   (->static-routes static-route-id :bus transport-operator-id))
           flex-stop-times   (concat gtfs-stop-times
-                                    (->static-stop-times areas static-trip-id))
+                                    (->static-stop-times static-trip-id areas))
           flex-calendar     (conj gtfs-calendar
                                   (->static-calendar static-service-id))
           flex-locations    (when-not (empty? areas)

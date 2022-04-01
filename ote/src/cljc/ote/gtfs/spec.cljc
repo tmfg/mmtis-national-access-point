@@ -237,10 +237,9 @@
 
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file with GTFS Flex extensions"}
   flex-location-groups-txt-fields
-  (into stop-times-txt-fields
-        [:gtfs-flex/location_group_id
-         :gtfs-flex/location_id
-         :gtfs-flex/location_group_name]))
+  [:gtfs-flex/location_group_id
+   :gtfs-flex/location_id
+   :gtfs-flex/location_group_name])
 
 (def flex-location-groups-txt-header "location_group_id,location_id,location_group_name")
 
