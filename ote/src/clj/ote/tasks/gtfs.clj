@@ -54,7 +54,7 @@
     (let [blacklisted-operators (get-blacklisted-operators config)
           interface (first (select-gtfs-urls-update db blacklisted-operators))]
       (when interface
-       (mark-gtfs-package-imported! db interface))
+        (mark-gtfs-package-imported! db interface))
       interface)))
 
 (defn fetch-given-gtfs-interface!
@@ -78,12 +78,12 @@
                                           {::t-service/id service-id})
                             first)
             operator (some-> (specql/fetch db ::t-operator/transport-operator
-                                                     #{::t-operator/email}
-                                                     {::t-operator/id (::t-service/transport-operator-id service)}
-                              first))
+                                           #{::t-operator/email}
+                                           {::t-operator/id (::t-service/transport-operator-id service)}
+                                           first))
             recipient "nap@fintraffic.fi" #_(or (::t-service/contact-email service)
-                          (::t-operator/email operator)
-                         "nap@fintraffic.fi")]
+                                                (::t-operator/email operator)
+                                                "nap@fintraffic.fi")]
         (localization/with-language
           "fi"
           (email/send! email {:to      recipient
@@ -105,6 +105,31 @@
                        "/"
                        interface-id))))))
 
+(defn- do-update-one-gtfs!
+  "Core process logic extracted to its own function so that we can perform additional actions independently from whether
+  this works or not."
+  [config db interface upload-s3? force-download? used-service-id]
+  (if interface
+    (try
+      (if-let [conversion-meta (import-gtfs/download-and-store-transit-package
+                                 (interface-type (:format interface))
+                                 (:gtfs config)
+                                 db
+                                 interface
+                                 upload-s3?
+                                 force-download?)]
+
+        (if (feature/feature-enabled? config :netex-conversion-automated)
+          (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
+            nil                                          ; SUCCESS. Explicit nil to make success branch more obvious
+            (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
+          nil)                                           ; SUCCESS. Explicit nil to make success branch more obvious
+        (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
+
+      (catch Exception e
+        (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
+    (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id)))
+
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
 (defn update-one-gtfs!
@@ -114,7 +139,7 @@
   ([config db email upload-s3?]
    (update-one-gtfs! config db email upload-s3? nil nil))
   ([config db email upload-s3? service-id interface-id]
-  ;; Ensure that gtfs-import flag is enabled
+   ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
    (let [;; Load next gtfs package or package that is related to given service-id
          interface (if service-id
@@ -126,30 +151,11 @@
          force-download? (integer? service-id)
          used-service-id (if service-id
                            service-id
-                           (:ts-id interface))]
-     (if interface
-       (try
-         (if-let [conversion-meta (import-gtfs/download-and-store-transit-package
-                                   (interface-type (:format interface))
-                                   (:gtfs config)
-                                   db
-                                   interface
-                                   upload-s3?
-                                   force-download?)]
-
-           (if (feature/feature-enabled? config :netex-conversion-automated)
-             (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
-               nil                                          ; SUCCESS. Explicit nil to make success branch more obvious
-               (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
-             nil)                                           ; SUCCESS. Explicit nil to make success branch more obvious
-           (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
-
-        (catch Exception e
-          (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
-      (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id))
+                           (:ts-id interface))
+         process-result (do-update-one-gtfs! config db interface upload-s3? force-download? used-service-id)]
      (when (some? email)
        (email-validation-results db email service-id interface-id))
-     )))
+     process-result)))
 
 (def night-hours #{0 1 2 3 4})
 
@@ -176,7 +182,7 @@
 
          ;; Convert to LocalDate instances
          [start-date end-date today query-detection-date] (map (comp time/date-fields->date time/date-fields)
-                                          [start-date end-date detection-date detection-date])]
+                                                               [start-date end-date detection-date detection-date])]
      (lock/try-with-lock
        db "gtfs-nightly-changes" lock-time-in-seconds
        (let [;; run detection only for given services or all
@@ -206,10 +212,10 @@
              (log/info "Detection completed for service: " service-id))))))))
 
 (defn recalculate-detected-changes-count
-"Change detection (detect-new-changes-task) stores detected changes. These changes will expire after some period of time.
-All changes occur on a certain day and they will get old. Transit-changes page shows how many changes there are and
-if we don't recalculate them every night expired changes will be show also. So in this fn we recalculate change counts again using
-different-week-date value and skip all expired changes."
+  "Change detection (detect-new-changes-task) stores detected changes. These changes will expire after some period of time.
+  All changes occur on a certain day and they will get old. Transit-changes page shows how many changes there are and
+  if we don't recalculate them every night expired changes will be show also. So in this fn we recalculate change counts again using
+  different-week-date value and skip all expired changes."
   [db]
   (let [upcoming-changes (upcoming-changes db)
         _ (log/info "Detected change count recalculation started!")]
@@ -218,8 +224,8 @@ different-week-date value and skip all expired changes."
       (let [change-row (nth upcoming-changes i)
             changes (map #(assoc % :change-type (keyword (:change-type %)))
                          (valid-detected-route-changes db
-                                                         {:date (:date change-row)
-                                                          :service-id (:transport-service-id change-row)}))
+                                                       {:date (:date change-row)
+                                                        :service-id (:transport-service-id change-row)}))
             grouped-changes (group-by :change-type changes)]
 
         (log/info (inc i) "/" (count upcoming-changes) " Recalculating detected change amounts (by change type) for service " (:transport-service-id change-row) " detection date " (:date change-row))
