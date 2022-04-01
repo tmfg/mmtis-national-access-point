@@ -56,14 +56,14 @@
     (catch Exception e
       (log/warn "Exception while generating GTFS zip" e))))
 
-(def ^:private transport-operator-columns #{::t-operator/id ::t-operator/name
-                                            ::t-operator/homepage ::t-operator/phone
-                                            ::t-operator/email})
-
 (defn get-transport-operator
   [db transport-operator-id]
   (first (fetch db ::t-operator/transport-operator
-                transport-operator-columns
+                #{::t-operator/id
+                  ::t-operator/name
+                  ::t-operator/homepage
+                  ::t-operator/phone
+                  ::t-operator/email}
                 {::t-operator/id transport-operator-id})))
 
 (defn get-sea-routes
@@ -75,7 +75,7 @@
   (let [transport-operator (get-transport-operator db transport-operator-id)
         routes             (get-sea-routes db transport-operator-id)]
     {:status 200
-     :headers {"Content-Type" "application/zip"
+     :headers {"Content-Type"        "application/zip"
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
      :body (ring-io/piped-input-stream
             (partial sea-routes-gtfs-zip transport-operator routes))}))
