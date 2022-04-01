@@ -499,7 +499,8 @@
      ; Palvelu
      [ui/table-row-column
       {:style   {:width   "15%"
-                 :padding "0 1em 0 1em"}
+                 :padding "0 1em 0 1em"
+                 :vertical-align "top"}
        :rowSpan 2}
       [common-ui/linkify
        (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
@@ -512,7 +513,8 @@
      ; Tunnisteet
      [ui/table-row-column
       {:style   {:width   "15%"
-                 :padding "0 1em 0 1em"}
+                 :padding "0 1em 0 1em"
+                 :vertical-align "top"}
        :rowSpan 2}
       [:span
        {:title (get-in report [:gtfs-package :id])}
@@ -528,7 +530,8 @@
                :white-space   "normal"
                :text-overflow ""
                :overflow      "visible"
-               :padding       "0 1em 0 1em"}
+               :padding       "0 1em 0 1em"
+               :vertical-align "top"}
        :title (get-in report [:gtfs-import-report :description])}
       (get-in report [:gtfs-import-report :description])]
 
@@ -538,7 +541,8 @@
                  :padding          "0 1em 0 1em"
                  :background-color severity-bg-color
                  :color            severity-text-color
-                 :text-align "center"}
+                 :text-align "center"
+                 :vertical-align   "top"}
        :rowSpan 2}
       (get-in report [:gtfs-import-report :severity])]]
 

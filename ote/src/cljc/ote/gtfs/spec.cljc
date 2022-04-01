@@ -224,6 +224,26 @@
 
 (def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_dropoff_window,end_pickup_dropoff_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec for location_groups.txt used by GTFS Flex
+
+(s/def :gtfs-flex/location-groups-txt
+  (s/coll-of :gtfs-flex/location-groups))
+
+(s/def :gtfs-flex/stop-times
+  (s/keys :req  [:gtfs-flex/location_group_id]
+          :opt  [:gtfs-flex/location_id
+                 :gtfs-flex/location_group_name]))
+
+(def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file with GTFS Flex extensions"}
+  flex-location-groups-txt-fields
+  (into stop-times-txt-fields
+        [:gtfs-flex/location_group_id
+         :gtfs-flex/location_id
+         :gtfs-flex/location_group_name]))
+
+(def flex-location-groups-txt-header "location_group_id,location_id,location_group_name")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for calendar.txt
 

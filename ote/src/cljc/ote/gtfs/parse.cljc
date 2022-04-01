@@ -135,7 +135,9 @@ This is only called with GTFS field names and cannot grow unbounded."}
    :gtfs/shapes-txt {:header gtfs-spec/shapes-txt-header
                      :fields gtfs-spec/shapes-txt-fields}
    :gtfs-flex/stop-times-txt {:header gtfs-spec/flex-stop-times-txt-header
-                              :fields gtfs-spec/flex-stop-times-txt-fields}})
+                              :fields gtfs-spec/flex-stop-times-txt-fields}
+   :gtfs-flex/location-groups-txt {:header gtfs-spec/flex-location-groups-txt-header
+                                   :fields gtfs-spec/flex-location-groups-txt-fields}})
 
 (defn parse-gtfs-file
   "Parse GTFS file of `gtfs-file-type` from `content`.

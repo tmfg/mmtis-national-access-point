@@ -20,14 +20,14 @@
             [ote.util.zip :as zip]
             [ring.util.io :as ring-io]
             [taoensso.timbre :as log])
-  (:import [java.time LocalDateTime]
+  (:import [java.time LocalDateTime LocalDate]
            [java.time.format DateTimeFormatter]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
 (defn- ->geojson-feature
-  [feature]
-  (let [{:keys [geojson feature-id primary?]} feature
+  [area]
+  (let [{:keys [geojson feature-id primary?]} area
         geometry                              (cheshire/decode geojson keyword)]
     {:type       "Feature"
      :id         feature-id
@@ -36,12 +36,13 @@
      :style      {:fill (if primary? "green" "orange")}}))
 
 (defn- ->geojson-features
-  [features]
-  (mapv ->geojson-feature features))
+  [areas]
+  (mapv ->geojson-feature areas))
 
-(defn- ->geojson-feature-collection [features]
+(defn- ->geojson-feature-collection
+  [areas]
   {:type     "FeatureCollection"
-   :features (->geojson-features features)})
+   :features (->geojson-features areas)})
 
 (defn export-geojson
   [db transport-service-id]
@@ -56,21 +57,19 @@
     (catch Exception e
       (log/warn "Exception while generating GTFS Flex zip" e))))
 
-(defn debug [m x] (log/warn (str m " " x)) x)
-
-(defn- ->static-schedule
-  "Generate static 24 hour schedule for all areas"
-  [areas]
-  (->> (mapv
-         (fn [area]
-           (let [{:keys [feature-id]} area]
-             {:gtfs/stop-id                         feature-id
-              :gtfs/pickup-type                      2
-              :gtfs/drop-off-type                    0
-              :gtfs-flex/start_pickup_dropoff_window "0:00:00"
-              :gtfs-flex/end_pickup_dropoff_window   "24:00:00"}))
-           areas)
-       (debug "resulting gtfs content")))
+(defn- ->static-stop-times
+  "Generate static 24 hour stop times for all areas with the same trip-id"
+  [trip-id areas]
+  (mapv
+    (fn [area]
+      (let [{:keys [feature-id]} area]
+        {:gtfs/trip-id                          trip-id
+         :gtfs/stop-id                          feature-id
+         :gtfs/pickup-type                      2
+         :gtfs/drop-off-type                    0
+         :gtfs-flex/start_pickup_dropoff_window "0:00:00"
+         :gtfs-flex/end_pickup_dropoff_window   "24:00:00"}))
+    areas))
 
 (defn join-routes-data
   "Splice together GTFS stop-times.txt with GTFS Flex compatible stop-times.txt by
@@ -81,47 +80,114 @@
   (log/warn (str "existing routes " (count existing)))
   (log/warn (str "areas data " (count areas)))
   (str areas
-       (str/replace-first existing #".*\n" ""))
-  )
+       (str/replace-first existing #".*\n" "")))
+
+(defn ->static-trips
+  "Generate a trip reference for given route-id, trip-id, service-id triplet.
+
+  This is a binding relation between the three, no actual scheduling metadata is involved in this file."
+  [route-id trip-id service-id]
+  {:gtfs/route-id   route-id
+   :gtfs/trip-id    (str route-id "_" trip-id)
+   :gtfs/service-id service-id})
+
+(defn ->static-routes
+  "Generate a static route reference for given route-id to specify an eternally servicing route."
+  [route-id route-type transport-operator-id]
+  {:gtfs/route-id         route-id
+   :gtfs/route-short-name ""
+   :gtfs/route-long-name  name
+   :gtfs/route-type (case route-type
+                      :light-rail "0"
+                      :subway "1"
+                      :rail "2"
+                      :bus "3"
+                      :ferry "4"
+                      :cable-car "5"
+                      :gondola "6"
+                      :funicular "7")
+   :gtfs/agency-id transport-operator-id})
+
+(defn ->static-calendar
+  [service-id]
+  {:gtfs/service-id service-id
+   :gtfs/monday     1
+   :gtfs/tuesday    1
+   :gtfs/wednesday  1
+   :gtfs/thursday   1
+   :gtfs/friday     1
+   :gtfs/saturday   1
+   :gtfs/sunday     1
+   :gtfs/start-date (LocalDate/now)
+   :gtfs/end-date   (-> (LocalDate/now) (.plusYears 5))})
+
+(defn ->static-location-groups
+  [areas]
+  ; TODO: should possibly generate stops locations as well?
+  (into
+    []
+    (map-indexed
+      (fn [n area]
+        (let [{:keys [feature-id]} area]
+          {:gtfs-flex/location_group_id   (str feature-id "_a_" n)
+           :gtfs-flex/location_id         feature-id
+           :gtfs-flex/location_group_name feature-id}))
+      areas)))
+
 (defn export-gtfs-flex
   [db config transport-operator-id transport-service-id]
 
+  ; load raw data and structures
   (let [transport-operator (gtfs/get-transport-operator db transport-operator-id)
         areas              (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
         routes             (gtfs/get-sea-routes db transport-operator-id)
-        trips              (gtfs-transform/sea-trips-txt routes)
-        trips-txt          (map #(dissoc % :stoptimes) trips)
-        geojson            (when-not (empty? areas)
-                             (-> (->geojson-feature-collection areas)
-                                 (cheshire/encode {:key-fn name})))]
-
-    (log/warn "Areas: " areas)
+        agency-txt         (gtfs-transform/agency-txt transport-operator)
+        calendar-dates-txt (gtfs-transform/calendar-dates-txt routes)
+        ; XXX: trips carries over metadata which is not part of any spec, but the existing functionality relies on it
+        pseudo-trips       (gtfs-transform/sea-trips-txt routes)
+        gtfs-trips         (->> pseudo-trips (map #(dissoc % :stoptimes)))
+        gtfs-stop-times    (gtfs-transform/sea-stop-times-txt routes pseudo-trips)
+        gtfs-routes        (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes)
+        gtfs-calendar      (gtfs-transform/calendar-txt routes)]
+    ; complement GTFS content with GTFS Flex additions
+    (let [static-route-id   (str (::t-operator/name transport-operator) " route")
+          static-service-id (str (::t-operator/name transport-operator) " schedule")
+          static-trip-id    (str (::t-operator/name transport-operator) " transport service")
+          flex-trips        (conj gtfs-trips
+                                  (->static-trips static-route-id static-trip-id static-service-id))
+          ; TODO: these are not all buses, but lets go with this one for now - areas and services need unique entries
+          ; most likely to produce accurate data
+          flex-routes       (conj gtfs-routes
+                                  (->static-routes static-route-id :bus transport-operator-id))
+          flex-stop-times   (concat gtfs-stop-times
+                                    (->static-stop-times areas static-trip-id))
+          flex-calendar     (conj gtfs-calendar
+                                  (->static-calendar static-service-id))
+          flex-locations    (when-not (empty? areas)
+                              (-> (->geojson-feature-collection areas)
+                                  (cheshire/encode {:key-fn name})))
+          flex-location-groups (->static-location-groups areas)]
     {:status  200
      :headers {"Content-Type"        "application/zip"
-               "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-file-name transport-operator))}
+               "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-flex-file-name transport-operator))}
      :body    (ring-io/piped-input-stream
                 (->> [{:name "agency.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/agency-txt (gtfs-transform/agency-txt transport-operator))}
+                       :data (parse/unparse-gtfs-file :gtfs/agency-txt agency-txt)}
                       {:name "routes.txt"
-                       :data (parse/unparse-gtfs-file
-                               :gtfs/routes-txt
-                               (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/routes-txt flex-routes)}
                       {:name "trips.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
+                       :data (parse/unparse-gtfs-file :gtfs/trips-txt flex-trips)}
                       {:name "calendar.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/calendar-txt (gtfs-transform/calendar-txt routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/calendar-txt flex-calendar)}
                       {:name "calendar_dates.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt (gtfs-transform/calendar-dates-txt routes))}
+                       :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates-txt)}
                       {:name "locations.geojson"
-                       :data geojson}
+                       :data flex-locations}
                       {:name "location_groups.txt"
-                       :data ""}
+                       :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt calendar-dates-txt)}
                       {:name "stop_times.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt (concat (gtfs-transform/sea-stop-times-txt routes trips)
-                                                                                        (->static-schedule areas)))}]
-                     (partial zip-content)))}
-    ; TODO: Hardcode 24h eternal (+5 years) schedule
-    ))
+                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}]
+                     (partial zip-content)))})))
 
 (defrecord GTFSFlexExport [config]
   component/Lifecycle
