@@ -184,9 +184,8 @@
     [:center
      [:div.whiteBackground.spacing-left-right
       [:a {:href (str (environment/base-url))}
-       ; TODO: Should update the logo, but we don't have a new asset yet
-       [:img {:src (str (environment/base-url) "img/icons/NAP-logo-blue.png")
-              :width "150" :height "100" :title "NAP Logo" :alt "NAP Logo"}]]
+       [:img {:src (str (environment/base-url) "img/fintraffic_email_logo.png")
+              :width "200" :height "144" :title "Fintraffic NAP Logo" :alt "Fintraffic NAP Logo"}]]
 
       body]
 
