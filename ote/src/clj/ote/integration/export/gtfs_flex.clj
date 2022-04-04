@@ -97,7 +97,7 @@
   This is a binding relation between the three, no actual scheduling metadata is involved in this file."
   [route-id trip-id service-id]
   {:gtfs/route-id   route-id
-   :gtfs/trip-id    (str route-id "_" trip-id)
+   :gtfs/trip-id    trip-id
    :gtfs/service-id service-id})
 
 (defn ->static-routes
