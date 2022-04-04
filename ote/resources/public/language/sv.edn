@@ -590,7 +590,7 @@
                      :associated-search-hint "Lägg till information om deltagande genom att skriva namnet på tjänsten eller tjänsteproducenten i det här fältet"
                      :edit-business-id ["Fyll i uppgifter gällande FO-nummer " :business-id]
                      :filling-info "Anvisning"
-                     :filling-info-content (:md "**Tjänster du anmälts delaktigt i** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna.\n\n**Lägg till uppgifter om deltagande själv**\nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap@fintraffic.fi\n\nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänsteuppgifter**.")
+                     :filling-info-content (:md "**Tjänster du anmälts delaktigt i** \nOm det under denna rubrik redan finns en lista över tjänster, har de som producerar tjänsterna i fråga meddelat ert företag (FO-numret) i NAP-tjänsten som ett företag som deltar i tillhandahållandet av tjänsten. Om uppgifterna inte är korrekta, ta kontakt med tjänsteproducenten i fråga för att ta bort de felaktiga uppgifterna.\n\n**Lägg till uppgifter om deltagande själv**\nOm det i listan saknas någon sådan relevant tjänst, som du deltar i tillhandahållandet av (t.ex. en förmedlingstjänst för taxitransport), skriv antingen tjänsteproducentens namn eller tjänstens namn i sökfältet. Välj därefter rätt tjänst mellan alternativen som föreslås. Om du i misstag väljer fel tjänst i listan, kan du ta bort den genom att klicka på krysset efter tjänsten. Om du inte hittar mobilitetstjänsten som du deltar i tillhandahållandet av i listan, kontakta **NAP-Helpdesk**: 029 450 7482 (vardagar kl. 9-15) eller nap@fintraffic.fi\n\nOm du förutom att köra för en förmedlingstjänst också tillhandahåller egna taxitjänster eller andra mobilitetstjänster, lägg också till den egna tjänsten eller de egna tjänsterna i NAP i fältet **Egna tjänsteuppgifter**.")
                      :no-associations [:operator-name " har inte anmälts som deltagare i någon annan tjänsteproducents tjänst."]
                      :no-own-associations ["Du har inte lagt till tjänsteproducenten " :operator-name " som delaktig i någon annan tjänst."]
                      :other-services-where-involved "Övriga tjänster du deltar i"
@@ -601,7 +601,7 @@
                      :own-services-directions-short "Anvisningar"
                      :own-services-new-provider1 "Du har nu lagt till tjänsteproducenten "
                      :own-services-new-provider2 (:md " i NAP. Observera, att du därutöver skall lägga till en eller flera tjänster under denna tjänsteproducent. Lägg nu till detaljerade uppgifter gällande din tjänst vid **Egna tjänsteuppgifter** alternativt vid **Övriga tjänster du är delaktig i**. Om du har ett taxiföretag och kör endast för en förmedlingscentral räcker det, att du endast fyller i punkten **Övriga tjänster du är delaktig i**.")
-                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 534 6705 (vardagar kl. 9-15) eller nap@fintraffic.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")
+                     :own-services-no-providers (:md "Ingen tjänsteproducent har ännu angett dig som medlem. För att publicera uppgifter om mobilitetstjänster måste du först **skapa en ny tjänsteproducent** i NAP-tjänsten, eller **anges som medlem av någon av de befintliga tjänsteproducenterna** genom att kontakta **NAP-Helpdesk**: 029 450 7482 (vardagar kl. 9-15) eller nap@fintraffic.fi\n\nMed tjänsteleverantör avses ett företag, sammanslutning eller någon annan organisation, som själv producerar en mobilitetstjänst eller som deltar i produktionen av en mobilitetstjänst. Det kan alltså vara fråga om t.ex. ett taxiföretag, ett företag inom bussbranschen, en tillhandahållare av kommersiella parkeringstjänster eller en kommun.")
                      :missing-service-info "Uppgifterna om tjänsten är bristfälliga"
                      :flaws "Bristfälliga punkter"
                      :missing-schedule "Tjänsten saknar det lagstadgade gränssnittet för rutt- och tidtabellsdata."
@@ -1150,7 +1150,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :nap-data-license-url "https://creativecommons.org/licenses/by/4.0/deed.sv"
 
   :save-user-success "Profil sparad"
-  :business-id-is-not-unique "FO-numret finns redan i NAP. Ta kontakt med NAP Help Desk, nap@fintraffic.fi eller tfn 0295 34 6705 (vardagar kl 9-15)."
+  :business-id-is-not-unique "FO-numret finns redan i NAP. Ta kontakt med NAP Help Desk, nap@fintraffic.fi eller tfn 0295 450 7482 (vardagar kl 9-15)."
   :start-time "Från kl"
   :ending-time "Till kl"
   :day-of-week-1-short "Må"
@@ -1394,7 +1394,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :confirm-email "Verifiering av e-postadress."
   :email-to-be-confirmed "E-postadress som verifieras"
   :resend-confirmation "Skicka verifieringsmeddelandet på nytt"
-  :resend-success ["Verifieringsmeddelandet har skickats till adressen " :email ". För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress enligt instruktionerna i meddelandet. Om du inte får något verifieringsmeddelande, kontakta NAP-Helpdesk: 029 534 5454 (vardagar kl. 9–15) eller nap@fintraffic.fi."]}
+  :resend-success ["Verifieringsmeddelandet har skickats till adressen " :email ". För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress enligt instruktionerna i meddelandet. Om du inte får något verifieringsmeddelande, kontakta NAP-Helpdesk: 029 450 7482 (vardagar kl. 9–15) eller nap@fintraffic.fi."]}
 
  :reset-password
  {:label "Återställ ditt lösenord"
@@ -1472,7 +1472,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :footer {:email-sender "Detta meddelande är skickat av NAP."
            :help-desk "NAP-HelpDesk:"
            :help-desk-email "nap@fintraffic.fi"
-           :help-desk-phone " eller 029 534 6705 (Mån-Fre kl 9-15)"}
+           :help-desk-phone " eller 029 450 7482 (Mån-Fre kl 9-15)"}
   :email-verification {:verification-message "Hej. Tack för att du registrerade dig i NAP-tjänsten! För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress. Du kan verifiera adressen genom att klicka nedan."
                        :verify-email "Verifiera e-postadress"
                        :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}
