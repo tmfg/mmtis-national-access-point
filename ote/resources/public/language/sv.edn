@@ -70,7 +70,7 @@
    :ote.db.transport-service/external-interfaces "Externa maskinläsbara gränssnitt"
    :ote.db.transport-service/data-content "Informationsinnehåll"
    :ote.db.transport-service/external-service-description "Tilläggsuppgifter"
-   :ote.db.transport-service/external-service-url "WWW-adress"
+   :ote.db.transport-service/external-service-url "URL (maskinläsbara gränssnitt)"
    :ote.db.transport-service/booking-service "Bokningstjänstens adress"
    :ote.db.transport-service/rental-service "Hyrtjänstens adress"
    :ote.db.transport-service/format "Format"
