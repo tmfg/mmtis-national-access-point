@@ -67,10 +67,10 @@
    :ote.db.transport-service/location "Location"
 
    ;; External interfaces
-   :ote.db.transport-service/external-interfaces "External machine-readable interfaces"
+   :ote.db.transport-service/external-interfaces "External interfaces and API's"
    :ote.db.transport-service/data-content "Data content"
    :ote.db.transport-service/external-service-description "More info"
-   :ote.db.transport-service/external-service-url "WWW-address"
+   :ote.db.transport-service/external-service-url "URL (external API)"
    :ote.db.transport-service/booking-service "Booking service address"
    :ote.db.transport-service/rental-service "Rental service address"
    :ote.db.transport-service/format "Format"

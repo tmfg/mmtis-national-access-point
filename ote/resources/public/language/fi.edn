@@ -70,7 +70,7 @@
    :ote.db.transport-service/external-interfaces "Ulkoiset koneluettavat rajapinnat"
    :ote.db.transport-service/data-content "Tietosisältö"
    :ote.db.transport-service/external-service-description "Lisätietoja"
-   :ote.db.transport-service/external-service-url "Web-osoite"
+   :ote.db.transport-service/external-service-url "Rajapinnan URL"
    :ote.db.transport-service/booking-service "Varauspalvelun osoitetiedot"
    :ote.db.transport-service/rental-service "Vuokrauspalvelun osoitetiedot"
    :ote.db.transport-service/format "Formaatti"
