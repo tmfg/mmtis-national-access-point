@@ -44,6 +44,13 @@
   {:type     "FeatureCollection"
    :features (->geojson-features areas)})
 
+(defn- mapv-indexed
+  "Like `mapv`, but with indices. Uses one-based index as those are better for non-technical users"
+  [f c]
+  (into [] (map-indexed
+             (fn [n i] (f (inc n) i))
+             c)))
+
 (defn export-geojson
   [db transport-service-id]
   (let [areas (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))]
@@ -60,13 +67,15 @@
 (defn- ->static-stop-times
   "Generate static 24 hour stop times for all areas with the same trip-id"
   [trip-id areas]
-  (mapv
-    (fn [area]
+  []
+  (mapv-indexed
+    (fn [n area]
       (let [{:keys [feature-id]} area]
         {:gtfs/trip-id                          trip-id
          :gtfs/stop-id                          feature-id
          :gtfs/pickup-type                      2
          :gtfs/drop-off-type                    0
+         :gtfs/stop-sequence                    n
          :gtfs-flex/start_pickup_dropoff_window "0:00:00"
          :gtfs-flex/end_pickup_dropoff_window   "24:00:00"}))
     areas))
@@ -124,15 +133,13 @@
 (defn ->static-location-groups
   [areas]
   ; TODO: should possibly generate stops locations as well?
-  (into
-    []
-    (map-indexed
-      (fn [n area]
-        (let [{:keys [feature-id]} area]
-          {:gtfs-flex/location_group_id   (str feature-id "_a_" n)
-           :gtfs-flex/location_id         feature-id
-           :gtfs-flex/location_group_name feature-id}))
-      areas)))
+  (mapv-indexed
+    (fn [n area]
+      (let [{:keys [feature-id]} area]
+        {:gtfs-flex/location_group_id   (str feature-id "_a_" n)
+         :gtfs-flex/location_id         feature-id
+         :gtfs-flex/location_group_name feature-id}))
+    areas))
 
 (defn export-gtfs-flex
   [db config transport-operator-id transport-service-id]
