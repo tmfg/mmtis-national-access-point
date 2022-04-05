@@ -68,6 +68,7 @@
 
 (defn expand-netex-validation-report
   [json]
+  (log/warn (str "Analysing " json))
   (->> (get-in (cheshire/parse-string json true) [:validation_report :errors])
        (map #(update % :test_id netex-validation-phases))))
 
