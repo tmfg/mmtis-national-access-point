@@ -155,43 +155,43 @@
   component/Lifecycle
   (start [{db :db http :http :as this}]
     (assoc this ::stop
-                (http/publish!
-                  http
-                  (routes
-                    (POST "/taxiui/price-info" {user      :user
+                [(http/publish!
+                   http
+                   (routes
+                     (POST "/taxiui/price-info" {user      :user
+                                                 form-data :body}
+                       (http/transit-response
+                         (fetch-priceinfo-for-service db user (http/transit-request form-data))))
+
+                     (POST "/taxiui/price-info/:operator-id/:service-id" {{:keys [operator-id service-id]} :params
+                                                                          user                             :user
+                                                                          form-data                        :body}
+                       (http/transit-response
+                         (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
+
+                     (POST "/taxiui/operating-areas" {form-data :body}
+                       (http/transit-response
+                         (fetch-operating-areas db (http/transit-request form-data))))
+
+                     (POST "/taxiui/service-summaries" {user      :user
+                                                        form-data :body}
+                       (http/transit-response
+                         (fetch-service-summaries db user (http/transit-request form-data))))
+
+                     (GET "/taxiui/approvals" {user :user}
+                       (http/transit-response
+                         (fetch-unapproved-prices db user)))
+
+                     (POST "/taxiui/approvals" {user      :user
                                                 form-data :body}
-                      (http/transit-response
-                        (fetch-priceinfo-for-service db user (http/transit-request form-data))))
-
-                    (POST "/taxiui/price-info/:operator-id/:service-id" {{:keys [operator-id service-id]} :params
-                                                                         user                             :user
-                                                                         form-data                        :body}
-                      (http/transit-response
-                        (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
-
-                    (POST "/taxiui/statistics" {form-data :body}
-                      (http/transit-response
-                        (fetch-pricing-statistics db (http/transit-request form-data))))
-
-                    (POST "/taxiui/operating-areas" {form-data :body}
-                      (http/transit-response
-                        (fetch-operating-areas db (http/transit-request form-data))))
-
-                    (POST "/taxiui/service-summaries" {user      :user
-                                                       form-data :body}
-                      (http/transit-response
-                        (fetch-service-summaries db user (http/transit-request form-data))))
-
-                    (GET "/taxiui/approvals" {user :user}
-                      (http/transit-response
-                        (fetch-unapproved-prices db user)))
-
-                    (POST "/taxiui/approvals" {user      :user
-                                               form-data :body}
-                      (http/transit-response
-                        (mark-prices-approved db user (http/transit-request form-data))))
-                    ))))
+                       (http/transit-response
+                         (mark-prices-approved db user (http/transit-request form-data))))
+                     ))
+                 (http/publish! http {:authenticated? false} (routes (POST "/taxiui/statistics" {form-data :body}
+                                                                       (http/transit-response
+                                                                         (fetch-pricing-statistics db (http/transit-request form-data))))))]))
 
   (stop [{stop ::stop :as this}]
-    (stop)
+    (doseq [s stop]
+      (s))
     (dissoc this ::stop)))

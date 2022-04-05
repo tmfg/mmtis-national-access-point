@@ -20,7 +20,7 @@
     ["/pricing-details/:operator-id/:service-id" :taxi-ui/pricing-details]]))
 
 ;; Add pages that needs authenticating to this list
-(def auth-required #{:taxi-ui/front-page :taxi-ui/stats :taxi-ui/pricing-details})
+(def auth-required #{:taxi-ui/front-page :taxi-ui/pricing-details})
 
 ;; Add pages that needs :transit-authority? authenticating to this list
 (def transit-authority-required #{:authority-pre-notices :transit-visualization :transit-changes :monitor})
