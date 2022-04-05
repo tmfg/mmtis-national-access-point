@@ -399,10 +399,6 @@
                    " result = " result
                    ", s3-filename = " s3-filename
                    ", conversion-meta=" conversion-meta))
-    (when (some? input-report-file)
-      (report/gtfs-import-report! db "warning" package-id
-                                  (str "NeTEx conversion input produced non-empty report")
-                                  (.getBytes input-report-file)))
     (when (some? validation-report-file)
       (doseq [r (expand-netex-validation-report validation-report-file)]
         (report/gtfs-import-report! db "error" package-id
