@@ -68,7 +68,6 @@
 
 (defn expand-netex-validation-report
   [json]
-  (log/warn (str "Analysing " json))
   (->> (get-in (cheshire/parse-string json true) [:validation_report :errors])
        (map #(update % :test_id netex-validation-phases))))
 
@@ -405,7 +404,7 @@
                                   (str "NeTEx conversion input produced non-empty report")
                                   (.getBytes input-report-file)))
     (when (some? validation-report-file)
-      (for [r (expand-netex-validation-report validation-report-file)]
+      (doseq [r (expand-netex-validation-report validation-report-file)]
         (report/gtfs-import-report! db "error" package-id
                                     (str "NeTEx conversion validation failed")
                                     (.getBytes (netex-validation-error r)))))
