@@ -130,8 +130,9 @@
   [config db email]
   (routes
     (GET "/transit-changes/current" {user :user :as request}
-      (or (authorization/transit-authority-authorization-response user)
-          (list-current-changes db)))
+      (http/no-cache-transit-response
+        (or (authorization/transit-authority-authorization-response user)
+            (list-current-changes db))))
 
     (GET "/transit-changes/hash-calculation/" {user :user :as request}
       (when (authorization/admin? user)
