@@ -88,7 +88,7 @@
                    :on-click #(entry-click-handler % {:key key :label label :href href})
                    :force-external-icon? force-external-icon?}
                   (when target {:target target})
-                  (when force-external-icon?) {:force-external-icon? force-external-icon?})]]))]
+                  (when force-external-icon? {:force-external-icon? force-external-icon?}))]]))]
     ]))
 
 (defn bottombar-simplelink [e! app options]
@@ -102,6 +102,19 @@
                                         label-styles)))
       (or label "")]
     ]]))
+
+(defn bottombar-linkify [e! app options]
+  (let [{:keys [key label href target force-external-icon?] :or {href "#"}} options]
+    [:div (stylefy/use-style {:align-self "center"})
+     [common/linkify
+      href
+      (str label)
+      (merge {:key      (name key)
+              :style    style-topnav/bottombar-dropdown-link
+              :force-external-icon? force-external-icon?}
+             (when target {:target target})
+             (when force-external-icon? {:force-external-icon? force-external-icon?}))]]))
+
 
 (defn bottombar-spacer
   "Horizontal spacing to give entries a bit of breathing room."
@@ -146,20 +159,12 @@
 
       [bottombar-spacer]
 
-      [bottombar-dropdown e! app desktop? {:tag                 :updates
+      [bottombar-dropdown e! app desktop? {:tag                 :service-info
                                            :entries             [{:key    :updates
                                                                   :label  (tr [:common-texts :updates-menu-updates])
                                                                   :href   "https://www.fintraffic.fi/fi/fintraffic/tiedotteet"
-                                                                  :target "_blank"}]
-                                           :label               (tr [:common-texts :navigation-updates-menu])
-                                           :state-flag          [:ote-service-flags :navigation-updates-menu]
-                                           :menu-click-handler  #(e! (fp-controller/->ToggleUpdatesMenu))
-                                           :entry-click-handler identity}]
-
-      [bottombar-spacer]
-
-      [bottombar-dropdown e! app desktop? {:tag                 :service-info
-                                           :entries             [{:key :ohjeet
+                                                                  :target "_blank"}
+                                                                 {:key :ohjeet
                                                                   :label (tr [:common-texts :user-menu-nap-help])
                                                                   :href (tr [:common-texts :user-menu-nap-help-link])
                                                                   :target "_blank"}
@@ -182,6 +187,7 @@
                                            :entry-click-handler identity}]
 
       [bottombar-spacer]
+
       [bottombar-dropdown e! app desktop? {:tag                 :support
                                            :entries             [{:key :channels
                                                                   :label (tr [:common-texts :support-menu-channels])
@@ -240,6 +246,19 @@
                                       :menu-click-handler #(do (routes/navigate! :services)
                                                                (e! (fp-controller/->CloseHeaderMenus)))}])
 
+      (when-not (user-logged-in? app) [bottombar-spacer])
+      (when-not (user-logged-in? app)
+        [bottombar-linkify e! app {:key :taxiui_statistics
+                                     :label (tr [:taxi-ui :cross-promo :myservices-statistics-link])
+                                     :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
+                                     :force-external-icon? true
+                                     :target "_blank"}])
+      #_{:key :taxiui_statistics
+         :label (tr [:taxi-ui :cross-promo :myservices-statistics-link])
+         :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
+         :force-external-icon? true
+         :target "_blank"}
+
       (when (and (user-logged-in? app)
                  (user-operates-service-type? app :taxi))
         [common/linkify
@@ -288,9 +307,8 @@
         [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-login])
                                       :menu-click-handler #(e! (login/->ShowLoginPage))}])
 
-      (when (not (user-logged-in? app)) [bottombar-spacer])
-
-      (when (not (user-logged-in? app))
+      (when-not (user-logged-in? app) [bottombar-spacer])
+      (when-not (user-logged-in? app)
         [bottombar-simplelink e! app {:label              (tr [:common-texts :navigation-register])
                                       :menu-click-handler #(e! (fp-controller/->ToggleRegistrationDialog))}])
 
