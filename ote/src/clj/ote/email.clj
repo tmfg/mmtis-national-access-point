@@ -22,7 +22,8 @@
   "Send a singular email using Postal."
   [server msg]
   (if (-> server :host some?)
-    (postal/send-message server msg)
+    (let [response (postal/send-message server msg)]
+      (log/info (str "Sending email to <" (:to msg) "> with subject '" (:subject msg) "' resulted in " response)))
     (log/warn "not sending email because configured smtp host is empty")))
 
 (defrecord Email [email-opts]

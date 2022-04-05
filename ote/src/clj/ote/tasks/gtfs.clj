@@ -149,12 +149,15 @@
                      (update interface :data-content  util-db/PgArray->vec)
                      interface)
          force-download? (integer? service-id)
-         used-service-id (if service-id
-                           service-id
-                           (:ts-id interface))
-         process-result (do-update-one-gtfs! config db interface upload-s3? force-download? used-service-id)]
-     (when (some? email)
-       (email-validation-results db email service-id interface-id))
+         ; ensure service-id has a value
+         service-id (if service-id
+                      service-id
+                      (:ts-id interface))
+         process-result (do-update-one-gtfs! config db interface upload-s3? force-download? service-id)]
+     (if (and (some? email)
+              (some? service-id))
+       (email-validation-results db email service-id interface-id)
+       (log/warn (str "Could not send email due to internal state mismatch! (" email " " service-id " " interface-id ")")))
      process-result)))
 
 (def night-hours #{0 1 2 3 4})
