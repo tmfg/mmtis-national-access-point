@@ -169,10 +169,6 @@
                        (http/transit-response
                          (update-priceinfo-for-service db user operator-id service-id (http/transit-request form-data))))
 
-                     (POST "/taxiui/operating-areas" {form-data :body}
-                       (http/transit-response
-                         (fetch-operating-areas db (http/transit-request form-data))))
-
                      (POST "/taxiui/service-summaries" {user      :user
                                                         form-data :body}
                        (http/transit-response
@@ -187,9 +183,16 @@
                        (http/transit-response
                          (mark-prices-approved db user (http/transit-request form-data))))
                      ))
-                 (http/publish! http {:authenticated? false} (routes (POST "/taxiui/statistics" {form-data :body}
-                                                                       (http/transit-response
-                                                                         (fetch-pricing-statistics db (http/transit-request form-data))))))]))
+                 (http/publish!
+                   http
+                   {:authenticated? false}
+                   (routes
+                     (POST "/taxiui/statistics" {form-data :body}
+                       (http/transit-response
+                         (fetch-pricing-statistics db (http/transit-request form-data))))
+                     (POST "/taxiui/operating-areas" {form-data :body}
+                       (http/transit-response
+                         (fetch-operating-areas db (http/transit-request form-data))))))]))
 
   (stop [{stop ::stop :as this}]
     (doseq [s stop]
