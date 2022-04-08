@@ -78,6 +78,22 @@ SELECT *
  ORDER BY "operator-id", "service-id";
 
 -- name: update-approved-status!
-UPDATE taxi_service_prices
-   SET "approved-by" = :user-id, "approved?" = NOW()
- WHERE id IN (:pricing-ids)
+  WITH pricing_to_approve AS (
+      SELECT "service_id",
+             "timestamp"
+        FROM taxi_service_prices
+       WHERE id = :pricing-id
+  ),
+       all_pricings AS (
+      SELECT ap.id
+        FROM taxi_service_prices ap,
+             pricing_to_approve
+       WHERE ap.service_id = pricing_to_approve.service_id
+         AND ap."timestamp" <= pricing_to_approve."timestamp"
+         AND ap."approved?" IS NULL
+  )
+UPDATE taxi_service_prices tsp
+   SET "approved-by" = :user-id,
+       "approved?"   = NOW()
+  FROM all_pricings ap
+ WHERE tsp.id IN (ap.id);
