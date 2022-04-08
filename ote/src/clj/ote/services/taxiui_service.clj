@@ -147,8 +147,9 @@
 (defn mark-prices-approved
   [db user {pricing-ids :pricing-ids}]
   (if (authorization/admin? user)
-    (update-approved-status! db {:pricing-ids (filter some? pricing-ids)
-                                 :user-id     (authorization/user-id user)})
+    (doseq [pricing-id (filter some? pricing-ids)]
+      (update-approved-status! db {:pricing-id pricing-id
+                                   :user-id    (authorization/user-id user)}))
     (log/warn (str "Non-admin user " (authorization/user-id user) " tried to approve pricings " pricing-ids))))
 
 (defrecord TaxiUIService []
@@ -181,8 +182,7 @@
                      (POST "/taxiui/approvals" {user      :user
                                                 form-data :body}
                        (http/transit-response
-                         (mark-prices-approved db user (http/transit-request form-data))))
-                     ))
+                         (mark-prices-approved db user (http/transit-request form-data))))))
                  (http/publish!
                    http
                    {:authenticated? false}
