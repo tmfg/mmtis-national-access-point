@@ -1305,6 +1305,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
 
  :service-viewer
  {:open-in-geojson "Öppna informationen i GeoJSON-format"
+  :open-in-gtfs-flex "Öppna informationen i GTFS Flex-format"
   :operator-info "Tjänsteproducentens uppgifter"
   :transport-service-info "Mobilitetstjänstens uppgifter"
   :not-disclosed "Har inte angetts"

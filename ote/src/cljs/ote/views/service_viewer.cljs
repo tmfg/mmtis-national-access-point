@@ -130,11 +130,11 @@
      [:div (stylefy/use-sub-style service-viewer/info-container :right-block)
       rv]]]))
 
-(def open-in-new-icon
-  (ic/action-open-in-new {:style {:width 20
-                                  :height 20
-                                  :margin-right "0.5rem"
-                                  :color colors/primary}}))
+(defn data-export-link
+  [url label]
+  [:div
+   [common-ui/linkify url label {:target "_blank"
+                                 :force-external-icon? true}]])
 
 (defn- service-header
   [service-name o-id s-id]
@@ -145,7 +145,8 @@
      [feather-icons/arrow-left style-base/inline-icon]
      (tr [:service-search :back-link])]]
    [:h1 {:style {:margin-top "1rem"}} service-name]
-   [link-with-icon {:target-blank? true} open-in-new-icon (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]])
+   [data-export-link (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]
+   [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])]])
 
 (defn- operator-info
   [title operator]

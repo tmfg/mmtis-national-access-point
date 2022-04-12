@@ -1302,7 +1302,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :logged-out "You have been logged out."}
 
  :service-viewer
- {:open-in-geojson "Open information in GeoJSON form"
+ {:open-in-geojson "Open information in GeoJSON format"
+  :open-in-gtfs-flex "Open information in GTFS Flex format"
   :operator-info "Service provider information"
   :transport-service-info "Transport service information"
   :not-disclosed "Not given"
