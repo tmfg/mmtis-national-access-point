@@ -345,46 +345,56 @@
 
 (defmethod netex-validation-error "1_gtfs_csv_3"
   [error]
-  (format "%s is missing the header row" (:error_value error)))
+  {:severity "warning"
+   :message  (format "%s is missing the header row" (:error_value error))})
 
 (defmethod netex-validation-error "1_gtfs_common_3"
   [error]
-  (format "Optional file %s is not present." (:error_value error)))
+  {:severity "warning"
+   :message  (format "Optional file %s is not present." (:error_value error))})
 
 (defmethod netex-validation-error "1_gtfs_common_4"
   [error]
-  (format "Unexpected file %s present in GTFS package" (:error_value error)))
+  {:severity "warning"
+   :message  (format "Unexpected file %s present in GTFS package" (:error_value error))})
 
 (defmethod netex-validation-error "1_gtfs_common_8"
   [error]
   (let [{:keys [source error_value reference_value]}   error
         {:keys [filename, line_number, column_number]} (:file source)]
-    (format "%s contains the value %s for key %s multiple times, starting at line %s, column %s."
-            filename error_value reference_value line_number column_number)))
+    {:severity "warning"
+     :message  (format "%s contains the value %s for key %s multiple times, starting at line %s, column %s."
+                       filename error_value reference_value line_number column_number)}))
 
 
 (defmethod netex-validation-error "1_gtfs_common_11"
   [error]
   (let [{:keys [source error_value]} error
         {:keys [filename]}           (:file source)]
-    (format "%s contains unknown column %s"
-            filename error_value)))
+    {:severity "warning"
+     :message  (format "%s contains unknown column %s"
+                       filename error_value)}))
 
 (defmethod netex-validation-error "1_gtfs_common_12"
   [error]
   (let [{:keys [source error_value reference_value]}   error
         {:keys [filename, line_number, column_number]} (:file source)]
-    (format "%s is missing required value for column %s on line %s, column %s"
-            filename error_value line_number column_number)))
+    {:severity "warning"
+     :message  (format "%s is missing required value for column %s on line %s, column %s"
+                       filename error_value line_number column_number)}))
 
 (defmethod netex-validation-error "2_gtfs_stop_4"
   [error]
   (let [{:keys [source error_value reference_value]}   error
         {:keys [filename, line_number, column_number]} (:file source)]
-    (format "%s contains a station %s without stations at line %s, column %s"
-            filename error_value line_number column_number)))
+    {:severity "warning"
+     :message  (format "%s contains a station %s without stations at line %s, column %s"
+                       filename error_value line_number column_number)}))
 
-(defmethod netex-validation-error :default [x] (str x))
+(defmethod netex-validation-error :default
+  [x]
+  {:severity "warning"
+   :message  (str x)})
 
 (defn set-conversion-status!
   "Resolves operation result based on input args and updates status to db.
@@ -401,9 +411,10 @@
                    ", conversion-meta=" conversion-meta))
     (when (some? validation-report-file)
       (doseq [r (expand-netex-validation-report validation-report-file)]
-        (report/gtfs-import-report! db "error" package-id
-                                    (str "NeTEx conversion validation failed")
-                                    (.getBytes (netex-validation-error r)))))
+        (let [{:keys [severity message]} (netex-validation-error r)]
+          (report/gtfs-import-report! db severity package-id
+                                      (str "NeTEx conversion validation failed")
+                                      (.getBytes message)))))
     (specql/upsert! db ::netex/netex-conversion
                     #{::netex/transport-service-id ::netex/external-interface-description-id}
                     {::netex/transport-service-id service-id

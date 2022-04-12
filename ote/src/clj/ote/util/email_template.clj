@@ -401,8 +401,14 @@
                   [:br]
                   [:h1 {:class "headerText1"
                         :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
-                   "Saitte tämän viestin, koska olette julkaisseet Fintrafficin liikennepalvelukatalogissa ja reitti- ja aikataulutiedoissanne on havaittu automaattitarkastuksessa seuraavat virheet."]
+                   "Olet saanut tämän viestin, koska olet ilmoittautunut viranomaispalvelussa joukkoliikenteen palveluntarjoajaksi ja tarjoamassanne joukkoliikenneaineistossa on havaittu virheitä."]
 
+                  [:br]
+                  [:p "Alla luetellut virheviestit ovat tulleet suoraan "
+                   [:a {:href "https://www.finap.fi/" :target "_blank"} "NAP-palvelusta."]
+                   "Välitättehän nämä ratkaistavaksi eteenpäin IT-kumppanillenne tai palvelun koodauksesta vastaavalle."]
+                  [:br]
+                  [:p "Virheiden kuvaukset on jätetty englanniksi, sillä ne kuvaavat ongelman selkeästi."]
 
                   [:div {:style "background-color:#FFFFFF"}
                    (html-divider-border nil)
@@ -419,6 +425,9 @@
                       {:class "tg-lusz" :width "15%" :label "Vakavuus"}]
                      (for [r report]
                        (report-row operator service r)))
-                   [:br]]
+                   [:br]
+                   [:p "Ohjeita ja yleistä tietoa Finap-palvelusta löydät Fintrafficin nettisivuilta "
+                    [:a {:href "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi" :target "_blank"}
+                     "NAP-liikkumispalvelukatalogi"]]]
 
                   (html-divider-border nil)]))

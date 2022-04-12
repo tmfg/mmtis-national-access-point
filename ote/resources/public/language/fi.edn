@@ -1312,6 +1312,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
 
  :service-viewer
  {:open-in-geojson "Avaa tiedot GeoJSON-muodossa"
+  :open-in-gtfs-flex "Avaa tiedot GTFS Flex-muodossa"
   :operator-info "Palveluntuottajan tiedot"
   :transport-service-info "Liikkumispalvelun tiedot"
   :not-disclosed "Ei ilmoitettu"
@@ -1482,7 +1483,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
                        :verify-email "Todenna sähköpostiosoite"
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}
-  :validation-report {:title "NAP - Ulkoisen rajapinnan automatisoitu tuonti epäonnistui"}}
+  :validation-report {:title "Korjauspyyntö NAP-palvelussa ilmoitettuihin rajapinta-aineistoihin"}}
 
  :country-list
  {:A "Valitse"
