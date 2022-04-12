@@ -69,9 +69,8 @@
     interface))
 
 (defn email-validation-results
-  [db email service-id interface-id]
-  ; disabled for now by request of customer
-  #_(let [report (->> (report/latest-import-reports-for-service-interface db service-id interface-id)
+  [db testing-env? email service-id interface-id]
+  (let [report (->> (report/latest-import-reports-for-service-interface db service-id interface-id)
                     (filter (fn [r] (= "error" (:gtfs-import-report/severity r)))))]
     (if (empty? report)
       (log/info (str "Empty report for service/interface " service-id "/" interface-id ", skipping email"))
@@ -87,19 +86,20 @@
             recipient "nap@fintraffic.fi" #_(or (::t-service/contact-email service)
                                                 (::t-operator/email operator)
                                                 "nap@fintraffic.fi")]
-        (localization/with-language
-          "fi"
-          (email/send! email {:to      recipient
-                              :subject (localization/tr [:email-templates :validation-report :title])
-                              :body    [{:type    "text/html;charset=utf-8"
-                                         :content (str email-template/html-header
-                                                       (hiccup/html (email-template/validation-report
-                                                                      [:email-templates :validation-report :title]
-                                                                      operator
-                                                                      service
-                                                                      report)))}]}))
+        (when-not testing-env?
+          (localization/with-language
+            "fi"
+            (email/send! email {:to      recipient
+                                :subject (localization/tr [:email-templates :validation-report :title])
+                                :body    [{:type    "text/html;charset=utf-8"
+                                           :content (str email-template/html-header
+                                                         (hiccup/html (email-template/validation-report
+                                                                        [:email-templates :validation-report :title]
+                                                                        operator
+                                                                        service
+                                                                        report)))}]})))
 
-        (log/info (str "Sent email to "
+        (log/info (str "Sent " (if testing-env? "(simulated) " "") "email to "
                        recipient
                        " containing "
                        (count report)
@@ -158,7 +158,7 @@
          process-result (do-update-one-gtfs! config db interface upload-s3? force-download? service-id)]
      (if (and (some? email)
               (some? service-id))
-       (email-validation-results db email service-id interface-id)
+       (email-validation-results (:testing-env? config) db email service-id interface-id)
        (log/warn (str "Could not send email due to internal state mismatch! (" email "/" service-id "/" interface-id ")")))
      process-result)))
 
