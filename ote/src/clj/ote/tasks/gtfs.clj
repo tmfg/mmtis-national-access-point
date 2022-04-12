@@ -71,7 +71,8 @@
 (defn email-validation-results
   [db email service-id interface-id]
   ; disabled for now by request of customer
-  #_(let [report (report/latest-import-reports-for-service-interface db service-id interface-id)]
+  #_(let [report (->> (report/latest-import-reports-for-service-interface db service-id interface-id)
+                    (filter (fn [r] (= "error" (:gtfs-import-report/severity r)))))]
     (if (empty? report)
       (log/info (str "Empty report for service/interface " service-id "/" interface-id ", skipping email"))
       (let [service (some-> (specql/fetch db ::t-service/transport-service
