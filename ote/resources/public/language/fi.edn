@@ -1483,7 +1483,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
                        :verify-email "Todenna sähköpostiosoite"
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}
-  :validation-report {:title "NAP - Ulkoisen rajapinnan automatisoitu tuonti epäonnistui"}}
+  :validation-report {:title "Korjauspyyntö NAP-palvelussa ilmoitettuihin rajapinta-aineistoihin"}}
 
  :country-list
  {:A "Valitse"
