@@ -142,12 +142,14 @@
     areas))
 
 (defn export-gtfs-flex
+  "This function is an adaptation of the GTFS generation in [[ote.gtfs.transform/sea-routes-gtfs]]"
   [db config transport-operator-id transport-service-id]
 
   ; load raw data and structures
   (let [transport-operator (gtfs/get-transport-operator db transport-operator-id)
         areas              (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
-        routes             (gtfs/get-sea-routes db transport-operator-id)
+        routes             (->> (gtfs/get-sea-routes db transport-operator-id)
+                                (mapv #(assoc % :services (gtfs-transform/route-services %))))
         agency-txt         (gtfs-transform/agency-txt transport-operator)
         calendar-dates-txt (gtfs-transform/calendar-dates-txt routes)
         ; XXX: trips carries over metadata which is not part of any spec, but the existing functionality relies on it
@@ -155,6 +157,10 @@
         gtfs-trips         (->> pseudo-trips (map #(dissoc % :stoptimes)))
         gtfs-stop-times    (gtfs-transform/sea-stop-times-txt routes pseudo-trips)
         gtfs-routes        (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes)
+        gtfs-stops (gtfs-transform/stops-txt (into {}
+                                                   (comp (mapcat :ote.db.transit/stops)
+                                                         (map (juxt :ote.db.transit/code identity)))
+                                                   routes))
         gtfs-calendar      (gtfs-transform/calendar-txt routes)]
     ; complement GTFS content with GTFS Flex additions
     (let [static-route-id   (str (::t-operator/name transport-operator) " route")
@@ -182,6 +188,8 @@
                        :data (parse/unparse-gtfs-file :gtfs/agency-txt agency-txt)}
                       {:name "routes.txt"
                        :data (parse/unparse-gtfs-file :gtfs/routes-txt flex-routes)}
+                      {:name "stops.txt"
+                       :data (parse/unparse-gtfs-file :gtfs/stops-txt gtfs-stops)}
                       {:name "trips.txt"
                        :data (parse/unparse-gtfs-file :gtfs/trips-txt flex-trips)}
                       {:name "calendar.txt"
