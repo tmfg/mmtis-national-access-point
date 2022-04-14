@@ -133,7 +133,6 @@
   "Fetch latest approved pricing statistics for specific service."
   [db service-id]
   (first (->> (list-service-pricing-statistics db {:service-id (Long/parseLong service-id)})
-  (first (->> (list-service-pricing-statistics db {:service-id (Long/parseLong service-id)})
               sanitize-pricing-output)))
 
 (defn fetch-operating-areas
