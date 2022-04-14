@@ -62,6 +62,8 @@
                            payment-methods (::t-service/payment-methods pt)
                            price-classes (::t-service/price-classes pt)
                            pricing (::t-service/pricing pt)]
+                       (js/console.log (str "subtypekey " (::t-service/id result)))
+                       (js/console.log (str "pt " pt))
                        {:payment-method-description payment-method-desc
                         :payment-methods payment-methods
                         :price-classes price-classes
@@ -79,6 +81,16 @@
         (assoc-in [:service-view :transport-service :pricing-info] pricing-data)
         (assoc-in [:service-view :transport-service :service-hours-info] service-hours-data)
         (assoc-in [:service-view :transport-service :areas] areas))))
+
+(define-event TaxiPricingSuccess [result]
+  {}
+  (if (and (some? result)
+           (not-empty result))
+    (do
+      (js/console.log (str "adding taxi pricing to app " result))
+      ; XXX: This is placed into separate parent key because implementation of ServiceSuccess overwrites the whole map
+      (assoc-in app [:service-view :taxi-service :pricing-info] result))
+    app))
 
 (define-event OperatorSuccess [result]
   {}
@@ -100,6 +112,8 @@
     (comm/get! (str "transport-service/" (url-util/encode-url-component service-id))
                {:on-success (tuck/send-async! ->ServiceSuccess)
                 :on-failure (tuck/send-async! ->ServiceFailure)})
+    (comm/get! (str "/taxiui/statistics/" (url-util/encode-url-component service-id))
+               {:on-success (tuck/send-async! ->TaxiPricingSuccess)})
     (comm/get! (str "t-operator/" (url-util/encode-url-component operator-id))
                {:on-success (tuck/send-async! ->OperatorSuccess)
                 :on-failure (tuck/send-async! ->OperatorFailure)}))
