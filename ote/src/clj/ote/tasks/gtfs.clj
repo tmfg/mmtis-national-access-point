@@ -158,7 +158,7 @@
          process-result (do-update-one-gtfs! config db interface upload-s3? force-download? service-id)]
      (if (and (some? email)
               (some? service-id))
-       (email-validation-results (:testing-env? config) db email service-id interface-id)
+       (email-validation-results db (:testing-env? config) email service-id interface-id)
        (log/warn (str "Could not send email due to internal state mismatch! (" email "/" service-id "/" interface-id ")")))
      process-result)))
 
