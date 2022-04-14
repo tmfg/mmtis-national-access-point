@@ -25,7 +25,6 @@
 (defn fetch-priceinfo-for-service
   [db user {service-id  :service-id
             operator-id :operator-id :as form-data}]
-  (log/info (str "fetch-priceinfo-for-service " form-data))
   (authorization/with-transport-operator-check
     db user (unknown->long operator-id)
     (fn []
@@ -109,6 +108,10 @@
   [filters]
   (-> filters :area-filter :label))
 
+(defn- sanitize-pricing-output
+  [pricing-statistics]
+  (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))) pricing-statistics))
+
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
   (let [{:keys [column direction]} sorting
@@ -124,7 +127,14 @@
                                            :age-filter          (age-filter filters)
                                            :name-filter         (str "%" (or (:name filters) "") "%")
                                            :area-filter         (area-filter filters)})
-              (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))))))))
+              sanitize-pricing-output))))
+
+(defn fetch-service-pricing-statistics
+  "Fetch latest approved pricing statistics for specific service."
+  [db service-id]
+  (first (->> (list-service-pricing-statistics db {:service-id (Long/parseLong service-id)})
+  (first (->> (list-service-pricing-statistics db {:service-id (Long/parseLong service-id)})
+              sanitize-pricing-output)))
 
 (defn fetch-operating-areas
   [db {filter :filter}]
@@ -190,6 +200,9 @@
                      (POST "/taxiui/statistics" {form-data :body}
                        (http/transit-response
                          (fetch-pricing-statistics db (http/transit-request form-data))))
+                     (GET "/taxiui/statistics/:service-id" {{:keys [service-id]} :params}
+                       (http/transit-response
+                         (fetch-service-pricing-statistics db service-id)))
                      (POST "/taxiui/operating-areas" {form-data :body}
                        (http/transit-response
                          (fetch-operating-areas db (http/transit-request form-data))))))]))

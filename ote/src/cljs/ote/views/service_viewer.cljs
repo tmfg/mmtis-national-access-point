@@ -21,7 +21,8 @@
             [ote.style.service-viewer :as service-viewer]
             [ote.app.controller.place-search :as place-search]
             [ote.ui.form-fields :as form-fields]
-            [ote.style.base :as base]))
+            [ote.style.base :as base]
+            [taxiui.views.components.formatters :as taxiui-formatters]))
 
 (defonce shown-language
          (r/atom (string/upper-case (name @selected-language))))
@@ -500,6 +501,37 @@
        [information-row-with-selection (tr [:service-viewer :limited-accessibility-description]) limited-description true]]]
      [spacer]]))
 
+(defn- taxi-pricing-segment
+  [keyname data position wide]
+  [:div (stylefy/use-sub-style service-viewer/info-seqment position)
+   [common-ui/information-row-with-option
+    (str (tr [:taxi-ui :pricing-details :inputs keyname :main-title])
+         " "
+         (tr [:taxi-ui :pricing-details :inputs keyname :subtitle]))
+    (taxiui-formatters/currency data) wide]])
+
+(defn- taxi-price-information
+  [title data]
+  [:section
+   [:h4 title]
+   (let [{:keys [start-price-daytime start-price-nighttime start-price-weekend price-per-minute price-per-kilometer
+                 accessibility-service-fare accessibility-service-stairs accessibility-service-stretchers]} data]
+     [:div
+      [:div {:style {:margin-bottom "1rem"}}
+       [:div (stylefy/use-style service-viewer/info-row)
+        [taxi-pricing-segment :start-price-daytime start-price-daytime :left false]
+        [taxi-pricing-segment :start-price-nighttime start-price-nighttime :mid false]
+        [taxi-pricing-segment :start-price-weekend start-price-weekend :right false]]
+       [:div (stylefy/use-style service-viewer/info-row)
+        [taxi-pricing-segment :price-per-minute price-per-minute :left false]
+        [taxi-pricing-segment :price-per-kilometer price-per-kilometer :mid false]
+        [:div {:style {:flex 1}}]]
+       [:div (stylefy/use-style service-viewer/info-row)
+        [taxi-pricing-segment :accessibility-service-fare accessibility-service-fare :left false]
+        [taxi-pricing-segment :accessibility-service-stairs accessibility-service-stairs :mid false]
+        [taxi-pricing-segment :accessibility-service-stretchers accessibility-service-stretchers :right false]]]])
+   [spacer]])
+
 (defn- price-information
   [title data]
   [:section
@@ -944,5 +976,7 @@
           [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
           [booking-service (tr [:service-viewer :reservation-service]) booking-data]
           [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
-          [price-information (tr [:service-viewer :price-information]) pricing-data]
+          (if (= :taxi service-sub-type)
+            [taxi-price-information (tr [:service-viewer :price-information]) (get-in app-state [:service-view :taxi-service :pricing-info])]
+            [price-information (tr [:service-viewer :price-information]) pricing-data])
           [service-hours (tr [:service-viewer :service-hours]) service-hours-info]])])))

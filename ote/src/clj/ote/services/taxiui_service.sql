@@ -42,6 +42,23 @@ SELECT *
              ELSE TRUE
         END);
 
+-- name: list-service-pricing-statistics
+SELECT id,
+       timestamp,
+       start_price_daytime as "start-price-daytime",
+       start_price_nighttime as "start-price-nighttime",
+       start_price_weekend as "start-price-weekend",
+       price_per_minute as "price-per-minute",
+       price_per_kilometer as "price-per-kilometer",
+       accessibility_service_stairs as "accessibility-service-stairs",
+       accessibility_service_stretchers as "accessibility-service-stretchers",
+       accessibility_service_fare as "accessibility-service-fare"
+  FROM taxi_service_prices
+ WHERE service_id = :service-id
+   AND "approved?" IS NOT NULL
+ ORDER BY timestamp DESC
+ LIMIT 1;
+
 -- name: list-operating-areas
 SELECT DISTINCT (oa_d.text) AS place
   FROM operation_area oa,
