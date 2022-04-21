@@ -82,34 +82,34 @@
   template: src=templates/ote/ns-chouette.sh.j2 dest=/opt/chouette/ns-chouette.sh owner=napote group=napote mode=755
   tags: configuration
 
-- name: Check Java13 existence and save state to variable get_java13
+- name: Check Java 17 existence and save state to variable get_java17
   stat: path={{java_name}}
-  register: get_java13
+  register: get_java17
 
-- name: Download Java13
+- name: Download Java 17
   get_url:
     url="{{java_download_url}}"
     dest="{{java_archive}}"
-  when: not get_java13.stat.exists
+  when: not get_java17.stat.exists
 
-- name: Unpack archive java13
+- name: Unpack archive Java 17
   unarchive:
     src: "{{java_archive}}"
     dest: "{{java_download_folder}}"
     remote_src: yes
-  when: not get_java13.stat.exists
+  when: not get_java17.stat.exists
 
-- name: Fix java13 ownership
+- name: Fix Java 17 ownership
   file: "state=directory path={{java_name}} owner=root group=root recurse=yes"
-  when: not get_java13.stat.exists
+  when: not get_java17.stat.exists
 
-- name: Make Java13 available for system
+- name: Make Java 17 available for system
   command: 'alternatives --install "/usr/bin/java" "java" "{{java_name}}/bin/java" 2000'
-  when: not get_java13.stat.exists
+  when: not get_java17.stat.exists
 
-- name: Take Java13 into use
+- name: Take Java 17 into use
   command: 'alternatives --set "java" "{{java_name}}/bin/java"'
-  when: not get_java13.stat.exists
+  when: not get_java17.stat.exists
 
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote
