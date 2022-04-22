@@ -505,7 +505,7 @@
   (process-event [{transport-service-id :transport-service-id db-file-key :db-file-key file-input :file-input} app]
     ;; Send csv file to server to parse its content
     (let [url (str "transport-service/upload-company-csv/"
-                   (or transport-service-id 0) "/" (or db-file-key (ote.util.text/rand-str 30)))]
+                   (or transport-service-id 0) "/" (ote.util.text/rand-str 30))]
       (comm/upload! url file-input
                     {:on-success (tuck/send-async! ->UploadCSVResponse)
                      :on-failure (tuck/send-async! ->ServerError)})
