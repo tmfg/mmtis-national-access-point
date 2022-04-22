@@ -83,9 +83,9 @@
                                            #{::t-operator/email}
                                            {::t-operator/id (::t-service/transport-operator-id service)}
                                            first))
-            recipient "nap@fintraffic.fi" #_(or (::t-service/contact-email service)
-                                                (::t-operator/email operator)
-                                                "nap@fintraffic.fi")]
+            recipient (or (::t-service/contact-email service)
+                          (::t-operator/email operator)
+                          "nap@fintraffic.fi")]
         (when-not testing-env?
           (localization/with-language
             "fi"

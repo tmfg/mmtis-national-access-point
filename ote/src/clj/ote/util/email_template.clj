@@ -406,7 +406,7 @@
                   [:br]
                   [:p "Alla luetellut virheviestit ovat tulleet suoraan "
                    [:a {:href "https://www.finap.fi/" :target "_blank"} "NAP-palvelusta."]
-                   "Välitättehän nämä ratkaistavaksi eteenpäin IT-kumppanillenne tai palvelun koodauksesta vastaavalle."]
+                   "Välitättehän nämä ratkaistavaksi eteenpäin IT-kumppanillenne, mikäli ette itse ylläpidä reitti-, aikataulu- ja hintatietoja Finap-palvelussa."]
                   [:br]
                   [:p "Virheiden kuvaukset on jätetty englanniksi, sillä ne kuvaavat ongelman selkeästi."]
 
