@@ -348,6 +348,13 @@
   {:severity "warning"
    :message  (format "%s is missing the header row" (:error_value error))})
 
+(defmethod netex-validation-error "1_gtfs_csv_5"
+  [error]
+  (let [{:keys [source error_value reference_value]}   error
+        {:keys [filename, line_number, column_number]} (:file source)]
+    {:severity "warning"
+    :message  (format "%s row %s is not in UTF-8 format, probably file encoding issue" filename line_number)}))
+
 (defmethod netex-validation-error "1_gtfs_common_3"
   [error]
   {:severity "warning"
@@ -357,6 +364,11 @@
   [error]
   {:severity "warning"
    :message  (format "Unexpected file %s present in GTFS package" (:error_value error))})
+
+(defmethod netex-validation-error "1_gtfs_common_5"
+  [error]
+  {:severity "warning"
+   :message  (format "%s doesn't have any data rows" (-> error :source :file :filename))})
 
 (defmethod netex-validation-error "1_gtfs_common_8"
   [error]
@@ -390,6 +402,14 @@
     {:severity "warning"
      :message  (format "%s contains a station %s without stations at line %s, column %s"
                        filename error_value line_number column_number)}))
+
+(defmethod netex-validation-error "1_gtfs_calendar_1"
+  [error]
+  (let [{:keys [source error_value reference_value]}   error
+        {:keys [filename, line_number, column_number]} (:file source)]
+    {:severity "warning"
+     :message  (format "%s row %s should have at least one day selected for the entry to be valid"
+                       filename line_number)}))
 
 (defmethod netex-validation-error :default
   [x]

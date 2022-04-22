@@ -46,10 +46,28 @@
                                                     :error_id "2_gtfs_stop_4",
                                                     :source {:file {:filename "stops.txt", :line_number 18, :column_number 10}, :objectid "71745", :label ""},
                                                     :error_value "s3846"})))))
+  (testing "1_gtfs_common_5 / Presence of data in files"
+    (is (= "agency.txt doesn't have any data rows"
+           (:message (netex/netex-validation-error {:test_id "Presence of data in files",
+                                                    :error_id "1_gtfs_common_5",
+                                                    :source {:file {:filename "agency.txt", :line_number 1, :column_number 0}, :objectid "", :label ""},
+                                                    :error_value ""})))))
+  (testing "1_gtfs_calendar_1 / At least one weekday"
+    (is (= "calendar.txt row 4 should have at least one day selected for the entry to be valid"
+           (:message (netex/netex-validation-error {:test_id "At least one weekday",
+                                                    :error_id "1_gtfs_calendar_1",
+                                                    :source {:file {:filename "calendar.txt", :line_number 4}, :objectid "", :label ""},
+                                                    :error_value "At least one day must be valid"})))))
+  (testing "1_gtfs_csv_5 / Valid UTF-8 CSV data line"
+    (is (= "stops.txt row 3 is not in UTF-8 format, probably file encoding issue"
+           (:message (netex/netex-validation-error {:test_id "Valid UTF-8 CSV data line",
+                                                    :error_id "1_gtfs_csv_5",
+                                                    :source {:file {:filename "stops.txt", :line_number 3}, :objectid "", :label ""},
+                                                    :error_value "stops.txt"})))))
   (testing "Unknown error type will return raw data as plain string"
     (let [error {:test_id "Teleporter endpoint temporality",
                  :error_id "9_matter_transportation",
                  :source {:file {:filename "quantum_gates.txt", :line_number 27, :column_number 9}, :objectid "", :label ""},
                  :error_value "P2X-555"}]
-      (is (= (str error) (netex/netex-validation-error error))))))
+      (is (= (str error) (:message (netex/netex-validation-error error)))))))
 
