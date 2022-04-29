@@ -80,9 +80,9 @@
                                           {::t-service/id service-id})
                             first)
             operator (some-> (specql/fetch db ::t-operator/transport-operator
-                                           #{::t-operator/email}
-                                           {::t-operator/id (::t-service/transport-operator-id service)}
-                                           first))
+                                           #{::t-operator/id ::t-operator/email}
+                                           {::t-operator/id (::t-service/transport-operator-id service)})
+                             first)
             recipient (or (::t-service/contact-email service)
                           (::t-operator/email operator)
                           "nap@fintraffic.fi")]
@@ -103,7 +103,9 @@
                        recipient
                        " containing "
                        (count report)
-                       " rows for service-id/interface-id "
+                       " rows for operator-id/service-id/interface-id "
+                       (::t-operator/id operator)
+                       "/"
                        service-id
                        "/"
                        interface-id))))))
