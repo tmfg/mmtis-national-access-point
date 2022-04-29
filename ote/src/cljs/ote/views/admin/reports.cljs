@@ -21,5 +21,6 @@
     [linkify "/admin/reports/tvv" "Toimivaltaiset viranomaiset"]
     [linkify "/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
     [linkify "/admin/reports/netex-interfaces-with-max-date" "Gtfs/Kalkati.net rajapinnat ja ajopäivät, jotka on käännetty Netex muotoon"]
-    [linkify "/admin/reports/associated-companies" "Liittyneet yritykset"]]])
+    [linkify "/admin/reports/associated-companies" "Liittyneet yritykset"]
+    [linkify "/admin/reports/reported-taxi-prices" "Taksiyritysten ilmoittamat hinnat"]]])
 

@@ -645,6 +645,14 @@
             (map (juxt :joined-service :service-id :operator :operator-id :operator-business-id :joined-operator :joined-operator-business-id :joined-date :joined-operator-id)
                  (fetch-associated-companies-for-admin db))))
 
+; TODO:
+;  - alueet vaikka välilyönnillä erotetuksi
+;  - muunna alueet intersectillä? niin että ne on alue/kuntakohtaisia
+(defn- reported-taxi-prices [db]
+  (csv-data ["Y-tunnus" "Palveluntuottajan nimi" "Palvelun nimi" "Aloitus (arkipäivisin)" "Aloitus (öisin)" "Aloitus (viikonloppuna)" "Matka (hinta per minuutti)" "Matka (hinta per kilometri)" "Avustaminen, Porrasveto" "Apuvälineet, Paariasennus" "Avustaminen, Kertalisä" "Hyväksytty" "Toiminta-alueet"]
+            (map (juxt :business-id :operator-name :service-name :start-price-daytime :start-price-nighttime :start-price-weekend :price-per-minute :price-per-kilometer :accessibility-service-stairs :accessibility-service-stretchers :accessibility-service-fare :approved? :operating-areas)
+                 (fetch-reported-taxi-prices db))))
+
 (defn- admin-get-service-interfaces [db service-id]
   (specql/fetch db ::t-service/external-interface-description
                 (specql/columns ::t-service/external-interface-description)
@@ -878,7 +886,13 @@
     :filename (str "liittyneet-yritykset-" (time/format-date-iso-8601 (time/now)) ".csv")}
   (GET "/admin/reports/associated-companies" {user :user}
     (or (authorization-fail-response (:user user))
-        (associated-companies-response db))))
+        (associated-companies-response db)))
+
+  ^{:format :csv
+    :filename (str "taksiyritysten-ilmoittamat-hinnat-" (time/format-date-iso-8601 (time/now)) ".csv")}
+  (GET "/admin/reports/reported-taxi-prices" {user :user}
+    (or (authorization-fail-response (:user user))
+        (reported-taxi-prices db))))
 
 (define-service-component MonitorReport []
   {}

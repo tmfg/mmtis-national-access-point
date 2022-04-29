@@ -252,6 +252,25 @@ from "associated-service-operators" aso
          join "transport-service" ts on ts.id = aso."service-id"
          join "transport-operator" tstop on tstop.id = ts."transport-operator-id";
 
+-- name: fetch-reported-taxi-prices
+SELECT top."business-id",
+       top.name as "operator-name",
+       ts.name as "service-name",
+       lts."start-price-daytime",
+       lts."start-price-nighttime",
+       lts."start-price-weekend",
+       lts."price-per-minute",
+       lts."price-per-kilometer",
+       lts."accessibility_service_stairs",
+       lts."accessibility_service_stretchers",
+       lts."accessibility_service_fare",
+       lts."approved?",
+       lts."operating-areas"
+  FROM "transport-service" ts
+           LEFT JOIN list_taxi_statistics('timestamp', FALSE, NULL, NULL, TRUE) lts ON lts."service-id" = ts.id
+           JOIN "transport-operator" top ON ts."transport-operator-id" = "top".id
+ WHERE ts."sub-type" = 'taxi';
+
 -- name: fetch-validation-services
 SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
        s.validate, s."transport-operator-id", o.name as "operator-name", s."re-edit", s."parent-id"
