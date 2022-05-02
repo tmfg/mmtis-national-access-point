@@ -395,7 +395,12 @@
     nil))
 
 (defn- maybe-copy-service-company-csv [db bucket transport-service-id original-service-id]
-  (let [original-csv-from-db (first (specql/fetch db ::t-service/transport-service-company-csv
+  ; XXX: This function is a no-op since the file-key started conflicting effectively preventing upload of new versions
+  ;      of the CSV. As this feature is quite complex to remove properly, it is left as is.
+  ;      For the history books, this CSV file-key tracking is originally for the functionality which copies the CSV to
+  ;      S3 bucket.
+  nil
+  #_(let [original-csv-from-db (first (specql/fetch db ::t-service/transport-service-company-csv
                                                   (specql/columns ::t-service/transport-service-company-csv)
                                                   {::t-service/transport-service-id original-service-id}))
         ;; original-csv-from-s3 (when original-csv-from-db (s3/get-object bucket (::t-service/file-key original-csv-from-db))) - Stop copying csv to s3
@@ -510,7 +515,8 @@
                          (not= original-service-id transport-service-id)) ;; child id is given
                   (do
                     (save-service-company-csv db original-service-id (::t-service/company-csv-filename service-info) (get-in config [:csv :bucket]))
-                    (maybe-copy-service-company-csv db (get-in config [:csv :bucket]) transport-service-id original-service-id))
+                    ; XXX: see comment in the function to see why this is commented out
+                    #_(maybe-copy-service-company-csv db (get-in config [:csv :bucket]) transport-service-id original-service-id))
                   (save-service-company-csv db transport-service-id (::t-service/company-csv-filename service-info) (get-in config [:csv :bucket])))
                 ;; Save possible external interfaces
                 (if (and (not (nil? original-service-id))
