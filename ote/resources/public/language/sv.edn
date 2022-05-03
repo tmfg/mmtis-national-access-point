@@ -1766,7 +1766,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                      :start-price-daytime "Börjän på vardagar"
                                      :price-per-kilometer "Sträcke €/km"
                                      :price-per-minute    "Tid €/min"
-                                     :operating-areas     "Verksamhetsområde"}
+                                     :operating-areas     "Verksamhetsområde (inom kommuner)"}
                    :sections {:filters {:title               "Filtrera din sökning"
                                         :within-six-months   "Inom 6 månader"
                                         :within-one-year     "Inom ett år"

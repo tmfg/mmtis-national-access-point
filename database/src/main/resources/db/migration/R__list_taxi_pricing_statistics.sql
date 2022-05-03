@@ -96,11 +96,13 @@ BEGIN
                l."accessibility_service_fare" AS "accessibility-service-fare",
                l."approved?" AS "approved?",
                l."approved-by" AS "approved-by",
-               (SELECT array_agg(oa_d.text)
+               (SELECT DISTINCT array_agg(p.namefin)
                   FROM operation_area oa,
-                       unnest(description) AS oa_d
+                       places p
                  WHERE oa."transport-service-id" = l."service_id"
-                   AND "primary?" = TRUE) AS "operating-areas",
+                   AND p.type = ''finnish-municipality''
+                   AND (ST_Within(oa.location, p.location) = TRUE
+                     OR ST_Overlaps(oa.location, p.location) = TRUE)) AS "operating-areas",
                (l.start_price_daytime + (l.price_per_minute * 15) + (l.price_per_kilometer * 10)) AS "example-trip"
           FROM list_taxi_pricing_statistics(' || inner_ordering_column || ', ' || inner_ordering_direction || ', ' || approved || ') l
           JOIN "transport-service" s ON l."service_id" = s."id"
