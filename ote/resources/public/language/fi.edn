@@ -1772,7 +1772,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                      :start-price-daytime "Aloitus (arkipäivisin)"
                                      :price-per-kilometer "Matka (per km)"
                                      :price-per-minute    "Matka (per min)"
-                                     :operating-areas     "Toiminta-alueet (ensisijainen)"}
+                                     :operating-areas     "Toiminta-alueet (kunnittain)"}
                    :sections {:filters {:title               "Suodata hakua"
                                         :within-six-months   "Kuuden kuukauden sisällä"
                                         :within-one-year     "Vuoden sisällä"

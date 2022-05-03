@@ -508,7 +508,11 @@
     (str (tr [:taxi-ui :pricing-details :inputs keyname :main-title])
          " "
          (tr [:taxi-ui :pricing-details :inputs keyname :subtitle]))
-    (taxiui-formatters/currency data) wide]])
+    (if (some? data)
+      (taxiui-formatters/currency data)
+      [:span (stylefy/use-style {:color colors/gray650
+                                 :font-style "italic"})
+       (tr [:service-viewer :not-disclosed])]) wide]])
 
 (defn- taxi-price-information
   [title data]

@@ -1763,7 +1763,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                                      :start-price-daytime "Start fare (Weekdays)"
                                      :price-per-kilometer "Travel fare (per km)"
                                      :price-per-minute    "Travel fare (per min)"
-                                     :operating-areas     "Operating areas (priority)"}
+                                     :operating-areas     "Operating areas (by municipality)"}
                    :sections {:filters {:title               "Filter search"
                                         :within-six-months   "Within six months"
                                         :within-one-year     "Within one year"

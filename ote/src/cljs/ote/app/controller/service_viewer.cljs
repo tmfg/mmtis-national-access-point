@@ -62,8 +62,6 @@
                            payment-methods (::t-service/payment-methods pt)
                            price-classes (::t-service/price-classes pt)
                            pricing (::t-service/pricing pt)]
-                       (js/console.log (str "subtypekey " (::t-service/id result)))
-                       (js/console.log (str "pt " pt))
                        {:payment-method-description payment-method-desc
                         :payment-methods payment-methods
                         :price-classes price-classes
@@ -86,11 +84,9 @@
   {}
   (if (and (some? result)
            (not-empty result))
-    (do
-      (js/console.log (str "adding taxi pricing to app " result))
-      ; XXX: This is placed into separate parent key because implementation of ServiceSuccess overwrites the whole map
-      (assoc-in app [:service-view :taxi-service :pricing-info] result))
-    app))
+    ; XXX: This is placed into separate parent key because implementation of ServiceSuccess overwrites the whole map
+    (assoc-in app [:service-view :taxi-service :pricing-info] result))
+    (update-in app [:service-view :taxi-service] dissoc :pricing-info))
 
 (define-event OperatorSuccess [result]
   {}
