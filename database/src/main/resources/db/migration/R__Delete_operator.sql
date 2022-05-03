@@ -8,6 +8,12 @@ BEGIN
     INTO op
    WHERE "ckan-group-id" = (SELECT id FROM "group" WHERE name = operator_group_name);
 
+  -- Remove service stats under services managed by operator
+  DELETE FROM "stats-service"
+   WHERE "transport-service-id" IN (SELECT id
+                                      FROM "transport-service"
+                                     WHERE "transport-operator-id" = op);
+
   -- Remove services under operator
   DELETE FROM "transport-service" WHERE "transport-operator-id" = op;
 
