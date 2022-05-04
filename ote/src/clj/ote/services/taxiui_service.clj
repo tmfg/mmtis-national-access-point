@@ -120,7 +120,7 @@
         primary-column             (when-not secondary-column column)
         primary-direction          (when primary-column direction)
         secondary-direction        (when secondary-column direction)]
-    (vec (->> (list-pricing-statistics db {:primary-column      (some-> primary-column csk/->snake_case_string)
+    []#_(vec (->> (list-pricing-statistics db {:primary-column      (some-> primary-column csk/->snake_case_string)
                                            :primary-direction   (= primary-direction :ascending)
                                            :secondary-column    (some-> secondary-column csk/->kebab-case-string)
                                            :secondary-direction (= secondary-direction :ascending)
@@ -149,7 +149,7 @@
   [db user]
   ; TODO: check admin privileges for user
   (if (authorization/admin? user)
-    (vec (->> (list-unapproved-prices db)
+    [#_(vec (->> (list-unapproved-prices db)
               (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))
     (log/warn (str "Non-admin user " (authorization/user-id user) " tried to list unapproved pricings"))))
 
@@ -184,7 +184,7 @@
                        (http/transit-response
                          (fetch-service-summaries db user (http/transit-request form-data))))
 
-                     (GET "/taxiui/approvals" {user :user}
+                     #_(GET "/taxiui/approvals" {user :user}
                        (http/transit-response
                          (fetch-unapproved-prices db user)))
 

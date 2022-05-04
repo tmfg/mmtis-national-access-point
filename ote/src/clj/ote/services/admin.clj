@@ -648,7 +648,7 @@
 (defn- reported-taxi-prices [db]
   (csv-data ["Y-tunnus" "Palveluntuottajan nimi" "Palvelun nimi" "Aloitus (arkipäivisin)" "Aloitus (öisin)" "Aloitus (viikonloppuna)" "Matka (hinta per minuutti)" "Matka (hinta per kilometri)" "Avustaminen, Porrasveto" "Apuvälineet, Paariasennus" "Avustaminen, Kertalisä" "Hyväksytty" "Toiminta-alueet kunnittain"]
             (map (juxt :business-id :operator-name :service-name :start-price-daytime :start-price-nighttime :start-price-weekend :price-per-minute :price-per-kilometer :accessibility-service-stairs :accessibility-service-stretchers :accessibility-service-fare :approved? :operating-areas)
-                 (->> (fetch-reported-taxi-prices db)
+                 []#_(->> (fetch-reported-taxi-prices db)
                       (map #(update % :operating-areas (fn [oa] (str/join " " (db-util/PgArray->vec oa)))))))))
 
 (defn- admin-get-service-interfaces [db service-id]
