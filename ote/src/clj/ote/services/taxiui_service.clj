@@ -196,7 +196,7 @@
                    http
                    {:authenticated? false}
                    (routes
-                     (POST "/taxiui/statistics" {form-data :body}
+                     #_ (POST "/taxiui/statistics" {form-data :body}
                        (http/transit-response
                          (fetch-pricing-statistics db (http/transit-request form-data))))
                      (GET "/taxiui/statistics/:service-id" {{:keys [service-id]} :params}
