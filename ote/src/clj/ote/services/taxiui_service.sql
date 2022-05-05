@@ -82,11 +82,18 @@ SELECT id,
  LIMIT 1;
 
 -- name: list-operating-areas
-SELECT DISTINCT (oa_d.text) AS place
-  FROM operation_area oa,
-       UNNEST(description) oa_d
- WHERE oa_d.text ILIKE :term
- ORDER BY place;
+WITH locations AS (
+  SELECT oa.description[1].text AS loc
+    FROM operation_area oa
+   WHERE oa."transport-service-id" IN (SELECT DISTINCT tsp."service_id"
+                                         FROM taxi_service_prices tsp
+                                        WHERE tsp."approved?" IS NOT NULL)
+)
+SELECT DISTINCT lr.parent_namefin AS "place"
+  FROM location_relations lr
+ WHERE lr.parent_type = 'finnish-municipality'
+   AND lr.child_namefin IN (SELECT loc FROM locations)
+    OR lr.parent_namefin IN (SELECT loc FROM locations);
 
 -- name: list-service-summaries
 SELECT o."id" AS "operator-id",

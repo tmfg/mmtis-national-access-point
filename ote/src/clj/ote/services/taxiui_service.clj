@@ -162,7 +162,8 @@
 
 (defn fetch-operating-areas
   [db {filter :filter}]
-  (vec (list-operating-areas db {:term (str "%" filter "%")})))
+  (vec (->> (list-operating-areas db)
+            (clojure.core/filter (fn [row] (str/includes? (:place row) filter))))))
 
 (defn fetch-service-summaries
   [db user {}]
