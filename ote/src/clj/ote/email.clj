@@ -1,6 +1,7 @@
 (ns ote.email
   "Email sending utilities."
-  (:require [postal.core :as postal]
+  (:require [clojure.set :as set]
+            [postal.core :as postal]
             [ote.nap.cookie :as nap-cookie]
             [ote.nap.users :as nap-users]
             [taoensso.timbre :as log]
@@ -22,7 +23,8 @@
   "Send a singular email using Postal."
   [server msg]
   (if (-> server :host some?)
-    (let [response (postal/send-message server msg)]
+    (let [response (-> (postal/send-message server msg)
+                       (set/rename-keys {:error :status}))]
       (log/info (str "Sending email to <" (:to msg) "> with subject '" (:subject msg) "' resulted in " response)))
     (log/warn "not sending email because configured smtp host is empty")))
 
