@@ -28,14 +28,16 @@
    (merge {:type       "text"
            :input-mode "decimal"
            :tabIndex   tab-index
-           :on-focus   (fn [e] (set! (.. e -target -value)
-                                     (or (. (.. e -target -dataset) -rawvalue) "")))
-           :on-change  (fn [e]
+           :on-focus   (fn [^js/FocusEvent e]
+                         (set! (.. e -target -value)
+                               (or (.. e -target -dataset -rawvalue) "")))
+           :on-change  (fn [^js/Event e]
                          (let [value (str (.. e -target -value))]
-                           (set! (. (.. e -target -dataset) -rawvalue) value)
+                           (set! (.. e -target -dataset -rawvalue) value)
                            (e! (controller/->StorePrice id value))))
-           :on-blur    (fn [e] (set! (.. e -target -value)
-                                     (formatters/currency (or (. (.. e -target -dataset) -rawvalue) "0.0"))))}
+           :on-blur    (fn [^js/FocusEvent e]
+                         (set! (.. e -target -value)
+                                     (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))}
           (when-let [existing-price (get-in app [:taxi-ui :pricing-details :price-information :prices id])]
             {:data-rawvalue existing-price
              :placeholder   (formatters/currency existing-price)}))
@@ -64,7 +66,7 @@
         (let [{label :ote.db.places/namefin} result]
           ^{:key (str "result_" index)}
           [:li (stylefy/use-style styles/autocomplete-result
-                                  {:on-click (fn [e]
+                                  {:on-click (fn [^js/Event e]
                                                (.preventDefault e)
                                                (e! (controller/->UserSelectedResult result))
                                                (set! (.. (.getElementById js/document "operating-areas") -value) label)
