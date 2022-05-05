@@ -29,13 +29,13 @@
            :input-mode "decimal"
            :tabIndex   tab-index
            :on-focus   (fn [e] (set! (.. e -target -value)
-                                     (or (.. e -target -dataset -rawvalue) "")))
+                                     (or (. (.. e -target -dataset) -rawvalue) "")))
            :on-change  (fn [e]
                          (let [value (str (.. e -target -value))]
-                           (set! (.. e -target -dataset -rawvalue) value)
+                           (set! (. (.. e -target -dataset) -rawvalue) value)
                            (e! (controller/->StorePrice id value))))
            :on-blur    (fn [e] (set! (.. e -target -value)
-                                     (formatters/currency (or (.. e -target -dataset -rawvalue) "0.0"))))}
+                                     (formatters/currency (or (. (.. e -target -dataset) -rawvalue) "0.0"))))}
           (when-let [existing-price (get-in app [:taxi-ui :pricing-details :price-information :prices id])]
             {:data-rawvalue existing-price
              :placeholder   (formatters/currency existing-price)}))
@@ -44,8 +44,8 @@
 (defn- autocomplete-results
   [e! results]
   [:div#autocomplete (stylefy/use-style {:position "relative"
-                              :z-index  1000
-                              :height   "0px"
+                                         :z-index  1000
+                                         :height   "0px"
                                          ::stylefy/mode {:hover {:cursor "pointer"}}}
                                         {:tabIndex "-1"})
    [:ul#results {:style {:position         "absolute"
@@ -73,26 +73,26 @@
 
 (defn- autocomplete-input
   [e! search-results]
-    [forms/input :operating-areas (tr [:taxi-ui :pricing-details :add-operating-area])
-     ; TODO: Extract this function + parameterize to work based on given elements, not inlined
-     {:on-click (fn [e]
-                  (.preventDefault e)
-                  (letfn [(pixels [v] (js/parseFloat (subs v 0 (- (count v) 2))))]
-                    (let [styles (js/getComputedStyle (.. e -target))
-                          results (.getElementById js/document "results")
-                          border-widths (+ (pixels (. styles -borderLeftWidth))
-                                           (pixels (. styles -borderRightWidth)))
-                          parent-width (- (pixels (. styles -width))
-                                          border-widths)]
-                      (set! (.. results -style -width) (str parent-width "px"))
-                      (set! (.. results -style -display) "block")
-                      false)))
-      :on-blur  (fn [e]
-                  (when-not (.contains (.. e -currentTarget -parentElement) (.. e -relatedTarget))
-                    (set! (.. (.getElementById js/document "results") -style -display) "none")))
-      :on-input (fn [e]
-                  (e! (controller/->Search (.. e -target -value))))}
-     [autocomplete-results e! search-results]])
+  [forms/input :operating-areas (tr [:taxi-ui :pricing-details :add-operating-area])
+   ; TODO: Extract this function + parameterize to work based on given elements, not inlined
+   {:on-click (fn [e]
+                (.preventDefault e)
+                (letfn [(pixels [v] (js/parseFloat (subs v 0 (- (count v) 2))))]
+                  (let [styles (js/getComputedStyle (.. e -target))
+                        results (.getElementById js/document "results")
+                        border-widths (+ (pixels (. styles -borderLeftWidth))
+                                         (pixels (. styles -borderRightWidth)))
+                        parent-width (- (pixels (. styles -width))
+                                        border-widths)]
+                    (set! (.. results -style -width) (str parent-width "px"))
+                    (set! (.. results -style -display) "block")
+                    false)))
+    :on-blur  (fn [e]
+                (when-not (.contains (.. e -currentTarget -parentElement) (.. e -relatedTarget))
+                  (set! (.. (.getElementById js/document "results") -style -display) "none")))
+    :on-input (fn [e]
+                (e! (controller/->Search (.. e -target -value))))}
+   [autocomplete-results e! search-results]])
 
 (defn pricing-details
   [_ _]
@@ -142,20 +142,20 @@
              ^{:key (str "pill_" label)}
              [pill label opts])))]
 
-     [:div (stylefy/use-style styles/flex-columns)
-      [:div (stylefy/use-style (styles/flex-column 3))
-       [autocomplete-input e! (get-in app [:taxi-ui :pricing-details :search :results])]]
+      [:div (stylefy/use-style styles/flex-columns)
+       [:div (stylefy/use-style (styles/flex-column 3))
+        [autocomplete-input e! (get-in app [:taxi-ui :pricing-details :search :results])]]
 
-      [:div (stylefy/use-style styles/spacer)]
-      [:div (stylefy/use-style (styles/flex-column 1))
-       ; TODO: the actions here shouldn't be directly hardcoded to specific path in app
-       [forms/button
-        :add-button
-        (tr [:taxi-ui :pricing-details :sections :operating-areas :add-button])
-        {:styles styles/secondary-button
-         :type "button"
-         :on-click (fn [e]
-                     (e! (controller/->AddOperatingArea (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
+       [:div (stylefy/use-style styles/spacer)]
+       [:div (stylefy/use-style (styles/flex-column 1))
+        ; TODO: the actions here shouldn't be directly hardcoded to specific path in app
+        [forms/button
+         :add-button
+         (tr [:taxi-ui :pricing-details :sections :operating-areas :add-button])
+         {:styles styles/secondary-button
+          :type "button"
+          :on-click (fn [e]
+                      (e! (controller/->AddOperatingArea (get-in app [:taxi-ui :pricing-details :search :selected]))))}]]]
       [forms/button
        :save-button
        (tr [:taxi-ui :pricing-details :sections :operating-areas :save-button])
