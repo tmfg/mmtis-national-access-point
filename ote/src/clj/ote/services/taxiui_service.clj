@@ -147,9 +147,8 @@
 
 (defn fetch-unapproved-prices
   [db user]
-  ; TODO: check admin privileges for user
   (if (authorization/admin? user)
-    []#_(vec (->> (list-unapproved-prices db)
+    (vec (->> (list-unapproved-prices db)
               (map (fn [service] (update service :operating-areas #(db-util/PgArray->vec %))))))
     (log/warn (str "Non-admin user " (authorization/user-id user) " tried to list unapproved pricings"))))
 
@@ -184,7 +183,7 @@
                        (http/transit-response
                          (fetch-service-summaries db user (http/transit-request form-data))))
 
-                     #_(GET "/taxiui/approvals" {user :user}
+                     (GET "/taxiui/approvals" {user :user}
                        (http/transit-response
                          (fetch-unapproved-prices db user)))
 

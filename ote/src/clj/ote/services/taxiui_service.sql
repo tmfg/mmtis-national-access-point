@@ -90,8 +90,31 @@ SELECT o."id" AS "operator-id",
  ORDER BY "operator-id", "service-id";
 
 -- name: list-unapproved-prices
-SELECT *
-  FROM list_taxi_statistics(null, null, null, null, false)
+SELECT *,
+       (SELECT array_agg(oa.description[1].text)
+          FROM operation_area oa
+         WHERE oa."transport-service-id" = prices."service-id") AS "operating-areas"
+  FROM (SELECT tsp.id,
+               o.id AS "operator-id",
+               s.id AS "service-id",
+               CONCAT(o."name", '/', s."name") AS "name",
+               tsp.timestamp AS "timestamp",
+               tsp.start_price_daytime AS "start-price-daytime",
+               tsp.start_price_nighttime AS "start-price-nighttime",
+               tsp.start_price_weekend AS "start-price-weekend",
+               tsp.price_per_minute AS "price-per-minute",
+               tsp.price_per_kilometer AS "price-per-kilometer",
+               tsp."accessibility_service_stairs" AS "accessibility-service-stairs",
+               tsp."accessibility_service_stretchers" AS "accessibility-service-stretchers",
+               tsp."accessibility_service_fare" AS "accessibility-service-fare",
+               tsp."approved?" AS "approved?",
+               tsp."approved-by" AS "approved-by",
+               row_number() OVER (PARTITION BY service_id ORDER BY timestamp desc)
+          FROM taxi_service_prices tsp
+          JOIN "transport-service" s ON tsp."service_id" = s."id"
+          JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
+         WHERE tsp."approved?" IS NULL) prices
+ WHERE prices.row_number = 1
  ORDER BY "operator-id", "service-id";
 
 -- name: update-approved-status!
