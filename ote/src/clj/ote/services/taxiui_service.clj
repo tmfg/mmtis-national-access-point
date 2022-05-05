@@ -12,7 +12,8 @@
             [clojure.string :as str]
             [specql.core :as specql]
             [specql.op :as op]
-            [ote.util.db :as db-util]))
+            [ote.util.db :as db-util])
+  (:import (java.time OffsetDateTime LocalDateTime ZoneOffset)))
 
 (defqueries "ote/services/taxiui_service.sql")
 
@@ -115,19 +116,43 @@
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
   (let [{:keys [column direction]} sorting
-        secondary-columns          #{:name :operating-areas :example-trip}
-        secondary-column           (get secondary-columns column)
-        primary-column             (when-not secondary-column column)
-        primary-direction          (when primary-column direction)
-        secondary-direction        (when secondary-column direction)]
-    []#_(vec (->> (list-pricing-statistics db {:primary-column      (some-> primary-column csk/->snake_case_string)
-                                           :primary-direction   (= primary-direction :ascending)
-                                           :secondary-column    (some-> secondary-column csk/->kebab-case-string)
-                                           :secondary-direction (= secondary-direction :ascending)
-                                           :age-filter          (age-filter filters)
-                                           :name-filter         (str "%" (or (:name filters) "") "%")
-                                           :area-filter         (area-filter filters)})
-              sanitize-pricing-output))))
+        {:keys [area-filter name age-filter]} filters
+        name-filter (if name
+                      (fn [row]
+                        (str/includes?
+                          (str/upper-case (:name row))
+                          (str/upper-case name)))
+                      identity)
+        oa-filter (if area-filter
+                    (fn [row] (some (fn [oa]
+                                      (str/includes?
+                                        (str/upper-case oa)
+                                        (str/upper-case (:label area-filter))))
+                                    (:operating-areas row)))
+                    identity)
+        last-published-filter (if age-filter
+                                (fn [row]
+
+                                  (let [ts (-> (:timestamp row) .toInstant (LocalDateTime/ofInstant ZoneOffset/UTC))]
+                                    (log/warn (type (:timestamp row)) (.toInstant (:timestamp row)))
+
+                                    (case age-filter
+                                      :within-six-months (.isBefore (.minusMonths (LocalDateTime/now) 6) ts)
+                                      :within-one-year   (.isBefore (.minusYears (LocalDateTime/now) 1) ts)
+                                      :over-year-ago     (.isAfter (.minusYears (LocalDateTime/now) 1) ts))
+
+                                    ))
+                                identity)
+        filtered (vec (->> (list-pricing-statistics db)
+                           sanitize-pricing-output
+                           (filter name-filter)
+                           (filter oa-filter)
+                           (filter last-published-filter)))]
+    (if (nil? column)
+      filtered
+      (sort-by column (fn [a b] (if (= :ascending direction)
+                                  (compare a b)
+                                  (compare b a))) column))))
 
 (defn fetch-service-pricing-statistics
   "Fetch latest approved pricing statistics for specific service."
@@ -195,7 +220,7 @@
                    http
                    {:authenticated? false}
                    (routes
-                     #_ (POST "/taxiui/statistics" {form-data :body}
+                     (POST "/taxiui/statistics" {form-data :body}
                        (http/transit-response
                          (fetch-pricing-statistics db (http/transit-request form-data))))
                      (GET "/taxiui/statistics/:service-id" {{:keys [service-id]} :params}
