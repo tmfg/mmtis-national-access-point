@@ -253,23 +253,36 @@ from "associated-service-operators" aso
          join "transport-operator" tstop on tstop.id = ts."transport-operator-id";
 
 -- name: fetch-reported-taxi-prices
-SELECT top."business-id",
-       top.name as "operator-name",
-       ts.name as "service-name",
-       lts."start-price-daytime",
-       lts."start-price-nighttime",
-       lts."start-price-weekend",
-       lts."price-per-minute",
-       lts."price-per-kilometer",
-       lts."accessibility_service_stairs",
-       lts."accessibility_service_stretchers",
-       lts."accessibility_service_fare",
-       lts."approved?",
-       lts."operating-areas"
-  FROM "transport-service" ts
-           LEFT JOIN list_taxi_statistics('timestamp', FALSE, NULL, NULL, TRUE) lts ON lts."service-id" = ts.id
-           JOIN "transport-operator" top ON ts."transport-operator-id" = "top".id
- WHERE ts."sub-type" = 'taxi';
+SELECT *,
+       -- summarize areas to municipality level to make the prices easier to compare
+       (SELECT array_agg(DISTINCT parent_namefin)
+          FROM location_relations
+         WHERE parent_type = 'finnish-municipality'
+             AND child_namefin IN (SELECT oa.description[1].text
+                                     FROM operation_area oa
+                                    WHERE oa."transport-service-id" = prices."service-id")
+            OR parent_namefin IN (SELECT oa.description[1].text
+                                    FROM operation_area oa
+                                   WHERE oa."transport-service-id" = prices."service-id")) AS "operating-areas"
+  FROM (SELECT o."business-id",
+               o."name" AS "operator-name",
+               s."id" AS "service-id",
+               s."name" AS "service-name",
+               tsp.start_price_daytime AS "start-price-daytime",
+               tsp.start_price_nighttime AS "start-price-nighttime",
+               tsp.start_price_weekend AS "start-price-weekend",
+               tsp.price_per_minute AS "price-per-minute",
+               tsp.price_per_kilometer AS "price-per-kilometer",
+               tsp."accessibility_service_stairs" AS "accessibility-service-stairs",
+               tsp."accessibility_service_stretchers" AS "accessibility-service-stretchers",
+               tsp."accessibility_service_fare" AS "accessibility-service-fare",
+               tsp."approved?" AS "approved?",
+               row_number() OVER (PARTITION BY service_id ORDER BY timestamp desc)
+          FROM taxi_service_prices tsp
+          JOIN "transport-service" s ON tsp."service_id" = s."id"
+          JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
+         WHERE tsp."approved?" IS NOT NULL) prices  -- NOT NULL = approved
+ WHERE prices."row_number" = 1;
 
 -- name: fetch-validation-services
 SELECT s.name, s.id, s."sub-type", s."type", s.created, s.modified, s.published,
