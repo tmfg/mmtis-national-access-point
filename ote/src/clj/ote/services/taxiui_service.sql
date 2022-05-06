@@ -30,17 +30,39 @@ SELECT id,
  LIMIT 1;
 
 -- name: list-pricing-statistics
-SELECT *
-  FROM list_taxi_statistics(:primary-column, :primary-direction, :secondary-column, :secondary-direction, true)
- WHERE (CASE WHEN EXTRACT(YEAR FROM (:age-filter)::interval) > 0
-             THEN timestamp < NOW() - INTERVAL '1 year'
-             ELSE timestamp > NOW() - (:age-filter)::INTERVAL
-        END)
-   AND name ILIKE :name-filter
-   AND (CASE WHEN (:area-filter)::text IS NOT NULL AND (:area-filter = '') IS NOT TRUE
-             THEN EXISTS (SELECT FROM unnest("operating-areas") areas WHERE areas = :area-filter)
-             ELSE TRUE
-        END);
+SELECT *,
+       -- summarize areas to municipality level to make the prices easier to compare
+       (SELECT array_agg(DISTINCT parent_namefin)
+          FROM location_relations
+         WHERE parent_type = 'finnish-municipality'
+           AND child_namefin IN (SELECT oa.description[1].text
+                                     FROM operation_area oa
+                                    WHERE oa."transport-service-id" = prices."service-id")
+            OR parent_namefin IN (SELECT oa.description[1].text
+                                    FROM operation_area oa
+                                   WHERE oa."transport-service-id" = prices."service-id")) AS "operating-areas"
+  FROM (SELECT tsp.id,
+               o.id AS "operator-id",
+               s.id AS "service-id",
+               CONCAT(o."name", '/', s."name") AS "name",
+               tsp.timestamp AS "timestamp",
+               tsp.start_price_daytime AS "start-price-daytime",
+               tsp.start_price_nighttime AS "start-price-nighttime",
+               tsp.start_price_weekend AS "start-price-weekend",
+               tsp.price_per_minute AS "price-per-minute",
+               tsp.price_per_kilometer AS "price-per-kilometer",
+               tsp."accessibility_service_stairs" AS "accessibility-service-stairs",
+               tsp."accessibility_service_stretchers" AS "accessibility-service-stretchers",
+               tsp."accessibility_service_fare" AS "accessibility-service-fare",
+               tsp."approved?" AS "approved?",
+               tsp."approved-by" AS "approved-by",
+               (tsp.start_price_daytime + (tsp.price_per_minute * 15) + (tsp.price_per_kilometer * 10)) AS "example-trip",
+               row_number() OVER (PARTITION BY service_id ORDER BY timestamp desc)
+          FROM taxi_service_prices tsp
+          JOIN "transport-service" s ON tsp."service_id" = s."id"
+          JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
+         WHERE tsp."approved?" IS NOT NULL) prices  -- NOT NULL = approved
+ WHERE prices."row_number" = 1;
 
 -- name: list-service-pricing-statistics
 SELECT id,
@@ -60,11 +82,18 @@ SELECT id,
  LIMIT 1;
 
 -- name: list-operating-areas
-SELECT DISTINCT (oa_d.text) AS place
-  FROM operation_area oa,
-       UNNEST(description) oa_d
- WHERE oa_d.text ILIKE :term
- ORDER BY place;
+WITH locations AS (
+  SELECT oa.description[1].text AS loc
+    FROM operation_area oa
+   WHERE oa."transport-service-id" IN (SELECT DISTINCT tsp."service_id"
+                                         FROM taxi_service_prices tsp
+                                        WHERE tsp."approved?" IS NOT NULL)
+)
+SELECT DISTINCT lr.parent_namefin AS "place"
+  FROM location_relations lr
+ WHERE lr.parent_type = 'finnish-municipality'
+   AND lr.child_namefin IN (SELECT loc FROM locations)
+    OR lr.parent_namefin IN (SELECT loc FROM locations);
 
 -- name: list-service-summaries
 SELECT o."id" AS "operator-id",
@@ -90,8 +119,31 @@ SELECT o."id" AS "operator-id",
  ORDER BY "operator-id", "service-id";
 
 -- name: list-unapproved-prices
-SELECT *
-  FROM list_taxi_statistics(null, null, null, null, false)
+SELECT *,
+       (SELECT array_agg(oa.description[1].text)
+          FROM operation_area oa
+         WHERE oa."transport-service-id" = prices."service-id") AS "operating-areas"
+  FROM (SELECT tsp.id,
+               o.id AS "operator-id",
+               s.id AS "service-id",
+               CONCAT(o."name", '/', s."name") AS "name",
+               tsp.timestamp AS "timestamp",
+               tsp.start_price_daytime AS "start-price-daytime",
+               tsp.start_price_nighttime AS "start-price-nighttime",
+               tsp.start_price_weekend AS "start-price-weekend",
+               tsp.price_per_minute AS "price-per-minute",
+               tsp.price_per_kilometer AS "price-per-kilometer",
+               tsp."accessibility_service_stairs" AS "accessibility-service-stairs",
+               tsp."accessibility_service_stretchers" AS "accessibility-service-stretchers",
+               tsp."accessibility_service_fare" AS "accessibility-service-fare",
+               tsp."approved?" AS "approved?",
+               tsp."approved-by" AS "approved-by",
+               row_number() OVER (PARTITION BY service_id ORDER BY timestamp desc)
+          FROM taxi_service_prices tsp
+          JOIN "transport-service" s ON tsp."service_id" = s."id"
+          JOIN "transport-operator" o ON s."transport-operator-id" = o."id"
+         WHERE tsp."approved?" IS NULL) prices
+ WHERE prices.row_number = 1
  ORDER BY "operator-id", "service-id";
 
 -- name: update-approved-status!

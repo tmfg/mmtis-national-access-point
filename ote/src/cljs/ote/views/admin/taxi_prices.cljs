@@ -58,14 +58,14 @@
              [ui/table-header-column {:class "table-header-wrap" :style {:width "8%"}} "Aloitus (vklp.)"]
              [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Hinta/min"]
              [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Hinta/km"]
-             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Pyörätuoli"]
-             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Rollaattori"]
-             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Matkatavarat"]
+             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Porrasveto"]
+             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Paariasennus"]
+             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Avustuksen kertalisä"]
              [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Toiminta-alueet"]
              [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Lisätty"]]]
            [ui/table-body {:deselect-on-clickaway false}
             (doall
-              (for [{:keys [id service-id name start-price-daytime start-price-nighttime start-price-weekend price-per-minute price-per-kilometer timestamp wheelchair walker large-luggage operating-areas] :as result} services]
+              (for [{:keys [id service-id name start-price-daytime start-price-nighttime start-price-weekend price-per-minute price-per-kilometer timestamp accessibility-service-stairs accessibility-service-stretchers accessibility-service-fare operating-areas] :as result} services]
                 ^{:key (str "prices_" service-id)}
                 [ui/table-row {:selectable true}
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "12%"})
@@ -84,11 +84,11 @@
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
                   (formatters/currency price-per-kilometer)]
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
-                  (formatters/currency wheelchair)]
+                  (formatters/currency accessibility-service-stairs)]
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
-                  (formatters/currency walker)]
+                  (formatters/currency accessibility-service-stretchers)]
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
-                  (formatters/currency large-luggage)]
+                  (formatters/currency accessibility-service-fare)]
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "10%"})
                   (doall
                     (for [area operating-areas]
