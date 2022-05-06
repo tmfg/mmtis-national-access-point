@@ -143,7 +143,10 @@
                  ;; Firejail - GNU General Public License, version 2
 
                  ; A Clojure[Script] library for word case conversions - Eclipse Public License 1.0
-                 [camel-snake-kebab "0.4.2"]]
+                 [camel-snake-kebab "0.4.2"]
+
+                 ; Clojure Core Memoize is a TTL memoizing library, useful for single point caching - Eclipse Public License 1.0
+                 [org.clojure/core.memoize "1.0.250"]]
   :profiles {:uberjar {:aot :all
 
                        ;; Prevent uberjar from cleaning cljs generated files

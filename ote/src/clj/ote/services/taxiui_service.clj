@@ -1,5 +1,6 @@
 (ns ote.services.taxiui-service
   (:require [camel-snake-kebab.core :as csk]
+            [clojure.core.memoize :as memo]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET POST]]
             [jeesql.core :refer [defqueries]]
@@ -113,6 +114,10 @@
   [pricing-statistics]
   (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))) pricing-statistics))
 
+; query performance is guarded by memoizing the results (with TTL)
+(def ^:private memoized-list-operating-areas (memo/ttl #(list-operating-areas %) :ttl/threshold 60))        ; 60 seconds
+(def ^:private memoized-list-pricing-statistics (memo/ttl #(list-pricing-statistics %) :ttl/threshold 60))  ; 60 seconds
+
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
   (let [{:keys [column direction]} sorting
@@ -132,10 +137,7 @@
                     identity)
         last-published-filter (if age-filter
                                 (fn [row]
-
                                   (let [ts (-> (:timestamp row) .toInstant (LocalDateTime/ofInstant ZoneOffset/UTC))]
-                                    (log/warn (type (:timestamp row)) (.toInstant (:timestamp row)))
-
                                     (case age-filter
                                       :within-six-months (.isBefore (.minusMonths (LocalDateTime/now) 6) ts)
                                       :within-one-year   (.isBefore (.minusYears (LocalDateTime/now) 1) ts)
@@ -143,7 +145,7 @@
 
                                     ))
                                 identity)
-        filtered (vec (->> (list-pricing-statistics db)
+        filtered (vec (->> (memoized-list-pricing-statistics db)
                            sanitize-pricing-output
                            (filter name-filter)
                            (filter oa-filter)
@@ -152,7 +154,8 @@
       filtered
       (sort-by column (fn [a b] (if (= :ascending direction)
                                   (compare a b)
-                                  (compare b a))) column))))
+                                  (compare b a)))
+               filtered))))
 
 (defn fetch-service-pricing-statistics
   "Fetch latest approved pricing statistics for specific service."
@@ -162,7 +165,7 @@
 
 (defn fetch-operating-areas
   [db {filter :filter}]
-  (vec (->> (list-operating-areas db)
+  (vec (->> (memoized-list-operating-areas db)
             (clojure.core/filter (fn [row] (str/includes? (:place row) filter))))))
 
 (defn fetch-service-summaries
