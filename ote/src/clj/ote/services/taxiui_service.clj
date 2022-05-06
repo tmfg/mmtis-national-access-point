@@ -115,8 +115,8 @@
   (map (fn [stats] (update stats :operating-areas #(db-util/PgArray->vec %))) pricing-statistics))
 
 ; query performance is guarded by memoizing the results (with TTL)
-(def ^:private memoized-list-operating-areas (memo/ttl #(list-operating-areas %) :ttl/threshold 60))        ; 60 seconds
-(def ^:private memoized-list-pricing-statistics (memo/ttl #(list-pricing-statistics %) :ttl/threshold 60))  ; 60 seconds
+(def ^:private memoized-list-operating-areas (memo/ttl #(list-operating-areas %) :ttl/threshold 60000))        ; 60 seconds
+(def ^:private memoized-list-pricing-statistics (memo/ttl #(list-pricing-statistics %) :ttl/threshold 60000))  ; 60 seconds
 
 (defn fetch-pricing-statistics
   [db {:keys [sorting filters]}]
