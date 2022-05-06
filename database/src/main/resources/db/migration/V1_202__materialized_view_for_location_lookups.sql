@@ -40,6 +40,7 @@ CREATE INDEX location_relations_p_type ON location_relations (parent_type);
 CREATE INDEX location_relations_p_namefin ON location_relations (parent_namefin);
 CREATE INDEX location_relations_c_type ON location_relations (child_type);
 CREATE INDEX location_relations_c_namefin ON location_relations (child_namefin);
+CREATE INDEX location_relations_ptype_pnamefin_cnamefin ON location_relations (parent_type, parent_namefin, child_namefin);
 
 CREATE FUNCTION refresh_location_relations ()
     RETURNS VOID
