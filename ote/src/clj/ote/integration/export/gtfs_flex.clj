@@ -14,12 +14,14 @@
             [ote.gtfs.parse :as parse]
             [ote.gtfs.transform :as gtfs-transform]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [ote.integration.export.geojson :as geojson]
             [ote.integration.export.gtfs :as gtfs]
             [ote.util.transport-operator-util :as op-util]
             [ote.util.zip :as zip]
             [ring.util.io :as ring-io]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [specql.core :as specql])
   (:import [java.time LocalDateTime LocalDate]
            [java.time.format DateTimeFormatter]))
 
@@ -102,10 +104,10 @@
 
 (defn ->static-routes
   "Generate a static route reference for given route-id to specify an eternally servicing route."
-  [route-id route-type transport-operator-id]
+  [route-id route-type transport-operator-id operator-name service-name]
   {:gtfs/route-id         route-id
-   :gtfs/route-short-name ""
-   :gtfs/route-long-name  ""
+   :gtfs/route-short-name operator-name
+   :gtfs/route-long-name  service-name
    :gtfs/route-type (case route-type
                       :light-rail "0"
                       :subway "1"
@@ -141,6 +143,13 @@
          :gtfs-flex/location_group_name feature-id}))
     areas))
 
+(defn get-transport-service
+  [db transport-service-id]
+  (first (specql/fetch db ::t-service/transport-service
+                       #{::t-service/id
+                         ::t-service/name}
+                       {::t-service/id transport-service-id})))
+
 (defn export-gtfs-flex
   "This function is an adaptation of the GTFS generation in [[ote.gtfs.transform/sea-routes-gtfs]]"
   [db config transport-operator-id transport-service-id]
@@ -163,7 +172,8 @@
                                                    routes))
         gtfs-calendar      (gtfs-transform/calendar-txt routes)]
     ; complement GTFS content with GTFS Flex additions
-    (let [static-route-id   (str (::t-operator/name transport-operator) " route")
+    (let [transport-service (get-transport-service db transport-service-id)
+          static-route-id   (str (::t-operator/name transport-operator) " route")
           static-service-id (str (::t-operator/name transport-operator) " schedule")
           static-trip-id    (str (::t-operator/name transport-operator) " transport service")
           flex-trips        (conj gtfs-trips
@@ -171,7 +181,7 @@
           ; TODO: these are not all buses, but lets go with this one for now - areas and services need unique entries
           ; most likely to produce accurate data
           flex-routes       (conj gtfs-routes
-                                  (->static-routes static-route-id :bus transport-operator-id))
+                                  (->static-routes static-route-id :bus transport-operator-id (::t-operator/name transport-operator) (::t-service/name transport-service)))
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas))
           flex-calendar     (conj gtfs-calendar
