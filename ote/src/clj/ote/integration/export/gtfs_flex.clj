@@ -74,7 +74,7 @@
         {:gtfs/trip-id                          trip-id
          :gtfs/stop-id                          feature-id
          :gtfs/pickup-type                      2
-         :gtfs/drop-off-type                    0
+         :gtfs/drop-off-type                    2
          :gtfs/stop-sequence                    n
          :gtfs-flex/start_pickup_dropoff_window "0:00:00"
          :gtfs-flex/end_pickup_dropoff_window   "24:00:00"}))
