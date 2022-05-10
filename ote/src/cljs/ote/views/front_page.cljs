@@ -35,16 +35,6 @@
     [linkify (tr [:common-texts :footer-livi-url-link])
      (tr [:common-texts :footer-livi-url-link])]]])
 
-(defn prod-env-warning []
-  [:div.test-env-warning
-   {:style {:margin "0.2em"
-            :border "4px dashed red"}}
-   [:p {:style {:margin "10px 0px 0px 10px"
-                :font-weight "bold"}}
-    "Taksien hintatietotilastojen näkymä on tällä hetkellä pois käytöstä järjestelmäpäivityksen vuoksi."]
-   [:p {:style {:margin "10px"}}
-    "Hintatietojen ilmoittaminen toimii normaalisti."]])
-
 (defn front-page
   "Front page info"
   [e! {user :user :as app}]
@@ -72,9 +62,8 @@
            [:span [feather-icons/external-link {:style {:height "23px" :width "40px" :padding-top "0px" :color "#fff"}}]]
            (tr [:buttons :other-access-points])]]])]]]
 
-   (if test-env?
-     [test-env-warning]
-     [prod-env-warning])
+   (when test-env?
+     [test-env-warning])
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
