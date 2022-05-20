@@ -85,8 +85,8 @@
   (if (and (some? result)
            (not-empty result))
     ; XXX: This is placed into separate parent key because implementation of ServiceSuccess overwrites the whole map
-    (assoc-in app [:service-view :taxi-service :pricing-info] result))
-    (update-in app [:service-view :taxi-service] dissoc :pricing-info))
+    (assoc-in app [:service-view :taxi-service :pricing-info] result)
+    (update-in app [:service-view :taxi-service] dissoc :pricing-info)))
 
 (define-event OperatorSuccess [result]
   {}
