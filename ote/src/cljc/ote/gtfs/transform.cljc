@@ -239,30 +239,34 @@
    (defn sea-routes-gtfs
      "Generate all supported GTFS files form given transport operator and route list"
      [transport-operator routes]
-     (let [routes (mapv #(assoc % :services (route-services %)) routes)
-           stops-by-code (into {}
-                               (comp (mapcat ::transit/stops)
-                                     (map (juxt ::transit/code identity)))
-                               routes)
-           trips (sea-trips-txt routes)
-           trips-txt (map #(dissoc % :stoptimes) trips)]
+     (let [routes         (mapv #(assoc % :services (route-services %)) routes)
+           stops-by-code  (into {}
+                                (comp (mapcat ::transit/stops)
+                                      (map (juxt ::transit/code identity)))
+                                routes)
+           trips          (sea-trips-txt routes)
+           trips-txt      (map #(dissoc % :stoptimes) trips)
+           calendar-dates (calendar-dates-txt routes)]
        (try
-         [{:name "agency.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt transport-operator))}
-          {:name "stops.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/stops-txt (stops-txt stops-by-code))}
-          {:name "stop_times.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt (sea-stop-times-txt routes trips))}
-          {:name "routes.txt"
-           :data (gtfs-parse/unparse-gtfs-file
-                   :gtfs/routes-txt
-                   (sea-routes-txt (::t-operator/id transport-operator) routes))}
-          {:name "trips.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
-          {:name "calendar.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-txt (calendar-txt routes))}
-          {:name "calendar_dates.txt"
-           :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-dates-txt (calendar-dates-txt routes))}]
+         (filter
+           some?
+           [{:name "agency.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/agency-txt (agency-txt transport-operator))}
+            {:name "stops.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/stops-txt (stops-txt stops-by-code))}
+            {:name "stop_times.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/stop-times-txt (sea-stop-times-txt routes trips))}
+            {:name "routes.txt"
+             :data (gtfs-parse/unparse-gtfs-file
+                     :gtfs/routes-txt
+                     (sea-routes-txt (::t-operator/id transport-operator) routes))}
+            {:name "trips.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
+            {:name "calendar.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-txt (calendar-txt routes))}
+            (when-not (empty? calendar-dates)
+              {:name "calendar_dates.txt"
+               :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates)})])
          (catch #?(:cljs js/Object :clj Exception) e
            (.printStackTrace e)
            (log/warn "Error generating GTFS file content" e))))))
