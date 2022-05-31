@@ -111,7 +111,7 @@
                        interface-id))))))
 
 (defn- do-update-one-gtfs!
-  "Core process logic extracted to its own function so that we can perform additional actions independently from whether
+  "Core process logic extracted to its own function so that we can perform additional actions independently of whether
   this works or not."
   [config db interface upload-s3? force-download? used-service-id]
   (if interface
@@ -134,6 +134,14 @@
       (catch Exception e
         (log/spy :warn "GTFS: Error importing, uploading or saving gtfs package to db! Exception=" e)))
     (log/spy :warn "GTFS: No gtfs files to upload. service-id = " used-service-id)))
+
+(defn clean-old-entries!
+  "Removes metadata from previous runs which are not needed anymore."
+  [db service-id interface-id]
+  (try
+    (report/clean-old-reports! db service-id interface-id)
+    (catch Exception e
+      (log/warn e "Failed to clean old reports"))))
 
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
@@ -162,6 +170,7 @@
               (some? service-id))
        (email-validation-results db (:testing-env? config) email service-id interface-id)
        (log/warn (str "Could not send email due to internal state mismatch! (" email "/" service-id "/" interface-id ")")))
+     (clean-old-entries! db service-id interface-id)
      process-result)))
 
 (def night-hours #{0 1 2 3 4})

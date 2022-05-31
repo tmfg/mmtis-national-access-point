@@ -16,7 +16,7 @@ SELECT "gp".id                                  AS "gtfs-package_id",
            JOIN "transport-service" "ts" ON "gp"."transport-service-id" = "ts".id
  WHERE "gir".package_id IN (SELECT DISTINCT ON ("gp"."transport-service-id") "gp".id AS "gtfs-package_id"
                               FROM gtfs_package "gp"
-                             ORDER BY "gp"."transport-service-id", "gp".id DESC)
+                             ORDER BY "gp"."transport-service-id", "gp".id DESC);
 
 -- name: fetch-latest-import-reports-for-service
 SELECT "gp".id                                  AS "gtfs-package_id",
@@ -39,3 +39,13 @@ WHERE "gir".package_id IN (SELECT DISTINCT ON ("gp"."transport-service-id") "gp"
                             WHERE "gp"."transport-service-id" = :transport-service-id
                               AND "gp"."external-interface-description-id" = :external-interface-description-id
                             ORDER BY "gp"."transport-service-id", "gp".id DESC);
+
+-- name: delete-old-import-reports-for-service
+DELETE
+  FROM gtfs_import_report gir
+ WHERE "gir".package_id IN (SELECT gp.id
+                              FROM gtfs_package "gp"
+                             WHERE "gp"."transport-service-id" = :transport-service-id
+                               AND "gp"."external-interface-description-id" = :external-interface-description-id
+                             ORDER BY "gp"."transport-service-id", "gp".id DESC
+                            OFFSET 1);
