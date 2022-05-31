@@ -25,3 +25,9 @@
                                                     :external-interface-description-id interface-id})
        (map (comp db-utils/underscore->structure
                   #(update % :gtfs-import-report_error (fn [v] (String. v)))))))
+
+(defn clean-old-reports!
+  "Deletes all but latest report for given service-id + interface-id"
+  [db service-id interface-id]
+  (->> (delete-old-import-reports-for-service db {:transport-service-id              service-id
+                                                  :external-interface-description-id interface-id})))
