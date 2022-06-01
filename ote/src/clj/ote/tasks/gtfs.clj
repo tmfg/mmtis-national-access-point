@@ -24,7 +24,8 @@
             [ote.util.email-template :as email-template]
             [ote.localization :as localization]
             [hiccup.core :as hiccup])
-  (:import (org.joda.time DateTimeZone DateTime)))
+  (:import (org.joda.time DateTimeZone DateTime)
+           (org.postgresql.util PSQLException)))
 
 (defqueries "ote/tasks/gtfs.sql")
 (defqueries "ote/services/transit_changes.sql")
@@ -140,6 +141,10 @@
   [db service-id interface-id]
   (try
     (report/clean-old-reports! db service-id interface-id)
+    (catch PSQLException pe
+      (case (.getSQLState pe)
+        "02000" nil  ; No results were returned by the query. -- ignored
+        (log/warn pe "Failed to clean old reports")))
     (catch Exception e
       (log/warn e "Failed to clean old reports"))))
 
