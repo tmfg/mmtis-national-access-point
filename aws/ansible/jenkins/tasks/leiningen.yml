@@ -1,2 +1,2 @@
-- name: Install leiningen standalone jar
-  get_url: url=https://github.com/technomancy/leiningen/releases/download/2.7.1/leiningen-2.7.1-standalone.zip dest=/var/lib/jenkins/leiningen.jar
+- name: Install leiningen 2.9.10 standalone jar
+  get_url: url=https://codeberg.org/attachments/895a0a0d-f20d-4580-a277-e06b5eec3b6b dest=/var/lib/jenkins/leiningen.jar
