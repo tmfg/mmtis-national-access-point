@@ -91,7 +91,7 @@
 (defn linkify
   ([url label]
    (linkify url label nil))
-  ([url label {:keys [icon target style hide-external-icon? force-external-icon? on-click] :as props}]
+  ([url label {:keys [icon target style hide-external-icon? force-external-icon? on-click analytics-tag] :as props}]
    (let [a-props         (dissoc
                            (if (= target "_blank")
                              ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
@@ -110,7 +110,8 @@
                                          style)))
              {:href url}
              a-props
-             (when (fn? on-click-fn) {:on-click on-click-fn}))
+             (when (fn? on-click-fn) {:on-click on-click-fn})
+             (when (some? analytics-tag) {:data-mtm analytics-tag}))
           (if icon
             [icon-link icon label]
             label)
