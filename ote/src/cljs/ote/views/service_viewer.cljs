@@ -289,7 +289,8 @@
             (when url [common-ui/linkify
                        url
                        url
-                       {:target "_blank"}])
+                       {:target "_blank"
+                        :analytics-tag "Verkko-osoite"}])
             false]
            [common-ui/information-row-with-option
             (tr [:field-labels :transport-service-common ::t-service/license])
