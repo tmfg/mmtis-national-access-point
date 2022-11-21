@@ -40,23 +40,16 @@
          "  window['ga-disable-" (:tracking-code ga-conf) "'] = true; "
          "}"))))
 
-(defn matomo-analytics-scripts [config]
+(defn matomo-analytics-scripts []
   (list
     (str " <!-- Matomo -->")
     (javascript-tag
-      (str " var _paq = window._paq || [];"
-           " /* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */"
-           " _paq.push(['setCustomUrl', 'finap.fi']);"
-           " _paq.push(['enableLinkTracking']);"
-           " _paq.push(['enableHeartBeatTimer']);"
-           " (function() {"
-           " var u=\"" (:piwik-url config) "\";"
-           " _paq.push(['setTrackerUrl', u+'piwik.php']);"
-           " _paq.push(['setSiteId', " (:site-id config) "]);"
-           " var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
-           " g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);"
-           " })();"
-           ))
+      (str
+        "var _mtm = window._mtm = window._mtm || [];"
+        "_mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});"
+        "var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
+        "g.async=true; g.src='https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_YeewVWCJ.js'; s.parentNode.insertBefore(g,s);"
+        ))
     (str " <!-- End Matomo Code -->")))
 
 (def favicons
@@ -109,8 +102,8 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
-      (when (not (true? dev-mode?))
-        (matomo-analytics-scripts matomo-config))
+      (when (not testing-env?)
+        (matomo-analytics-scripts))
       (translations localization/*language*)
       (user-info db user)]
 

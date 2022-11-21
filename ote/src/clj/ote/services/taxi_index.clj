@@ -23,6 +23,18 @@
          (str "-" (:current-revision-sha (current-revision-sha))))
        ".js"))
 
+(defn matomo-analytics-scripts []
+  (list
+    (str " <!-- Matomo -->")
+    (javascript-tag
+      (str
+        "var _mtm = window._mtm = window._mtm || [];"
+        "_mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});"
+        "var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];"
+        "g.async=true; g.src='https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_YeewVWCJ.js'; s.parentNode.insertBefore(g,s);"
+        ))
+    (str " <!-- End Matomo Code -->")))
+
 (def favicons
   [{:rel "apple-touch-icon" :sizes "180x180" :href "/favicon/apple-touch-icon.png?v=E6jNQXq6yK"}
    {:rel "icon" :type "image/png" :sizes "32x32" :href "/favicon/favicon-32x32.png?v=E6jNQXq6yK"}
@@ -72,6 +84,8 @@
                         {:integrity integrity}))])
       [:style {:id "_stylefy-constant-styles_"} ""]
       [:style {:id "_stylefy-styles_"}]
+      (when (not testing-env?)
+        (matomo-analytics-scripts))
       (translations localization/*language*)
       (user-info db user)]
 
