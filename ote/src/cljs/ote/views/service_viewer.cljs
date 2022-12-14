@@ -264,11 +264,12 @@
      [spacer]]))
 
 (defn- published-interfaces
-  [title data o-id s-id]
+  [title data o-id s-id s-sub-type]
   [:div
    [:h4 title]
    [data-export-link (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]
-   [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])]
+   (when (not= :schedule s-sub-type)
+     [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])])
    (if data
      (doall
        (for [interface data
@@ -933,7 +934,7 @@
        [operator-info (tr [:service-viewer :operator-info]) to]
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
-       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts)]
+       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts) (::t-service/sub-type ts)]
        [spacer]
 
        (case service-sub-type
