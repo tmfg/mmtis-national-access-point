@@ -334,7 +334,10 @@
     [:div
      [page/page-controls "" "Ylläpitopaneeli"
       [:div {:style {:padding-bottom "20px"}}
-       [tabs/tabs tabs {:update-fn #(e! (admin-controller/->ChangeTab %))
+       [tabs/tabs tabs {:update-fn #(do
+                                      (when (cljs.core/exists? js/_paq)
+                                        (.push js/_paq (clj->js ["trackEvent" "Ylläpito" "Tab" %])))
+                                      (e! (admin-controller/->ChangeTab %)))
                         :selected-tab (get-in app [:admin :tab :admin-page])}]
        ;; Show search parameters in page-controls section
        (when (= "validation" selected-tab)
