@@ -138,16 +138,14 @@
                                  :force-external-icon? true}]])
 
 (defn- service-header
-  [service-name o-id s-id]
+  [service-name]
   [:section
    [common-ui/linkify
     "/#/services"
     [:span
      [feather-icons/arrow-left style-base/inline-icon]
      (tr [:service-search :back-link])]]
-   [:h1 {:style {:margin-top "1rem"}} service-name]
-   [data-export-link (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]
-   [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])]])
+   [:h1 {:style {:margin-top "1rem"}} service-name]])
 
 (defn- operator-info
   [title operator]
@@ -266,9 +264,11 @@
      [spacer]]))
 
 (defn- published-interfaces
-  [title data]
+  [title data o-id s-id]
   [:div
    [:h4 title]
+   [data-export-link (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]
+   [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])]
    (if data
      (doall
        (for [interface data
@@ -933,7 +933,7 @@
        [operator-info (tr [:service-viewer :operator-info]) to]
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
-       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces]
+       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts)]
        [spacer]
 
        (case service-sub-type
