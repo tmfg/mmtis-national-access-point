@@ -120,7 +120,7 @@
    :gtfs/agency-id transport-operator-id})
 
 (defn ->static-calendar
-  [service-id]
+  [service-id transport-service]
   {:gtfs/service-id service-id
    :gtfs/monday     1
    :gtfs/tuesday    1
@@ -129,8 +129,10 @@
    :gtfs/friday     1
    :gtfs/saturday   1
    :gtfs/sunday     1
-   :gtfs/start-date (LocalDate/now)
-   :gtfs/end-date   (-> (LocalDate/now) (.plusYears 5))})
+   :gtfs/start-date (or (::t-service/available-from transport-service)
+                        (LocalDate/now))
+   :gtfs/end-date   (or (::t-service/available-to transport-service)
+                        (-> (LocalDate/now) (.plusYears 5)))})
 
 (defn ->static-location-groups
   [areas]
@@ -147,7 +149,9 @@
   [db transport-service-id]
   (first (specql/fetch db ::t-service/transport-service
                        #{::t-service/id
-                         ::t-service/name}
+                         ::t-service/name
+                         ::t-service/available-from
+                         ::t-service/available-to}
                        {::t-service/id transport-service-id})))
 
 (defn export-gtfs-flex
@@ -185,7 +189,7 @@
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas))
           flex-calendar     (conj gtfs-calendar
-                                  (->static-calendar static-service-id))
+                                  (->static-calendar static-service-id transport-service))
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
                                   (cheshire/encode {:key-fn name})))
