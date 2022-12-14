@@ -5,22 +5,25 @@
             [ote.ui.common :refer [linkify]]
             [ote.style.base :as style-base]))
 
-(defn reports[e!]
+(defn reports
+  [e!]
   [:div
    [:h2 "Palveluntuottajaraportit"]
-   [:div (stylefy/use-style (style-base/flex-container "column"))
-    [linkify "/admin/reports/transport-operator/all-emails" "Käytössä olevien käyttäjien ja palveluiden sähköpostit"]
-    [linkify "/admin/reports/transport-operator/no-services" "Ei palveluita"]
-    [linkify "/admin/reports/transport-operator/unpublished-services" "Julkaisemattomia palveluita"]
-    [linkify "/admin/reports/transport-operator/brokerage" "Välityspalvelut"]
-    [linkify "/admin/reports/transport-operator/taxi-operators" "Taksipalveluita tuottavat yritykset ja aliyritykset"]
-    [linkify "/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
-    [linkify "/admin/reports/transport-operator/schedule-operators" "Säännöllistä aikataulun mukaista liikennettä tuottavat yritykset ja aliyritykset"]
-    [linkify "/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
-    [linkify "/admin/reports/port" "Satama-aineisto csv"]
-    [linkify "/admin/reports/tvv" "Toimivaltaiset viranomaiset"]
-    [linkify "/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
-    [linkify "/admin/reports/netex-interfaces-with-max-date" "Gtfs/Kalkati.net rajapinnat ja ajopäivät, jotka on käännetty Netex muotoon"]
-    [linkify "/admin/reports/associated-companies" "Liittyneet yritykset"]
-    [linkify "/admin/reports/reported-taxi-prices" "Taksiyritysten ilmoittamat hinnat"]]])
+   (into [:div (stylefy/use-style (style-base/flex-container "column"))]
+    (mapv
+      (fn [[link label]] [linkify link label {:analytics-tag "palveluntuottajaraportit"}])
+      [["/admin/reports/transport-operator/all-emails" "Käytössä olevien käyttäjien ja palveluiden sähköpostit"]
+       ["/admin/reports/transport-operator/no-services" "Ei palveluita"]
+       ["/admin/reports/transport-operator/unpublished-services" "Julkaisemattomia palveluita"]
+       ["/admin/reports/transport-operator/brokerage" "Välityspalvelut"]
+       ["/admin/reports/transport-operator/taxi-operators" "Taksipalveluita tuottavat yritykset ja aliyritykset"]
+       ["/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
+       ["/admin/reports/transport-operator/schedule-operators" "Säännöllistä aikataulun mukaista liikennettä tuottavat yritykset ja aliyritykset"]
+       ["/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
+       ["/admin/reports/port" "Satama-aineisto csv"]
+       ["/admin/reports/tvv" "Toimivaltaiset viranomaiset"]
+       ["/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
+       ["/admin/reports/netex-interfaces-with-max-date" "Gtfs/Kalkati.net rajapinnat ja ajopäivät, jotka on käännetty Netex muotoon"]
+       ["/admin/reports/associated-companies" "Liittyneet yritykset"]
+       ["/admin/reports/reported-taxi-prices" "Taksiyritysten ilmoittamat hinnat"]]))])
 
