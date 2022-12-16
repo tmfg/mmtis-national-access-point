@@ -188,8 +188,7 @@
                                   (->static-routes static-route-id :bus transport-operator-id (::t-operator/name transport-operator) (::t-service/name transport-service)))
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas))
-          flex-calendar     (conj gtfs-calendar
-                                  (->static-calendar static-service-id transport-service))
+          flex-calendar     [(->static-calendar static-service-id transport-service)]
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
                                   (cheshire/encode {:key-fn name})))
