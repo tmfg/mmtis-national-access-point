@@ -169,7 +169,7 @@
                      (do
                        ; SPA page changes must be pushed to analytics script because url route might not change.
                        ;; Check tracker script in case script loading failed. A browser extension or other issue may block it.
-                       #_(when (exists? js/_paq)
+                       (when (exists? js/_paq)
                          (.push js/_paq (clj->js ["setCustomUrl", win-location]))
                          ;; trackPageView signals to matomo piwik js api a single page visit.
                          (.push js/_paq (clj->js ["trackPageView"])))
