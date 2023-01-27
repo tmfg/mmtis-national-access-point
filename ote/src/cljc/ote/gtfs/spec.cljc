@@ -333,5 +333,9 @@
 
 (def shapes-txt-header "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_idst_traveled")
 
+(def translations-txt-header "table_name,field_name,language,translation,record_id")
+
+(def translations-txt-fields
+  [:gtfs/table-name :gtfs/field-name :gtfs/language :gtfs/translation :gtfs/record-id])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; FIXME: support optional files as well

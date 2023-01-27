@@ -1,6 +1,7 @@
 (ns ote.gtfs.transform
   "Transform ote.db.transit datamodel maps to GTFS data"
-  (:require [ote.db.transit :as transit]
+  (:require [camel-snake-kebab.core :as csk]
+            [ote.db.transit :as transit]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [ote.db.transport-operator :as t-operator]
@@ -51,7 +52,7 @@
   (for [{::transit/keys [route-id name route-type]} routes]
     {:gtfs/route-id route-id
      :gtfs/route-short-name ""
-     :gtfs/route-long-name name
+     :gtfs/route-long-name (t-service/localized-text-with-fallback localization/*language* name)
      :gtfs/route-type (case route-type
                         :light-rail "0"
                         :subway "1"
@@ -156,6 +157,26 @@
     (catch #?(:cljs js/Object :clj Exception) e
       (log/warn e "Error generating GTFS file content for trips"))))
 
+(defn translations-txt [routes]
+  (letfn [(translations-rows [[table-name record-id field-name translations]]
+            (map
+              (fn [translation]
+                {:gtfs/table-name  table-name
+                 :gtfs/record-id   record-id
+                 ; extract GTFS field name from familiar keyword, this bit exists so that anyone searching for usages
+                 ; of specific keywords will also find this part
+                 :gtfs/field-name  (-> field-name name csk/->snake_case)
+                 :gtfs/language    (::t-service/lang translation)
+                 :gtfs/translation (::t-service/text translation)})
+              translations))]
+    (mapcat
+      (fn [route]
+        (let [{::transit/keys [route-id name departure-point-name destination-point-name]} route]
+          (mapcat
+            translations-rows
+            [["routes" route-id :gtfs/route-long-name name]])))
+      routes)))
+
 (defn calendar-txt [routes]
   (mapcat
     (fn [{services :services}]
@@ -235,6 +256,7 @@
          (.printStackTrace e)
          (log/warn "Error generating GTFS file content for stop-times" e)))))
 
+
 #?(:clj
    (defn sea-routes-gtfs
      "Generate all supported GTFS files form given transport operator and route list"
@@ -264,6 +286,8 @@
              :data (gtfs-parse/unparse-gtfs-file :gtfs/trips-txt trips-txt)}
             {:name "calendar.txt"
              :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-txt (calendar-txt routes))}
+            {:name "translations.txt"
+             :data (gtfs-parse/unparse-gtfs-file :gtfs/translations-txt (translations-txt routes))}
             (when-not (empty? calendar-dates)
               {:name "calendar_dates.txt"
                :data (gtfs-parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates)})])

@@ -39,8 +39,13 @@
   "Return the currently available published sea routes of the given transport operator."
   [db transport-operator-id]
   (let [routes (fetch db ::transit/route
-               #{::transit/route-id ::transit/name ::transit/stops
-                 ::transit/route-type ::transit/service-calendars}
+               #{::transit/route-id
+                 ::transit/name
+                 ::transit/departure-point-name
+                 ::transit/destination-point-name
+                 ::transit/stops
+                 ::transit/route-type
+                 ::transit/service-calendars}
                {::transit/transport-operator-id transport-operator-id
                 ::transit/published? true})]
     (mapv #(assoc %
@@ -68,7 +73,8 @@
 
 (defn get-sea-routes
   [db transport-operator-id]
-  (map #(update % ::transit/name (flip t-service/localized-text-with-fallback) *language*)
+  (fetch-sea-routes-published db transport-operator-id)
+  #_(map #(update % ::transit/name (flip t-service/localized-text-with-fallback) *language*)
        (fetch-sea-routes-published db transport-operator-id)))
 
 (defn export-sea-gtfs [db transport-operator-id]
