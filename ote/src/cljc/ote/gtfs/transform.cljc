@@ -1,6 +1,7 @@
 (ns ote.gtfs.transform
   "Transform ote.db.transit datamodel maps to GTFS data"
-  (:require [ote.db.transit :as transit]
+  (:require [camel-snake-kebab.core :as csk]
+            [ote.db.transit :as transit]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
             [ote.db.transport-operator :as t-operator]
@@ -162,7 +163,9 @@
               (fn [translation]
                 {:gtfs/table-name  table-name
                  :gtfs/record-id   record-id
-                 :gtfs/field-name  (clojure.core/name field-name)
+                 ; extract GTFS field name from familiar keyword, this bit exists so that anyone searching for usages
+                 ; of specific keywords will also find this part
+                 :gtfs/field-name  (-> field-name name csk/->snake_case)
                  :gtfs/language    (::t-service/lang translation)
                  :gtfs/translation (::t-service/text translation)})
               translations))]
@@ -171,9 +174,7 @@
         (let [{::transit/keys [route-id name departure-point-name destination-point-name]} route]
           (mapcat
             translations-rows
-            [["routes" route-id :basic-info-route-name name]
-             ["routes" route-id :basic-info-departure-point-name departure-point-name]
-             ["routes" route-id :basic-info-destination-point-name destination-point-name]])))
+            [["routes" route-id :gtfs/route-long-name name]])))
       routes)))
 
 (defn calendar-txt [routes]
