@@ -106,6 +106,8 @@
       "fi"
       (tx/with-transaction
         db
+        (log/info "pre-notice-email lock acquired and transaction opened, continuing...")
+
         ;; Returned collection contains those detected-change-history ids, which were included in sent notifications.
         ;; Does not contain those, which no user was interested about.
         ;; Not used at the moment. If used, put into set and remove nil to get unique ids.
