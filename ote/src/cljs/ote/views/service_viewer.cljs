@@ -268,7 +268,7 @@
   [:div
    [:h4 title]
    [data-export-link (str "/export/geojson/" o-id "/" s-id) (tr [:service-viewer :open-in-geojson])]
-   (when-not (some #{:schedule :request} s-sub-type)
+   (when (not= :schedule s-sub-type)
      [data-export-link (str "/export/gtfs-flex/" o-id "/" s-id) (tr [:service-viewer :open-in-gtfs-flex])])
    (if data
      (doall
