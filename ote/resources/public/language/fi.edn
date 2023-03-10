@@ -1384,9 +1384,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :confirm "Syötä salasana uudelleen"
            :current-password "Nykyinen salasana"
            :new-password "Uusi salasana"}
-  :placeholder {:username "matti"
-                :name "Matti Meikäläinen"
-                :email "matti@example.com"}
   :errors {:passwords-must-match "Antamasi salasana ei vastaa edellisen kentän salasanaa"
            :username-taken "Käyttäjänimi on jo varattu"
            :username-invalid "Käyttäjänimi ei kelvollinen. Kelvollisia merkkejä ovat: pienet kirjaimet (a-z), numerot (0-9) sekä symbolit - ja _ . "

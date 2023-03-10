@@ -1375,9 +1375,6 @@ You can also draw the operating area or point to the map with drawing tools. You
            :confirm "Re-enter password"
            :current-password "Current password"
            :new-password "New password"}
-  :placeholder {:username "username"
-                :name "Joe Bloggs"
-                :email "joe@example.com"}
   :errors {:passwords-must-match "Password does not match the previous field"
            :username-taken "That login name is not available."
            :username-invalid "Allowed characters are small letters written together. Special symbols allowed are: - and _."

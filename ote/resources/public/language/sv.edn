@@ -1377,9 +1377,6 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :confirm "Bekräfta lösenord"
            :current-password "Nuvarande lösenord"
            :new-password "Ny lösenord"}
-  :placeholder {:username "användarnamn"
-                :name "Medel-Svensson"
-                :email "medel-svensson@epost.se"}
   :errors {:passwords-must-match "Lösenordet du angav matchar inte lösenordet för föregående fält"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
            :username-invalid "Användarnamnet ej giltigt. Tillåtna tecken: små bokstäver (a-z), siffror (0-9) och symbolerna - och ."
