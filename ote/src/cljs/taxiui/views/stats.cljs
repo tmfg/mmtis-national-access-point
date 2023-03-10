@@ -133,7 +133,7 @@
                 :padding-bottom "0.4em"}
        :on-change #(set-filter e! :name (-> % .-target .-value))}]]]
 
-   [filter-input e! app "Toiminta-alue" "(kuntakoodeittain)"
+   [filter-input e! app (tr [:taxi-ui :stats :sections :filters :operating-area]) (tr [:taxi-ui :stats :sections :filters :operating-area-subtitle])
     [nudger
      [forms/autocomplete-input
       e!

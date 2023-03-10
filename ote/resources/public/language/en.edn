@@ -1085,6 +1085,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-email-notification-settings "Email notification settings"
   :updates-menu-updates "News"
   :support-menu-channels "Support Channels"
+  :support-menu-channels-url "https://www.fintraffic.fi/en/instructions-tos"
   :support-menu-contacts "Contacts"
   :user-menu-service-guide "User guide"
   :user-menu-service-operator "Edit transport operator"
@@ -1374,9 +1375,6 @@ You can also draw the operating area or point to the map with drawing tools. You
            :confirm "Re-enter password"
            :current-password "Current password"
            :new-password "New password"}
-  :placeholder {:username "username"
-                :name "Joe Bloggs"
-                :email "joe@example.com"}
   :errors {:passwords-must-match "Password does not match the previous field"
            :username-taken "That login name is not available."
            :username-invalid "Allowed characters are small letters written together. Special symbols allowed are: - and _."
@@ -1764,13 +1762,15 @@ You can also draw the operating area or point to the map with drawing tools. You
                                      :price-per-kilometer "Travel fare (per km)"
                                      :price-per-minute    "Travel fare (per min)"
                                      :operating-areas     "Operating areas (by municipality)"}
-                   :sections {:filters {:title               "Filter search"
-                                        :within-six-months   "Within six months"
-                                        :within-one-year     "Within one year"
-                                        :over-year-ago       "Over year ago"
-                                        :prices-updated-last "Prices last updated"
-                                        :company-by-name     "Search company by name"
-                                        :add-operating-area  "Add operating area"}}}
+                   :sections {:filters {:title                   "Filter search"
+                                        :within-six-months       "Within six months"
+                                        :within-one-year         "Within one year"
+                                        :over-year-ago           "Over year ago"
+                                        :prices-updated-last     "Prices last updated"
+                                        :company-by-name         "Search company by name"
+                                        :operating-area          "Operating area"
+                                        :operating-area-subtitle "(by municipality code)"
+                                        :add-operating-area       "Add operating area"}}}
            :loader {:page-loading              "Loading"
                     :loading-price-information "Loading fare information"
                     :save-prices-successful    "Fare information saved successfully!"}

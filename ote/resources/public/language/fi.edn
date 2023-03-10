@@ -1090,6 +1090,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
   :updates-menu-updates "Tiedotteet"
   :support-menu-channels "Tukikanavat"
+  :support-menu-channels-url "https://www.fintraffic.fi/fi/kaytto-ohjeet-ehdot"
   :support-menu-contacts "Yhteystiedot"
   :user-menu-service-guide "Ohje"
   :user-menu-service-operator "Muokkaa palveluntuottajaa"
@@ -1383,9 +1384,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :confirm "Syötä salasana uudelleen"
            :current-password "Nykyinen salasana"
            :new-password "Uusi salasana"}
-  :placeholder {:username "matti"
-                :name "Matti Meikäläinen"
-                :email "matti@example.com"}
   :errors {:passwords-must-match "Antamasi salasana ei vastaa edellisen kentän salasanaa"
            :username-taken "Käyttäjänimi on jo varattu"
            :username-invalid "Käyttäjänimi ei kelvollinen. Kelvollisia merkkejä ovat: pienet kirjaimet (a-z), numerot (0-9) sekä symbolit - ja _ . "
@@ -1773,12 +1771,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                      :price-per-kilometer "Matka (per km)"
                                      :price-per-minute    "Matka (per min)"
                                      :operating-areas     "Toiminta-alueet (kunnittain)"}
-                   :sections {:filters {:title               "Suodata hakua"
-                                        :within-six-months   "Kuuden kuukauden sisällä"
-                                        :within-one-year     "Vuoden sisällä"
-                                        :over-year-ago       "Yli vuosi sitten"
-                                        :prices-updated-last "Hintatiedot päivitetty"
-                                        :company-by-name     "Hae yritystä nimellä"
+                   :sections {:filters {:title                   "Suodata hakua"
+                                        :within-six-months       "Kuuden kuukauden sisällä"
+                                        :within-one-year         "Vuoden sisällä"
+                                        :over-year-ago           "Yli vuosi sitten"
+                                        :prices-updated-last     "Hintatiedot päivitetty"
+                                        :company-by-name         "Hae yritystä nimellä"
+                                        :operating-area          "Toiminta-alue"
+                                        :operating-area-subtitle "(kuntakoodeittain)"
                                         :add-operating-area  "Lisää toiminta-alue"}}}
            :loader {:page-loading              "Ladataan..."
                     :loading-price-information "Ladataan hintatietoja..."

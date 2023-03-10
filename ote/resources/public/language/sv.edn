@@ -1085,6 +1085,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
   :updates-menu-updates "Nyheter"
   :support-menu-channels "Kundtjänst"
+  :support-menu-channels-url "https://www.fintraffic.fi/sv/nap-katalog"
   :support-menu-contacts "Kontaktuppgifter"
   :user-menu-service-guide "Anvisning"
   :user-menu-service-operator "Tjänsteproducentens basinfo"
@@ -1376,9 +1377,6 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :confirm "Bekräfta lösenord"
            :current-password "Nuvarande lösenord"
            :new-password "Ny lösenord"}
-  :placeholder {:username "användarnamn"
-                :name "Medel-Svensson"
-                :email "medel-svensson@epost.se"}
   :errors {:passwords-must-match "Lösenordet du angav matchar inte lösenordet för föregående fält"
            :username-taken "Det inloggningsnamnet är inte tillgängligt"
            :username-invalid "Användarnamnet ej giltigt. Tillåtna tecken: små bokstäver (a-z), siffror (0-9) och symbolerna - och ."
@@ -1767,13 +1765,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                      :price-per-kilometer "Sträcke €/km"
                                      :price-per-minute    "Tid €/min"
                                      :operating-areas     "Verksamhetsområde (inom kommuner)"}
-                   :sections {:filters {:title               "Filtrera din sökning"
-                                        :within-six-months   "Inom 6 månader"
-                                        :within-one-year     "Inom ett år"
-                                        :over-year-ago       "Över att år sedan"
-                                        :prices-updated-last "Prisinofrmation uppdaterad"
-                                        :company-by-name     "Sök efter ett företag med namn"
-                                        :add-operating-area  "Lägga till verksamhetsområde"}}}
+                   :sections {:filters {:title                   "Filtrera din sökning"
+                                        :within-six-months       "Inom 6 månader"
+                                        :within-one-year         "Inom ett år"
+                                        :over-year-ago           "Över att år sedan"
+                                        :prices-updated-last     "Prisinofrmation uppdaterad"
+                                        :company-by-name         "Sök efter ett företag med namn"
+                                        :operating-area          "Verksamhetsområde"
+                                        :operating-area-subtitle "(enligt kommunkod)"
+                                        :add-operating-area      "Lägga till verksamhetsområde"}}}
            :loader {:page-loading              "Laddar"
                     :loading-price-information "Laddar prisinformation"
                     :save-prices-successful    "Prisinformation sparad!"}

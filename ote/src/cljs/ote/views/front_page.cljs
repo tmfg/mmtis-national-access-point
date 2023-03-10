@@ -137,7 +137,7 @@
      [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
       [:div (stylefy/use-style style-front-page/lower-section-data-container)
        [:img (merge (stylefy/use-style style-front-page/lower-section-font-icon)
-                    {:src "/img/icons/TRAFICOM_rgb.svg"
+                    {:src "/img/icons/Traficom.svg"
                      :alt (tr [:common-texts :footer-livi-logo])}) ]
        [:p (stylefy/use-style style-front-page/lower-section-text)
         (tr [:front-page :column-service-operator-info])]
