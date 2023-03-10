@@ -1085,6 +1085,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :navigation-email-notification-settings "Email notification settings"
   :updates-menu-updates "News"
   :support-menu-channels "Support Channels"
+  :support-menu-channels-url "https://www.fintraffic.fi/en/instructions-tos"
   :support-menu-contacts "Contacts"
   :user-menu-service-guide "User guide"
   :user-menu-service-operator "Edit transport operator"

@@ -1090,6 +1090,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :navigation-email-notification-settings "Sähköposti-ilmoitusten asetukset"
   :updates-menu-updates "Tiedotteet"
   :support-menu-channels "Tukikanavat"
+  :support-menu-channels-url "https://www.fintraffic.fi/fi/kaytto-ohjeet-ehdot"
   :support-menu-contacts "Yhteystiedot"
   :user-menu-service-guide "Ohje"
   :user-menu-service-operator "Muokkaa palveluntuottajaa"

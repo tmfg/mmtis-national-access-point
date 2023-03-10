@@ -191,7 +191,7 @@
       [bottombar-dropdown e! app desktop? {:tag                 :support
                                            :entries             [{:key :channels
                                                                   :label (tr [:common-texts :support-menu-channels])
-                                                                  :href "https://www.fintraffic.fi/fi/kaytto-ohjeet-ehdot"
+                                                                  :href (tr [:common-texts :support-menu-channels-url])
                                                                   :target "_blank"}]
                                            :label               (tr [:common-texts :navigation-support-menu])
                                            :state-flag          [:ote-service-flags :support-menu-open]

@@ -1085,6 +1085,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :navigation-email-notification-settings "Inställningar för e-postmeddelanden"
   :updates-menu-updates "Nyheter"
   :support-menu-channels "Kundtjänst"
+  :support-menu-channels-url "https://www.fintraffic.fi/sv/nap-katalog"
   :support-menu-contacts "Kontaktuppgifter"
   :user-menu-service-guide "Anvisning"
   :user-menu-service-operator "Tjänsteproducentens basinfo"
