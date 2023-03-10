@@ -1768,13 +1768,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                      :price-per-kilometer "Sträcke €/km"
                                      :price-per-minute    "Tid €/min"
                                      :operating-areas     "Verksamhetsområde (inom kommuner)"}
-                   :sections {:filters {:title               "Filtrera din sökning"
-                                        :within-six-months   "Inom 6 månader"
-                                        :within-one-year     "Inom ett år"
-                                        :over-year-ago       "Över att år sedan"
-                                        :prices-updated-last "Prisinofrmation uppdaterad"
-                                        :company-by-name     "Sök efter ett företag med namn"
-                                        :add-operating-area  "Lägga till verksamhetsområde"}}}
+                   :sections {:filters {:title                   "Filtrera din sökning"
+                                        :within-six-months       "Inom 6 månader"
+                                        :within-one-year         "Inom ett år"
+                                        :over-year-ago           "Över att år sedan"
+                                        :prices-updated-last     "Prisinofrmation uppdaterad"
+                                        :company-by-name         "Sök efter ett företag med namn"
+                                        :operating-area          "Verksamhetsområde"
+                                        :operating-area-subtitle "(enligt kommunkod)"
+                                        :add-operating-area      "Lägga till verksamhetsområde"}}}
            :loader {:page-loading              "Laddar"
                     :loading-price-information "Laddar prisinformation"
                     :save-prices-successful    "Prisinformation sparad!"}
