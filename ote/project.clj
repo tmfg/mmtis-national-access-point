@@ -17,7 +17,7 @@
                  [com.fzakaria/slf4j-timbre "0.3.8"]
 
                  ;; PostgreSQL JDBC driver, connection pool and other libraries - BSD-2-Clause License
-                 [org.postgresql/postgresql "42.1.4"]
+                 [org.postgresql/postgresql "42.5.4"]
                  ;; Postgis jdbc driver - LGPL 2.1
                  [net.postgis/postgis-jdbc "2.1.7.2"
                   :exclusions [ch.qos.logback/logback-classic
