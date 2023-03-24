@@ -1,6 +1,7 @@
 (ns ote.gtfs.transform
   "Transform ote.db.transit datamodel maps to GTFS data"
   (:require [camel-snake-kebab.core :as csk]
+            [clojure.string :as str]
             [ote.db.transit :as transit]
             [ote.gtfs.spec :as gtfs-spec]
             [ote.gtfs.parse :as gtfs-parse]
@@ -30,10 +31,14 @@
      [url transport-operator]
      url))
 
+(defn ^:private replace-newlines
+  "Sanitize stringy value to not have newlines so that the generated CSV won't break"
+  [s]
+  (str/replace s #"\n|\r" ""))
 
 (defn agency-txt [{::t-operator/keys [id name homepage phone email] :as transport-operator}]
   [{:gtfs/agency-id id
-    :gtfs/agency-name name
+    :gtfs/agency-name (replace-newlines name)
     :gtfs/agency-url (ensure-has-protocol homepage transport-operator)
     :gtfs/agency-timezone "Europe/Helsinki"
     :gtfs/agency-lang "FI"
@@ -42,17 +47,19 @@
 
 (defn stops-txt [stops]
   (for [[id {::transit/keys [name location stop-type]}] stops]
-    {:gtfs/stop-id id
-     :gtfs/stop-name (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
-                                                                :clj  localization/*language*) name)
-     :gtfs/stop-lat (.-y (.getGeometry location))
-     :gtfs/stop-lon (.-x (.getGeometry location))}))
+    {:gtfs/stop-id   id
+     :gtfs/stop-name (-> (t-service/localized-text-with-fallback #?(:cljs @localization/selected-language
+                                                                    :clj  localization/*language*) name)
+                         replace-newlines)
+     :gtfs/stop-lat  (.-y (.getGeometry location))
+     :gtfs/stop-lon  (.-x (.getGeometry location))}))
 
 (defn sea-routes-txt [transport-operator-id routes]
   (for [{::transit/keys [route-id name route-type]} routes]
     {:gtfs/route-id route-id
      :gtfs/route-short-name ""
-     :gtfs/route-long-name (t-service/localized-text-with-fallback localization/*language* name)
+     :gtfs/route-long-name (-> (t-service/localized-text-with-fallback localization/*language* name)
+                               replace-newlines)
      :gtfs/route-type (case route-type
                         :light-rail "0"
                         :subway "1"
