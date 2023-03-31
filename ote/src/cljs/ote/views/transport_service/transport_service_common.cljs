@@ -975,27 +975,6 @@
                           false
                           true))}))
 
-(defn taxi-pricing-info [operator-id service-id]
-  (form/group
-    {:label (tr [:taxi-ui :cross-promo :service-editor :title])
-     :columns 3
-     :layout :row
-     :card? false
-     :top-border true}
-
-    {:name        :netex-info-text
-     :type        :component
-     :full-width? true
-     :component   (fn [_]
-                    [:div {:style {:margin-top "1rem"}}
-                     (tr [:taxi-ui :cross-promo :service-editor :instructions])
-                     [linkify
-                      (str "/taxiui#" (taxiui-router/resolve :taxi-ui/pricing-details {:operator-id operator-id
-                                                                                      :service-id  service-id}))
-                      (tr [:taxi-ui :cross-promo :service-editor :link-to-taxiui-text])
-                      {:target               "_blank"
-                       :force-external-icon? true}]])}))
-
 (defn place-search-dirty-event [e!]
   ;; To set transport service form dirty when adding / removing places using the place-search component,
   ;; we'll have to manually trigger EditTransportService event with empty data.
