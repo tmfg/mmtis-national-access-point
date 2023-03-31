@@ -517,9 +517,29 @@
        (tr [:service-viewer :not-disclosed])]) wide]])
 
 (defn- taxi-price-information
-  [title data]
+  [title common-pricing-info data]
   [:section
    [:h4 title]
+   ; generic pricing info from service details
+   (let [payment-methods (map #(tr [:enums ::t-service/payment-methods %]) (:payment-methods common-pricing-info))
+         payment-method-desc (format-descriptions (:payment-method-description common-pricing-info))
+         pricing-description (format-descriptions (get-in common-pricing-info [:pricing ::t-service/description]))
+         pricing-url (get-in common-pricing-info [:pricing ::t-service/url])]
+     [:div
+      [common-ui/information-row-with-option
+       (tr [:parking-page :header-payment-methods])
+       (when (not-empty payment-methods) (string/lower-case (string/join ", " payment-methods)))
+       true]
+      [information-row-with-selection (tr [:service-viewer :payment-method-description]) payment-method-desc true]
+      [information-row-with-selection
+       (tr [:field-labels :passenger-transportation ::t-service/pricing-description])
+       pricing-description
+       true]
+      [common-ui/information-row-with-option
+       (tr [:field-labels :passenger-transportation ::t-service/pricing-url])
+       (when pricing-url
+         [common-ui/linkify pricing-url pricing-url {:target "_blank"}]) true]])
+  ; detailed pricing info from Taxi UI
    (let [{:keys [start-price-daytime start-price-nighttime start-price-weekend price-per-minute price-per-kilometer
                  accessibility-service-fare accessibility-service-stairs accessibility-service-stretchers]} data]
      [:div
@@ -983,6 +1003,6 @@
           [booking-service (tr [:service-viewer :reservation-service]) booking-data]
           [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
           (if (= :taxi service-sub-type)
-            [taxi-price-information (tr [:service-viewer :price-information]) (get-in app-state [:service-view :taxi-service :pricing-info])]
+            [taxi-price-information (tr [:service-viewer :price-information]) pricing-data (get-in app-state [:service-view :taxi-service :pricing-info])]
             [price-information (tr [:service-viewer :price-information]) pricing-data])
           [service-hours (tr [:service-viewer :service-hours]) service-hours-info]])])))

@@ -4,9 +4,11 @@
              [ote.db.transport-service :as t-service]
              [ote.localization :refer [tr tr-key]]
              [ote.util.values :as values]
+             [ote.ui.common :refer [linkify]]
              [ote.ui.form :as form]
              [ote.app.controller.transport-service :as ts-controller]
-             [ote.views.transport-service.transport-service-common :as ts-common])
+             [ote.views.transport-service.transport-service-common :as ts-common]
+             [taxiui.app.routes :as taxiui-router])
   (:require-macros [reagent.core :refer [with-let]]))
 
 (defn transportation-form-options [e! schemas in-validation? app]
@@ -121,7 +123,7 @@
      :container-class "col-xs-12 col-sm-6 col-md-6"
      :full-width? true}))
 
-(defn pricing-group [sub-type in-validation?]
+(defn pricing-group [operator-id service-id sub-type in-validation?]
   (let [price-class-name-label
           (cond
             (= :taxi sub-type) (tr [:field-labels :passenger-transportation ::t-service/price-class-name-taxi])
@@ -138,15 +140,32 @@
     :card? false
     :top-border true}
 
-   {:type :info-toggle
-    :name :pricing-group-info
-    :label (tr [:common-texts :filling-info])
-    :body [:div (tr [:form-help :pricing-info])]
-    :default-state false
-    :full-width? true
-    :container-class "col-xs-12 col-sm-12 col-md-12"}
+   ; Cross-promo for Taxi UI
+   (when (= :taxi sub-type)
+     {:name        :netex-info-text
+      :type        :component
+      :full-width? true
+      :component   (fn [_]
+                     [:div {:style {:margin-top "1rem"}}
+                      (tr [:taxi-ui :cross-promo :service-editor :instructions])
+                      [linkify
+                       (str "/taxiui#" (taxiui-router/resolve :taxi-ui/pricing-details {:operator-id operator-id
+                                                                                        :service-id  service-id}))
+                       (tr [:taxi-ui :cross-promo :service-editor :link-to-taxiui-text])
+                       {:target               "_blank"
+                        :force-external-icon? true}]])})
 
-   (merge
+   (when-not (= :taxi sub-type)
+     {:type            :info-toggle
+      :name            :pricing-group-info
+      :label           (tr [:common-texts :filling-info])
+      :body            [:div (tr [:form-help :pricing-info])]
+      :default-state   false
+      :full-width?     true
+      :container-class "col-xs-12 col-sm-12 col-md-12"})
+
+   (when-not (= :taxi sub-type)
+     (merge
      {:container-class "col-xs-12"
       :name ::t-service/price-classes
       :type :div-table
@@ -176,7 +195,7 @@
        {:add-label (tr [:buttons :add-new-price-class])
         :inner-delete? true
         :inner-delete-class "col-xs-12 col-sm-6 col-md-2"
-        :inner-delete-label (tr [:buttons :delete])}))
+        :inner-delete-label (tr [:buttons :delete])})))
 
    {:container-class "col-xs-12 col-sm-6 col-md-6"
     :name        ::t-service/payment-methods
@@ -222,9 +241,11 @@
               (ts-common/companies-group e! in-validation? service-id db-file-key)
               (ts-common/brokerage-group e! in-validation?)
               (ts-common/place-search-group (ts-common/place-search-dirty-event e!) ::t-service/passenger-transportation in-validation?)
-              (if (= (::t-service/sub-type service) :taxi)
-                (ts-common/taxi-pricing-info (-> app :transport-operator :ote.db.transport-operator/id) service-id)
-                (pricing-group (get service ::t-service/sub-type) in-validation?))
+              (pricing-group
+                (-> app :transport-operator :ote.db.transport-operator/id)
+                service-id
+                (get service ::t-service/sub-type)
+                in-validation?)
               (ts-common/external-interfaces e!
                                              (get service ::t-service/type)
                                              (get service ::t-service/sub-type)
