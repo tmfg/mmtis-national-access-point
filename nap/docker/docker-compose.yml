@@ -31,3 +31,4 @@ services:
     ports:
       - "127.0.0.1:1025:1025"  # SMTP listen port
       - "127.0.0.1:1080:1080"  # HTTP server port for API (http://localhost:1080/api/emails)
+    platform: linux/amd64
