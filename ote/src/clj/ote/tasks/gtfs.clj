@@ -16,6 +16,7 @@
             [ote.tasks.util :as tasks-util]
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.report :as report]
+            [ote.integration.tis-vaco :as tis-vaco]
             [ote.time :as time]
             [ote.transit-changes.detection :as detection]
             [ote.config.transit-changes-config :as config-tc]
@@ -124,11 +125,14 @@
                                  interface
                                  upload-s3?
                                  force-download?)]
-
         (if (feature/feature-enabled? config :netex-conversion-automated)
-          (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
-            nil                                          ; SUCCESS. Explicit nil to make success branch more obvious
-            (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
+          (do
+            ; call TIS VACO API to perform validation and conversion
+            (tis-vaco/queue-entry db (:tis-vaco config) interface conversion-meta)
+            ; run legacy validation logic
+            (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
+              nil                                        ; SUCCESS. Explicit nil to make success branch more obvious
+              (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion")))
           nil)                                           ; SUCCESS. Explicit nil to make success branch more obvious
         (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
 
