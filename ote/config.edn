@@ -72,4 +72,8 @@
  :netex {:chouette-path "/opt/chouette/"
          :conversion-work-path "/tmp/ote/netex-conversion/"
          :bucket "napote-netex-localdev"}
- }
+
+ :tis-vaco {:tenant-id     "placeholder"
+            :client-id     "placeholder"
+            :client-secret "placeholder"
+            :api-base-url  "placeholder"}}
