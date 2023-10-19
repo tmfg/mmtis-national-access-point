@@ -125,15 +125,17 @@
                                  interface
                                  upload-s3?
                                  force-download?)]
-        (if (feature/feature-enabled? config :netex-conversion-automated)
-          (do
-            ; call TIS VACO API to perform validation and conversion
-            (tis-vaco/queue-entry db (:tis-vaco config) interface conversion-meta)
-            ; run legacy validation logic
+
+        (do
+          ; call TIS VACO API to perform validation and conversion
+          (when (feature/feature-enabled? config :tis-vaco-integration)
+            (tis-vaco/queue-entry db (:tis-vaco config) interface conversion-meta))
+          ; run legacy validation logic
+          (if (feature/feature-enabled? config :netex-conversion-automated)
             (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
-              nil                                        ; SUCCESS. Explicit nil to make success branch more obvious
-              (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion")))
-          nil)                                           ; SUCCESS. Explicit nil to make success branch more obvious
+              nil                                           ; SUCCESS. Explicit nil to make success branch more obvious
+              (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
+            nil))                                           ; SUCCESS. Explicit nil to make success branch more obvious
         (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
 
       (catch Exception e
