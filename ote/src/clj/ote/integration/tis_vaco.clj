@@ -59,15 +59,21 @@
                      ::specql/limit           1}))))
 
 (defn api-call
-  "Adds common headers, handles authentication etc. for TIS VACO API calls"
+  "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
   [config call url body]
-  (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
-        {:keys [status headers body]} (call (str (:api-base-url config) url)
-                                            {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                            "Authorization" (str "Bearer " access-token)}
-                                             :content-type :json
-                                             :body         (cheshire/generate-string body)})]
-    (cheshire/parse-string body csk/->kebab-case-keyword)))
+  (try
+    (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
+          rest-endpoint                 (str (:api-base-url config) url)
+          {:keys [status headers body]} (call rest-endpoint
+                                              {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
+                                                              "Authorization" (str "Bearer " access-token)}
+                                               :content-type :json
+                                               :body         (cheshire/generate-string body)})]
+      (log/debug (str "API call to " rest-endpoint " returned " status))
+      (cheshire/parse-string body csk/->kebab-case-keyword))
+    (catch Exception e
+      (log/warn e (str "Failed API call " (str (:api-base-url config) url)))
+      nil)))
 
 (defn queue-entry
   [db
@@ -85,18 +91,17 @@
                                                                   :etag        (when package (:gtfs/etag package))
                                                                   :validations [{:name   "gtfs.canonical.v4_1_0"
                                                                                  :config {}}]
-                                                                  :metadata    {:caller       "FINAP"
-                                                                                :operator-id  operator-id
-                                                                                :service-id   service-id
-                                                                                :interface-id id
-                                                                                :package-id   package-id}})]
-    (try
-      (specql/update! db :gtfs/package
-        {:gtfs/tis-entry-public-id (-> new-entry :data :public-id)}
-        {:gtfs/id (:gtfs/id package)})
-      new-entry
-      (catch Exception e
-        (log/warn e "Failed to update GTFS package with TIS VACO entry reference")))
-
-    )
-  )
+                                                                  :metadata    {:caller        "FINAP"
+                                                                                :operator-id   operator-id
+                                                                                :operator-name operator-name
+                                                                                :service-id    service-id
+                                                                                :interface-id  id
+                                                                                :package-id    package-id}})]
+    (when new-entry
+      (try
+        (specql/update! db :gtfs/package
+                        {:gtfs/tis-entry-public-id (-> new-entry :data :public-id)}
+                        {:gtfs/id (:gtfs/id package)})
+        new-entry
+        (catch Exception e
+          (log/warn e "Failed to update GTFS package with TIS VACO entry reference"))))))
