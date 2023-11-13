@@ -19,7 +19,7 @@
     (->> (select-packages-without-finished-results db)
          (mapv
            (fn [package]
-             (log/info (str "Polling package " (select-keys package [:id :tis-entry-public-id]) " for results"))
+             (log/debug (str "Polling package " (select-keys package [:id :tis-entry-public-id]) " for results"))
              (let [entry (tis-vaco/api-fetch-entry (:tis-vaco config) (:tis-entry-public-id package))
                    links (get entry "links")
                    result (get links "gtfs2netex.perille.v1_0_0")]
