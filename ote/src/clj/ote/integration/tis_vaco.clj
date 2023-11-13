@@ -8,9 +8,9 @@
             [specql.core :as specql]
             [taoensso.timbre :as log]))
 
-(def auth-data (atom {}))
+(def ^:private auth-data (atom {}))
 
-(defn get-token [tenant-id client-id client-secret]
+(defn ^:private get-token [tenant-id client-id client-secret]
   {:url (str "https://login.microsoftonline.com/" tenant-id "/oauth2/v2.0/token")
    :params {"grant_type" "client_credentials"
             "client_id" client-id
@@ -26,7 +26,7 @@
         ts
         (jt/minus (jt/local-date-time) (jt/minutes 1)))))
 
-(defn update-expired-token
+(defn ^:private update-expired-token
   "Handles access token caching to avoid nuking Azure AD endpoints. Uses token expiration as refresh hint. See also
   [[token-expired?]]"
   [auth-data {:keys [tenant-id client-id client-secret]}]
@@ -37,7 +37,7 @@
           (update :expires-in (fn [offset] (jt/plus (jt/local-date-time) (jt/seconds (- offset 10)))))))
     auth-data))
 
-(defn fetch-business-id [db operator-id]
+(defn ^:private fetch-business-id [db operator-id]
   ; TODO
   (-> (specql/fetch db ::t-operator/transport-operator
                       #{::t-operator/business-id}
@@ -45,8 +45,7 @@
         first
         ::t-operator/business-id))
 
-(defn find-package [db interface-id package-id]
-  (println "interface-id " interface-id "package-id" package-id)
+(defn ^:private find-package [db interface-id package-id]
   (when interface-id
     (first
       (specql/fetch db :gtfs/package
@@ -58,22 +57,31 @@
                      ::specql/order-direction :descending
                      ::specql/limit           1}))))
 
-(defn api-call
+(defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
   [config call url body]
   (try
     (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
           rest-endpoint                 (str (:api-base-url config) url)
           {:keys [status headers body]} (call rest-endpoint
-                                              {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                              "Authorization" (str "Bearer " access-token)}
-                                               :content-type :json
-                                               :body         (cheshire/generate-string body)})]
+                                              (merge
+                                                {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
+                                                                "Authorization" (str "Bearer " access-token)}
+                                                 :content-type :json}
+                                                (when body {:body (when body (cheshire/generate-string body))})))]
       (log/debug (str "API call to " rest-endpoint " returned " status))
-      (cheshire/parse-string body csk/->kebab-case-keyword))
+      (cheshire/parse-string body))
     (catch Exception e
       (log/warn e (str "Failed API call " (str (:api-base-url config) url)))
       nil)))
+
+(defn api-queue-create
+  [config payload]
+  (api-call config http-client/post "/api/queue" payload))
+
+(defn api-fetch-entry
+  [config entry-id]
+  (api-call config http-client/get (str "/api/queue/" entry-id) nil))
 
 (defn queue-entry
   [db
@@ -85,22 +93,24 @@
    {:keys [gtfs-file gtfs-filename gtfs-basename external-interface-description-id external-interface-data-content service-id package-id operator-name]}]
   ; 1) get auth token
   (let [package   (find-package db id package-id)
-        new-entry (api-call config http-client/post "/api/queue" {:url         url
-                                                                  :format      "gtfs"
-                                                                  :businessId  (fetch-business-id db operator-id)
-                                                                  :etag        (when package (:gtfs/etag package))
-                                                                  :validations [{:name   "gtfs.canonical.v4_1_0"
-                                                                                 :config {}}]
-                                                                  :metadata    {:caller        "FINAP"
-                                                                                :operator-id   operator-id
-                                                                                :operator-name operator-name
-                                                                                :service-id    service-id
-                                                                                :interface-id  id
-                                                                                :package-id    package-id}})]
+        new-entry (api-queue-create config {:url         url
+                                            :format      "gtfs"
+                                            :businessId  (fetch-business-id db operator-id)
+                                            :etag        (when package (:gtfs/etag package))
+                                            :validations [{:name   "gtfs.canonical.v4_1_0"
+                                                           :config {}}]
+                                            :conversions [{:name "gtfs2netex.perille.v1_0_0"
+                                                           :config {}}]
+                                            :metadata    {:caller        "FINAP"
+                                                          :operator-id   operator-id
+                                                          :operator-name operator-name
+                                                          :service-id    service-id
+                                                          :interface-id  id
+                                                          :package-id    package-id}})]
     (when new-entry
       (try
         (specql/update! db :gtfs/package
-                        {:gtfs/tis-entry-public-id (-> new-entry :data :public-id)}
+                        {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])}
                         {:gtfs/id (:gtfs/id package)})
         new-entry
         (catch Exception e
