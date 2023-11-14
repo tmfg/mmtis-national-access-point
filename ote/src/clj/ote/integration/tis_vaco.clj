@@ -72,7 +72,10 @@
       (log/debug (str "API call to " rest-endpoint " returned " status))
       (cheshire/parse-string body))
     (catch Exception e
-      (log/warn e (str "Failed API call " (str (:api-base-url config) url)))
+      ; clj-http throws exceptions for just about everything which is stupid, so the exception needs to be swallowed
+      (let [status (some-> e ex-data :status)]
+        (when (< 4 (int (/ status 100)))
+          (log/warn e (str "Failed API call " (str (:api-base-url config) url)))))
       nil)))
 
 (defn api-queue-create
@@ -81,7 +84,8 @@
 
 (defn api-fetch-entry
   [config entry-id]
-  (api-call config http-client/get (str "/api/queue/" entry-id) nil))
+  (or (api-call config http-client/get (str "/api/queue/" entry-id) nil)
+      {}))
 
 (defn queue-entry
   [db
