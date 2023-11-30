@@ -95,7 +95,6 @@
    {:keys [url operator-id operator-name ts-id last-import-date license id data-content]}
    ; conversion-meta
    {:keys [gtfs-file gtfs-filename gtfs-basename external-interface-description-id external-interface-data-content service-id package-id operator-name]}]
-  ; 1) get auth token
   (let [package   (find-package db id package-id)
         new-entry (api-queue-create config {:url         url
                                             :format      "gtfs"
@@ -103,7 +102,7 @@
                                             :etag        (when package (:gtfs/etag package))
                                             :validations [{:name   "gtfs.canonical.v4_1_0"
                                                            :config {}}]
-                                            :conversions [{:name "gtfs2netex.perille.v1_0_0"
+                                            :conversions [{:name "gtfs2netex.fintraffic.v1_0_0"
                                                            :config {}}]
                                             :metadata    {:caller        "FINAP"
                                                           :operator-id   operator-id
