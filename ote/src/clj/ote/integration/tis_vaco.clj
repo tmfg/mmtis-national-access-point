@@ -75,7 +75,7 @@
       ; clj-http throws exceptions for just about everything which is stupid, so the exception needs to be swallowed
       (let [status (some-> e ex-data :status)]
         (when (< 4 (int (/ status 100)))
-          (log/warn e (str "Failed API call " (str (:api-base-url config) url)))))
+          (log/warn (str "Failed API call " (str (:api-base-url config) url) " / " status))))
       nil)))
 
 (defn api-queue-create
