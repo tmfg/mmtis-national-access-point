@@ -3,7 +3,8 @@ SELECT *
   FROM "gtfs_package"
  WHERE "tis-entry-public-id" IS NOT NULL
    AND "tis-result-links" IS NULL
-   AND "tis-complete" IS NULL OR FALSE;
+   AND "tis-complete" IS FALSE
+   AND created > (NOW() - INTERVAL '1 week') IS TRUE;
 
 -- name: update-tis-results!
 UPDATE "gtfs_package"
