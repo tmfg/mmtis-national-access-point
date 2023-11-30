@@ -21,14 +21,27 @@
       (log/info (str (count packages) " TIS packages to update"))
       (mapv
         (fn [package]
-          (log/debug (str "Polling package " (select-keys package [:id :tis-entry-public-id]) " for results"))
-          (let [entry  (tis-vaco/api-fetch-entry (:tis-vaco config) (:tis-entry-public-id package))
-                links  (get entry "links")
-                result (some-> links "gtfs2netex.perille.v1_0_0")]
-            (when result
-              (log/info (str "Results found for package " (select-keys package [:id :tis-entry-public-id]) ", storing links to database"))
-              (update-tis-results! db {:tis-entry-public-id (get-in entry ["data" "publicId"])
-                                       :tis-result-links    (cheshire/generate-string result)}))))
+          (let [[package-id entry-public-id] (select-keys package [:id :tis-entry-public-id])]
+            (log/debug (str "Polling package " package-id "/" entry-public-id " for results"))
+            (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
+                  complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
+                  links     (get entry "links")
+                  result    (some-> links (get "gtfs2netex.fintraffic.v1_0_0"))]
+              (if result
+                (do
+                  (log/info (str "Results found for package " package-id "/" entry-public-id ", storing links to database"))
+                  (update-tis-results! db {:tis-entry-public-id entry-public-id
+                                           :tis-complete        true
+                                           :tis-result-links    (cheshire/generate-string result)}))
+                (if complete?
+                  (do
+                    (log/debug (str "No results found for package " package-id "/" entry-public-id " but the entry is complete -> no result available"))
+                    (update-tis-results! db {:tis-entry-public-id entry-public-id
+                                             :tis-complete        true
+                                             :tis-result-links    nil}))
+                  (log/debug (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side."))))))
+
+          )
         packages))))
 
 (defrecord TisTasks [config]
