@@ -100,7 +100,7 @@
                                             :format      "gtfs"
                                             :businessId  (fetch-business-id db operator-id)
                                             :etag        (when package (:gtfs/etag package))
-                                            :name        (str "Automated publish of package " (:gtfs/id package) " (operator " operator-id "/ service " service-id ")")
+                                            :name        (str "Automated publish of package " (:gtfs/id package) " (operator " operator-id "/service " service-id ")")
                                             :validations [{:name   "gtfs.canonical.v4_1_0"
                                                            :config {}}]
                                             :conversions [{:name "gtfs2netex.fintraffic.v1_0_0"
