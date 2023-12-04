@@ -18,10 +18,10 @@
   (when (and (feature/feature-enabled? config :tis-vaco-integration)
              (feature/feature-enabled? config :netex-conversion-automated))
     (let [packages (select-packages-without-finished-results db)]
+      (log/info (str (count packages) " TIS packages to update"))
       (mapv
         (fn [package]
-          (log/info (str "Processing package " package))
-          (let [[package-id entry-public-id] (select-keys package [:id :tis-entry-public-id])]
+          (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
                   complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
