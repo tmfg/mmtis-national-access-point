@@ -18,7 +18,6 @@
   (when (and (feature/feature-enabled? config :tis-vaco-integration)
              (feature/feature-enabled? config :netex-conversion-automated))
     (let [packages (select-packages-without-finished-results db)]
-      (log/info (str (count packages) " TIS packages to update"))
       (mapv
         (fn [package]
           (let [[package-id entry-public-id] (select-keys package [:id :tis-entry-public-id])]
