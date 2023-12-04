@@ -20,6 +20,7 @@
     (let [packages (select-packages-without-finished-results db)]
       (mapv
         (fn [package]
+          (log/info (str "Processing package " package))
           (let [[package-id entry-public-id] (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
