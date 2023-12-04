@@ -69,7 +69,7 @@
                                                                 "Authorization" (str "Bearer " access-token)}
                                                  :content-type :json}
                                                 (when body {:body (when body (cheshire/generate-string body))})))]
-      (log/debug (str "API call to " rest-endpoint " returned " status))
+      (log/info (str "API call to " rest-endpoint " returned " status))
       (cheshire/parse-string body))
     (catch Exception e
       ; clj-http throws exceptions for just about everything which is stupid, so the exception needs to be swallowed
@@ -100,7 +100,7 @@
                                             :format      "gtfs"
                                             :businessId  (fetch-business-id db operator-id)
                                             :etag        (when package (:gtfs/etag package))
-                                            :name        (str "Automated publish of package " (:gtfs/id package) " (operator " operator-id "/ service " service-id ")")
+                                            :name        (str "Automated publish of package " (:gtfs/id package) " (operator " operator-id "/service " service-id ")")
                                             :validations [{:name   "gtfs.canonical.v4_1_0"
                                                            :config {}}]
                                             :conversions [{:name "gtfs2netex.fintraffic.v1_0_0"
