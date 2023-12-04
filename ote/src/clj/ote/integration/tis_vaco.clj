@@ -69,7 +69,7 @@
                                                                 "Authorization" (str "Bearer " access-token)}
                                                  :content-type :json}
                                                 (when body {:body (when body (cheshire/generate-string body))})))]
-      (log/debug (str "API call to " rest-endpoint " returned " status))
+      (log/info (str "API call to " rest-endpoint " returned " status))
       (cheshire/parse-string body))
     (catch Exception e
       ; clj-http throws exceptions for just about everything which is stupid, so the exception needs to be swallowed
