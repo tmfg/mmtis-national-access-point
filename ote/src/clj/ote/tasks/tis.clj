@@ -44,7 +44,7 @@
                   result    (some-> links (get "gtfs2netex.fintraffic.v1_0_0"))]
               (if result
                 (do
-                  (log/info (str "Results found for package " package-id "/" entry-public-id ", copying blob to S3 and storing links to database"))
+                  (log/info (str "Results found for package " package-id "/" entry-public-id ", copying blob to S3"))
                   (let [filename (copy-to-s3
                                    config
                                    (get-in links ["gtfs2netex.fintraffic.v1_0_0" "result"])
@@ -59,13 +59,13 @@
                        :external-interface-data-content   #{:route-and-schedule}})
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
-                                             :tis-result-links    (cheshire/generate-string result)})))
+                                             :tis-success         true})))
                 (if complete?
                   (do
                     (log/info (str "No results found for package " package-id "/" entry-public-id " but the entry is complete -> no result available"))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
-                                             :tis-result-links    nil}))
+                                             :tis-success         false}))
                   (log/info (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side."))))))
 
           )
