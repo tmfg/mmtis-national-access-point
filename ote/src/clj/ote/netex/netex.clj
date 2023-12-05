@@ -328,7 +328,8 @@
         (log/error (str "Bad path argument(s) " config-netex))
         nil))))
 
-(defn- upload-s3
+; public because TIS VACO integration reuses this, see usages
+(defn upload-s3
   "Takes path to file and map with bucket name and puts file into bucket.
   Returns: On success true,
   on failure amazonica throws an exception, on other failures like missing argument this returns false"

@@ -60,6 +60,7 @@
             ;; This is an URL, fetch and read it
             (load-zip-from-url url-or-response)))))
 
+; This is also used by ote.tasks.tis to generate a compatible name
 (defn gtfs-file-name [operator-id ts-id]
   (let [new-date (java.util.Date.)
         date (.format (java.text.SimpleDateFormat. "yyyy-MM-dd") new-date)]
