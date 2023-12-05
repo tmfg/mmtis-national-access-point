@@ -41,13 +41,13 @@
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
                   complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
                   links     (get entry "links")
-                  result    (some-> links (get "gtfs2netex.fintraffic.v1_0_0"))]
+                  result    (some-> links (get-in ["gtfs2netex.fintraffic.v1_0_0" "result"]))]
               (if result
                 (do
-                  (log/info (str "Results found for package " package-id "/" entry-public-id ", copying blob to S3"))
+                  (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
                   (let [filename (copy-to-s3
                                    config
-                                   (get-in links ["gtfs2netex.fintraffic.v1_0_0" "result"])
+                                   result
                                    (:transport-operator-id package))]
                     (netex/set-conversion-status!
                       {:netex-filepath filename
