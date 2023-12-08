@@ -40,8 +40,7 @@
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
                   complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
-                  links     (get entry "links")
-                  result    (some-> links (get-in ["gtfs2netex.fintraffic.v1_0_0" "result"]))]
+                  result    (get-in entry ["links" tis-vaco/conversion-rule-name "result"])]
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))

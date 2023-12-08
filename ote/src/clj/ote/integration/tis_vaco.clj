@@ -8,6 +8,9 @@
             [specql.core :as specql]
             [taoensso.timbre :as log]))
 
+
+(def conversion-rule-name "gtfs2netex.fintraffic.v1_0_0")
+
 (def ^:private auth-data (atom {}))
 
 (defn ^:private get-token [tenant-id client-id client-secret]
@@ -102,7 +105,7 @@
                                             :name        (str "Automated publish of package " (:gtfs/id package) " (operator " operator-id "/service " service-id ")")
                                             :validations [{:name   "gtfs.canonical.v4_1_0"
                                                            :config {}}]
-                                            :conversions [{:name "gtfs2netex.fintraffic.v1_0_0"
+                                            :conversions [{:name   conversion-rule-name
                                                            :config {}}]
                                             :metadata    {:caller        "FINAP"
                                                           :operator-id   operator-id
