@@ -70,6 +70,13 @@
           )
         packages))))
 
+(defn poll-tis-entries!
+  [config db]
+  (try
+    (poll-incomplete-entry-results! config db)
+    (catch Exception e
+      (log/warn e "Failure during polling!"))))
+
 (defrecord TisTasks [config]
   component/Lifecycle
   (start [{db :db :as this}]
@@ -77,7 +84,7 @@
       ; 5 minute delay is more than enough, we do not want to overload the VACO API with redundant calls
       ::tis-tasks [(chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 15)))
                               (fn [_]
-                                (#'poll-incomplete-entry-results! config db)))]))
+                                (#'poll-tis-entries! config db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
