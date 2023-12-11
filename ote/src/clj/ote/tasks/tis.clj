@@ -19,11 +19,11 @@
   [config link operator-id service-id]
   (when-let [href (get link "href")]
     (with-open [in (:body (http-client/get href {:as :stream}))]
-      (let [filename (import-gtfs/gtfs-file-name operator-id service-id)]
-        (s3/put-object (:bucket config)
-                       filename
-                       in
-                       {:content-length (.available in)})
+      (let [bucket   (get-in config [:netex :bucket])
+            available (.available in)
+            filename (import-gtfs/gtfs-file-name operator-id service-id)]
+        (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
+        (s3/put-object bucket filename in {:content-length available})
         filename))))
 
 (defn poll-incomplete-entry-results!
