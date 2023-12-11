@@ -81,8 +81,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ; 5 minute delay is more than enough, we do not want to overload the VACO API with redundant calls
-      ::tis-tasks [(chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 15)))
+      ::tis-tasks [(chime/chime-at (periodic/periodic-seq (t/now) (t/minutes 15))
                               (fn [_]
                                 (#'poll-tis-entries! config db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
