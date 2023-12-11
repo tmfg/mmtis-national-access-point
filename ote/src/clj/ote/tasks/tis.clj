@@ -16,15 +16,22 @@
 (defqueries "ote/tasks/tis.sql")
 
 (defn ^:private copy-to-s3
-  [config link operator-id service-id]
+  [config link filename]
   (when-let [href (get link "href")]
     (with-open [in (:body (http-client/get href {:as :stream}))]
-      (let [bucket   (get-in config [:netex :bucket])
-            available (.available in)
-            filename (import-gtfs/gtfs-file-name operator-id service-id)]
+      (let [bucket    (get-in config [:netex :bucket])
+            available (.available in)]
         (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
         (s3/put-object bucket filename in {:content-length available})
         filename))))
+
+(defn get-filename
+  [package]
+  (let [{operator-id  :transport-operator-id
+         service-id   :transport-service-id
+         interface-id :external-interface-description-id} package
+        date (.format (java.text.SimpleDateFormat. "yyyy-MM-dd") (java.util.Date.))]
+    (str date "_" operator-id "_" service-id "_" interface-id "_netex.zip")))
 
 (defn poll-incomplete-entry-results!
   "Polls incomplete TIS entries and complete them by storing the result links to database."
@@ -44,10 +51,7 @@
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
-                  (let [filename (copy-to-s3
-                                   config
-                                   result
-                                   (:transport-operator-id package))]
+                  (let [filename (copy-to-s3 config result (get-filename package))]
                     (netex/set-conversion-status!
                       {:netex-filepath filename
                        :s3-filename    filename
@@ -81,8 +85,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ; 5 minute delay is more than enough, we do not want to overload the VACO API with redundant calls
-      ::tis-tasks [(chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 15)))
+      ::tis-tasks [(chime/chime-at (periodic/periodic-seq (t/now) (t/minutes 15))
                               (fn [_]
                                 (#'poll-tis-entries! config db)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
