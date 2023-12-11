@@ -17,7 +17,7 @@
 
 (defn ^:private copy-to-s3
   [config link operator-id service-id]
-  (when-let [{href :href} link]
+  (when-let [href (get link "href")]
     (with-open [in (:body (http-client/get href {:as :stream}))]
       (let [filename (import-gtfs/gtfs-file-name operator-id service-id)]
         (s3/put-object (:bucket config)
