@@ -3,6 +3,7 @@
   (:require [camel-snake-kebab.core :as csk]
             [cheshire.core :as cheshire]
             [clj-http.client :as http-client]
+            [clojure.java.io :as io]
             [clojure.string :as str]
             [java-time :as jt]
             [ote.db.transport-operator :as t-operator]
@@ -72,30 +73,42 @@
             {:keys [status headers body]} (call endpoint
                                                 (merge
                                                   {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                                  "Authorization" (str "Bearer " access-token)}
-                                                   :content-type :json}
+                                                                  "Authorization" (str "Bearer " access-token)}}
                                                   params
                                                   (when body {:body (when body (cheshire/generate-string body))})))]
         (log/info (str "API call to " endpoint " returned " status))
-        (cheshire/parse-string body))
+        body)
       (catch Exception e
         (log/warn e (str "Failed API call " endpoint))
         nil))))
 
 (defn api-queue-create
   [config payload]
-  (api-call config http-client/post "/api/queue" payload))
+  (some-> (api-call config http-client/post "/api/queue" payload {:content-type :json})
+          (cheshire/parse-string)))
 
 (defn api-fetch-entry
   [config entry-id]
-  (or (api-call config http-client/get (str "/api/queue/" entry-id) nil)
+  (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil{:content-type :json})
+              (cheshire/parse-string))
       (do
         (log/info (str "No fetch-entry result available for " entry-id))
         {})))
 
-(defn download-package
+(defn read-to-memory [is]
+  (let [baos (java.io.ByteArrayOutputStream.)]
+    (io/copy is baos)
+    (java.io.ByteArrayInputStream. (.toByteArray baos))))
+
+(defn api-download-file
   [config href]
-  (:body (api-call config http-client/get href {:content-type nil :as :stream})))
+  (let [{:keys [access-token]} (swap! auth-data update-expired-token config)
+        body (-> (http-client/get href {:headers {"User-Agent"    "Fintraffic FINAP / 0.1"
+                                                  "Authorization" (str "Bearer " access-token)}
+                                        :as      :stream})
+                 :body
+                 (read-to-memory))]
+    body))
 
 (defn queue-entry
   [db
