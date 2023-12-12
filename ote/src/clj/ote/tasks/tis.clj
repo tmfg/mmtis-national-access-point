@@ -18,7 +18,7 @@
 (defn ^:private copy-to-s3
   [config link filename]
   (when-let [href (get link "href")]
-    (with-open [in (tis-vaco/download-package (:tis-vaco config) href)]
+    (with-open [in (tis-vaco/api-download-file (:tis-vaco config) href)]
       (let [bucket    (get-in config [:netex :bucket])
             available (.available in)]
         (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
