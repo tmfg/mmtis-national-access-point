@@ -85,7 +85,7 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::tis-tasks [(chime/chime-at (periodic/periodic-seq (t/now) (t/minutes 15))
+      ::tis-tasks [(chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
                               (fn [_]
                                 (#'poll-tis-entries! config db)))]))
   (stop [{stop-tasks ::tis-tasks :as this}]

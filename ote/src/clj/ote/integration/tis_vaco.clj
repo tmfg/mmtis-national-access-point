@@ -64,7 +64,7 @@
 
 (defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
-  [config call url body & params]
+  [config call url body params]
   (let [endpoint                      (if (str/starts-with? url (:api-base-url config))
                                         url
                                         (str (:api-base-url config) url))]
@@ -89,7 +89,7 @@
 
 (defn api-fetch-entry
   [config entry-id]
-  (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil{:content-type :json})
+  (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil {:content-type :json})
               (cheshire/parse-string))
       (do
         (log/info (str "No fetch-entry result available for " entry-id))
