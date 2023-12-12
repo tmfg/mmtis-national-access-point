@@ -64,23 +64,23 @@
 (defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
   [config call url body & params]
-  (try
-    (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
-          endpoint                      (if (str/starts-with? url (:api-base-url config))
-                                          url
-                                          (str (:api-base-url config) url))
-          {:keys [status headers body]} (call endpoint
-                                              (merge
-                                                {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                                "Authorization" (str "Bearer " access-token)}
-                                                 :content-type :json}
-                                                params
-                                                (when body {:body (when body (cheshire/generate-string body))})))]
-      (log/info (str "API call to " endpoint " returned " status))
-      (cheshire/parse-string body))
-    (catch Exception e
-      (log/warn e (str "Failed API call " (str (:api-base-url config) url)))
-      nil)))
+  (let [endpoint                      (if (str/starts-with? url (:api-base-url config))
+                                        url
+                                        (str (:api-base-url config) url))]
+    (try
+      (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
+            {:keys [status headers body]} (call endpoint
+                                                (merge
+                                                  {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
+                                                                  "Authorization" (str "Bearer " access-token)}
+                                                   :content-type :json}
+                                                  params
+                                                  (when body {:body (when body (cheshire/generate-string body))})))]
+        (log/info (str "API call to " endpoint " returned " status))
+        (cheshire/parse-string body))
+      (catch Exception e
+        (log/warn e (str "Failed API call " endpoint))
+        nil))))
 
 (defn api-queue-create
   [config payload]
