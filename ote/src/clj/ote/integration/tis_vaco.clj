@@ -3,6 +3,7 @@
   (:require [camel-snake-kebab.core :as csk]
             [cheshire.core :as cheshire]
             [clj-http.client :as http-client]
+            [clojure.string :as str]
             [java-time :as jt]
             [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
@@ -65,15 +66,17 @@
   [config call url body & params]
   (try
     (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
-          rest-endpoint                 (str (:api-base-url config) url)
-          {:keys [status headers body]} (call rest-endpoint
+          endpoint                      (if (str/starts-with? url (:api-base-url config))
+                                          url
+                                          (str (:api-base-url config) url))
+          {:keys [status headers body]} (call endpoint
                                               (merge
                                                 {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
                                                                 "Authorization" (str "Bearer " access-token)}
                                                  :content-type :json}
                                                 params
                                                 (when body {:body (when body (cheshire/generate-string body))})))]
-      (log/info (str "API call to " rest-endpoint " returned " status))
+      (log/info (str "API call to " endpoint " returned " status))
       (cheshire/parse-string body))
     (catch Exception e
       (log/warn e (str "Failed API call " (str (:api-base-url config) url)))
