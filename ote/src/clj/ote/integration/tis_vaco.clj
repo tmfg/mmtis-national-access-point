@@ -95,7 +95,7 @@
 
 (defn download-package
   [config href]
-  (:body (api-call config http-client/get href {:as :stream})))
+  (:body (api-call config http-client/get href {:content-type nil :as :stream})))
 
 (defn queue-entry
   [db
