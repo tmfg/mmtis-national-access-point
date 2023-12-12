@@ -18,7 +18,7 @@
 (defn ^:private copy-to-s3
   [config link filename]
   (when-let [href (get link "href")]
-    (with-open [in (:body (http-client/get href {:as :stream}))]
+    (with-open [in (tis-vaco/download-package (:tis-vaco config) href)]
       (let [bucket    (get-in config [:netex :bucket])
             available (.available in)]
         (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
@@ -88,10 +88,10 @@
       ::tis-tasks [(chime/chime-at (periodic/periodic-seq (t/now) (t/minutes 15))
                               (fn [_]
                                 (#'poll-tis-entries! config db)))]))
-  (stop [{stop-tasks ::stop-tasks :as this}]
+  (stop [{stop-tasks ::tis-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
-    (dissoc this ::stop-tasks)))
+    (dissoc this ::tis-tasks)))
 
 (defn tis-tasks [config]
   (->TisTasks config))

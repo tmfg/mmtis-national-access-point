@@ -62,7 +62,7 @@
 
 (defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
-  [config call url body]
+  [config call url body & params]
   (try
     (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
           rest-endpoint                 (str (:api-base-url config) url)
@@ -71,6 +71,7 @@
                                                 {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
                                                                 "Authorization" (str "Bearer " access-token)}
                                                  :content-type :json}
+                                                params
                                                 (when body {:body (when body (cheshire/generate-string body))})))]
       (log/info (str "API call to " rest-endpoint " returned " status))
       (cheshire/parse-string body))
@@ -88,6 +89,10 @@
       (do
         (log/info (str "No fetch-entry result available for " entry-id))
         {})))
+
+(defn download-package
+  [config href]
+  (:body (api-call config http-client/get href {:as :stream})))
 
 (defn queue-entry
   [db
