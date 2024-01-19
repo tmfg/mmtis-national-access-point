@@ -1790,5 +1790,11 @@ You can also draw the operating area or point to the map with drawing tools. You
                                         :operating-areas    {:title       "Operating areas"
                                                              :add-button  "Add"
                                                              :save-button "Save"}}}}
+
+ ; TIS VACO service integration and announcement related translations
+ :tis-vaco {:announcement {:title "The Finap.fi contact point is renewing in January-February 2024."
+                           :content "Fintraffic will launch a validation and conversion service (VACO) to improve the accuracy and quality of travel data. Entities publishing their travel data in the service catalogue will in future receive messages related to the summary and quality reports of their data releases. For more information, visit "
+                           :link-url "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"
+                           :link-label "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"}}
  }
 

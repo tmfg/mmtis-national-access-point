@@ -35,6 +35,18 @@
     [linkify (tr [:common-texts :footer-livi-url-link])
      (tr [:common-texts :footer-livi-url-link])]]])
 
+(defn tis-vaco-announcement
+  []
+  [:div
+   {:style {:margin "0.2em"
+            :border "4px solid #213BF7"}}
+   [:p {:style {:margin "10px 0px 0px 10px"
+                :font-weight "bold"}}
+    (tr [:tis-vaco :announcement :title])]
+   [:p {:style {:margin "10px"}}
+    (tr [:tis-vaco :announcement :content])
+    [linkify (tr [:tis-vaco :announcement :link-url]) (tr [:tis-vaco :announcement :link-label])]]])
+
 (defn front-page
   "Front page info"
   [e! {user :user :as app}]
@@ -64,6 +76,8 @@
 
    (when test-env?
      [test-env-warning])
+
+   [tis-vaco-announcement]
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
