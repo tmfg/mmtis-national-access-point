@@ -1287,6 +1287,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :transport-type "Liikennemuoto"
   :homepage "Verkko-osoite"
   :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
+  :vaco-generated-url "VACOn generoima NeTEx-rajapinta"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 

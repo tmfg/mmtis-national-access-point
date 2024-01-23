@@ -283,8 +283,8 @@
                    format (first (::t-service/format interface))
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
          ^{:key (str (::t-service/id interface) title)}
-         [info-sections-2-cols (string/upper-case title)
-          [:div
+         [:div
+          [info-sections-1-col (string/upper-case title)
            [common-ui/information-row-with-option
             (tr [:service-search :homepage])
             (when url [common-ui/linkify
@@ -292,26 +292,46 @@
                        url
                        {:target "_blank"
                         :analytics-tag "Verkko-osoite"}])
-            false]
-           [common-ui/information-row-with-option
-            (tr [:field-labels :transport-service-common ::t-service/license])
-            license
-            false]
-           (when url-ote-netex
-             [common-ui/information-row-with-option
-              (tr [:service-search :ote-generated-url])
-              [common-ui/linkify
-               (str url-ote-netex "?origin=ui")
-               url-ote-netex
-               {:target "_blank"}]
-              false])]
-          [:div
-           [common-ui/information-row-with-option (tr [:common-texts :format]) format false]
-           [information-row-with-selection
-            (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-            descriptions
-            false]]
-          {:sub-title true}]))
+            true]]
+          [info-sections-3-cols
+             ""
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+              [common-ui/information-row-with-option
+               (tr [:field-labels :transport-service-common ::t-service/license])
+               license false]]
+
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+              [common-ui/information-row-with-option
+               (tr [:common-texts :format]) format true]]
+             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+              [information-row-with-selection
+               (tr [:field-labels :transport-service-common ::t-service/external-service-description])
+               descriptions
+               false]]
+             {:sub-title false}]
+          (when url-ote-netex
+            (if-let [tis-vaco (:tis-vaco interface)]
+              [info-sections-1-col
+               nil
+               [common-ui/information-row-with-option
+                (tr [:service-search :vaco-generated-url])
+                [:div
+                 [:img {:src (str (:api-base-url tis-vaco) "/api/badge/" (:gtfs/tis-entry-public-id tis-vaco))
+                        :style {:margin-right "0.5em"}
+                     :height "24" :title "VACO status badge" :alt "VACO status badge"}]
+                 (when (and (:gtfs/tis-complete tis-vaco)
+                            (:gtfs/tis-success tis-vaco))
+                   [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}])]
+                true]
+               {:sub-title false}]
+
+              [info-sections-1-col
+               nil
+               [common-ui/information-row-with-option
+                (tr [:service-search :ote-generated-url])
+                [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}]
+                true]
+               {:sub-title false}]))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
                                {:color colors/gray650
@@ -954,7 +974,7 @@
        [operator-info (tr [:service-viewer :operator-info]) to]
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
-       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts) (::t-service/sub-type ts)]
+       [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts) (::t-service/sub-type ts) "TODO package"]
        [spacer]
 
        (case service-sub-type

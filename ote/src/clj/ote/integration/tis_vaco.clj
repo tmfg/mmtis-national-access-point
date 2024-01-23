@@ -6,6 +6,7 @@
             [clojure.java.io :as io]
             [clojure.string :as str]
             [java-time :as jt]
+            [ote.db.netex :as netex]
             [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
             [taoensso.timbre :as log]))
@@ -142,3 +143,14 @@
         new-entry
         (catch Exception e
           (log/warn e "Failed to update GTFS package with TIS VACO entry reference"))))))
+
+(defn fetch-public-data
+  "Returns publicly available data about the NeTEx `interface` if any. Data should be used for rendering
+  badges/inter-service links and such.
+
+  Returns `nil` if public data isn't available for any reason."
+  [db config interface-id package-id]
+  (when-let [package (find-package db interface-id package-id)]
+    (-> package
+        (select-keys [:gtfs/tis-entry-public-id :gtfs/tis-success :gtfs/tis-complete])
+        (assoc :api-base-url (get-in config [:tis-vaco :api-base-url])))))

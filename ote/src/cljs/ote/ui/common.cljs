@@ -97,7 +97,7 @@
                              ;; https://mathiasbynens.github.io/rel-noopener/ Avoid a browser vulnerability by using noopener noreferrer.
                              (assoc props :rel "noopener noreferrer")
                              props)
-                           :icon :style :hide-external-icon? :force-external-icon?)
+                           :icon :style :hide-external-icon? :force-external-icon? :analytics-tag)
          [url external?] (sanitize-url url)
          on-click-fn     (if (and external?
                                   (not (trusted-url? url)))
