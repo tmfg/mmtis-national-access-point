@@ -3,7 +3,8 @@
   (:require [specql.core :as specql]
             [specql.op :as op]
             [ote.db.netex :as netex]
-            [ote.db.transport-service :as t-service]))
+            [ote.db.transport-service :as t-service]
+            [ote.integration.tis-vaco :as tis-vaco]))
 
 (defn file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
   (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
@@ -54,10 +55,11 @@
                                                                            (::netex/external-interface-description-id conversion))
                                                                     conversion))
                                                                 conversions)]
-                              (assoc interface :url-ote-netex
-                                               (file-download-url config
+                              (assoc interface
+                                :url-ote-netex (file-download-url config
                                                                   (::netex/transport-service-id interface-conversion)
-                                                                  (::netex/id interface-conversion)))
+                                                                  (::netex/id interface-conversion))
+                                :tis-vaco (tis-vaco/fetch-public-data db config interface-id (::netex/package_id interface-conversion)))
                               interface))))))
             services)
       services)))
