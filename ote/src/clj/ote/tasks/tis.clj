@@ -9,8 +9,11 @@
             [jeesql.core :refer [defqueries]]
             [ote.integration.tis-vaco :as tis-vaco]
             [ote.netex.netex :as netex]
+            [ote.tasks.util :as tasks-util]
+            [ote.time :as time]
             [ote.util.feature :as feature]
             [ote.integration.import.gtfs :as import-gtfs]
+            [specql.core :as specql]
             [taoensso.timbre :as log]))
 
 (defqueries "ote/tasks/tis.sql")
@@ -74,6 +77,56 @@
           )
         packages))))
 
+(defn ^:private interface-latest-package [db interface-id]
+  (when interface-id
+    (first
+      (specql/fetch db :gtfs/package
+                    #{:gtfs/id :gtfs/etag :gtfs/sha256}
+                    {:gtfs/external-interface-description-id interface-id
+                     :gtfs/deleted? false}
+                    {::specql/order-by :gtfs/created
+                     ::specql/order-direction :descending
+                     ::specql/limit 1}))))
+
+(defn ^:private create-package
+  [db operator-id service-id external-interface-description-id license]
+  (let [latest-package (interface-latest-package db external-interface-description-id)
+        package-count (:package-count (first (fetch-count-service-packages db {:service-id service-id})))]
+    (specql/insert! db :gtfs/package
+                    {:gtfs/first_package (= 0 package-count)
+                     :gtfs/transport-operator-id operator-id
+                     :gtfs/transport-service-id service-id
+                     :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
+                     :gtfs/license license
+                     :gtfs/external-interface-description-id external-interface-description-id})))
+
+(defn submit-known-interfaces!
+  [config db]
+  (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
+  (when (feature/feature-enabled? config :tis-vaco-integration)
+    (->> (list-all-external-interfaces db)
+         (map
+           (fn [interface]
+             (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+                   package (create-package db operator-id service-id external-interface-description-id license)]
+               (log/info (str "interface: " interface))
+               (log/info (str "package: " package))
+               (tis-vaco/queue-entry db (:tis-vaco config)
+                                     {:url         url
+                                      :operator-id operator-id
+                                      :id          external-interface-description-id}
+                                     {:service-id    service-id
+                                      :package-id    (:gtfs/id package)
+                                      :operator-name operator-name}))))
+         doall)))
+
+(defn submit-finap-feeds!
+  [config db]
+  (try
+    (submit-known-interfaces! config db)
+    (catch Exception e
+      (log/warn e "Failure during polling!"))))
+
 (defn poll-tis-entries!
   [config db]
   (try
@@ -85,9 +138,12 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::tis-tasks [(chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
-                              (fn [_]
-                                (#'poll-tis-entries! config db)))]))
+      ::tis-tasks [(chime/chime-at (tasks-util/daily-at 3 15)
+                                   (fn [_]
+                                     (#'submit-finap-feeds! config db)))
+                   (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
+                                   (fn [_]
+                                     (#'poll-tis-entries! config db)))]))
   (stop [{stop-tasks ::tis-tasks :as this}]
     (doseq [stop stop-tasks]
       (stop))
