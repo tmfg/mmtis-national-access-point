@@ -7,6 +7,7 @@
             [clj-time.periodic :as periodic]
             [com.stuartsierra.component :as component]
             [jeesql.core :refer [defqueries]]
+            [ote.db.lock :as lock]
             [ote.integration.tis-vaco :as tis-vaco]
             [ote.netex.netex :as netex]
             [ote.tasks.util :as tasks-util]
@@ -104,21 +105,22 @@
   [config db]
   (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
   (when (feature/feature-enabled? config :tis-vaco-integration)
-    (->> (list-all-external-interfaces db)
-         (map
-           (fn [interface]
-             (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
-                   package (create-package db operator-id service-id external-interface-description-id license)]
-               (log/info (str "interface: " interface))
-               (log/info (str "package: " package))
-               (tis-vaco/queue-entry db (:tis-vaco config)
-                                     {:url         url
-                                      :operator-id operator-id
-                                      :id          external-interface-description-id}
-                                     {:service-id    service-id
-                                      :package-id    (:gtfs/id package)
-                                      :operator-name operator-name}))))
-         doall)))
+    (lock/try-with-lock
+      db "tis-vaco-queue-entries" 1800 ; lock for 30 minutes
+      (->> (list-all-external-interfaces db)
+           (map
+             (fn [interface]
+               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+                     package (create-package db operator-id service-id external-interface-description-id license)]
+                 (log/info (str "Submit package " (:gtfs/id package)  " to TIS VACO for processing"))
+                 (tis-vaco/queue-entry db (:tis-vaco config)
+                                       {:url         url
+                                        :operator-id operator-id
+                                        :id          external-interface-description-id}
+                                       {:service-id    service-id
+                                        :package-id    (:gtfs/id package)
+                                        :operator-name operator-name}))))
+           doall))))
 
 (defn submit-finap-feeds!
   [config db]
