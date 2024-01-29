@@ -105,7 +105,7 @@
   [config db]
   (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
   (when (feature/feature-enabled? config :tis-vaco-integration)
-    (lock/try-with-lock
+    (lock/with-exclusive-lock
       db "tis-vaco-queue-entries" 1800 ; lock for 30 minutes
       (->> (list-all-external-interfaces db)
            (map
