@@ -50,7 +50,9 @@
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
+                  complete? (let [status (get-in entry ["data" "status"])]
+                              (not (or (= status "received")
+                                       (= status "processing"))))
                   result    (get-in entry ["links" tis-vaco/conversion-rule-name "result"])]
               (if result
                 (do
