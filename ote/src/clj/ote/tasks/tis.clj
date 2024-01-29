@@ -50,7 +50,9 @@
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete? (every? (fn [t] (not (some? (get t "completed")))) (get-in entry ["data" "tasks"]))
+                  complete? (let [status (get-in entry ["data" "status"])]
+                              (not (or (= status "received")
+                                       (= status "processing"))))
                   result    (get-in entry ["links" tis-vaco/conversion-rule-name "result"])]
               (if result
                 (do
@@ -105,22 +107,26 @@
   [config db]
   (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
   (when (feature/feature-enabled? config :tis-vaco-integration)
-    (lock/try-with-lock
-      db "tis-vaco-queue-entries" 1800 ; lock for 30 minutes
-      (->> (list-all-external-interfaces db)
-           (map
-             (fn [interface]
-               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
-                     package (create-package db operator-id service-id external-interface-description-id license)]
-                 (log/info (str "Submit package " (:gtfs/id package)  " to TIS VACO for processing"))
-                 (tis-vaco/queue-entry db (:tis-vaco config)
-                                       {:url         url
-                                        :operator-id operator-id
-                                        :id          external-interface-description-id}
-                                       {:service-id    service-id
-                                        :package-id    (:gtfs/id package)
-                                        :operator-name operator-name}))))
-           doall))))
+    (lock/with-exclusive-lock
+      db "tis-vaco-queue-entries" 1800                      ; lock for 30 minutes
+      (try
+        (->> (list-all-external-interfaces db)
+             (map
+               (fn [interface]
+                 (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+                       package (create-package db operator-id service-id external-interface-description-id license)]
+                   (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
+                   (tis-vaco/queue-entry db (:tis-vaco config)
+                                         {:url         url
+                                          :operator-id operator-id
+                                          :id          external-interface-description-id}
+                                         {:service-id                        service-id
+                                          :package-id                        (:gtfs/id package)
+                                          :external-interface-description-id external-interface-description-id
+                                          :operator-name                     operator-name}))))
+             doall)
+        (catch Exception e
+          (log/warn e "Failed to submit known interfaces"))))))
 
 (defn submit-finap-feeds!
   [config db]
