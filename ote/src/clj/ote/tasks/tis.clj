@@ -106,21 +106,24 @@
   (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
   (when (feature/feature-enabled? config :tis-vaco-integration)
     (lock/with-exclusive-lock
-      db "tis-vaco-queue-entries" 1800 ; lock for 30 minutes
-      (->> (list-all-external-interfaces db)
-           (map
-             (fn [interface]
-               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
-                     package (create-package db operator-id service-id external-interface-description-id license)]
-                 (log/info (str "Submit package " (:gtfs/id package)  " to TIS VACO for processing"))
-                 (tis-vaco/queue-entry db (:tis-vaco config)
-                                       {:url         url
-                                        :operator-id operator-id
-                                        :id          external-interface-description-id}
-                                       {:service-id    service-id
-                                        :package-id    (:gtfs/id package)
-                                        :operator-name operator-name}))))
-           doall))))
+      db "tis-vaco-queue-entries" 1800                      ; lock for 30 minutes
+      (try
+        (->> (list-all-external-interfaces db)
+             (map
+               (fn [interface]
+                 (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+                       package (create-package db operator-id service-id external-interface-description-id license)]
+                   (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id " to TIS VACO for processing"))
+                   (tis-vaco/queue-entry db (:tis-vaco config)
+                                         {:url         url
+                                          :operator-id operator-id
+                                          :id          external-interface-description-id}
+                                         {:service-id    service-id
+                                          :package-id    (:gtfs/id package)
+                                          :operator-name operator-name}))))
+             doall)
+        (catch Exception e
+          (log/warn e "Failed to submit known interfaces"))))))
 
 (defn submit-finap-feeds!
   [config db]
