@@ -241,9 +241,9 @@
       nil))))
 
 (defmulti validate-interface-zip-package
-          (fn [type _ _ _] type))
+          (fn [type _] type))
 
-(defmethod validate-interface-zip-package :gtfs [_ db package-id byte-array-input]
+(defmethod validate-interface-zip-package :gtfs [_ byte-array-input]
   (let [expected-files #{"agency.txt" "stops.txt" "stop_times.txt" "calendar_dates.txt" "routes.txt" "trips.txt"}
         file-list      (list-zip byte-array-input)
         missing-files  (clojure.set/difference expected-files (set file-list))]
@@ -254,7 +254,7 @@
                        :file-list      file-list
                        :missing-files  missing-files})))))
 
-(defmethod validate-interface-zip-package :kalkati [_ db package-id byte-array-input]
+(defmethod validate-interface-zip-package :kalkati [_ byte-array-input]
   (let [file-list (list-zip byte-array-input)]
 
     (when-not (contains? file-list "LVM.xml")
@@ -262,7 +262,7 @@
 
 (defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
-    (validate-interface-zip-package type db package-id byte-array-data)
+    (validate-interface-zip-package type byte-array-data)
 
     (catch Exception e
       (let [message (str "Error when opening interface zip package from url " url ":" (.getMessage e))
