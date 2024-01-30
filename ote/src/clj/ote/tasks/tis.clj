@@ -105,28 +105,29 @@
 
 (defn submit-known-interfaces!
   [config db]
-  (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
   (when (feature/feature-enabled? config :tis-vaco-integration)
     (lock/with-exclusive-lock
-      db "tis-vaco-queue-entries" 1800                      ; lock for 30 minutes
-      (try
-        (->> (list-all-external-interfaces db)
-             (map
-               (fn [interface]
-                 (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
-                       package (create-package db operator-id service-id external-interface-description-id license)]
-                   (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
-                   (tis-vaco/queue-entry db (:tis-vaco config)
-                                         {:url         url
-                                          :operator-id operator-id
-                                          :id          external-interface-description-id}
-                                         {:service-id                        service-id
-                                          :package-id                        (:gtfs/id package)
-                                          :external-interface-description-id external-interface-description-id
-                                          :operator-name                     operator-name}))))
-             doall)
-        (catch Exception e
-          (log/warn e "Failed to submit known interfaces"))))))
+      db "tis-vaco-queue-entries" 1800  ; lock for 30 minutes
+      (do
+        (log/info "Submitting all known external interfaces as new entries to TIS/VACO API")
+        (try
+          (->> (list-all-external-interfaces db)
+               (map
+                 (fn [interface]
+                   (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+                         package (create-package db operator-id service-id external-interface-description-id license)]
+                     (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
+                     (tis-vaco/queue-entry db (:tis-vaco config)
+                                           {:url         url
+                                            :operator-id operator-id
+                                            :id          external-interface-description-id}
+                                           {:service-id                        service-id
+                                            :package-id                        (:gtfs/id package)
+                                            :external-interface-description-id external-interface-description-id
+                                            :operator-name                     operator-name}))))
+               doall)
+          (catch Exception e
+            (log/warn e "Failed to submit known interfaces")))))))
 
 (defn submit-finap-feeds!
   [config db]
@@ -146,7 +147,9 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::tis-tasks [(chime/chime-at (tasks-util/daily-at 3 15)
+      ::tis-tasks [(chime/chime-at (tasks-util/daily-at
+                                     ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
+                                     (if (:testing-env? config) 10 3) 15)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
