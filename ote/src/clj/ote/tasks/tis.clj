@@ -57,7 +57,7 @@
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
-                  (let [filename (copy-to-s3 config result (get-filename package))]
+                  (let [filename (get-filename package)#_(copy-to-s3 config result (get-filename package))]
                     (netex/set-conversion-status!
                       {:netex-filepath filename
                        :s3-filename    filename
@@ -146,7 +146,9 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
-      ::tis-tasks [(chime/chime-at (tasks-util/daily-at 3 15)
+      ::tis-tasks [(chime/chime-at (tasks-util/daily-at
+                                     ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
+                                     (if (:testing-env? config) 8 3) 15)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
