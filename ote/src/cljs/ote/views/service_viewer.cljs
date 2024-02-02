@@ -310,28 +310,32 @@
                false]]
              {:sub-title false}]
           (when url-ote-netex
-            (if-let [tis-vaco (:tis-vaco interface)]
-              [info-sections-1-col
-               nil
-               [common-ui/information-row-with-option
-                (tr [:service-search :vaco-generated-url])
-                [:div
-                 [:img {:src (str (:api-base-url tis-vaco) "/api/badge/" (:gtfs/tis-entry-public-id tis-vaco))
-                        :style {:margin-right "0.5em"}
-                     :height "24" :title "VACO status badge" :alt "VACO status badge"}]
-                 (when (and (:gtfs/tis-complete tis-vaco)
-                            (:gtfs/tis-success tis-vaco))
-                   [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}])]
-                true]
-               {:sub-title false}]
+            (let [tis-vaco  (:tis-vaco interface)
+                  public-id (:gtfs/tis-entry-public-id tis-vaco)]
+              (if (some? public-id)
+                ; VACO-originating NeTEx conversion
+                [info-sections-1-col
+                 nil
+                 [common-ui/information-row-with-option
+                  (tr [:service-search :vaco-generated-url])
+                  [:div
+                   [:img {:src (str (:api-base-url tis-vaco) "/api/badge/" public-id)
+                          :style {:margin-right "0.5em"}
+                          :height "24" :title "VACO status badge" :alt "VACO status badge"}]
+                   (when (and (:gtfs/tis-complete tis-vaco)
+                              (:gtfs/tis-success tis-vaco))
+                     [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}])]
+                  true]
+                 {:sub-title false}]
 
-              [info-sections-1-col
-               nil
-               [common-ui/information-row-with-option
-                (tr [:service-search :ote-generated-url])
-                [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}]
-                true]
-               {:sub-title false}]))]))
+                ; FINAP (Chouette)-originating NeTEx conversion
+                [info-sections-1-col
+                 nil
+                 [common-ui/information-row-with-option
+                  (tr [:service-search :ote-generated-url])
+                  [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}]
+                  true]
+                 {:sub-title false}])))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
                                {:color colors/gray650
