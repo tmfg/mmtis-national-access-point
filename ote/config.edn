@@ -75,5 +75,6 @@
 
  :tis-vaco {:tenant-id     "placeholder"
             :client-id     "placeholder"
+            :scope         "placeholder"
             :client-secret "placeholder"
             :api-base-url  "placeholder"}}

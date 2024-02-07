@@ -16,11 +16,11 @@
 
 (def ^:private auth-data (atom {}))
 
-(defn ^:private get-token [tenant-id client-id client-secret]
-  {:url (str "https://login.microsoftonline.com/" tenant-id "/oauth2/v2.0/token")
-   :params {"grant_type" "client_credentials"
-            "client_id" client-id
-            "scope" (str client-id "/.default")
+(defn ^:private get-token [tenant-id client-id scope client-secret]
+  {:url    (str "https://login.microsoftonline.com/" tenant-id "/oauth2/v2.0/token")
+   :params {"grant_type"    "client_credentials"
+            "client_id"     client-id
+            "scope"         scope
             "client_secret" client-secret}})
 
 (defn ^:private token-expired?
@@ -35,9 +35,9 @@
 (defn ^:private update-expired-token
   "Handles access token caching to avoid nuking Azure AD endpoints. Uses token expiration as refresh hint. See also
   [[token-expired?]]"
-  [auth-data {:keys [tenant-id client-id client-secret]}]
+  [auth-data {:keys [tenant-id client-id scope client-secret]}]
   (if (token-expired? (:expires-in auth-data))
-    (let [{:keys [url params]}          (get-token tenant-id client-id client-secret)
+    (let [{:keys [url params]}          (get-token tenant-id client-id scope client-secret)
           {:keys [status headers body]} (http-client/post url {:form-params params})]
       (-> (cheshire/parse-string body csk/->kebab-case-keyword)
           (update :expires-in (fn [offset] (jt/plus (jt/local-date-time) (jt/seconds (- offset 10)))))))
