@@ -41,8 +41,7 @@
   "Polls incomplete TIS entries and complete them by storing the result links to database."
   [config db]
   (log/info "Polling for finished entries from TIS/VACO API")
-  (when (and (feature/feature-enabled? config :tis-vaco-integration)
-             (feature/feature-enabled? config :netex-conversion-automated))
+  (when (feature/feature-enabled? config :tis-vaco-integration)
     (let [packages (select-packages-without-finished-results db)]
       (log/info (str (count packages) " TIS packages to update"))
       (mapv
