@@ -47,7 +47,7 @@
            db :db :as this}]
     (assoc this
       ::stop
-      (when (feature/feature-enabled? config :netex-conversion-automated)
+      (when (feature/feature-enabled? config :tis-vaco-integration)
         (http/publish! http
                        {:authenticated? false}
                        (GET "/export/netex/:transport-service-id{[0-9]+}/:file-id{[0-9]+}"
