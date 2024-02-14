@@ -1,8 +1,6 @@
 (ns ote.tasks.tis
   (:require [amazonica.aws.s3 :as s3]
-            [cheshire.core :as cheshire]
             [chime :as chime]
-            [clj-http.client :as http-client]
             [clj-time.core :as t]
             [clj-time.periodic :as periodic]
             [com.stuartsierra.component :as component]
@@ -11,9 +9,7 @@
             [ote.integration.tis-vaco :as tis-vaco]
             [ote.netex.netex :as netex]
             [ote.tasks.util :as tasks-util]
-            [ote.time :as time]
             [ote.util.feature :as feature]
-            [ote.integration.import.gtfs :as import-gtfs]
             [specql.core :as specql]
             [taoensso.timbre :as log]))
 

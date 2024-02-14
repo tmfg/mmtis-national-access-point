@@ -62,19 +62,17 @@
                      :pre-notice
                      :gtfs-import
                      :ote-register
-                     :netex-conversion-automated
                      :service-validation
                      :terms-of-service
-                     :other-catalogs}
+                     :other-catalogs
+                     :tis-vaco-integration}
 
  :no-gtfs-update-for-operators #{}
 
- :netex {:chouette-path "/opt/chouette/"
-         :conversion-work-path "/tmp/ote/netex-conversion/"
-         :bucket "napote-netex-localdev"}
+ :netex {:bucket "napote-netex-localdev"}
 
  :tis-vaco {:tenant-id     "placeholder"
             :client-id     "placeholder"
-            :scope         "placeholder"
             :client-secret "placeholder"
+            :scope         "placeholder"
             :api-base-url  "placeholder"}}
