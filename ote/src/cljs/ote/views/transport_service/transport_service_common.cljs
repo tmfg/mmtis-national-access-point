@@ -225,7 +225,9 @@
                           {:name ::t-service/format
                            :type :autocomplete
                            :open-on-focus? true
-                           :suggestions ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
+                           :suggestions (if (flags/enabled? :new-transit-data-formats)
+                                          ["GTFS" "GTFS-RT" "GBFS" "Kalkati" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
+                                          ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"])
                            :max-results 10
                            :label (tr [:field-labels :transport-service-common ::t-service/format])
                            :field-class "col-xs-12 col-sm-3 col-md-3"

@@ -65,7 +65,8 @@
                      :service-validation
                      :terms-of-service
                      :other-catalogs
-                     :tis-vaco-integration}
+                     :tis-vaco-integration
+                     :new-transit-data-formats}
 
  :no-gtfs-update-for-operators #{}
 
