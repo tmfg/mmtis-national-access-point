@@ -117,7 +117,8 @@
 (defn interface-type [format]
   (case format
     "GTFS" :gtfs
-    "Kalkati.net" :kalkati
+    "Kalkati" :kalkati
+    "Kalkati.net" :kalkati  ; kept for legacy support
     nil))
 
 (defn- check-external-api

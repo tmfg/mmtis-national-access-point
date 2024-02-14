@@ -4,6 +4,7 @@
   (:require [cljs-react-material-ui.reagent :as ui]
             [ote.app.controller.admin :as admin-controller]
             [clojure.string :as str]
+            [ote.app.controller.flags :as flags]
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :as common-ui]
             [ote.time :as time]
@@ -112,7 +113,10 @@
           (tr [:service-search :view-routes])
           {:target "_blank"})))))
 
-(def interface-formats [:GTFS :Kalkati.net :ALL])
+(def interface-formats
+  (if (flags/enabled? :new-transit-data-formats)
+    [:GTFS :GTFS-RT :GBFS :Kalkati :SIRI :NeTEx :GeoJSON :JSON :CSV :ALL]
+    [:GTFS :Kalkati.net :ALL]))
 
 (defn interface-table-row [e! interface-id data-content operator-name format
                            import-error url date-0 imported db-error interface first? list-count selected-interface-id]

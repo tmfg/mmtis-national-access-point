@@ -1009,8 +1009,18 @@ You can also draw the operating area or point to the map with drawing tools. You
  :admin-page
  {:business-id-filter {:operators "Transport operators" :services "Services" :ALL "All"}
   :published-types {:YES "Published" :NO "Not published" :ALL "All"}
-  :interface-formats {:GTFS "GTFS" :Kalkati.net "Kalkati.net" :ALL "All"}
-  :report-types {:tertile "Tertiili" :month "Kuukausi"}}
+  :interface-formats  {:GTFS        "GTFS"
+                       :GTFS-RT     "GTFS-RT"
+                       :GBFS        "GBFS"
+                       :Kalkati     "Kalkati"
+                       :Kalkati.net "Kalkati"               ; kept for legacy support
+                       :SIRI        "SIRI"
+                       :NeTEx       "NeTEx"
+                       :GeoJSON     "GeoJSON"
+                       :JSON        "JSON"
+                       :CSV         "CSV"
+                       :ALL         "All"}
+  :report-types       {:tertile "Tertiili" :month "Kuukausi"}}
 
  :transit-changes
  {:route-new "New route"
