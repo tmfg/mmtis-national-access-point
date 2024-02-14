@@ -1,51 +1,46 @@
 (ns ote.services.admin
   "Backend services for admin functionality."
-  (:require [clojure.data.csv :as csv]
+  (:require [cheshire.core :as cheshire]
+            [clj-http.client :as http-client]
+            [clj-time.core :as t]
+            [clj-time.format :as format]
             [clojure.data :as data]
+            [clojure.data.csv :as csv]
             [clojure.set :as set]
             [clojure.spec.alpha :as spec]
             [clojure.string :as str]
-            [clj-http.client :as http-client]
             [com.stuartsierra.component :as component]
-            [specql.impl.composite :as composite]
-            [specql.core :refer [fetch update! insert! upsert! delete!] :as specql]
-            [specql.impl.registry :as specql-registry]
-            [specql.op :as op]
-            [clj-time.core :as t]
-            [clj-time.format :as format]
-            [taoensso.timbre :as log]
+            [compojure.core :refer [DELETE GET POST routes]]
             [hiccup.core :refer [html]]
-            [compojure.core :refer [routes GET POST DELETE]]
-            [cheshire.core :as cheshire]
-            [ote.components.http :as http]
-            [ote.util.csv :as csv-util]
-            [ote.db.tx :as tx]
-            [ote.db.gtfs :as gtfs]
-            [ote.transit :refer [clj->transit]]
             [jeesql.core :refer [defqueries]]
-            [ote.nap.users :as nap-users]
-            [specql.core :as specql]
+            [ote.authorization :as authorization]
+            [ote.components.http :as http]
+            [ote.components.service :refer [define-service-component]]
             [ote.db.auditlog :as auditlog]
-            [ote.db.transport-service :as t-service]
-            [ote.db.transport-operator :as t-operator]
-            [ote.db.transit :as transit]
             [ote.db.modification :as modification]
             [ote.db.netex :as netex]
-            [ote.integration.export.netex :as export-netex]
-            [ote.services.transport :as transport]
-            [ote.services.operators :as operators]
-            [ote.authorization :as authorization]
-            [ote.util.db :as db-util]
-            [ote.components.service :refer [define-service-component]]
-            [ote.localization :as localization :refer [tr]]
-            [ote.time :as time]
-            [ote.services.external :as external]
-            [ote.tasks.pre-notices :as pn]
-            [ote.tasks.gtfs :as task-gtfs]
+            [ote.db.transit :as transit]
+            [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [ote.email :as email]
+            [ote.localization :refer [tr]]
+            [ote.nap.users :as nap-users]
+            [ote.services.operators :as operators]
+            [ote.services.transport :as transport]
+            [ote.services.users :as srv-users]
+            [ote.tasks.gtfs :as task-gtfs]
+            [ote.tasks.pre-notices :as pn]
+            [ote.time :as time]
+            [ote.transit :refer [clj->transit]]
             [ote.util.collections :as ote-coll]
+            [ote.util.csv :as csv-util]
+            [ote.util.db :as db-util]
             [ote.util.email-template :as email-template]
-            [ote.services.users :as srv-users])
+            [specql.core :refer [fetch upsert!] :as specql]
+            [specql.impl.composite :as composite]
+            [specql.impl.registry :as specql-registry]
+            [specql.op :as op]
+            [taoensso.timbre :as log])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -259,12 +254,15 @@
                                routes-with-namespace)]
     routes-with-name))
 
+(defn netex-file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
+  (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
+
 (defn- assoc-download-url [config conversions]
   (mapv (fn [conv]
           (if (= :ok (keyword (:ote.db.netex/status conv)))
-            (assoc conv :url (export-netex/file-download-url config
-                                                             (:ote.db.transport-service/id conv)
-                                                             (:ote.db.netex/id conv)))
+            (assoc conv :url (netex-file-download-url config
+                                                      (:ote.db.transport-service/id conv)
+                                                      (:ote.db.netex/id conv)))
             conv))
         conversions))
 

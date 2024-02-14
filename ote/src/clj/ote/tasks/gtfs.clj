@@ -4,28 +4,26 @@
             [clj-time.core :as t]
             [clj-time.periodic :refer [periodic-seq]]
             [com.stuartsierra.component :as component]
+            [hiccup.core :as hiccup]
             [jeesql.core :refer [defqueries]]
-            [taoensso.timbre :as log]
-            [specql.core :as specql]
-            [ote.db.tx :as tx]
+            [ote.config.transit-changes-config :as config-tc]
+            [ote.db.lock :as lock]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.db.lock :as lock]
-            [ote.util.db :as util-db]
-            [ote.util.feature :as feature]
-            [ote.tasks.util :as tasks-util]
+            [ote.db.tx :as tx]
+            [ote.email :as email]
             [ote.integration.import.gtfs :as import-gtfs]
             [ote.integration.report :as report]
-            [ote.integration.tis-vaco :as tis-vaco]
+            [ote.localization :as localization]
+            [ote.tasks.util :as tasks-util]
             [ote.time :as time]
             [ote.transit-changes.detection :as detection]
-            [ote.config.transit-changes-config :as config-tc]
-            [ote.netex.netex :as netex]
-            [ote.email :as email]
+            [ote.util.db :as util-db]
             [ote.util.email-template :as email-template]
-            [ote.localization :as localization]
-            [hiccup.core :as hiccup])
-  (:import (org.joda.time DateTimeZone DateTime)
+            [ote.util.feature :as feature]
+            [specql.core :as specql]
+            [taoensso.timbre :as log])
+  (:import (org.joda.time DateTime DateTimeZone)
            (org.postgresql.util PSQLException)))
 
 (defqueries "ote/tasks/gtfs.sql")
@@ -125,13 +123,7 @@
                                  interface
                                  upload-s3?
                                  force-download?)]
-
-        (do
-          (if (feature/feature-enabled? config :netex-conversion-automated)
-            (if (netex/gtfs->netex-and-set-status! db (:netex config) conversion-meta)
-              nil                                           ; SUCCESS. Explicit nil to make success branch more obvious
-              (log/spy :warn "GTFS: Error on GTFS->NeTEx conversion"))
-            nil))                                           ; SUCCESS. Explicit nil to make success branch more obvious
+        nil  ; SUCCESS. Explicit nil to make success branch more obvious
         (log/spy :warn "GTFS: Could not import GTFS file. service-id = " (:ts-id interface)))
 
       (catch Exception e

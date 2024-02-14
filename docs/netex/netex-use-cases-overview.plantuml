@@ -6,15 +6,18 @@ hide footbox
 actor "USER" as USER
 actor "ADMIN" as ADMIN
 participant "NAP" as NAP
-participant "Chouette" as CONVERTER
+participant "TIS VACO" as CONVERTER
 
-
-group Scheduled task
-activate NAP
-NAP->NAP : Import GTFS
-NAP->CONVERTER : Convert GTFS to NeTEx
-return
+group Conversion task submission
+NAP->CONVERTER : Submit GTFS external interfaces
+CONVERTER-->NAP: task submission confirmation
 end
+
+group Conversion status polling
+NAP->CONVERTER : poll task completion
+CONVERTER-->NAP: conversion status
+end
+
 USER->NAP : Open service viewer
 return  Include NeTEx package link
 

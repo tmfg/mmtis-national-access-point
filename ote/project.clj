@@ -138,9 +138,6 @@
                  [com.google.guava/guava "21.0"]
                  ;; Infer clojure specs from sample data. - Eclipse Public License 1.0
                  #_[spec-provider "0.4.14"]
-                 ;; Also in use:
-                 ;; Chouette command line tool - CeCILL-B
-                 ;; Firejail - GNU General Public License, version 2
 
                  ; A Clojure[Script] library for word case conversions - Eclipse Public License 1.0
                  [camel-snake-kebab "0.4.2"]

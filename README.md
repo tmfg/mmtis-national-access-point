@@ -32,8 +32,6 @@ Here is a overview of our AWS production architecture. CI and other development 
  - [CircleCI](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/.circleci/README.md)
  - [Docker](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/nap/docker/README.md)
  - [Route Changes DevEnv setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/devsetup-route-changes.md)
- - [Netex configuration DevEnv setup](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/devsetup-netex.md)
- - [Chouette](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/tools/chouette/README.md)
  - [Geometry Data](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/geometry-data.md)
 
 ## API documentation

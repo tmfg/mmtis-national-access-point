@@ -1,23 +1,22 @@
 (ns ote.integration.export.geojson
   "Integration service that serves GeoJSON documents for published
   transport services."
-  (:require [ote.components.http :as http]
-            [ote.components.service :refer [define-service-component]]
+  (:require [cheshire.core :as cheshire]
+            [clojure.set :as set]
+            [clojure.spec.alpha :as s]
             [compojure.core :refer [GET]]
-            [specql.core :as specql]
+            [jeesql.core :refer [defqueries]]
+            [ote.components.http :as http]
+            [ote.components.service :refer [define-service-component]]
+            [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [jeesql.core :refer [defqueries]]
-            [cheshire.core :as cheshire]
-            [ote.db.modification :as modification]
-            [clojure.set :as set]
             [ote.integration.export.transform :as transform]
-            [ote.netex.netex_util :as netex-util]
-            [ote.util.feature :as feature]
-            [ote.time]                                      ; Require time which extends PGInterval JSON generation
-            [clojure.spec.alpha :as s]
-            [taoensso.timbre :as log]
-            [specql.op :as op]))
+            [ote.time]
+    ; Require time which extends PGInterval JSON generation
+            [specql.core :as specql]
+            [specql.op :as op]
+            [taoensso.timbre :as log]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -58,18 +57,6 @@
                      :style {:fill (if primary? "green" "orange")}))
                  areas)})
 
-(defn- append-nap-generated-netex-file-links
-  "Returns `service` collection where NAP NeTEx file download link is appended to interfaces collection."
-  [service db config]
-  (if (feature/feature-enabled? config :netex-conversion-automated)
-    (when service
-      (-> (vector service)
-          (netex-util/append-ote-netex-urls config
-                                            db
-                                            ::t-service/external-interfaces)
-          first))
-    service))
-
 (defn export-geojson [db config transport-operator-id transport-service-id]
   (let [areas (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
         operator (when areas
@@ -88,7 +75,6 @@
                                       {::t-service/transport-operator-id transport-operator-id
                                        ::t-service/id transport-service-id
                                        ::t-service/published op/not-null?}))
-                      (append-nap-generated-netex-file-links db config)
                       ;; Company contact details removed because of privacy requirement
                       (dissoc ::t-service/contact-address
                               ::t-service/contact-email

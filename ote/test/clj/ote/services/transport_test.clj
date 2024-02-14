@@ -32,7 +32,6 @@
                                            :sea-routes
                                            :gtfs-import
                                            :ote-register
-                                           :netex-conversion-automated
                                            :service-validation
                                            :terms-of-service
                                            :other-catalogs}})
