@@ -155,4 +155,7 @@
      [:h2 (tr [:taxi-ui :stats :sections :filters :title])]
      [filters e! app]
 
+     [:section
+      [:div (tr [:taxi-ui :stats :info :example-trip-description])]]
+
      [table e! (get-in app [:taxi-ui :stats :companies])]]))

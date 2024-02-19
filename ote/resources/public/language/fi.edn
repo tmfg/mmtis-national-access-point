@@ -1771,13 +1771,14 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
            :front-page {:sections {:service-summary {:price-information-header  " hintatiedot"
                                                      :information-last-updated  "Hintatiedot päivitetty "
                                                      :information-never-updated "Hintatietoja ei annettu"
-                                                     :example-trip              "Esimerkkimatka (10 km + 15 min)"
+                                                     :example-trip              "Vertailumatka (10 km + 15 min)"
                                                      :per-kilometer             "/km"
                                                      :per-minute                "/min"
                                                      :prices-not-added-yet "Palvelulle ei ole vielä syötetty hintatietoja"}}}
            :stats {:page-main-title "Kokonaiskatsaus"
+                   :info            {:example-trip-description "Vertailumatkan hinta lasketaan 10 kilometrin matkalle, joka kestää 15 minuuttia sisältäen lähtömaksun. Vertailumatkan tiedot lasketaan yrityksen ilmoittamien arkipäivämatkan tietojen perusteella."}
                    :columns         {:name                "Yritys"
-                                     :example-trip        "Esimerkkimatka"
+                                     :example-trip        "Vertailumatka"
                                      :start-price-daytime "Aloitus (arkipäivisin)"
                                      :price-per-kilometer "Matka (per km)"
                                      :price-per-minute    "Matka (per min)"

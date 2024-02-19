@@ -1770,6 +1770,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                                      :per-minute                "/min"
                                                      :prices-not-added-yet      "Prisinformation för tjänsten är inte tillgänglig"}}}
            :stats {:page-main-title "Alla tjänster"
+                   :info {:example-trip-description "Priset för exempel resan är beräknat för en 10 km lång resa på 15 minuter, inklusive startpriset. Uppgifterna för exempel resan beräknas på grundval av uppgifterna för en resa på en vardag som tillhandahålls av företaget."}
                    :columns         {:name                "Företag"
                                      :example-trip        "Exempel resan"
                                      :start-price-daytime "Börjän på vardagar"

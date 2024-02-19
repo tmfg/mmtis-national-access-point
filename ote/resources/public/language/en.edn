@@ -1767,6 +1767,7 @@ You can also draw the operating area or point to the map with drawing tools. You
                                                      :per-minute                "/min"
                                                      :prices-not-added-yet      "Fare information for the service is not available"}}}
            :stats {:page-main-title "All Services"
+                   :info            {:example-trip-description "The fare for the example trip is calculated for a 10 km journey of 15 minutes, including the starting fare. The data for the example trip is calculated on the basis of the data for a weekday journey provided by the company."}
                    :columns         {:name                "Company"
                                      :example-trip        "Example trip"
                                      :start-price-daytime "Start fare (Weekdays)"
