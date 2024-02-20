@@ -3,6 +3,7 @@
             [hiccup.util :refer [escape-html]]
             [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
+            [ote.db.transport-service :as t-service]
             [ote.localization :refer [tr] :as localization]
             [ote.time :as time]
             [ote.util.db :as db-util]
@@ -429,5 +430,67 @@
                    [:p "Ohjeita ja yleistä tietoa Finap-palvelusta löydät Fintrafficin nettisivuilta "
                     [:a {:href "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi" :target "_blank"}
                      "NAP-liikkumispalvelukatalogi"]]]
+
+                  (html-divider-border nil)]))
+
+(defn localized-pricing-detail-header
+  [k]
+  (str (tr [:taxi-ui :pricing-details :inputs k :main-title])
+       " "
+       (tr [:taxi-ui :pricing-details :inputs k :subtitle])))
+
+(defn- taxi-price-row [operator service prices]
+  (letfn [(currency-formatted [d]
+            (->> (format "%.2f €" d)
+                 (escape-html)))]
+    [(currency-formatted (:start-price-daytime prices))
+     (currency-formatted (:start-price-nighttime prices))
+     (currency-formatted (:start-price-weekend prices))
+     (currency-formatted (:price-per-minute prices))
+     (currency-formatted (:price-per-kilometer prices))
+     (currency-formatted (:accessibility-service-stairs prices))
+     (currency-formatted (:accessibility-service-stretchers prices))
+     (currency-formatted (:accessibility-service-fare prices))]))
+
+(defn outdated-taxi-prices
+  [title operator service taxi-prices]
+  (println "operator=" operator)
+  (println "service=" service)
+  (html-template {:show-email-settings? true} title
+                 [:div
+                  [:br]
+                  [:h1 {:class "headerText1"
+                        :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.5rem; font-weight:700;"}
+                   (tr [:email-templates :outdated-taxi-prices :title])]
+
+                  [:br]
+                  [:p
+                   (tr [:email-templates :outdated-taxi-prices :description-header])
+                   [:a {:href (str "https://finap.fi/taxiui#/pricing-details/" (::t-operator/id operator) "/" (::t-service/id service)) :target "_blank"}
+                    (tr [:email-templates :outdated-taxi-prices :description-link])]
+                   (tr [:email-templates :outdated-taxi-prices :description-tailer])]
+
+                  [:div {:style "background-color:#FFFFFF"}
+                   (html-divider-border nil)
+                   [:p {:style "margin-bottom:  20px;"}
+                    [:h2 {:class "headerText2"
+                          :style "font-family:Public Sans,helvetica neue,arial,sans-serif; font-size:1.2rem; font-weight:700;margin-top:0;margin-bottom:20px;"}
+                     (tr [:email-templates :outdated-taxi-prices :prices-table-header])]]
+
+                   (html-table
+                     [{:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :start-price-daytime)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :start-price-nighttime)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :start-price-weekend)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :price-per-minute)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :price-per-kilometer)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :accessibility-service-stairs)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :accessibility-service-stretchers)}
+                      {:class "tg-lusz" :width "10%" :label (localized-pricing-detail-header :accessibility-service-fare)}]
+                     (for [r taxi-prices]
+                       (taxi-price-row operator service r)))
+                   [:br]
+                   [:p (tr [:email-templates :instructions-footer :description])
+                    [:a {:href (tr [:email-templates :instructions-footer :link-url]) :target "_blank"}
+                     (tr [:email-templates :instructions-footer :link-text])]]]
 
                   (html-divider-border nil)]))

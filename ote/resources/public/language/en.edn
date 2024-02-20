@@ -1483,7 +1483,15 @@ You can also draw the operating area or point to the map with drawing tools. You
   :email-verification {:verification-message "Dear recipient, Thank you for registering with the NAP service! Before you can start using the service, please verify your email address by clicking on the button below."
                        :verify-email "Verify your email address"
                        :if-not-registered "If you have not recently registered with the NAP service, you can ignore this message."}
-  :validation-report {:title "Request to repair for external interface data reported in NAP service" }}
+  :validation-report {:title "Request to repair for external interface data reported in NAP service" }
+  :outdated-taxi-prices {:title               "Update your published taxi service pricing information"
+                         :description-header  "The price information for the published taxi service is more than 12 months old. Go and check the price information previously indicated "
+                         :description-link    "from this link"
+                         :description-tailer  ". Please update the price to match the current one or confirm the price previously stated."
+                         :prices-table-header "Published taxi pricing information"}
+  :instructions-footer {:description          "For instructions and general information on the Finap service, visit the Fintraffic website "
+                        :link-url             "https://www.fintraffic.fi/en/nap-tsc"
+                        :link-text            "NAP-Transportation Service Catalog"}}
 
  :country-list
  {:A "Select"
