@@ -39,6 +39,7 @@
             [ote.tasks.company :as tasks-company]
             [ote.tasks.pre-notices :as tasks-pre-notices]
             [ote.tasks.gtfs :as tasks-gtfs]
+            [ote.tasks.taxiui :as tasks-taxiui]
             [ote.tasks.tis :as tasks-tis]
 
             [ote.util.feature :as feature]
@@ -129,7 +130,8 @@
    :tasks-gtfs (component/using (tasks-gtfs/gtfs-tasks config) [:db :email])
    :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:pre-notices config))
                                        [:db :email])
-   :tasks-tis (component/using (tasks-tis/tis-tasks config) [:db])))
+   :tasks-tis (component/using (tasks-tis/tis-tasks config) [:db])
+   :tasks-taxiui (component/using (tasks-taxiui/taxiui-tasks config) [:db])))
 
 (defn configure-logging [dev-mode? {:keys [level] :as log-config}]
   (log/merge-config!

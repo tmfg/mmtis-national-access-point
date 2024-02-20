@@ -1492,7 +1492,15 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :email-verification {:verification-message "Hei. Kiitos rekisteröitymisestäsi NAP-palveluun! Voidaksesi käyttää palvelua, tulee sinun vielä todentaa sähköpostiosoitteesi. Voit tehdä alla olevasta painikkeesta."
                        :verify-email "Todenna sähköpostiosoite"
                        :if-not-registered "Mikäli et ole juuri rekisteröitynyt NAP-palveluun, voit jättää tämän viestin huomioimatta."}
-  :validation-report {:title "Korjauspyyntö NAP-palvelussa ilmoitettuihin rajapinta-aineistoihin"}}
+  :validation-report {:title "Korjauspyyntö NAP-palvelussa ilmoitettuihin rajapinta-aineistoihin"}
+  :outdated-taxi-prices {:title               "Päivittäkää taksipalvelunne hintatiedot"
+                         :description-header  "Ilmoittamanne taksipalvelun hintatieto on yli 12 kuukautta vanha. Käykää tarkistamassa ilmoittamanne hintatieto "
+                         :description-link    "tästä linkistä"
+                         :description-tailer  ". Päivittäkää hinta vastaamaan nykyistä tai vahvistakaa aiemmin ilmoittamanne hinta."
+                         :prices-table-header "Ilmoittamanne hintatiedot"}
+  :instructions-footer {:description          "Ohjeita ja yleistä tietoa Finap-palvelusta löydät Fintrafficin nettisivuilta "
+                        :link-url             "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
+                        :link-text            "NAP-liikkumispalvelukatalogi"}}
 
  :country-list
  {:A "Valitse"

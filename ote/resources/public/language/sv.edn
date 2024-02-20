@@ -1486,7 +1486,15 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :email-verification {:verification-message "Hej. Tack för att du registrerade dig i NAP-tjänsten! För att du ska kunna använda tjänsten behöver du ännu verifiera din e-postadress. Du kan verifiera adressen genom att klicka nedan."
                        :verify-email "Verifiera e-postadress"
                        :if-not-registered "Om du inte precis har registrerat dig i NAP-tjänsten kan du ignorera detta meddelande."}
-  :validation-report {:title "Reparations begäran för externa maskinläsbara gränssnitt data som rapporterats i NAP-tjänsten"}}
+  :validation-report {:title "Reparations begäran för externa maskinläsbara gränssnitt data som rapporterats i NAP-tjänsten"}
+  :outdated-taxi-prices {:title               "Uppdatera prisinformationen för din taxitjänst"
+                         :description-header  "Prisinformationen för den publicerade taxitjänsten är mer än 12 månader gammal. Gå och kontrollera prisinformationen som tidigare angetts "
+                         :description-link    "från denna länk"
+                         :description-tailer  ". Uppdatera priset så att det stämmer överens med det nuvarande eller bekräfta priset som tidigare angetts."
+                         :prices-table-header "Publicerade taxitjänst"}
+  :instructions-footer {:description          "För instruktioner och allmän information om Finap-tjänsten, vänligen besök Fintraffic webbplats "
+                        :link-url             "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
+                        :link-text            "NAP-mobilitetstjänstekatalog"}}
 
  :country-list
  {:A "Välj"
