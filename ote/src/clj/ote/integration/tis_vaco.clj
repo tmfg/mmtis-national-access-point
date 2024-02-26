@@ -12,7 +12,7 @@
             [taoensso.timbre :as log]))
 
 
-(def conversion-rule-name "gtfs2netex.fintraffic.v1_0_0")
+(def conversion-rule-name "gtfs2netex.fintraffic")
 
 (def ^:private auth-data (atom {}))
 
@@ -125,7 +125,7 @@
                                             :businessId  (fetch-business-id db operator-id)
                                             :etag        (when package (:gtfs/etag package))
                                             :name        (str operator-name " / GTFS / FINAP (" operator-id "/" service-id "/" external-interface-description-id ")")
-                                            :validations [{:name   "gtfs.canonical.v4_1_0"
+                                            :validations [{:name   "gtfs.canonical"
                                                            :config {}}]
                                             :conversions [{:name   conversion-rule-name
                                                            :config {}}]
