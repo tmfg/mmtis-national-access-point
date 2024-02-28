@@ -10,23 +10,11 @@ RUN apt-get update && apt -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils gnupg gnupg1 gnupg2
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y apt-utils
 
-# Create /etc/apt/sources.list.d/pgdg.list
-#CMD echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' >> /etc/apt/sources.list
-
-
-# Import the repository signing key, and update the package lists
-#RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
-#CMD RELEASE=$(lsb_release -cs)
-#RUN bash -c 'echo -e' ${RELEASE}
-
-#CMD echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" | sudo tee  /etc/apt/sources.list.d/pgdg.list
-
-## Combine pgdg.list to sources.list and key into single line command
+# add PostgreSQL repository information for PostgreSQL 11 with PostGIS 2.5 (postgresql-11-postgis-2.5)
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg \
  && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
- && echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' >> /etc/apt/sources.list
+ && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt bionic-pgdg main' >> /etc/apt/sources.list
 
 # Install dependencies
 RUN apt-get update
