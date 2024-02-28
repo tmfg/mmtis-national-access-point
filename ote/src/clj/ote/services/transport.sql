@@ -56,3 +56,25 @@ SELECT e.id, (e."external-interface").url as url, "original-interface-id"
   FROM "external-interface-description" e
  WHERE e."transport-service-id" = :service-id
    AND 'route-and-schedule' = ANY(e."data-content");
+
+-- name: fetch-rental-booking-info
+  WITH inserted AS
+      (
+          INSERT INTO "rental_booking" ("transport-service-id")
+               VALUES (:service-id)
+              ON CONFLICT DO NOTHING
+       RETURNING *)
+SELECT *
+  FROM inserted
+ UNION ALL
+SELECT *
+  FROM "rental_booking"
+ WHERE "transport-service-id" = :service-id
+ LIMIT 1;
+
+-- name: save-rental-booking-info!
+UPDATE "rental_booking"
+SET "application-link" = :application-link,
+    "phone-countrycode" = :phone-countrycode,
+    "phone-number" = :phone-number
+WHERE "transport-service-id" = :transport-service-id

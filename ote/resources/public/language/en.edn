@@ -203,7 +203,10 @@
    :maximum-stay-limited "Duration for parking is limited"}
 
   :transport-service
-  {:ote.db.transport-service/name "Service name"
+  {:ote.db.rental-booking-service/application-link "Application link"
+   :ote.db.rental-booking-service/phone-countrycode "Country code"
+   :ote.db.rental-booking-service/phone-number "Phone number"
+   :ote.db.transport-service/name "Service name"
    :ote.db.transport-service/additional-services "Additional services"
    :ote.db.transport-service/url "Service WWW-address"
    :ote.db.transport-service/description "Service description"

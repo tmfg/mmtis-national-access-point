@@ -204,7 +204,10 @@
    :maximum-stay-limited "Parkeringstid begränsad"}
 
   :transport-service
-  {:ote.db.transport-service/name "Tjänstens namn"
+  {:ote.db.rental-booking-service/application-link "Applikationslänk"
+   :ote.db.rental-booking-service/phone-countrycode "Landskod"
+   :ote.db.rental-booking-service/phone-number "Telefonnummer"
+   :ote.db.transport-service/name "Tjänstens namn"
    :ote.db.transport-service/additional-services "Övriga tjänster"
    :ote.db.transport-service/url "Tjänstens www-adress"
    :ote.db.transport-service/description "Tjänstebeskrivning"

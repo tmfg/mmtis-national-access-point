@@ -2,7 +2,8 @@
   "Required datas for passenger transportation provider"
    (:require [ote.app.utils :refer [user-operates-service-type?]]
              [ote.db.transport-service :as t-service]
-             [ote.localization :refer [tr tr-key]]
+             [ote.db.rental-booking-service :as rental-booking]
+             [ote.localization :refer [tr tr-key tr-tree]]
              [ote.util.values :as values]
              [ote.ui.common :refer [linkify]]
              [ote.ui.form :as form]
@@ -228,6 +229,70 @@
     :write #(assoc-in %1 [::t-service/pricing ::t-service/url] %2)
     :read (comp ::t-service/url ::t-service/pricing)})))
 
+(defn rental-booking-info
+  [element-id label info-message in-validation?]
+  (apply
+    form/group
+    {:label label
+     :layout :row
+     :columns 3
+     :card? false
+     :top-border true}
+
+    (concat
+      (when info-message
+        [{:type :info-toggle
+          :name :service-url-info
+          :label (tr [:common-texts :filling-info])
+          :body [:div info-message]
+          :default-state false
+          :full-width? true
+          :container-class "col-xs-12 col-sm-12 col-md-12"}])
+
+      [{:class "set-bottom"
+        :element-id element-id
+        :name ::rental-booking/application-link
+        :type :string
+        :disabled? in-validation?
+        :read (comp ::rental-booking/application-link ::rental-booking/rental-booking-info)
+        :write (fn [data url]
+                 (assoc-in data [::rental-booking/rental-booking-info ::rental-booking/application-link] url))
+        :full-width? true
+        :container-class "col-xs-12 col-sm-12 col-md-12 col-lg-12"
+        :max-length 200}
+
+       {:element-id "input-service-country"
+        ;:label (tr [:common-texts :country])
+        :name :ote.db.rental-booking-service/phone-countrycode
+        :type :selection
+        :disabled? in-validation?
+        :container-class "col-xs-3 col-sm-3 col-md-3 col-lg-3"
+        :style {:margin-bottom "2rem"}
+        :full-width? true
+        ; translate viewed options + sort by translated names to make the list intuitive for users
+        :options (->> (tr-tree [:phone-countrycodes])
+                      (mapv (fn [cc]
+                              (assoc cc :country (tr [:country-list (:country cc)]))))
+                      (sort-by :country)
+                      (vec))
+        :option-value :code
+        ; format dropdown values for human readability with correct translations
+        :show-option (fn [o] (str (:country o) " (" (:code o) ")"))
+        :read (comp ::rental-booking/phone-countrycode ::rental-booking/rental-booking-info)
+        :write (fn [data desc]
+                 (assoc-in data [::rental-booking/rental-booking-info ::rental-booking/phone-countrycode] desc))}
+
+       {:name :ote.db.rental-booking-service/phone-number
+        :type :string
+        :disabled? in-validation?
+        :rows 1
+        :read (comp ::rental-booking/phone-number ::rental-booking/rental-booking-info)
+        :regex #"\d*"
+        :write (fn [data desc]
+                 (assoc-in data [::rental-booking/rental-booking-info ::rental-booking/phone-number] desc))
+        :container-class "col-xs-5 col-sm-5 col-md-5 col-lg-5"
+        :full-width? true}])))
+
 (defn passenger-transportation-info [e! {form-data ::t-service/passenger-transportation :as service} app]
   (let [validate (::t-service/validate form-data)
         service-id (::t-service/id service)
@@ -258,11 +323,19 @@
                                      (tr [:form-help :real-time-info])
                                      in-validation?)
               (ts-common/advance-reservation-group in-validation?)
-              (ts-common/service-url "booking-service-url"
+              (if (and (= (::t-service/type service) :passenger-transportation)
+                       (contains? #{:taxi :request} (::t-service/sub-type service)))
+                (rental-booking-info "rental-booking-id"
                                      (tr [:field-labels :transport-service-common ::t-service/booking-service])
-                                     ::t-service/booking-service
-                                     nil
+                                     nil #_[:div (str (::t-service/type service) "/" (::t-service/sub-type service))
+                                      [:br]
+                                      (str (::rental-booking/rental-booking-info form-data))]
                                      in-validation?)
+                (ts-common/service-url "booking-service-url"
+                                       (tr [:field-labels :transport-service-common ::t-service/booking-service])
+                                       ::t-service/booking-service
+                                       nil
+                                       in-validation?))
               (accessibility-group in-validation?)
               (ts-common/service-hours-group "passenger-transportation" false in-validation?)]
              form-options (transportation-form-options e! form-groups in-validation? app)]
