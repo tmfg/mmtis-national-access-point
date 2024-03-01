@@ -9,6 +9,7 @@
             [re-svg-icons.feather-icons :as feather-icons]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.rental-booking-service :as booking-service]
             [ote.db.netex :as netex]
             [ote.db.common :as common]
             [ote.util.transport-service-util :as tsu]
@@ -412,6 +413,7 @@
 
 (defn- booking-service
   [title data]
+  (js/console.log (str "DATA >> " data))
   (let [descriptions (format-descriptions (::t-service/description data))
         url (::t-service/url data)]
     [:section
@@ -422,6 +424,25 @@
       [:div
        [information-row-with-selection (tr [:common-texts :description]) descriptions false]]]
      [spacer]]))
+
+(defn- rental-booking-service
+  [title data]
+  (let [{::booking-service/keys [application-link phone-countrycode phone-number]} data
+        full-phone-number (when (and (not-empty phone-countrycode)
+                                   (not-empty phone-number))
+                            (str phone-countrycode " " phone-number))]
+    [:section
+     [:h4 title (str data)]
+     [:div
+      [common-ui/information-row-with-option
+       (tr [:field-labels :transport-service ::booking-service/application-link])
+       application-link
+       true]
+      [common-ui/information-row-with-option
+       (tr [:field-labels :transport-service ::booking-service/phone-number])
+       (when (not-empty full-phone-number)
+         full-phone-number)
+       true]]]))
 
 (defn- passenger-accessibility-and-other-services
   [title data]
@@ -1024,7 +1045,9 @@
           [luggage-warnings (tr [:service-viewer :luggage-warnings]) luggage-restrictions]
           [real-time-info (tr [:service-viewer :real-time-info]) real-time-info-data]
           [pre-booking (tr [:service-viewer :advance-reservation]) pre-booking-data]
-          [booking-service (tr [:service-viewer :reservation-service]) booking-data]
+          (if (contains? #{:taxi :request} service-sub-type)
+            [rental-booking-service (tr [:service-viewer :reservation-service]) (get-in ts [::t-service/passenger-transportation ::booking-service/rental-booking-info])]
+            [booking-service (tr [:service-viewer :reservation-service]) booking-data])
           [passenger-accessibility-and-other-services (tr [:service-viewer :accessibility-and-other-services]) accessibility-data]
           (if (= :taxi service-sub-type)
             [taxi-price-information (tr [:service-viewer :price-information]) pricing-data (get-in app-state [:service-view :taxi-service :pricing-info])]

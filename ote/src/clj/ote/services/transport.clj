@@ -325,6 +325,24 @@
         ;; change-detection can skip packages that are donwloaded from deleted interface
         _ (update-packages-with-deleted-interface-true! db {:service-id parent-id})]))
 
+
+(defn- save-rental-booking-info
+  [db transport-service-id rental-booking]
+  (log/info (str "saving rental booking info " transport-service-id " / " rental-booking))
+  (let [{::rental-booking/keys [application-link phone-countrycode phone-number]} rental-booking]
+    (save-rental-booking-info! db {:transport-service-id transport-service-id
+                                   :application-link     application-link
+                                   :phone-countrycode    phone-countrycode
+                                   :phone-number         phone-number})))
+
+(defn- replace-rental-booking-info
+  [db parent-id child-id]
+  (when-let [{:keys [application-link phone-countrycode phone-number]} (first (fetch-rental-booking-info db {:service-id child-id}))]
+    (save-rental-booking-info db parent-id #::rental-booking{:transport-service-id parent-id
+                                                             :application-link  application-link
+                                                             :phone-countrycode phone-countrycode
+                                                             :phone-number      phone-number})))
+
 (defn replace-parent-service-with-child [db bucket child-id publish?]
   (let [;; Get child service data
         service (first (specql/fetch db ::t-service/transport-service
@@ -358,6 +376,9 @@
 
       ;; Maybe delete company-csv from S3
       (maybe-delete-company-csv-from-s3 db bucket child-id)
+
+      ;; replace rental booking info if present
+      (replace-rental-booking-info db parent-id child-id)
 
       ;; Delete child - and its external-interfaces and places
       (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
@@ -477,14 +498,6 @@
                   (::modification/created service))]
     (assoc service ::modification/created created)))
 
-(defn- save-rental-booking-info
-  [db transport-service-id rental-booking]
-  (let [{::rental-booking/keys [application-link phone-countrycode phone-number]} rental-booking]
-    (save-rental-booking-info! db {:transport-service-id transport-service-id
-                                   :application-link     application-link
-                                   :phone-countrycode    phone-countrycode
-                                   :phone-number         phone-number})))
-
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
   [config db user {places              ::t-service/operation-area
@@ -583,7 +596,9 @@
 
                 ;; save rental service booking data if present
                 (when (not (nil? rental-booking))
-                  (save-rental-booking-info db transport-service-id rental-booking))
+                  (save-rental-booking-info db
+                    transport-service-id
+                    rental-booking))
                 transport-service))]
 
         ;; if service is a child and if it is saved as a draft then copy data to parent

@@ -73,8 +73,10 @@ SELECT *
  LIMIT 1;
 
 -- name: save-rental-booking-info!
-UPDATE "rental_booking"
-SET "application-link" = :application-link,
-    "phone-countrycode" = :phone-countrycode,
-    "phone-number" = :phone-number
-WHERE "transport-service-id" = :transport-service-id
+INSERT INTO "rental_booking" ("transport-service-id", "application-link", "phone-countrycode", "phone-number")
+VALUES (:transport-service-id, :application-link, :phone-countrycode, :phone-number)
+    ON CONFLICT ("transport-service-id")
+        DO UPDATE
+        SET "application-link"  = excluded."application-link",
+            "phone-countrycode" = excluded."phone-countrycode",
+            "phone-number"      = excluded."phone-number"
