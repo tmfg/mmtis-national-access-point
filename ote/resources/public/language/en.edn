@@ -1773,14 +1773,14 @@ You can also draw the operating area or point to the map with drawing tools. You
            :front-page {:sections {:service-summary {:price-information-header  " fare information"
                                                      :information-last-updated  "Fare information updated "
                                                      :information-never-updated "No valid fare information"
-                                                     :example-trip              "Example trip (10 km + 15 min)"
+                                                     :example-trip              "Comparison trip (10 km + 15 min)"
                                                      :per-kilometer             "/km"
                                                      :per-minute                "/min"
                                                      :prices-not-added-yet      "Fare information for the service is not available"}}}
            :stats {:page-main-title "All Services"
-                   :info            {:example-trip-description "The fare for the example trip is calculated for a 10 km journey of 15 minutes, including the starting fare. The data for the example trip is calculated on the basis of the data for a weekday journey provided by the company."}
+                   :info            {:example-trip-description "The price of the comparison trip is calculated for a 10-kilometer trip that takes 15 minutes, including the departure fee. The information of the comparison trip is calculated based on the information of the weekday trip reported by the company."}
                    :columns         {:name                "Company"
-                                     :example-trip        "Example trip"
+                                     :example-trip        "Comparison trip price"
                                      :start-price-daytime "Start fare (Weekdays)"
                                      :price-per-kilometer "Travel fare (per km)"
                                      :price-per-minute    "Travel fare (per min)"

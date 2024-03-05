@@ -1776,14 +1776,14 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
            :front-page {:sections {:service-summary {:price-information-header  "prisinformation"
                                                      :information-last-updated  "Prisinformation uppdaterad "
                                                      :information-never-updated "Ingen prisinformation har lagts ännu"
-                                                     :example-trip              "Exempelresan (10 km + 15 min)"
+                                                     :example-trip              "Jämförelseresan (10 km + 15 min)"
                                                      :per-kilometer             "/km"
                                                      :per-minute                "/min"
                                                      :prices-not-added-yet      "Prisinformation för tjänsten är inte tillgänglig"}}}
            :stats {:page-main-title "Alla tjänster"
-                   :info {:example-trip-description "Priset för exempel resan är beräknat för en 10 km lång resa på 15 minuter, inklusive startpriset. Uppgifterna för exempel resan beräknas på grundval av uppgifterna för en resa på en vardag som tillhandahålls av företaget."}
+                   :info {:example-trip-description "Priset på jämförelseresan är beräknat för en 10 kilometer lång resa som tar 15 minuter inklusive avgångsavgift. Informationen om jämförelseresan beräknas utifrån uppgifterna om veckodagsresan som rapporterats av företaget."}
                    :columns         {:name                "Företag"
-                                     :example-trip        "Exempel resan"
+                                     :example-trip        "Pris för jämförelseresor"
                                      :start-price-daytime "Börjän på vardagar"
                                      :price-per-kilometer "Sträcke €/km"
                                      :price-per-minute    "Tid €/min"
