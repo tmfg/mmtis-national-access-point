@@ -245,9 +245,11 @@
    :gtfs-flex/location_id
    :gtfs-flex/location_group_name])
 
-(def flex-location-groups-txt-header "location_group_id,location_id,location_group_name");;;;;;;;;;;;;;;;;;;;;;;;;;;
+(def flex-location-groups-txt-header "location_group_id,location_id,location_group_name")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for booking_rules.txt used by GTFS Flex
+
 (s/def :gtfs-flex/booking-rules-txt
   (s/coll-of :gtfs-flex/booking-rules))
 
