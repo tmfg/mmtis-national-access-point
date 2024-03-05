@@ -16,6 +16,7 @@
             [ote.db.modification :as modification]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
+            [ote.db.rental-booking-service :as rental-booking]
             [ote.db.stats :as stats]
             [ote.util.db :as util]
             [ote.authorization :as authorization]
@@ -121,6 +122,31 @@
                        transport-service-personal-columns)
                 {::t-service/id id})))
 
+(defn get-rental-booking-info
+  [db service-id]
+  (first (fetch-rental-booking-info db {:service-id service-id})))
+
+(defn fetch-or-create-rental-booking-info
+  [db service]
+  (let [{:keys [application-link phone-countrycode phone-number]} (get-rental-booking-info db (::t-service/id service))]
+    {::rental-booking/application-link  application-link
+     ::rental-booking/phone-countrycode phone-countrycode
+     ::rental-booking/phone-number      phone-number}))
+
+(defn type-specific-booking-data
+  [services config db]
+  (mapv
+    (fn [service]
+      (if (and (= :passenger-transportation (::t-service/type service))
+               (contains? #{:taxi :rental} (::t-service/sub-type service)))
+        (assoc-in service
+                  [::t-service/passenger-transportation ::rental-booking/rental-booking-info]
+                  (fetch-or-create-rental-booking-info db service))
+        service))
+    services))
+
+
+
 (defn all-data-transport-service
   "Get single transport service by id"
   [config db id]
@@ -131,6 +157,7 @@
                       (places/fetch-transport-service-operation-area db id))
             vector
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
+            (type-specific-booking-data config db)
             first)
         200)
       {:status 404})))
@@ -302,6 +329,24 @@
         ;; change-detection can skip packages that are donwloaded from deleted interface
         _ (update-packages-with-deleted-interface-true! db {:service-id parent-id})]))
 
+
+(defn- save-rental-booking-info
+  [db transport-service-id rental-booking]
+  (log/info (str "saving rental booking info " transport-service-id " / " rental-booking))
+  (let [{::rental-booking/keys [application-link phone-countrycode phone-number]} rental-booking]
+    (save-rental-booking-info! db {:transport-service-id transport-service-id
+                                   :application-link     application-link
+                                   :phone-countrycode    phone-countrycode
+                                   :phone-number         phone-number})))
+
+(defn- replace-rental-booking-info
+  [db parent-id child-id]
+  (when-let [{:keys [application-link phone-countrycode phone-number]} (get-rental-booking-info db child-id)]
+    (save-rental-booking-info db parent-id #::rental-booking{:transport-service-id parent-id
+                                                             :application-link  application-link
+                                                             :phone-countrycode phone-countrycode
+                                                             :phone-number      phone-number})))
+
 (defn replace-parent-service-with-child [db bucket child-id publish?]
   (let [;; Get child service data
         service (first (specql/fetch db ::t-service/transport-service
@@ -335,6 +380,9 @@
 
       ;; Maybe delete company-csv from S3
       (maybe-delete-company-csv-from-s3 db bucket child-id)
+
+      ;; replace rental booking info if present
+      (replace-rental-booking-info db parent-id child-id)
 
       ;; Delete child - and its external-interfaces and places
       (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
@@ -456,7 +504,7 @@
 
 (defn- save-transport-service
   "UPSERT! given data to database. And convert possible float point values to bigdecimal"
-  [config db user {places ::t-service/operation-area
+  [config db user {places              ::t-service/operation-area
                    external-interfaces ::t-service/external-interfaces
                    :as data}]
   ;; When validation flag is enabled we cannot let users to update service data if it has child service in validation.
@@ -504,12 +552,12 @@
               [db db]
               (let [transport-service (upsert! db ::t-service/transport-service service-info)
                     transport-service-id (::t-service/id transport-service)
+                    rental-booking       (some-> transport-service ::t-service/passenger-transportation ::rental-booking/rental-booking-info)
                     ;; Update transport-service-id only when saving service for the first time
                     _ (when (and csv-file-key (nil? original-service-id))
                         (specql/update! db ::t-service/transport-service-company-csv-temp
                                         {::t-service/transport-service-id transport-service-id}
                                         {::t-service/file-key csv-file-key}))]
-
                 ;; Copy possible company csv file to child service if needed
                 (if (and (not (nil? original-service-id))
                          (not= original-service-id transport-service-id)) ;; child id is given
@@ -549,6 +597,12 @@
                   (save-external-companies db transport-service)
                   ;; If url is empty, delete remaining data
                   (delete-external-companies db transport-service))
+
+                ;; save rental service booking data if present
+                (when (not (nil? rental-booking))
+                  (save-rental-booking-info db
+                    transport-service-id
+                    rental-booking))
                 transport-service))]
 
         ;; if service is a child and if it is saved as a draft then copy data to parent
@@ -641,6 +695,7 @@
                       (places/fetch-transport-service-operation-area db id))
             vector
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
+            (type-specific-booking-data config db)
             first))
       {:status 404})))
 
