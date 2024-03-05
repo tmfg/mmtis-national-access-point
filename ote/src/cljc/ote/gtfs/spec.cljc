@@ -207,7 +207,9 @@
                  :gtfs-flex/mean_duration_factor
                  :gtfs-flex/mean_duration_offset
                  :gtfs-flex/safe_duration_factor
-                 :gtfs-flex/safe_duration_offset]))
+                 :gtfs-flex/safe_duration_offset
+                 :gtfs-flex/pickup_booking_rule_id
+                 :gtfs-flex/drop_off_booking_rule_id]))
 
 (s/def :gtfs/shape-dist-traveled nat-int?)
 (s/def :gtfs/stop-sequence nat-int?)
@@ -220,9 +222,11 @@
          :gtfs-flex/mean_duration_factor
          :gtfs-flex/mean_duration_offset
          :gtfs-flex/safe_duration_factor
-         :gtfs-flex/safe_duration_offset]))
+         :gtfs-flex/safe_duration_offset
+         :gtfs-flex/pickup_booking_rule_id
+         :gtfs-flex/drop_off_booking_rule_id]))
 
-(def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_dropoff_window,end_pickup_dropoff_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset"))
+(def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_dropoff_window,end_pickup_dropoff_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset,pickup_booking_rule_id,drop_off_booking_rule_id"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for location_groups.txt used by GTFS Flex
@@ -241,7 +245,28 @@
    :gtfs-flex/location_id
    :gtfs-flex/location_group_name])
 
-(def flex-location-groups-txt-header "location_group_id,location_id,location_group_name")
+(def flex-location-groups-txt-header "location_group_id,location_id,location_group_name");;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Spec for booking_rules.txt used by GTFS Flex
+(s/def :gtfs-flex/booking-rules-txt
+  (s/coll-of :gtfs-flex/booking-rules))
+
+(s/def :gtfs-flex/booking-rules
+  (s/keys :req  [:gtfs-flex/booking_rule_id
+                 :gtfs-flex/booking_type]
+          :opt  [:gtfs-flex/booking_url
+                 :gtfs-flex/booking_prior_notice_last_day
+                 :gtfs-flex/booking_phone_number]))
+
+(def ^{:doc "Defines the order of the CSV fields in a booking_rules.txt file with GTFS Flex extensions"}
+  flex-booking-rules-txt-fields
+  [:gtfs-flex/booking_rule_id
+   :gtfs-flex/booking_type
+   :gtfs-flex/booking_url
+   :gtfs-flex/booking_prior_notice_last_day
+   :gtfs-flex/booking_phone_number])
+
+(def flex-booking-rules-txt-header "booking_rule_id,booking_type,booking_url,booking_prior_notice_last_day,phone_number")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for calendar.txt

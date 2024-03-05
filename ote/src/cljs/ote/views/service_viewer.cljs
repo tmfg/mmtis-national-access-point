@@ -432,7 +432,7 @@
                                    (not-empty phone-number))
                             (str phone-countrycode " " phone-number))]
     [:section
-     [:h4 title (str data)]
+     [:h4 title]
      [:div
       [common-ui/information-row-with-option
        (tr [:field-labels :transport-service ::booking-service/application-link])

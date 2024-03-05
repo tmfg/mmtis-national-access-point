@@ -122,9 +122,13 @@
                        transport-service-personal-columns)
                 {::t-service/id id})))
 
+(defn get-rental-booking-info
+  [db service-id]
+  (first (fetch-rental-booking-info db {:service-id service-id})))
+
 (defn fetch-or-create-rental-booking-info
   [db service]
-  (let [{:keys [application-link phone-countrycode phone-number]} (first (fetch-rental-booking-info db {:service-id (::t-service/id service)}))]
+  (let [{:keys [application-link phone-countrycode phone-number]} (get-rental-booking-info db (::t-service/id service))]
     {::rental-booking/application-link  application-link
      ::rental-booking/phone-countrycode phone-countrycode
      ::rental-booking/phone-number      phone-number}))
@@ -337,7 +341,7 @@
 
 (defn- replace-rental-booking-info
   [db parent-id child-id]
-  (when-let [{:keys [application-link phone-countrycode phone-number]} (first (fetch-rental-booking-info db {:service-id child-id}))]
+  (when-let [{:keys [application-link phone-countrycode phone-number]} (get-rental-booking-info db child-id)]
     (save-rental-booking-info db parent-id #::rental-booking{:transport-service-id parent-id
                                                              :application-link  application-link
                                                              :phone-countrycode phone-countrycode

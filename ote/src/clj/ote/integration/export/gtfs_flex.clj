@@ -17,6 +17,7 @@
             [ote.db.transport-service :as t-service]
             [ote.integration.export.geojson :as geojson]
             [ote.integration.export.gtfs :as gtfs]
+            [ote.services.transport :as transport-service]
             [ote.util.transport-operator-util :as op-util]
             [ote.util.zip :as zip]
             [ring.util.io :as ring-io]
@@ -68,19 +69,21 @@
 
 (defn- ->static-stop-times
   "Generate static 24 hour stop times for all areas with the same trip-id"
-  [trip-id areas]
-  []
-  (mapv-indexed
-    (fn [n area]
-      (let [{:keys [feature-id]} area]
-        {:gtfs/trip-id                          trip-id
-         :gtfs/stop-id                          feature-id
-         :gtfs/pickup-type                      2
-         :gtfs/drop-off-type                    2
-         :gtfs/stop-sequence                    n
-         :gtfs-flex/start_pickup_dropoff_window "0:00:00"
-         :gtfs-flex/end_pickup_dropoff_window   "24:00:00"}))
-    areas))
+  [trip-id areas flex-booking-rules]
+  (let [booking-id (:gtfs-flex/booking_rule_id flex-booking-rules)]
+    (mapv-indexed
+      (fn [n area]
+        (let [{:keys [feature-id]} area]
+          {:gtfs/trip-id                          trip-id
+           :gtfs/stop-id                          feature-id
+           :gtfs/pickup-type                      2
+           :gtfs/drop-off-type                    2
+           :gtfs/stop-sequence                    n
+           :gtfs-flex/start_pickup_dropoff_window "0:00:00"
+           :gtfs-flex/end_pickup_dropoff_window   "24:00:00"
+           :gtfs-flex/pickup_booking_rule_id      booking-id
+           :gtfs-flex/drop_off_booking_rule_id    booking-id}))
+      areas)))
 
 (defn join-routes-data
   "Splice together GTFS stop-times.txt with GTFS Flex compatible stop-times.txt by
@@ -145,6 +148,15 @@
          :gtfs-flex/location_group_name feature-id}))
     areas))
 
+(defn ->booking-rules
+  [db service]
+  (when-let [{:keys [application-link phone-countrycode phone-number]} (transport-service/get-rental-booking-info db (::t-service/id service))]
+    {:gtfs-flex/booking_rule_id               1
+     :gtfs-flex/booking_type                  2
+     :gtfs-flex/booking_url                   application-link
+     :gtfs-flex/booking_prior_notice_last_day 1
+     :gtfs-flex/booking_phone_number          (str phone-countrycode phone-number)}))
+
 (defn get-transport-service
   [db transport-service-id]
   (first (specql/fetch db ::t-service/transport-service
@@ -186,8 +198,9 @@
           ; most likely to produce accurate data
           flex-routes       (conj gtfs-routes
                                   (->static-routes static-route-id :bus transport-operator-id (::t-operator/name transport-operator) (::t-service/name transport-service)))
+          flex-booking-rule (->booking-rules db transport-service)  ; TODO: maybe apply to all stop times?
           flex-stop-times   (concat gtfs-stop-times
-                                    (->static-stop-times static-trip-id areas))
+                                    (->static-stop-times static-trip-id areas flex-booking-rule))
           flex-calendar     [(->static-calendar static-service-id transport-service)]
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
@@ -214,7 +227,9 @@
                       {:name "location_groups.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt flex-location-groups)}
                       {:name "stop_times.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}]
+                       :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}
+                      {:name "booking_rules.txt"
+                       :data (parse/unparse-gtfs-file :gtfs-flex/booking-rules-txt [flex-booking-rule])}]
                      (partial zip-content)))})))
 
 (defrecord GTFSFlexExport [config]
