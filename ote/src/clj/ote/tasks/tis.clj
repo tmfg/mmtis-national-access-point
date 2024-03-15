@@ -98,6 +98,22 @@
                      :gtfs/license license
                      :gtfs/external-interface-description-id external-interface-description-id})))
 
+(defmulti vaco-create-payload identity)
+
+(defmethod vaco-create-payload "gtfs" [_]
+  {:validations [{:name   "gtfs.canonical"
+                  :config {}}]
+   :conversions [{:name   "gtfs2netex.fintraffic"
+                  :config {}}]})
+
+(defmethod vaco-create-payload "netex" [_]
+  {:validations [{:name   "netex.entur"
+                  :config {}}]})
+
+(defmethod vaco-create-payload "gbfs" [_]
+  {:validations [{:name   "gbfs.entur"
+                  :config {}}]})
+
 (defn submit-known-interfaces!
   [config db]
   (when (feature/feature-enabled? config :tis-vaco-integration)
@@ -108,7 +124,7 @@
         (try
           ; execute sequentially for side effects only, discarding intermediate entries to help garbage collector do its thing
           (doseq [interface (list-all-external-interfaces db)]
-            (let [{:keys [operator-id operator-name service-id external-interface-description-id url license]} interface
+            (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format]} interface
                   package (create-package db operator-id service-id external-interface-description-id license)]
               (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
               (tis-vaco/queue-entry db (:tis-vaco config)
@@ -118,7 +134,9 @@
                                     {:service-id                        service-id
                                      :package-id                        (:gtfs/id package)
                                      :external-interface-description-id external-interface-description-id
-                                     :operator-name                     operator-name})
+                                     :operator-name                     operator-name}
+                                    (merge {:format format}
+                                           (vaco-create-payload format)))
               ; return nil to allow early collection of intermediate results
               nil))
           (catch Exception e

@@ -6,13 +6,9 @@
             [clojure.java.io :as io]
             [clojure.string :as str]
             [java-time :as jt]
-            [ote.db.netex :as netex]
             [ote.db.transport-operator :as t-operator]
             [specql.core :as specql]
             [taoensso.timbre :as log]))
-
-
-(def conversion-rule-name "gtfs2netex.fintraffic")
 
 (def ^:private auth-data (atom {}))
 
@@ -118,17 +114,18 @@
    ; interface
    {:keys [url operator-id operator-name ts-id last-import-date license id data-content]}
    ; conversion-meta
-   {:keys [gtfs-file gtfs-filename gtfs-basename external-interface-description-id external-interface-data-content service-id package-id operator-name]}]
-  (let [package   (find-package db id package-id)
+   {:keys [gtfs-file gtfs-filename gtfs-basename external-interface-description-id external-interface-data-content service-id package-id operator-name]}
+   ; payload
+   {:keys [format validations conversions]}]
+  (let [context   (str "FINAP (" operator-id "/" service-id "/" external-interface-description-id ")")
+        package   (find-package db id package-id)
         new-entry (api-queue-create config {:url         url
-                                            :format      "gtfs"
+                                            :format      format
                                             :businessId  (fetch-business-id db operator-id)
                                             :etag        (when package (:gtfs/etag package))
-                                            :name        (str operator-name " / GTFS / FINAP (" operator-id "/" service-id "/" external-interface-description-id ")")
-                                            :validations [{:name   "gtfs.canonical"
-                                                           :config {}}]
-                                            :conversions [{:name   conversion-rule-name
-                                                           :config {}}]
+                                            :name        (str operator-name " / GTFS / " context)
+                                            :validations (or validations [])
+                                            :conversions (or conversions [])
                                             :metadata    {:caller        "FINAP"
                                                           :operator-id   operator-id
                                                           :operator-name operator-name

@@ -20,9 +20,9 @@ SELECT tso.id                         AS "operator-id",
        tse.id                         AS "service-id",
        eid.id                         AS "external-interface-description-id",
        eid.license                    AS "license",
+       trim(lower(eid.format[1]))     AS "format",
        (eid."external-interface").url AS url
   FROM "external-interface-description" eid
            LEFT JOIN "transport-service" tse ON tse.id = eid."transport-service-id"
            LEFT JOIN "transport-operator" tso ON tso.id = tse."transport-operator-id"
- WHERE tse.published IS NOT NULL
-   AND ('GTFS' = ANY (eid.format) OR 'gtfs' = ANY (eid.format));
+ WHERE tse.published IS NOT NULL;
