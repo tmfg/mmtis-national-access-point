@@ -215,35 +215,24 @@
                          :show-option (tr-key [:enums ::t-service/interface-data-content])
                          :required? true
                          :is-empty? validation/empty-enum-dropdown?}
-                        (if in-validation?
-                          {:name ::t-service/format
-                           :type :string
-                           :disabled? in-validation?
-                           :label (tr [:field-labels :transport-service-common ::t-service/format])
-                           :field-class "col-xs-12 col-sm-3 col-md-3"
-                           :full-width? true}
-                          {:name ::t-service/format
-                           :type :autocomplete
-                           :open-on-focus? true
-                           :suggestions (if (flags/enabled? :new-transit-data-formats)
-                                          ["GTFS" "GTFS-RT" "GBFS" "Kalkati" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"]
-                                          ["GTFS" "Kalkati.net" "SIRI" "NeTEx" "GeoJSON" "JSON" "CSV"])
-                           :max-results 10
-                           :label (tr [:field-labels :transport-service-common ::t-service/format])
-                           :field-class "col-xs-12 col-sm-3 col-md-3"
-                           :full-width? true
-                           :required? true
-                           ;; Wrap value with vector to support current type of format field in the database.
-                           :write (fn [row val]
-                                    (let [{eif ::t-service/external-interface} row]
-                                      ;; validate external interface again, if changing format.
-                                      ;; Invoke event asynchronously so that the value will be update before sending the
-                                      ;; validation request to prevent stuttering user interface.
-                                      (.setTimeout
-                                        js/window
-                                        #(e! (ts-controller/->EnsureExternalInterfaceUrl (::t-service/url eif) val)) 0)
-                                      (assoc row ::t-service/format #{val})))
-                           :read #(first (get-in % [::t-service/format]))})
+
+                        {:name ::t-service/format
+                         :type :selection
+                         :disabled? in-validation?
+                         :label (tr [:field-labels :transport-service-common ::t-service/format])
+                         :field-class "col-xs-12 col-sm-3 col-md-3"
+                         :full-width? true
+                         ; XXX: This used to be a multiselect which means the produced values were wrapped in a vector,
+                         ;      the database type for this column is array etc. etc. Easiest way to get around this
+                         ;      without breaking existing data is to just return one-item vectors :)
+                         :options (if (flags/enabled? :new-transit-data-formats)
+                                    [["GTFS"] ["GTFS-RT"] ["GBFS"] ["Kalkati"] ["SIRI"] ["NeTEx"] ["GeoJSON"] ["JSON"] ["CSV"]]
+                                    [["GTFS"] ["Kalkati.net"] ["SIRI"] ["NeTEx"] ["GeoJSON"] ["JSON"] ["CSV"]])
+                         :show-option first
+                         :required? true
+                         :is-empty? validation/empty-enum-dropdown?
+                         :update! (fn [v] [v])}
+
                         {:name ::t-service/external-service-url
                          :type :component
                          :label (tr [:field-labels :transport-service-common ::t-service/external-service-url])
