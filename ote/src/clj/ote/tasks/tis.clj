@@ -48,7 +48,7 @@
                   complete? (let [status (get-in entry ["data" "status"])]
                               (not (or (= status "received")
                                        (= status "processing"))))
-                  result    (get-in entry ["links" tis-vaco/conversion-rule-name "result"])]
+                  result    (get-in entry ["links" "gtfs2netex.fintraffic" "result"])]
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
