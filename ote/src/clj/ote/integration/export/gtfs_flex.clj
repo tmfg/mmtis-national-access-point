@@ -122,20 +122,25 @@
                       :funicular "7")
    :gtfs/agency-id transport-operator-id})
 
-(defn ->static-calendar
+(defn ->calendar
   [service-id transport-service]
-  {:gtfs/service-id service-id
-   :gtfs/monday     1
-   :gtfs/tuesday    1
-   :gtfs/wednesday  1
-   :gtfs/thursday   1
-   :gtfs/friday     1
-   :gtfs/saturday   1
-   :gtfs/sunday     1
-   :gtfs/start-date (or (::t-service/available-from transport-service)
-                        (LocalDate/now))
-   :gtfs/end-date   (or (::t-service/available-to transport-service)
-                        (-> (LocalDate/now) (.plusYears 5)))})
+  (some->> (get-in transport-service [::t-service/passenger-transportation ::t-service/service-hours])
+           (mapv-indexed
+             (fn [n cal]
+               (let [{::t-service/keys [week-days from to description all-day]} cal
+                     week-days                                           (set week-days)]
+                 {:gtfs/service-id (str service-id "_c_" n)
+                  :gtfs/monday     (contains? week-days :MON)
+                  :gtfs/tuesday    (contains? week-days :TUE)
+                  :gtfs/wednesday  (contains? week-days :WED)
+                  :gtfs/thursday   (contains? week-days :THU)
+                  :gtfs/friday     (contains? week-days :FRI)
+                  :gtfs/saturday   (contains? week-days :SAT)
+                  :gtfs/sunday     (contains? week-days :SUN)
+                  :gtfs/start-date (or (::t-service/available-from transport-service)
+                                       (LocalDate/now))
+                  :gtfs/end-date   (or (::t-service/available-to transport-service)
+                                       (-> (LocalDate/now) (.plusYears 5)))})))))
 
 (defn ->static-location-groups
   [areas]
@@ -163,7 +168,8 @@
                        #{::t-service/id
                          ::t-service/name
                          ::t-service/available-from
-                         ::t-service/available-to}
+                         ::t-service/available-to,
+                         ::t-service/passenger-transportation}
                        {::t-service/id transport-service-id})))
 
 (defn export-gtfs-flex
@@ -201,7 +207,7 @@
           flex-booking-rule (->booking-rules db transport-service)  ; TODO: maybe apply to all stop times?
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas flex-booking-rule))
-          flex-calendar     [(->static-calendar static-service-id transport-service)]
+          flex-calendar     (->calendar static-service-id transport-service)
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
                                   (cheshire/encode {:key-fn name})))
