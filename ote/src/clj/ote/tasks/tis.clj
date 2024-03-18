@@ -114,6 +114,10 @@
   {:validations [{:name   "gbfs.entur"
                   :config {}}]})
 
+(defmethod vaco-create-payload :default [_]
+  ; default is no-op
+  {})
+
 (defn submit-known-interfaces!
   [config db]
   (when (feature/feature-enabled? config :tis-vaco-integration)
