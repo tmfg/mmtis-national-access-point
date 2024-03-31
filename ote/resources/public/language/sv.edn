@@ -1294,7 +1294,11 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :transport-type "Trafikslag"
   :homepage "www-sidor"
   :ote-generated-url "NeTEx-gränssnitt som genererats i NAP"
-  :vaco-generated-url "NeTEx-gränssnitt som genererats i VACO"
+  :vaco-quality-details-title "Gränssnitt kvalitet"
+  :vaco-validated-feed "Gränssnitt som validerats i VACO"
+  :vaco-converted-feed "Gränssnitt som konverterad i VACO"
+  :vaco-magic-link "Visa i VACO"
+  :download-netex "Nerladda konverterad pakett"
   :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}
 
  :login

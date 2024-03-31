@@ -1,5 +1,6 @@
 (ns ote.views.service-viewer
-  (:require [ote.time :as time]
+  (:require [clojure.string :as str]
+            [ote.time :as time]
             [stylefy.core :as stylefy]
             [cljs-react-material-ui.icons :as ic]
             [clojure.string :as string]
@@ -22,6 +23,7 @@
             [ote.style.service-viewer :as service-viewer]
             [ote.app.controller.place-search :as place-search]
             [ote.ui.form-fields :as form-fields]
+            [ote.util.tis-configs :as tis-configs]
             [ote.style.base :as base]
             [taxiui.views.components.formatters :as taxiui-formatters]))
 
@@ -295,87 +297,72 @@
                         :analytics-tag "Verkko-osoite"}])
             true]]
           [info-sections-3-cols
-             ""
-             [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
-              [common-ui/information-row-with-option
-               (tr [:field-labels :transport-service-common ::t-service/license])
-               license false]]
+           ""
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+            [common-ui/information-row-with-option
+             (tr [:field-labels :transport-service-common ::t-service/license])
+             license false]]
 
-             [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-              [common-ui/information-row-with-option
-               (tr [:common-texts :format]) format true]]
-             [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-              [information-row-with-selection
-               (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-               descriptions
-               false]]
-             {:sub-title false}]
-          (when url-ote-netex
-            (let [tis-vaco  (:tis-vaco interface)
-                  public-id (:gtfs/tis-entry-public-id tis-vaco)]
-              (if (some? public-id)
-                ; VACO-originating NeTEx conversion
-                [info-sections-1-col
-                 nil
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+            [common-ui/information-row-with-option
+             (tr [:common-texts :format]) format true]]
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
+            [information-row-with-selection
+             (tr [:field-labels :transport-service-common ::t-service/external-service-description])
+             descriptions
+             false]]
+           {:sub-title false}]
+
+          ;; TIS-VACO data quality information
+          (let [tis-vaco   (:tis-vaco interface)
+                public-id  (:gtfs/tis-entry-public-id tis-vaco)
+                magic-link (:gtfs/tis-magic-link tis-vaco)
+                format     (some-> (::t-service/format interface) first str/lower-case)
+                {:keys [validator converter]} (tis-configs/base-task-names format)]
+            (when (some? public-id)
+              ; VACO-originating NeTEx conversion
+              [:div
+               [info-sections-2-cols
+                (tr [:service-search :vaco-quality-details-title])
+                [:div
+                 ;; validation details
+                 (when validator
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-validated-feed])
+                    [:div
+                     ; validation status badge
+                     [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id "/" validator)
+                            :style  {:margin-right "0.5em"}
+                            :height "24" :title "VACO validation status badge" :alt "VACO validation status badge"}]]
+                    false])]
+                ;; conversion details
+                [:div
+                 (when converter
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-converted-feed])
+                    [:div
+                     ; conversion status badge
+                     [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id "/" converter)
+                            :style  {:margin-right "0.5em"}
+                            :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}]]
+                    false])]
+                {:sub-title true}]
+               [info-sections-1-col
+                ""
+                [:div
                  [common-ui/information-row-with-option
-                  (tr [:service-search :vaco-generated-url])
+                  ""
                   [:div
-                   [:img {:src (str (:api-base-url tis-vaco) "/api/badge/" public-id)
-                          :style {:margin-right "0.5em"}
-                          :height "24" :title "VACO status badge" :alt "VACO status badge"}]
+                   (when magic-link [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}])
                    (when (and (:gtfs/tis-complete tis-vaco)
-                              (:gtfs/tis-success tis-vaco))
-                     [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}])]
-                  true]
-                 {:sub-title false}]
-
-                ; FINAP (Chouette)-originating NeTEx conversion
-                [info-sections-1-col
-                 nil
-                 [common-ui/information-row-with-option
-                  (tr [:service-search :ote-generated-url])
-                  [common-ui/linkify (str url-ote-netex "?origin=ui") url-ote-netex {:target "_blank"}]
-                  true]
-                 {:sub-title false}])))]))
+                              (:gtfs/tis-success tis-vaco)
+                              url-ote-netex)
+                     [common-ui/linkify (str url-ote-netex "?origin=ui") (tr [:service-search :download-netex]) {:target "_blank"}])]]]]]))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
                                {:color colors/gray650
                                 :font-style "italic"}))
       (tr [:service-viewer :not-disclosed])])])
-
-(defn- ote-interfaces
-  [data]
-  [:div
-   (when data
-     (doall
-       (for [interface data
-             :let [title (string/join ", "
-                                      (map
-                                        #(tr [:enums ::netex/interface-data-content %])
-                                        (::netex/data-content interface)))
-                   url (:url interface)
-                   format (:format interface)]]
-         ^{:key (str (::netex/id interface) title url)}
-         [info-sections-2-cols (string/upper-case title)
-          [:div
-           [common-ui/information-row-with-option
-            (tr [:service-search :ote-generated-url])
-            (when url [common-ui/linkify
-                       url
-                       url
-                       {:target "_blank"}])
-            false]
-           [common-ui/information-row-with-option
-            (tr [:field-labels :transport-service-common ::t-service/license])
-            nil
-            false]]
-          [:div
-           [common-ui/information-row-with-option (tr [:common-texts :format]) format false]
-           [information-row-with-selection
-            (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-            nil
-            false]]
-          {:sub-title true}])))])
 
 (defn- luggage-warnings
   [title data]

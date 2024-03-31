@@ -10,6 +10,7 @@
             [ote.netex.netex :as netex]
             [ote.tasks.util :as tasks-util]
             [ote.util.feature :as feature]
+            [ote.util.tis-configs :as tis-configs]
             [specql.core :as specql]
             [taoensso.timbre :as log]))
 
@@ -44,11 +45,12 @@
         (fn [package]
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
-            (let [entry     (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete? (let [status (get-in entry ["data" "status"])]
-                              (not (or (= status "received")
-                                       (= status "processing"))))
-                  result    (get-in entry ["links" "gtfs2netex.fintraffic" "result"])]
+            (let [entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
+                  complete?  (let [status (get-in entry ["data" "status"])]
+                               (not (or (= status "received")
+                                        (= status "processing"))))
+                  result     (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
+                  magic-link (get-in entry ["links" "refs" "magic" "href"])]
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
@@ -63,13 +65,15 @@
                        :external-interface-data-content   #{:route-and-schedule}})
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
-                                             :tis-success         true})))
+                                             :tis-success         true
+                                             :tis-magic-link      magic-link})))
                 (if complete?
                   (do
                     (log/info (str "No results found for package " package-id "/" entry-public-id " but the entry is complete -> no result available"))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
-                                             :tis-success         false}))
+                                             :tis-success         false
+                                             :tis-magic-link      nil}))
                   (log/info (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side."))))))
 
           )
@@ -98,26 +102,6 @@
                      :gtfs/license license
                      :gtfs/external-interface-description-id external-interface-description-id})))
 
-(defmulti vaco-create-payload identity)
-
-(defmethod vaco-create-payload "gtfs" [_]
-  {:validations [{:name   "gtfs.canonical"
-                  :config {}}]
-   :conversions [{:name   "gtfs2netex.fintraffic"
-                  :config {}}]})
-
-(defmethod vaco-create-payload "netex" [_]
-  {:validations [{:name   "netex.entur"
-                  :config {}}]})
-
-(defmethod vaco-create-payload "gbfs" [_]
-  {:validations [{:name   "gbfs.entur"
-                  :config {}}]})
-
-(defmethod vaco-create-payload :default [_]
-  ; default is no-op
-  {})
-
 (defn submit-known-interfaces!
   [config db]
   (when (feature/feature-enabled? config :tis-vaco-integration)
@@ -140,7 +124,7 @@
                                      :external-interface-description-id external-interface-description-id
                                      :operator-name                     operator-name}
                                     (merge {:format format}
-                                           (vaco-create-payload format)))
+                                           (tis-configs/vaco-create-payload format)))
               ; return nil to allow early collection of intermediate results
               nil))
           (catch Exception e
