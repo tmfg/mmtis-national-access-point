@@ -357,7 +357,8 @@
                    (when (and (:gtfs/tis-complete tis-vaco)
                               (:gtfs/tis-success tis-vaco)
                               url-ote-netex)
-                     [common-ui/linkify (str url-ote-netex "?origin=ui") (tr [:service-search :download-netex]) {:target "_blank"}])]]]]]))]))
+                     [common-ui/linkify (str url-ote-netex "?origin=ui") (tr [:service-search :download-netex]) {:target "_blank"}])]]]
+                true]]))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
                                {:color colors/gray650
