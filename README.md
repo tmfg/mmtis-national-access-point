@@ -41,6 +41,3 @@ Here is a overview of our AWS production architecture. CI and other development 
 ## Transit changes documentation
 
  - [Transit changes](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/transit-changes/README.md)
- 
- 
-<a href="https://www.browserstack.com" target="_blank" rel="noopener noreferrer"><img src="./Browserstack-logo.svg" width="200"></a>

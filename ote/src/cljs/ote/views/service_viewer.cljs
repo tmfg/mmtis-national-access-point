@@ -351,7 +351,7 @@
                 ""
                 [:div
                  [common-ui/information-row-with-option
-                  ""
+                  (tr [:service-search :vaco-links-section-title])
                   [:div
                    (when magic-link [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}])
                    (when (and (:gtfs/tis-complete tis-vaco)

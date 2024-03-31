@@ -1298,6 +1298,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :vaco-converted-feed "Interface converted by VACO"
   :vaco-magic-link "View in TIS VACO"
   :download-netex "Download converted package"
+  :vaco-links-section-title "VACO resources"
   :no-homepage "No website has been entered in the service."}
 
  :login
