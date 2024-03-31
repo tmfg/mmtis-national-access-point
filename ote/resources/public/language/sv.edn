@@ -1299,6 +1299,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :vaco-converted-feed "Gränssnitt som konverterad i VACO"
   :vaco-magic-link "Visa i VACO"
   :download-netex "Nerladda konverterad pakett"
+  :vaco-links-section-title "VACO-resurserna"
   :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}
 
  :login

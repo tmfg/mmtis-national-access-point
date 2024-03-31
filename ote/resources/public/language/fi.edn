@@ -1304,6 +1304,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :vaco-validated-feed "Lähderajapinnan datan laatu"
   :vaco-converted-feed "VACOn muuntaman rajapinnan tila"
   :vaco-magic-link "Tarkastele TIS VACOssa"
+  :vaco-links-section-title "VACO-resurssit"
   :download-netex "Lataa muunnospaketti"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
