@@ -23,15 +23,15 @@ Example call with [curl](https://curl.haxx.se/) tool to fetch all taxi services:
 
 The query is a GET request and all the search filters are given as query parameters.
 
-Name | Description | Example
----- | ----------- | -------
-text | Free text search term (searches the name of the service) | `bus`
-operation_area | Comma separated list, matches services that have any of the listed areas as their operation area | `Oulu,Kempele`
-sub_types | Comma separated list, matches services of the listed type (see service types) | `terminal,taxi`
-operators | List of operator ids (see operator search), matches any service created by the given operators | `4,8,15,16,23,42`
-limit | Max number of results to return | `25`
-offset | Where to start returning results (for paging) | `0`
-response_format | Output format (defaults to transit) | `json`
+| Name            | Description                                                                                      | Example           |
+|-----------------|--------------------------------------------------------------------------------------------------|-------------------|
+| text            | Free text search term (searches the name of the service)                                         | `bus`             |
+| operation_area  | Comma separated list, matches services that have any of the listed areas as their operation area | `Oulu,Kempele`    |
+| sub_types       | Comma separated list, matches services of the listed type (see service types)                    | `terminal,taxi`   |
+| operators       | List of operator ids (see operator search), matches any service created by the given operators   | `4,8,15,16,23,42` |
+| limit           | Max number of results to return                                                                  | `25`              |
+| offset          | Where to start returning results (for paging)                                                    | `0`               |
+| response_format | Output format (defaults to transit)                                                              | `json`            |
 
 All parameters are optional. If no parameters are specified the search will return the latest services.
 The default output format is Transit but can be changed to JSON with the `response_format` query parameter.
@@ -43,15 +43,14 @@ All the types are represented in the "sub_types" parameter list.
 
 Valid values are
 
-Value | Description
------ | -----------
-taxi | Taxi service (road traffic)
-request | Charter traffic and other equest based
-schedule | Regular scheduled traffic 
-terminal | Stations, ports and other terminals
-rentals | Vehicle rentals and commercial shared vehicle solutions
-parking | General commercial parking services
-
+| Value    | Description                                             |
+|----------|---------------------------------------------------------|
+| taxi     | Taxi service (road traffic)                             |
+| request  | Charter traffic and other equest based                  |
+| schedule | Regular scheduled traffic                               |
+| terminal | Stations, ports and other terminals                     |
+| rentals  | Vehicle rentals and commercial shared vehicle solutions |
+| parking  | General commercial parking services                     |
 
 ### Response values
 
