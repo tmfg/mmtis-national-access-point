@@ -8,7 +8,8 @@ SELECT *
 -- name: update-tis-results!
 UPDATE "gtfs_package"
    SET "tis-complete" = :tis-complete,
-       "tis-success" = :tis-success
+       "tis-success" = :tis-success,
+       "tis-magic-link" = :tis-magic-link
 WHERE "tis-entry-public-id" = :tis-entry-public-id;
 
 -- name: fetch-count-service-packages

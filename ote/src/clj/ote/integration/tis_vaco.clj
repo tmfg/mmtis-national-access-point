@@ -149,5 +149,5 @@
   [db config interface-id package-id]
   (when-let [package (find-package db interface-id package-id)]
     (-> package
-        (select-keys [:gtfs/tis-entry-public-id :gtfs/tis-success :gtfs/tis-complete])
+        (select-keys [:gtfs/tis-entry-public-id :gtfs/tis-success :gtfs/tis-complete :gtfs/tis-magic-link])
         (assoc :api-base-url (get-in config [:tis-vaco :api-base-url])))))

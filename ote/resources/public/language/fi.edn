@@ -1300,7 +1300,11 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :transport-type "Liikennemuoto"
   :homepage "Verkko-osoite"
   :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
-  :vaco-generated-url "VACOn generoima NeTEx-rajapinta"
+  :vaco-quality-details-title "Rajapinnan laatutiedot"
+  :vaco-validated-feed "Lähderajapinnan datan laatu"
+  :vaco-converted-feed "VACOn muuntaman rajapinnan tila"
+  :vaco-magic-link "Tarkastele TIS VACOssa"
+  :download-netex "Lataa muunnospaketti"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 
