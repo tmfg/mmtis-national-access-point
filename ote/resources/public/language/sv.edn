@@ -1823,8 +1823,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
                                                              :save-button "Spara"}}}}
 
  ; TIS VACO service integration and announcement related translations
- :tis-vaco {:announcement {:title "Finap.fi katalogen förnyas i januari-februari 2024."
-                           :content "Fintraffic publicerar en validerings- och konverteringstjänst (VACO) för att förbättra korrektheten och kvaliteten på reseinformationen. Parter som publicerar reseinformation i tjänstekatalogen kommer i framtiden att få meddelanden om sammanfattningen av sina datautgivningar och kvalitetsrapporter. Mer information "
+ :tis-vaco {:announcement {:title "Finap.fi katalogen förnyas"
+                           :content "Fintraffic publicerar en validerings- och konverteringstjänst (VACO) för att förbättra korrektheten och kvaliteten på reseinformationen. Parter som publicerar reseinformation i tjänstekatalogen kommer i framtiden att få meddelanden om sammanfattningen av sina datautgivningar och kvalitetsrapporter. Rapporter kan också användas av dataanvändare. Mer information "
                            :link-url "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"
                            :link-label "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"}}
  :phone-countrycodes [{:country :AD :code "+376"}
