@@ -22,8 +22,12 @@ SELECT tso.id                         AS "operator-id",
        eid.id                         AS "external-interface-description-id",
        eid.license                    AS "license",
        trim(lower(eid.format[1]))     AS "format",
-       (eid."external-interface").url AS url
+       (eid."external-interface").url AS url,
+       COALESCE(tso.email, u.email)   AS "contact-email"
   FROM "external-interface-description" eid
-           LEFT JOIN "transport-service" tse ON tse.id = eid."transport-service-id"
-           LEFT JOIN "transport-operator" tso ON tso.id = tse."transport-operator-id"
- WHERE tse.published IS NOT NULL;
+       LEFT JOIN "transport-service" tse ON tse.id = eid."transport-service-id"
+       LEFT JOIN "transport-operator" tso ON tso.id = tse."transport-operator-id"
+       LEFT JOIN member m ON m.group_id = tso."ckan-group-id"
+       LEFT JOIN "user" u ON u.id = m.table_id
+ WHERE tse.published IS NOT NULL
+   AND m.capacity = 'admin';
