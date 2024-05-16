@@ -112,7 +112,7 @@
         (try
           ; execute sequentially for side effects only, discarding intermediate entries to help garbage collector do its thing
           (doseq [interface (list-all-external-interfaces db)]
-            (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format]} interface
+            (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format contact-email]} interface
                   package (create-package db operator-id service-id external-interface-description-id license)]
               (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
               (tis-vaco/queue-entry db (:tis-vaco config)
@@ -122,7 +122,8 @@
                                     {:service-id                        service-id
                                      :package-id                        (:gtfs/id package)
                                      :external-interface-description-id external-interface-description-id
-                                     :operator-name                     operator-name}
+                                     :operator-name                     operator-name
+                                     :contact-email                     contact-email}
                                     (merge {:format format}
                                            (tis-configs/vaco-create-payload format)))
               ; return nil to allow early collection of intermediate results

@@ -112,9 +112,24 @@
    ; :tis-vaco config root from config.edn
    config
    ; interface
-   {:keys [url operator-id operator-name ts-id last-import-date license id data-content]}
+   {:keys [url
+           operator-id
+           operator-name
+           ts-id
+           last-import-date
+           license
+           id
+           data-content]}
    ; conversion-meta
-   {:keys [gtfs-file gtfs-filename gtfs-basename external-interface-description-id external-interface-data-content service-id package-id operator-name]}
+   {:keys [gtfs-file
+           gtfs-filename
+           gtfs-basename
+           external-interface-description-id
+           external-interface-data-content
+           service-id
+           package-id
+           operator-name
+           contact-email]}
    ; payload
    {:keys [format validations conversions]}]
   (let [context   (str "FINAP (" operator-id "/" service-id "/" external-interface-description-id ")")
@@ -127,12 +142,13 @@
                                             :validations (or validations [])
                                             :conversions (or conversions [])
                                             :context     (str operator-id "/" service-id "/" id)
-                                            :metadata    {:caller        "FINAP"
-                                                          :operator-id   operator-id
-                                                          :operator-name operator-name
-                                                          :service-id    service-id
-                                                          :interface-id  id
-                                                          :package-id    package-id}})]
+                                            :metadata    (merge {:caller        "FINAP"
+                                                                 :operator-id   operator-id
+                                                                 :operator-name operator-name
+                                                                 :service-id    service-id
+                                                                 :interface-id  id
+                                                                 :package-id    package-id}
+                                                                (when contact-email {:contact-email contact-email}))})]
     (when new-entry
       (try
         (specql/update! db :gtfs/package
