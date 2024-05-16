@@ -126,6 +126,7 @@
                                             :name        (str operator-name " / GTFS / " context)
                                             :validations (or validations [])
                                             :conversions (or conversions [])
+                                            :context     (str operator-id "/" service-id "/" id)
                                             :metadata    {:caller        "FINAP"
                                                           :operator-id   operator-id
                                                           :operator-name operator-name
