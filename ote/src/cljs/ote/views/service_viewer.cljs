@@ -341,8 +341,9 @@
                    [common-ui/information-row-with-option
                     (tr [:service-search :vaco-converted-feed])
                     [:div
-                     ; conversion status badge
-                     [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id "/" converter)
+                     ; conversion status badge, falls back to entry badge if converter is unknown
+                     [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id (condp = converter
+                                                                                            "gtfs2netex.fintraffic" "/netex.entur"))
                             :style  {:margin-right "0.5em"}
                             :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}]]
                     false])]
