@@ -1296,10 +1296,10 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :ote-generated-url "NeTEx-gränssnitt som genererats i NAP"
   :vaco-quality-details-title "Gränssnitt kvalitet"
   :vaco-validated-feed "Gränssnitt som validerats i VACO"
-  :vaco-converted-feed "Gränssnitt som konverterad i VACO"
-  :vaco-magic-link "Visa i VACO"
-  :download-netex "Nerladda konverterad pakett"
-  :vaco-links-section-title "VACO-resurserna"
+  :vaco-converted-feed "Konverteringens status"
+  :vaco-magic-link "Visa i valideringstänsten"
+  :vaco-links-section-title "Valideringstjänst"
+  :download-netex "Ladda ner den konverterade filen"
   :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}
 
  :login

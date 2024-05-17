@@ -1302,10 +1302,10 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
   :vaco-quality-details-title "Rajapinnan laatutiedot"
   :vaco-validated-feed "Lähderajapinnan datan laatu"
-  :vaco-converted-feed "VACOn muuntaman rajapinnan tila"
-  :vaco-magic-link "Tarkastele TIS VACOssa"
-  :vaco-links-section-title "VACO-resurssit"
-  :download-netex "Lataa muunnospaketti"
+  :vaco-converted-feed "NeTEx-muunnoksen tila"
+  :vaco-magic-link "Tarkastele validointipalvelussa"
+  :vaco-links-section-title "Validointipalvelu"
+  :download-netex "Lataa muunnettu NeTEx-paketti"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 
