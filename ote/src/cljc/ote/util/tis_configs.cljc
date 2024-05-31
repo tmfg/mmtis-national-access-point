@@ -1,18 +1,22 @@
 (ns ote.util.tis-configs)
 
+;; IMPLEMENTATION NOTE! Both :name and :config keys are mandatory!
 (defmulti base-task-names identity)
 
 (defmethod base-task-names "gtfs" [_]
-  {:validator {:name "gtfs.canonical"}
-   :converter {:name "gtfs2netex.fintraffic"
+  {:validator {:name   "gtfs.canonical"
+               :config {}}
+   :converter {:name   "gtfs2netex.fintraffic"
                :config {"codespace"     "FIN"
                         "maximumErrors" 1000}}})
 
 (defmethod base-task-names "netex" [_]
-  {:validator {:name "netex.entur"}})
+  {:validator {:name   "netex.entur"
+               :config {}}})
 
 (defmethod base-task-names "gbfs" [_]
-  {:validator {:name "gbfs.entur"}})
+  {:validator {:name   "gbfs.entur"
+               :config {}}})
 
 (defmethod base-task-names :default [_]
   {})
