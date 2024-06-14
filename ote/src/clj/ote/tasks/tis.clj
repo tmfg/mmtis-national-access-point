@@ -47,7 +47,8 @@
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
                   complete?  (let [status (get-in entry ["data" "status"])]
-                               (not (or (= status "received")
+                               (not (or (nil? status)
+                                        (= status "received")
                                         (= status "processing"))))
                   result     (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
                   magic-link (get-in entry ["links" "refs" "magic" "href"])]
