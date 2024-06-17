@@ -1,3 +1,11 @@
-[ote]
+[ote:children]
+ote-el7
+ote-el9
+
+[ote-el7]
 napote-ote1-prod.finap.fi
 napote-ote2-prod.finap.fi
+
+[ote-el9]
+napote-ote1-prod-el9.finap.fi
+napote-ote2-prod-el9.finap.fi
