@@ -8,9 +8,6 @@ napote-bastion
 [jenkins-el7:vars]
 
 [jenkins-el9]
-napote-bastion
-
-[jenkins-el9:vars]
 napote-bastion-el9
 
 [jenkins-el9:vars]
