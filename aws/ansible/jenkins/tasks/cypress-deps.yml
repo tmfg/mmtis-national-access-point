@@ -11,9 +11,13 @@
   with_items:
     - xorg-x11-server-Xvfb
     - google-chrome
-    - gtk2
+    - gtk2-devel
+    - gtk3-devel
+    - libnotify-devel
+    - nss
     - libXtst
-    - GConf2
+    - libXScrnSaver
+#    - GConf2
     - alsa-lib
     - freetype
     - liberation-fonts-common

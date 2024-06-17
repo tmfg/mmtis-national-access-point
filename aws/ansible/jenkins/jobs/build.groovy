@@ -4,11 +4,11 @@ job('OTE build from master') {
     }
 
     scm {
-        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/master')
+        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/ol9-update')
     }
-    triggers {
-        scm('H/15 * * * *')
-    }
+    // triggers {
+    //     scm('H/15 * * * *')
+    // }
 
     environmentVariables {
         groovy('''

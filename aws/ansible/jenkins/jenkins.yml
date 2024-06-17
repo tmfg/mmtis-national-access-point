@@ -2,7 +2,7 @@
 - hosts: jenkins
   become: yes
   tasks:
-    - include: tasks/java8.yml
+    - include: tasks/java11.yml
     - include: tasks/leiningen.yml
     - include: tasks/cypress-deps.yml
 
@@ -34,5 +34,7 @@
       - mattiu
       - antti.nuortimo
       - esko.suomi
+      - oskari.jokinen
+      - jaska.kivela
   roles:
     - solita.jenkins
