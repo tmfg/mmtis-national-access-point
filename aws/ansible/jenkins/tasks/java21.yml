@@ -1,0 +1,2 @@
+- name: Install Java 21
+  yum: name=java-21-openjdk state=installed
