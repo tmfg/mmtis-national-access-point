@@ -25,3 +25,6 @@
     - liberation-narrow-fonts
     - liberation-sans-fonts
     - liberation-serif-fonts
+    - postgresql
+    - postgresql-server
+    - postgresql-contrib

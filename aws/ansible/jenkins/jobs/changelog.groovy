@@ -6,9 +6,9 @@ job('Generate ChangeLog from Github PRs') {
     scm {
         git('https://github.com/tmfg/mmtis-national-access-point.git', '*/ol9-update')
     }
-    // triggers {
-    //     cron('0 22 * * *')
-    // }
+    triggers {
+        cron('0 22 * * *')
+    }
     steps {
         leiningenBuilder {
             subdirPath('tools/changelog')
