@@ -1,6 +1,10 @@
 - name: Gathering ec2 facts
   action: ec2_metadata_facts
 
+- name: Print ansible version
+  debug:
+    msg: "Ansible version is  {{ ansible_version.full }}"
+
 - name: Fetch ALB Target group ARN
   delegate_to: 127.0.0.1
   become: false
