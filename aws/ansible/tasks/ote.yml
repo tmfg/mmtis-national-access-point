@@ -13,6 +13,10 @@
      --names "{{vault_ote_target_group_name}}"
   register: target_group
 
+- name: Print target_group
+  debug:
+    msg: "Target group is  {{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
+
 - name: Set instance id
   set_fact: instance_id="{{ansible_ec2_instance_id}}"
 
