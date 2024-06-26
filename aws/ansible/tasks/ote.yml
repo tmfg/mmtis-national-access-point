@@ -31,8 +31,8 @@
 - pause:
     seconds: 10
 
-- name: Install required packages
-  yum: name=['java-1.8.0-openjdk'] state=installed
+#- name: Install required packages
+#  yum: name=['java-1.8.0-openjdk'] state=installed
 
 - name: Ensure botocore and boto3 modules are installed
   pip:
