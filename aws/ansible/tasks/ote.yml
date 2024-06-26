@@ -15,7 +15,7 @@
 
 - name: Print target_group
   debug:
-    msg: "Target group is  {{(target_group.stdout | from_json).TargetGroups[0].TargetGroupArn}}"
+    msg: "Target group is {{ target_group.stdout }}"
 
 - name: Set instance id
   set_fact: instance_id="{{ansible_ec2_instance_id}}"
