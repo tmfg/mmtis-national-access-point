@@ -32,9 +32,9 @@
     seconds: 10
 
 - name: Install required packages
-    yum:
+  yum:
     name: pip3
-    state: present
+    state: installed
 #  yum: name=['java-1.8.0-openjdk'] state=installed
 
 - name: Ensure botocore and boto3 modules are installed
