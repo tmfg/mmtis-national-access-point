@@ -33,9 +33,12 @@
 
 - name: Install required packages
   yum:
-    name: python3-pip
+    name: "{{ packages }}"
     state: installed
-#  yum: name=['java-1.8.0-openjdk'] state=installed
+  vars:
+    packages:
+    - python3-pip
+    - java-1.8.0-openjdk
 
 - name: Ensure botocore and boto3 modules are installed
   pip:
