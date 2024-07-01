@@ -5,7 +5,7 @@ job('Deploy OTE') {
         choiceParam('ENV', ['staging','production']);
     }
     scm {
-        git('https://github.com/tmfg/mmtis-national-access-point.git','*/ol9-update')
+        git('https://github.com/tmfg/mmtis-national-access-point.git','*/master')
     }
 
     environmentVariables {
@@ -42,7 +42,6 @@ job('Deploy OTE') {
             inventory {
                 inventoryPath { path('aws/ansible/environments/${ENV}/inventory') }
             }
-            limit: 'ote-el9'
             extraVars {
                 extraVar {
                     key('ote_build_artifact')

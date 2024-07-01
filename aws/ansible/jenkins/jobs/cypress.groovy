@@ -4,7 +4,7 @@ job('Cypress-e2e-tests') {
     }
 
     scm {
-        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/ol9-update')
+        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/master')
     }
 
     wrappers {

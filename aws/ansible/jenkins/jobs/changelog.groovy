@@ -4,7 +4,7 @@ job('Generate ChangeLog from Github PRs') {
     }
 
     scm {
-        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/ol9-update')
+        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/master')
     }
     triggers {
         cron('0 22 * * *')
