@@ -1,13 +1,4 @@
-[jenkins:children]
-jenkins-el7
-jenkins-el9
-
-[jenkins-el7]
-napote-bastion
-
-[jenkins-el7:vars]
-
-[jenkins-el9]
+[jenkins]
 napote-bastion-el9
 
-[jenkins-el9:vars]
+[jenkins:vars]
