@@ -1,6 +1,10 @@
 - name: Gathering ec2 facts
   action: ec2_metadata_facts
 
+- name: Print ansible version
+  debug:
+    msg: "Ansible version is  {{ ansible_version.full }}"
+
 - name: Fetch ALB Target group ARN
   delegate_to: 127.0.0.1
   become: false
@@ -8,6 +12,10 @@
     aws elbv2 describe-target-groups
      --names "{{vault_ote_target_group_name}}"
   register: target_group
+
+- name: Print target_group
+  debug:
+    msg: "Target group is {{ target_group }}"
 
 - name: Set instance id
   set_fact: instance_id="{{ansible_ec2_instance_id}}"
@@ -24,7 +32,13 @@
     seconds: 10
 
 - name: Install required packages
-  yum: name=[u'java-1.8.0-openjdk'] state=installed
+  yum:
+    name: "{{ packages }}"
+    state: installed
+  vars:
+    packages:
+    - python3-pip
+    - java-1.8.0-openjdk
 
 - name: Ensure botocore and boto3 modules are installed
   pip:
