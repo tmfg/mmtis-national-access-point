@@ -5,12 +5,13 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.string :as str]))
 
-(defn hikari-datasource [{:keys [url username password] :as config}]
+(defn hikari-datasource [{:keys [url username password schema] :as config}]
   (HikariDataSource.
    (doto (HikariConfig.)
      (.setJdbcUrl url)
      (.setUsername username)
      (.setPassword password)
+     (.setSchema schema)
      (.addDataSourceProperty "cachePrepStmts" "true")
      (.addDataSourceProperty "prepStmtCacheSize" "250")
      (.addDataSourceProperty "prepStmtCacheSqlLimit" "2048"))))

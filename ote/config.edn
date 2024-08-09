@@ -3,7 +3,8 @@
  :testing-env? true
  :db {:url "jdbc:postgresql://localhost:5432/napote"
       :username "napote"
-      :password ""}
+      :password ""
+      :schema "public"}
  ;; example for reading password from a file:
  ;; :db {:url "jdbc:postgresql://localhost:5435/napote"
  ;;      :username "ote"
