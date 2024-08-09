@@ -31,6 +31,7 @@ job('OTE build from master') {
             mavenInstallation('Maven 3.5.0')
             property('databaseUrl', 'jdbc:postgresql://localhost/napotetest_template')
             property('databaseUser', 'napotetest')
+            property('databaseSchema', 'napotetest_template')
         }
 
         leiningenBuilder {
