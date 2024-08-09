@@ -33,6 +33,7 @@ job('Deploy OTE') {
             property('databaseUrl', 'jdbc:postgresql://${vault_db_host}/napote')
             property('databaseUser', '${vault_db_flyway_user}')
             property('databasePassword', '${vault_db_flyway_password}')
+            property('databaseSchema', 'napote')
         }
 
 

@@ -31,6 +31,9 @@
                     <url>${databaseUrl}</url>
                     <user>${databaseUser}</user>
                     <password>${databasePassword}</password>
+                    <schemas>
+                        <schema>${databaseSchema}</schema>
+                    </schemas>
                 </configuration>
                 <dependencies>
                     <dependency>
