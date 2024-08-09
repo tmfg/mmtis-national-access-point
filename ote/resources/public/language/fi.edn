@@ -1829,11 +1829,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                                                              :add-button  "Lisää"
                                                              :save-button "Tallenna"}}}}
 
- ; TIS VACO service integration and announcement related translations
- :tis-vaco {:announcement {:title "Finap.fi yhteyspiste uudistuu"
-                           :content "Fintraffic julkaisee matkatietojen oikeellisuuden ja laadun parantamiseen tarkoitetun validointi- ja konvertointipalvelun (VACO). Palvelukatalogissa matkatietojaan julkaisevat tahot tulevat jatkossa saamaan viestejä liittyen datajulkaisujensa yhteenvetoon ja laaturaportteihin. Raportteja voivat käyttää myös tietojen hyödyntäjät. Lisätietoa "
-                           :link-url "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"
-                           :link-label "https://www.fintraffic.fi/fi/fintraffic/validointi-ja-konvertointipalvelu"}}
+ :downtime-apology {:title "Finap on palautettu vikatilanteesta."
+                    :content "Mikäli olette tehneet muutoksia maanantaina 5.8.2024 tarkastakaa onko tietonne päivittyneet oikein. Tehkää tarvittaessa muutokset uudestaan. Pahoittelemme palvelukatkosta aiheutuneesta haitasta."}
 
  :phone-countrycodes [{:country :AD :code "+376"}
                       {:country :AE :code "+971"}

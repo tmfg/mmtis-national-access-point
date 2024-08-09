@@ -35,17 +35,16 @@
     [linkify (tr [:common-texts :footer-livi-url-link])
      (tr [:common-texts :footer-livi-url-link])]]])
 
-(defn tis-vaco-announcement
+(defn downtime-apology-message
   []
   [:div
    {:style {:margin "0.2em"
             :border "4px solid #213BF7"}}
    [:p {:style {:margin "10px 0px 0px 10px"
                 :font-weight "bold"}}
-    (tr [:tis-vaco :announcement :title])]
+    (tr [:downtime-apology :title])]
    [:p {:style {:margin "10px"}}
-    (tr [:tis-vaco :announcement :content])
-    [linkify (tr [:tis-vaco :announcement :link-url]) (tr [:tis-vaco :announcement :link-label])]]])
+    (tr [:downtime-apology :content])]])
 
 (defn front-page
   "Front page info"
@@ -77,7 +76,8 @@
    (when test-env?
      [test-env-warning])
 
-   [tis-vaco-announcement]
+   ;; TODO: Remove after 18 August 2024
+   [downtime-apology-message]
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
