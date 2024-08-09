@@ -57,6 +57,7 @@
             <properties>
                 <databaseUrl>jdbc:postgresql://localhost/napote</databaseUrl>
                 <databaseUser>napote</databaseUser>
+                <databaseSchema>public</databaseSchema>
             </properties>
         </profile>
 
@@ -65,6 +66,7 @@
             <properties>
                 <databaseUrl>jdbc:postgresql://localhost/napote_template</databaseUrl>
                 <databaseUser>napote</databaseUser>
+                <databaseSchema>public</databaseSchema>
             </properties>
         </profile>
 
@@ -74,6 +76,7 @@
             <properties>
                 <databaseUrl>jdbc:postgresql://localhost/napotetest_template</databaseUrl>
                 <databaseUser>napotetest</databaseUser>
+                <databaseSchema>public</databaseSchema>
             </properties>
         </profile>
 
@@ -83,6 +86,7 @@
             <properties>
                 <databaseUrl>jdbc:postgresql://localhost/napotetest_template</databaseUrl>
                 <databaseUser>postgres</databaseUser>
+                <databaseSchema>public</databaseSchema>
             </properties>
         </profile>
     </profiles>
