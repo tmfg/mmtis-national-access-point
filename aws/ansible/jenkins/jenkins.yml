@@ -36,5 +36,6 @@
       - esko.suomi
       - oskari.jokinen
       - jaska.kivela
+      - peetu.kaan
   roles:
     - solita.jenkins
