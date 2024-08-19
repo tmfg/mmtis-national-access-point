@@ -76,8 +76,8 @@
    (when test-env?
      [test-env-warning])
 
-   ;; TODO: Remove after 18 August 2024
-   [downtime-apology-message]
+   ; NOTE: commented out just in case we want to find this easier the next time we want to show an alert on the front page
+   ; [downtime-apology-message]
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
