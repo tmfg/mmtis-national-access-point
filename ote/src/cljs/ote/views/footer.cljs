@@ -37,7 +37,7 @@
                                 [:traffic-situation
                                  :feedback-channel
                                  :train-departures
-                                 :skynavx
+                                 :fintraffic-app
                                  :digitraffic
                                  :digitransit
                                  :finap])]

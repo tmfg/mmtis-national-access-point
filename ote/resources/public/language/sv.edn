@@ -1767,7 +1767,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
  {:traffic-situation "Trafikläget"
   :feedback-channel "Responskanalen"
   :train-departures "Tågavgångar"
-  :skynavx "Drone-tjänster"
+  :fintraffic-app "Fintraffic Appen"
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}

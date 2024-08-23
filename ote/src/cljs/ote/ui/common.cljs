@@ -25,7 +25,7 @@
    :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
    :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
    :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
-   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :fintraffic-app    {:url "https://www.fintraffic.fi"                   :langs {:fi "/fi/mobiili" :sv "/sv/fintraffic_appen" :en "/en/fintraffic_app"}}
    :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
    :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
    :finap             {:url "https://finap.fi/#/"                         :langs {}}})
