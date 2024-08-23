@@ -25,7 +25,7 @@
    :traffic-situation {:url "https://liikennetilanne.fintraffic.fi"       :langs {:fi "/fi" :sv "/sv" :en "/en"}}
    :feedback-channel  {:url "https://palautevayla.fi/aspa?lang="          :langs {:fi "fi"  :sv "sv"  :en "en"}}
    :train-departures  {:url "https://junalahdot.fi/junalahdot/main?lang=" :langs {:fi "1"   :sv "2"   :en "3"}}
-   :skynavx           {:url "https://skynavx.fi/#/drone"                  :langs {}}
+   :fintraffic-app    {:url "https://www.fintraffic.fi"                   :langs {:fi "/fi/mobiili" :sv "/sv/fintraffic_appen" :en "/en/fintraffic_app"}}
    :digitraffic       {:url "https://www.digitraffic.fi"                  :langs {:en "/en/"}}
    :digitransit       {:url "https://digitransit.fi"                      :langs {:en "/en/"}}
    :finap             {:url "https://finap.fi/#/"                         :langs {}}})
@@ -33,9 +33,12 @@
 (def ^:private trusted-urls
   "List of external trusted URLs which user doesn't need to confirm before navigating."
   (concat
-    (map (fn [[_ data]] (:url data)) quicklink-urls)  ; Fintraffic properties
-    ["https://www.traficom.fi"]                       ; UI links to various resources hosted on Traficom.fi
-    ))
+    ; Fintraffic properties
+    (map (fn [[_ data]] (:url data)) quicklink-urls)
+    ; UI links to various resources hosted on Traficom.fi
+    ["https://www.traficom.fi"]
+    ; TIS VACO UI links
+    ["https://validator.fintraffic.fi/" "https://validator-test.fintraffic.fi/"]))
 
 (defn- trusted-url?
   [url]

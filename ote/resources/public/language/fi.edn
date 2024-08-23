@@ -1774,7 +1774,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
  {:traffic-situation "Liikennetilanne"
   :feedback-channel "Palauteväylä"
   :train-departures "Junalähdöt"
-  :skynavx "Drone-palvelut"
+  :fintraffic-app "Fintraffic Mobiili"
   :digitraffic "Digitraffic"
   :digitransit "Digitransit"
   :finap "NAP"}

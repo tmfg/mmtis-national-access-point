@@ -25,6 +25,7 @@
             [ote.services.transit-changes :as transit-changes]
             [ote.services.taxiui-service :as taxiui-services]
             [ote.services.robots :as robots]
+            [ote.services.health :as health]
 
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
@@ -131,7 +132,9 @@
    :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:pre-notices config))
                                        [:db :email])
    :tasks-tis (component/using (tasks-tis/tis-tasks config) [:db])
-   :tasks-taxiui (component/using (tasks-taxiui/taxiui-tasks config) [:db])))
+   :tasks-taxiui (component/using (tasks-taxiui/taxiui-tasks config) [:db])
+
+   :health (component/using (health/->Health config) [:db :http])))
 
 (defn configure-logging [dev-mode? {:keys [level] :as log-config}]
   (log/merge-config!

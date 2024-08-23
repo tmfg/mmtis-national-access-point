@@ -17,7 +17,8 @@ WHERE "tis-entry-public-id" = :tis-entry-public-id;
 SELECT COUNT(p.id) as "package-count" FROM gtfs_package p WHERE p."transport-service-id" = :service-id;
 
 -- name: list-all-external-interfaces
-SELECT tso.id                         AS "operator-id",
+SELECT DISTINCT
+       tso.id                         AS "operator-id",
        tso.name                       AS "operator-name",
        tse.id                         AS "service-id",
        eid.id                         AS "external-interface-description-id",

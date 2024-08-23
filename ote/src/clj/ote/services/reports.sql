@@ -45,6 +45,23 @@ SELECT op.name,
    AND ts.published IS NOT NULL
  ORDER BY op.name ASC;
 
+-- name: fetch-all-operators
+-- This is quite similar to the ones below, but was created long after the original reports as per TRAFICOM's request.
+-- Simply returns all active operators.
+SELECT DISTINCT op.name                                AS "operator",
+                op."business-id"                       AS "business-id",
+                (op."visiting-address").country_code   AS "postinumero",
+                (op."visiting-address").post_office    AS "postitoimipaikka",
+                (op."visiting-address").street         AS "osoite",
+                (op."visiting-address").country_code   AS "maa",
+                ts.name                                AS "palvelutyyppi",
+                COALESCE(ts."contact-email", op.email) AS "spostiosoite"
+  FROM "transport-operator" op
+  JOIN "transport-service" ts ON op.id = ts."transport-operator-id"
+ WHERE op.id = ts."transport-operator-id"
+   AND op."deleted?" = FALSE
+   AND ts.published IS NOT NULL;
+
 -- name: fetch-operators-with-sub-contractors
 -- In the first selection select operators that do not have any sub companies.
 -- Then select all operators that have sub companies in transport-service table, but don't have anything in service_company table.
