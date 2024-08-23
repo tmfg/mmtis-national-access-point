@@ -25,5 +25,6 @@
        ["/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
        ["/admin/reports/netex-interfaces-with-max-date" "Gtfs/Kalkati.net rajapinnat ja ajopäivät, jotka on käännetty Netex muotoon"]
        ["/admin/reports/associated-companies" "Liittyneet yritykset"]
-       ["/admin/reports/reported-taxi-prices" "Taksiyritysten ilmoittamat hinnat"]]))])
+       ["/admin/reports/reported-taxi-prices" "Taksiyritysten ilmoittamat hinnat"]
+       ["/admin/reports/transport-operator/all-operators" "Kaikki aktiiviset liikennepalvelutuottajat"]]))])
 

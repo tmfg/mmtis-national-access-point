@@ -454,6 +454,11 @@
               (map (juxt :name :business-id :phone :email :service-name)
                    (fetch-operators-brokerage db)))
 
+    "all-operators"
+    (csv-data ["Palveluntuottaja" "Y-tunnus" "Postinumero" "Postitoimipaikka" "Käyntiosoite" "Maa" "Palvelutyyppi", "Sähköpostiosoite"]
+              (map (juxt :operator, :business-id, :postinumero, :postitoimipaikka, :osoite, :maa, :palvelutyyppi, :spostiosoite)
+                   (fetch-all-operators db)))
+
     "taxi-operators"
     (csv-data ["Palveluntuottaja" "Y-tunnus" "Alla oleva yritys" "Y-tunnus" "Palvelu" "Liikennemuoto"]
               (map (juxt :operator :business-id :sub-company :sub-business-id :service-name :transport-type)
