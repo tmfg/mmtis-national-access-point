@@ -33,9 +33,12 @@
 (def ^:private trusted-urls
   "List of external trusted URLs which user doesn't need to confirm before navigating."
   (concat
-    (map (fn [[_ data]] (:url data)) quicklink-urls)  ; Fintraffic properties
-    ["https://www.traficom.fi"]                       ; UI links to various resources hosted on Traficom.fi
-    ))
+    ; Fintraffic properties
+    (map (fn [[_ data]] (:url data)) quicklink-urls)
+    ; UI links to various resources hosted on Traficom.fi
+    ["https://www.traficom.fi"]
+    ; TIS VACO UI links
+    ["https://validator.fintraffic.fi/" "https://validator-test.fintraffic.fi/"]))
 
 (defn- trusted-url?
   [url]
