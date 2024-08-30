@@ -7,6 +7,7 @@
             [clojure.string :as str]
             [java-time :as jt]
             [ote.db.transport-operator :as t-operator]
+            [ote.util.throttle :as throttle]
             [specql.core :as specql]
             [taoensso.timbre :as log]))
 
@@ -59,25 +60,34 @@
                      ::specql/order-direction :descending
                      ::specql/limit           1}))))
 
+(def ^:private rate-limiter-hit-delay
+  "Returns in milliseconds the wait time for single call based on rate limiter configuration."
+  (let [timespan         (* 5 60 1000)  ; total timespan for calls is 5 minutes
+        allowed-requests 1000           ; how many requests allowed per timespan
+        delay-per-call   (/ timespan allowed-requests)]
+    delay-per-call))
+
 (defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
   [config call url body params]
-  (let [endpoint                      (if (str/starts-with? url (:api-base-url config))
-                                        url
-                                        (str (:api-base-url config) url))]
-    (try
-      (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
-            {:keys [status headers body]} (call endpoint
-                                                (merge
-                                                  {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                                  "Authorization" (str "Bearer " access-token)}}
-                                                  params
-                                                  (when body {:body (when body (cheshire/generate-string body))})))]
-        (log/info (str "API call to " endpoint " returned " status))
-        body)
-      (catch Exception e
-        (log/warn e (str "Failed API call " endpoint))
-        nil))))
+  (throttle/with-throttle-ms
+    rate-limiter-hit-delay
+    (let [endpoint                      (if (str/starts-with? url (:api-base-url config))
+                                          url
+                                          (str (:api-base-url config) url))]
+      (try
+        (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
+              {:keys [status headers body]} (call endpoint
+                                                  (merge
+                                                    {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
+                                                                    "Authorization" (str "Bearer " access-token)}}
+                                                    params
+                                                    (when body {:body (when body (cheshire/generate-string body))})))]
+          (log/info (str "API call to " endpoint " returned " status))
+          body)
+        (catch Exception e
+          (log/warn e (str "Failed API call " endpoint))
+          nil)))))
 
 (defn api-queue-create
   [config payload]
