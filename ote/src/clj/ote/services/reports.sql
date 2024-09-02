@@ -50,7 +50,7 @@ SELECT op.name,
 -- Simply returns all active operators.
 SELECT DISTINCT op.name                                AS "operator",
                 op."business-id"                       AS "business-id",
-                (op."visiting-address").country_code   AS "postinumero",
+                (op."visiting-address").postal_code    AS "postinumero",
                 (op."visiting-address").post_office    AS "postitoimipaikka",
                 (op."visiting-address").street         AS "osoite",
                 (op."visiting-address").country_code   AS "maa",
