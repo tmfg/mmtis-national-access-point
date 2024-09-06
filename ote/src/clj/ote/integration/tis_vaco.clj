@@ -81,7 +81,9 @@
                                                   (merge
                                                     {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
                                                                     "Authorization" (str "Bearer " access-token)}}
-                                                    params
+                                                    ; this is an actual API which uses HTTP statuses for a reason,
+                                                    ; so allow all non 5xx to be handled properly
+                                                    (merge {:unexceptional-status #(<= 200 % 499)} params)
                                                     (when body {:body (when body (cheshire/generate-string body))})))]
           (log/info (str "API call to " endpoint " returned " status))
           body)
