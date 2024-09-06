@@ -46,10 +46,14 @@
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete?  (let [status (get-in entry ["data" "status"])]
-                               (not (or (nil? status)
-                                        (= status "received")
-                                        (= status "processing"))))
+                  complete?  (let [error  (get-in entry ["error"])
+                                   status (get-in entry ["data" "status"])]
+                               (when (some? error)
+                                 (log/info (str "API error when fetching entry " entry-public-id ": " error)))
+                               (or (some? error)
+                                   (not (or (nil? status)
+                                            (= status "received")
+                                            (= status "processing")))))
                   result     (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
                   magic-link (get-in entry ["links" "refs" "magic" "href"])]
               (if result
