@@ -104,7 +104,7 @@
                      :gtfs/transport-operator-id operator-id
                      :gtfs/transport-service-id service-id
                      :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
-                     :gtfs/license license
+                     :gtfs/license (or license "CC BY 4.0")
                      :gtfs/external-interface-description-id external-interface-description-id})))
 
 (defn submit-known-interfaces!
