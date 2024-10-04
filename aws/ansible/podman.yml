@@ -1,0 +1,112 @@
+---
+- name: Build Podman Image and Container for Persistent Service
+  hosts: jenkins
+  tasks:
+
+    - name: Get the Podman image list
+      ansible.builtin.command:
+        cmd: podman images --format "{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }}"
+      become: true
+      become_user: jenkins
+      register: image_check
+
+    - name: Check if Podman image exists in image list
+      ansible.builtin.debug:
+        msg: "Image solita/napotedb11:latest exists."
+      when: "'solita/napotedb11:latest' in image_check.stdout"
+
+    - name: Build the Podman image if it does not exist
+      ansible.builtin.shell: |
+        cd /home/jenkins/mmtis-national-access-point/database && podman build -t solita/napotedb11:latest .
+      when: "'solita/napotedb11:latest' not in image_check.stdout"
+      become: true
+      become_user: jenkins
+
+    - name: Check if the container exists
+      ansible.builtin.command:
+        cmd: podman ps -a --filter "name=napotedb11"
+      become: true
+      become_user: jenkins
+      register: container_status_check
+      ignore_errors: true
+
+    - name: Debug container check output
+      ansible.builtin.debug:
+        var: container_check.stdout
+
+    - name: Run the container only if status is not 'Up'
+      ansible.builtin.command:
+        cmd: podman run --name napotedb11 -dit --restart=unless-stopped -p 5432:5432 localhost/solita/napotedb11:latest
+      become: true
+      become_user: jenkins
+      when: "'Up' not in container_status_check.stdout"
+      register: run_output
+      ignore_errors: true # systemd unit file has Restart=on-failure
+
+
+    - name: Generate systemd unit file for container
+      containers.podman.podman_generate_systemd:
+        name: napotedb11
+        dest: /tmp/podman_generate_systemd
+      become: true
+      become_user: jenkins
+      register: generate_systemd
+
+    - name: Ensure the correct ownership and permissions of the systemd unit file
+      ansible.builtin.file:
+        path: /etc/systemd/system/container-napotedb11.service
+        owner: root
+        group: root
+        mode: '0755'
+      become: true
+
+    - name: Move the container systemd unit file
+      ansible.builtin.command:
+        cmd: mv /tmp/podman_generate_systemd/container-napotedb11.service /etc/systemd/system/
+      become: true
+
+    - name: Add User=jenkins to systemd service file
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/container-napotedb11.service
+        insertafter: '^\[Service\]'  # Insert after the [Service] section
+        line: 'User=jenkins'
+      become: true
+
+    - name: Restore SELinux context for systemd unit file
+      ansible.builtin.command:
+        cmd: restorecon -v /etc/systemd/system/container-napotedb11.service
+      become: true
+      ignore_errors: true
+
+    - name: Reload systemd daemon
+      ansible.builtin.command:
+        cmd: systemctl daemon-reload
+      become: true
+
+    - name: Enable and restart the Podman container systemd service
+      ansible.builtin.systemd:
+        name: container-napotedb11.service
+        enabled: true
+        state: restarted
+      become: true
+      when: not ansible_check_mode
+
+    - name: Ensure the Podman container is running
+      ansible.builtin.command:
+        cmd: podman ps --filter "name=napotedb11" --filter "status=running"
+      become: true
+      become_user: jenkins
+      register: container_running_check
+
+    - name: Debug Podman container running status
+      ansible.builtin.debug:
+        var: container_running_check.stdout
+
+    - name: Fail if the Podman container is not running
+      ansible.builtin.fail:
+        msg: "The container napotedb11 is not running!"
+      become_user: jenkins
+      when:
+        - "'napotedb11' not in container_running_check.stdout"
+        - not ansible_check_mode
+      
