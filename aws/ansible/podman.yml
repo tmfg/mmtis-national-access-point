@@ -10,19 +10,19 @@
       become_user: jenkins
       register: image_check
 
-    - name: Check if Podman image exists in image list
+    - name: Check if Podman image napotedb11 exists in image list
       ansible.builtin.debug:
         msg: "Image solita/napotedb11:latest exists."
       when: "'solita/napotedb11:latest' in image_check.stdout"
 
-    - name: Build the Podman image if it does not exist
+    - name: Build the Podman image napotedb11 if it does not exist
       ansible.builtin.shell: |
         cd /home/jenkins/mmtis-national-access-point/database && podman build -t solita/napotedb11:latest .
       when: "'solita/napotedb11:latest' not in image_check.stdout"
       become: true
       become_user: jenkins
 
-    - name: Check if the container exists
+    - name: Check if the container napotedb11 exists
       ansible.builtin.command:
         cmd: podman ps -a --filter "name=napotedb11"
       become: true
@@ -32,7 +32,7 @@
 
     - name: Debug container check output
       ansible.builtin.debug:
-        var: container_check.stdout
+        var: container_status_check.stdout
 
     - name: Run the container only if status is not 'Up'
       ansible.builtin.command:
@@ -44,7 +44,7 @@
       ignore_errors: true # systemd unit file has Restart=on-failure
 
 
-    - name: Generate systemd unit file for container
+    - name: Generate systemd service file for container
       containers.podman.podman_generate_systemd:
         name: napotedb11
         dest: /tmp/podman_generate_systemd
@@ -52,7 +52,7 @@
       become_user: jenkins
       register: generate_systemd
 
-    - name: Ensure the correct ownership and permissions of the systemd unit file
+    - name: Ensure the correct ownership and permissions of the systemd service file
       ansible.builtin.file:
         path: /etc/systemd/system/container-napotedb11.service
         owner: root
@@ -60,7 +60,7 @@
         mode: '0755'
       become: true
 
-    - name: Move the container systemd unit file
+    - name: Move the container systemd service file
       ansible.builtin.command:
         cmd: mv /tmp/podman_generate_systemd/container-napotedb11.service /etc/systemd/system/
       become: true
@@ -68,11 +68,11 @@
     - name: Add User=jenkins to systemd service file
       ansible.builtin.lineinfile:
         path: /etc/systemd/system/container-napotedb11.service
-        insertafter: '^\[Service\]'  # Insert after the [Service] section
+        insertafter: '^\[Service\]'
         line: 'User=jenkins'
       become: true
 
-    - name: Restore SELinux context for systemd unit file
+    - name: Restore SELinux context for systemd service file
       ansible.builtin.command:
         cmd: restorecon -v /etc/systemd/system/container-napotedb11.service
       become: true
