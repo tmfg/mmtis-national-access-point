@@ -1,6 +1,6 @@
 ---
  # Playbook can be used to build and deploy a systemd service, that runs a Podman container named napotedb11 
- # Playvook will also rebuild and redeploy existing systemd service, that runs a Podman container named napotedb11 
+ # Playbook will also rebuild and redeploy existing systemd service, that runs a Podman container named napotedb11 
 - name:  Build and deploy Podman Container napotedb11 as a persistent systemd service
   hosts: jenkins
   tasks:
