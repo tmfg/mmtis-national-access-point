@@ -1,16 +1,31 @@
 ---
-- name: Build Podman Image and Container for Persistent Service
+ # Playbook can be used to build and deploy a systemd service, that runs a Podman container named napotedb11 
+ # Playvook will also rebuild and redeploy existing systemd service, that runs a Podman container named napotedb11 
+- name:  Build and deploy Podman Container napotedb11 as a persistent systemd service
   hosts: jenkins
   tasks:
 
-    - name: Get the Podman image list
+    - name: Check if the repository exists
+      stat:
+        path: /home/jenkins/mmtis-national-access-point
+      become: true
+      register: repo_exists
+
+    - name: Clone the repository if it does not exist
+      git:
+        repo: 'https://github.com/tmfg/mmtis-national-access-point.git'
+        dest: /home/jenkins/mmtis-national-access-point/
+      become: true
+      when: not repo_exists.stat.exists
+  
+    - name: Get the Podman images as a list
       ansible.builtin.command:
         cmd: podman images --format "{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }}"
       become: true
       become_user: jenkins
       register: image_check
 
-    - name: Check if Podman image napotedb11 exists in image list
+    - name: Check if Podman image napotedb11 exists in the list
       ansible.builtin.debug:
         msg: "Image solita/napotedb11:latest exists."
       when: "'solita/napotedb11:latest' in image_check.stdout"
@@ -22,7 +37,7 @@
       become: true
       become_user: jenkins
 
-    - name: Check if the container napotedb11 exists
+    - name: Check if Podman container napotedb11 already exists
       ansible.builtin.command:
         cmd: podman ps -a --filter "name=napotedb11"
       become: true
@@ -34,23 +49,45 @@
       ansible.builtin.debug:
         var: container_status_check.stdout
 
-    - name: Run the container only if status is not 'Up'
+    - name: Check if systemd service file for napotedb11 already exists
+      stat:
+        path: /etc/systemd/system/container-napotedb11.service
+      become: true
+      register: service_file
+
+    - name: Stop system service for napotedb11 if already running
+      systemd:
+        name: container-napotedb11.service
+        state: stopped
+      become: true
+      when: service_file.stat.exists
+
+    - name: Stop the Podman container napotedb11 if still running
       ansible.builtin.command:
-        cmd: podman run --name napotedb11 -dit --restart=unless-stopped -p 5432:5432 localhost/solita/napotedb11:latest
+        cmd: podman stop napotedb11
+      when: "'napotedb11' in  container_status_check.stdout"
       become: true
       become_user: jenkins
-      when: "'Up' not in container_status_check.stdout"
-      register: run_output
-      ignore_errors: true # systemd unit file has Restart=on-failure
 
+    - name: Remove the Podman Container napotedb11 if it exists
+      ansible.builtin.command:
+        cmd: podman rm napotedb11
+      when: "'napotedb11' in  container_status_check.stdout"
+      become: true
+      become_user: jenkins
 
-    - name: Generate systemd service file for container
+    - name: Create the Podman container napotedb11
+      ansible.builtin.command:
+        cmd: podman create --name napotedb11 -p 5432:5432 localhost/solita/napotedb11:latest
+      become: true
+      become_user: jenkins
+
+    - name: Generate systemd service file for Podman container napotedb11
       containers.podman.podman_generate_systemd:
         name: napotedb11
         dest: /tmp/podman_generate_systemd
       become: true
       become_user: jenkins
-      register: generate_systemd
 
     - name: Ensure the correct ownership and permissions of the systemd service file
       ansible.builtin.file:
@@ -83,7 +120,7 @@
         cmd: systemctl daemon-reload
       become: true
 
-    - name: Enable and restart the Podman container systemd service
+    - name: Enable and restart the system service for Podman container napotedb11
       ansible.builtin.systemd:
         name: container-napotedb11.service
         enabled: true
@@ -91,18 +128,18 @@
       become: true
       when: not ansible_check_mode
 
-    - name: Ensure the Podman container is running
+    - name: Ensure Podman container napotedb11 is running
       ansible.builtin.command:
         cmd: podman ps --filter "name=napotedb11" --filter "status=running"
       become: true
       become_user: jenkins
       register: container_running_check
 
-    - name: Debug Podman container running status
+    - name: Debug Podman container napotedb11 status
       ansible.builtin.debug:
         var: container_running_check.stdout
 
-    - name: Fail if the Podman container is not running
+    - name: Fail if the Podman container napotedb11 is not running
       ansible.builtin.fail:
         msg: "The container napotedb11 is not running!"
       become_user: jenkins
