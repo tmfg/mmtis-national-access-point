@@ -73,9 +73,7 @@
 
 (defn get-sea-routes
   [db transport-operator-id]
-  (fetch-sea-routes-published db transport-operator-id)
-  #_(map #(update % ::transit/name (flip t-service/localized-text-with-fallback) *language*)
-       (fetch-sea-routes-published db transport-operator-id)))
+  (fetch-sea-routes-published db transport-operator-id))
 
 (defn export-sea-gtfs [db transport-operator-id]
   (let [transport-operator (get-transport-operator db transport-operator-id)

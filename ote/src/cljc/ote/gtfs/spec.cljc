@@ -195,15 +195,16 @@
   (s/keys :req  [:gtfs/trip-id
                  :gtfs/arrival-time
                  :gtfs/departure-time
-                 :gtfs/stop-id
                  :gtfs/stop-sequence]
           :opt  [:gtfs/stop-headsign
                  :gtfs/pickup-type
                  :gtfs/drop-off-type
                  :gtfs/shape-dist-traveled
                  :gtfs/timepoint
-                 :gtfs-flex/start_pickup_dropoff_window
-                 :gtfs-flex/end_pickup_dropoff_window
+                 :gtfs/stop-id
+                 :gtfs/location-group-id
+                 :gtfs-flex/start_pickup_drop_off_window
+                 :gtfs-flex/end_pickup_drop_off_window
                  :gtfs-flex/mean_duration_factor
                  :gtfs-flex/mean_duration_offset
                  :gtfs-flex/safe_duration_factor
@@ -217,8 +218,8 @@
 (def ^{:doc "Defines the order of the CSV fields in a stop_times.txt file with GTFS Flex extensions"}
   flex-stop-times-txt-fields
   (into stop-times-txt-fields
-        [:gtfs-flex/start_pickup_dropoff_window
-         :gtfs-flex/end_pickup_dropoff_window
+        [:gtfs-flex/start_pickup_drop_off_window
+         :gtfs-flex/end_pickup_drop_off_window
          :gtfs-flex/mean_duration_factor
          :gtfs-flex/mean_duration_offset
          :gtfs-flex/safe_duration_factor
@@ -226,7 +227,7 @@
          :gtfs-flex/pickup_booking_rule_id
          :gtfs-flex/drop_off_booking_rule_id]))
 
-(def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_dropoff_window,end_pickup_dropoff_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset,pickup_booking_rule_id,drop_off_booking_rule_id"))
+(def flex-stop-times-txt-header (str stop-times-txt-header ",start_pickup_drop_off_window,end_pickup_drop_off_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset,pickup_booking_rule_id,drop_off_booking_rule_id"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for location_groups.txt used by GTFS Flex

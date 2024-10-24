@@ -68,33 +68,31 @@
       (log/warn "Exception while generating GTFS Flex zip" e))))
 
 (defn- ->static-stop-times
-  "Generate static 24 hour stop times for all areas with the same trip-id"
+  "Generate static 24 hour stop times for all areas. Uses same trip-id for all stop times. Generates two entries for
+   each area to enable within-area routing. Groups entries using feature-id"
   [trip-id areas flex-booking-rules]
   (let [booking-id (:gtfs-flex/booking_rule_id flex-booking-rules)]
-    (mapv-indexed
-      (fn [n area]
-        (let [{:keys [feature-id]} area]
-          {:gtfs/trip-id                          trip-id
-           :gtfs/stop-id                          feature-id
-           :gtfs/pickup-type                      2
-           :gtfs/drop-off-type                    2
-           :gtfs/stop-sequence                    n
-           :gtfs-flex/start_pickup_dropoff_window "0:00:00"
-           :gtfs-flex/end_pickup_dropoff_window   "24:00:00"
-           :gtfs-flex/pickup_booking_rule_id      booking-id
-           :gtfs-flex/drop_off_booking_rule_id    booking-id}))
-      areas)))
+    (->> (mapv-indexed
+           (fn [n area]
+             (let [{:keys [feature-id]} area
+                   common-info {:gtfs/trip-id                           (str trip-id " " n)
+                                :gtfs/location-group-id                 feature-id
+                                :gtfs/pickup-type                       2
+                                :gtfs/drop-off-type                     2
+                                :gtfs-flex/start_pickup_drop_off_window "0:00:00"
+                                :gtfs-flex/end_pickup_drop_off_window   "24:00:00"
+                                :gtfs-flex/pickup_booking_rule_id       booking-id
+                                :gtfs-flex/drop_off_booking_rule_id     booking-id}]
 
-(defn join-routes-data
-  "Splice together GTFS stop-times.txt with GTFS Flex compatible stop-times.txt by
-    1. append GTFS Flex header and content
-    2. drop GTFS header
-    3. append GTFS content"
-  [existing areas]
-  (log/warn (str "existing routes " (count existing)))
-  (log/warn (str "areas data " (count areas)))
-  (str areas
-       (str/replace-first existing #".*\n" "")))
+               [; "from" stop in sequence
+                (merge common-info
+                       {:gtfs/stop-sequence 1})
+                ; "to" stop in sequence
+                (merge common-info
+                       {:gtfs/stop-sequence 2})]))
+           areas)
+         (flatten)
+         (into []))))
 
 (defn ->static-trips
   "Generate a trip reference for given route-id, trip-id, service-id triplet.
@@ -119,17 +117,20 @@
                       :ferry "4"
                       :cable-car "5"
                       :gondola "6"
-                      :funicular "7")
+                      :funicular "7"
+                      :trolleybus "11"
+                      :monorail "12"
+                      :taxi "1501")
    :gtfs/agency-id transport-operator-id})
 
 (defn ->calendar
   [service-id transport-service]
   (some->> (get-in transport-service [::t-service/passenger-transportation ::t-service/service-hours])
-           (mapv-indexed
-             (fn [n cal]
+           (mapv
+             (fn [cal]
                (let [{::t-service/keys [week-days from to description all-day]} cal
                      week-days                                           (set week-days)]
-                 {:gtfs/service-id (str service-id "_c_" n)
+                 {:gtfs/service-id service-id
                   :gtfs/monday     (contains? week-days :MON)
                   :gtfs/tuesday    (contains? week-days :TUE)
                   :gtfs/wednesday  (contains? week-days :WED)
@@ -141,17 +142,6 @@
                                        (LocalDate/now))
                   :gtfs/end-date   (or (::t-service/available-to transport-service)
                                        (-> (LocalDate/now) (.plusYears 5)))})))))
-
-(defn ->static-location-groups
-  [areas]
-  ; TODO: should possibly generate stops locations as well?
-  (mapv-indexed
-    (fn [n area]
-      (let [{:keys [feature-id]} area]
-        {:gtfs-flex/location_group_id   (str feature-id "_a_" n)
-         :gtfs-flex/location_id         feature-id
-         :gtfs-flex/location_group_name feature-id}))
-    areas))
 
 (defn ->booking-rules
   [db service]
@@ -200,18 +190,24 @@
           static-trip-id    (str (::t-operator/name transport-operator) " transport service")
           flex-trips        (conj gtfs-trips
                                   (->static-trips static-route-id static-trip-id static-service-id))
-          ; TODO: these are not all buses, but lets go with this one for now - areas and services need unique entries
-          ; most likely to produce accurate data
+          ; TODO: defaulting to bus is due to backwards compatability, feel free to improve this detection if necessary
+          readable-route-type (if (= (::t-service/sub-type transport-service) "taxi")
+                                :taxi
+                                :bus)
           flex-routes       (conj gtfs-routes
-                                  (->static-routes static-route-id :bus transport-operator-id (::t-operator/name transport-operator) (::t-service/name transport-service)))
+                                  (->static-routes
+                                    static-route-id
+                                    readable-route-type
+                                    transport-operator-id
+                                    (::t-operator/name transport-operator)
+                                    (::t-service/name transport-service)))
           flex-booking-rule (->booking-rules db transport-service)  ; TODO: maybe apply to all stop times?
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas flex-booking-rule))
           flex-calendar     (->calendar static-service-id transport-service)
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
-                                  (cheshire/encode {:key-fn name})))
-          flex-location-groups (->static-location-groups areas)]
+                                  (cheshire/encode {:key-fn name})))]
     {:status  200
      :headers {"Content-Type"        "application/zip"
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-flex-file-name transport-operator))}
@@ -230,8 +226,6 @@
                        :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates-txt)}
                       {:name "locations.geojson"
                        :data flex-locations}
-                      {:name "location_groups.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt flex-location-groups)}
                       {:name "stop_times.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}
                       {:name "booking_rules.txt"
