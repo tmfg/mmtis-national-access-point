@@ -128,11 +128,11 @@
 (defn ->calendar
   [service-id transport-service]
   (some->> (get-in transport-service [::t-service/passenger-transportation ::t-service/service-hours])
-           (mapv-indexed
-             (fn [n cal]
+           (mapv
+             (fn [cal]
                (let [{::t-service/keys [week-days from to description all-day]} cal
                      week-days                                           (set week-days)]
-                 {:gtfs/service-id (str service-id "_c_" n)
+                 {:gtfs/service-id service-id
                   :gtfs/monday     (contains? week-days :MON)
                   :gtfs/tuesday    (contains? week-days :TUE)
                   :gtfs/wednesday  (contains? week-days :WED)
