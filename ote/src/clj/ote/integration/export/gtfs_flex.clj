@@ -145,17 +145,6 @@
                   :gtfs/end-date   (or (::t-service/available-to transport-service)
                                        (-> (LocalDate/now) (.plusYears 5)))})))))
 
-(defn ->static-location-groups
-  [areas]
-  ; TODO: should possibly generate stops locations as well?
-  (mapv-indexed
-    (fn [n area]
-      (let [{:keys [feature-id]} area]
-        {:gtfs-flex/location_group_id   (str feature-id "_a_" n)
-         :gtfs-flex/location_id         feature-id
-         :gtfs-flex/location_group_name feature-id}))
-    areas))
-
 (defn ->booking-rules
   [db service]
   (when-let [{:keys [application-link phone-countrycode phone-number]} (transport-service/get-rental-booking-info db (::t-service/id service))]
@@ -220,8 +209,7 @@
           flex-calendar     (->calendar static-service-id transport-service)
           flex-locations    (when-not (empty? areas)
                               (-> (->geojson-feature-collection areas)
-                                  (cheshire/encode {:key-fn name})))
-          flex-location-groups (->static-location-groups areas)]
+                                  (cheshire/encode {:key-fn name})))]
     {:status  200
      :headers {"Content-Type"        "application/zip"
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-flex-file-name transport-operator))}
@@ -240,8 +228,6 @@
                        :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates-txt)}
                       {:name "locations.geojson"
                        :data flex-locations}
-                      {:name "location_groups.txt"
-                       :data (parse/unparse-gtfs-file :gtfs-flex/location-groups-txt flex-location-groups)}
                       {:name "stop_times.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}
                       {:name "booking_rules.txt"
