@@ -121,7 +121,8 @@
                       :gondola "6"
                       :funicular "7"
                       :trolleybus "11"
-                      :monorail "12")
+                      :monorail "12"
+                      :taxi "1501")
    :gtfs/agency-id transport-operator-id})
 
 (defn ->calendar
@@ -202,10 +203,17 @@
           static-trip-id    (str (::t-operator/name transport-operator) " transport service")
           flex-trips        (conj gtfs-trips
                                   (->static-trips static-route-id static-trip-id static-service-id))
-          ; TODO: these are not all buses, but lets go with this one for now - areas and services need unique entries
-          ; most likely to produce accurate data
+          ; TODO: defaulting to bus is due to backwards compatability, feel free to improve this detection if necessary
+          readable-route-type (if (= (::t-service/sub-type transport-service) "taxi")
+                                :taxi
+                                :bus)
           flex-routes       (conj gtfs-routes
-                                  (->static-routes static-route-id :bus transport-operator-id (::t-operator/name transport-operator) (::t-service/name transport-service)))
+                                  (->static-routes
+                                    static-route-id
+                                    readable-route-type
+                                    transport-operator-id
+                                    (::t-operator/name transport-operator)
+                                    (::t-service/name transport-service)))
           flex-booking-rule (->booking-rules db transport-service)  ; TODO: maybe apply to all stop times?
           flex-stop-times   (concat gtfs-stop-times
                                     (->static-stop-times static-trip-id areas flex-booking-rule))
