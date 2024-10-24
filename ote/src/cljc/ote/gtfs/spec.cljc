@@ -195,13 +195,14 @@
   (s/keys :req  [:gtfs/trip-id
                  :gtfs/arrival-time
                  :gtfs/departure-time
-                 :gtfs/stop-id
                  :gtfs/stop-sequence]
           :opt  [:gtfs/stop-headsign
                  :gtfs/pickup-type
                  :gtfs/drop-off-type
                  :gtfs/shape-dist-traveled
                  :gtfs/timepoint
+                 :gtfs/stop-id
+                 :gtfs/location-group-id
                  :gtfs-flex/start_pickup_drop_off_window
                  :gtfs-flex/end_pickup_drop_off_window
                  :gtfs-flex/mean_duration_factor

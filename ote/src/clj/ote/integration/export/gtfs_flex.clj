@@ -68,33 +68,31 @@
       (log/warn "Exception while generating GTFS Flex zip" e))))
 
 (defn- ->static-stop-times
-  "Generate static 24 hour stop times for all areas with the same trip-id"
+  "Generate static 24 hour stop times for all areas. Uses same trip-id for all stop times. Generates two entries for
+   each area to enable within-area routing. Groups entries using feature-id"
   [trip-id areas flex-booking-rules]
   (let [booking-id (:gtfs-flex/booking_rule_id flex-booking-rules)]
-    (mapv-indexed
-      (fn [n area]
-        (let [{:keys [feature-id]} area]
-          {:gtfs/trip-id                           trip-id
-           :gtfs/stop-id                           feature-id
-           :gtfs/pickup-type                       2
-           :gtfs/drop-off-type                     2
-           :gtfs/stop-sequence                     n
-           :gtfs-flex/start_pickup_drop_off_window "0:00:00"
-           :gtfs-flex/end_pickup_drop_off_window   "24:00:00"
-           :gtfs-flex/pickup_booking_rule_id       booking-id
-           :gtfs-flex/drop_off_booking_rule_id     booking-id}))
-      areas)))
+    (->> (mapv-indexed
+           (fn [n area]
+             (let [{:keys [feature-id]} area
+                   common-info {:gtfs/trip-id                           (str trip-id " " n)
+                                :gtfs/location-group-id                 feature-id
+                                :gtfs/pickup-type                       2
+                                :gtfs/drop-off-type                     2
+                                :gtfs-flex/start_pickup_drop_off_window "0:00:00"
+                                :gtfs-flex/end_pickup_drop_off_window   "24:00:00"
+                                :gtfs-flex/pickup_booking_rule_id       booking-id
+                                :gtfs-flex/drop_off_booking_rule_id     booking-id}]
 
-(defn join-routes-data
-  "Splice together GTFS stop-times.txt with GTFS Flex compatible stop-times.txt by
-    1. append GTFS Flex header and content
-    2. drop GTFS header
-    3. append GTFS content"
-  [existing areas]
-  (log/warn (str "existing routes " (count existing)))
-  (log/warn (str "areas data " (count areas)))
-  (str areas
-       (str/replace-first existing #".*\n" "")))
+               [; "from" stop in sequence
+                (merge common-info
+                       {:gtfs/stop-sequence 1})
+                ; "to" stop in sequence
+                (merge common-info
+                       {:gtfs/stop-sequence 2})]))
+           areas)
+         (flatten)
+         (into []))))
 
 (defn ->static-trips
   "Generate a trip reference for given route-id, trip-id, service-id triplet.
