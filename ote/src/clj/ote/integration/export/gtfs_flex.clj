@@ -119,7 +119,9 @@
                       :ferry "4"
                       :cable-car "5"
                       :gondola "6"
-                      :funicular "7")
+                      :funicular "7"
+                      :trolleybus "11"
+                      :monorail "12")
    :gtfs/agency-id transport-operator-id})
 
 (defn ->calendar
