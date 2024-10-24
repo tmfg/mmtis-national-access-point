@@ -74,15 +74,15 @@
     (mapv-indexed
       (fn [n area]
         (let [{:keys [feature-id]} area]
-          {:gtfs/trip-id                          trip-id
-           :gtfs/stop-id                          feature-id
-           :gtfs/pickup-type                      2
-           :gtfs/drop-off-type                    2
-           :gtfs/stop-sequence                    n
-           :gtfs-flex/start_pickup_dropoff_window "0:00:00"
-           :gtfs-flex/end_pickup_dropoff_window   "24:00:00"
-           :gtfs-flex/pickup_booking_rule_id      booking-id
-           :gtfs-flex/drop_off_booking_rule_id    booking-id}))
+          {:gtfs/trip-id                           trip-id
+           :gtfs/stop-id                           feature-id
+           :gtfs/pickup-type                       2
+           :gtfs/drop-off-type                     2
+           :gtfs/stop-sequence                     n
+           :gtfs-flex/start_pickup_drop_off_window "0:00:00"
+           :gtfs-flex/end_pickup_drop_off_window   "24:00:00"
+           :gtfs-flex/pickup_booking_rule_id       booking-id
+           :gtfs-flex/drop_off_booking_rule_id     booking-id}))
       areas)))
 
 (defn join-routes-data
