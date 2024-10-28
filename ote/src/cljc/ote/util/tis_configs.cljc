@@ -7,12 +7,14 @@
   {:validator {:name   "gtfs.canonical"
                :config {}}
    :converter {:name   "gtfs2netex.fintraffic"
-               :config {"codespace"     "FIN"
+               :config {"codespace"     "FSR"
                         "maximumErrors" 1000}}})
 
 (defmethod base-task-names "netex" [_]
   {:validator {:name   "netex.entur"
-               :config {}}})
+               :config {}}
+   :converter {:name   "netex2gtfs.entur"
+               :config {"codespace" "FSR"}}})
 
 (defmethod base-task-names "gbfs" [_]
   {:validator {:name   "gbfs.entur"
