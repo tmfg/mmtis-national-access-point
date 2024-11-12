@@ -1,5 +1,5 @@
 - name: Gathering ec2 facts
-  action: ec2_metadata_facts
+  amazon.aws.ec2_metadata_facts:
 
 - name: Print ansible version
   debug:
