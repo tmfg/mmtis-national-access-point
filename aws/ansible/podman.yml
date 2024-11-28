@@ -87,34 +87,10 @@
       become: true
       become_user: jenkins
 
-    - name: Generate systemd service file for Podman container napotedb11
-      containers.podman.podman_generate_systemd:
-        name: napotedb11
-        dest: /tmp/podman_generate_systemd
-      become: true
-      become_user: jenkins
-
-    - name: Ensure the correct ownership and permissions of the systemd service file
-      ansible.builtin.file:
-        path: /etc/systemd/system/container-napotedb11.service
-        owner: root
-        group: root
-        mode: '0755'
-      become: true
-
-    - name: Move the container systemd service file
-      ansible.builtin.command:
-        cmd: mv /tmp/podman_generate_systemd/container-napotedb11.service /etc/systemd/system/
-      become: true
-
     - name: Get the UID of the jenkins user
       ansible.builtin.shell: "getent passwd jenkins | cut -d: -f3"
       register: jenkins_uid
       become: true
-
-    - name: Debug UID of jenkins
-      ansible.builtin.debug:
-        var: jenkins_uid.stdout
 
     - name: Ensure runtime folder for jenkins user exists
       ansible.builtin.file:
