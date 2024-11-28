@@ -5,6 +5,11 @@
   hosts: jenkins
   tasks:
 
+    - name: Enable lingering for jenkins
+      ansible.builtin.command:
+        cmd: loginctl enable-linger jenkins
+      become: true
+
     - name: Check if the repository exists
       stat:
         path: /home/jenkins/mmtis-national-access-point
@@ -82,31 +87,50 @@
       become: true
       become_user: jenkins
 
-    - name: Generate systemd service file for Podman container napotedb11
-      containers.podman.podman_generate_systemd:
-        name: napotedb11
-        dest: /tmp/podman_generate_systemd
+    - name: Get the UID of the jenkins user
+      ansible.builtin.shell: "getent passwd jenkins | cut -d: -f3"
+      register: jenkins_uid
       become: true
-      become_user: jenkins
 
-    - name: Ensure the correct ownership and permissions of the systemd service file
+    - name: Ensure runtime folder for jenkins user exists
       ansible.builtin.file:
-        path: /etc/systemd/system/container-napotedb11.service
+        path: "/run/user/{{ jenkins_uid.stdout }}"
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0700'
+      become: true
+
+    - name: Update systemd service file for Podman container
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/container-napotedb11.service
+        content: |
+          [Unit]
+          Description=Podman container-napotedb11.service
+          Documentation=man:podman-generate-systemd(1)
+          Wants=network-online.target
+          After=network-online.target
+          RequiresMountsFor=/tmp/containers-user-{{ jenkins_uid.stdout }}/containers
+
+          [Service]
+          Environment=XDG_RUNTIME_DIR=/run/user/{{ jenkins_uid.stdout }}
+          PIDFile=/run/user/{{ jenkins_uid.stdout }}/containers/podman/pid/container-napotedb11.pid
+          User=jenkins
+          Group=jenkins
+          Environment=PODMAN_SYSTEMD_UNIT=%n
+          Restart=on-failure
+          TimeoutStopSec=70
+          ExecStart=/usr/bin/podman start -a napotedb11
+          ExecStop=/usr/bin/podman stop -t 10 napotedb11
+          KillMode=process
+          Delegate=yes
+          Type=simple
+
+          [Install]
+          WantedBy=default.target
         owner: root
         group: root
-        mode: '0755'
-      become: true
-
-    - name: Move the container systemd service file
-      ansible.builtin.command:
-        cmd: mv /tmp/podman_generate_systemd/container-napotedb11.service /etc/systemd/system/
-      become: true
-
-    - name: Add User=jenkins to systemd service file
-      ansible.builtin.lineinfile:
-        path: /etc/systemd/system/container-napotedb11.service
-        insertafter: '^\[Service\]'
-        line: 'User=jenkins'
+        mode: '0644'
       become: true
 
     - name: Restore SELinux context for systemd service file
@@ -146,4 +170,4 @@
       when:
         - "'napotedb11' not in container_running_check.stdout"
         - not ansible_check_mode
-      
+          
