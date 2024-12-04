@@ -110,19 +110,20 @@
           Documentation=man:podman-generate-systemd(1)
           Wants=network-online.target
           After=network-online.target
+          StartLimitIntervalSec=60
           RequiresMountsFor=/tmp/containers-user-{{ jenkins_uid.stdout }}/containers
 
           [Service]
           Environment=XDG_RUNTIME_DIR=/run/user/{{ jenkins_uid.stdout }}
-          PIDFile=/run/user/{{ jenkins_uid.stdout }}/containers/podman/pid/container-napotedb11.pid
           User=jenkins
           Group=jenkins
           Environment=PODMAN_SYSTEMD_UNIT=%n
           Restart=on-failure
-          TimeoutStopSec=70
+          RestartSec=5
+          TimeoutStopSec=30
           ExecStart=/usr/bin/podman start -a napotedb11
-          ExecStop=/usr/bin/podman stop -t 10 napotedb11
-          KillMode=process
+          ExecStop=/usr/bin/podman stop -t 30 napotedb11
+          KillMode=control-group
           Delegate=yes
           Type=simple
 
