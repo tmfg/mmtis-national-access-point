@@ -118,6 +118,9 @@
           User=jenkins
           Group=infra_admin
           Environment=PODMAN_SYSTEMD_UNIT=%n
+          # Clean up temp files before start
+          ExecStartPre=-/bin/rm -rf /tmp/containers-user-{{ jenkins_uid.stdout }}/containers
+          ExecStartPre=-/bin/rm -rf /tmp/podman-run-{{ jenkins_uid.stdout }}/libpod/tmp
           Restart=on-failure
           RestartSec=5
           TimeoutStopSec=30
