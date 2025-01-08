@@ -68,4 +68,4 @@ EXPOSE 5432
 
 USER postgres
 
-CMD service postgresql start && tail -F /var/log/postgresql/postgresql-11-main.log
+CMD ["/bin/bash", "-c", "service postgresql start; trap \"service postgresql stop; exit 0\" TERM; tail -F /var/log/postgresql/postgresql-11-main.log & wait"]
