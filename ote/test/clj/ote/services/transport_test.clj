@@ -1,23 +1,13 @@
 (ns ote.services.transport-test
   (:require [clojure.test :as t :refer [deftest testing is]]
             [ote.test :refer [system-fixture http-get http-post]]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
-            [cheshire.core :as chesire]
-            [ote.components.db :as db]
             [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
             [ote.services.transport :as transport-service]
-            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [clojure.spec.gen.alpha :as sgen]
-            [clojure.spec.test.alpha :as stest]
-            [clojure.spec.alpha :as s]
-            [ote.db.generators :as generators]
             [ote.db.service-generators :as s-generators]
             [clojure.string :as str]
             [clojure.set :as set]
@@ -26,7 +16,7 @@
             [specql.core :as specql]
             [ote.integration.import.gtfs :as gtfs-import]
             [ote.services.admin :as admin]
-            [cheshire.core :as cheshire]))
+            [ote.test-tools :as test-tools]))
 
 (def enabled-features {:enabled-features #{:ote-login
                                            :sea-routes
@@ -171,7 +161,12 @@
         service (:transit response)
         fetch-response (http-get "admin"
                                  (str "transport-service/" (::t-service/id service)))
-        fetched (:transit fetch-response)]
+        fetched (:transit fetch-response)
+        ;; Rental booking info is added for service when service-type is :passenger-transportation without it having it. for UI purposes
+        ;; Generator doesn't have this data, so we remove if from fetched data
+        fetched (if (= (::t-service/type transport-service) :passenger-transportation)
+                  (test-tools/dissoc-in fetched [::t-service/passenger-transportation :ote.db.rental-booking-service/rental-booking-info])
+                  fetched)]
 
     (and (= (:status response) (:status fetch-response) 200)
          (effectively-same-deep
