@@ -1760,7 +1760,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :YT "Mayotte"
   :ZA "Sydafrika"
   :ZM "Zambia"
-  :ZW "Zimbabwe"}
+  :ZW "Zimbabwe"
+  :AN "Karibiska Nederländerna"}
 
  ;; Fintraffic common quicklink header
  :quicklink-header
