@@ -10,7 +10,17 @@ The database is shared between CKAN and the OTE application and is in folder: `.
 The instances are pushed to dockerhub and can be run without building locally.
 
 To start all the nap containers, run:
-`docker-compose up -d`
+`cd nap/docker`
+`docker compose build` or `docker-compose build`
+`docker-compose up -d` or `docker compose up -d`
+
+If database is not up and running, you can start it with:
+`cd database`
+`sh devdb_down.sh`
+`sh devdb_up.sh`
+To run new migrations you can run:
+`sh devdb_migrate.sh`
+
 
 If you encounter weird errors with docker containers or the images are taking too much space, run the following:
 `docker-compose down`  
@@ -42,13 +52,13 @@ First time build everything
 Start all dockers  
 `docker-compose up`
 
-If napotedb11 gives error remove 'old' version  
-`docker rm napotedb11`
+If napotedb163 gives error remove 'old' version  
+`docker rm napotedb163`
 
-If db migrate is needed stop napotedb11  
-`docker-compose rm -s napotedb11`
+If db migrate is needed stop napotedb163  
+`docker-compose rm -s napotedb163`
 
-Restart napotedb11  
+Restart napotedb163  
 `docker-compose up`
 
 Migrate latest db changes in `mmtis-national-access-point/database`  

@@ -22,7 +22,7 @@ SELECT c.name as "operator", c."business-id" as "business-id",
           LEFT JOIN LATERAL unnest(COALESCE(sc.companies, s.companies)) AS c ON TRUE
          WHERE c."business-id" IS NOT NULL
            AND s.published IS NOT NULL
-)Ω
+)
 SELECT *
   FROM companies c
   JOIN services s ON c."transport-service-id" = s.id;
