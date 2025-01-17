@@ -283,7 +283,8 @@
 
 (defn transit-changes [e! {:keys [page transit-changes] :as app}]
   (let [tabs [{:label "Lomakeilmoitukset" :value "authority-pre-notices"}
-              {:label "Tunnistetut muutokset (testi)" :value "transit-changes"}]
+              ; Change detection is disabled.
+              #_ {:label "Tunnistetut muutokset (testi)" :value "transit-changes"}]
         selected-tab (or (get-in app [:transit-changes :selected-tab])
                          (when page
                            (name page)))]
@@ -295,6 +296,7 @@
      [:div.container
       (case selected-tab
         "authority-pre-notices" [pre-notices-authority-listing/pre-notices e! app]
-        "transit-changes" [detected-transit-changes e! transit-changes]
+        ; Change detection is disabled
+        #_#_ "transit-changes" [detected-transit-changes e! transit-changes]
         ;;default
         [pre-notices-authority-listing/pre-notices e! app])]]))
