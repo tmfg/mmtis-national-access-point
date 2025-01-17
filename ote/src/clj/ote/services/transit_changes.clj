@@ -143,7 +143,8 @@
         (http/transit-response (detection/reset-last-hash-recalculations db))))
 
     ;; Calculate date-hashes. day/month/contract (all or only latest on every month or only for contract traffic) true/false (only to future or all days)
-    (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
+    ; Change detection is disabled
+    #_ (GET "/transit-changes/hash-calculation/:scope/:future" [scope is-future :as {user :user}]
       (when (authorization/admin? user)
         ;; Start slow process in other thread
         (future
@@ -163,7 +164,8 @@
            :body   "OK"})))
 
     ;; Calculate date-hashes for given service-id and package-count
-    (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
+    ;; Change detection is disabled.
+    #_ (GET "/transit-changes/force-calculate-hashes/:service-id/:package-count" [service-id package-count :as {user :user}]
       (when (authorization/admin? user)
         (do
           ;; Calculate date hashes in other thread
@@ -190,20 +192,23 @@
         (http/transit-response (load-gtfs-import-reports db))))
 
     ;; Force change detection for all services
-    (POST "/transit-changes/force-detect/" req
+    ;; Change detection is disabled.
+    #_ (POST "/transit-changes/force-detect/" req
       (when (authorization/admin? (:user req))
         (gtfs-tasks/detect-new-changes-task config db (time/now) true)
         "OK"))
 
     ;; Force change detection for single service
-    (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
+    ; Change detection is disabled.
+    #_ (POST "/transit-changes/force-detect/:service-id" {{:keys [service-id]} :params
                                                        user                 :user}
       (when (authorization/admin? user)
         (gtfs-tasks/detect-new-changes-task config db (time/now) true [(Long/parseLong service-id)])
         "OK"))
 
     ;; Force change detection for single service
-    (POST "/transit-changes/force-detect-for-date/:service-id/:detection-date" {{:keys [service-id detection-date]} :params
+    ; Change detection is disabled.
+    #_ (POST "/transit-changes/force-detect-for-date/:service-id/:detection-date" {{:keys [service-id detection-date]} :params
                                                                                 user                                :user}
       (let [detection-date (time/date-string->date-time detection-date)]
         (when (authorization/admin? user)
