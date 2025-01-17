@@ -1,7 +1,6 @@
 (ns ote.views.front-page
   "Front page for OTE service - Select service type and other basic functionalities"
   (:require [clojure.string :as s]
-            [reagent.core :as reagent]
             [reagent.core :as r]
             [re-svg-icons.feather-icons :as feather-icons]
             [cljs-react-material-ui.icons :as ic]
@@ -10,7 +9,7 @@
             [ote.localization :refer [tr tr-key]]
             [ote.style.front-page :as style-front-page]
             [ote.ui.icons :as icons]
-            [ote.ui.common :refer [linkify]]
+            [ote.ui.common :refer [linkify extended-help-link] :as uicommon]
             [ote.app.utils :refer [user-logged-in?]]
             [ote.app.controller.flags :as flags]
             [ote.app.controller.front-page :as fp]))
@@ -46,6 +45,15 @@
    [:p {:style {:margin "10px"}}
     (tr [:downtime-apology :content])]])
 
+(defn merirae-discontinued-message
+  []
+  [:div
+   {:style {:margin "0.2em" :border "4px solid #213BF7"}}
+   [:p {:style {:margin "10px 0px 0px 10px"}}
+    (tr [:front-page :rae-discontinued-info1])
+    (linkify (tr [:front-page :rae-discontinued-info-link]) (tr [:front-page :rae-discontinued-info-desc]) {:target "_blank"})
+    (tr [:front-page :rae-discontinued-info2])]])
+
 (defn front-page
   "Front page info"
   [e! {user :user :as app}]
@@ -78,6 +86,8 @@
 
    ; NOTE: commented out just in case we want to find this easier the next time we want to show an alert on the front page
    ; [downtime-apology-message]
+
+   [merirae-discontinued-message]
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
