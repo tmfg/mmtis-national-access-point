@@ -126,12 +126,13 @@
                   :service-view [sv/service-view e! app]
 
                   :admin [admin/admin-panel e! app]
-                  :admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
-                  :admin-route-id [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-route-id")]
-                  :admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-upload-gtfs")]
-                  :admin-gtfs-import-reports [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-gtfs-import-reports")]
-                  :admin-commercial-services [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-commercial-services")]
-                  :admin-exception-days [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-exception-days")]
+                  ; Change detection is disabled
+                  ;:admin-detected-changes [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-detected-changes")]
+                  ;:admin-route-id [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-route-id")]
+                  ;:admin-upload-gtfs [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-upload-gtfs")]
+                  ;:admin-gtfs-import-reports [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-gtfs-import-reports")]
+                  ;:admin-commercial-services [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-commercial-services")]
+                  ;:admin-exception-days [admin-detected-changes/configure-detected-changes e! (assoc-in app [:admin :transit-changes :tab] "admin-exception-days")]
 
                   :email-settings [email-settings/email-notification-settings e! app]
                   :confirm-email [ce/confirm-email e! app]
@@ -149,7 +150,8 @@
                   :pre-notices [pre-notices-listing/pre-notices e! app]
 
                   :view-gtfs [gtfs-viewer/gtfs-viewer e! app]
-                  :transit-visualization [transit-visualization/transit-visualization e! app]
+                  ; Change detection is disabled.
+                  ;:transit-visualization [transit-visualization/transit-visualization e! app]
 
                   (:transit-changes :authority-pre-notices)
                   [transit-changes/transit-changes e! app]

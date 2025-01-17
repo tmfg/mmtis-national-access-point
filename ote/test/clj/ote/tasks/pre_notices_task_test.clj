@@ -35,7 +35,8 @@
 (defn- email-content []
   (get-in @outbox [0 :body 0 :content]))
 
-(defn- clean-up-db [db]
+; Change detection is disabled.
+#_ (defn- clean-up-db [db]
   ;; Stupid way to clean up database. But package is hard coded to these test. So it must remain the same.
   (specql/delete! db :gtfs/detection-route
                   {:gtfs/package-id 1})                 ;; Clean up detection-route to prevent foreign key problems
@@ -81,7 +82,8 @@
     (send!)
     (is (= 1 (count @outbox)))))
 
-(deftest email-includes-detected-changes
+; Change detection is disabled.
+#_ (deftest email-includes-detected-changes
   (let [route-hash-id "route-hash-id"
         current-date (tc/to-sql-date (time/now))
         different-week-date (tc/to-sql-date (time/days-from (time/now) 70))

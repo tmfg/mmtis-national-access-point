@@ -278,7 +278,8 @@
             (upload-transport-service-csv db (:csv config) service-id db-file-key req)))
 
         ;; Upload gtfs package from admin panel
-        (POST "/transit-changes/upload-gtfs/:service-id/:interface-id/:date"
+        ; Change detection is disabled.
+        #_ (POST "/transit-changes/upload-gtfs/:service-id/:interface-id/:date"
               {{:keys [service-id interface-id date]} :params
                user :user
                :as req}
