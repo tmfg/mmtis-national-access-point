@@ -709,12 +709,10 @@
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
   :operator-dont-have-any-services "Du har nu lagt till en tjänsteleverantör i NAP. Lägg nu till information om de mobilitetstjänster du tillhandahåller. Om du tillhandahåller mer än en typ av mobilitetstjänst, lägg först till en tjänst. Du kan sedan lägga till följande tjänst."
-  :rae-discontinued-info1 "MeriRAE (Merenkulun reitti- ja aikataulueditori) osana Finap-katalogia poistuu käytöstä 30.4.2025.
-  Merenkulun ja muun vesiliikenteen reitti- ja aikataulueditorin uusi osoite on: "
+  :rae-discontinued-info1 "MeriRAE (Sjöfartens rutt- och schemaredigerare) som en del av Finap- katalogen tas ur bruk den 30 april 2025. Den nya adressen till rutt- och schemaredigeraren för sjöfart och övrig sjötrafik är "
   :rae-discontinued-info-link "https://rae.fintraffic.fi/ui/"
-  :rae-discontinued-info-desc "https://rae.fintraffic.fi/ui/"
-  :rae-discontinued-info2 "Kannustamme siirtymään jo ennen huhtikuutta uuden RAE-palvelun käyttäjiksi."}
-
+  :rae-discontinued-info-desc "rae.fintraffic.fi."
+  :rae-discontinued-info2 "Vi rekommenderar att ni börjar använda den nya RAE-tjänsten redan före april."}
 
  :organization-page
  {:address-postal "Postadress"
