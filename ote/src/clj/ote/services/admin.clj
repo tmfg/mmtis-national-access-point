@@ -816,7 +816,8 @@
       (require-admin-user "general-troubleshooting-log" (:user (:user req)))
       (log-different-date-formations (:user (:user req))))
 
-    (POST "/admin/recalculate-detected-changes-count" req
+    ; Change detection is disabled
+    #_ (POST "/admin/recalculate-detected-changes-count" req
       (require-admin-user "recalculate-detected-changes-count" (:user (:user req)))
       (task-gtfs/recalculate-detected-changes-count db))
 

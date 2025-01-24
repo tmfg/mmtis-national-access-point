@@ -39,7 +39,8 @@
 
 ;; [there was comment with construction notes on this test, check git history if interested]
 
-(deftest rewrite-calendar-testutil-works
+; Change detection is disabled.
+#_ (deftest rewrite-calendar-testutil-works
   (let [same-localdate-weekday? (fn [ld1 ld2]
                                   (= (.getValue (.getDayOfWeek ld1))
                                      (.getValue (.getDayOfWeek ld2))))
@@ -105,7 +106,8 @@
         ;; Parse gtfs package and save it to database.
         (gtfs-import/save-gtfs-to-db db gtfs-bytes (:gtfs/id package) interface-id ts-id intercept-fn nil (time/format-date-iso-8601 import-date))))))
 
-(deftest test-with-gtfs-package
+; Change detection is disabled.
+#_ (deftest test-with-gtfs-package
   (let [db (:db ote.test/*ote*)
         ;; db (:db ote.main/ote)
         gtfs-zip-path "test/resources/2019-02-07_1149_1712_gtfs_anon.zip"
