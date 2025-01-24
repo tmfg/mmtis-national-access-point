@@ -709,7 +709,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :to-add-new-operator-tab " välilehdestä."
   :operator-dont-have-any-services "Hienoa! Olet nyt lisännyt palveluntuottajan tiedot NAP:iin. Lisää seuraavaksi tiedot tarjoamastasi liikkumispalvelusta tai -palveluista. Mikäli tarjoat useamman tyyppistä liikkumispalvelua, lisää ensin yksi palvelu. Tämän jälkeen voit lisätä seuraavan palvelun."
   :rae-discontinued-info1 "MeriRAE (Merenkulun reitti- ja aikataulueditori) osana Finap-katalogia poistuu käytöstä 30.4.2025.
-  Merenkulun ja muun vesiliikenteen reitti- ja aikataulueditorin uusi osoite on: "
+  Merenkulun ja muun vesiliikenteen reitti- ja aikataulueditorin uusi osoite on "
   :rae-discontinued-info-link "https://rae.fintraffic.fi/ui/"
   :rae-discontinued-info-desc "RAE - Reitti- ja aikataulueditori"
   :rae-discontinued-info2 "Kannustamme siirtymään jo ennen huhtikuutta uuden RAE-palvelun käyttäjiksi."}
