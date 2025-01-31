@@ -182,7 +182,7 @@
   (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours night-hours boolean))
 
 ;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task (:db ote.main/ote) (time/now) true [1289])`
-#_ (defn detect-new-changes-task
+(defn detect-new-changes-task
   ([config db ^DateTime detection-date force?]
    (detect-new-changes-task config db detection-date force? nil))
   ([config db ^DateTime detection-date force? service-ids]
@@ -230,7 +230,7 @@
                  (log/warn e "Change detection failed for service " service-id)))
              (log/info "Detection completed for service: " service-id))))))))
 
-#_ (defn recalculate-detected-changes-count
+(defn recalculate-detected-changes-count
   "Change detection (detect-new-changes-task) stores detected changes. These changes will expire after some period of time.
   All changes occur on a certain day and they will get old. Transit-changes page shows how many changes there are and
   if we don't recalculate them every night expired changes will be show also. So in this fn we recalculate change counts again using
@@ -271,10 +271,10 @@
            (fn [_]
              (#'update-one-gtfs! config db email true)))
          ;; Change detection has been disabled.
-         #_ (chime-at (tasks-util/daily-at 5 15)
+         (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task config db (time/now) false)))
-         #_ (chime-at (tasks-util/daily-at 0 15)
+         (chime-at (tasks-util/daily-at 0 15)
                    (fn [_]
                      (recalculate-detected-changes-count db)))]
         (do
