@@ -2,9 +2,13 @@
   "Utilities for working with netex objects"
   (:require [specql.core :as specql]
             [specql.op :as op]
+            [jeesql.core :refer [defqueries]]
             [ote.db.netex :as netex]
             [ote.db.transport-service :as t-service]
             [ote.integration.tis-vaco :as tis-vaco]))
+
+(defqueries "ote/tasks/gtfs.sql")
+(declare fetch-latest-gtfs-vaco-status)
 
 (defn file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
   (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
@@ -42,7 +46,7 @@
   [services config db ext-ifs-key]
   (let [conversions (fetch-conversions-for-services config db (set (map #(::t-service/id %)
                                                                         services)))]
-    (if (some? conversions)
+    (if (seq conversions)
       (mapv (fn [service]
               (update service
                       ext-ifs-key
@@ -62,4 +66,19 @@
                                 :tis-vaco (tis-vaco/fetch-public-data db config interface-id (::netex/package_id interface-conversion)))
                               interface))))))
             services)
-      services)))
+      ;; If there is not netex data, add only a vaco link to get more information
+      (mapv (fn [service]
+                (update service
+                        ext-ifs-key
+                        (fn [interfaces]
+                            (vec
+                              (for [interface interfaces
+                                    :let [interface-id (::t-service/id interface)
+                                          service-id (::t-service/transport-service-id interface)
+                                          latest-gtfs (first (fetch-latest-gtfs-vaco-status db {:service-id service-id
+                                                                                                :interface-id interface-id}))]]
+                                   (assoc interface
+                                          :tis-vaco {:gtfs/tis-magic-link (:tis-magic-link latest-gtfs)
+                                                     :gtfs/tis-entry-public-id (:tis-entry-public-id latest-gtfs)
+                                                     :api-base-url (get-in config [:tis-vaco :api-base-url])}))))))
+            services))))

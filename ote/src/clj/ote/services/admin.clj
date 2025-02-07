@@ -40,7 +40,8 @@
             [specql.impl.composite :as composite]
             [specql.impl.registry :as specql-registry]
             [specql.op :as op]
-            [taoensso.timbre :as log])
+            [taoensso.timbre :as log]
+            [ote.tasks.tis :as tis])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -721,6 +722,13 @@
                       {:gtfs/transport-service-id service-id})]
     (http/transit-response packages 200)))
 
+;; Used for testing purposes
+(defn- start-tis-vaco [db config]
+ (let [vastaus (tis/submit-known-interfaces! config db)]
+      {:status 200
+       :headers {"Content-Type" "application/json+transit"}
+       :body (clj->transit {:status "OK"})}))
+
 (defn get-authority-group-details
   [db authority-group-id]
   (ote.services.transport-operator/operator-users-response db authority-group-id))
@@ -735,6 +743,9 @@
     (DELETE "/admin/user/:id" [id :as req]
       (or (authorization-fail-response (get-in req [:user :user]))
           (delete-user-response db id)))
+
+    ;; Used for testing purposes
+    (GET "/admin/start/tis-vaco" req (start-tis-vaco db config))
 
     (GET "/admin/member" req
       (or (authorization-fail-response (get-in req [:user :user]))

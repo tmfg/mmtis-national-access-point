@@ -163,8 +163,10 @@
                                                                 (when contact-email {:contact-email contact-email}))})]
     (when new-entry
       (try
+        ;; Add vaco information to the GTFS package when query is made.
         (specql/update! db :gtfs/package
-                        {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])}
+                        {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])
+                         :gtfs/tis-magic-link (get-in new-entry ["links" "refs" "magic" "href"])}
                         {:gtfs/id (:gtfs/id package)})
         new-entry
         (catch Exception e
