@@ -1,5 +1,5 @@
 -- name: select-gtfs-urls-update
-SELECT eid.id as id, (eid."external-interface").url, eid.format[1], eid.license,
+SELECT eid.id as id, TRIM((eid."external-interface").url) as url, eid.format[1] , eid.license,
        ts."transport-operator-id" as "operator-id", top."name" as "operator-name", ts.id as "ts-id",
        eid."gtfs-imported" as "last-import-date",
        eid."data-content" as "data-content"
@@ -51,3 +51,11 @@ SELECT ts.id
                  AND 'route-and-schedule' = ANY(eid."data-content")
                  AND eid."transport-service-id" = ts.id)
    AND (:force = TRUE OR gtfs_should_calculate_transit_change(ts.id));
+
+-- name: fetch-latest-gtfs-vaco-status
+SELECT gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link"
+  FROM gtfs_package gp
+ WHERE gp."transport-service-id" = :service-id
+   AND gp."external-interface-description-id" = :interface-id
+ORDER BY gp.created DESC
+ LIMIT 1;
