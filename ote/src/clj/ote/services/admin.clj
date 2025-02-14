@@ -249,7 +249,8 @@
 
 (defn- list-vaco-status-packages
   "Get latest VACO status packages for services. "
-  [db user query]
+  [route db user query config]
+  (require-admin-user route (:user user))
   (let [service-name (:service-name query)
         operator-name (:operator-name query)
         vaco-status (:vaco-status query)
@@ -263,7 +264,11 @@
                            :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}
         status-list (when (not (:no-interface query))
                                   (interfaces-array->vec
-                                    (search-vaco-status-packages db search-parameters)))]
+                                    (search-vaco-status-packages db search-parameters)))
+        ;; Add vaco-url to the response
+        status-list (map (fn [x]
+                            (assoc x :vaco-url (str (get-in config [:tis-vaco :api-base-url]))))
+                          status-list)]
     status-list))
 
 (defn- list-interface-downloads [db interface-id]
@@ -757,6 +762,13 @@
        :headers {"Content-Type" "application/json+transit"}
        :body (clj->transit {:status "OK"})}))
 
+(defn- start-tis-vaco-for-single-package [db config package-id]
+  (let [return (when package-id
+                 (tis/submit-single-package config db (Integer/parseInt package-id)))]
+    {:status 200
+     :headers {"Content-Type" "application/json+transit"}
+     :body (clj->transit {:status "OK"})}))
+
 (defn get-authority-group-details
   [db authority-group-id]
   (ote.services.transport-operator/operator-users-response db authority-group-id))
@@ -775,6 +787,8 @@
     ;; Used for testing purposes
     (GET "/admin/start/tis-vaco" req (start-tis-vaco db config))
 
+    (GET "/admin/start/tis-vaco-for-package/:package-id" [package-id :as req] (start-tis-vaco-for-single-package db config package-id))
+
     (GET "/admin/member" req
       (or (authorization-fail-response (get-in req [:user :user]))
           (user-operator-memberships-response db (ote-coll/map->keyed (:params req)))))
@@ -787,7 +801,8 @@
 
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
 
-    (POST "/admin/vaco-status-packages" req (admin-service "interfaces" req db #'list-vaco-status-packages))
+    (POST "/admin/vaco-status-packages" req
+      (http/transit-response (list-vaco-status-packages "vaco-status-packages" db (:user req) req config)))
 
     (GET "/admin/list-interface-downloads/:interface-id" {{:keys [interface-id]}
                                                           :params

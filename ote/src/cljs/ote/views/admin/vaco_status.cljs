@@ -8,7 +8,9 @@
             [ote.localization :refer [tr tr-key]]
             [ote.ui.common :as common-ui]
             [ote.time :as time]
-            [ote.ui.form :as form]))
+            [ote.ui.form :as form]
+            [ote.ui.common :refer [linkify]]
+            [ote.util.tis-configs :as tis-configs]))
 
 (def interface-formats
   (if (flags/enabled? :new-transit-data-formats)
@@ -59,24 +61,37 @@
                       :on-click #(e! (admin-controller/->SearchVacoStatus))
                       :label "Hae Vacon konvertointitiedot"}]])
 
-(defn interface-table-row [e! operator-name service-name format url tis-success tis-complete tis-magic-link created]
-  [ui/table-row {:key (gensym) :selectable false }
-   [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} operator-name]
-   [ui/table-row-column {:style {:width "15%" :padding "0px 5px 0px 5px"}} service-name]
-   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (first format)]
-   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} [common-ui/linkify url "Katso" {:target "_blank"}]]
-   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (if tis-success "Onnistui" "Virhe!")]
-   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (if tis-complete "Valmistui" "Virhe!")]
-   [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}} [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}]]
-   [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui created)]])
+(defn interface-table-row [e! packageid vaco-url vaco-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created]
+  (let [{:keys [validator converter]} (tis-configs/base-task-names (str/lower-case (first format)))]
+    [ui/table-row {:key (gensym) :selectable false}
+     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} operator-name]
+     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} service-name]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (first format)]
+     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} [common-ui/linkify url "Katso" {:target "_blank"}]]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (if tis-success "Onnistui" "Virhe!")]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (if tis-complete "Valmistui" "Virhe!")]
+     [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
+      [:div
+       (when validator
+         [:img {:src (str vaco-url "/api/badge/" vaco-public-id "/" (:name validator))
+                :style {:margin-right "0.5em"}
+                :height "24" :title "VACO validation status badge" :alt "VACO validation status badge"}])
+       (when converter
+         [:img {:src (str vaco-url "/api/badge/" vaco-public-id (condp = (:name converter)
+                                                                  "gtfs2netex.fintraffic" "/netex.entur"))
+                :style {:margin-right "0.5em"}
+                :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}])]]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}]]
+     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui created)]
+     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-for-package/" packageid) "Validoi paketti"]]]))
 
 (defn interface-list [e! app]
   (let [{:keys [loading? results filters]} (get-in app [:admin :vaco-status])
         rows (doall
-               (mapcat (fn [{:keys [operator-name service-name format url tis-success tis-complete tis-magic-link created]
+               (mapcat (fn [{:keys [id tis-entry-public-id vaco-url operator-name service-name format url tis-success tis-complete tis-magic-link created]
                              :as interface}]
                          [^{:key (str "tbl-row-" (hash (str interface created)))}
-                          (interface-table-row e! operator-name service-name format url tis-success tis-complete tis-magic-link created)])
+                          (interface-table-row e! id vaco-url tis-entry-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created)])
                        results))]
 
     [:div.row
@@ -96,13 +111,15 @@
                             :adjust-for-checkbox false
                             :display-select-all false}
            [ui/table-row
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "15%"}} "Palveluntuottaja"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "15%"}} "Palvelu"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Tyyppi"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Palveluntuottaja"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Palvelu"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Tyyppi"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Rajapinta"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Status"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Status"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Valmistui"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Validointi"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Vaco Linkki"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Valmistui"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Vaco Linkki"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Valmistui"]]]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Käynnistä"]]]
           [ui/table-body {:display-row-checkbox false}
            rows]]])]]))
