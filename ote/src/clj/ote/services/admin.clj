@@ -47,6 +47,15 @@
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
 
+(declare search-services-with-interfaces search-services-wihtout-interface search-interface-downloads
+         fetch-sea-routes-for-admin fetch-netex-conversions-for-admin fetch-reported-taxi-prices
+         fetch-associated-companies-for-admin fetch-successfull-netex-conversion-interfaces-for-admin-with-max-date
+         fetch-successfull-netex-conversion-interfaces-for-admin fetch-all-ports fetch-validation-services
+         fetch-service-business-ids fetch-operator-business-ids monthly-producer-types-and-counts
+         monthly-registered-companies tertile-registered-companies operator-type-distribution fetch-all-emails
+         fetch-operators-no-services fetch-operators-brokerage fetch-all-operators fetch-operators-with-sub-contractors
+         fetch-operators-unpublished-services fetch-operators-with-payment-services search-vaco-status-packages)
+
 (def netex-column-keys
   {:netex-conversion-id ::netex/id
    :external-interface-description-id ::netex/external-interface-description-id
@@ -145,7 +154,7 @@
   [db ^String id]
   (let [email (:user_email                                  ;; Delete user clears email field, so get it before deleting
                 (first
-                  (ote.nap.users/fetch-user-by-id db {:user-id id})))
+                  (nap-users/fetch-user-by-id db {:user-id id})))
         affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
@@ -237,6 +246,25 @@
                                      (search-services-wihtout-interface db {:service-name (when service-name (str "%" service-name "%"))
                                                                             :operator-name (when operator-name (str "%" operator-name "%"))}))]
     (concat services-with-interface services-without-interface)))
+
+(defn- list-vaco-status-packages
+  "Get latest VACO status packages for services. "
+  [db user query]
+  (let [service-name (:service-name query)
+        operator-name (:operator-name query)
+        vaco-status (:vaco-status query)
+        interface-format (:interface-format query)
+        interface-url (:interface-url query)
+        ;; Get services that doesn't have any issues or services with errors.
+        search-parameters {:service-name (when service-name (str "%" service-name "%"))
+                           :operator-name (when operator-name (str "%" operator-name "%"))
+                           :interface-url (when interface-url (str "%" interface-url "%"))
+                           ;:vaco-status (when vaco-status true)
+                           :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}
+        status-list (when (not (:no-interface query))
+                                  (interfaces-array->vec
+                                    (search-vaco-status-packages db search-parameters)))]
+    status-list))
 
 (defn- list-interface-downloads [db interface-id]
   (interfaces-array->vec (search-interface-downloads db {:interface-id interface-id})))
@@ -758,6 +786,8 @@
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
+
+    (POST "/admin/vaco-status-packages" req (admin-service "interfaces" req db #'list-vaco-status-packages))
 
     (GET "/admin/list-interface-downloads/:interface-id" {{:keys [interface-id]}
                                                           :params
