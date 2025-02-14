@@ -100,6 +100,11 @@
 (defrecord EditTransportOperator [business-id])
 (defrecord EditTransportOperatorResponse [response])
 
+;; Vaco Status tab
+(defrecord SearchVacoStatus [])
+(defrecord SearchVacoStatusResponse [response])
+(defrecord UpdateVacoStatusFilters [filter])
+
 (defrecord ToggleAddMemberDialog [id])
 (defrecord ChangeTab [tab-value])
 
@@ -426,6 +431,25 @@
                {:on-success (tuck/send-async! ->FetchCompanyCsvsResponse)
                 :on-failure (tuck/send-async! ->ServerError)})
     (assoc-in app [:admin :company-csv :loading?] true))
+
+  UpdateVacoStatusFilters
+  (process-event [{filter :filter} app]
+    (update-in app [:admin :vaco-status] assoc :filters filter))
+
+  SearchVacoStatus
+  (process-event [_ app]
+    (comm/post! "admin/vaco-status-packages"
+                (form/without-form-metadata
+                  (get-in app [:admin :vaco-status :filters]))
+               {:on-success (tuck/send-async! ->SearchVacoStatusResponse)
+                :on-failure (tuck/send-async! ->ServerError)})
+    (assoc-in app [:admin :vaco-status :loading?] true))
+
+  SearchVacoStatusResponse
+  (process-event [{response :response} app]
+    (update-in app [:admin :vaco-status] assoc
+               :loading? false
+               :results response))
 
   OpenValidationWarningModal
   (process-event [{warning :warning} app]

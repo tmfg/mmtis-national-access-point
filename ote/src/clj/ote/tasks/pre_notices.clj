@@ -29,6 +29,8 @@
 
 (defqueries "ote/tasks/pre_notices.sql")
 
+(declare fetch-pre-notices-by-interval-and-regions fetch-unsent-changes-by-regions)
+
 (defn datetime-string [dt timezone]
   (when dt
     (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
