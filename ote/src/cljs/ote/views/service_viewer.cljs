@@ -287,25 +287,25 @@
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
          ^{:key (str (::t-service/id interface) title)}
          [:div
-          [info-sections-1-col (string/upper-case title)
-           [common-ui/information-row-with-option
-            (tr [:service-search :homepage])
-            (when url [common-ui/linkify
-                       url
-                       url
-                       {:target "_blank"
-                        :analytics-tag "Verkko-osoite"}])
-            true]]
-          [info-sections-3-cols
-           ""
+          [info-sections-3-cols (string/upper-case title)
            [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+            [common-ui/information-row-with-option
+             (tr [:service-search :homepage])
+             (when url [common-ui/linkify
+                        url
+                        url
+                        {:target "_blank"
+                         :analytics-tag "Verkko-osoite"}])
+             true]]
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
             [common-ui/information-row-with-option
              (tr [:field-labels :transport-service-common ::t-service/license])
              license false]]
-
-           [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
             [common-ui/information-row-with-option
-             (tr [:common-texts :format]) format true]]
+             (tr [:common-texts :format]) format true]]]
+          [info-sections-1-col
+           ""
            [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
             [information-row-with-selection
              (tr [:field-labels :transport-service-common ::t-service/external-service-description])

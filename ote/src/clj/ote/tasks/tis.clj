@@ -3,6 +3,7 @@
             [chime :as chime]
             [clj-time.core :as t]
             [clj-time.periodic :as periodic]
+            [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [jeesql.core :refer [defqueries]]
             [ote.db.lock :as lock]
@@ -12,9 +13,12 @@
             [ote.util.feature :as feature]
             [ote.util.tis-configs :as tis-configs]
             [specql.core :as specql]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [ote.services.operators :as operators-q]))
 
 (defqueries "ote/tasks/tis.sql")
+
+(declare fetch-external-interface-for-package)
 
 (defn ^:private copy-to-s3
   [config link filename]
@@ -106,6 +110,32 @@
                      :gtfs/created (java.sql.Timestamp. (System/currentTimeMillis))
                      :gtfs/license (or license "CC BY 4.0")
                      :gtfs/external-interface-description-id external-interface-description-id})))
+
+(defn submit-single-package [config db package-id]
+  (let [;; Get interface for package
+        interface (first (fetch-external-interface-for-package db {:package-id package-id}))
+        external-interface-description-id (:id interface)
+        format (str/lower-case (:format interface))
+        service-id (:transport-service-id interface)
+        operator (first (operators-q/fetch-operator-by-service-id db {:service-id service-id}))
+        operator-id (:id operator)
+        package (create-package db operator-id service-id external-interface-description-id (:license interface))
+        _ (log/info (str "Submit single package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
+        result (tis-vaco/queue-entry db (:tis-vaco config)
+                                     {:url (:url interface)
+                                      :operator-id operator-id
+                                      :id external-interface-description-id}
+                                     {:service-id service-id
+                                      :package-id (:gtfs/id package)
+                                      :external-interface-description-id external-interface-description-id
+                                      :operator-name (:name operator)
+                                      :contact-email (:email operator)}
+                                     (merge {:format format}
+                                            (tis-configs/vaco-create-payload format)))
+        _ (log/info "Single package result:" result)]
+    result
+    ; return nil to allow early collection of intermediate results
+    nil))
 
 (defn submit-known-interfaces!
   [config db]

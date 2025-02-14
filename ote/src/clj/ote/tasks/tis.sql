@@ -33,3 +33,15 @@ SELECT DISTINCT
        LEFT JOIN "user" u ON u.id = m.table_id
  WHERE tse.published IS NOT NULL
    AND m.capacity = 'admin';
+
+-- name: fetch-external-interface-for-package
+-- For admin panel. Use this when submitting a single package to vaco
+SELECT eid.id,
+       eid."transport-service-id",
+       (eid."external-interface").url as url,
+       (eid."external-interface").url,
+       eid.format[1],
+       eid.license,
+       eid."data-content"
+from "external-interface-description" eid
+WHERE eid.id = (SELECT "external-interface-description-id" from gtfs_package where id = :package-id);
