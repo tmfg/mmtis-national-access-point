@@ -247,6 +247,25 @@
                                                                             :operator-name (when operator-name (str "%" operator-name "%"))}))]
     (concat services-with-interface services-without-interface)))
 
+(defn- list-vaco-status-packages
+  "Get latest VACO status packages for services. "
+  [db user query]
+  (let [service-name (:service-name query)
+        operator-name (:operator-name query)
+        vaco-status (:vaco-status query)
+        interface-format (:interface-format query)
+        interface-url (:interface-url query)
+        ;; Get services that doesn't have any issues or services with errors.
+        search-parameters {:service-name (when service-name (str "%" service-name "%"))
+                           :operator-name (when operator-name (str "%" operator-name "%"))
+                           :interface-url (when interface-url (str "%" interface-url "%"))
+                           ;:vaco-status (when vaco-status true)
+                           :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}
+        status-list (when (not (:no-interface query))
+                                  (interfaces-array->vec
+                                    (search-vaco-status-packages db search-parameters)))]
+    status-list))
+
 (defn- list-interface-downloads [db interface-id]
   (interfaces-array->vec (search-interface-downloads db {:interface-id interface-id})))
 
@@ -767,6 +786,8 @@
     (POST "/admin/transport-services-by-operator" req (admin-service "services" req db #'list-services-by-operator))
 
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
+
+    (POST "/admin/vaco-status-packages" req (admin-service "interfaces" req db #'list-vaco-status-packages))
 
     (GET "/admin/list-interface-downloads/:interface-id" {{:keys [interface-id]}
                                                           :params

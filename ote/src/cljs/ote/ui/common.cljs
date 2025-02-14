@@ -64,11 +64,11 @@
   [url]
   (cond
     ;; URL with protocol, use as is
-    (re-matches #"^(\w+:).*" url)
+    (and (string? url) (re-matches #"^(\w+:).*" url))
     [url true]
 
     ;; User specified link without protocol (like "www.serviceprovider.fi/foo")
-    (re-matches #"^[^/]+\..*" url)
+    (and (string? url) (re-matches #"^[^/]+\..*" url))
     [(str "http://" url) true]
 
     ;; Internal relative link, like "pre-notice/attachment/1"
