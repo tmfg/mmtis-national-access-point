@@ -47,6 +47,15 @@
 (defqueries "ote/services/admin.sql")
 (defqueries "ote/services/reports.sql")
 
+(declare search-services-with-interfaces search-services-wihtout-interface search-interface-downloads
+         fetch-sea-routes-for-admin fetch-netex-conversions-for-admin fetch-reported-taxi-prices
+         fetch-associated-companies-for-admin fetch-successfull-netex-conversion-interfaces-for-admin-with-max-date
+         fetch-successfull-netex-conversion-interfaces-for-admin fetch-all-ports fetch-validation-services
+         fetch-service-business-ids fetch-operator-business-ids monthly-producer-types-and-counts
+         monthly-registered-companies tertile-registered-companies operator-type-distribution fetch-all-emails
+         fetch-operators-no-services fetch-operators-brokerage fetch-all-operators fetch-operators-with-sub-contractors
+         fetch-operators-unpublished-services fetch-operators-with-payment-services search-vaco-status-packages)
+
 (def netex-column-keys
   {:netex-conversion-id ::netex/id
    :external-interface-description-id ::netex/external-interface-description-id
@@ -145,7 +154,7 @@
   [db ^String id]
   (let [email (:user_email                                  ;; Delete user clears email field, so get it before deleting
                 (first
-                  (ote.nap.users/fetch-user-by-id db {:user-id id})))
+                  (nap-users/fetch-user-by-id db {:user-id id})))
         affected-records (nap-users/delete-user! db {:id (str id)
                                                      :name (java.util.Date.)})]
     (log/info "Delete user id: " (pr-str id), ", records affected=" affected-records)
