@@ -7,6 +7,7 @@ WITH latest_packagees AS (
     LIMIT 100)
 SELECT * from latest_packagees
 WHERE "tis-complete" IS FALSE
+  AND "tis-entry-public-id" IS NOT NULL
   AND created > (NOW() - INTERVAL '1 week') IS TRUE;
 
 -- name: update-tis-results!

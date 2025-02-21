@@ -89,8 +89,7 @@
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
                                              :tis-success         false
-                                             :tis-magic-link      nil}))
-                  (log/info (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side.")))))))
+                                             :tis-magic-link      nil})))))))
         packages))))
 
 (defn ^:private interface-latest-package [db interface-id]
