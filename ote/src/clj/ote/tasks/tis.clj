@@ -27,7 +27,11 @@
       (let [bucket    (get-in config [:netex :bucket])
             available (.available in)]
         (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
-        (s3/put-object bucket filename in {:content-length available})
+        ;; Try and catch put. S3PUT doesn't work in localhost by default (it can be enabled), so we need to catch the exception.
+        (try
+          (s3/put-object bucket filename in {:content-length available})
+          (catch Exception e
+            (log/error e "Failed to copy file to S3")))
         filename))))
 
 (defn get-filename
