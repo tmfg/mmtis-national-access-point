@@ -18,7 +18,8 @@
 
 (defqueries "ote/tasks/tis.sql")
 
-(declare fetch-external-interface-for-package)
+(declare fetch-external-interface-for-package select-packages-without-finished-results fetch-count-service-packages
+         update-tis-results! list-all-external-interfaces)
 
 (defn ^:private copy-to-s3
   [config link filename]
@@ -27,7 +28,11 @@
       (let [bucket    (get-in config [:netex :bucket])
             available (.available in)]
         (log/info (str "Copying file to " bucket "/" filename " (" available " bytes available)"))
-        (s3/put-object bucket filename in {:content-length available})
+        ;; Try and catch put. S3PUT doesn't work in localhost by default (it can be enabled), so we need to catch the exception.
+        (try
+          (s3/put-object bucket filename in {:content-length available})
+          (catch Exception e
+            (log/error e "Failed to copy file to S3")))
         filename))))
 
 (defn get-filename
@@ -72,20 +77,20 @@
                       {:service-id                        (:transport-service-id package)
                        :external-interface-description-id (:external-interface-description-id package)
                        :external-interface-data-content   #{:route-and-schedule}})
+                    (log/info "Netex conversion status updated.")
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
                                              :tis-success         true
-                                             :tis-magic-link      magic-link})))
-                (if complete?
+                                             :tis-magic-link      magic-link})
+                    (log/info "VACO integration status updated.")))
+                (when complete?
                   (do
                     (log/info (str "No results found for package " package-id "/" entry-public-id " but the entry is complete -> no result available"))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
                                              :tis-success         false
                                              :tis-magic-link      nil}))
-                  (log/info (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side."))))))
-
-          )
+                  (log/info (str "Package " package-id "/" entry-public-id " processing is not yet complete on TIS side.")))))))
         packages))))
 
 (defn ^:private interface-latest-package [db interface-id]
