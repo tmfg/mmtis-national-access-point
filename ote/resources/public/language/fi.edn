@@ -1310,6 +1310,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :vaco-converted-feed "NeTEx-muunnoksen tila"
   :vaco-magic-link "Tarkastele validointipalvelussa"
   :vaco-links-section-title "Validointipalvelu"
+  :vaco-given-interface-has-problem "Annetun rajapinnan käytössä ongelma."
+  :vaco-validation-in-progress "Validointi ei ole vielä valmistunut."
   :download-netex "Lataa muunnettu NeTEx-paketti"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 

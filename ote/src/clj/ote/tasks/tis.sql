@@ -1,10 +1,13 @@
 -- name: select-packages-without-finished-results
-SELECT *
-  FROM "gtfs_package"
- WHERE "tis-entry-public-id" IS NOT NULL
-   AND "tis-complete" IS FALSE
-   AND created > (NOW() - INTERVAL '1 week') IS TRUE
- LIMIT 100;
+-- Select only newest package for each interface.
+WITH latest_packagees AS (
+    SELECT distinct on ("external-interface-description-id") "external-interface-description-id", *
+    FROM "gtfs_package"
+    ORDER BY  "external-interface-description-id" DESC, id DESC
+    LIMIT 100)
+SELECT * from latest_packagees
+WHERE "tis-complete" IS FALSE
+  AND created > (NOW() - INTERVAL '1 week') IS TRUE;
 
 -- name: update-tis-results!
 UPDATE "gtfs_package"
@@ -33,3 +36,15 @@ SELECT DISTINCT
        LEFT JOIN "user" u ON u.id = m.table_id
  WHERE tse.published IS NOT NULL
    AND m.capacity = 'admin';
+
+-- name: fetch-external-interface-for-package
+-- For admin panel. Use this when submitting a single package to vaco
+SELECT eid.id,
+       eid."transport-service-id",
+       (eid."external-interface").url as url,
+       (eid."external-interface").url,
+       eid.format[1],
+       eid.license,
+       eid."data-content"
+from "external-interface-description" eid
+WHERE eid.id = (SELECT "external-interface-description-id" from gtfs_package where id = :package-id);

@@ -63,7 +63,7 @@ SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", 
        "transport-operator" as op,
        "transport-service" as ts,
        "external-interface-description" as eid
-       JOIN download_status id ON id."external-interface-description-id" = eid.id
+       LEFT JOIN download_status id ON id."external-interface-description-id" = eid.id
  WHERE
        (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
    AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
@@ -82,6 +82,31 @@ SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", 
    AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
  GROUP BY eid.id, id.id, id.created, eid.id, id."download-error", id."db-error", ts.id, op.id, id.id, id.url
  ORDER BY eid.id ASC, id.id DESC;
+
+-- name: search-vaco-status-packages
+SELECT op.name as "operator-name", ts.name as "service-name", eid."data-content" as "data-content", (eid."external-interface").url as url,
+       eid.format as format, gp.id, gp."tis-success", gp."tis-complete", gp."tis-magic-link", gp.created, gp."tis-entry-public-id"
+FROM
+    "transport-operator" as op,
+    "transport-service" as ts,
+    "external-interface-description" as eid
+        join lateral (SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link", gp.created
+                      FROM gtfs_package gp
+                      WHERE gp."transport-service-id" = ts.id
+                        AND gp."external-interface-description-id" = eid.id
+                      ORDER BY gp.created DESC
+                      LIMIT 1) gp ON true
+WHERE
+    (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
+  AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
+  AND (:interface-url::TEXT IS NULL OR (eid."external-interface").url ilike :interface-url)
+  AND (:interface-format::TEXT IS NULL OR :interface-format = ANY(lower(eid.format::text)::text[]))
+  AND ts.published IS NOT NULL
+  AND ts."transport-operator-id" = op.id
+  AND eid."transport-service-id" = ts.id
+  AND ts."sub-type" = 'schedule'
+  AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+ORDER BY gp."tis-success" DESC;
 
 -- name: search-services-wihtout-interface
 select ts.id as "interface-id", ts.id as "service-id", op.id as "operator-id",

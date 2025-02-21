@@ -17,7 +17,7 @@ SELECT COUNT(id)
 -- single?: true
 SELECT COUNT(id)
   FROM "transport-operator" o
- WHERE o."deleted?" = FALSE
+ WHERE o."deleted?" = FALSE;
 
 -- name: delete-transport-operator
 -- Delete all operator data except published external interface data from ckan
@@ -63,3 +63,9 @@ SELECT u.id, u.name, u.fullname, u.email
   FROM member m
       JOIN "user" u ON m.table_id = u.id AND u.state = 'active' AND m.state = 'active'
 WHERE m.group_id = :ckan-group-id;
+
+-- name: fetch-operator-by-service-id
+SELECT tso.id as id, tso.name as "name", tso."business-id" as "business-id", tso.email
+  FROM "transport-service" ts
+       JOIN "transport-operator" tso ON ts."transport-operator-id" = tso.id
+ WHERE ts.id = :service-id;

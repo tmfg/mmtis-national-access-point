@@ -14,6 +14,9 @@
 
 (defqueries "ote/services/operators.sql")
 
+(declare delete-transport-operator fetch-operator-service-counts count-all-operators count-matching-operators
+         fetch-operator-by-service-id)
+
 (def operator-listing-columns
   #{::t-operator/id ::t-operator/name
     ::t-operator/business-id

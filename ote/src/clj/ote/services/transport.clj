@@ -229,7 +229,7 @@
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removable-interfaces]
-  (let [external-interfaces (mapv #(dissoc % :url-ote-netex) ; Remove because not part of db data model
+  (let [external-interfaces (mapv #(dissoc % :url-ote-netex :tis-vaco) ; Remove because not part of db data model
                                   external-interfaces)]
 
     ;; Delete removed services from OTE db
