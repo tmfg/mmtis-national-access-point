@@ -8,7 +8,7 @@ SELECT eid.id as id, TRIM((eid."external-interface").url) as url, eid.format[1] 
   JOIN "transport-operator" top ON top.id = ts."transport-operator-id"
  WHERE ts.published IS NOT NULL
    AND top.id NOT IN (:blacklist)
-   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format))
+   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format))
    AND ( "gtfs-imported" < (current_timestamp - '1 day'::interval) OR "gtfs-imported" IS NULL)
  ORDER BY "gtfs-imported" ASC LIMIT 1
    FOR UPDATE SKIP LOCKED;
