@@ -1,10 +1,13 @@
 -- name: select-packages-without-finished-results
-SELECT *
-  FROM "gtfs_package"
- WHERE "tis-entry-public-id" IS NOT NULL
-   AND "tis-complete" IS FALSE
-   AND created > (NOW() - INTERVAL '1 week') IS TRUE
- LIMIT 100;
+-- Select only newest package for each interface.
+WITH latest_packagees AS (
+    SELECT distinct on ("external-interface-description-id") "external-interface-description-id", *
+    FROM "gtfs_package"
+    ORDER BY  "external-interface-description-id" DESC, id DESC
+    LIMIT 100)
+SELECT * from latest_packagees
+WHERE "tis-complete" IS FALSE
+  AND created > (NOW() - INTERVAL '1 week') IS TRUE;
 
 -- name: update-tis-results!
 UPDATE "gtfs_package"
