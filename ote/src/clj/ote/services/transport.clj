@@ -394,9 +394,7 @@
       (doseq [ext-interface (specql/fetch db ::t-service/external-interface-description
                                           #{::t-service/id ::t-service/original-interface-id}
                                           {::t-service/transport-service-id parent-id})]
-        (let [_ (println "replace-parent-service-with-child :: ext-interface: " ext-interface)
-              ;; Change iterface-id to original id - if original id is set
-
+        (let [;; Change iterface-id to original id - if original id is set
               _ (when (::t-service/original-interface-id ext-interface)
                   (specql/update! db ::t-service/external-interface-description
                                   {::t-service/id (::t-service/original-interface-id ext-interface)}
