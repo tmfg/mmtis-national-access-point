@@ -63,7 +63,7 @@ SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", 
        "transport-operator" as op,
        "transport-service" as ts,
        "external-interface-description" as eid
-       JOIN download_status id ON id."external-interface-description-id" = eid.id
+       LEFT JOIN download_status id ON id."external-interface-description-id" = eid.id
  WHERE
        (:operator-name::TEXT IS NULL OR op.name ilike :operator-name)
    AND (:service-name::TEXT IS NULL OR ts.name ilike :service-name)
