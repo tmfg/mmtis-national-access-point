@@ -318,7 +318,6 @@
                 public-id  (:gtfs/tis-entry-public-id tis-vaco)
                 magic-link (:gtfs/tis-magic-link tis-vaco)
                 format     (some-> (::t-service/format interface) first str/lower-case)
-                vaco-complete? (:gtfs/tis-complete tis-vaco)
                 {:keys [validator converter]} (tis-configs/base-task-names format)]
             (if (some? public-id)
               ; VACO-originating NeTEx conversion if possible
@@ -388,9 +387,7 @@
                   (tr [:service-search :vaco-links-section-title])
                   [:div (if magic-link
                           [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
-                          (if vaco-complete?
-                            (tr [:service-search :vaco-given-interface-has-problem])
-                            (tr [:service-search :vaco-validation-in-progress])))]
+                          (tr [:service-search :vaco-given-interface-has-problem]))]
                   true]]]]))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
