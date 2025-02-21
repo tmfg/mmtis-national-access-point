@@ -304,14 +304,9 @@
            [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
             [common-ui/information-row-with-option
              (tr [:common-texts :format]) format true]]]
-          [info-sections-1-col
-           ""
-           [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-            [information-row-with-selection
-             (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-             descriptions
-             false]]
-           {:sub-title false}]
+          [:section
+           [:div
+            [information-row-with-selection (tr [:field-labels :transport-service-common ::t-service/external-service-description]) descriptions true]]]
 
           ;; TIS-VACO data quality information
           (let [tis-vaco   (:tis-vaco interface)
@@ -361,34 +356,35 @@
                      [common-ui/linkify (str url-ote-netex "?origin=ui") (tr [:service-search :download-netex]) {:target "_blank"}])]
                   true]]]]
               ;; Show error message if no VACO data is available
-              [:div {:style {:margin-left "20px"}}
-               [info-sections-2-cols
-                (tr [:service-search :vaco-quality-details-title])
-                [:div
-                 [common-ui/information-row-with-option
-                  (tr [:service-search :vaco-validated-feed])
+              (when (or (= "gtfs" format) (= "netex" format) (= "gtfs-flex" format) (= "kalkati" format))
+                [:div {:style {:margin-left "20px"}}
+                 [info-sections-2-cols
+                  (tr [:service-search :vaco-quality-details-title])
                   [:div
-                   ; error badge
-                   [:img {:src "img/icons/VACO_errors_badge.svg"}]]
-                  false]]
-                ;; conversion details
-                [:div
-                 [common-ui/information-row-with-option
-                  (tr [:service-search :vaco-converted-feed])
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-validated-feed])
+                    [:div
+                     ; error badge
+                     [:img {:src "img/icons/VACO_errors_badge.svg"}]]
+                    false]]
+                  ;; conversion details
                   [:div
-                   ; errors badge
-                   [:img {:src "img/icons/VACO_errors_badge.svg"}]]
-                  false]]
-                {:sub-title true}]
-               [info-sections-1-col
-                ""
-                [:div
-                 [common-ui/information-row-with-option
-                  (tr [:service-search :vaco-links-section-title])
-                  [:div (if magic-link
-                          [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
-                          (tr [:service-search :vaco-given-interface-has-problem]))]
-                  true]]]]))]))
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-converted-feed])
+                    [:div
+                     ; errors badge
+                     [:img {:src "img/icons/VACO_errors_badge.svg"}]]
+                    false]]
+                  {:sub-title true}]
+                 [info-sections-1-col
+                  ""
+                  [:div
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-links-section-title])
+                    [:div (if magic-link
+                            [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
+                            (tr [:service-search :vaco-given-interface-has-problem]))]
+                    true]]]])))]))
      [:h5 (stylefy/use-style (merge
                                style-base/info-content
                                {:color colors/gray650
