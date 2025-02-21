@@ -10,7 +10,6 @@
             [clojure.set :as set]
             [jeesql.core :refer [defqueries]]
             [specql.core :refer [fetch upsert! delete!] :as specql]
-            [specql.op :as op]
             [ote.components.http :as http]
             [ote.util.feature :as feature]
             [ote.db.modification :as modification]
@@ -32,6 +31,10 @@
 (defqueries "ote/services/operators.sql")
 (defqueries "ote/services/associations.sql")
 (defqueries "ote/nap/users.sql")
+
+(declare fetch-transport-services fetch-rental-booking-info fetch-child-service-interfaces
+         save-rental-booking-info! update-old-package-interface-ids! update-packages-with-deleted-interface-true!
+         update-child-parent-interfaces)
 
 (def transport-service-personal-columns
   #{::t-service/contact-phone
@@ -308,7 +311,7 @@
                                               {::t-service/transport-service-id parent-id
                                                ::t-service/url url})
                             ;; Update packages
-                            packages (specql/fetch db :gtfs/package (specql/columns :gtfs/package)
+                            _ (specql/fetch db :gtfs/package (specql/columns :gtfs/package)
                                                    {:gtfs/transport-service-id parent-id
                                                     :gtfs/external-interface-description-id orig-interface-id})
                             _ (specql/update! db :gtfs/package
@@ -385,7 +388,22 @@
       (replace-rental-booking-info db parent-id child-id)
 
       ;; Delete child - and its external-interfaces and places
-      (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
+      (specql/delete! db ::t-service/transport-service {::t-service/id child-id})
+
+      ;; Update external interfaces ids with original id
+      (doseq [ext-interface (specql/fetch db ::t-service/external-interface-description
+                                          #{::t-service/id ::t-service/original-interface-id}
+                                          {::t-service/transport-service-id parent-id})]
+        (let [;; Change iterface-id to original id - if original id is set
+              _ (when (::t-service/original-interface-id ext-interface)
+                  (specql/update! db ::t-service/external-interface-description
+                                  {::t-service/id (::t-service/original-interface-id ext-interface)}
+                                  {::t-service/id (::t-service/id ext-interface)}))
+              ;; Remove original-interface-id - if original id is set
+              _ (when (::t-service/original-interface-id ext-interface)
+                  (specql/update! db ::t-service/external-interface-description
+                                  {::t-service/original-interface-id nil}
+                                  {::t-service/id (::t-service/original-interface-id ext-interface)}))])))))
 
 (defn- set-publish-time
   [data db]
@@ -771,12 +789,6 @@
                              {::t-service/file-key file-key})
              ;; Return
              file-key))))))
-
-(defn ckan-group-id->group
-  [db ckan-group-id]
-  (first (specql/fetch db ::t-operator/group
-                       (specql/columns ::t-operator/group)
-                       {::t-operator/group-id ckan-group-id})))
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"

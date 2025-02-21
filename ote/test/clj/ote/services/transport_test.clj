@@ -353,3 +353,54 @@
     (is (thrown-with-msg?
           clojure.lang.ExceptionInfo #"status 404"
           (http-get "normaluser" (str "transport-service/" service-id))))))
+
+(deftest ensure-external-interface-id-after-publish
+  (let [operator-id 2                                       ;; force operator id
+        generated-service (gen/generate (s-generators/service-sub-type-generator :schedule))
+        ;; Generated interfaces cannot be trusted so create one with correct data
+        default-interface {::t-service/external-interface {::t-service/url "www.default.url"
+                                                           ::t-service/description [{::t-service/lang "FI",
+                                                                                     ::t-service/text "Default text"}]}
+                           ::t-service/data-content [:route-and-schedule]
+                           ::t-service/format ["GTFS"]
+                           ::t-service/license "jnppWN61pC0u77PG4ha0"}
+        generated-service (-> generated-service
+                              (assoc ::t-service/transport-operator-id operator-id)
+                              (dissoc ::t-service/external-interfaces)
+                              (assoc-in [::t-service/external-interfaces] [default-interface])
+                              ;; "move" to validation
+                              (assoc ::t-service/validate? (time-coerce/to-sql-date (time/now))))
+        saved-service1 (:transit (http-post (:user-id-normal @ote.test/user-db-ids-atom) "transport-service" generated-service))
+
+        service-id (::t-service/id saved-service1)
+        saved-service2 (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        ;; Take external-interface-description-id
+        interfaces2 (::t-service/external-interfaces saved-service2)
+        interface-id1 (::t-service/id (first interfaces2))
+
+        ;; Generated services are not published, publish this one
+        _ (http-post (:user-id-admin @ote.test/user-db-ids-atom) "admin/publish-service" {:id service-id})
+        ;; And fetch it
+        saved-service3 (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        interfaces3 (::t-service/external-interfaces saved-service3)
+        interface-id2 (::t-service/id (first interfaces3))
+        _ (is (= interface-id1 interface-id2) "Interface id should stay the same after publishing the service.")
+
+        ;; Ensure that service is in published state
+        _ (is (not (nil? (::t-service/published saved-service3)))) ;; is published
+        _ (is (nil? (::t-service/validate saved-service3)))  ;; not in validation
+        _ (is (nil? (::t-service/re-edit saved-service3)))   ;; not in re-edit
+        ]
+    ;; Saved ok
+    (is (pos? service-id))
+
+    ;; Delete
+    (let [delete-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
+                                     "transport-service/delete"
+                                     {:id service-id})]
+      (is (= (:transit delete-response) service-id)))
+
+    ;; Try to fetch now and it does not exist
+    (is (thrown-with-msg?
+          clojure.lang.ExceptionInfo #"status 404"
+          (http-get "normaluser" (str "transport-service/" service-id))))))
