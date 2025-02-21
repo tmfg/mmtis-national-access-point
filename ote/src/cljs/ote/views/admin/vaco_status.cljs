@@ -72,13 +72,14 @@
      [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (if tis-complete "Valmistui" "Virhe!")]
      [ui/table-row-column {:style {:width "20%" :padding "0px 5px 0px 5px"}}
       [:div
-       (when validator
+       (when (and validator vaco-public-id)
          [:img {:src (str vaco-url "/api/badge/" vaco-public-id "/" (:name validator))
                 :style {:margin-right "0.5em"}
                 :height "24" :title "VACO validation status badge" :alt "VACO validation status badge"}])
-       (when converter
+       (when (and converter vaco-public-id)
          [:img {:src (str vaco-url "/api/badge/" vaco-public-id (condp = (:name converter)
-                                                                  "gtfs2netex.fintraffic" "/netex.entur"))
+                                                                  "gtfs2netex.fintraffic" "/netex.entur"
+                                                                  "netex2gtfs.entur" "/netex.entur"))
                 :style {:margin-right "0.5em"}
                 :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}])]]
      [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}]]
@@ -117,7 +118,7 @@
             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Rajapinta"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Status"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Valmistui"]
-            [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Validointi"]
+            [ui/table-header-column {:class "table-header-wrap" :style {:width "20%"}} "Validointi/Konvertointi"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "5%"}} "Vaco Linkki"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Valmistui"]
             [ui/table-header-column {:class "table-header-wrap" :style {:width "10%"}} "Käynnistä"]]]
