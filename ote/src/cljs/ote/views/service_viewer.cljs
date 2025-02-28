@@ -342,8 +342,7 @@
                                                                                             "netex2gtfs.entur" "/gtfs.canonical"))
                             :style  {:margin-right "0.5em"}
                             :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}]]
-                    false])]
-                {:sub-title true}]
+                    false])]]
                [info-sections-1-col
                 ""
                 [:div
@@ -382,15 +381,18 @@
                   [:div
                    [common-ui/information-row-with-option
                     (tr [:service-search :vaco-links-section-title])
-                    [:div (if magic-link
-                            [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
-                            (tr [:service-search :vaco-given-interface-has-problem]))]
-                    true]]]])))]))
-     [:h5 (stylefy/use-style (merge
-                               style-base/info-content
-                               {:color colors/gray650
-                                :font-style "italic"}))
-      (tr [:service-viewer :not-disclosed])])])
+                    [:div "jee" (if magic-link
+                                  [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
+                                  (tr [:service-search :vaco-given-interface-has-problem]))]
+                    true]]]])))
+          [spacer]]))
+     [:div
+      [:h5 (stylefy/use-style (merge
+                                style-base/info-content
+                                {:color colors/gray650
+                                 :font-style "italic"}))
+       (tr [:service-viewer :not-disclosed])]
+      [spacer]])])
 
 (defn- luggage-warnings
   [title data]
@@ -1014,7 +1016,6 @@
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts) (::t-service/sub-type ts) "TODO package"]
-       [spacer]
 
        (case service-sub-type
          :rentals
