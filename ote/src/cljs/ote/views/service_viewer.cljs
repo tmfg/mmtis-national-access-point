@@ -339,7 +339,7 @@
                      ; conversion status badge, falls back to entry badge if converter is unknown
                      [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id (condp = (:name converter)
                                                                                             "gtfs2netex.fintraffic" "/netex.entur"
-                                                                                            "netex2gtfs.entur" "/netex.entur"))
+                                                                                            "netex2gtfs.entur" "/gtfs.canonical"))
                             :style  {:margin-right "0.5em"}
                             :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}]]
                     false])]
