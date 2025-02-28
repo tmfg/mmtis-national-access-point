@@ -1307,7 +1307,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :ote-generated-url "NAP:n generoima NeTEx-rajapinta"
   :vaco-quality-details-title "Rajapinnan laatutiedot"
   :vaco-validated-feed "Lähderajapinnan datan laatu"
-  :vaco-converted-feed "NeTEx-muunnoksen tila"
+  :vaco-converted-feed "Muunnoksen tila"
   :vaco-magic-link "Tarkastele validointipalvelussa"
   :vaco-links-section-title "Validointipalvelu"
   :vaco-given-interface-has-problem "Annetun rajapinnan käytössä ongelma."
