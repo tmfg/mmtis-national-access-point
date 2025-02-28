@@ -226,7 +226,8 @@
                          ;      the database type for this column is array etc. etc. Easiest way to get around this
                          ;      without breaking existing data is to just return one-item vectors :)
                          :options (if (flags/enabled? :new-transit-data-formats)
-                                    [["GTFS"] ["GTFS-RT"] ["GBFS"] ["Kalkati"] ["SIRI"] ["NeTEx"] ["GeoJSON"] ["JSON"] ["CSV"]]
+                                    [["GTFS"] ["GTFS-RT"] ["GBFS"] ["Kalkati"] ["NeTEx"] ["GeoJSON"] ["JSON"]
+                                     ["CSV"] ["Datex II"] ["SIRI"] ["SIRI-ET"] ["SIRI-SX"] ["SIRI-VM"]]
                                     [["GTFS"] ["Kalkati.net"] ["SIRI"] ["NeTEx"] ["GeoJSON"] ["JSON"] ["CSV"]])
                          :show-option first
                          :required? true
