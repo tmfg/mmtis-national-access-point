@@ -79,7 +79,7 @@ SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", 
    AND ts."transport-operator-id" = op.id
    AND eid."transport-service-id" = ts.id
    AND ts."sub-type" = 'schedule'
-   AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+   AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]) OR 'netex' = ANY(lower(eid.format::text)::text[]))
  GROUP BY eid.id, id.id, id.created, eid.id, id."download-error", id."db-error", ts.id, op.id, id.id, id.url
  ORDER BY eid.id ASC, id.id DESC;
 
@@ -105,7 +105,7 @@ WHERE
   AND ts."transport-operator-id" = op.id
   AND eid."transport-service-id" = ts.id
   AND ts."sub-type" = 'schedule'
-  AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]))
+  AND ('gtfs' = ANY(lower(eid.format::text)::text[]) OR 'kalkati.net' = ANY(lower(eid.format::text)::text[]) OR 'netex' = ANY(lower(eid.format::text)::text[]))
 ORDER BY gp."tis-success" DESC;
 
 -- name: search-services-wihtout-interface

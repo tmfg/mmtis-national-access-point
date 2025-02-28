@@ -262,9 +262,8 @@
                            :interface-url (when interface-url (str "%" interface-url "%"))
                            ;:vaco-status (when vaco-status true)
                            :interface-format (when (and interface-format (not= :ALL interface-format)) (str/lower-case (name interface-format)))}
-        status-list (when (not (:no-interface query))
-                                  (interfaces-array->vec
-                                    (search-vaco-status-packages db search-parameters)))
+        status-list (interfaces-array->vec
+                      (search-vaco-status-packages db search-parameters))
         ;; Add vaco-url to the response
         status-list (map (fn [x]
                             (assoc x :vaco-url (str (get-in config [:tis-vaco :api-base-url]))))
@@ -802,7 +801,8 @@
     (POST "/admin/interfaces" req (admin-service "interfaces" req db #'list-interfaces))
 
     (POST "/admin/vaco-status-packages" req
-      (http/transit-response (list-vaco-status-packages "vaco-status-packages" db (:user req) req config)))
+      (http/transit-response
+        (list-vaco-status-packages "vaco-status-packages" db (:user req) (http/transit-request (:body req)) config)))
 
     (GET "/admin/list-interface-downloads/:interface-id" {{:keys [interface-id]}
                                                           :params

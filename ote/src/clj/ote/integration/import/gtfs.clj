@@ -334,7 +334,7 @@
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
-        _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
+        _ (log/info "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
         package (specql/insert! db :gtfs/package
                                 {:gtfs/first_package (= 0 package-count)
                                  :gtfs/transport-operator-id operator-id
