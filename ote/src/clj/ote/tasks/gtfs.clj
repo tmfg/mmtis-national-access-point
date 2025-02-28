@@ -273,10 +273,10 @@
                ;; Do not send anyting to s3 in local environment
                (if (:dev-mode? config) false true))))
          ;; Change detection has been disabled.
-         (chime-at (tasks-util/daily-at 5 15)
+         #_ (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task config db (time/now) false)))
-         (chime-at (tasks-util/daily-at 0 15)
+         #_ (chime-at (tasks-util/daily-at 0 15)
                    (fn [_]
                      (recalculate-detected-changes-count db)))]
         (do
