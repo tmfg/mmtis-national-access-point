@@ -322,7 +322,8 @@
                      ::specql/limit 1}))))
 
 (defn download-and-store-transit-package
-  "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
+  "Download GTFS or kalkati file, optionally upload to s3,
+  (Since change detection is disabled, don't parse and store to database anymore.)
   Returns map containing an in-memory traffic gtfs package and related attributes or nil on failure "
   [interface-type
    gtfs-config
@@ -361,7 +362,8 @@
                              (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
-              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
+              ;; Change detection has been disabled.
+              #_ (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
               ;; Mark interface download a success
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id

@@ -160,6 +160,7 @@
    (let [;; Load next gtfs package or package that is related to given service-id
          interface (if service-id
                      (fetch-given-gtfs-interface! db service-id interface-id)
+                     ;; Get next interface that is not been used in 24 hours.
                      (fetch-next-gtfs-interface! db config))
          interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
                      (update interface :data-content  util-db/PgArray->vec)
