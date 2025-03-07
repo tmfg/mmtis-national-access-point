@@ -5,7 +5,7 @@
             [clj-http.client :as http-client]
             [ote.integration.import.gtfs :as gtfs]
             [ote.services.transit-changes :as transit-changes]
-            [ote.test :refer [system-fixture http-post]]
+            [ote.test :refer [sql-query]]
             [ote.components.db :as db]
             [taoensso.timbre :as log]
             [ote.gtfs.parse :as gtfs-parse]

@@ -26,6 +26,8 @@
 (defqueries "ote/integration/import/import_gtfs.sql")
 (defqueries "ote/transit_changes/detection.sql")
 
+(declare fetch-count-service-packages gtfs-trip-id-and-index update-stop-times! calculate-fuzzy-location-for-stops!
+         generate-date-hashes-for-future gtfs-set-package-geometry)
 
 (defn load-zip-from-url [url]
   (with-open [in (:body (http-client/get url {:as :stream}))]
@@ -164,7 +166,8 @@
                    (report/gtfs-import-report! db "error" package-id
                                                (str "No data rows in file " name " of type " file-type)
                                                (.getBytes "")))
-                 (doseq [fk rows]
+                 ;; Change Detection is disabled, so no need to store the data
+                 #_ (doseq [fk rows]
                    (when (and db-table-name (seq fk))
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
 
@@ -362,8 +365,7 @@
                              (java.io.ByteArrayInputStream. gtfs-file)
                              {:content-length (count gtfs-file)})
               ;; Parse gtfs package and save it to database.
-              ;; Change detection has been disabled.
-              #_ (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
+              (save-gtfs-to-db db gtfs-file (:gtfs/id package) id ts-id nil url (java.util.Date.))
               ;; Mark interface download a success
               (specql/insert! db ::t-service/external-interface-download-status
                               {::t-service/external-interface-description-id id

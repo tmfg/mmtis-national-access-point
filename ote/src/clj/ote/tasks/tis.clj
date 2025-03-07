@@ -180,7 +180,11 @@
 (defn poll-tis-entries!
   [config db]
   (try
-    (poll-incomplete-entry-results! config db)
+    ;; Use lock to prevent duplicate polls
+    (let [lock-time-in-seconds 3600]  ; 1 hour
+      (lock/try-with-lock
+        db "poll-incomplete-entry-results!" lock-time-in-seconds
+       (poll-incomplete-entry-results! config db)))
     (catch Exception e
       (log/warn e "Failure during polling!"))))
 
