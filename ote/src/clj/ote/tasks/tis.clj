@@ -181,10 +181,12 @@
   [config db]
   (try
     ;; Use lock to prevent duplicate polls
-    (let [lock-time-in-seconds 480]  ; 8 min
-      (lock/with-exclusive-lock
-        db "poll-incomplete-entry-results!" lock-time-in-seconds
-       (poll-incomplete-entry-results! config db)))
+    (do
+      (log/info "Polling for incomplete TIS entries :: Lock is in use.")
+      (let [lock-time-in-seconds 480]                       ; 8 min
+        (lock/with-exclusive-lock
+          db "poll-incomplete-entry-results!" lock-time-in-seconds
+          (poll-incomplete-entry-results! config db))))
     (catch Exception e
       (log/warn e "Failure during polling!"))))
 

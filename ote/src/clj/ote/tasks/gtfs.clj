@@ -148,7 +148,7 @@
 
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
-(def update-gtfs-lock-time-in-seconds 30)
+(def update-gtfs-lock-time-in-seconds 1000)                 ;; about 20 min
 (defn update-one-gtfs!
   "Selects the given service id, or if none given then selects the next service with external interface with new
   content, downloads and stores the content.
