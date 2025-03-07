@@ -159,7 +159,6 @@
    ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
    ;; Use lock to prevent duplicate updates
-   (log/info "Update one GTFS package! - Use Lock")
    (lock/with-exclusive-lock
      db "update-one-gtfs!" update-gtfs-lock-time-in-seconds
      (let [_ (log/info "Updating one GTFS package! - Using lock - this should not be seen in all nodes.")

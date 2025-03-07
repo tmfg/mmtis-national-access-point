@@ -172,7 +172,8 @@
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
 
       ;; Handle stop times
-      (import-stop-times db package-id stop-times-file)
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (import-stop-times db package-id stop-times-file)
 
       ;; Calculate stop-fuzzy-lat and stop-fuzzy-lon
       (log/info "Generating fuzzy location for stops in package " package-id)
