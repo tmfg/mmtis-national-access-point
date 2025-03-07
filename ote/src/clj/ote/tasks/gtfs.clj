@@ -148,7 +148,7 @@
 
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
-(def update-gtfs-lock-time-in-seconds 3600)
+(def update-gtfs-lock-time-in-seconds 30)
 (defn update-one-gtfs!
   "Selects the given service id, or if none given then selects the next service with external interface with new
   content, downloads and stores the content.
@@ -160,7 +160,7 @@
    ;; upload-s3? should be false when using local environment
    ;; Use lock to prevent duplicate updates
    (log/info "Update one GTFS package! - Use Lock")
-   (lock/try-with-lock
+   (lock/with-exclusive-lock
      db "update-one-gtfs!" update-gtfs-lock-time-in-seconds
      (let [_ (log/info "Updating one GTFS package! - Using lock - this should not be seen in all nodes.")
            ;; Load next gtfs package or package that is related to given service-id

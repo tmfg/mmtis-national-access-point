@@ -181,8 +181,8 @@
   [config db]
   (try
     ;; Use lock to prevent duplicate polls
-    (let [lock-time-in-seconds 3600]  ; 1 hour
-      (lock/try-with-lock
+    (let [lock-time-in-seconds 480]  ; 8 min
+      (lock/with-exclusive-lock
         db "poll-incomplete-entry-results!" lock-time-in-seconds
        (poll-incomplete-entry-results! config db)))
     (catch Exception e
