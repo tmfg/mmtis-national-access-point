@@ -381,9 +381,9 @@
                   [:div
                    [common-ui/information-row-with-option
                     (tr [:service-search :vaco-links-section-title])
-                    [:div "jee" (if magic-link
-                                  [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
-                                  (tr [:service-search :vaco-given-interface-has-problem]))]
+                    [:div (if magic-link
+                            [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
+                            (tr [:service-search :vaco-given-interface-has-problem]))]
                     true]]]])))
           [spacer]]))
      [:div
