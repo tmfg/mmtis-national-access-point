@@ -28,7 +28,7 @@ SELECT DISTINCT
        eid.id                         AS "external-interface-description-id",
        eid.license                    AS "license",
        trim(lower(eid.format[1]))     AS "format",
-       (eid."external-interface").url AS url,
+       trim((eid."external-interface").url) AS url,
        COALESCE(tso.email, u.email)   AS "contact-email"
   FROM "external-interface-description" eid
        LEFT JOIN "transport-service" tse ON tse.id = eid."transport-service-id"
@@ -36,7 +36,8 @@ SELECT DISTINCT
        LEFT JOIN member m ON m.group_id = tso."ckan-group-id"
        LEFT JOIN "user" u ON u.id = m.table_id
  WHERE tse.published IS NOT NULL
-   AND m.capacity = 'admin';
+   AND m.capacity = 'admin'
+   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format));
 
 -- name: fetch-external-interface-for-package
 -- For admin panel. Use this when submitting a single package to vaco

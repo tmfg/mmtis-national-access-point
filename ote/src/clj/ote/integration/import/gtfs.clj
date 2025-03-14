@@ -176,18 +176,22 @@
       #_ (import-stop-times db package-id stop-times-file)
 
       ;; Calculate stop-fuzzy-lat and stop-fuzzy-lon
-      (log/info "Generating fuzzy location for stops in package " package-id)
-      (calculate-fuzzy-location-for-stops! db {:package-id package-id})
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (log/info "Generating fuzzy location for stops in package " package-id)
+      #_ (calculate-fuzzy-location-for-stops! db {:package-id package-id})
 
       ;; Handle detection-routes
       ;; Calculate route-hash-id for the service using previous 100 packages
-      (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
 
-      (log/info "Generating date hashes for package " package-id " service: " service-id)
-      (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date import-date})
+      ;; Change Detection is disabled, so no need to store the data
+      #_(log/info "Generating date hashes for package " package-id " service: " service-id)
+      #_(generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date import-date})
 
-      (log/info "Generating finnish regions and envelope for package " package-id)
-      (gtfs-set-package-geometry db {:package-id package-id})
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (log/info "Generating finnish regions and envelope for package " package-id)
+      #_ (gtfs-set-package-geometry db {:package-id package-id})
 
       (catch Exception e
         (log/warn "Error in save-gtfs-to-db" e)
