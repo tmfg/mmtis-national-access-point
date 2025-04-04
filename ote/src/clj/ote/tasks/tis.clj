@@ -71,15 +71,18 @@
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
                   (let [filename (copy-to-s3 config result (get-filename package))]
-                    (netex/set-conversion-status!
-                      {:netex-filepath filename
-                       :s3-filename    filename
-                       :package-id     package-id}
-                      db
-                      {:service-id                        (:transport-service-id package)
-                       :external-interface-description-id (:external-interface-description-id package)
-                       :external-interface-data-content   #{:route-and-schedule}})
-                    (log/info "Netex conversion status updated.")
+                    (try
+                      (netex/set-conversion-status!
+                        {:netex-filepath filename
+                         :s3-filename filename
+                         :package-id package-id}
+                        db
+                        {:service-id (:transport-service-id package)
+                         :external-interface-description-id (:external-interface-description-id package)
+                         :external-interface-data-content #{:route-and-schedule}})
+                      (log/info "Netex conversion status updated.")
+                      (catch Exception e
+                        (log/error e (str "Failed to update netex conversion status for package " package-id "/" entry-public-id))))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
                                              :tis-success         true
@@ -199,7 +202,7 @@
   (try
     ;; Use lock to prevent duplicate polls
     (let [lock-time-in-seconds 480]                         ; 8 min
-      (lock/with-exclusive-lock
+      (lock/try-with-lock
         db "poll-incomplete-entry-results!" lock-time-in-seconds
         (do
           (log/info "Polling for incomplete TIS entries.")

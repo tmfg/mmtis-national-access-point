@@ -8,7 +8,7 @@ WITH latest_packagees AS (
 SELECT * from latest_packagees
 WHERE "tis-complete" IS FALSE
   AND "tis-entry-public-id" IS NOT NULL
-  AND created > (NOW() - INTERVAL '4 week') IS TRUE;
+  AND created > (NOW() - INTERVAL '1 week') IS TRUE;
 
 -- name: update-tis-results!
 UPDATE "gtfs_package"
