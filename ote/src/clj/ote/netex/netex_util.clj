@@ -76,8 +76,7 @@
                                    (assoc interface
                                           :url-ote-netex (file-download-url config
                                                                             (::netex/transport-service-id interface-conversion)
-                                                                            (::netex/id interface-conversion))
-                                          :tis-vaco vaco-status))
+                                                                            (::netex/id interface-conversion))))
                               interface))))))
             services)
       ;; If there is not netex data, add only a vaco link to get more information
