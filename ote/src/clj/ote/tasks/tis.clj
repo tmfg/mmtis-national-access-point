@@ -19,7 +19,8 @@
 (defqueries "ote/tasks/tis.sql")
 
 (declare fetch-external-interface-for-package select-packages-without-finished-results fetch-count-service-packages
-         update-tis-results! list-all-external-interfaces)
+         update-tis-results! list-all-external-interfaces tis-submit-started! tis-submit-completed! tis-polling-started!
+         tis-polling-completed!)
 
 (defn ^:private copy-to-s3
   [config link filename]
@@ -54,7 +55,8 @@
         (fn [package]
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
-            (let [entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
+            (let [_ (tis-polling-started! db {:package-id package-id})
+                  entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
                   complete?  (let [error  (get-in entry ["error"])
                                    status (get-in entry ["data" "status"])]
                                (when (some? error)
@@ -156,26 +158,35 @@
             (doseq [interface interfaces]
               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format contact-email]} interface
                     package (interface-latest-package db external-interface-description-id)
-                    #_ (create-package db operator-id service-id external-interface-description-id license)]
+                    #_ (create-package db operator-id service-id external-interface-description-id license)
+                    _ (tis-submit-started! db {:package-id (:gtfs/id package)})]
                 (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing. " @sent-interface-count "/" (count interfaces)))
                 (swap! sent-interface-count inc)
-                (tis-vaco/queue-entry db (:tis-vaco config)
-                                      {:url url
-                                       :operator-id operator-id
-                                       :id external-interface-description-id}
-                                      {:service-id service-id
-                                       :package-id (:gtfs/id package)
-                                       :external-interface-description-id external-interface-description-id
-                                       :operator-name operator-name
-                                       :contact-email contact-email}
-                                      (merge {:format format}
-                                             (tis-configs/vaco-create-payload format)))
+                (try
+                  (tis-vaco/queue-entry db (:tis-vaco config)
+                                        {:url url
+                                         :operator-id operator-id
+                                         :id external-interface-description-id}
+                                        {:service-id service-id
+                                         :package-id (:gtfs/id package)
+                                         :external-interface-description-id external-interface-description-id
+                                         :operator-name operator-name
+                                         :contact-email contact-email}
+                                        (merge {:format format}
+                                               (tis-configs/vaco-create-payload format)))
+                  (tis-submit-completed! db {:package-id (:gtfs/id package)})
+                  (catch Exception e
+                    (log/warn e (str "Failed to submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing."))
+                    ;; Handle specific error cases if needed
+                    ;; For now, just log the error and continue
+                    (log/error e "Error submitting package to TIS VACO")))
                 ; return nil to allow early collection of intermediate results
                 nil))
             (catch Exception e
               (log/warn e "Failed to submit known interfaces"))))))))
 
 (defn submit-finap-feeds!
+  "Submit all FINAP feeds to TIS VACO for processing."
   [config db]
   (try
     (submit-known-interfaces! config db)
@@ -183,6 +194,7 @@
       (log/warn e "Failure during polling!"))))
 
 (defn poll-tis-entries!
+  "Poll TIS entries for results and update the database."
   [config db]
   (try
     ;; Use lock to prevent duplicate polls
@@ -190,7 +202,7 @@
       (lock/with-exclusive-lock
         db "poll-incomplete-entry-results!" lock-time-in-seconds
         (do
-          (log/info "Polling for incomplete TIS entries :: Lock is in use. So this won't show up, if the lock is not released.")
+          (log/info "Polling for incomplete TIS entries.")
           (poll-incomplete-entry-results! config db))))
     (catch Exception e
       (log/warn e "Failure during polling!"))))
@@ -201,7 +213,7 @@
     (assoc this
       ::tis-tasks [(chime/chime-at (tasks-util/daily-at
                                      ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
-                                     (if (:testing-env? config) 10 3) 15)
+                                     (if (:testing-env? config) 10 3) 13)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
