@@ -5,7 +5,9 @@
   (:import (java.io File)))
 
 (defn migration-number [name]
-  (second (re-matches #"^V1_(\d+)__.*\.sql$" name)))
+  (second (or
+            (re-matches #"^V1_(\d+)__.*\.sql$" name)
+            (re-matches #"^V(\d+)__.*\.sql$" name))))
 
 (defn repeatable-migration? [name]
   (re-matches #"^R_.*$" name))
@@ -25,9 +27,9 @@
 
     (doseq [m migrations]
       ;; Migrations have one exception. And it is really hard to fix from all places. So skip it now.
-      (println "m" (pr-str m))
       (when-not (= m "V210__store_tis_magic_link.sql")
-        (is (re-matches #"^V1_\d+__.*\.sql$" m)
+        (is (or (re-matches #"^V1_\d+__.*\.sql$" m)
+                (re-matches #"^V\d+__.*\.sql$" m))
             (str "File " m " doesn't match the migration filename pattern!"))))
 
     (let [numbers (group-by identity (map migration-number migrations))]
