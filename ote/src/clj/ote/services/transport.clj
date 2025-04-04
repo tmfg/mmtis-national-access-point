@@ -23,6 +23,8 @@
             [ote.services.places :as places]
             [ote.services.external :as external]
             [ote.db.tx :as tx]
+            [ote.integration.tis-vaco :as tis-vaco]
+            [ote.tasks.gtfs :as gtfs-q]
             ;[ote.util.file :as file] - CSV s3 copy is not used currently
             ))
 
@@ -148,7 +150,26 @@
         service))
     services))
 
-
+(defn vaco-specific-interface-data
+  "Add Vaco speficic data to external interfaces."
+  [services db config]
+  (mapv (fn [service]
+          (update service
+                  ::t-service/external-interfaces
+                  (fn [interfaces]
+                    (vec
+                      (for [interface interfaces
+                            :let [interface-id (::t-service/id interface)
+                                  service-id (::t-service/transport-service-id interface)
+                                  latest-conversion-status (first (gtfs-q/fetch-latest-gtfs-vaco-status db {:service-id service-id
+                                                                                                            :interface-id interface-id}))]]
+                        (if latest-conversion-status
+                          (let [vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
+                                             :gtfs/tis-entry-public-id (:tis-entry-public-id latest-conversion-status)
+                                             :api-base-url (get-in config [:tis-vaco :api-base-url])}]
+                            (assoc interface :tis-vaco vaco-status))
+                          interface))))))
+        services))
 
 (defn all-data-transport-service
   "Get single transport service by id"
@@ -712,6 +733,7 @@
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             vector
+            (vaco-specific-interface-data db config)
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
             (type-specific-booking-data config db)
             first))

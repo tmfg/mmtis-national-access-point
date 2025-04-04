@@ -1302,7 +1302,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :vaco-converted-feed "Konverteringens status"
   :vaco-magic-link "Visa i valideringstänsten"
   :vaco-links-section-title "Valideringstjänst"
-  :vaco-given-interface-has-problem "Ett problem med att använda det angivna gränssnittet."
+  :vaco-given-interface-has-problem "Gränssnittet returnerar inte data."
   :vaco-validation-in-progress "Valideringen är inte ännu slutförd."
   :download-netex "Ladda ner den konverterade filen"
   :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}

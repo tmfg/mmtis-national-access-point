@@ -8,14 +8,33 @@ WITH latest_packagees AS (
 SELECT * from latest_packagees
 WHERE "tis-complete" IS FALSE
   AND "tis-entry-public-id" IS NOT NULL
-  AND created > (NOW() - INTERVAL '1 week') IS TRUE;
+  AND created > (NOW() - INTERVAL '4 week') IS TRUE;
 
 -- name: update-tis-results!
 UPDATE "gtfs_package"
    SET "tis-complete" = :tis-complete,
        "tis-success" = :tis-success,
-       "tis-magic-link" = :tis-magic-link
+       "tis-magic-link" = :tis-magic-link,
+       tis_polling_completed = NOW()
 WHERE "tis-entry-public-id" = :tis-entry-public-id;
+
+-- name: tis-polling-started!
+UPDATE "gtfs_package"
+   SET tis_polling_started = NOW()
+ WHERE id = :package-id
+   AND tis_polling_started IS NULL;
+
+-- name: tis-polling-completed!
+UPDATE "gtfs_package" SET tis_polling_completed = NOW() WHERE id = :package-id;
+
+-- name: tis-submit-started!
+UPDATE "gtfs_package"
+   SET tis_submit_started = NOW()
+ WHERE id = :package-id
+   AND tis_submit_started IS NULL;
+
+-- name: tis-submit-completed!
+UPDATE "gtfs_package" SET tis_submit_completed = NOW() WHERE id = :package-id;
 
 -- name: fetch-count-service-packages
 SELECT COUNT(p.id) as "package-count" FROM gtfs_package p WHERE p."transport-service-id" = :service-id;
@@ -37,7 +56,8 @@ SELECT DISTINCT
        LEFT JOIN "user" u ON u.id = m.table_id
  WHERE tse.published IS NOT NULL
    AND m.capacity = 'admin'
-   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format));
+   AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format))
+ORDER BY tso.id DESC;
 
 -- name: fetch-external-interface-for-package
 -- For admin panel. Use this when submitting a single package to vaco

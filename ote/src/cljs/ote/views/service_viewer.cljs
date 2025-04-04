@@ -363,17 +363,13 @@
                   [:div
                    [common-ui/information-row-with-option
                     (tr [:service-search :vaco-validated-feed])
-                    [:div
-                     ; error badge
-                     [:img {:src "img/icons/VACO_errors_badge.svg"}]]
+                    [:div]
                     false]]
                   ;; conversion details
                   [:div
                    [common-ui/information-row-with-option
                     (tr [:service-search :vaco-converted-feed])
-                    [:div
-                     ; errors badge
-                     [:img {:src "img/icons/VACO_errors_badge.svg"}]]
+                    [:div]
                     false]]
                   {:sub-title true}]
                  [info-sections-1-col

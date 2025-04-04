@@ -92,7 +92,7 @@
            (log/warn e (str "Failed API call " endpoint))
            (when (and db package-id)
              ;; If database and package-id is provided, log the error to the database
-             (specql/update! db :gtfs/package {:gtfs/tis-error e} {:gtfs/id package-id}))
+             (specql/update! db :gtfs/package {:gtfs/tis_polling_error e} {:gtfs/id package-id}))
            nil))))))
 
 (defn api-queue-create
@@ -172,7 +172,8 @@
         ;; Add vaco information to the GTFS package when query is made.
         (specql/update! db :gtfs/package
                         {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])
-                         :gtfs/tis-magic-link (get-in new-entry ["links" "refs" "magic" "href"])}
+                         :gtfs/tis-magic-link (get-in new-entry ["links" "refs" "magic" "href"])
+                         :gtfs/tis_submit_completed (java.sql.Timestamp. (System/currentTimeMillis))}
                         {:gtfs/id (:gtfs/id package)})
         new-entry
         (catch Exception e

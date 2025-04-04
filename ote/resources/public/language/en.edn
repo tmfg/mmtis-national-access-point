@@ -1301,7 +1301,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :vaco-converted-feed "State of conversion"
   :vaco-magic-link "View in data validation service"
   :vaco-links-section-title "Data validation service"
-  :vaco-given-interface-has-problem "A problem in using the provided interface."
+  :vaco-given-interface-has-problem "The interface does not return data."
   :vaco-validation-in-progress "Validation has not yet been completed."
   :download-netex "Download converted file"
   :no-homepage "No website has been entered in the service."}

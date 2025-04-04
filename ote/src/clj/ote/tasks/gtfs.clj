@@ -30,7 +30,7 @@
 (defqueries "ote/services/transit_changes.sql")
 
 (declare services-for-nightly-change-detection select-gtfs-urls-update select-gtfs-url-for-service
-         select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes)
+         select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes fetch-latest-gtfs-vaco-status)
 
 (def daily-update-time (t/from-time-zone (t/today-at 0 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
