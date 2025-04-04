@@ -154,23 +154,21 @@
   "Add Vaco speficic data to external interfaces."
   [services db config]
   (mapv (fn [service]
-          (do
-            (println "kohta kosahtaa :: service" (pr-str service))
-            (update service
-                      ::t-service/external-interfaces
-                      (fn [interfaces]
-                        (vec
-                          (for [interface interfaces
-                                :let [interface-id (::t-service/id interface)
-                                      service-id (::t-service/transport-service-id interface)
-                                      latest-conversion-status (first (gtfs-q/fetch-latest-gtfs-vaco-status db {:service-id service-id
-                                                                                                                :interface-id interface-id}))]]
-                            (if latest-conversion-status
-                              (let [vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
-                                                 :gtfs/tis-entry-public-id (:tis-entry-public-id latest-conversion-status)
-                                                 :api-base-url (get-in config [:tis-vaco :api-base-url])}]
-                                (assoc interface :tis-vaco vaco-status))
-                              interface)))))))
+          (update service
+                  ::t-service/external-interfaces
+                  (fn [interfaces]
+                    (vec
+                      (for [interface interfaces
+                            :let [interface-id (::t-service/id interface)
+                                  service-id (::t-service/transport-service-id interface)
+                                  latest-conversion-status (first (gtfs-q/fetch-latest-gtfs-vaco-status db {:service-id service-id
+                                                                                                            :interface-id interface-id}))]]
+                        (if latest-conversion-status
+                          (let [vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
+                                             :gtfs/tis-entry-public-id (:tis-entry-public-id latest-conversion-status)
+                                             :api-base-url (get-in config [:tis-vaco :api-base-url])}]
+                            (assoc interface :tis-vaco vaco-status))
+                          interface))))))
         services))
 
 (defn all-data-transport-service

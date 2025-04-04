@@ -56,16 +56,16 @@
           (let [{package-id :id entry-public-id :tis-entry-public-id} (select-keys package [:id :tis-entry-public-id])]
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [_ (tis-polling-started! db {:package-id package-id})
-                  entry      (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete?  (let [error  (get-in entry ["error"])
-                                   status (get-in entry ["data" "status"])]
-                               (when (some? error)
-                                 (log/info (str "API error when fetching entry " entry-public-id ": " error)))
-                               (or (some? error)
-                                   (not (or (nil? status)
-                                            (= status "received")
-                                            (= status "processing")))))
-                  result     (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
+                  entry (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
+                  complete? (let [error (get-in entry ["error"])
+                                  status (get-in entry ["data" "status"])]
+                              (when (some? error)
+                                (log/info (str "API error when fetching entry " entry-public-id ": " error)))
+                              (or (some? error)
+                                  (not (or (nil? status)
+                                           (= status "received")
+                                           (= status "processing")))))
+                  result (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
                   magic-link (get-in entry ["links" "refs" "magic" "href"])]
               (if result
                 (do
@@ -213,7 +213,7 @@
     (assoc this
       ::tis-tasks [(chime/chime-at (tasks-util/daily-at
                                      ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
-                                     (if (:testing-env? config) 10 3) 13)
+                                     (if (:testing-env? config) 10 3) 15)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
