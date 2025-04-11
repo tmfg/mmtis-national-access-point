@@ -168,7 +168,7 @@
                                                                 (when contact-email {:contact-email contact-email}))}
                                     db package-id)
         ;; Temporary logging
-        _ (log/info (str "API call returned new-entry: " (pr-str new-entry)))]
+        _ (log/info (str "API call returned new-entry :: magic-link " (pr-str (get-in new-entry ["links" "refs" "magic" "href"]))))]
     (when new-entry
       (try
         ;; Add vaco information to the GTFS package when query is made.

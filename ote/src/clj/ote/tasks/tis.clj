@@ -65,8 +65,10 @@
                                   (not (or (nil? status)
                                            (= status "received")
                                            (= status "processing")))))
+                  ;; TODO: Assuming that all packages are GTFS -> NeTEx, but they can be NeTEx -> GTFS as well
                   result (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
-                  magic-link (get-in entry ["links" "refs" "magic" "href"])]
+                  magic-link (get-in entry ["links" "refs" "magic" "href"])
+                  _ (log/info (str "Poll result public-id: " entry-public-id " status: " (if complete? "complete" "incomplete") ", result magic-link: " magic-link))]
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
