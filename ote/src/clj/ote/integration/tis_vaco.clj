@@ -166,7 +166,9 @@
                                                                  :interface-id  id
                                                                  :package-id    package-id}
                                                                 (when contact-email {:contact-email contact-email}))}
-                                    db package-id)]
+                                    db package-id)
+        ;; Temporary logging
+        _ (log/info (str "API call returned new-entry: " (pr-str new-entry)))]
     (when new-entry
       (try
         ;; Add vaco information to the GTFS package when query is made.
