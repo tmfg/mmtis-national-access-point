@@ -142,7 +142,7 @@
                                       :contact-email (:email operator)}
                                      (merge {:format format}
                                             (tis-configs/vaco-create-payload format)))
-        (tis-submit-completed! db {:package-id (:gtfs/id package)})
+        _ (tis-submit-completed! db {:package-id (:gtfs/id package)})
         _ (log/info "Single package result from Admin panel:" result)]
     result
     ; return nil to allow early collection of intermediate results
