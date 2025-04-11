@@ -129,7 +129,8 @@
         operator (first (operators-q/fetch-operator-by-service-id db {:service-id service-id}))
         operator-id (:id operator)
         package (create-package db operator-id service-id external-interface-description-id (:license interface))
-        _ (log/info (str "Submit single package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
+        _ (log/info (str "Submit single package from Admin panel " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing"))
+        _ (tis-submit-started! db {:package-id (:gtfs/id package)})
         result (tis-vaco/queue-entry db (:tis-vaco config)
                                      {:url (:url interface)
                                       :operator-id operator-id
@@ -141,7 +142,8 @@
                                       :contact-email (:email operator)}
                                      (merge {:format format}
                                             (tis-configs/vaco-create-payload format)))
-        _ (log/info "Single package result:" result)]
+        (tis-submit-completed! db {:package-id (:gtfs/id package)})
+        _ (log/info "Single package result from Admin panel:" result)]
     result
     ; return nil to allow early collection of intermediate results
     nil))
