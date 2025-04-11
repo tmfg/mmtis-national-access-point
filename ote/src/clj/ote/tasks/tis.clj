@@ -96,7 +96,7 @@
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
                                              :tis-complete        true
                                              :tis-success         false
-                                             :tis-magic-link      nil})))))))
+                                             :tis-magic-link      magic-link})))))))
         packages))))
 
 (defn ^:private interface-latest-package [db interface-id]
