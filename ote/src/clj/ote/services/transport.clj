@@ -180,6 +180,7 @@
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             vector
+            (vaco-specific-interface-data db config)
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
             (type-specific-booking-data config db)
             first)

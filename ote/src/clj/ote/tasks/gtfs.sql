@@ -53,7 +53,7 @@ SELECT ts.id
    AND (:force = TRUE OR gtfs_should_calculate_transit_change(ts.id));
 
 -- name: fetch-latest-gtfs-vaco-status
-SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link"
+SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link", gp.tis_submit_completed, gp.tis_polling_completed
   FROM gtfs_package gp
  WHERE gp."transport-service-id" = :service-id
    AND gp."external-interface-description-id" = :interface-id
