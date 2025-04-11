@@ -1311,6 +1311,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :vaco-magic-link "Tarkastele validointipalvelussa"
   :vaco-links-section-title "Validointipalvelu"
   :vaco-given-interface-has-problem "Rajapinta ei palauta dataa."
+  :vaco-validation-not-started "Validointi ei ole alkanut."
   :vaco-validation-in-progress "Validointi ei ole vielä valmistunut."
   :download-netex "Lataa muunnettu NeTEx-paketti"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}

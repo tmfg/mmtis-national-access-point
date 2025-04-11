@@ -1302,6 +1302,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :vaco-magic-link "View in data validation service"
   :vaco-links-section-title "Data validation service"
   :vaco-given-interface-has-problem "The interface does not return data."
+  :vaco-validation-not-started "Validation has not started."
   :vaco-validation-in-progress "Validation has not yet been completed."
   :download-netex "Download converted file"
   :no-homepage "No website has been entered in the service."}
