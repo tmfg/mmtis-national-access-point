@@ -182,7 +182,7 @@
        (clean-old-entries! db service-id interface-id)
        process-result))))
 
-(def night-hours #{0 1 2 3 4})
+(def night-hours #{0 1 2 3 4 5 20 21 22 23 24})
 
 (defn night-time? [dt]
   (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours night-hours boolean))
