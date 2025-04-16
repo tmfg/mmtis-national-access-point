@@ -137,9 +137,9 @@
 (defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
-    (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
+    #_ (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
     (assoc this
-      ::stop-tasks [(chime-at (daily-at 8 15)
+      ::stop-tasks nil #_ [(chime-at (daily-at 8 15)
                               (fn [_]
                                 (#'send-pre-notice-emails! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
