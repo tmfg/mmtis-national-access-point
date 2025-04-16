@@ -171,3 +171,13 @@
               reports (fetch-reports-for 6402 result)]
           (is (= true (some? result)))
           (is (= 0 (count reports))))))))
+
+;; Mock url loading if planning to take this into use
+#_ (deftest validate-interface-zip-package-test
+  (let [url "Give correct url or use mock"
+        response (gtfs/load-transit-interface-url :netex db 345 7001 2
+                                                  url
+                                                  nil nil true)
+        byles (java.io.ByteArrayInputStream. (:body response))
+        valid (gtfs/validate-interface-zip-package :netex byles)]
+    (is (= (nil? valid)))))

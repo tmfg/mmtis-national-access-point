@@ -205,10 +205,11 @@
   [config db]
   (try
     ;; Use lock to prevent duplicate polls
-    (let [lock-time-in-seconds 480]                         ; 8 min
-      (lock/try-with-lock
+    (let [lock-time-in-seconds 300]                         ; 5 min
+      ;; Use non-macro lock to test how it works
+      (lock/try-with-lock-non-macro
         db "poll-incomplete-entry-results!" lock-time-in-seconds
-        (do
+        #(do
           (log/info "Polling for incomplete TIS entries.")
           (poll-incomplete-entry-results! config db))))
     (catch Exception e

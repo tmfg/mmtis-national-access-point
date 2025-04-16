@@ -1,5 +1,6 @@
 (ns ote.db.lock
-  (:require [jeesql.core :refer [defqueries]])
+  (:require [jeesql.core :refer [defqueries]]
+            [taoensso.timbre :as log])
   (:import (java.util UUID)))
 
 (defqueries "ote/db/lock.sql")
@@ -48,3 +49,31 @@
         ;; possible for the first runner to release the lock before the next one tries to
         ;; acquire it. This sleep with the lock held prevents that.
         (Thread/sleep *exclusive-task-wait-ms*)))))
+
+;; non-macro version of the above
+(defn run-function [db lock-name do-fn]
+  (try
+    (do-fn)
+    (catch Exception e
+      (throw e))
+    (finally
+      (log/info "run-function with name: " lock-name))))
+
+(defn try-with-lock-non-macro
+  "Yritä ajaa annettu funktio lukon kanssa. Jos lukko on lukittuna, ei toimintoa ajeta.
+  Palauttaa true jos toiminto ajettiin, false muuten.
+  Huom! Vanhenemisaika täytyy aina antaa, jotta lukko ei jää virhetilanteessa ikuisesti kiinni."
+  ([db lock-name do-fn] (try-with-lock-non-macro db lock-name *exclusive-task-wait-ms* do-fn))
+  ([db lock-name timelimit do-fn]
+   (let [_ (log/info "try-with-lock-non-macro :: lock-name" (pr-str lock-name) "timelimit:" timelimit ) al (acquire-lock db {:id lock-name
+                              :lock (str (UUID/randomUUID))
+                              :timelimit timelimit})]
+
+     (if al
+       (do
+         (log/info (format "Lock: %s is not set. Run function." lock-name))
+         (run-function db lock-name do-fn)
+         true)
+       (do
+         (log/info (format "Lock: %s is set. Cannot run function." lock-name))
+         false)))))
