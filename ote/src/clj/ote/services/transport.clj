@@ -162,12 +162,24 @@
                             :let [interface-id (::t-service/id interface)
                                   service-id (::t-service/transport-service-id interface)
                                   latest-conversion-status (first (gtfs-q/fetch-latest-gtfs-vaco-status db {:service-id service-id
-                                                                                                            :interface-id interface-id}))]]
+                                                                                                            :interface-id interface-id}))
+                                  latest-netex-conversion (first
+                                                            (gtfs-q/fetch-latest-netex-conversion
+                                                              db {:service-id service-id
+                                                                  :interface-id interface-id}))]]
                         (if latest-conversion-status
-                          (let [vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
+                          (let [api-base-url (get-in config [:tis-vaco :api-base-url])
+                                vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
                                              :gtfs/tis-entry-public-id (:tis-entry-public-id latest-conversion-status)
-                                             :api-base-url (get-in config [:tis-vaco :api-base-url])}]
-                            (assoc interface :tis-vaco vaco-status))
+                                             :gtfs/tis-complete (:tis-complete latest-conversion-status)
+                                             :gtfs/tis-success (:tis-success latest-conversion-status)
+                                             :gtfs/download-status (:download-status latest-conversion-status)
+                                             :api-base-url api-base-url}]
+                            (-> interface
+                                (assoc :tis-vaco vaco-status)
+                                (assoc :api-base-url api-base-url)
+                                (assoc :url-ote-netex (when (:filename latest-netex-conversion)
+                                                        (format "%s/export/netex/%s/%s" (get-in config [:tis-vaco :api-base-url]) service-id (:filename latest-netex-conversion))))))
                           interface))))))
         services))
 

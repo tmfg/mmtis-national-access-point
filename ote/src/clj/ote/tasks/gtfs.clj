@@ -30,13 +30,15 @@
 (defqueries "ote/services/transit_changes.sql")
 
 (declare services-for-nightly-change-detection select-gtfs-urls-update select-gtfs-url-for-service
-         select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes fetch-latest-gtfs-vaco-status)
+         select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes fetch-latest-gtfs-vaco-status
+         fetch-latest-netex-conversion)
 
 (def daily-update-time (t/from-time-zone (t/today-at 21 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
 
 (defn interface-type [format]
   (case format
+    "NeTEx" :netex
     "GTFS" :gtfs
     "Kalkati" :kalkati
     "Kalkati.net" :kalkati  ; kept for legacy support
@@ -148,7 +150,6 @@
 
 ;; Return value could be reafactored to something else,
 ;; returned string used only for manually triggered operation result
-(def update-gtfs-lock-time-in-seconds 1000)                 ;; about 20 min
 (defn update-one-gtfs!
   "Selects the given service id, or if none given then selects the next service with external interface with new
   content, downloads and stores the content.
@@ -159,28 +160,27 @@
    ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
    ;; Use lock to prevent duplicate updates
-   (lock/with-exclusive-lock
-     db "update-one-gtfs!" update-gtfs-lock-time-in-seconds
-     (let [_ (log/info "Updating one GTFS package! - Using lock - this should not be seen in all nodes.")
-           ;; Load next gtfs package or package that is related to given service-id
-           interface (if service-id
-                       (fetch-given-gtfs-interface! db service-id interface-id)
-                       ;; Get next interface that is not been used in 24 hours.
-                       (fetch-next-gtfs-interface! db config))
-           interface (if (contains? interface :data-content) ; Avoid creating a coll with empty key when coll doesn't exist
-                       (update interface :data-content util-db/PgArray->vec)
-                       interface)
-           force-download? (integer? service-id)
-           ; ensure ids have values for sending emails
-           service-id (or service-id (:ts-id interface))
-           interface-id (or interface-id (:id interface))
-           process-result (do-update-one-gtfs! config db interface upload-s3? force-download? service-id)]
-       (if (and (some? email)
-                (some? service-id))
-         (email-validation-results db (:testing-env? config) email service-id interface-id)
-         (log/warn (str "Could not send email due to internal state mismatch! (" email "/" service-id "/" interface-id ")")))
-       (clean-old-entries! db service-id interface-id)
-       process-result))))
+   (let [_ (log/info "Updating one GTFS package!")
+         ;; Load next gtfs package or package that is related to given service-id
+         interface (if service-id
+                     (fetch-given-gtfs-interface! db service-id interface-id)
+                     ;; Get next interface that is not been used in 24 hours.
+                     (fetch-next-gtfs-interface! db config))
+         interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
+                     (update interface :data-content util-db/PgArray->vec)
+                     interface)
+         _ (log/info "Updating one GTFS package! - interface" (pr-str interface))
+         force-download? (integer? service-id)
+         ; ensure ids have values for sending emails
+         service-id (or service-id (:ts-id interface))
+         interface-id (or interface-id (:id interface))
+         process-result (do-update-one-gtfs! config db interface upload-s3? force-download? service-id)]
+     (if (and (some? email)
+              (some? service-id))
+       (email-validation-results db (:testing-env? config) email service-id interface-id)
+       (log/warn (str "Could not send email due to internal state mismatch! (" email "/" service-id "/" interface-id ")")))
+     (clean-old-entries! db service-id interface-id)
+     process-result)))
 
 (def night-hours #{0 1 2 3 4 5 20 21 22 23 24})
 

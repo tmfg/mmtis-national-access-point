@@ -311,6 +311,7 @@
           ;; TIS-VACO data quality information
           (let [tis-vaco   (:tis-vaco interface)
                 public-id  (:gtfs/tis-entry-public-id tis-vaco)
+                download-status  (:gtfs/download-status tis-vaco)
                 submit-completed  (:gtfs/tis-submit-completed tis-vaco)
                 magic-link (:gtfs/tis-magic-link tis-vaco)
                 format     (some-> (::t-service/format interface) first str/lower-case)
@@ -381,9 +382,9 @@
                     [:div (cond
                             (and (not (nil? magic-link)) (not (str/blank? magic-link)))
                             [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
-                            (nil? submit-completed)
+                            (and (= "success" download-status) (nil? submit-completed))
                             (tr [:service-search :vaco-validation-not-started])
-                            (and (nil? public-id) (nil? submit-completed) (nil? magic-link))
+                            (not= "success" download-status)
                             (tr [:service-search :vaco-given-interface-has-problem]))]
                     true]]]])))
           [spacer]]))

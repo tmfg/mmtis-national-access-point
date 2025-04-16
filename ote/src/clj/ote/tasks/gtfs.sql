@@ -36,7 +36,7 @@ FROM "external-interface-description" eid
 WHERE ts.published IS NOT NULL
   AND ts.id = :service-id
   AND eid.id = :interface-id
-  AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format));
+  AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format));
 
 -- name: services-for-nightly-change-detection
 SELECT ts.id
@@ -53,9 +53,19 @@ SELECT ts.id
    AND (:force = TRUE OR gtfs_should_calculate_transit_change(ts.id));
 
 -- name: fetch-latest-gtfs-vaco-status
-SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link", gp.tis_submit_completed, gp.tis_polling_completed
+SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link",
+       gp.tis_submit_completed, gp.tis_polling_completed, es."download-status", gp.created
   FROM gtfs_package gp
+      LEFT JOIN "external-interface-download-status" es ON gp.id = es."package-id"
  WHERE gp."transport-service-id" = :service-id
    AND gp."external-interface-description-id" = :interface-id
 ORDER BY gp.created DESC
+ LIMIT 1;
+
+-- name: fetch-latest-netex-conversion
+SELECT nc.filename, nc.status, nc."input-file-error", nc."validation-file-error"
+    FROM "netex-conversion" nc
+WHERE nc."transport-service-id" = :service-id
+  AND nc."external-interface-description-id" = :interface-id
+ORDER BY nc.modified DESC, nc.created DESC
  LIMIT 1;

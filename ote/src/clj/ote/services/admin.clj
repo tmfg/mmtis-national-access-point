@@ -41,7 +41,8 @@
             [specql.impl.registry :as specql-registry]
             [specql.op :as op]
             [taoensso.timbre :as log]
-            [ote.tasks.tis :as tis])
+            [ote.tasks.tis :as tis]
+            [ote.tasks.gtfs :as gtfs-tasks])
   (:import (org.joda.time DateTimeZone)))
 
 (defqueries "ote/services/admin.sql")
@@ -787,6 +788,17 @@
     (GET "/admin/start/tis-vaco" req (start-tis-vaco db config))
 
     (GET "/admin/start/tis-vaco-for-package/:package-id" [package-id :as req] (start-tis-vaco-for-single-package db config package-id))
+
+    (GET "/admin/start/tis-vaco-force-interface-import/:service-id/:interface-id"
+         {{:keys [service-id interface-id]} :params
+          user :user}
+      (if (authorization/admin? user)
+        (if-let [result-error (gtfs-tasks/update-one-gtfs! config db nil false
+                                                           (Long/parseLong service-id)
+                                                           (Long/parseLong interface-id))]
+          (http/transit-response result-error 409)
+          (http/transit-response nil 200))
+        (http/transit-response nil 401)))
 
     (GET "/admin/member" req
       (or (authorization-fail-response (get-in req [:user :user]))

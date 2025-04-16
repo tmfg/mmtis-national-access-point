@@ -61,7 +61,7 @@
                       :on-click #(e! (admin-controller/->SearchVacoStatus))
                       :label "Hae Vacon konvertointitiedot"}]])
 
-(defn interface-table-row [e! packageid vaco-url vaco-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created]
+(defn interface-table-row [e! packageid transport-service-id interface-id vaco-url vaco-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created]
   (let [{:keys [validator converter]} (tis-configs/base-task-names (str/lower-case (first format)))]
     [ui/table-row {:key (gensym) :selectable false}
      [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} operator-name]
@@ -84,15 +84,19 @@
                 :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}])]]
      [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}]]
      [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui created)]
-     [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-for-package/" packageid) "Validoi paketti"]]]))
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-for-package/" packageid) "Validoi"]]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-force-interface-import/" transport-service-id "/" interface-id) "Lataa"]]
+
+     ]))
 
 (defn interface-list [e! app]
   (let [{:keys [loading? results filters]} (get-in app [:admin :vaco-status])
         rows (doall
-               (mapcat (fn [{:keys [id tis-entry-public-id vaco-url operator-name service-name format url tis-success tis-complete tis-magic-link created]
+               (mapcat (fn [{:keys [id tis-entry-public-id vaco-url operator-name service-name format url
+                                    tis-success tis-complete tis-magic-link created transport-service-id interface-id]
                              :as interface}]
                          [^{:key (str "tbl-row-" (hash (str interface created)))}
-                          (interface-table-row e! id vaco-url tis-entry-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created)])
+                          (interface-table-row e! id transport-service-id interface-id vaco-url tis-entry-public-id operator-name service-name format url tis-success tis-complete tis-magic-link created)])
                        results))]
 
     [:div.row

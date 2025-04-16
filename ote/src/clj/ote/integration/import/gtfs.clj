@@ -233,11 +233,11 @@
       (save-gtfs-to-db db bytes 1 1 1 nil nil (java.util.Date.))
       (println "******************* test-hsl-gtfs end *********************"))))
 
-(defn- load-interface-url [db interface-id service-id url last-import-date saved-etag force-download?]
+(defn- load-interface-url [db format interface-id service-id url last-import-date saved-etag force-download?]
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
-      (let [message (str "Error when loading gtfs package from url " url ": " (.getMessage e))]
+      (let [message (str "Error when loading " format " package from url " url ": " (.getMessage e))]
         (log/warn message)
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
@@ -268,6 +268,13 @@
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
+(defmethod validate-interface-zip-package :netex [_ byte-array-input]
+  (let [file-list (list-zip byte-array-input)
+        matching-filenames (filter (fn [filename] (re-matches #"^Line.*\.xml$" filename)) file-list)]
+
+    (when (empty? matching-filenames)
+      (throw (ex-info "Missing required files in netex zip file " {:file-names file-list})))))
+
 (defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
     (validate-interface-zip-package type byte-array-data)
@@ -291,7 +298,7 @@
           (fn [type _ _ _ _ _ _ _ _] type))
 
 (defmethod load-transit-interface-url :gtfs [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
+  (let [response (load-interface-url db :gtfs interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
@@ -305,7 +312,7 @@
       nil)))
 
 (defmethod load-transit-interface-url :kalkati [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
+  (let [response (load-interface-url :kalkati db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
@@ -314,6 +321,21 @@
         ;; Return nil response in case of error
         (catch Exception e
           (log/warn "Error while loading package from url url " url ": " (.getMessage e))
+          nil))
+      ;; Return nil response in case of error
+      nil)))
+
+(defmethod load-transit-interface-url :netex [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url :netex db interface-id service-id url last-import-date saved-etag force-download?)]
+    (if response
+      (try
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        ;; Return response
+        response
+
+        ;; Return nil response in case of error
+        (catch Exception e
+          (log/warn "Error while loading package from url: " url ": " (.getMessage e))
           nil))
       ;; Return nil response in case of error
       nil)))
@@ -339,7 +361,7 @@
    {:keys [url operator-id operator-name ts-id last-import-date license id data-content]}
    upload-s3?
    force-download?]
-  (log/debug "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
+  (log/info "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))

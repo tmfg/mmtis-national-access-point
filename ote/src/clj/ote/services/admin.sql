@@ -84,7 +84,8 @@ SELECT id.id as "download-id", eid.id as "interface-id", ts.id as "service-id", 
  ORDER BY eid.id ASC, id.id DESC;
 
 -- name: search-vaco-status-packages
-SELECT op.name as "operator-name", ts.name as "service-name", eid."data-content" as "data-content", (eid."external-interface").url as url,
+SELECT op.name as "operator-name", ts.name as "service-name", ts.id as "transport-service-id",
+       eid."data-content" as "data-content", (eid."external-interface").url as url, eid.id as "interface-id",
        eid.format as format, gp.id, gp."tis-success", gp."tis-complete", gp."tis-magic-link", gp.created, gp."tis-entry-public-id"
 FROM
     "transport-operator" as op,
