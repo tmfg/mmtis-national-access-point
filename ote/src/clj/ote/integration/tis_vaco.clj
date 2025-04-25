@@ -103,11 +103,15 @@
 
 (defn api-fetch-entry
   [config entry-id]
-  (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil {:content-type :json})
-              (cheshire/parse-string))
-      (do
-        (log/info (str "No fetch-entry result available for " entry-id))
-        {})))
+  (try
+    (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil {:content-type :json})
+                (cheshire/parse-string))
+        (do
+          (log/info (str "No fetch-entry result available for " entry-id))
+          {}))
+    (catch Exception e
+      (log/error e (str "Failed api call to " (str "/api/queue/" entry-id) e))
+      nil)))
 
 (defn read-to-memory [is]
   (let [baos (java.io.ByteArrayOutputStream.)]

@@ -57,18 +57,18 @@
             (log/info (str "Polling package " package-id "/" entry-public-id " for results"))
             (let [_ (tis-polling-started! db {:package-id package-id})
                   entry (tis-vaco/api-fetch-entry (:tis-vaco config) entry-public-id)
-                  complete? (let [error (get-in entry ["error"])
-                                  status (get-in entry ["data" "status"])]
+                  tis-entry-status (get-in entry ["data" "status"])
+                  complete? (let [error (get-in entry ["error"])]
                               (when (some? error)
                                 (log/info (str "API error when fetching entry " entry-public-id ": " error)))
                               (or (some? error)
-                                  (not (or (nil? status)
-                                           (= status "received")
-                                           (= status "processing")))))
+                                  (not (or (nil? tis-entry-status)
+                                           (= tis-entry-status "received")
+                                           (= tis-entry-status "processing")))))
                   ;; TODO: Assuming that all packages are GTFS -> NeTEx, but they can be NeTEx -> GTFS as well
+                  _ (log/info "poll-incomplete-entry-results! :: entry: " (pr-str entry))
                   result (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
-                  magic-link (get-in entry ["links" "refs" "magic" "href"])
-                  _ (log/info (str "Poll result public-id: " entry-public-id " status: " (if complete? "complete" "incomplete") ", result magic-link: " magic-link))]
+                  magic-link (get-in entry ["links" "refs" "magic" "href"])]
               (if result
                 (do
                   (log/info (str "Result " result " found for package " package-id "/" entry-public-id ", copying blob to S3"))
@@ -86,17 +86,27 @@
                       (catch Exception e
                         (log/error e (str "Failed to update netex conversion status for package " package-id "/" entry-public-id))))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
-                                             :tis-complete        true
-                                             :tis-success         true
-                                             :tis-magic-link      magic-link})
+                                             :tis-complete true
+                                             :tis-success true
+                                             :tis-entry-status tis-entry-status
+                                             :tis-magic-link magic-link})
                     (log/info "VACO integration status updated.")))
-                (when complete?
+                (if complete?
                   (do
                     (log/info (str "No results found for package " package-id "/" entry-public-id " but the entry is complete -> no result available"))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
-                                             :tis-complete        true
-                                             :tis-success         false
-                                             :tis-magic-link      magic-link})))))))
+                                             :tis-complete true
+                                             :tis-success false
+                                             :tis-entry-status tis-entry-status
+                                             :tis-magic-link magic-link}))
+                  ;; Polling not ready yet, but lets update status
+                  (do
+                    (log/info (str "Vaco validation/conversion not ready yet. " package-id "/" entry-public-id " update status."))
+                    (update-tis-results! db {:tis-entry-public-id entry-public-id
+                                             :tis-complete true
+                                             :tis-success false
+                                             :tis-entry-status tis-entry-status
+                                             :tis-magic-link magic-link})))))))
         packages))))
 
 (defn ^:private interface-latest-package [db interface-id]

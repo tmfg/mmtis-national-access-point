@@ -15,6 +15,7 @@ UPDATE "gtfs_package"
    SET "tis-complete" = :tis-complete,
        "tis-success" = :tis-success,
        "tis-magic-link" = :tis-magic-link,
+       tis_entry_status = :tis-entry-status,
        tis_polling_completed = NOW()
 WHERE "tis-entry-public-id" = :tis-entry-public-id;
 
