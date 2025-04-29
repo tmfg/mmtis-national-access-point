@@ -1109,7 +1109,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :user-menu-profile "Visa egen profil"
   :user-menu-summary "Sammandrag"
   :user-menu-nap-help "NAP-anvisningar och -meddelanden"
-  :user-menu-nap-help-link "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
+  :user-menu-nap-help-link "https://www.fintraffic.fi/sv/transport-informationsjanst/nap-katalog"
   :user-menu-video-tutorials "Undervisningsvideor"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basinfo"
