@@ -1,8 +1,9 @@
 -- name: select-packages-without-finished-results
 -- Select only newest package for each interface.
 WITH latest_packagees AS (
-    SELECT distinct on ("external-interface-description-id") "external-interface-description-id", *
-    FROM "gtfs_package"
+    SELECT distinct on ("external-interface-description-id") "external-interface-description-id", gp.*, lower(eid.format[1]) as format
+    FROM "gtfs_package" gp
+             JOIN "external-interface-description" eid ON eid.id = "external-interface-description-id"
     ORDER BY  "external-interface-description-id" DESC, id DESC
     LIMIT 100)
 SELECT * from latest_packagees

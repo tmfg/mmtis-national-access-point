@@ -1,6 +1,7 @@
 (ns ote.integration.import.gtfs
   "GTFS file import functionality."
   (:require [amazonica.aws.s3 :as s3]
+            [clojure.string :as str]
             [ote.components.http :as http]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
@@ -270,7 +271,7 @@
 
 (defmethod validate-interface-zip-package :netex [_ byte-array-input]
   (let [file-list (list-zip byte-array-input)
-        matching-filenames (filter (fn [filename] (re-matches #"^Line.*\.xml$" filename)) file-list)]
+        matching-filenames (filter (fn [filename] (re-matches #"(?i).*line.*\.xml$" (str/lower-case filename))) file-list)]
 
     (when (empty? matching-filenames)
       (throw (ex-info "Missing required files in netex zip file " {:file-names file-list})))))

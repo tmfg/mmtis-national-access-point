@@ -67,7 +67,10 @@
                                            (= tis-entry-status "processing")))))
                   ;; TODO: Assuming that all packages are GTFS -> NeTEx, but they can be NeTEx -> GTFS as well
                   _ (log/info "poll-incomplete-entry-results! :: entry: " (pr-str entry))
-                  result (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
+                  result (cond
+                           (= "gtfs" (:format package)) (get-in entry ["links" "gtfs2netex.fintraffic" "result"])
+                           (= "kalkati" (:format package)) (get-in entry ["links" "kalkati2gtfs.fintraffic" "result"])
+                           (= "netex" (:format package)) (get-in entry ["links" "netex2gtfs.entur" "result"]))
                   magic-link (get-in entry ["links" "refs" "magic" "href"])]
               (if result
                 (do
@@ -103,7 +106,7 @@
                   (do
                     (log/info (str "Vaco validation/conversion not ready yet. " package-id "/" entry-public-id " update status."))
                     (update-tis-results! db {:tis-entry-public-id entry-public-id
-                                             :tis-complete true
+                                             :tis-complete false
                                              :tis-success false
                                              :tis-entry-status tis-entry-status
                                              :tis-magic-link magic-link})))))))

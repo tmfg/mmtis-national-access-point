@@ -82,10 +82,10 @@
                                                                   "netex2gtfs.entur" "/netex.entur"))
                 :style {:margin-right "0.5em"}
                 :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}])]]
-     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}]]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (when tis-magic-link [common-ui/linkify tis-magic-link "Katso" {:target "_blank"}])]
      [ui/table-row-column {:style {:width "10%" :padding "0px 5px 0px 5px"}} (time/format-timestamp-for-ui created)]
-     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-for-package/" packageid) "Validoi"]]
-     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-force-interface-import/" transport-service-id "/" interface-id) "Lataa"]]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} (when packageid [linkify (str "/admin/start/tis-vaco-for-package/" packageid) "Validoi" {:target "_blank"}])]
+     [ui/table-row-column {:style {:width "5%" :padding "0px 5px 0px 5px"}} [linkify (str "/admin/start/tis-vaco-force-interface-import/" transport-service-id "/" interface-id) "Lataa" {:target "_blank"}]]
 
      ]))
 
