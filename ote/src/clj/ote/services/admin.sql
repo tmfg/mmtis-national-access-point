@@ -91,7 +91,7 @@ FROM
     "transport-operator" as op,
     "transport-service" as ts,
     "external-interface-description" as eid
-        join lateral (SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link", gp.created
+       left join lateral (SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp."tis-magic-link", gp.created
                       FROM gtfs_package gp
                       WHERE gp."transport-service-id" = ts.id
                         AND gp."external-interface-description-id" = eid.id
