@@ -33,7 +33,10 @@
          select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes fetch-latest-gtfs-vaco-status
          fetch-latest-netex-conversion)
 
-(def daily-update-time (t/from-time-zone (t/today-at 18 5)
+(def daily-update-time-dev (t/from-time-zone (t/today-at 11 5)
+                                         (DateTimeZone/forID "Europe/Helsinki")))
+
+(def daily-update-time-prod (t/from-time-zone (t/today-at 18 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
 
 (defn interface-type [format]
@@ -182,7 +185,7 @@
      (clean-old-entries! db service-id interface-id)
      process-result)))
 
-(def allowed-hours #{0 1 2 3 4 5 18 19 20 21 22 23 24})
+(def allowed-hours #{0 1 2 3 4 5 11 12 13 14 15 16 17 18 19 20 21 22 23 24})
 
 (defn allowed-time? [dt]
   (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours allowed-hours boolean))
@@ -294,6 +297,6 @@
     (dissoc this ::stop-tasks)))
 
 (defn gtfs-tasks
-  ([config] (gtfs-tasks daily-update-time config))
+  ([config] (gtfs-tasks (if (:dev-mode? config) daily-update-time-dev daily-update-time-prod ) config))
   ([at config]
    (->GtfsTasks at config)))
