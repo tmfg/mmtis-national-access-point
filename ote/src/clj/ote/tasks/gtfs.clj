@@ -61,7 +61,8 @@
   (tx/with-transaction
     db
     (let [blacklisted-operators (get-blacklisted-operators config)
-          interface (first (select-gtfs-urls-update db blacklisted-operators))]
+          interface (first (select-gtfs-urls-update db blacklisted-operators))
+          _ (log/info "select-gtfs-urls-update :: interface" (pr-str interface))]
       (when interface
         (mark-gtfs-package-imported! db interface))
       interface)))
@@ -72,7 +73,8 @@
   (let [interface (if (nil? interface-id)
                     (first (select-gtfs-url-for-service db {:service-id service-id}))
                     (first (select-gtfs-url-for-interface db {:service-id service-id
-                                                              :interface-id interface-id})))]
+                                                              :interface-id interface-id})))
+        _ (log/info "fetch-given-gtfs-interface! :: interface" (pr-str interface))]
     (when interface
       (mark-gtfs-package-imported! db interface))
     interface))
