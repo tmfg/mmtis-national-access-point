@@ -62,7 +62,9 @@
     db
     (let [blacklisted-operators (get-blacklisted-operators config)
           interface (first (select-gtfs-urls-update db blacklisted-operators))
-          _ (log/info "select-gtfs-urls-update :: interface" (pr-str interface))]
+          _ (log/info "select-gtfs-urls-update :: interfaces: " (pr-str (select-gtfs-urls-update db blacklisted-operators)))
+          _ (log/info "select-gtfs-urls-update :: interface:" (pr-str interface))
+          ]
       (when interface
         (mark-gtfs-package-imported! db interface))
       interface)))
