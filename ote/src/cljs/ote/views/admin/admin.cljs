@@ -327,7 +327,8 @@
                 {:label "Palveluntuottajat" :value "operators"}
                 {:label "Rajapinnat" :value "interfaces"}
                 {:label "CSV Raportit" :value "reports"}
-                {:label "Merireitit" :value "sea-routes"}
+                ;; MeriRAE is disabled
+                #_ {:label "Merireitit" :value "sea-routes"}
                 {:label "Netex" :value "netex"}
                 {:label "Taksien hintatiedot" :value "taxi-prices"}
                 {:label "Vaco status" :value "vaco-status"}
@@ -353,7 +354,8 @@
        ;; (when (= "companycsv" selected-tab) [companycsv/page-controls e! app]) - Take csv file upload functionality off for now
        (when (= "operators" selected-tab)
          [operator-page-controls e! app])
-       (when (= "sea-routes" selected-tab)
+       ;; MeriRae is disabled
+       #_ (when (= "sea-routes" selected-tab)
          [sea-routes/sea-routes-page-controls e! app])
        (when (= "netex" selected-tab)
          [netex/netex-page-controls e! app])
@@ -375,7 +377,8 @@
         "interfaces" [interfaces/interface-list e! app]
         "vaco-status" [vaco-status/interface-list e! app]
         "reports" [report-view/reports e! app]
-        "sea-routes" [sea-routes/sea-routes e! app]
+        ;; MeriRae is disabled
+        ;"sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex e! app]
         "taxi-prices" [taxi-prices/taxi-prices e! app]
         "authority-group-admin" [authority-group-admin/authority-group-admin e! app]
