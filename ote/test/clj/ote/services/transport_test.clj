@@ -19,7 +19,7 @@
             [ote.test-tools :as test-tools]))
 
 (def enabled-features {:enabled-features #{:ote-login
-                                           :sea-routes
+                                           #_ :sea-routes
                                            :gtfs-import
                                            :ote-register
                                            :service-validation
