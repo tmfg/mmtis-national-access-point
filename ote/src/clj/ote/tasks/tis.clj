@@ -234,7 +234,7 @@
     (assoc this
       ::tis-tasks [(chime/chime-at (tasks-util/daily-at
                                      ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
-                                     (if (:testing-env? config) 8 5) 15)
+                                     (if (:testing-env? config) 8 3) 15)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
