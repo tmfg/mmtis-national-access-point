@@ -6,7 +6,7 @@ testing_environment: "false"
 auth_shared_secret: "{{vault_beaker_session_secret}}"
 cookie_domain: "finap.fi"
 base_url: "https://finap.fi"
-flags: "#{:ote-login :ote-operators-list :sea-routes :pre-notice :gtfs-import :ote-register :service-validation :other-catalogs :terms-of-service :tis-vaco-integration :new-transit-data-formats}"
+flags: "#{:ote-login :ote-operators-list :pre-notice :gtfs-import :ote-register :service-validation :other-catalogs :terms-of-service :tis-vaco-integration :new-transit-data-formats}"
 ote_cookie_key: "{{vault_ote_cookie_key}}"
 pre_notice_attachment_bucket: "napote-pre-notice-attachment-prod"
 email_from: noreply@finap.fi

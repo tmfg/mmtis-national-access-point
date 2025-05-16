@@ -197,7 +197,7 @@
          [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
           (tr [:own-services-page :open-rae])
           {:target "_blank"}]])
-      (when (error-keys :no-schedule-sea)
+      #_ (when (error-keys :no-schedule-sea)
         [:p {:style {:margin 0}}
          [:strong (tr [:enums ::t-service/transport-type :sea]) " • "]
          [linkify "/#/routes" (tr [:own-services-page :open-sea-rae]) {:target "_blank"}]])]

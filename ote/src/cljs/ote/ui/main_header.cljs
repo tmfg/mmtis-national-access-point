@@ -213,7 +213,8 @@
                                                                     :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
                                                                     :force-external-icon? true
                                                                     :target "_blank"}
-                                                                   {:key :routes
+                                                                   ;; MeriRAE is disabled from ui
+                                                                   #_ {:key :routes
                                                                     :label (tr [:common-texts :navigation-route])
                                                                     :href "#/routes"}
                                                                    {:key :pre-notices
