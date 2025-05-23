@@ -1,6 +1,6 @@
 (defproject ote "0.1-SNAPSHOT"
   :dependencies [;; Clojure - Eclipse Public License 1.0
-                 [org.clojure/clojure "1.10.1"]
+                 [org.clojure/clojure "1.12.0"]
                  ;; ClojureScript (clojure to js) - Eclipse Public License 1.0
                  [org.clojure/clojurescript "1.10.597"]
                  ;; CSV parser for backend
