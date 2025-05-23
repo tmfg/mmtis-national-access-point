@@ -178,9 +178,13 @@
             (doseq [interface interfaces]
               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format contact-email]} interface
                     package (interface-latest-package db external-interface-description-id)
-                    #_ (create-package db operator-id service-id external-interface-description-id license)
+                    (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing. " @sent-interface-count "/" (count interfaces)))
+                    ;; On some rare occasions the package is nil, so we need to create it
+                    package (if (nil? (:gtfs/id package))
+                              (create-package db operator-id service-id external-interface-description-id license)
+                              package)
                     _ (tis-submit-started! db {:package-id (:gtfs/id package)})]
-                (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing. " @sent-interface-count "/" (count interfaces)))
+
                 (swap! sent-interface-count inc)
                 (try
                   (tis-vaco/queue-entry db (:tis-vaco config)
@@ -234,7 +238,7 @@
     (assoc this
       ::tis-tasks [(chime/chime-at (tasks-util/daily-at
                                      ; run in testing in the morning so that nightly shutdown doesn't affect the API calls
-                                     (if (:testing-env? config) 8 3) 15)
+                                     (if (:testing-env? config) 8 0) 15)
                                    (fn [_]
                                      (#'submit-finap-feeds! config db)))
                    (chime/chime-at (drop 1 (periodic/periodic-seq (t/now) (t/minutes 10)))
