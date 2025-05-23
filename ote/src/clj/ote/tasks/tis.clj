@@ -178,7 +178,7 @@
             (doseq [interface interfaces]
               (let [{:keys [operator-id operator-name service-id external-interface-description-id url license format contact-email]} interface
                     package (interface-latest-package db external-interface-description-id)
-                    (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing. " @sent-interface-count "/" (count interfaces)))
+                    _ (log/info (str "Submit package " (:gtfs/id package) " for " operator-id "/" service-id "/" external-interface-description-id " to TIS VACO for processing. " @sent-interface-count "/" (count interfaces)))
                     ;; On some rare occasions the package is nil, so we need to create it
                     package (if (nil? (:gtfs/id package))
                               (create-package db operator-id service-id external-interface-description-id license)
