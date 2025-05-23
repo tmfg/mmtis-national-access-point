@@ -189,7 +189,7 @@
      (clean-old-entries! db service-id interface-id)
      process-result)))
 
-(def allowed-hours #{0 1 2 3 4 5 11 12 13 14 15 16 17 18 19 20 21 22 23 24})
+(def allowed-hours #{11 12 13 14 15 16 17 18 19 20 21 22 23 24})
 
 (defn allowed-time? [dt]
   (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours allowed-hours boolean))
