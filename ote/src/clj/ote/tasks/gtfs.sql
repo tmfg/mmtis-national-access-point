@@ -60,6 +60,7 @@ SELECT gp.id, gp."tis-entry-public-id", gp."tis-complete", gp."tis-success", gp.
  WHERE gp."transport-service-id" = :service-id
    AND gp."external-interface-description-id" = :interface-id
    AND (gp.tis_entry_status is null OR (gp.tis_entry_status is not null and gp.tis_entry_status != 'cancelled'))
+   AND gp.tis_submit_completed IS NOT NULL -- Take only packages that have been submitted to TIS.
 ORDER BY gp.created DESC
  LIMIT 1;
 
