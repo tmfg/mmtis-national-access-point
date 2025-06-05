@@ -708,8 +708,11 @@
   :desc-to-add-new-operator-5 "Hittade du inte rätt tjänsteoperatör eller är du huvudanvändare?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Du har nu lagt till en tjänsteleverantör i NAP. Lägg nu till information om de mobilitetstjänster du tillhandahåller. Om du tillhandahåller mer än en typ av mobilitetstjänst, lägg först till en tjänst. Du kan sedan lägga till följande tjänst."}
-
+  :operator-dont-have-any-services "Du har nu lagt till en tjänsteleverantör i NAP. Lägg nu till information om de mobilitetstjänster du tillhandahåller. Om du tillhandahåller mer än en typ av mobilitetstjänst, lägg först till en tjänst. Du kan sedan lägga till följande tjänst."
+  :rae-discontinued-info1 "MeriRAE (Sjöfartens rutt- och schemaredigerare) som en del av Finap- katalogen tas ur bruk den 30 april 2025. Den nya adressen till rutt- och schemaredigeraren för sjöfart och övrig sjötrafik är "
+  :rae-discontinued-info-link "https://rae.fintraffic.fi/ui/"
+  :rae-discontinued-info-desc "rae.fintraffic.fi."
+  :rae-discontinued-info2 "Vi rekommenderar att ni börjar använda den nya RAE-tjänsten redan före april."}
 
  :organization-page
  {:address-postal "Postadress"
@@ -1106,7 +1109,7 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :user-menu-profile "Visa egen profil"
   :user-menu-summary "Sammandrag"
   :user-menu-nap-help "NAP-anvisningar och -meddelanden"
-  :user-menu-nap-help-link "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
+  :user-menu-nap-help-link "https://www.fintraffic.fi/sv/transport-informationsjanst/nap-katalog"
   :user-menu-video-tutorials "Undervisningsvideor"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basinfo"
@@ -1299,6 +1302,9 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :vaco-converted-feed "Konverteringens status"
   :vaco-magic-link "Visa i valideringstänsten"
   :vaco-links-section-title "Valideringstjänst"
+  :vaco-given-interface-has-problem "Gränssnittet returnerar inte data."
+  :vaco-validation-not-started "Validering har inte startat."
+  :vaco-validation-in-progress "Valideringen är inte ännu slutförd."
   :download-netex "Ladda ner den konverterade filen"
   :no-homepage "Det har ännu inte förts in någon webbadress i tjänsten"}
 
@@ -1760,7 +1766,8 @@ Tjänsterna beskrivs var för sig på egen blankett. I exemplet fyller man i bå
   :YT "Mayotte"
   :ZA "Sydafrika"
   :ZM "Zambia"
-  :ZW "Zimbabwe"}
+  :ZW "Zimbabwe"
+  :AN "Karibiska Nederländerna"}
 
  ;; Fintraffic common quicklink header
  :quicklink-header

@@ -62,47 +62,56 @@
 
 (def ^:private rate-limiter-hit-delay
   "Returns in milliseconds the wait time for single call based on rate limiter configuration."
-  (let [timespan         (* 5 60 1000)  ; total timespan for calls is 5 minutes
-        allowed-requests 1000           ; how many requests allowed per timespan
+  (let [timespan         (* 60 60 1000)  ; total timespan for calls is 60 minutes
+        allowed-requests 500           ; how many requests allowed per timespan
         delay-per-call   (/ timespan allowed-requests)]
     delay-per-call))
 
 (defn ^:private api-call
   "Adds common headers, handles authentication etc. for TIS VACO API calls. Returns nil on failure to allow punning."
-  [config call url body params]
-  (throttle/with-throttle-ms
-    rate-limiter-hit-delay
-    (let [endpoint                      (if (str/starts-with? url (:api-base-url config))
-                                          url
-                                          (str (:api-base-url config) url))]
-      (try
-        (let [{:keys [access-token]}        (swap! auth-data update-expired-token config)
-              {:keys [status headers body]} (call endpoint
-                                                  (merge
-                                                    {:headers      {"User-Agent"    "Fintraffic FINAP / 0.1"
-                                                                    "Authorization" (str "Bearer " access-token)}}
-                                                    ; this is an actual API which uses HTTP statuses for a reason,
-                                                    ; so allow all non 5xx to be handled properly
-                                                    (merge {:unexceptional-status #(<= 200 % 499)} params)
-                                                    (when body {:body (when body (cheshire/generate-string body))})))]
-          (log/info (str "API call to " endpoint " returned " status))
-          body)
-        (catch Exception e
-          (log/warn e (str "Failed API call " endpoint))
-          nil)))))
+  ([config call url body params] (api-call config call url body params nil nil))
+  ([config call url body params db package-id]
+   (throttle/with-throttle-ms
+     rate-limiter-hit-delay
+     (let [endpoint (if (str/starts-with? url (:api-base-url config))
+                      url
+                      (str (:api-base-url config) url))]
+       (try
+         (let [{:keys [access-token]} (swap! auth-data update-expired-token config)
+               {:keys [status headers body]} (call endpoint
+                                                   (merge
+                                                     {:headers {"User-Agent" "Fintraffic FINAP / 0.1"
+                                                                "Authorization" (str "Bearer " access-token)}}
+                                                     ; this is an actual API which uses HTTP statuses for a reason,
+                                                     ; so allow all non 5xx to be handled properly
+                                                     (merge {:unexceptional-status #(<= 200 % 499)} params)
+                                                     (when body {:body (when body (cheshire/generate-string body))})))]
+           (log/info (str "API call to " endpoint " returned " status))
+           body)
+         (catch Exception e
+           (log/warn e (str "Failed API call " endpoint))
+           (when (and db package-id)
+             ;; If database and package-id is provided, log the error to the database
+             (specql/update! db :gtfs/package {:gtfs/tis_polling_error e} {:gtfs/id package-id}))
+           nil))))))
 
 (defn api-queue-create
-  [config payload]
-  (some-> (api-call config http-client/post "/api/queue" payload {:content-type :json})
-          (cheshire/parse-string)))
+  ([config payload] (api-queue-create config payload nil nil))
+  ([config payload db package-id]
+   (some-> (api-call config http-client/post "/api/queue" payload {:content-type :json} db package-id)
+           (cheshire/parse-string))))
 
 (defn api-fetch-entry
   [config entry-id]
-  (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil {:content-type :json})
-              (cheshire/parse-string))
-      (do
-        (log/info (str "No fetch-entry result available for " entry-id))
-        {})))
+  (try
+    (or (some-> (api-call config http-client/get (str "/api/queue/" entry-id) nil {:content-type :json})
+                (cheshire/parse-string))
+        (do
+          (log/info (str "No fetch-entry result available for " entry-id))
+          {}))
+    (catch Exception e
+      (log/error e (str "Failed api call to " (str "/api/queue/" entry-id) e))
+      nil)))
 
 (defn read-to-memory [is]
   (let [baos (java.io.ByteArrayOutputStream.)]
@@ -160,11 +169,17 @@
                                                                  :service-id    service-id
                                                                  :interface-id  id
                                                                  :package-id    package-id}
-                                                                (when contact-email {:contact-email contact-email}))})]
+                                                                (when contact-email {:contact-email contact-email}))}
+                                    db package-id)
+        ;; Temporary logging
+        _ (log/info (str "API call returned new-entry :: magic-link " (pr-str (get-in new-entry ["links" "refs" "magic" "href"]))))]
     (when new-entry
       (try
+        ;; Add vaco information to the GTFS package when query is made.
         (specql/update! db :gtfs/package
-                        {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])}
+                        {:gtfs/tis-entry-public-id (get-in new-entry ["data" "publicId"])
+                         :gtfs/tis-magic-link (get-in new-entry ["links" "refs" "magic" "href"])
+                         :gtfs/tis_submit_completed (java.sql.Timestamp. (System/currentTimeMillis))}
                         {:gtfs/id (:gtfs/id package)})
         new-entry
         (catch Exception e

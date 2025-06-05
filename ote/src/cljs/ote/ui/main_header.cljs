@@ -213,7 +213,8 @@
                                                                     :href (str "/taxiui#" (taxiui-router/resolve :taxi-ui/stats {}))
                                                                     :force-external-icon? true
                                                                     :target "_blank"}
-                                                                   {:key :routes
+                                                                   ;; MeriRAE is disabled from ui
+                                                                   #_ {:key :routes
                                                                     :label (tr [:common-texts :navigation-route])
                                                                     :href "#/routes"}
                                                                    {:key :pre-notices
@@ -227,7 +228,8 @@
                                                                      {:key :admin
                                                                       :label (tr [:document-title :admin])
                                                                       :href "#/admin"})
-                                                                   (when (user-is? app :authority-group-admin?)
+                                                                   ; Change detection is disabled.
+                                                                   #_ (when (user-is? app :authority-group-admin?)
                                                                      {:key :admin-detected-changes
                                                                       :label (tr [:document-title :admin-detected-changes])
                                                                       :href "#/admin/detected-changes/detect-changes"})

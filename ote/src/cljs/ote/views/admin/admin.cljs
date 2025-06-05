@@ -18,6 +18,7 @@
             [ote.app.controller.front-page :as fp]
             [ote.views.admin.authority-group-admin :as authority-group-admin]
             [ote.views.admin.interfaces :as interfaces]
+            [ote.views.admin.vaco-status :as vaco-status]
             [ote.views.admin.reports :as report-view]
             [ote.views.admin.users :as users]
             [ote.views.admin.service-list :as service-list]
@@ -326,9 +327,11 @@
                 {:label "Palveluntuottajat" :value "operators"}
                 {:label "Rajapinnat" :value "interfaces"}
                 {:label "CSV Raportit" :value "reports"}
-                {:label "Merireitit" :value "sea-routes"}
+                ;; MeriRAE is disabled
+                #_ {:label "Merireitit" :value "sea-routes"}
                 {:label "Netex" :value "netex"}
                 {:label "Taksien hintatiedot" :value "taxi-prices"}
+                {:label "Vaco status" :value "vaco-status"}
                 (when (get-in app [:user :authority-group-admin?]) {:label "Ylläpitoryhmän hallinta" :value "authority-group-admin"})])
         selected-tab (or (get-in app [:admin :tab :admin-page]) "validation")]
     [:div
@@ -351,7 +354,8 @@
        ;; (when (= "companycsv" selected-tab) [companycsv/page-controls e! app]) - Take csv file upload functionality off for now
        (when (= "operators" selected-tab)
          [operator-page-controls e! app])
-       (when (= "sea-routes" selected-tab)
+       ;; MeriRae is disabled
+       #_ (when (= "sea-routes" selected-tab)
          [sea-routes/sea-routes-page-controls e! app])
        (when (= "netex" selected-tab)
          [netex/netex-page-controls e! app])
@@ -359,7 +363,9 @@
          [taxi-prices/page-controls e! app])
        (when (and (= "authority-group-admin" selected-tab)
                   (= true (get-in app [:user :authority-group-admin?])))
-         [authority-group-admin/page-controls e! app])]]
+         [authority-group-admin/page-controls e! app])
+       (when (= "vaco-status" selected-tab)
+         [vaco-status/vaco-status-page-controls e! app])]]
      [:div.container {:style {:margin-top "20px"}}
       (case selected-tab
         "validation" [validate-view/validate-services e! app]
@@ -369,8 +375,10 @@
         ;; "companycsv" [companycsv/company-csv-list e! app] - Take csv file upload functionality off for now
         "operators" [operator-list e! app]
         "interfaces" [interfaces/interface-list e! app]
+        "vaco-status" [vaco-status/interface-list e! app]
         "reports" [report-view/reports e! app]
-        "sea-routes" [sea-routes/sea-routes e! app]
+        ;; MeriRae is disabled
+        ;"sea-routes" [sea-routes/sea-routes e! app]
         "netex" [netex/netex e! app]
         "taxi-prices" [taxi-prices/taxi-prices e! app]
         "authority-group-admin" [authority-group-admin/authority-group-admin e! app]

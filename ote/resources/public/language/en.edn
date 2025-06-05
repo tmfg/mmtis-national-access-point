@@ -705,8 +705,11 @@ You can also draw the operating area or point to the map with drawing tools. You
   :desc-to-add-new-operator-5 "Did you not find the transport operator you were looking for or are you the main user of the organization, company or community you are representing?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Well done! Now you have successfully added a service provider to the NAP service catalog. The next task is to add information about the transport service or services you are providing. If you provide different types of transport services, please, add just a single service first. After that you can add the next one."}
-
+  :operator-dont-have-any-services "Well done! Now you have successfully added a service provider to the NAP service catalog. The next task is to add information about the transport service or services you are providing. If you provide different types of transport services, please, add just a single service first. After that you can add the next one."
+  :rae-discontinued-info1 "MeriRAE (The Maritime Route and Schedule Editor) as part of the Finap catalogue will be discontinued on 30 April 2025. The new address for the route and schedule editor for maritime traffic and other waterborne traffic is "
+  :rae-discontinued-info-link "https://rae.fintraffic.fi/ui/"
+  :rae-discontinued-info-desc "rae.fintraffic.fi."
+  :rae-discontinued-info2 "We encourage you to adopt use of the new RAE service before April."}
 
  :organization-page
  {:address-postal "Postal address"
@@ -1106,7 +1109,7 @@ You can also draw the operating area or point to the map with drawing tools. You
   :user-menu-profile "Edit user account"
   :user-menu-summary "Summary"
   :user-menu-nap-help "NAP instructions and announcements"
-  :user-menu-nap-help-link "https://www.fintraffic.fi/fi/nap-liikkumispalvelukatalogi"
+  :user-menu-nap-help-link "https://www.fintraffic.fi/fi/digitaalisetpalvelut/fintrafficin-datapalvelut/liikkumisen-tietopalvelut/nap-liikkumispalvelukatalogi"
   :user-menu-video-tutorials "Video tutorials for service providers"
   :user-menu-video-tutorials-link "https://www.youtube.com/watch?v=0H18Nif1is0&list=PLVXTUB2QscCaWzfvqlFtNbmIzYNtTT4bC"
   :title-operator-basic-details "Basic information"
@@ -1298,6 +1301,9 @@ You can also draw the operating area or point to the map with drawing tools. You
   :vaco-converted-feed "State of conversion"
   :vaco-magic-link "View in data validation service"
   :vaco-links-section-title "Data validation service"
+  :vaco-given-interface-has-problem "The interface does not return data."
+  :vaco-validation-not-started "Validation has not started."
+  :vaco-validation-in-progress "Validation has not yet been completed."
   :download-netex "Download converted file"
   :no-homepage "No website has been entered in the service."}
 
@@ -1757,7 +1763,8 @@ You can also draw the operating area or point to the map with drawing tools. You
   :EH "Western Sahara"
   :YE "Yemen"
   :ZM "Zambia"
-  :ZW "Zimbabwe"}
+  :ZW "Zimbabwe"
+  :AN "Caribbean Netherlands"}
 
  ;; Fintraffic common quicklink header
  :quicklink-header

@@ -14,7 +14,7 @@ mv $LATEST_DUMP finap.dump
 
 docker run -v $DIR:/database -it \
        --network docker_napote \
-       --link napotedb11:postgres --rm postgres:9.6.8 \
+       --link napotedb163:postgres --rm postgres:9.6.8 \
        sh /database/finap_backup_docker.sh
 
 rm finap.dump

@@ -10,7 +10,6 @@
             [clojure.set :as set]
             [jeesql.core :refer [defqueries]]
             [specql.core :refer [fetch upsert! delete!] :as specql]
-            [specql.op :as op]
             [ote.components.http :as http]
             [ote.util.feature :as feature]
             [ote.db.modification :as modification]
@@ -24,6 +23,8 @@
             [ote.services.places :as places]
             [ote.services.external :as external]
             [ote.db.tx :as tx]
+            [ote.integration.tis-vaco :as tis-vaco]
+            [ote.tasks.gtfs :as gtfs-q]
             ;[ote.util.file :as file] - CSV s3 copy is not used currently
             ))
 
@@ -32,6 +33,10 @@
 (defqueries "ote/services/operators.sql")
 (defqueries "ote/services/associations.sql")
 (defqueries "ote/nap/users.sql")
+
+(declare fetch-transport-services fetch-rental-booking-info fetch-child-service-interfaces
+         save-rental-booking-info! update-old-package-interface-ids! update-packages-with-deleted-interface-true!
+         update-child-parent-interfaces)
 
 (def transport-service-personal-columns
   #{::t-service/contact-phone
@@ -145,7 +150,38 @@
         service))
     services))
 
-
+(defn vaco-specific-interface-data
+  "Add Vaco speficic data to external interfaces."
+  [services db config]
+  (mapv (fn [service]
+          (update service
+                  ::t-service/external-interfaces
+                  (fn [interfaces]
+                    (vec
+                      (for [interface interfaces
+                            :let [interface-id (::t-service/id interface)
+                                  service-id (::t-service/transport-service-id interface)
+                                  latest-conversion-status (first (gtfs-q/fetch-latest-gtfs-vaco-status db {:service-id service-id
+                                                                                                            :interface-id interface-id}))
+                                  latest-netex-conversion (first
+                                                            (gtfs-q/fetch-latest-netex-conversion
+                                                              db {:service-id service-id
+                                                                  :interface-id interface-id}))]]
+                        (if latest-conversion-status
+                          (let [api-base-url (get-in config [:tis-vaco :api-base-url])
+                                vaco-status {:gtfs/tis-magic-link (:tis-magic-link latest-conversion-status)
+                                             :gtfs/tis-entry-public-id (:tis-entry-public-id latest-conversion-status)
+                                             :gtfs/tis-complete (:tis-complete latest-conversion-status)
+                                             :gtfs/tis-success (:tis-success latest-conversion-status)
+                                             :gtfs/download-status (:download-status latest-conversion-status)
+                                             :api-base-url api-base-url}]
+                            (-> interface
+                                (assoc :tis-vaco vaco-status)
+                                (assoc :api-base-url api-base-url)
+                                (assoc :url-ote-netex (when (:filename latest-netex-conversion)
+                                                        (format "%s/export/netex/%s/%s" (get-in config [:tis-vaco :api-base-url]) service-id (:filename latest-netex-conversion))))))
+                          interface))))))
+        services))
 
 (defn all-data-transport-service
   "Get single transport service by id"
@@ -156,6 +192,7 @@
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             vector
+            (vaco-specific-interface-data db config)
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
             (type-specific-booking-data config db)
             first)
@@ -226,7 +263,7 @@
 (defn- save-external-interfaces
   "Save external interfaces for a transport service"
   [db transport-service-id external-interfaces removable-interfaces]
-  (let [external-interfaces (mapv #(dissoc % :url-ote-netex) ; Remove because not part of db data model
+  (let [external-interfaces (mapv #(dissoc % :url-ote-netex :tis-vaco :api-base-url) ; Remove because not part of db data model
                                   external-interfaces)]
 
     ;; Delete removed services from OTE db
@@ -308,7 +345,7 @@
                                               {::t-service/transport-service-id parent-id
                                                ::t-service/url url})
                             ;; Update packages
-                            packages (specql/fetch db :gtfs/package (specql/columns :gtfs/package)
+                            _ (specql/fetch db :gtfs/package (specql/columns :gtfs/package)
                                                    {:gtfs/transport-service-id parent-id
                                                     :gtfs/external-interface-description-id orig-interface-id})
                             _ (specql/update! db :gtfs/package
@@ -385,7 +422,22 @@
       (replace-rental-booking-info db parent-id child-id)
 
       ;; Delete child - and its external-interfaces and places
-      (specql/delete! db ::t-service/transport-service {::t-service/id child-id}))))
+      (specql/delete! db ::t-service/transport-service {::t-service/id child-id})
+
+      ;; Update external interfaces ids with original id
+      (doseq [ext-interface (specql/fetch db ::t-service/external-interface-description
+                                          #{::t-service/id ::t-service/original-interface-id}
+                                          {::t-service/transport-service-id parent-id})]
+        (let [;; Change iterface-id to original id - if original id is set
+              _ (when (::t-service/original-interface-id ext-interface)
+                  (specql/update! db ::t-service/external-interface-description
+                                  {::t-service/id (::t-service/original-interface-id ext-interface)}
+                                  {::t-service/id (::t-service/id ext-interface)}))
+              ;; Remove original-interface-id - if original id is set
+              _ (when (::t-service/original-interface-id ext-interface)
+                  (specql/update! db ::t-service/external-interface-description
+                                  {::t-service/original-interface-id nil}
+                                  {::t-service/id (::t-service/original-interface-id ext-interface)}))])))))
 
 (defn- set-publish-time
   [data db]
@@ -694,6 +746,7 @@
         (-> (assoc ts ::t-service/operation-area
                       (places/fetch-transport-service-operation-area db id))
             vector
+            (vaco-specific-interface-data db config)
             (netex-util/append-ote-netex-urls config db ::t-service/external-interfaces)
             (type-specific-booking-data config db)
             first))
@@ -771,12 +824,6 @@
                              {::t-service/file-key file-key})
              ;; Return
              file-key))))))
-
-(defn ckan-group-id->group
-  [db ckan-group-id]
-  (first (specql/fetch db ::t-operator/group
-                       (specql/columns ::t-operator/group)
-                       {::t-operator/group-id ckan-group-id})))
 
 (defn- transport-service-routes-auth
   "Routes that require authentication"

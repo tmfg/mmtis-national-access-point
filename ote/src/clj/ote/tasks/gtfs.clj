@@ -29,11 +29,19 @@
 (defqueries "ote/tasks/gtfs.sql")
 (defqueries "ote/services/transit_changes.sql")
 
-(def daily-update-time (t/from-time-zone (t/today-at 0 5)
+(declare services-for-nightly-change-detection select-gtfs-urls-update select-gtfs-url-for-service
+         select-gtfs-url-for-interface upcoming-changes valid-detected-route-changes fetch-latest-gtfs-vaco-status
+         fetch-latest-netex-conversion)
+
+(def daily-update-time-dev (t/from-time-zone (t/today-at 11 5)
+                                         (DateTimeZone/forID "Europe/Helsinki")))
+
+(def daily-update-time-prod (t/from-time-zone (t/today-at 18 5)
                                          (DateTimeZone/forID "Europe/Helsinki")))
 
 (defn interface-type [format]
   (case format
+    "NeTEx" :netex
     "GTFS" :gtfs
     "Kalkati" :kalkati
     "Kalkati.net" :kalkati  ; kept for legacy support
@@ -53,7 +61,10 @@
   (tx/with-transaction
     db
     (let [blacklisted-operators (get-blacklisted-operators config)
-          interface (first (select-gtfs-urls-update db blacklisted-operators))]
+          interface (first (select-gtfs-urls-update db blacklisted-operators))
+          _ (log/info "select-gtfs-urls-update :: interfaces: " (pr-str (select-gtfs-urls-update db blacklisted-operators)))
+          _ (log/info "select-gtfs-urls-update :: interface:" (pr-str interface))
+          ]
       (when interface
         (mark-gtfs-package-imported! db interface))
       interface)))
@@ -64,7 +75,8 @@
   (let [interface (if (nil? interface-id)
                     (first (select-gtfs-url-for-service db {:service-id service-id}))
                     (first (select-gtfs-url-for-interface db {:service-id service-id
-                                                              :interface-id interface-id})))]
+                                                              :interface-id interface-id})))
+        _ (log/info "fetch-given-gtfs-interface! :: interface" (pr-str interface))]
     (when interface
       (mark-gtfs-package-imported! db interface))
     interface))
@@ -154,13 +166,17 @@
   ([config db email upload-s3? service-id interface-id]
    ;; Ensure that gtfs-import flag is enabled
    ;; upload-s3? should be false when using local environment
-   (let [;; Load next gtfs package or package that is related to given service-id
+   ;; Use lock to prevent duplicate updates
+   (let [_ (log/info "Updating one GTFS package!")
+         ;; Load next gtfs package or package that is related to given service-id
          interface (if service-id
                      (fetch-given-gtfs-interface! db service-id interface-id)
+                     ;; Get next interface that is not been used in 24 hours.
                      (fetch-next-gtfs-interface! db config))
          interface (if (contains? interface :data-content)  ; Avoid creating a coll with empty key when coll doesn't exist
-                     (update interface :data-content  util-db/PgArray->vec)
+                     (update interface :data-content util-db/PgArray->vec)
                      interface)
+         _ (log/info "Updating one GTFS package! - interface" (pr-str interface))
          force-download? (integer? service-id)
          ; ensure ids have values for sending emails
          service-id (or service-id (:ts-id interface))
@@ -173,10 +189,10 @@
      (clean-old-entries! db service-id interface-id)
      process-result)))
 
-(def night-hours #{0 1 2 3 4})
+(def allowed-hours #{11 12 13 14 15 16 17 18 19 20 21 22 23 24})
 
-(defn night-time? [dt]
-  (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours night-hours boolean))
+(defn allowed-time? [dt]
+  (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours allowed-hours boolean))
 
 ;; To run change detection for service(s) from REPL, call this with vector of service-ids: `(detect-new-changes-task (:db ote.main/ote) (time/now) true [1289])`
 (defn detect-new-changes-task
@@ -263,14 +279,17 @@
       ::stop-tasks
       (if (feature/feature-enabled? config :gtfs-import)
         [(chime-at
-           (filter night-time?
+           (filter allowed-time?
                    (drop 1 (periodic-seq (t/now) (t/minutes 1))))
            (fn [_]
-             (#'update-one-gtfs! config db email true)))
-         (chime-at (tasks-util/daily-at 5 15)
+             (#'update-one-gtfs! config db email
+               ;; Do not send anyting to s3 in local environment
+               (if (:dev-mode? config) false true))))
+         ;; Change detection has been disabled.
+         #_ (chime-at (tasks-util/daily-at 5 15)
                    (fn [_]
                      (detect-new-changes-task config db (time/now) false)))
-         (chime-at (tasks-util/daily-at 0 15)
+         #_ (chime-at (tasks-util/daily-at 0 15)
                    (fn [_]
                      (recalculate-detected-changes-count db)))]
         (do
@@ -282,6 +301,6 @@
     (dissoc this ::stop-tasks)))
 
 (defn gtfs-tasks
-  ([config] (gtfs-tasks daily-update-time config))
+  ([config] (gtfs-tasks (if (:dev-mode? config) daily-update-time-dev daily-update-time-prod ) config))
   ([at config]
    (->GtfsTasks at config)))

@@ -44,9 +44,10 @@
     ["/confirm-email/:token" :confirm-email]
 
     ;; Route based traffic
-    ["/routes" :routes]
-    ["/route/new" :new-route]
-    ["/edit-route/:id" :edit-route]
+    ;; MeriRAE is disabled
+    ;["/routes" :routes]
+    ;["/route/new" :new-route]
+    ;["/edit-route/:id" :edit-route]
 
     ["/routes/view-gtfs" :view-gtfs]
     ["/transit-visualization/:service-id/:date/:scope/:route-hash-id/:change-id/" :transit-visualization]

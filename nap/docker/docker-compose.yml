@@ -8,10 +8,10 @@ networks:
   napote:
 
 services:
-  napotedbpsql11:
+  napotedbpsql163:
     restart: always
-    container_name: napotedb11
-    image: solita/napotedb11:latest
+    container_name: napotedb163
+    image: solita/napotedb163:latest
     build: ../../database/
     networks:
       - napote

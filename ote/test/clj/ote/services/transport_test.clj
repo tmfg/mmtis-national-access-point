@@ -1,23 +1,13 @@
 (ns ote.services.transport-test
   (:require [clojure.test :as t :refer [deftest testing is]]
             [ote.test :refer [system-fixture http-get http-post]]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
-            [cheshire.core :as chesire]
-            [ote.components.db :as db]
             [com.stuartsierra.component :as component]
-            [ote.components.http :as http]
             [ote.services.transport :as transport-service]
-            [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.db.common :as common]
-            [clojure.spec.gen.alpha :as sgen]
-            [clojure.spec.test.alpha :as stest]
-            [clojure.spec.alpha :as s]
-            [ote.db.generators :as generators]
             [ote.db.service-generators :as s-generators]
             [clojure.string :as str]
             [clojure.set :as set]
@@ -26,10 +16,10 @@
             [specql.core :as specql]
             [ote.integration.import.gtfs :as gtfs-import]
             [ote.services.admin :as admin]
-            [cheshire.core :as cheshire]))
+            [ote.test-tools :as test-tools]))
 
 (def enabled-features {:enabled-features #{:ote-login
-                                           :sea-routes
+                                           #_ :sea-routes
                                            :gtfs-import
                                            :ote-register
                                            :service-validation
@@ -171,7 +161,12 @@
         service (:transit response)
         fetch-response (http-get "admin"
                                  (str "transport-service/" (::t-service/id service)))
-        fetched (:transit fetch-response)]
+        fetched (:transit fetch-response)
+        ;; Rental booking info is added for service when service-type is :passenger-transportation without it having it. for UI purposes
+        ;; Generator doesn't have this data, so we remove if from fetched data
+        fetched (if (= (::t-service/type transport-service) :passenger-transportation)
+                  (test-tools/dissoc-in fetched [::t-service/passenger-transportation :ote.db.rental-booking-service/rental-booking-info])
+                  fetched)]
 
     (and (= (:status response) (:status fetch-response) 200)
          (effectively-same-deep
@@ -347,6 +342,57 @@
       ;; interface-id should be changed
       (is (not= (:gtfs/external-interface-description-id (first packages)) (:gtfs/external-interface-description-id (first possibly-changed-packages))))
       (is (= true (:gtfs/interface-deleted? (first possibly-changed-packages)))))
+
+    ;; Delete
+    (let [delete-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)
+                                     "transport-service/delete"
+                                     {:id service-id})]
+      (is (= (:transit delete-response) service-id)))
+
+    ;; Try to fetch now and it does not exist
+    (is (thrown-with-msg?
+          clojure.lang.ExceptionInfo #"status 404"
+          (http-get "normaluser" (str "transport-service/" service-id))))))
+
+(deftest ensure-external-interface-id-after-publish
+  (let [operator-id 2                                       ;; force operator id
+        generated-service (gen/generate (s-generators/service-sub-type-generator :schedule))
+        ;; Generated interfaces cannot be trusted so create one with correct data
+        default-interface {::t-service/external-interface {::t-service/url "www.default.url"
+                                                           ::t-service/description [{::t-service/lang "FI",
+                                                                                     ::t-service/text "Default text"}]}
+                           ::t-service/data-content [:route-and-schedule]
+                           ::t-service/format ["GTFS"]
+                           ::t-service/license "jnppWN61pC0u77PG4ha0"}
+        generated-service (-> generated-service
+                              (assoc ::t-service/transport-operator-id operator-id)
+                              (dissoc ::t-service/external-interfaces)
+                              (assoc-in [::t-service/external-interfaces] [default-interface])
+                              ;; "move" to validation
+                              (assoc ::t-service/validate? (time-coerce/to-sql-date (time/now))))
+        saved-service1 (:transit (http-post (:user-id-normal @ote.test/user-db-ids-atom) "transport-service" generated-service))
+
+        service-id (::t-service/id saved-service1)
+        saved-service2 (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        ;; Take external-interface-description-id
+        interfaces2 (::t-service/external-interfaces saved-service2)
+        interface-id1 (::t-service/id (first interfaces2))
+
+        ;; Generated services are not published, publish this one
+        _ (http-post (:user-id-admin @ote.test/user-db-ids-atom) "admin/publish-service" {:id service-id})
+        ;; And fetch it
+        saved-service3 (:transit (http-get "normaluser" (str "transport-service/" service-id)))
+        interfaces3 (::t-service/external-interfaces saved-service3)
+        interface-id2 (::t-service/id (first interfaces3))
+        _ (is (= interface-id1 interface-id2) "Interface id should stay the same after publishing the service.")
+
+        ;; Ensure that service is in published state
+        _ (is (not (nil? (::t-service/published saved-service3)))) ;; is published
+        _ (is (nil? (::t-service/validate saved-service3)))  ;; not in validation
+        _ (is (nil? (::t-service/re-edit saved-service3)))   ;; not in re-edit
+        ]
+    ;; Saved ok
+    (is (pos? service-id))
 
     ;; Delete
     (let [delete-response (http-post (:user-id-normal @ote.test/user-db-ids-atom)

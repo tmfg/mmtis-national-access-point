@@ -12,7 +12,8 @@
 
 (defmethod base-task-names "netex" [_]
   {:validator {:name   "netex.entur"
-               :config {}}
+               :config {"codespace"     "FSR"
+                        "maximumErrors" 1000}}
    :converter {:name   "netex2gtfs.entur"
                :config {"codespace" "FSR"}}})
 

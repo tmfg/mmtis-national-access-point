@@ -1,12 +1,8 @@
 (defproject ote "0.1-SNAPSHOT"
   :dependencies [;; Clojure - Eclipse Public License 1.0
-                 [org.clojure/clojure "1.10.1"]
+                 [org.clojure/clojure "1.12.0"]
                  ;; ClojureScript (clojure to js) - Eclipse Public License 1.0
                  [org.clojure/clojurescript "1.10.597"]
-                 ;; CSV parser for backend
-                 [org.clojure/data.csv "0.1.4"]
-                 ;; CSV parser for frontend - Eclipse Public License 1.0
-                 [testdouble/clojurescript.csv "0.3.0"]
 
                  ;; Components - MIT
                  [com.stuartsierra/component "0.3.2"]
@@ -126,6 +122,8 @@
                  [cljsjs/jszip "3.1.3-0"]
                  ;; An HTML5 saveAs() FileSaver - MIT
                  [cljsjs/filesaverjs "1.3.3-0"]
+                 ;; CSV parser for frontend - Eclipse Public License 1.0
+                 [testdouble/clojurescript.csv "0.3.0"]
 
                  ;; Amazon Web Services - Eclipse Public License 1.0
                  [amazonica "0.3.121"

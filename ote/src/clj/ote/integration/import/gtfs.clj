@@ -1,6 +1,7 @@
 (ns ote.integration.import.gtfs
   "GTFS file import functionality."
   (:require [amazonica.aws.s3 :as s3]
+            [clojure.string :as str]
             [ote.components.http :as http]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [routes GET]]
@@ -26,6 +27,8 @@
 (defqueries "ote/integration/import/import_gtfs.sql")
 (defqueries "ote/transit_changes/detection.sql")
 
+(declare fetch-count-service-packages gtfs-trip-id-and-index update-stop-times! calculate-fuzzy-location-for-stops!
+         generate-date-hashes-for-future gtfs-set-package-geometry)
 
 (defn load-zip-from-url [url]
   (with-open [in (:body (http-client/get url {:as :stream}))]
@@ -164,26 +167,32 @@
                    (report/gtfs-import-report! db "error" package-id
                                                (str "No data rows in file " name " of type " file-type)
                                                (.getBytes "")))
-                 (doseq [fk rows]
+                 ;; Change Detection is disabled, so no need to store the data
+                 #_ (doseq [fk rows]
                    (when (and db-table-name (seq fk))
                      (specql/insert! db db-table-name (assoc fk :gtfs/package-id package-id))))))))))
 
       ;; Handle stop times
-      (import-stop-times db package-id stop-times-file)
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (import-stop-times db package-id stop-times-file)
 
       ;; Calculate stop-fuzzy-lat and stop-fuzzy-lon
-      (log/info "Generating fuzzy location for stops in package " package-id)
-      (calculate-fuzzy-location-for-stops! db {:package-id package-id})
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (log/info "Generating fuzzy location for stops in package " package-id)
+      #_ (calculate-fuzzy-location-for-stops! db {:package-id package-id})
 
       ;; Handle detection-routes
       ;; Calculate route-hash-id for the service using previous 100 packages
-      (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (detection/calculate-route-hash-id-for-service db service-id 100 (detection/db-route-detection-type db service-id))
 
-      (log/info "Generating date hashes for package " package-id " service: " service-id)
-      (generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date import-date})
+      ;; Change Detection is disabled, so no need to store the data
+      #_(log/info "Generating date hashes for package " package-id " service: " service-id)
+      #_(generate-date-hashes-for-future db {:package-id package-id :transport-service-id service-id :from-date import-date})
 
-      (log/info "Generating finnish regions and envelope for package " package-id)
-      (gtfs-set-package-geometry db {:package-id package-id})
+      ;; Change Detection is disabled, so no need to store the data
+      #_ (log/info "Generating finnish regions and envelope for package " package-id)
+      #_ (gtfs-set-package-geometry db {:package-id package-id})
 
       (catch Exception e
         (log/warn "Error in save-gtfs-to-db" e)
@@ -225,11 +234,11 @@
       (save-gtfs-to-db db bytes 1 1 1 nil nil (java.util.Date.))
       (println "******************* test-hsl-gtfs end *********************"))))
 
-(defn- load-interface-url [db interface-id service-id url last-import-date saved-etag force-download?]
+(defn- load-interface-url [db format interface-id service-id url last-import-date saved-etag force-download?]
   (try
     (load-file-from-url db interface-id url last-import-date saved-etag force-download?)
     (catch Exception e
-      (let [message (str "Error when loading gtfs package from url " url ": " (.getMessage e))]
+      (let [message (str "Error when loading " format " package from url " url ": " (.getMessage e))]
         (log/warn message)
         (specql/insert! db ::t-service/external-interface-download-status
                         {::t-service/external-interface-description-id interface-id
@@ -260,6 +269,13 @@
     (when-not (contains? file-list "LVM.xml")
       (throw (ex-info "Missing required files in kalkati zip file" {:file-names file-list})))))
 
+(defmethod validate-interface-zip-package :netex [_ byte-array-input]
+  (let [file-list (list-zip byte-array-input)
+        matching-filenames (filter (fn [filename] (re-matches #"(?i).*line.*\.xml$" (str/lower-case filename))) file-list)]
+
+    (when (empty? matching-filenames)
+      (throw (ex-info "Missing required files in netex zip file " {:file-names file-list})))))
+
 (defn check-interface-zip [type db package-id interface-id url byte-array-data service-id]
   (try
     (validate-interface-zip-package type byte-array-data)
@@ -283,7 +299,7 @@
           (fn [type _ _ _ _ _ _ _ _] type))
 
 (defmethod load-transit-interface-url :gtfs [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
+  (let [response (load-interface-url db :gtfs interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
@@ -297,7 +313,7 @@
       nil)))
 
 (defmethod load-transit-interface-url :kalkati [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
-  (let [response (load-interface-url db interface-id service-id url last-import-date saved-etag force-download?)]
+  (let [response (load-interface-url :kalkati db interface-id service-id url last-import-date saved-etag force-download?)]
     (if response
       (try
         (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
@@ -306,6 +322,21 @@
         ;; Return nil response in case of error
         (catch Exception e
           (log/warn "Error while loading package from url url " url ": " (.getMessage e))
+          nil))
+      ;; Return nil response in case of error
+      nil)))
+
+(defmethod load-transit-interface-url :netex [type db package-id interface-id service-id url last-import-date saved-etag force-download?]
+  (let [response (load-interface-url :netex db interface-id service-id url last-import-date saved-etag force-download?)]
+    (if response
+      (try
+        (check-interface-zip type db package-id interface-id url (java.io.ByteArrayInputStream. (:body response)) service-id)
+        ;; Return response
+        response
+
+        ;; Return nil response in case of error
+        (catch Exception e
+          (log/warn "Error while loading package from url: " url ": " (.getMessage e))
           nil))
       ;; Return nil response in case of error
       nil)))
@@ -322,7 +353,8 @@
                      ::specql/limit 1}))))
 
 (defn download-and-store-transit-package
-  "Download GTFS or kalkati file, optionally upload to s3, parse and store to database.
+  "Download GTFS or kalkati file, optionally upload to s3,
+  (Since change detection is disabled, don't parse and store to database anymore.)
   Returns map containing an in-memory traffic gtfs package and related attributes or nil on failure "
   [interface-type
    gtfs-config
@@ -330,11 +362,11 @@
    {:keys [url operator-id operator-name ts-id last-import-date license id data-content]}
    upload-s3?
    force-download?]
-  (log/debug "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
+  (log/info "GTFS: Proceeding to download, service-id = " ts-id ", file url = " (pr-str url))
   (let [filename (gtfs-file-name operator-id ts-id)
         latest-package (interface-latest-package db id)
         package-count (:package-count (first (fetch-count-service-packages db {:service-id ts-id})))
-        _ (log/warn "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
+        _ (log/info "download-and-store-transit-package :: package-count" (pr-str package-count) "(= 0 package-count)" (= 0 package-count))
         package (specql/insert! db :gtfs/package
                                 {:gtfs/first_package (= 0 package-count)
                                  :gtfs/transport-operator-id operator-id

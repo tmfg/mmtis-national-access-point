@@ -29,6 +29,8 @@
 
 (defqueries "ote/tasks/pre_notices.sql")
 
+(declare fetch-pre-notices-by-interval-and-regions fetch-unsent-changes-by-regions)
+
 (defn datetime-string [dt timezone]
   (when dt
     (format/unparse (format/with-zone (format/formatter "dd.MM.yyyy HH:mm") timezone) dt)))
@@ -135,9 +137,9 @@
 (defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
-    (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
+    #_ (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
     (assoc this
-      ::stop-tasks [(chime-at (daily-at 8 15)
+      ::stop-tasks nil #_ [(chime-at (daily-at 8 15)
                               (fn [_]
                                 (#'send-pre-notice-emails! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]

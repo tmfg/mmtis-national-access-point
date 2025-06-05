@@ -14,4 +14,5 @@ done
 echo "Connection established!"
 mvn flyway:migrate
 cd -
-docker run -v $DIR:/database -v $DIR/../../fintraffic-napote-config/static-data:/static-data -it --network docker_napote --link napotedb11:postgres --rm postgres sh /database/devdb_testdata.sh
+
+sh ./devdb_testdata.sh

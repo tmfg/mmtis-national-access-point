@@ -6,7 +6,6 @@
 
   See also https://github.com/MobilityData/gtfs-flex"
   (:require [cheshire.core :as cheshire]
-            [clojure.string :as str]
             [com.stuartsierra.component :as component]
             [compojure.core :refer [GET]]
             [jeesql.core :refer [defqueries]]
@@ -15,7 +14,6 @@
             [ote.gtfs.transform :as gtfs-transform]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.integration.export.geojson :as geojson]
             [ote.integration.export.gtfs :as gtfs]
             [ote.services.transport :as transport-service]
             [ote.util.transport-operator-util :as op-util]
@@ -23,8 +21,7 @@
             [ring.util.io :as ring-io]
             [taoensso.timbre :as log]
             [specql.core :as specql])
-  (:import [java.time LocalDateTime LocalDate]
-           [java.time.format DateTimeFormatter]))
+  (:import [java.time LocalDate]))
 
 (defqueries "ote/integration/export/geojson.sql")
 
@@ -159,6 +156,7 @@
                          ::t-service/name
                          ::t-service/available-from
                          ::t-service/available-to,
+                         ::t-service/sub-type,
                          ::t-service/passenger-transportation}
                        {::t-service/id transport-service-id})))
 
@@ -191,7 +189,7 @@
           flex-trips        (conj gtfs-trips
                                   (->static-trips static-route-id static-trip-id static-service-id))
           ; TODO: defaulting to bus is due to backwards compatability, feel free to improve this detection if necessary
-          readable-route-type (if (= (::t-service/sub-type transport-service) "taxi")
+          readable-route-type (if (= (::t-service/sub-type transport-service) :taxi)
                                 :taxi
                                 :bus)
           flex-routes       (conj gtfs-routes

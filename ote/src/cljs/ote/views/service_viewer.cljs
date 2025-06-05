@@ -287,41 +287,38 @@
                    descriptions (format-descriptions (::t-service/description (::t-service/external-interface interface)))]]
          ^{:key (str (::t-service/id interface) title)}
          [:div
-          [info-sections-1-col (string/upper-case title)
-           [common-ui/information-row-with-option
-            (tr [:service-search :homepage])
-            (when url [common-ui/linkify
-                       url
-                       url
-                       {:target "_blank"
-                        :analytics-tag "Verkko-osoite"}])
-            true]]
-          [info-sections-3-cols
-           ""
+          [info-sections-3-cols (string/upper-case title)
            [:div (stylefy/use-sub-style service-viewer/info-seqment :left)
+            [common-ui/information-row-with-option
+             (tr [:service-search :homepage])
+             (when url [common-ui/linkify
+                        url
+                        url
+                        {:target "_blank"
+                         :analytics-tag "Verkko-osoite"}])
+             true]]
+           [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
             [common-ui/information-row-with-option
              (tr [:field-labels :transport-service-common ::t-service/license])
              license false]]
-
-           [:div (stylefy/use-sub-style service-viewer/info-seqment :mid)
-            [common-ui/information-row-with-option
-             (tr [:common-texts :format]) format true]]
            [:div (stylefy/use-sub-style service-viewer/info-seqment :right)
-            [information-row-with-selection
-             (tr [:field-labels :transport-service-common ::t-service/external-service-description])
-             descriptions
-             false]]
-           {:sub-title false}]
+            [common-ui/information-row-with-option
+             (tr [:common-texts :format]) format true]]]
+          [:section
+           [:div
+            [information-row-with-selection (tr [:field-labels :transport-service-common ::t-service/external-service-description]) descriptions true]]]
 
           ;; TIS-VACO data quality information
           (let [tis-vaco   (:tis-vaco interface)
                 public-id  (:gtfs/tis-entry-public-id tis-vaco)
+                download-status  (:gtfs/download-status tis-vaco)
+                submit-completed  (:gtfs/tis-submit-completed tis-vaco)
                 magic-link (:gtfs/tis-magic-link tis-vaco)
                 format     (some-> (::t-service/format interface) first str/lower-case)
                 {:keys [validator converter]} (tis-configs/base-task-names format)]
-            (when (some? public-id)
-              ; VACO-originating NeTEx conversion
-              [:div
+            (if (and (not (nil? public-id)) (not (str/blank? public-id)))
+              ; VACO-originating NeTEx conversion if possible
+              [:div {:style {:margin-left "20px"}}
                [info-sections-2-cols
                 (tr [:service-search :vaco-quality-details-title])
                 [:div
@@ -343,11 +340,11 @@
                     [:div
                      ; conversion status badge, falls back to entry badge if converter is unknown
                      [:img {:src    (str (:api-base-url tis-vaco) "/api/badge/" public-id (condp = (:name converter)
-                                                                                            "gtfs2netex.fintraffic" "/netex.entur"))
+                                                                                            "gtfs2netex.fintraffic" "/netex.entur"
+                                                                                            "netex2gtfs.entur" "/gtfs.canonical"))
                             :style  {:margin-right "0.5em"}
                             :height "24" :title "VACO conversion status badge" :alt "VACO conversion status badge"}]]
-                    false])]
-                {:sub-title true}]
+                    false])]]
                [info-sections-1-col
                 ""
                 [:div
@@ -359,12 +356,45 @@
                               (:gtfs/tis-success tis-vaco)
                               url-ote-netex)
                      [common-ui/linkify (str url-ote-netex "?origin=ui") (tr [:service-search :download-netex]) {:target "_blank"}])]
-                  true]]]]))]))
-     [:h5 (stylefy/use-style (merge
-                               style-base/info-content
-                               {:color colors/gray650
-                                :font-style "italic"}))
-      (tr [:service-viewer :not-disclosed])])])
+                  true]]]]
+              ;; Show error message if no VACO data is available
+              (when (or (= "gtfs" format) (= "netex" format) (= "gtfs-flex" format) (= "kalkati" format))
+                [:div {:style {:margin-left "20px"}}
+                 [info-sections-2-cols
+                  (tr [:service-search :vaco-quality-details-title])
+                  [:div
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-validated-feed])
+                    [:div]
+                    false]]
+                  ;; conversion details
+                  [:div
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-converted-feed])
+                    [:div]
+                    false]]
+                  {:sub-title true}]
+                 [info-sections-1-col
+                  ""
+                  [:div
+                   [common-ui/information-row-with-option
+                    (tr [:service-search :vaco-links-section-title])
+                    [:div (cond
+                            (and (not (nil? magic-link)) (not (str/blank? magic-link)))
+                            [common-ui/linkify magic-link (tr [:service-search :vaco-magic-link]) {:target "_blank"}]
+                            (and (= "success" download-status) (nil? submit-completed))
+                            (tr [:service-search :vaco-validation-not-started])
+                            (not= "success" download-status)
+                            (tr [:service-search :vaco-given-interface-has-problem]))]
+                    true]]]])))
+          [spacer]]))
+     [:div
+      [:h5 (stylefy/use-style (merge
+                                style-base/info-content
+                                {:color colors/gray650
+                                 :font-style "italic"}))
+       (tr [:service-viewer :not-disclosed])]
+      [spacer]])])
 
 (defn- luggage-warnings
   [title data]
@@ -402,7 +432,6 @@
 
 (defn- booking-service
   [title data]
-  (js/console.log (str "DATA >> " data))
   (let [descriptions (format-descriptions (::t-service/description data))
         url (::t-service/url data)]
     [:section
@@ -989,7 +1018,6 @@
        [service-info (tr [:service-viewer :transport-service-info]) ts sub-type-key]
        [service-area e! (tr [:service-viewer :service-area]) ts]
        [published-interfaces (tr [:service-viewer :published-interfaces]) interfaces (::t-operator/id to) (::t-service/id ts) (::t-service/sub-type ts) "TODO package"]
-       [spacer]
 
        (case service-sub-type
          :rentals

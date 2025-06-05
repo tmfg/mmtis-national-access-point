@@ -5,7 +5,7 @@
             [clj-http.client :as http-client]
             [ote.integration.import.gtfs :as gtfs]
             [ote.services.transit-changes :as transit-changes]
-            [ote.test :refer [system-fixture http-post]]
+            [ote.test :refer [sql-query]]
             [ote.components.db :as db]
             [taoensso.timbre :as log]
             [ote.gtfs.parse :as gtfs-parse]
@@ -140,7 +140,7 @@
       (testing "empty content in GTFS files are reported"
         (let [result  (process-transit-package 6201 "required-empty-1")
               reports (fetch-reports-for 6201 result)]
-          (is (= 6 (count reports)))
+          (is (= 5 (count reports)))
           (-> reports
               (assert-report "No data rows in file agency.txt of type :gtfs/agency-txt" "error")
               (assert-report "No data rows in file stops.txt of type :gtfs/stops-txt" "error")
@@ -148,7 +148,8 @@
               (assert-report "No data rows in file routes.txt of type :gtfs/routes-txt" "error")
               (assert-report "No data rows in file trips.txt of type :gtfs/trips-txt" "error")
               ; stop times is a special file and is handled last because of trip id lookups
-              (assert-report "No data rows in file stop_times.txt of type :gtfs/stop-times-txt" "error"))))
+              ;; Due to disabling change detection, stop_times.txt is not required anymore
+              #_ (assert-report "No data rows in file stop_times.txt of type :gtfs/stop-times-txt" "error"))))
 
       (testing "uploading invalid package multiple times adds only one failure report to latest package"
         (let [reports-before (fetch-reports-for 6301 nil)
@@ -170,3 +171,13 @@
               reports (fetch-reports-for 6402 result)]
           (is (= true (some? result)))
           (is (= 0 (count reports))))))))
+
+;; Mock url loading if planning to take this into use
+#_ (deftest validate-interface-zip-package-test
+  (let [url "Give correct url or use mock"
+        response (gtfs/load-transit-interface-url :netex db 345 7001 2
+                                                  url
+                                                  nil nil true)
+        byles (java.io.ByteArrayInputStream. (:body response))
+        valid (gtfs/validate-interface-zip-package :netex byles)]
+    (is (= (nil? valid)))))

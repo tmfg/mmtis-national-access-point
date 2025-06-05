@@ -1,4 +1,5 @@
-FROM ubuntu:bionic
+# Uusin ubuntu image
+FROM ubuntu:latest
 
 # Install wget to get signing key
 RUN  apt-get update \
@@ -10,7 +11,7 @@ RUN apt-get update && apt -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils gnupg gnupg1 gnupg2
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y apt-utils
 
-# add PostgreSQL repository information for PostgreSQL 11 with PostGIS 2.5 (postgresql-11-postgis-2.5)
+# add PostgreSQL repository information for PostgreSQL 16.3 with PostGIS 3.3 (postgresql-16-postgis-3.3)
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y wget gnupg \
  && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
@@ -18,17 +19,17 @@ RUN apt-get update \
 
 # Install dependencies
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata postgresql-11 postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts postgresql-contrib-11 maven
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata postgresql-16 postgresql-16-postgis-3 postgresql-16-postgis-3-scripts postgresql-contrib-16 maven
 
 # Configure pg to listen network
-RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/11/main/postgresql.conf
-RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/11/main/postgresql.conf
-RUN echo "local all all trust" > /etc/postgresql/11/main/pg_hba.conf
-RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/11/main/pg_hba.conf
+RUN sed -i "s/#listen_addresses.*/listen_addresses = '*'/g" /etc/postgresql/16/main/postgresql.conf
+RUN sed -i "s/port = 5433/port = 5432/g" /etc/postgresql/16/main/postgresql.conf
+RUN echo "local all all trust" > /etc/postgresql/16/main/pg_hba.conf
+RUN echo "host    all             all             0.0.0.0/0            trust" >> /etc/postgresql/16/main/pg_hba.conf
 
 # Configure fsync and full page writes off
-RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/11/main/postgresql.conf
-RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/11/main/postgresql.conf
+RUN sed -i "s/#fsync.*/fsync = off/g" /etc/postgresql/16/main/postgresql.conf
+RUN sed -i "s/#full_page_writes.*/full_page_writes = off/g" /etc/postgresql/16/main/postgresql.conf
 
 # Create database
 RUN service postgresql restart && \
@@ -68,4 +69,5 @@ EXPOSE 5432
 
 USER postgres
 
-CMD ["/bin/bash", "-c", "service postgresql start; trap \"service postgresql stop; exit 0\" TERM; tail -F /var/log/postgresql/postgresql-11-main.log & wait"]
+
+CMD ["/bin/bash", "-c", "service postgresql start; trap \"service postgresql stop; exit 0\" TERM; tail -F /var/log/postgresql/postgresql-16-main.log & wait"]
