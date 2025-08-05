@@ -141,7 +141,14 @@
                  [camel-snake-kebab "0.4.2"]
 
                  ; Clojure Core Memoize is a TTL memoizing library, useful for single point caching - Eclipse Public License 1.0
-                 [org.clojure/core.memoize "1.0.250"]]
+                 [org.clojure/core.memoize "1.0.250"]
+                 ;; New jna
+                 [net.java.dev.jna/jna "5.14.0"]
+
+                 ;; APache Jena
+                 [org.apache.jena/jena-core "4.10.0"]
+                 [org.apache.jena/jena-arq "4.10.0"]
+                 ]
   :profiles {:uberjar {:aot :all
 
                        ;; Prevent uberjar from cleaning cljs generated files
@@ -149,7 +156,7 @@
              :dev {:dependencies [[org.clojure/test.check "0.10.0-alpha2"]
                                   [webjure/json-schema "0.7.4"]]
                    :test-paths ["test/clj"]
-                   :resource-paths ["test_resources"]}}
+                   :resource-paths ["resources" "test_resources"]}}
 
   :repositories [["osgeo-release" "https://repo.osgeo.org/repository/release/"]
                  ["osgeo" "https://download.osgeo.org/webdav/geotools/"]
@@ -158,7 +165,7 @@
   :plugins [;; Automatically compile your ClojureScript code into Javascript - Eclipse Public License 1.0
             [lein-cljsbuild "1.1.7"]
             ;; Figwheel builds your ClojureScript code and hot loads it into the browser - Eclipse Public License 1.0
-            [lein-figwheel "0.5.13"]
+            [lein-figwheel "0.5.20"]
             ;; Static code analyzer for Clojure, ClojureScript - Eclipse Public License 1.0
             [lein-kibit "0.1.6"]]
 
