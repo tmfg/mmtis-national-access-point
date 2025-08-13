@@ -3,28 +3,24 @@
   (:require [com.stuartsierra.component :as component]
             [ote.components.http :as http]
             [ote.localization :as localization :refer [tr]]
-            [ote.time :as time]
-            [clojure.java.io :as io]
             [ring.util.response :as response]
             [specql.core :as specql]
-            [taoensso.timbre :as log]
             [compojure.core :refer [routes GET]]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
-            [ote.db.modification :as modification]
-            [clojure.string :as str]
-            )
+            [ote.db.modification :as modification])
   (:import (org.apache.jena.datatypes.xsd XSDDateTime)
            [org.apache.jena.rdf.model ModelFactory ResourceFactory]
            [org.apache.jena.vocabulary RDF]
            [org.apache.jena.datatypes BaseDatatype]
            [org.apache.jena.datatypes.xsd.impl XSDDateTimeType]
-           [java.time Instant])
-  )
+           [java.time Instant]))
 
 (defqueries "ote/integration/export/geojson.sql")
 (defqueries "ote/services/service_search.sql")
+
+(declare fetch-operation-area-for-service latest-published-service)
 
 ;; URI-prefiksit DCAT-AP:lle ja Mobility DCAT-AP:lle
 (def base-uri "http://localhost:3000/")
@@ -43,6 +39,10 @@
 (def catalog-uri (str base-uri "catalog"))
 (def dataset-base-uri (str base-uri "rdf/" service-id))
 (def distribution-base-uri (str dataset-base-uri "/distribution"))
+(def distribution-interface-base-uri (str dataset-base-uri "/distribution/interface"))
+;;TODO: Select suitable licence url from this list: http://publications.europa.eu/resource/authority/licence
+(def licence-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+
 
 (defn localized-text-with-key
   "Usage: (localized-text-with-key \"fi\" [:email-templates :password-reset :subject])"
@@ -96,33 +96,51 @@
       "https://w3id.org/mobilitydcat-ap/transport-mode/taxi"
       (and (= transport-type :road) (= :schedule sub-type))
       "https://w3id.org/mobilitydcat-ap/transport-mode/bus"
-      :else "https://w3id.org/mobilitydcat-ap/transport-mode/bus"))
+      :else "https://w3id.org/mobilitydcat-ap/transport-mode/bus")))
 
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/air> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/bicycle> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/bike-hire> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/bike-sharing> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/bus> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/car> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/car-hire> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/car-pooling> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/car-sharing> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/e-scooter> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/long-distance-coach> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/long-distance-rail> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/maritime> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/metro-subway-train> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/motorcycle> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/other> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/pedestrian> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/regional-and-local-rail> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/ride-pooling> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/shuttle-bus> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/shuttle-ferry> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/taxi> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/tram-light-rail> ,
-  ;<https://w3id.org/mobilitydcat-ap/transport-mode/truck> .
-  )
+(defn get-mobility-data-standard
+  "When implementing final version of this function, ensure that is this ok."
+  [interface]
+  (case (str (first (::t-service/format interface)))
+    "GTFS" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/gtfs"
+    "GTFS-RT" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/gtfs-rt"
+    "GBFS" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/gbfs"
+    "Kalkati" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+    "NeTEx" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+    "GeoJSON" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+    "JSON" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+    "CSV" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+    "Datex II" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/datex-II"
+    "SIRI" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/siri"
+    :else "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"))
+
+(defn get-interface-format-extent [interface]
+  (case (str (first (::t-service/format interface)))
+    "GTFS" "http://publications.europa.eu/resource/authority/file-type/CSV"
+    "GTFS-RT" "http://publications.europa.eu/resource/authority/file-type/CSV"
+    "GBFS" "http://publications.europa.eu/resource/authority/file-type/JSON"
+    "Kalkati" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "NeTEx" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "GeoJSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
+    "JSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
+    "CSV" "http://publications.europa.eu/resource/authority/file-type/CSV"
+    ;; TODO: Ensure correct format somehow - This is mandatory information so the correct format has to be given.
+    ;; DATEX II is primary in XML format, but can also be in JSON format.
+    "Datex II" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "SIRI" "http://publications.europa.eu/resource/authority/file-type/XML"
+    ;; TODO: In cases where format is not known, we need to get the corredt format from somewhere due to DCAT-AP requirements. This is mandatory field.
+    ;; This might be a big problem in the future. To ensure the correct format, the data from the interface must be downloaded and checked.
+    ;; Correct format might be written in the first bytes in the downloaded file.
+    :else nil))
+
+(defn get-rights-url [interface]
+  ;; This is the best we can do with data that is available in the service.
+  ;; By changing lincence as a mandatory data and by changing lisence to be selected from a list, we can ensure that this is correct.
+  ;; But now this is the best we can do.
+  (if (::t-service/license interface)
+    "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided"
+    "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/other"))
+
 
 (defn periodOfTime [model available-from available-to created]
   (let [period (ResourceFactory/createResource)
@@ -139,43 +157,94 @@
 
 ;; Luo Mobility DCAT-AP RDF-malli
 
-(defn create-catalog-model [model catalog fintraffic-agent]
-  ;; ;; Catalog kuvaa mikä Finap on
-  (.add model catalog RDF/type (ResourceFactory/createResource (str dcat "Catalog")))
-  (.add model catalog
-        (ResourceFactory/createProperty (str foaf "title"))
-        (ResourceFactory/createStringLiteral "Finap.fi - NAP - National Access Point"))
-  (.add model catalog
-        (ResourceFactory/createProperty (str foaf "description"))
-        ;; TODO: Hae kielimallin mukainen kuvaus
-        (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "FIN"))
-  (.add model catalog
-        (ResourceFactory/createProperty (str foaf "description"))
-        ;; TODO: Hae kielimallin mukainen kuvaus
-        (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "SWE"))
-  (.add model catalog
-        (ResourceFactory/createProperty (str foaf "homepage"))
-        (ResourceFactory/createStringLiteral "https://www.finap.fi/"))
-  (.add model fintraffic-agent RDF/type (ResourceFactory/createResource (str foaf "Organization")))
-  (.add model fintraffic-agent
-        (ResourceFactory/createProperty (str foaf "name"))
-        (ResourceFactory/createStringLiteral "Fintraffic Oy"))
-  (.add model catalog
-        (ResourceFactory/createProperty (str dct "publisher"))
-        fintraffic-agent)
-  )
+(defn create-catalog-model [db model catalog]
+  (let [latest-publication (:published (first (latest-published-service db)))
+        licence-resource (ResourceFactory/createResource)]
+    ;; Catalog kuvaa mikä Finap on
+    (.add model catalog RDF/type (ResourceFactory/createResource (str dcat "Catalog")))
+    (.add model catalog
+          (ResourceFactory/createProperty (str foaf "title"))
+          (ResourceFactory/createStringLiteral "Finap.fi - NAP - National Access Point"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str foaf "description"))
+          ;; TODO: Hae kielimallin mukainen kuvaus. From file en.edn, fi.edn, sv.edn
+          (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "fi"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str foaf "description"))
+          ;; TODO: Hae kielimallin mukainen kuvaus
+          (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "sv"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str foaf "homepage"))
+          (ResourceFactory/createStringLiteral "https://www.finap.fi/"))
 
-(defn create-record [service model]
+    ;; TODO: Ensure that this is ok by customer
+    ;; Default is now Finland - http://data.europa.eu/nuts/code/FI
+    ;; It means that catalog contains information only from Finland
+    (.add model catalog (ResourceFactory/createProperty (str dct "spatial"))
+          (ResourceFactory/createResource "http://data.europa.eu/nuts/code/FI"))
+
+    ;; language
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "language"))
+          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "language"))
+          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/SWE"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "language"))
+          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG"))
+
+    ;; license
+    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
+    (.add model licence-resource
+          (ResourceFactory/createProperty (str dct "identifier"))
+          (ResourceFactory/createResource licence-url))
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "license"))
+          licence-resource)
+
+  ;; issued - published
+  (.add model catalog
+        (ResourceFactory/createProperty (str dct "issued"))
+        (ResourceFactory/createTypedLiteral (str "2018-01-01T00:00:01Z") (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
+
+  ;; http://publications.europa.eu/resource/authority/data-theme/TRAN
+  ;; themeTaxonomy
+  (.add model catalog
+        (ResourceFactory/createProperty (str dct "themeTaxonomy"))
+        (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/mobility-theme"))
+
+  ;; modified -- Last recent modification date
+  (.add model catalog
+        (ResourceFactory/createProperty (str dct "modified"))
+        (ResourceFactory/createTypedLiteral (str latest-publication) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
+
+    ;; hasPart - Finap doesn't fetch other catalogs data.
+    ;; isPartOf - As far as we know Finap is not part of any other catalog, so this is not used.
+
+    ;; dct:identifier
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "identifier"))
+          (ResourceFactory/createStringLiteral catalog-uri))
+
+    ;; adms:identifier - As far as we know, Finap is not issued an EU-wide identificator yet.
+    ))
+
+(defn create-record [service model catalog interface dataset-resource fintraffic-agent]
   (let [id (:ote.db.transport-service/id service)
-        record-uri ""
-        dataset-uri (str dataset-base-uri id)
+        record-uri (if (nil? interface)
+                     (str dataset-base-uri id "/record")
+                     (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))
         record (ResourceFactory/createResource record-uri)
         created (:ote.db.modification/created service)
         modified (:ote.db.modification/modified service)]
+
     (.add model record RDF/type (ResourceFactory/createResource (str dcat "CatalogRecord")))
+    ;; created
     (.add model record
           (ResourceFactory/createProperty (str dct "created"))
           (ResourceFactory/createStringLiteral (str created)))
+    ;; language
     (.add model record
           (ResourceFactory/createProperty (str dct "language"))
           (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
@@ -185,20 +254,120 @@
     (.add model record
           (ResourceFactory/createProperty (str dct "language"))
           (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG"))
+    ;; primaryTopic
     (.add model record
           (ResourceFactory/createProperty (str foaf "primaryTopic"))
-          (ResourceFactory/createResource (str dataset-uri)))
+          dataset-resource)
+    ;; modified
     (.add model record
           (ResourceFactory/createProperty (str dct "modified"))
-          (ResourceFactory/createStringLiteral (str modified)))))
+          (ResourceFactory/createStringLiteral (str modified)))
 
-(defn create-dataset [service model catalog service-id operator-id operation-areas operator]
-  (let [id (:ote.db.transport-service/id service)
+    ;; dct:publisher
+    (.add model record
+          (ResourceFactory/createProperty (str dct "publisher"))
+          fintraffic-agent)
+
+    ;; Add Record to Catalog
+    (.add model catalog
+          (ResourceFactory/createProperty (str dcat "record"))
+          record)
+
+    ;; source - Used when records are harvested from other portals and Finap doesn't harvest them.
+    ))
+
+(defn create-data-service
+  "TODO: All external interfaces are not accessServices. Add this only for those that have API interfaces. ie. Finnair etc.
+  We need to come up with a solution to distinguish between accessService and reqular dataset."
+  [model interface]
+  (let [accessService-resource (ResourceFactory/createResource)
+        endpointUrl (get-in interface [::t-service/external-interface ::t-service/url])
+        title (localized-text-with-key "fi" [:enums :ote.db.transport-service/interface-data-content :route-and-schedule])
+        ;; First element is the finnish description, second is the swedish description and third is the english description.
+        ;;TODO: Use correct language versions
+        description (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")
+
+        rights-resource (ResourceFactory/createResource)
+        rights-url (get-rights-url interface)
+        licence-resource (ResourceFactory/createResource)]
+
+    (.add model accessService-resource RDF/type (ResourceFactory/createResource (str dct "DataService")))
+    (.add model accessService-resource
+          (ResourceFactory/createProperty (str dcat "endpointURL"))
+          (ResourceFactory/createResource endpointUrl))
+    (.add model accessService-resource
+          (ResourceFactory/createProperty (str dct "title"))
+          (ResourceFactory/createResource title))
+    ;;TODO: endpointDescription is like link to swagger documentation or similar. Finap doesn't have this information
+    ;; endpointDescription
+
+    (.add model rights-resource RDF/type (ResourceFactory/createResource (str dct "RightsStatement")))
+    (.add model rights-resource
+          (ResourceFactory/createProperty (str dct "type"))
+          (ResourceFactory/createResource rights-url))
+    (.add model accessService-resource
+          (ResourceFactory/createProperty (str dct "rights"))
+          rights-resource)
+
+    (.add model accessService-resource
+          (ResourceFactory/createProperty (str dcat "description"))
+          (ResourceFactory/createResource description))
+
+    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
+    (.add model licence-resource
+          (ResourceFactory/createProperty (str dct "identifier"))
+          (ResourceFactory/createResource licence-url))
+    (.add model accessService-resource
+          (ResourceFactory/createProperty (str dct "license"))
+          licence-resource)
+
+    ))
+
+(defn create-dataset [service model catalog service-id operator-id operation-areas operator interface]
+  (let [_ (println "Creating dataset for service: ")
+        id (:ote.db.transport-service/id service)
         available-from (:ote.db.transport-service/available-from service)
         available-to (:ote.db.transport-service/available-to service)
         created (::modification/created service)
-        dataset-uri (str dataset-base-uri id)
-        distribution-uri (str distribution-base-uri "/" id)
+        dataset-uri (if (nil? interface)
+                      (str dataset-base-uri id)
+                      (get-in interface [::t-service/external-interface ::t-service/url]))
+        accessURL (if (nil? interface)
+                    (str base-uri "export/geojson/" operator-id "/" service-id)
+                    (get-in interface [::t-service/external-interface ::t-service/url]))
+        downloadURL (if (nil? interface)
+                      (str base-uri "export/geojson/" operator-id "/" service-id)
+                      (get-in interface [::t-service/external-interface ::t-service/url]))
+        mobilityDataStandard (if (nil? interface)
+                               "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
+                               (get-mobility-data-standard interface))
+        format (if (nil? interface)
+                 "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
+                 (get-interface-format-extent interface))
+
+        rights-resource (ResourceFactory/createResource)
+        rights-url (if (nil? interface)
+                     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
+                     (get-rights-url interface))
+
+        licence-resource (ResourceFactory/createResource)
+        licence-url (if (nil? interface)
+                      "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0"
+                      ;;TODO: Select suitable licence url from this list: http://publications.europa.eu/resource/authority/licence
+                      "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+
+        ;; We can use http/https protocol because Finap is doing automatic checks for all interfaces in http format when inteface is added to the service.
+        applicationLayerProtocol "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https"
+
+        ;; TODO: Set the correct description for the default distribution.
+        distribution-description (if (nil? interface)
+                                   (ResourceFactory/createLangLiteral (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service)) "fi")
+                                   ;; TODO: Use correct language versions
+                                   (ResourceFactory/createLangLiteral (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "") "fi"))
+
+        distribution-uri (if (nil? interface)
+                           (str distribution-base-uri "/" id)
+                           (str distribution-interface-base-uri "/" (::t-service/id interface)))
         operator-uri (operator-url (::t-operator/business-id operator))
         kind-uri (str base-uri "operator/" operator-id)
         dataset (ResourceFactory/createResource dataset-uri)
@@ -206,7 +375,8 @@
         spatial-resource (ResourceFactory/createResource)
         operator-agent (ResourceFactory/createResource operator-uri)
         operator-kind (ResourceFactory/createResource operator-uri)
-        operator-name (:ote.db.transport-operator/name operator)]
+        operator-name (:ote.db.transport-operator/name operator)
+        ]
     (.add model dataset RDF/type (ResourceFactory/createResource (str dcat "Dataset")))
     (.add model dataset
           (ResourceFactory/createProperty (str dct "title"))
@@ -214,10 +384,6 @@
     (.add model dataset
           (ResourceFactory/createProperty (str dct "description"))
           (ResourceFactory/createStringLiteral (or (::t-service/description service) "")))
-
-    (.add model catalog
-          (ResourceFactory/createProperty (str dcat "dataset"))
-          dataset)
 
     (.add model dataset
           (ResourceFactory/createProperty (str mobility "transportMode"))
@@ -231,11 +397,49 @@
     ;;
     (.add model distribution
           (ResourceFactory/createProperty (str dcat "accessURL"))
-          (ResourceFactory/createResource (str base-uri "export/geojson/" operator-id "/" service-id)))
+          (ResourceFactory/createResource accessURL))
     ;; Download urliin tulee osote, josta se data on ladattavissa
     (.add model distribution
           (ResourceFactory/createProperty (str dcat "downloadURL"))
-          (ResourceFactory/createResource (str base-uri "export/geojson/" operator-id "/" service-id)))
+          (ResourceFactory/createResource downloadURL))
+
+    ;; mobilityDataStandard
+    (.add model distribution
+          (ResourceFactory/createProperty (str mobility "mobilityDataStandard"))
+          (ResourceFactory/createResource mobilityDataStandard))
+
+    ;; format
+    (.add model distribution
+          (ResourceFactory/createProperty (str dct "format"))
+          (ResourceFactory/createResource format))
+
+    ;; rights
+    (.add model rights-resource RDF/type (ResourceFactory/createResource (str dct "RightsStatement")))
+    (.add model rights-resource
+          (ResourceFactory/createProperty (str dct "type"))
+          (ResourceFactory/createResource rights-url))
+    (.add model distribution
+          (ResourceFactory/createProperty (str dct "rights"))
+          rights-resource)
+
+    ;; applicationLayerProtocol
+    (.add model distribution
+          (ResourceFactory/createProperty (str mobility "applicationLayerProtocol"))
+          (ResourceFactory/createResource applicationLayerProtocol))
+
+    ;; description
+    (.add model distribution
+          (ResourceFactory/createProperty (str mobility "description"))
+          distribution-description)
+
+    ;; license
+    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
+    (.add model licence-resource
+          (ResourceFactory/createProperty (str dct "identifier"))
+          (ResourceFactory/createResource licence-url))
+    (.add model distribution
+          (ResourceFactory/createProperty (str dct "license"))
+          licence-resource)
 
     (.add model dataset
           (ResourceFactory/createProperty (str dct "accrualPeriodicity"))
@@ -317,19 +521,31 @@
           (ResourceFactory/createProperty (str mobility "transportMode"))
           (ResourceFactory/createResource (select-transport-mode service)))
 
+    ;; Add DataSet to catalog
+    (.add model catalog
+          (ResourceFactory/createProperty (str dcat "dataset"))
+          dataset)
+
+    ;; Return the dataset resource
+    dataset
     ))
 
-(defn create-dcat-ap-model [service operation-areas operator]
+(defn create-dcat-ap-model
+  "https://mobilitydcat-ap.github.io/mobilityDCAT-AP/releases/#properties-for-dataset"
+  [db service operation-areas operator]
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
         model (ModelFactory/createDefaultModel)
         catalog (ResourceFactory/createResource catalog-uri)
         datasets [service]
+        external-interfaces (::t-service/external-interfaces service)
+        is-dataservice? false
+        _ (println "create-dcat-ap-model :: external-interfaces " external-interfaces)
         #_(println "create-dcat-ap-model :: datasets " datasets)
         _ (println "create-dcat-ap-model :: service " service)
         ;; Tälläinen organisaatiosivu pitäisi tehdä, joka listaa organisaation palvelut
         fintraffic-agent (ResourceFactory/createResource (fintraffic-url business-id))
-        ;linquistic-resource (ResourceFactory/createResource fintraffic-url)
+
 
         records datasets]
     (.setNsPrefix model "dcat" dcat)
@@ -337,16 +553,31 @@
     (.setNsPrefix model "foaf" foaf)
     (.setNsPrefix model "mobility" mobility)
 
+    ;; Fintraffic agent
+    (.add model fintraffic-agent RDF/type (ResourceFactory/createResource (str foaf "Organization")))
+    (.add model fintraffic-agent
+          (ResourceFactory/createProperty (str foaf "name"))
+          (ResourceFactory/createStringLiteral "Fintraffic Oy"))
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "publisher"))
+          fintraffic-agent)
+
     ;; Lisää catalogi
-    (create-catalog-model model catalog fintraffic-agent)
+    (create-catalog-model db model catalog)
 
-    ;; Records
-    (doseq [service records]
-      (create-record service model))
+    ;; Records and Dataset
+    (let [dataset-resource (create-dataset service model catalog service-id operator-id operation-areas operator nil)
+          _ (create-record service model catalog nil dataset-resource fintraffic-agent)])
 
-    ;; Datasetit - KAikki datasetit, mitä tietokannasta löytyy
-    (doseq [service datasets]
-      (create-dataset service model catalog service-id operator-id operation-areas operator))
+    (doseq [interface external-interfaces]
+      ;; TODO: is interface a dataservice or dataset?
+      ;; If interface is not a dataservice, then create accessService
+      (if is-dataservice?
+        (create-data-service model interface)
+        (let [dataset-resource (create-dataset service model catalog service-id operator-id operation-areas operator interface)
+              _ (create-record service model catalog interface dataset-resource fintraffic-agent)])))
+
+    ;; Return model
     model))
 
 ;; Sarjallista RDF/XML
@@ -359,7 +590,6 @@
   (let [service-id (if (string? service-id)
                      (Long/parseLong service-id)
                      service-id)
-        #_(println "create-rds :: service-id " service-id)
         service (first (specql/fetch db ::t-service/transport-service
                                      (conj (specql/columns ::t-service/transport-service)
                                            ;; join external interfaces
@@ -371,16 +601,12 @@
         operator (first (specql/fetch db ::t-operator/transport-operator
                                       (specql/columns ::t-operator/transport-operator)
                                       {::t-operator/id operator-id}))
-        _ (println "create-rds :: operator " operator)
-        #_(println "create-rds :: operation-areas " operation-areas)
-        #_(println "create-rds :: service " service)
 
-        model (create-dcat-ap-model service operation-areas operator)
+        model (create-dcat-ap-model db service operation-areas operator)
         ;rdf-xml (serialize-model model)
         rdf-turtle (serialize-model model)
         turtle-format (-> (response/response rdf-turtle)
-                          (response/content-type "text/turtle; charset=UTF-8"))
-        #_(println "create-rds :: juttu " juttu)]
+                          (response/content-type "text/turtle; charset=UTF-8"))]
     turtle-format))
 
 (defn- rds-routes [config db]
