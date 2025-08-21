@@ -19,8 +19,9 @@
 
 (defqueries "ote/integration/export/geojson.sql")
 (defqueries "ote/services/service_search.sql")
+(defqueries "ote/tasks/gtfs.sql")
 
-(declare fetch-operation-area-for-service latest-published-service)
+(declare fetch-operation-area-for-service latest-published-service fetch-latest-gtfs-vaco-status)
 
 ;; URI-prefiksit DCAT-AP:lle ja Mobility DCAT-AP:lle
 (def base-uri "http://localhost:3000/")
@@ -59,7 +60,6 @@
     :parking "https://w3id.org/mobilitydcat-ap/mobility-theme/parking-service-and-rest-area-information"
     :brokerage "https://w3id.org/mobilitydcat-ap/mobility-theme/sharing-and-hiring-services"
     :other "https://w3id.org/mobilitydcat-ap/mobility-theme/other"))
-
 
 (defn select-sub-theme [service]
   (case (:ote.db.transport-service/sub-type service)
@@ -155,6 +155,35 @@
             (ResourceFactory/createTypedLiteral (str available-to) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime"))))
     period))
 
+
+(defn add-isreferenced-and-related-to-dataset [geojson-dataset interface-dataset model]
+  (.add model interface-dataset
+        (ResourceFactory/createProperty (str dct "isReferencedBy"))
+        geojson-dataset)
+  (.add model geojson-dataset
+        (ResourceFactory/createProperty (str dct "relation"))
+        interface-dataset))
+
+(defn get-inteted-information-service
+  "Päättele tyyppi interface typestä"
+  [interface]
+  (case (name (first (::t-service/data-content interface)))
+    "route-and-schedule" "https://w3id.org/mobilitydcat-ap/intended-information-service/trip-plans"
+    "luggage-restrictions" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "realtime-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-passing-times-trip-plans-and-auxiliary-information"
+    "booking-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
+    "accessibility-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "other-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "pricing" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "service-hours" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
+    "disruptions" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-information-service"
+    "payment-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "other" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "map-and-location" "https://w3id.org/mobilitydcat-ap/intended-information-service/location-search"
+    "on-behalf-errand" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+    "customer-account-info" "https://w3id.org/mobilitydcat-ap/intended-information-service/information-service"
+    :else "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))
+
 ;; Luo Mobility DCAT-AP RDF-malli
 
 (defn create-catalog-model [db model catalog]
@@ -203,21 +232,21 @@
           (ResourceFactory/createProperty (str dct "license"))
           licence-resource)
 
-  ;; issued - published
-  (.add model catalog
-        (ResourceFactory/createProperty (str dct "issued"))
-        (ResourceFactory/createTypedLiteral (str "2018-01-01T00:00:01Z") (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
+    ;; issued - published
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "issued"))
+          (ResourceFactory/createTypedLiteral (str "2018-01-01T00:00:01Z") (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
 
-  ;; http://publications.europa.eu/resource/authority/data-theme/TRAN
-  ;; themeTaxonomy
-  (.add model catalog
-        (ResourceFactory/createProperty (str dct "themeTaxonomy"))
-        (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/mobility-theme"))
+    ;; http://publications.europa.eu/resource/authority/data-theme/TRAN
+    ;; themeTaxonomy
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "themeTaxonomy"))
+          (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/mobility-theme"))
 
-  ;; modified -- Last recent modification date
-  (.add model catalog
-        (ResourceFactory/createProperty (str dct "modified"))
-        (ResourceFactory/createTypedLiteral (str latest-publication) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
+    ;; modified -- Last recent modification date
+    (.add model catalog
+          (ResourceFactory/createProperty (str dct "modified"))
+          (ResourceFactory/createTypedLiteral (str latest-publication) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
 
     ;; hasPart - Finap doesn't fetch other catalogs data.
     ;; isPartOf - As far as we know Finap is not part of any other catalog, so this is not used.
@@ -319,13 +348,10 @@
           (ResourceFactory/createResource licence-url))
     (.add model accessService-resource
           (ResourceFactory/createProperty (str dct "license"))
-          licence-resource)
+          licence-resource)))
 
-    ))
-
-(defn create-dataset [service model catalog service-id operator-id operation-areas operator interface]
-  (let [_ (println "Creating dataset for service: ")
-        id (:ote.db.transport-service/id service)
+(defn create-dataset [db service model catalog service-id operator-id operation-areas operator interface]
+  (let [id (:ote.db.transport-service/id service)
         available-from (:ote.db.transport-service/available-from service)
         available-to (:ote.db.transport-service/available-to service)
         created (::modification/created service)
@@ -369,14 +395,31 @@
                            (str distribution-base-uri "/" id)
                            (str distribution-interface-base-uri "/" (::t-service/id interface)))
         operator-uri (operator-url (::t-operator/business-id operator))
-        kind-uri (str base-uri "operator/" operator-id)
         dataset (ResourceFactory/createResource dataset-uri)
         distribution (ResourceFactory/createResource distribution-uri)
         spatial-resource (ResourceFactory/createResource)
         operator-agent (ResourceFactory/createResource operator-uri)
         operator-kind (ResourceFactory/createResource operator-uri)
         operator-name (:ote.db.transport-operator/name operator)
-        ]
+        assessment-resource (ResourceFactory/createResource)
+
+        ;; TODO: This is not tested yet.
+        ;; Ensure that this works as expected in stg and in prod.
+        latest-conversion-status (when interface
+                                   (first (fetch-latest-gtfs-vaco-status db {:service-id service-id
+                                                                             :interface-id (::t-service/id interface)})))
+        vaco-validation-timestamp (when interface
+                                    (:tis_polling_completed latest-conversion-status))
+
+        last-modified (cond
+                        (and interface latest-conversion-status)
+                        (:created latest-conversion-status)
+                        (and interface
+                             (nil? latest-conversion-status)
+                             (::t-service/gtfs-imported interface))
+                        (::t-service/gtfs-imported interface)
+                        (not interface)
+                        (:ote.db.modification/modified service))]
     (.add model dataset RDF/type (ResourceFactory/createResource (str dcat "Dataset")))
     (.add model dataset
           (ResourceFactory/createProperty (str dct "title"))
@@ -394,11 +437,12 @@
           (ResourceFactory/createProperty (str dcat "distribution"))
           distribution)
 
-    ;;
+    ;; accessURL
     (.add model distribution
           (ResourceFactory/createProperty (str dcat "accessURL"))
           (ResourceFactory/createResource accessURL))
-    ;; Download urliin tulee osote, josta se data on ladattavissa
+
+    ;; Download url is an url where data set data is located
     (.add model distribution
           (ResourceFactory/createProperty (str dcat "downloadURL"))
           (ResourceFactory/createResource downloadURL))
@@ -441,27 +485,29 @@
           (ResourceFactory/createProperty (str dct "license"))
           licence-resource)
 
+    ;; accrualPeriodicity
     (.add model dataset
           (ResourceFactory/createProperty (str dct "accrualPeriodicity"))
           (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"))
 
+    ;; mobilityTheme
     (.add model dataset
           (ResourceFactory/createProperty (str mobility "mobilityTheme"))
           (ResourceFactory/createResource (select-mobility-theme service)))
 
-    ;; Jos sub-themeä ei ole, niin ei lisätä sitä
+    ;; IF sub-theme is missing, do not stress
     (when (select-sub-theme service)
       (.add model dataset
             (ResourceFactory/createProperty (str mobility "mobilityTheme"))
             (ResourceFactory/createResource (select-sub-theme service))))
 
-    ;; Hae NUTS aineistosta korkeampi taso: http://publications.europa.eu/resource/dataset/nuts - hae täältä Esim suomi Finland
-    ;; Ja täältä esim kunta: https://stirdata.github.io/data-specification/lau.ttl
-    ;; Tässä vaiheessa on annettu pelkästään polygon, joka on kaikilla Finapin palveluilla
-    ;; TODO: Ota tuo minicipality ensin ja muuten vasta sitte tuo geojson formaatti. Esim, kempele voi olla primary alue ja sitten voi olla piirretty geometria lisäalueeksi.
+    ;; Get higher state from NUTS: http://publications.europa.eu/resource/dataset/nuts - e.g. Finland
+    ;; and munivipality here: https://stirdata.github.io/data-specification/lau.ttl
+    ;; Currently only polygon is provided because it is set for every service in Finap
+    ;; TODO: Take municipality first and then geojson format according to primary and secondary areas
     (.add model spatial-resource RDF/type (ResourceFactory/createResource (str dct "Location")))
     (.add model dataset (ResourceFactory/createProperty (str dct "spatial"))
-          (ResourceFactory/createResource "https://w3id.org/stirdata/resource/lau/item/FI_244")) ;; Tässä kovakoodattu kempele, alla on tämän geometria
+          (ResourceFactory/createResource "https://w3id.org/stirdata/resource/lau/item/FI_244")) ;; Hardcoded!
 
     (.add model spatial-resource (ResourceFactory/createProperty (str locn "geometry"))
           (ResourceFactory/createTypedLiteral (:geojson (first operation-areas)) (BaseDatatype. "https://www.iana.org/assignments/media-types/application/vnd.geo+json")))
@@ -477,7 +523,7 @@
           (ResourceFactory/createProperty (str dct "publisher"))
           operator-agent)
 
-    ;; georeferencingMethod - lat/lon arvojen perusteella päätelty oikea tyyppi
+    ;; georeferencingMethod - using lat/lon values can correct type to be provided
     (.add model dataset
           (ResourceFactory/createProperty (str mobility "georeferencingMethod"))
           (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates"))
@@ -521,14 +567,69 @@
           (ResourceFactory/createProperty (str mobility "transportMode"))
           (ResourceFactory/createResource (select-transport-mode service)))
 
+    ;; applicableLegislation - More or less impossible to determine which legislation applies to the dataset.
+
+    ;; assessmentResult - Added VACO validation url
+    (when (and interface vaco-validation-timestamp)
+      (.add model assessment-resource RDF/type (ResourceFactory/createResource (str mobility "Assessment")))
+      (.add model assessment-resource
+            (ResourceFactory/createProperty (str dct "date"))
+            (ResourceFactory/createTypedLiteral (str vaco-validation-timestamp) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
+      (.add model distribution
+            (ResourceFactory/createProperty (str dct "result"))
+            (:tis-magic-link latest-conversion-status)))
+
+    ;; hasVersion - Datasets in Finap are not versioned, so not added.
+
+    ;; identifier
+    (.add model dataset
+          (ResourceFactory/createProperty (str mobility "identifier"))
+          (ResourceFactory/createResource dataset-uri))
+
+    ;; isReferencedBy AND related is implemented outside of this function.
+    ;; isVersionOf - Datasets in Finap are not versioned, so not added.
+
+    ;; intendedInformationService
+    (.add model dataset
+          (ResourceFactory/createProperty (str mobility "identifier"))
+          (ResourceFactory/createResource (if interface
+                                            (get-inteted-information-service interface)
+                                            "https://w3id.org/mobilitydcat-ap/intended-information-service/other")))
+
+    ;; language
+    (when-not interface
+      (.add model dataset
+            (ResourceFactory/createProperty (str dct "language"))
+            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
+      (.add model dataset
+            (ResourceFactory/createProperty (str dct "language"))
+            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/SWE"))
+      (.add model dataset
+            (ResourceFactory/createProperty (str dct "language"))
+            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG")))
+
+    ;; adms:identifier - As far as we know, Finap is not issued an EU-wide identificator yet.
+
+    ;; issuded - Documentation says that this should not be used.
+
+    ;; modified
+    (when last-modified
+      (.add model dataset
+            (ResourceFactory/createProperty (str dct "modified"))
+            (ResourceFactory/createTypedLiteral (str last-modified) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime"))))
+
+
+    ;; versionInfo - not supported in Finap, so not added.
+    ;; versionNotes - not supported in Finap, so not added.
+    ;; asQualityAnnotation -- not supported in Finap, so not added.
+
     ;; Add DataSet to catalog
     (.add model catalog
           (ResourceFactory/createProperty (str dcat "dataset"))
           dataset)
 
     ;; Return the dataset resource
-    dataset
-    ))
+    dataset))
 
 (defn create-dcat-ap-model
   "https://mobilitydcat-ap.github.io/mobilityDCAT-AP/releases/#properties-for-dataset"
@@ -540,14 +641,9 @@
         datasets [service]
         external-interfaces (::t-service/external-interfaces service)
         is-dataservice? false
-        _ (println "create-dcat-ap-model :: external-interfaces " external-interfaces)
-        #_(println "create-dcat-ap-model :: datasets " datasets)
-        _ (println "create-dcat-ap-model :: service " service)
-        ;; Tälläinen organisaatiosivu pitäisi tehdä, joka listaa organisaation palvelut
-        fintraffic-agent (ResourceFactory/createResource (fintraffic-url business-id))
 
-
-        records datasets]
+        ;; TODO: Better Organization page should be added to Finap
+        fintraffic-agent (ResourceFactory/createResource (fintraffic-url business-id))]
     (.setNsPrefix model "dcat" dcat)
     (.setNsPrefix model "dct" dct)
     (.setNsPrefix model "foaf" foaf)
@@ -562,20 +658,23 @@
           (ResourceFactory/createProperty (str dct "publisher"))
           fintraffic-agent)
 
-    ;; Lisää catalogi
+    ;; Add catalog
     (create-catalog-model db model catalog)
 
     ;; Records and Dataset
-    (let [dataset-resource (create-dataset service model catalog service-id operator-id operation-areas operator nil)
-          _ (create-record service model catalog nil dataset-resource fintraffic-agent)])
+    (let [geojson-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator nil)
+          _ (create-record service model catalog nil geojson-dataset-resource fintraffic-agent)]
 
-    (doseq [interface external-interfaces]
-      ;; TODO: is interface a dataservice or dataset?
-      ;; If interface is not a dataservice, then create accessService
-      (if is-dataservice?
-        (create-data-service model interface)
-        (let [dataset-resource (create-dataset service model catalog service-id operator-id operation-areas operator interface)
-              _ (create-record service model catalog interface dataset-resource fintraffic-agent)])))
+      (doseq [interface external-interfaces]
+        ;; TODO: is interface a dataservice or dataset?
+        ;; If interface is not a dataservice, then create accessService
+        (if is-dataservice?
+          (create-data-service model interface)
+          (let [interface-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator interface)
+                _ (create-record service model catalog interface interface-dataset-resource fintraffic-agent)
+                _ (add-isreferenced-and-related-to-dataset geojson-dataset-resource
+                                                           interface-dataset-resource
+                                                           model)]))))
 
     ;; Return model
     model))
@@ -603,7 +702,7 @@
                                       {::t-operator/id operator-id}))
 
         model (create-dcat-ap-model db service operation-areas operator)
-        ;rdf-xml (serialize-model model)
+
         rdf-turtle (serialize-model model)
         turtle-format (-> (response/response rdf-turtle)
                           (response/content-type "text/turtle; charset=UTF-8"))]
