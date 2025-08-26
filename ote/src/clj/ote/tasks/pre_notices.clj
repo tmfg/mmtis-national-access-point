@@ -58,8 +58,8 @@
   [db user detected-changes-recipients]
   (try
     (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
-          detected-changes (when (detected-changes-recipients (:email user))
-                             (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))
+          detected-changes nil #_(when (detected-changes-recipients (:email user))
+                                   (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))
           history-ids (set (map :history-id detected-changes))]
 
       (if (or (seq notices) (seq detected-changes))
@@ -137,9 +137,9 @@
 (defrecord PreNoticesTasks [detected-changes-recipients]
   component/Lifecycle
   (start [{db :db email :email :as this}]
-    #_ (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
+    (log/info "PreNoticesTasks: starting task, recipient emails = " detected-changes-recipients)
     (assoc this
-      ::stop-tasks nil #_ [(chime-at (daily-at 8 15)
+      ::stop-tasks [(chime-at (daily-at 8 15)
                               (fn [_]
                                 (#'send-pre-notice-emails! db email detected-changes-recipients)))]))
   (stop [{stop-tasks ::stop-tasks :as this}]
