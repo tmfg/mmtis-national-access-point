@@ -58,8 +58,8 @@
   [db user detected-changes-recipients]
   (try
     (let [notices (fetch-pre-notices-by-interval-and-regions db {:interval "1 day" :regions (:finnish-regions user)})
-          detected-changes (when (detected-changes-recipients (:email user))
-                             (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))
+          detected-changes nil #_(when (detected-changes-recipients (:email user))
+                                   (fetch-unsent-changes-by-regions db {:regions (:finnish-regions user)}))
           history-ids (set (map :history-id detected-changes))]
 
       (if (or (seq notices) (seq detected-changes))
