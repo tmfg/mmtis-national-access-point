@@ -15,7 +15,8 @@
 
 (defqueries "ote/nap/users.sql")
 
-(declare list-users fetch-user-by-id delete-user! search-user-operators-and-members list-authority-users)
+(declare list-users fetch-user-by-id delete-user! search-user-operators-and-members list-authority-users
+         transit-authority-group-id has-group-attribute? authority-group-admin-id)
 
 (defn find-user [db user-id]
   (let [rows (map db-utils/underscore->structure

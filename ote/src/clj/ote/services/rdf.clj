@@ -12,7 +12,7 @@
             [ote.db.modification :as modification])
   (:import (org.apache.jena.datatypes.xsd XSDDateTime)
            [org.apache.jena.rdf.model ModelFactory ResourceFactory]
-           [org.apache.jena.vocabulary RDF]
+           [org.apache.jena.vocabulary RDF OWL]
            [org.apache.jena.datatypes BaseDatatype]
            [org.apache.jena.datatypes.xsd.impl XSDDateTimeType]
            [java.time Instant]))
@@ -34,6 +34,7 @@
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
+(def cnt "http://www.w3.org/2011/content#")
 (def locn "http://www.w3.org/ns/locn#")
 (def foaf "http://xmlns.com/foaf/0.1/")
 (def mobility "http://www.w3.org/ns/mobilitydcatap#")
@@ -364,9 +365,19 @@
         downloadURL (if (nil? interface)
                       (str base-uri "export/geojson/" operator-id "/" service-id)
                       (get-in interface [::t-service/external-interface ::t-service/url]))
+
+        ;; See: https://github.com/mobilityDCAT-AP/mobilityDCAT-AP/issues/62
         mobilityDataStandard (if (nil? interface)
-                               "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
-                               (get-mobility-data-standard interface))
+                               (let [moblityDataStandard-resource (ResourceFactory/createResource)]
+                                 (doto model
+                                   (.add moblityDataStandard-resource RDF/type (ResourceFactory/createResource (str mobility "MobilityDataStandard")))
+                                   (.add moblityDataStandard-resource OWL/versionInfo (ResourceFactory/createPlainLiteral "GeoJSON rfc7946"))
+                                   (.add moblityDataStandard-resource
+                                         (ResourceFactory/createProperty (str mobility "schema"))
+                                         (ResourceFactory/createResource "https://geojson.org/schema/GeoJSON.json")))
+                                 moblityDataStandard-resource)
+                               (ResourceFactory/createResource (get-mobility-data-standard interface)))
+
         format (if (nil? interface)
                  "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
                  (get-interface-format-extent interface))
@@ -399,7 +410,6 @@
         distribution (ResourceFactory/createResource distribution-uri)
         spatial-resource (ResourceFactory/createResource)
         operator-agent (ResourceFactory/createResource operator-uri)
-        operator-kind (ResourceFactory/createResource operator-uri)
         operator-name (:ote.db.transport-operator/name operator)
         assessment-resource (ResourceFactory/createResource)
 
@@ -450,7 +460,7 @@
     ;; mobilityDataStandard
     (.add model distribution
           (ResourceFactory/createProperty (str mobility "mobilityDataStandard"))
-          (ResourceFactory/createResource mobilityDataStandard))
+          mobilityDataStandard)
 
     ;; format
     (.add model distribution
@@ -485,10 +495,38 @@
           (ResourceFactory/createProperty (str dct "license"))
           licence-resource)
 
+    ;; accessService - TODO: Implement if data service is implemented in final product
+
+    ;; characterEncoding - We donät know encondig of the external interface data. So add only if geojson distribution is created.
+    (when (nil? interface)
+      (.add model distribution
+            (ResourceFactory/createProperty (str cnt "characterEncoding"))
+            (ResourceFactory/createPlainLiteral "UTF-8")))
+
+    ;; communicationMethod
+    (.add model distribution
+          (ResourceFactory/createProperty (str mobility "communicationMethod"))
+          (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/communication-method/pull"))
+
+    ;; dataFormatNotes - No additional notes are available
+
+    ;; grammar - We don't know grammar of the external interface data. So add only if geojson distribution is created.
+    (when (nil? interface)
+      (.add model distribution
+            (ResourceFactory/createProperty (str mobility "grammar"))
+            (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/grammar/json-schema")))
+
+    ;; sample - Finap or external interfaces doesn't provide sample data.
+    ;; temporal - Finap doesn't provide temporal data.
+
+    ;; title - Finap has only one distribution of each. No title needed.
+
     ;; accrualPeriodicity
     (.add model dataset
           (ResourceFactory/createProperty (str dct "accrualPeriodicity"))
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"))
+          (ResourceFactory/createResource (if (nil interface)
+                                            "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+                                            "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))
 
     ;; mobilityTheme
     (.add model dataset
@@ -528,7 +566,6 @@
           (ResourceFactory/createProperty (str mobility "georeferencingMethod"))
           (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates"))
 
-    (.add model operator-kind RDF/type (ResourceFactory/createResource (str foaf "Organization")))
     (.add model operator-agent
           (ResourceFactory/createProperty (str foaf "name"))
           (ResourceFactory/createStringLiteral operator-name))
@@ -542,10 +579,11 @@
     ;; esim suomenlahdella, mutta eivät sisämaan kanavissa.
     ;;
 
-    ;; conformsTo
-    (.add model dataset
-          (ResourceFactory/createProperty (str dct "conformsTo"))
-          (ResourceFactory/createResource "https://www.opengis.net/def/crs/EPSG/0/4326"))
+    ;; conformsTo - Only geojson data is in EPSG:4326 format. External interfaces can be in any format.
+    (when (nil? interface)
+      (.add model dataset
+            (ResourceFactory/createProperty (str dct "conformsTo"))
+            (ResourceFactory/createResource "https://www.opengis.net/def/crs/EPSG/0/4326")))
 
     ;; rightsHolder - Tämä on sama kuin operaattori. Oletuksena on, että operaattori on oikeuksien haltija.
     (.add model dataset
@@ -638,7 +676,6 @@
         operator-id (:ote.db.transport-service/transport-operator-id service)
         model (ModelFactory/createDefaultModel)
         catalog (ResourceFactory/createResource catalog-uri)
-        datasets [service]
         external-interfaces (::t-service/external-interfaces service)
         is-dataservice? false
 
