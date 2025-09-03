@@ -436,7 +436,7 @@
           (ResourceFactory/createStringLiteral (:ote.db.transport-service/name service)))
     (.add model dataset
           (ResourceFactory/createProperty (str dct "description"))
-          (ResourceFactory/createStringLiteral (or (::t-service/description service) "")))
+          (ResourceFactory/createStringLiteral (or (get-in service [::t-service/description 0 ::t-service/text]) "")))
 
     (.add model dataset
           (ResourceFactory/createProperty (str mobility "transportMode"))
@@ -524,7 +524,7 @@
     ;; accrualPeriodicity
     (.add model dataset
           (ResourceFactory/createProperty (str dct "accrualPeriodicity"))
-          (ResourceFactory/createResource (if (nil interface)
+          (ResourceFactory/createResource (if (nil? interface)
                                             "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
                                             "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))
 
