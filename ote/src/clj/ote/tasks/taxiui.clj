@@ -10,7 +10,8 @@
             [ote.localization :as localization]
             [ote.services.taxiui-service :as taxiui]
             [ote.util.email-template :as email-template]
-            [specql.core :as specql]))
+            [specql.core :as specql]
+            [taoensso.timbre :as log]))
 
 (defn ^:private once-every-month
   [day-of-month]
@@ -42,6 +43,7 @@
                         (::t-operator/email operator)
                         "nap@fintraffic.fi")]
       (when-not (:testing-env? config)
+        (log/info "Initiating sending of outdated taxiui prices email to" recipient "for service" service-id)
         (localization/with-language
           "fi"
           (email/send! email {:to      recipient
@@ -53,11 +55,14 @@
                                                                       operator
                                                                       service
                                                                       ; note: we could group by operator to reduce total number of sent emails, but in practice this is probably fine
-                                                                      [outdated])))}]}))))))
+                                                                      [outdated])))}]}))
+        (log/info "Email of outdated taxiui prices sent")))))
 
 (defrecord TaxiUITasks [config]
   component/Lifecycle
   (start [{db :db email :email :as this}]
+    (when-not (satisfies? email/Send email)
+      (log/warn "Email component does not satisfy email/Send protocol"))
     (assoc this
       ::taxiui-tasks [(chime/chime-at (once-every-month 15)
                                       (fn [_]

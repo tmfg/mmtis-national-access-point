@@ -132,7 +132,7 @@
    :tasks-pre-notices (component/using (tasks-pre-notices/pre-notices-tasks (:pre-notices config))
                                        [:db :email])
    :tasks-tis (component/using (tasks-tis/tis-tasks config) [:db])
-   :tasks-taxiui (component/using (tasks-taxiui/taxiui-tasks config) [:db])
+   :tasks-taxiui (component/using (tasks-taxiui/taxiui-tasks config) [:db :email])
 
    :health (component/using (health/->Health config) [:db :http])))
 
