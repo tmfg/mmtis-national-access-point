@@ -42,7 +42,7 @@
           recipient (or (::t-service/contact-email service)
                         (::t-operator/email operator)
                         "nap@fintraffic.fi")]
-      (when-not (:testing-env? config)
+      (when-not false #_(:testing-env? config)
         (log/info "Initiating sending of outdated taxiui prices email to" recipient "for service" service-id)
         (localization/with-language
           "fi"
