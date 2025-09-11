@@ -42,7 +42,7 @@
           recipient (or (::t-service/contact-email service)
                         (::t-operator/email operator)
                         "nap@fintraffic.fi")]
-      (when-not false #_(:testing-env? config)
+      (when-not (:testing-env? config)
         (log/info "Initiating sending of outdated taxiui prices email to" recipient "for service" service-id)
         (localization/with-language
           "fi"
@@ -64,7 +64,7 @@
     (when-not (satisfies? email/Send email)
       (log/warn "Email component does not satisfy email/Send protocol"))
     (assoc this
-      ::taxiui-tasks [(chime/chime-at (once-every-month 11)
+      ::taxiui-tasks [(chime/chime-at (once-every-month 15)
                                       (fn [_]
                                         (#'send-outdated-taxiui-prices-emails config db email)))]))
   (stop [{stop-tasks ::taxiui-tasks :as this}]
