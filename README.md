@@ -41,3 +41,8 @@ Here is a overview of our AWS production architecture. CI and other development 
 ## Transit changes documentation
 
  - [Transit changes](https://github.com/finnishtransportagency/mmtis-national-access-point/blob/master/docs/transit-changes/README.md)
+
+## Dependencies
+
+See [Dependency Overview](./docs/dependencies.md) for where each
+ecosystem's dependencies are declared and commands to list them.
