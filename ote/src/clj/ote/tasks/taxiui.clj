@@ -65,7 +65,7 @@
       (log/info "Confirmed email component satisfies email/Send protocol")
       (log/warn "Email component does not satisfy email/Send protocol"))
     (assoc this
-      ::taxiui-tasks [(chime/chime-at (once-every-month 17)
+      ::taxiui-tasks [(chime/chime-at (once-every-month 15)
                                       (fn [_]
                                         (#'send-outdated-taxiui-prices-emails config db email)))]))
   (stop [{stop-tasks ::taxiui-tasks :as this}]
