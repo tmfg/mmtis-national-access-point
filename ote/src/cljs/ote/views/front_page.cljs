@@ -45,15 +45,6 @@
    [:p {:style {:margin "10px"}}
     (tr [:downtime-apology :content])]])
 
-(defn merirae-discontinued-message
-  []
-  [:div
-   {:style {:margin "0.2em" :border "4px solid #213BF7"}}
-   [:p {:style {:margin "10px 0px 0px 10px"}}
-    (tr [:front-page :rae-discontinued-info1])
-    (linkify (tr [:front-page :rae-discontinued-info-link]) (tr [:front-page :rae-discontinued-info-desc]) {:target "_blank"})
-    (tr [:front-page :rae-discontinued-info2])]])
-
 (defn front-page
   "Front page info"
   [e! {user :user :as app}]
@@ -86,8 +77,6 @@
 
    ; NOTE: commented out just in case we want to find this easier the next time we want to show an alert on the front page
    ; [downtime-apology-message]
-
-   [merirae-discontinued-message]
 
    [:div.container
     [:div.row (stylefy/use-style style-front-page/row-media)
