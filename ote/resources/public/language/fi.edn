@@ -1307,7 +1307,7 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :vaco-given-interface-has-problem "Rajapinta ei palauta dataa."
   :vaco-validation-not-started "Validointi ei ole alkanut."
   :vaco-validation-in-progress "Validointi ei ole vielä valmistunut."
-  :download-netex "Lataa muunnettu NeTEx-paketti"
+  :download-netex "Lataa muunnettu matkatietoaineisto"
   :no-homepage "Palvelulle ei ole annettu vielä verkko-osoitetta."}
 
 
