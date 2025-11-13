@@ -742,17 +742,16 @@
 
         rdf-turtle (serialize-model model)
         turtle-format (-> (response/response rdf-turtle)
-                          (response/content-type "text/turtle; charset=UTF-8"))]
+                          (response/content-type "text/turtle; charset=UTF-8")
+                          (response/header "Content-Disposition" "attachment;"))]
     turtle-format))
 
 (defn- rds-routes [config db]
   (routes
-    (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params :as req}
-      #_(http/api-response req (create-rdf db service-id))
-      {:status 200
-       :headers {"Content-Type" "text/turtle; charset=UTF-8"
-                 "Content-Disposition" "attachment;"}
-       :body (create-rdf db service-id)})))
+   (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params :as req}
+     ;; create-rdf returns a complete response
+     ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
+     (create-rdf db service-id))))
 
 (defrecord RDS [config]
   component/Lifecycle

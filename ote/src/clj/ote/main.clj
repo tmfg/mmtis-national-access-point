@@ -27,6 +27,8 @@
             [ote.services.robots :as robots]
             [ote.services.health :as health]
 
+            [ote.services.rdf :as rdf]
+
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.export.csv :as export-csv]
@@ -62,6 +64,8 @@
    :http (component/using (http/http-server (:http config)) [:db])
    :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
    :email (email/->Email (:email config))
+
+   :rdf (component/using (rdf/->RDS config) [:http :db])
 
    ;; Index pages for frontends
    :ote/index (component/using (index/->Index config) [:http :db])
