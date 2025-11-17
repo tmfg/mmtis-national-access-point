@@ -1,6 +1,7 @@
 (ns ote.services.rdf
   "Use Jena to create Mobility DCAT-AP RDF from the database."
   (:require [com.stuartsierra.component :as component]
+            [taoensso.timbre :as log]
             [ote.components.http :as http]
             [ote.localization :as localization :refer [tr]]
             [ring.util.response :as response]
@@ -11,7 +12,7 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification])
   (:import (org.apache.jena.datatypes.xsd XSDDateTime)
-           [org.apache.jena.rdf.model ModelFactory ResourceFactory]
+           [org.apache.jena.rdf.model Model ModelFactory ResourceFactory]
            [org.apache.jena.vocabulary RDF OWL]
            [org.apache.jena.datatypes BaseDatatype]
            [org.apache.jena.datatypes.xsd.impl XSDDateTimeType]
@@ -113,7 +114,8 @@
     "CSV" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"
     "Datex II" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/datex-II"
     "SIRI" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/siri"
-    :else "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"))
+    ;; :else
+    "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"))
 
 (defn get-interface-format-extent [interface]
   (case (str (first (::t-service/format interface)))
@@ -132,7 +134,9 @@
     ;; TODO: In cases where format is not known, we need to get the corredt format from somewhere due to DCAT-AP requirements. This is mandatory field.
     ;; This might be a big problem in the future. To ensure the correct format, the data from the interface must be downloaded and checked.
     ;; Correct format might be written in the first bytes in the downloaded file.
-    :else nil))
+    
+    ;; :else
+    nil))
 
 (defn get-rights-url [interface]
   ;; This is the best we can do with data that is available in the service.
@@ -165,25 +169,29 @@
         (ResourceFactory/createProperty (str dct "relation"))
         interface-dataset))
 
-(defn get-inteted-information-service
+(defn get-intended-information-service
   "Päättele tyyppi interface typestä"
   [interface]
-  (case (name (first (::t-service/data-content interface)))
-    "route-and-schedule" "https://w3id.org/mobilitydcat-ap/intended-information-service/trip-plans"
-    "luggage-restrictions" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "realtime-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-passing-times-trip-plans-and-auxiliary-information"
-    "booking-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
-    "accessibility-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "other-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "pricing" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "service-hours" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
-    "disruptions" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-information-service"
-    "payment-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "other" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "map-and-location" "https://w3id.org/mobilitydcat-ap/intended-information-service/location-search"
-    "on-behalf-errand" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
-    "customer-account-info" "https://w3id.org/mobilitydcat-ap/intended-information-service/information-service"
-    :else "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))
+  (let [data-content (some-> interface ::t-service/data-content first)]
+    (case data-content
+      "route-and-schedule" "https://w3id.org/mobilitydcat-ap/intended-information-service/trip-plans"
+      "luggage-restrictions" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "realtime-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-passing-times-trip-plans-and-auxiliary-information"
+      "booking-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
+      "accessibility-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "other-services" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "pricing" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "service-hours" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-availability-check"
+      "disruptions" "https://w3id.org/mobilitydcat-ap/intended-information-service/dynamic-information-service"
+      "payment-interface" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "other" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "map-and-location" "https://w3id.org/mobilitydcat-ap/intended-information-service/location-search"
+      "on-behalf-errand" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
+      "customer-account-info" "https://w3id.org/mobilitydcat-ap/intended-information-service/information-service"
+      ;; :else
+      (do
+        (log/warnf "Unknown datacontent %s" (pr-str data-content))
+        "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))))
 
 ;; Luo Mobility DCAT-AP RDF-malli
 
@@ -631,7 +639,7 @@
     (.add model dataset
           (ResourceFactory/createProperty (str mobility "identifier"))
           (ResourceFactory/createResource (if interface
-                                            (get-inteted-information-service interface)
+                                            (get-intended-information-service interface)
                                             "https://w3id.org/mobilitydcat-ap/intended-information-service/other")))
 
     ;; language
@@ -699,19 +707,22 @@
     (create-catalog-model db model catalog)
 
     ;; Records and Dataset
-    (let [geojson-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator nil)
-          _ (create-record service model catalog nil geojson-dataset-resource fintraffic-agent)]
+    
+    ;; 🤷‍♀️
+    (when operation-areas
+      (let [geojson-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator nil)
+            _ (create-record service model catalog nil geojson-dataset-resource fintraffic-agent)]
 
-      (doseq [interface external-interfaces]
-        ;; TODO: is interface a dataservice or dataset?
-        ;; If interface is not a dataservice, then create accessService
-        (if is-dataservice?
-          (create-data-service model interface)
-          (let [interface-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator interface)
-                _ (create-record service model catalog interface interface-dataset-resource fintraffic-agent)
-                _ (add-isreferenced-and-related-to-dataset geojson-dataset-resource
-                                                           interface-dataset-resource
-                                                           model)]))))
+        (doseq [interface external-interfaces]
+          ;; TODO: is interface a dataservice or dataset?
+          ;; If interface is not a dataservice, then create accessService
+          (if is-dataservice?
+            (create-data-service model interface)
+            (let [interface-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator interface)
+                  _ (create-record service model catalog interface interface-dataset-resource fintraffic-agent)
+                  _ (add-isreferenced-and-related-to-dataset geojson-dataset-resource
+                                                             interface-dataset-resource
+                                                             model)])))))
 
     ;; Return model
     model))
@@ -722,7 +733,36 @@
     (.write model out "TURTLE" #_"RDF/XML")
     (.toString out)))
 
-(defn create-rdf [db service-id]
+(defn create-rdf
+  ([db]
+   (let [service-ids (map :ote.db.transport-service/id (specql/fetch db ::t-service/transport-service
+                                   #{:ote.db.transport-service/id}
+                                   {}))
+         _ (assert (seq service-ids))
+         models (map (fn [service-id]
+                       (let [service (first (specql/fetch db ::t-service/transport-service
+                                                          (conj (specql/columns ::t-service/transport-service)
+                                                                ;; join external interfaces
+                                                                [::t-service/external-interfaces
+                                                                 (specql/columns ::t-service/external-interface-description)])
+                                                          {::t-service/id service-id}))
+                             operation-areas (seq (fetch-operation-area-for-service db {:transport-service-id service-id}))
+                             operator-id (:ote.db.transport-service/transport-operator-id service)
+                             operator (first (specql/fetch db ::t-operator/transport-operator
+                                                           (specql/columns ::t-operator/transport-operator)
+                                                           {::t-operator/id operator-id}))]
+                         (create-dcat-ap-model db service operation-areas operator)))
+                     service-ids)
+         final-model (reduce (fn [acc model]
+                               (doto acc
+                                 (.add model)))
+                             models)
+         rdf-turtle (serialize-model final-model)]
+   (-> (response/response rdf-turtle)
+       (response/content-type "text/turtle; charset=UTF-8")
+       (response/header "Content-Disposition" "attachment;"))))
+  
+  ([db service-id]
   (let [service-id (if (string? service-id)
                      (Long/parseLong service-id)
                      service-id)
@@ -744,10 +784,12 @@
         turtle-format (-> (response/response rdf-turtle)
                           (response/content-type "text/turtle; charset=UTF-8")
                           (response/header "Content-Disposition" "attachment;"))]
-    turtle-format))
+    turtle-format)))
 
 (defn- rds-routes [config db]
   (routes
+   (GET "/rdf" {:as req}
+     (create-rdf db))
    (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params :as req}
      ;; create-rdf returns a complete response
      ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
