@@ -203,14 +203,11 @@
     (.add model catalog
           (ResourceFactory/createProperty (str foaf "title"))
           (ResourceFactory/createStringLiteral "Finap.fi - NAP - National Access Point"))
-    (.add model catalog
-          (ResourceFactory/createProperty (str foaf "description"))
-          ;; TODO: Hae kielimallin mukainen kuvaus. From file en.edn, fi.edn, sv.edn
-          (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "fi"))
-    (.add model catalog
-          (ResourceFactory/createProperty (str foaf "description"))
-          ;; TODO: Hae kielimallin mukainen kuvaus
-          (ResourceFactory/createLangLiteral "NAP-liikkumispalvelukatalogi on avoin kansallinen yhteyspiste (National Access Point, NAP), johon liikkumispalvelun tuottajien on toimitettava tietoja digitaalisista olennaisten tietojen koneluettavista rajapinnoistaan. NAP-palvelu on osa kokonaisuutta, jonka tavoitteena on aikaansaada helppokäyttöisiä yhdistettyjä liikkumis- ja infopalveluita. NAP ei ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja kehittäjille." "sv"))
+
+    (doseq [lang #{"fi" "sv" "en"}]
+      (.add model catalog
+            (ResourceFactory/createProperty (str dct "description"))
+            (ResourceFactory/createLangLiteral (localized-text-with-key lang [:front-page :column-NAP ]) lang)))
     (.add model catalog
           (ResourceFactory/createProperty (str foaf "homepage"))
           (ResourceFactory/createStringLiteral "https://www.finap.fi/"))
