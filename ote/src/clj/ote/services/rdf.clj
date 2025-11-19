@@ -529,9 +529,14 @@
     ;; accrualPeriodicity
     (.add model dataset
           (ResourceFactory/createProperty (str dct "accrualPeriodicity"))
+          ;; interface as in an api of a (transport-)service-provider
+          ;; (nil? interface) => t signifies complete lack of api
           (ResourceFactory/createResource (if (nil? interface)
                                             "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-                                            "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))
+                                            (let [{:ote.db.transport-service/keys [format]} interface]
+                                              (if (= (first format) "GeoJSON")
+                                                "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+                                                "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))))
 
     ;; mobilityTheme
     (.add model dataset
