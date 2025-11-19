@@ -212,9 +212,6 @@
           (ResourceFactory/createProperty (str foaf "homepage"))
           (ResourceFactory/createStringLiteral "https://www.finap.fi/"))
 
-    ;; TODO: Ensure that this is ok by customer
-    ;; Default is now Finland - http://data.europa.eu/nuts/code/FI
-    ;; It means that catalog contains information only from Finland
     (.add model catalog (ResourceFactory/createProperty (str dct "spatial"))
           (ResourceFactory/createResource "http://data.europa.eu/nuts/code/FI"))
 
