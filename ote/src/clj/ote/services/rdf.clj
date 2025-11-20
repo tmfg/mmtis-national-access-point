@@ -131,7 +131,7 @@
   [language key]
   (localization/with-language language (tr key)))
 
-(defn select-mobility-theme [service]
+(defn service->mobility-theme [service]
   (case (:ote.db.transport-service/sub-type service)
     :taxi "https://w3id.org/mobilitydcat-ap/mobility-theme/public-transport-non-scheduled-transport"
     :request "https://w3id.org/mobilitydcat-ap/mobility-theme/public-transport-non-scheduled-transport"
@@ -142,7 +142,7 @@
     :brokerage "https://w3id.org/mobilitydcat-ap/mobility-theme/sharing-and-hiring-services"
     :other "https://w3id.org/mobilitydcat-ap/mobility-theme/other"))
 
-(defn select-sub-theme [service]
+(defn service->sub-theme [service]
   (case (:ote.db.transport-service/sub-type service)
     :taxi nil
     :request nil
@@ -154,7 +154,7 @@
     :other nil
     :else nil))
 
-(defn select-transport-mode [service]
+(defn service->transport-mode [service]
   (let [transport-type (first (::t-service/transport-type service))
         sub-type (:ote.db.transport-service/sub-type service)]
 
@@ -179,7 +179,7 @@
       "https://w3id.org/mobilitydcat-ap/transport-mode/bus"
       :else "https://w3id.org/mobilitydcat-ap/transport-mode/bus")))
 
-(defn get-mobility-data-standard
+(defn interface->mobility-data-standard
   "When implementing final version of this function, ensure that is this ok."
   [interface]
   (case (str (first (::t-service/format interface)))
@@ -196,7 +196,7 @@
     ;; :else
     "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"))
 
-(defn get-interface-format-extent [interface]
+(defn interface->format-extent [interface]
   (case (str (first (::t-service/format interface)))
     "GTFS" "http://publications.europa.eu/resource/authority/file-type/CSV"
     "GTFS-RT" "http://publications.europa.eu/resource/authority/file-type/CSV"
@@ -217,7 +217,7 @@
     ;; :else
     nil))
 
-(defn get-rights-url [interface]
+(defn interface->rights-url [interface]
   ;; This is the best we can do with data that is available in the service.
   ;; By changing lincence as a mandatory data and by changing lisence to be selected from a list, we can ensure that this is correct.
   ;; But now this is the best we can do.
@@ -399,7 +399,7 @@
         description (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")
 
         rights-resource (ResourceFactory/createResource)
-        rights-url (get-rights-url interface)
+        rights-url (interface->rights-url interface)
         licence-resource (ResourceFactory/createResource)]
 
     (.add model accessService-resource RDF/type (ResourceFactory/createResource (str dct "DataService")))
@@ -457,16 +457,16 @@
                                          (property :mobility/schema)
                                          (ResourceFactory/createResource "https://geojson.org/schema/GeoJSON.json")))
                                  moblityDataStandard-resource)
-                               (ResourceFactory/createResource (get-mobility-data-standard interface)))
+                               (ResourceFactory/createResource (interface->mobility-data-standard interface)))
 
         format (if (nil? interface)
                  "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
-                 (get-interface-format-extent interface))
+                 (interface->format-extent interface))
 
         rights-resource (ResourceFactory/createResource)
         rights-url (if (nil? interface)
                      "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
-                     (get-rights-url interface))
+                     (interface->rights-url interface))
 
         licence-resource (ResourceFactory/createResource)
         licence-url (if (nil? interface)
@@ -617,13 +617,13 @@
     ;; mobilityTheme
     (.add model dataset
           (property :mobility/mobilityTheme)
-          (ResourceFactory/createResource (select-mobility-theme service)))
+          (ResourceFactory/createResource (service->mobility-theme service)))
 
     ;; IF sub-theme is missing, do not stress
-    (when (select-sub-theme service)
+    (when (service->sub-theme service)
       (.add model dataset
             (property :mobility/mobilityTheme)
-            (ResourceFactory/createResource (select-sub-theme service))))
+            (ResourceFactory/createResource (service->sub-theme service))))
 
     ;; Get higher state from NUTS: http://publications.europa.eu/resource/dataset/nuts - e.g. Finland
     ;; and munivipality here: https://stirdata.github.io/data-specification/lau.ttl
@@ -689,7 +689,7 @@
     ;; transportMode
     (.add model dataset
           (property :mobility/transportMode)
-          (ResourceFactory/createResource (select-transport-mode service)))
+          (ResourceFactory/createResource (service->transport-mode service)))
 
     ;; applicableLegislation - More or less impossible to determine which legislation applies to the dataset.
 
