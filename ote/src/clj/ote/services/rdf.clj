@@ -107,7 +107,8 @@
                    :mobility/grammar
                    :mobility/mobilityTheme
                    :mobility/georeferencingMethod
-                   :mobility/identifier]]
+                   :mobility/identifier
+                   :mobility/intendedInformationService]]
     (into {} (map (fn [kw]
                     [kw (ResourceFactory/createProperty (kw->uri kw))])
                   prop-keys))))
@@ -226,27 +227,106 @@
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/other"))
 
 
-(defn periodOfTime [model available-from available-to created]
-  (let [period (ResourceFactory/createResource)
-        available-from (if available-from available-from created)]
-    (.add model period RDF/type (ResourceFactory/createResource (str dcat "PeridOfTime")))
-    (.add model period
-          (property :dcat/startDate)
-          (ResourceFactory/createTypedLiteral (str available-from) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
-    (when available-to
-      (.add model period
-            (property :dcat/endDate)
-            (ResourceFactory/createTypedLiteral (str available-to) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime"))))
-    period))
+;; Helper functions to create self-describing RDF values
+(defn uri
+  "Create a URI/resource reference."
+  [value]
+  {:type :uri :value value})
+
+(defn literal
+  "Create a plain literal string."
+  [value]
+  {:type :literal :value value})
+
+(defn typed-literal
+  "Create a typed literal with datatype."
+  [value datatype]
+  {:type :typed-literal :value value :datatype datatype})
+
+(defn lang-literal
+  "Create a language-tagged literal."
+  [value lang]
+  {:type :lang-literal :value value :lang lang})
+
+;; Phase 1: Create Clojure data representation
+(defn period-of-time-data
+  "Create a Clojure map representing a dcat:PeriodOfTime."
+  [available-from available-to created]
+  (let [start (or available-from created)]
+    (cond-> {:rdf/type (uri :dcat/PeridOfTime)  ;; NOTE: Typo in original, keeping for compatibility
+             :dcat/startDate (typed-literal (str start) "http://www.w3.org/2001/XMLSchema#dateTime")}
+      available-to
+      (assoc :dcat/endDate (typed-literal (str available-to) "http://www.w3.org/2001/XMLSchema#dateTime")))))
+
+;; Phase 2: Convert Clojure data to Jena model
+(defn add-resource-to-model!
+  "Add a resource and its properties to a Jena model.
+   properties-map is a map of property keywords to value descriptors.
+   Value descriptors are maps with :type and :value keys:
+   - {:type :uri :value <keyword-or-string>} - Resource reference
+   - {:type :literal :value <string>} - Plain string literal
+   - {:type :typed-literal :value <string> :datatype <uri-string>} - Typed literal
+   - {:type :lang-literal :value <string> :lang <lang-code>} - Language-tagged literal
+   Values can also be vectors of the above for multi-valued properties."
+  [model resource properties-map]
+  (doseq [[prop-kw val] properties-map]
+    (let [vals (if (vector? val) val [val])]
+      (doseq [v vals]
+        (let [object (case (:type v)
+                       :uri
+                       (let [uri-val (:value v)]
+                         (if (keyword? uri-val)
+                           (ResourceFactory/createResource (kw->uri uri-val))
+                           (ResourceFactory/createResource uri-val)))
+                       
+                       :literal
+                       (ResourceFactory/createStringLiteral (:value v))
+                       
+                       :typed-literal
+                       (ResourceFactory/createTypedLiteral 
+                         (:value v) 
+                         (BaseDatatype. (:datatype v)))
+                       
+                       :lang-literal
+                       (ResourceFactory/createLangLiteral (:value v) (:lang v))
+                       
+                       :resource
+                       (:value v)
+                       
+                       (throw (ex-info "Unknown value type" {:value v})))]
+          (if (= prop-kw :rdf/type)
+            (.add model resource RDF/type object)
+            (.add model resource (property prop-kw) object))))))
+  resource)
+
+;; Compatibility wrapper (uses both phases)
+(defn period-of-time [model available-from available-to created]
+  (let [data (period-of-time-data available-from available-to created)
+        resource (ResourceFactory/createResource)]
+    (add-resource-to-model! model resource data)))
 
 
+;; Phase 1: Create relationship data
+(defn isreferenced-and-related-data
+  "Create data representing bidirectional reference relationships between datasets."
+  [geojson-dataset-id interface-dataset-id]
+  [{:subject geojson-dataset-id
+    :properties {:dct/relation (uri interface-dataset-id)}}
+   {:subject interface-dataset-id
+    :properties {:dct/isReferencedBy (uri geojson-dataset-id)}}])
+
+;; Phase 2: Add relationships to model
+(defn add-relationships-to-model!
+  "Add multiple subject-property-object relationships to a Jena model.
+   relationships is a seq of maps with :subject (resource) and :properties (map)."
+  [model relationships]
+  (doseq [{:keys [subject properties]} relationships]
+    (add-resource-to-model! model subject properties)))
+
+;; Compatibility wrapper
 (defn add-isreferenced-and-related-to-dataset [geojson-dataset interface-dataset model]
-  (.add model interface-dataset
-        (property :dct/isReferencedBy)
-        geojson-dataset)
-  (.add model geojson-dataset
-        (property :dct/relation)
-        interface-dataset))
+  (let [relationships (isreferenced-and-related-data geojson-dataset interface-dataset)]
+    (add-relationships-to-model! model relationships)))
 
 (defn get-intended-information-service
   "Päättele tyyppi interface typestä"
@@ -274,165 +354,119 @@
 
 ;; Luo Mobility DCAT-AP RDF-malli
 
+;; Phase 1: Create catalog data
+(defn catalog-data
+  "Create a Clojure map representing a dcat:Catalog."
+  [db]
+  (let [latest-publication (:published (first (latest-published-service db)))]
+    {:catalog
+     {:rdf/type (uri :dcat/Catalog)
+      :foaf/title (literal "Finap.fi - NAP - National Access Point")
+      :dct/description [(lang-literal (localized-text-with-key "fi" [:front-page :column-NAP]) "fi")
+                        (lang-literal (localized-text-with-key "sv" [:front-page :column-NAP]) "sv")
+                        (lang-literal (localized-text-with-key "en" [:front-page :column-NAP]) "en")]
+      :foaf/homepage (literal "https://www.finap.fi/")
+      :dct/spatial (uri "http://data.europa.eu/nuts/code/FI")
+      :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
+                     (uri "http://publications.europa.eu/resource/authority/language/SWE")
+                     (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+      :dct/license {:type :blank-node
+                    :properties {:rdf/type (uri :dct/LicenseDocument)
+                                :dct/identifier (uri licence-url)}}
+      :dct/issued (typed-literal "2018-01-01T00:00:01Z" "http://www.w3.org/2001/XMLSchema#dateTime")
+      :dct/themeTaxonomy (uri "https://w3id.org/mobilitydcat-ap/mobility-theme")
+      :dct/modified (typed-literal (str latest-publication) "http://www.w3.org/2001/XMLSchema#dateTime")
+      :dct/identifier (literal catalog-uri)}}))
+
+;; Compatibility wrapper
 (defn create-catalog-model [db model catalog]
-  (let [latest-publication (:published (first (latest-published-service db)))
-        licence-resource (ResourceFactory/createResource)]
-    ;; Catalog kuvaa mikä Finap on
-    (.add model catalog RDF/type (ResourceFactory/createResource (str dcat "Catalog")))
-    (.add model catalog
-          (property :foaf/title)
-          (ResourceFactory/createStringLiteral "Finap.fi - NAP - National Access Point"))
+  (let [data (catalog-data db)
+        catalog-props (get-in data [:catalog])
+        license-data (get catalog-props :dct/license)
+        license-resource (ResourceFactory/createResource)
+        catalog-props-without-license (dissoc catalog-props :dct/license)]
+    ;; Add license properties
+    (when (= (:type license-data) :blank-node)
+      (add-resource-to-model! model license-resource (:properties license-data)))
+    ;; Add catalog properties with license as a resource reference
+    (add-resource-to-model! model catalog (assoc catalog-props-without-license 
+                                                 :dct/license {:type :resource :value license-resource}))))
 
-    (doseq [lang #{"fi" "sv" "en"}]
-      (.add model catalog
-            (property :dct/description)
-            (ResourceFactory/createLangLiteral (localized-text-with-key lang [:front-page :column-NAP ]) lang)))
-    (.add model catalog
-          (property :foaf/homepage)
-          (ResourceFactory/createStringLiteral "https://www.finap.fi/"))
-
-    (.add model catalog (property :dct/spatial)
-          (ResourceFactory/createResource "http://data.europa.eu/nuts/code/FI"))
-
-    ;; language
-    (.add model catalog
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
-    (.add model catalog
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/SWE"))
-    (.add model catalog
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG"))
-
-    ;; license
-    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
-    (.add model licence-resource
-          (ResourceFactory/createProperty (str dct "identifier"))
-          (ResourceFactory/createResource licence-url))
-    (.add model catalog
-          (property :dct/license)
-          licence-resource)
-
-    ;; issued - published
-    (.add model catalog
-          (property :dct/issued)
-          (ResourceFactory/createTypedLiteral (str "2018-01-01T00:00:01Z") (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
-
-    ;; http://publications.europa.eu/resource/authority/data-theme/TRAN
-    ;; themeTaxonomy
-    (.add model catalog
-          (property :dct/themeTaxonomy)
-          (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/mobility-theme"))
-
-    ;; modified -- Last recent modification date
-    (.add model catalog
-          (property :dct/modified)
-          (ResourceFactory/createTypedLiteral (str latest-publication) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
-
-    ;; hasPart - Finap doesn't fetch other catalogs data.
-    ;; isPartOf - As far as we know Finap is not part of any other catalog, so this is not used.
-
-    ;; dct:identifier
-    (.add model catalog
-          (property :dct/identifier)
-          (ResourceFactory/createStringLiteral catalog-uri))
-
-    ;; adms:identifier - As far as we know, Finap is not issued an EU-wide identificator yet.
-    ))
-
-(defn create-record [service model catalog interface dataset-resource fintraffic-agent]
+(defn catalog-record-data [service interface dataset-resource fintraffic-agent]
   (let [id (:ote.db.transport-service/id service)
         record-uri (if (nil? interface)
                      (str dataset-base-uri id "/record")
                      (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))
-        record (ResourceFactory/createResource record-uri)
         created (:ote.db.modification/created service)
         modified (:ote.db.modification/modified service)]
+    {:uri record-uri
+     :properties {:rdf/type (uri :dcat/CatalogRecord)
+                  :dct/created (literal (str created))
+                  :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
+                                 (uri "http://publications.europa.eu/resource/authority/language/SWE")
+                                 (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+                  :foaf/primaryTopic {:type :resource :value dataset-resource}
+                  :dct/modified (literal (str modified))
+                  :dct/publisher {:type :resource :value fintraffic-agent}}}))
 
-    (.add model record RDF/type (ResourceFactory/createResource (str dcat "CatalogRecord")))
-    ;; created
-    (.add model record
-          (property :dct/created)
-          (ResourceFactory/createStringLiteral (str created)))
-    ;; language
-    (.add model record
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
-    (.add model record
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/SWE"))
-    (.add model record
-          (property :dct/language)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG"))
-    ;; primaryTopic
-    (.add model record
-          (property :foaf/primaryTopic)
-          dataset-resource)
-    ;; modified
-    (.add model record
-          (property :dct/modified)
-          (ResourceFactory/createStringLiteral (str modified)))
-
-    ;; dct:publisher
-    (.add model record
-          (property :dct/publisher)
-          fintraffic-agent)
-
+(defn create-catalog-record [service model catalog interface dataset-resource fintraffic-agent]
+  (let [record-data (catalog-record-data service interface dataset-resource fintraffic-agent)
+        record (ResourceFactory/createResource (:uri record-data))]
+    (add-resource-to-model! model record (:properties record-data))
     ;; Add Record to Catalog
     (.add model catalog
           (property :dcat/record)
           record)
-
     ;; source - Used when records are harvested from other portals and Finap doesn't harvest them.
     ))
+
+(defn data-service-data
+  "Create a Clojure map representing a dcat:DataService (accessService)."
+  [interface]
+  (let [endpointUrl (get-in interface [::t-service/external-interface ::t-service/url])
+        title (localized-text-with-key "fi" [:enums :ote.db.transport-service/interface-data-content :route-and-schedule])
+        ;; First element is the finnish description, second is the swedish description and third is the english description.
+        ;;TODO: Use correct language versions
+        description (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")
+        rights-url (interface->rights-url interface)]
+    {:access-service
+     {:properties {:rdf/type (uri :dct/DataService)
+                   :dcat/endpointURL (uri endpointUrl)
+                   :dct/title (uri title)
+                   :dct/description (uri description)
+                   :dct/rights {:type :blank-node
+                                :properties {:rdf/type (uri :dct/RightsStatement)
+                                            :dct/type (uri rights-url)}}
+                   :dct/license {:type :blank-node
+                                 :properties {:rdf/type (uri :dct/LicenseDocument)
+                                             :dct/identifier (uri licence-url)}}}}}))
 
 (defn create-data-service
   "TODO: All external interfaces are not accessServices. Add this only for those that have API interfaces. ie. Finnair etc.
   We need to come up with a solution to distinguish between accessService and reqular dataset."
   [model interface]
-  (let [accessService-resource (ResourceFactory/createResource)
-        endpointUrl (get-in interface [::t-service/external-interface ::t-service/url])
-        title (localized-text-with-key "fi" [:enums :ote.db.transport-service/interface-data-content :route-and-schedule])
-        ;; First element is the finnish description, second is the swedish description and third is the english description.
-        ;;TODO: Use correct language versions
-        description (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")
-
+  (let [data (data-service-data interface)
+        accessService-resource (ResourceFactory/createResource)
+        access-service-props (get-in data [:access-service :properties])
+        rights-data (get access-service-props :dct/rights)
         rights-resource (ResourceFactory/createResource)
-        rights-url (interface->rights-url interface)
-        licence-resource (ResourceFactory/createResource)]
+        license-data (get access-service-props :dct/license)
+        license-resource (ResourceFactory/createResource)
+        access-service-props-clean (-> access-service-props
+                                        (dissoc :dct/rights)
+                                        (dissoc :dct/license))]
+    ;; Add rights properties
+    (add-resource-to-model! model rights-resource (get rights-data :properties))
+    ;; Add license properties
+    (add-resource-to-model! model license-resource (get license-data :properties))
+    ;; Add access service properties with resource references
+    (add-resource-to-model! model accessService-resource
+                           (assoc access-service-props-clean
+                                  :dct/rights {:type :resource :value rights-resource}
+                                  :dct/license {:type :resource :value license-resource}))
+    accessService-resource))
 
-    (.add model accessService-resource RDF/type (ResourceFactory/createResource (str dct "DataService")))
-    (.add model accessService-resource
-          (property :dcat/endpointURL)
-          (ResourceFactory/createResource endpointUrl))
-    (.add model accessService-resource
-          (property :dct/title)
-          (ResourceFactory/createResource title))
-    ;;TODO: endpointDescription is like link to swagger documentation or similar. Finap doesn't have this information
-    ;; endpointDescription
-
-    (.add model rights-resource RDF/type (ResourceFactory/createResource (str dct "RightsStatement")))
-    (.add model rights-resource
-          (ResourceFactory/createProperty (str dct "type"))
-          (ResourceFactory/createResource rights-url))
-    (.add model accessService-resource
-          (property :dct/rights)
-          rights-resource)
-
-    (.add model accessService-resource
-          (property :dcat/description)
-          (ResourceFactory/createResource description))
-
-    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
-    (.add model licence-resource
-          (property :dct/identifier)
-          (ResourceFactory/createResource licence-url))
-    (.add model accessService-resource
-          (property :dct/license)
-          licence-resource)))
-
-(defn create-dataset [db service model catalog service-id operator-id operation-areas operator interface]
+(defn dataset-data [db service service-id operator-id operation-areas operator interface]
   (let [id (:ote.db.transport-service/id service)
         available-from (:ote.db.transport-service/available-from service)
         available-to (:ote.db.transport-service/available-to service)
@@ -446,56 +480,31 @@
         downloadURL (if (nil? interface)
                       (str base-uri "export/geojson/" operator-id "/" service-id)
                       (get-in interface [::t-service/external-interface ::t-service/url]))
-
-        ;; See: https://github.com/mobilityDCAT-AP/mobilityDCAT-AP/issues/62
-        mobilityDataStandard (if (nil? interface)
-                               (let [moblityDataStandard-resource (ResourceFactory/createResource)]
-                                 (doto model
-                                   (.add moblityDataStandard-resource RDF/type (ResourceFactory/createResource (str mobility "MobilityDataStandard")))
-                                   (.add moblityDataStandard-resource OWL/versionInfo (ResourceFactory/createPlainLiteral "GeoJSON rfc7946"))
-                                   (.add moblityDataStandard-resource
-                                         (property :mobility/schema)
-                                         (ResourceFactory/createResource "https://geojson.org/schema/GeoJSON.json")))
-                                 moblityDataStandard-resource)
-                               (ResourceFactory/createResource (interface->mobility-data-standard interface)))
-
+        
         format (if (nil? interface)
                  "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
                  (interface->format-extent interface))
 
-        rights-resource (ResourceFactory/createResource)
         rights-url (if (nil? interface)
                      "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
                      (interface->rights-url interface))
 
-        licence-resource (ResourceFactory/createResource)
         licence-url (if (nil? interface)
                       "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0"
-                      ;;TODO: Select suitable licence url from this list: http://publications.europa.eu/resource/authority/licence
                       "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
-        ;; We can use http/https protocol because Finap is doing automatic checks for all interfaces in http format when inteface is added to the service.
         applicationLayerProtocol "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https"
 
-        ;; TODO: Set the correct description for the default distribution.
         distribution-description (if (nil? interface)
-                                   (ResourceFactory/createLangLiteral (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service)) "fi")
-                                   ;; TODO: Use correct language versions
-                                   (ResourceFactory/createLangLiteral (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "") "fi"))
+                                   (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service))
+                                   (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) ""))
 
         distribution-uri (if (nil? interface)
                            (str distribution-base-uri "/" id)
                            (str distribution-interface-base-uri "/" (::t-service/id interface)))
         operator-uri (operator-url (::t-operator/business-id operator))
-        dataset (ResourceFactory/createResource dataset-uri)
-        distribution (ResourceFactory/createResource distribution-uri)
-        spatial-resource (ResourceFactory/createResource)
-        operator-agent (ResourceFactory/createResource operator-uri)
         operator-name (:ote.db.transport-operator/name operator)
-        assessment-resource (ResourceFactory/createResource)
 
-        ;; TODO: This is not tested yet.
-        ;; Ensure that this works as expected in stg and in prod.
         latest-conversion-status (when interface
                                    (first (fetch-latest-gtfs-vaco-status db {:service-id service-id
                                                                              :interface-id (::t-service/id interface)})))
@@ -510,248 +519,154 @@
                              (::t-service/gtfs-imported interface))
                         (::t-service/gtfs-imported interface)
                         (not interface)
-                        (:ote.db.modification/modified service))]
-    (.add model dataset RDF/type (ResourceFactory/createResource (str dcat "Dataset")))
-    (.add model dataset
-          (property :dct/title)
-          (ResourceFactory/createStringLiteral (:ote.db.transport-service/name service)))
-    (.add model dataset
-          (property :dct/description)
-          (ResourceFactory/createStringLiteral (or (get-in service [::t-service/description 0 ::t-service/text]) "")))
+                        (:ote.db.modification/modified service))
+        
+        accrual-periodicity (if (nil? interface)
+                              "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+                              (let [{:ote.db.transport-service/keys [format]} interface]
+                                (if (= (first format) "GeoJSON")
+                                  "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+                                  "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))
+        
+        mobility-themes (if-let [sub-theme (service->sub-theme service)]
+                          [(uri (service->mobility-theme service))
+                           (uri sub-theme)]
+                          [(uri (service->mobility-theme service))])
+        
+        dataset-languages (when-not interface
+                            [(uri "http://publications.europa.eu/resource/authority/language/FIN")
+                             (uri "http://publications.europa.eu/resource/authority/language/SWE")
+                             (uri "http://publications.europa.eu/resource/authority/language/ENG")])]
+    
+    {:dataset-uri dataset-uri
+     :distribution-uri distribution-uri
+     :operator-uri operator-uri
+     :needs-mobility-data-standard-blank-node? (nil? interface)
+     :mobility-data-standard-uri (when interface (interface->mobility-data-standard interface))
+     :operator
+     {:properties {:rdf/type (uri :foaf/Organization)
+                   :foaf/name (literal operator-name)}}
+     :spatial
+     {:properties {:rdf/type (uri :dct/Location)
+                   :locn/geometry (typed-literal (:geojson (first operation-areas)) 
+                                                 "https://www.iana.org/assignments/media-types/application/vnd.geo+json")}}
+     :rights
+     {:properties {:rdf/type (uri :dct/RightsStatement)
+                   :dct/type (uri rights-url)}}
+     :license
+     {:properties {:rdf/type (uri :dct/LicenseDocument)
+                   :dct/identifier (uri licence-url)}}
+     :assessment (when (and interface vaco-validation-timestamp)
+                   {:properties {:rdf/type (uri :mobility/Assessment)
+                                :dct/date (typed-literal (str vaco-validation-timestamp) 
+                                                        "http://www.w3.org/2001/XMLSchema#dateTime")}
+                    :result-link (:tis-magic-link latest-conversion-status)})
+     :distribution
+     {:properties (cond-> {:rdf/type (uri :dcat/Distribution)
+                           :dcat/accessURL (uri accessURL)
+                           :dcat/downloadURL (uri downloadURL)
+                           :dct/format (uri format)
+                           :mobility/applicationLayerProtocol (uri applicationLayerProtocol)
+                           :mobility/description (lang-literal distribution-description "fi")
+                           :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")}
+                    (nil? interface)
+                    (assoc :cnt/characterEncoding (literal "UTF-8")
+                           :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")))}
+     :dataset
+     {:properties (cond-> {:rdf/type (uri :dcat/Dataset)
+                           :dct/title (literal (:ote.db.transport-service/name service))
+                           :dct/description (literal (or (get-in service [::t-service/description 0 ::t-service/text]) ""))
+                           :mobility/transportMode (uri (service->transport-mode service))
+                           :dct/accrualPeriodicity (uri accrual-periodicity)
+                           :mobility/mobilityTheme mobility-themes
+                           :dct/spatial [(uri "https://w3id.org/stirdata/resource/lau/item/FI_244")]
+                           :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
+                           :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
+                           :dct/temporal {:type :blank-node
+                                         :properties (period-of-time-data available-from available-to created)}
+                           :mobility/identifier (uri dataset-uri)
+                           :mobility/intendedInformationService (uri (if interface
+                                                                        (get-intended-information-service interface)
+                                                                        "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))}
+                    (nil? interface)
+                    (assoc :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326"))
+                    
+                    dataset-languages
+                    (assoc :dct/language dataset-languages)
+                    
+                    last-modified
+                    (assoc :dct/modified (typed-literal (str last-modified) 
+                                                       "http://www.w3.org/2001/XMLSchema#dateTime")))}}))
 
-    (.add model dataset
-          (property :mobility/transportMode)
-          (ResourceFactory/createStringLiteral (name (:ote.db.transport-service/sub-type service))))
-
-    (.add model distribution RDF/type (ResourceFactory/createResource (str dcat "Distribution")))
-    (.add model dataset
-          (property :dcat/distribution)
-          distribution)
-
-    ;; accessURL
-    (.add model distribution
-          (property :dcat/accessURL)
-          (ResourceFactory/createResource accessURL))
-
-    ;; Download url is an url where data set data is located
-    (.add model distribution
-          (property :dcat/downloadURL)
-          (ResourceFactory/createResource downloadURL))
-
-    ;; mobilityDataStandard
-    (.add model distribution
-          (property :mobility/mobilityDataStandard)
-          mobilityDataStandard)
-
-    ;; format
-    (.add model distribution
-          (property :dct/format)
-          (ResourceFactory/createResource format))
-
-    ;; rights
-    (.add model rights-resource RDF/type (ResourceFactory/createResource (str dct "RightsStatement")))
-    (.add model rights-resource
-          (property :dct/type)
-          (ResourceFactory/createResource rights-url))
-    (.add model distribution
-          (property :dct/rights)
-          rights-resource)
-
-    ;; applicationLayerProtocol
-    (.add model distribution
-          (property :mobility/applicationLayerProtocol)
-          (ResourceFactory/createResource applicationLayerProtocol))
-
-    ;; description
-    (.add model distribution
-          (property :mobility/description)
-          distribution-description)
-
-    ;; license
-    (.add model licence-resource RDF/type (ResourceFactory/createResource (str dct "LicenseDocument")))
-    (.add model licence-resource
-          (property :dct/identifier)
-          (ResourceFactory/createResource licence-url))
-    (.add model distribution
-          (property :dct/license)
-          licence-resource)
-
-    ;; accessService - TODO: Implement if data service is implemented in final product
-
-    ;; characterEncoding - We donät know encondig of the external interface data. So add only if geojson distribution is created.
-    (when (nil? interface)
-      (.add model distribution
-            (property :cnt/characterEncoding)
-            (ResourceFactory/createPlainLiteral "UTF-8")))
-
-    ;; communicationMethod
-    (.add model distribution
-          (property :mobility/communicationMethod)
-          (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/communication-method/pull"))
-
-    ;; dataFormatNotes - No additional notes are available
-
-    ;; grammar - We don't know grammar of the external interface data. So add only if geojson distribution is created.
-    (when (nil? interface)
-      (.add model distribution
-            (property :mobility/grammar)
-            (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/grammar/json-schema")))
-
-    ;; sample - Finap or external interfaces doesn't provide sample data.
-    ;; temporal - Finap doesn't provide temporal data.
-
-    ;; title - Finap has only one distribution of each. No title needed.
-
-    ;; accrualPeriodicity
-    (.add model dataset
-          (property :dct/accrualPeriodicity)
-          ;; interface as in an api of a (transport-)service-provider
-          ;; (nil? interface) => t signifies complete lack of api
-          (ResourceFactory/createResource (if (nil? interface)
-                                            "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-                                            (let [{:ote.db.transport-service/keys [format]} interface]
-                                              (if (= (first format) "GeoJSON")
-                                                "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-                                                "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")))))
-
-    ;; mobilityTheme
-    (.add model dataset
-          (property :mobility/mobilityTheme)
-          (ResourceFactory/createResource (service->mobility-theme service)))
-
-    ;; IF sub-theme is missing, do not stress
-    (when (service->sub-theme service)
-      (.add model dataset
-            (property :mobility/mobilityTheme)
-            (ResourceFactory/createResource (service->sub-theme service))))
-
-    ;; Get higher state from NUTS: http://publications.europa.eu/resource/dataset/nuts - e.g. Finland
-    ;; and munivipality here: https://stirdata.github.io/data-specification/lau.ttl
-    ;; Currently only polygon is provided because it is set for every service in Finap
-    ;; TODO: Take municipality first and then geojson format according to primary and secondary areas
-    (.add model spatial-resource RDF/type (ResourceFactory/createResource (str dct "Location")))
-    (.add model dataset (property :dct/spatial)
-          (ResourceFactory/createResource "https://w3id.org/stirdata/resource/lau/item/FI_244")) ;; Hardcoded!
-
-    (.add model spatial-resource (property :locn/geometry)
-          (ResourceFactory/createTypedLiteral (:geojson (first operation-areas)) (BaseDatatype. "https://www.iana.org/assignments/media-types/application/vnd.geo+json")))
-    (.add model dataset
-          (property :dct/spatial)
-          spatial-resource)
-
-    (.add model operator-agent RDF/type (ResourceFactory/createResource (str foaf "Organization")))
-    (.add model operator-agent
-          (property :foaf/name)
-          (ResourceFactory/createStringLiteral operator-name))
-    (.add model dataset
-          (property :dct/publisher)
-          operator-agent)
-
-    ;; georeferencingMethod - using lat/lon values can correct type to be provided
-    (.add model dataset
-          (property :mobility/georeferencingMethod)
-          (ResourceFactory/createResource "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates"))
-
-    (.add model operator-agent
-          (property :foaf/name)
-          (ResourceFactory/createStringLiteral operator-name))
-    (.add model dataset
-          (property :dct/publisher)
-          operator-agent)
-
-    ;; contactPoint -- Jätetään pois, koska Kind tyyppiä, jolla pitää olla email ja nimi. Finapissa ei ole henkilötietoja eikä operaattorin emailia julkisena.
-    ;; keyword - Jätetään pois -  Finapissa ei ole tageja.
-    ;; networkCoverage - Jätetään pois - Yksiselitteistä verkkoa on vaikea päätellä. Esim Waterways ei toteudu kaikilla "meriliikenteen" toimijoilla, koska ne voivat toimia
-    ;; esim suomenlahdella, mutta eivät sisämaan kanavissa.
-    ;;
-
-    ;; conformsTo - Only geojson data is in EPSG:4326 format. External interfaces can be in any format.
-    (when (nil? interface)
-      (.add model dataset
-            (property :dct/conformsTo)
-            (ResourceFactory/createResource "https://www.opengis.net/def/crs/EPSG/0/4326")))
-
-    ;; rightsHolder - Tämä on sama kuin operaattori. Oletuksena on, että operaattori on oikeuksien haltija.
-    (.add model dataset
-          (property :dct/rightsHolder)
-          operator-agent)
-
-    ;; theme
-    (.add model dataset
-          (property :dct/theme)
-          (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/data-theme/TRAN"))
-
-    ;;temporal
-    (.add model dataset
-          (property :dct/temporal)
-          (periodOfTime model available-from available-to created))
-
-    ;; transportMode
-    (.add model dataset
-          (property :mobility/transportMode)
-          (ResourceFactory/createResource (service->transport-mode service)))
-
-    ;; applicableLegislation - More or less impossible to determine which legislation applies to the dataset.
-
-    ;; assessmentResult - Added VACO validation url
-    (when (and interface vaco-validation-timestamp)
-      (.add model assessment-resource RDF/type (ResourceFactory/createResource (str mobility "Assessment")))
-      (.add model assessment-resource
-            (property :dct/date)
-            (ResourceFactory/createTypedLiteral (str vaco-validation-timestamp) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime")))
-      (.add model distribution
-            (property :dct/result)
-            (:tis-magic-link latest-conversion-status)))
-
-    ;; hasVersion - Datasets in Finap are not versioned, so not added.
-
-    ;; identifier
-    (.add model dataset
-          (property :mobility/identifier)
-          (ResourceFactory/createResource dataset-uri))
-
-    ;; isReferencedBy AND related is implemented outside of this function.
-    ;; isVersionOf - Datasets in Finap are not versioned, so not added.
-
-    ;; intendedInformationService
-    (.add model dataset
-          (property :mobility/identifier)
-          (ResourceFactory/createResource (if interface
-                                            (get-intended-information-service interface)
-                                            "https://w3id.org/mobilitydcat-ap/intended-information-service/other")))
-
-    ;; language
-    (when-not interface
-      (.add model dataset
-            (property :dct/language)
-            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/FIN"))
-      (.add model dataset
-            (property :dct/language)
-            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/SWE"))
-      (.add model dataset
-            (property :dct/language)
-            (ResourceFactory/createResource "http://publications.europa.eu/resource/authority/language/ENG")))
-
-    ;; adms:identifier - As far as we know, Finap is not issued an EU-wide identificator yet.
-
-    ;; issuded - Documentation says that this should not be used.
-
-    ;; modified
-    (when last-modified
-      (.add model dataset
-            (property :dct/modified)
-            (ResourceFactory/createTypedLiteral (str last-modified) (BaseDatatype. "http://www.w3.org/2001/XMLSchema#dateTime"))))
-
-
-    ;; versionInfo - not supported in Finap, so not added.
-    ;; versionNotes - not supported in Finap, so not added.
-    ;; asQualityAnnotation -- not supported in Finap, so not added.
-
-    ;; Add DataSet to catalog
-    (.add model catalog
-          (property :dcat/dataset)
-          dataset)
-
+(defn create-dataset [db service model catalog service-id operator-id operation-areas operator interface]
+  (let [data (dataset-data db service service-id operator-id operation-areas operator interface)
+        dataset (ResourceFactory/createResource (:dataset-uri data))
+        distribution (ResourceFactory/createResource (:distribution-uri data))
+        operator-agent (ResourceFactory/createResource (:operator-uri data))
+        spatial-resource (ResourceFactory/createResource)
+        rights-resource (ResourceFactory/createResource)
+        license-resource (ResourceFactory/createResource)
+        assessment-resource (when (:assessment data) (ResourceFactory/createResource))
+        temporal-resource (ResourceFactory/createResource)
+        
+        ;; Special case: mobility data standard for GeoJSON
+        mobilityDataStandard (if (:needs-mobility-data-standard-blank-node? data)
+                               (let [mds-resource (ResourceFactory/createResource)]
+                                 (doto model
+                                   (.add mds-resource RDF/type (ResourceFactory/createResource (kw->uri :mobility/MobilityDataStandard)))
+                                   (.add mds-resource OWL/versionInfo (ResourceFactory/createPlainLiteral "GeoJSON rfc7946"))
+                                   (.add mds-resource
+                                         (property :mobility/schema)
+                                         (ResourceFactory/createResource "https://geojson.org/schema/GeoJSON.json")))
+                                 mds-resource)
+                               (ResourceFactory/createResource (:mobility-data-standard-uri data)))]
+    
+    ;; Add operator properties
+    (add-resource-to-model! model operator-agent (get-in data [:operator :properties]))
+    
+    ;; Add spatial properties
+    (add-resource-to-model! model spatial-resource (get-in data [:spatial :properties]))
+    
+    ;; Add rights properties
+    (add-resource-to-model! model rights-resource (get-in data [:rights :properties]))
+    
+    ;; Add license properties
+    (add-resource-to-model! model license-resource (get-in data [:license :properties]))
+    
+    ;; Add temporal properties
+    (add-resource-to-model! model temporal-resource (get-in data [:dataset :properties :dct/temporal :properties]))
+    
+    ;; Add assessment if exists
+    (when assessment-resource
+      (add-resource-to-model! model assessment-resource (get-in data [:assessment :properties])))
+    
+    ;; Add distribution properties
+    (let [dist-props (get-in data [:distribution :properties])
+          dist-props-with-refs (assoc dist-props
+                                     :dct/rights {:type :resource :value rights-resource}
+                                     :dct/license {:type :resource :value license-resource}
+                                     :mobility/mobilityDataStandard {:type :resource :value mobilityDataStandard})
+          dist-props-final (if assessment-resource
+                             (assoc dist-props-with-refs 
+                                   :dct/result (literal (get-in data [:assessment :result-link])))
+                             dist-props-with-refs)]
+      (add-resource-to-model! model distribution dist-props-final))
+    
+    ;; Add dataset properties
+    (let [dataset-props (get-in data [:dataset :properties])
+          dataset-props-clean (dissoc dataset-props :dct/temporal)
+          dataset-props-with-refs (assoc dataset-props-clean
+                                        :dcat/distribution {:type :resource :value distribution}
+                                        :dct/spatial [{ :type :resource :value (ResourceFactory/createResource "https://w3id.org/stirdata/resource/lau/item/FI_244")}
+                                                      {:type :resource :value spatial-resource}]
+                                        :dct/publisher {:type :resource :value operator-agent}
+                                        :dct/rightsHolder {:type :resource :value operator-agent}
+                                        :dct/temporal {:type :resource :value temporal-resource})]
+      (add-resource-to-model! model dataset dataset-props-with-refs))
+    
+    ;; Add dataset to catalog
+    (.add model catalog (property :dcat/dataset) dataset)
+    
     ;; Return the dataset resource
     dataset))
 
@@ -773,7 +688,7 @@
     (.setNsPrefix model "mobility" mobility)
 
     ;; Fintraffic agent
-    (.add model fintraffic-agent RDF/type (ResourceFactory/createResource (str foaf "Organization")))
+    (.add model fintraffic-agent RDF/type (ResourceFactory/createResource (kw->uri :foaf/Organization)))
     (.add model fintraffic-agent
           (property :foaf/name)
           (ResourceFactory/createStringLiteral "Fintraffic Oy"))
@@ -789,7 +704,7 @@
     ;; 🤷‍♀️
     (when operation-areas
       (let [geojson-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator nil)
-            _ (create-record service model catalog nil geojson-dataset-resource fintraffic-agent)]
+            _ (create-catalog-record service model catalog nil geojson-dataset-resource fintraffic-agent)]
 
         (doseq [interface external-interfaces]
           ;; TODO: is interface a dataservice or dataset?
@@ -797,7 +712,7 @@
           (if is-dataservice?
             (create-data-service model interface)
             (let [interface-dataset-resource (create-dataset db service model catalog service-id operator-id operation-areas operator interface)
-                  _ (create-record service model catalog interface interface-dataset-resource fintraffic-agent)
+                  _ (create-catalog-record service model catalog interface interface-dataset-resource fintraffic-agent)
                   _ (add-isreferenced-and-related-to-dataset geojson-dataset-resource
                                                              interface-dataset-resource
                                                              model)])))))
