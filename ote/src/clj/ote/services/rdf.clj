@@ -58,10 +58,65 @@
       (throw (ex-info (str "Unknown namespace: " ns) {:keyword kw})))
     (str base-uri name)))
 
+(def properties
+  "Map of property keywords to pre-created RDF properties."
+  (let [prop-keys [:dcat/startDate
+                   :dcat/endDate
+                   :dcat/record
+                   :dcat/distribution
+                   :dcat/accessURL
+                   :dcat/downloadURL
+                   :dcat/endpointURL
+                   :dcat/description
+                   :dcat/dataset
+                   :dct/isReferencedBy
+                   :dct/relation
+                   :dct/description
+                   :dct/spatial
+                   :dct/language
+                   :dct/license
+                   :dct/identifier
+                   :dct/issued
+                   :dct/themeTaxonomy
+                   :dct/modified
+                   :dct/created
+                   :dct/publisher
+                   :dct/title
+                   :dct/rights
+                   :dct/type
+                   :dct/format
+                   :dct/accrualPeriodicity
+                   :dct/conformsTo
+                   :dct/rightsHolder
+                   :dct/theme
+                   :dct/temporal
+                   :dct/date
+                   :dct/result
+                   :foaf/title
+                   :foaf/homepage
+                   :foaf/primaryTopic
+                   :foaf/name
+                   :locn/geometry
+                   :cnt/characterEncoding
+                   :mobility/schema
+                   :mobility/transportMode
+                   :mobility/mobilityDataStandard
+                   :mobility/applicationLayerProtocol
+                   :mobility/description
+                   :mobility/communicationMethod
+                   :mobility/grammar
+                   :mobility/mobilityTheme
+                   :mobility/georeferencingMethod
+                   :mobility/identifier]]
+    (into {} (map (fn [kw]
+                    [kw (ResourceFactory/createProperty (kw->uri kw))])
+                  prop-keys))))
+
 (defn property
-  "Create an RDF property from a namespaced keyword."
+  "Get a pre-created RDF property from a namespaced keyword."
   [kw]
-  (ResourceFactory/createProperty (kw->uri kw)))
+  (or (get properties kw)
+      (throw (ex-info (str "Unknown property: " kw) {:keyword kw}))))
 
 (def catalog-uri (str base-uri "catalog"))
 (def dataset-base-uri (str base-uri "rdf/" service-id))
