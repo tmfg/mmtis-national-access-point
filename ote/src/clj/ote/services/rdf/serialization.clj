@@ -96,23 +96,29 @@
       (throw (ex-info (str "Unknown property: " kw) {:keyword kw}))))
 
 (defn add-resource-to-model!
-  "Add a resource and its properties to a Jena model.
+  "Add a resource and its properties to a Jena RDF model.
    
    Two-arity version: [model resource-data]
-   Takes a resource data structure (created with the `resource` helper function)
-   and adds it to the model. The resource-data should have :uri and :properties keys,
-   or :subject and :properties keys (for relationships).
+   Takes a resource data structure and adds it to the model. 
+   The resource-data should have:
+   - :uri (string) - The resource URI, or
+   - :subject (string) - For relationship objects
+   - :properties (map) - Property map as described below
    
    Three-arity version: [model resource properties-map]
    Takes a Jena Resource object and a properties-map.
-   properties-map is a map of property keywords to value descriptors.
+   
+   The properties-map is a map of property keywords to value descriptors.
    Value descriptors are maps with :type and :value keys:
-   - {:type :uri :value <keyword-or-string>} - Resource reference
+   - {:type :uri :value <keyword-or-string>} - Resource reference (keyword is resolved via kw->uri)
    - {:type :literal :value <string>} - Plain string literal
-   - {:type :typed-literal :value <string> :datatype <uri-string>} - Typed literal
-   - {:type :lang-literal :value <string> :lang <lang-code>} - Language-tagged literal
-   - {:type :blank-node :properties {...}} - Blank node with nested properties
-   Values can also be vectors of the above for multi-valued properties."
+   - {:type :typed-literal :value <string> :datatype <uri-string>} - Typed literal with datatype
+   - {:type :lang-literal :value <string> :lang <lang-code>} - Language-tagged literal (e.g., \"en\", \"fi\")
+   - {:type :resource :properties {...}} - Nested resource (blank node or named resource)
+   - {:type :resource :value <Jena-Resource>} - Reference to an existing Jena resource object
+   
+   Values can be single maps or vectors/sequences of maps for multi-valued properties.
+   Special handling: :rdf/type is mapped to RDF/type constant."
   ([model resource-data]
    (let [;; Handle both regular resources and relationship objects
          uri-or-subject (or (:uri resource-data) (:subject resource-data))
