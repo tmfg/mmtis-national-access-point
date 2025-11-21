@@ -8,19 +8,12 @@
             [compojure.core :refer [routes GET]]
             [ote.db.transport-service :as t-service]
             [ote.services.rdf.data :as rdf-data]
-            [ote.services.rdf.model :as rdf-model])
+            [ote.services.rdf.model :as rdf-model]
+            [ote.services.rdf :as rdf])
   (:import [org.apache.jena.rdf.model ModelFactory ResourceFactory]
            [org.apache.jena.vocabulary RDF]
            [org.apache.jena.datatypes BaseDatatype]))
 
-;; URI-prefiksit DCAT-AP:lle ja Mobility DCAT-AP:lle
-(def base-uri "http://localhost:3000/")
-(def service-id 1)
-(def business-id "2942108-7")                               ;; Tämä on testibusiness-id, jota käytetään Finap.fi:n testisivuilla
-(defn fintraffic-url [business-id]
-  (str "https://finap.fi/service-search?operators=" business-id))
-(defn operator-url [business-id]
-  (str "https://finap.fi/service-search?operators=" business-id))
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
@@ -111,8 +104,6 @@
   (or (get properties kw)
       (throw (ex-info (str "Unknown property: " kw) {:keyword kw}))))
 
-(def dataset-base-uri (str base-uri "rdf/" service-id))
-
 
 ;; ===== RDF CONVERSION LAYER: Jena Model Creation =====
 ;; Functions that convert RDF data structures to Jena models
@@ -188,11 +179,8 @@
 
 (defn create-dcat-ap-model
   "https://mobilitydcat-ap.github.io/mobilityDCAT-AP/releases/#properties-for-dataset"
-  [service-data]
-  (let [model (ModelFactory/createDefaultModel)
-        
-        ;; Create all RDF data structures using pure functions
-        rdf-data (rdf-model/service-data->rdf service-data)]
+  [rdf-data]
+  (let [model (ModelFactory/createDefaultModel)]
     ;; Set namespace prefixes from data
     (doseq [[prefix uri] (:ns-prefixes rdf-data)]
       (.setNsPrefix model prefix uri))
@@ -205,38 +193,43 @@
     model))
 
 ;; Sarjallista RDF/XML
-(defn serialize-model [model]
-  (with-open [out (java.io.ByteArrayOutputStream.)]
-    (.write model out "TURTLE" #_"RDF/XML")
-    (.toString out)))
+(defn serialize-model [model-or-models]
+  ;; TODO we could (should?) merge the models as clojure structs before serializing, but this works for now
+  (let [model (if (sequential? model-or-models)
+                (->> model-or-models
+                     (map create-dcat-ap-model)
+                     (reduce (fn [acc m]
+                               (doto acc
+                                 (.add m)))))
+                (create-dcat-ap-model model-or-models))]
+    (with-open [out (java.io.ByteArrayOutputStream.)]
+      (.write model out "TURTLE" #_"RDF/XML")
+      (.toString out))))
+
+(defn fetch-all-service-ids [db]
+  (->> (specql/fetch db ::t-service/transport-service
+                     #{:ote.db.transport-service/id}
+                     {})
+       (map :ote.db.transport-service/id)))
 
 (defn create-rdf
   ([db]
-   (let [service-ids (map :ote.db.transport-service/id (specql/fetch db ::t-service/transport-service
-                                   #{:ote.db.transport-service/id}
-                                   {}))
-         _ (assert (seq service-ids))
-         models (map (fn [service-id]
-                       (let [service-data (rdf-data/fetch-service-data db service-id)]
-                         (create-dcat-ap-model service-data)))
-                     service-ids)
-         final-model (reduce (fn [acc model]
-                               (doto acc
-                                 (.add model)))
-                             models)
-         rdf-turtle (serialize-model final-model)]
-   (-> (response/response rdf-turtle)
-       (response/content-type "text/turtle; charset=UTF-8")
-       (response/header "Content-Disposition" "attachment;"))))
+   (let [rdf-turtle (->> (fetch-all-service-ids db)
+                         (map (partial rdf-data/fetch-service-data db))
+                         (map rdf-model/service-data->rdf)
+                         serialize-model)] 
+     (-> (response/response rdf-turtle)
+         (response/content-type "text/turtle; charset=UTF-8")
+         (response/header "Content-Disposition" "attachment;"))))
   
   ([db service-id]
   ;; Use data layer functions for fetching
   (let [service-id (if (string? service-id)
                      (Long/parseLong service-id)
                      service-id)
-        service-data (rdf-data/fetch-service-data db service-id)
-        model (create-dcat-ap-model service-data)
-        rdf-turtle (serialize-model model)
+        rdf-turtle (-> (rdf-data/fetch-service-data db service-id)
+                       rdf-model/service-data->rdf 
+                       serialize-model)
         turtle-format (-> (response/response rdf-turtle)
                           (response/content-type "text/turtle; charset=UTF-8")
                           (response/header "Content-Disposition" "attachment;"))]

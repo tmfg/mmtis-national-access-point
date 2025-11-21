@@ -22,11 +22,11 @@
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
-(def cnt "http://www.w3.org/2011/content#")
-(def locn "http://www.w3.org/ns/locn#")
+#_(def cnt "http://www.w3.org/2011/content#")
+#_(def locn "http://www.w3.org/ns/locn#")
 (def foaf "http://xmlns.com/foaf/0.1/")
 (def mobility "http://www.w3.org/ns/mobilitydcatap#")
-(def owl "http://www.w3.org/2002/07/owl#")
+#_(def owl "http://www.w3.org/2002/07/owl#")
 
 (def catalog-uri (str base-uri "catalog"))
 (def dataset-base-uri (str base-uri "rdf/" service-id))
