@@ -17,28 +17,31 @@
                      {})
        (map :ote.db.transport-service/id)))
 
+(defn service-id->rdf-model [db service-id]
+  (let [rdf-data (rdf-data/fetch-service-data db service-id)]
+    (rdf-model/service-data->rdf rdf-data)))
+
+(defn turtle-response [turtle-data]
+  (-> (response/response turtle-data)
+      (response/content-type "text/turtle; charset=UTF-8")
+      (response/header "Content-Disposition" "attachment;")))
+
 (defn create-rdf
   ([db]
-   (let [rdf-datas (->> (fetch-all-service-ids db)
-                        (map (partial rdf-data/fetch-service-data db))
-                        (map rdf-model/service-data->rdf))
-         rdf-turtle (rdf-serialization/rdf-data->turtle rdf-datas)] 
-     (-> (response/response rdf-turtle)
-         (response/content-type "text/turtle; charset=UTF-8")
-         (response/header "Content-Disposition" "attachment;"))))
+   (->> (fetch-all-service-ids db)
+        (map (partial service-id->rdf-model db))
+        rdf-serialization/rdf-data->turtle
+        turtle-response))
   
   ([db service-id]
-  ;; Use data layer functions for fetching
-  (let [service-id (if (string? service-id)
-                     (Long/parseLong service-id)
-                     service-id)
-        rdf-data (-> (rdf-data/fetch-service-data db service-id)
-                     rdf-model/service-data->rdf)
-        rdf-turtle (rdf-serialization/rdf-data->turtle rdf-data)
-        turtle-format (-> (response/response rdf-turtle)
-                          (response/content-type "text/turtle; charset=UTF-8")
-                          (response/header "Content-Disposition" "attachment;"))]
-    turtle-format)))
+   ;; Use data layer functions for fetching
+   (let [service-id (if (string? service-id)
+                      (Long/parseLong service-id)
+                      service-id)]
+     (->> service-id
+          (service-id->rdf-model db)
+          rdf-serialization/rdf-data->turtle
+          turtle-response))))
 
 (defn- rds-routes [config db]
   (routes
