@@ -637,7 +637,7 @@
    Calls domain->rdf-for-service for geojson and all interfaces, merges results,
    and creates catalog. Returns a map with :catalog, :datasets, :distributions,
    :assessments, :catalog-records, :data-services, :relationships, and :fintraffic-agent."
-  [service operation-areas operator external-interfaces latest-publication fintraffic-uri fetch-validation-fn is-dataservice?]
+  [service operation-areas operator external-interfaces latest-publication fintraffic-uri validation-data is-dataservice?]
   (let [fintraffic-agent (resource fintraffic-uri
                                    {:rdf/type (uri :foaf/Organization)
                                     :foaf/name (literal "Fintraffic Oy")})
@@ -646,14 +646,14 @@
                        (vec (map domain->data-service external-interfaces))
                        [])
         result (if operation-areas
-                 (let [service-id (:ote.db.transport-service/id service)
-                       ;; Generate RDF data for GeoJSON dataset
+                 (let [;; Generate RDF data for GeoJSON dataset
                        geojson-rdf (domain->rdf-for-service service operation-areas operator nil nil fintraffic-uri)
                        
                        ;; Process interfaces and collect their RDF data
                        interface-rdf-models (doall
                                              (for [interface external-interfaces]
-                                               (let [validation-status (fetch-validation-fn service-id (::t-service/id interface))]
+                                               (let [interface-id (::t-service/id interface)
+                                                     validation-status (get validation-data interface-id)]
                                                  (domain->rdf-for-service service operation-areas operator interface validation-status fintraffic-uri))))
                        
                        ;; Merge all RDF models
@@ -781,6 +781,12 @@
         is-dataservice? false
         latest-publication (:published (rdf-data/fetch-latest-published-service db))
         fintraffic-uri (fintraffic-url business-id)
+        service-id (:ote.db.transport-service/id service)
+        
+        ;; Fetch validation data for all interfaces
+        validation-data (into {} (for [interface external-interfaces]
+                                   (let [interface-id (::t-service/id interface)]
+                                     [interface-id (rdf-data/fetch-gtfs-validation-data db service-id interface-id)])))
         
         ;; Create all RDF data structures using pure functions
         rdf-data (domain->rdf service 
@@ -789,8 +795,7 @@
                               external-interfaces 
                               latest-publication 
                               fintraffic-uri
-                              (fn [service-id interface-id]
-                                (rdf-data/fetch-gtfs-validation-data db service-id interface-id))
+                              validation-data
                               is-dataservice?)]
     (.setNsPrefix model "dcat" dcat)
     (.setNsPrefix model "dct" dct)
