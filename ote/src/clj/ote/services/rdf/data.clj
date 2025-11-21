@@ -46,3 +46,22 @@
   (when interface-id
     (first (fetch-latest-gtfs-vaco-status db {:service-id service-id
                                               :interface-id interface-id}))))
+
+(defn fetch-service-data
+  "Fetch all data needed for RDF generation for a given service.
+   Returns a map with :service, :operation-areas, :operator, :validation-data, and :latest-publication."
+  [db service-id]
+  (let [service (fetch-dataset-raw-data db service-id)
+        operation-areas (fetch-operation-areas-data db service-id)
+        operator-id (:ote.db.transport-service/transport-operator-id service)
+        operator (fetch-operator-data db operator-id)
+        external-interfaces (:ote.db.transport-service/external-interfaces service)
+        validation-data (into {} (for [interface external-interfaces]
+                                   (let [interface-id (:ote.db.transport-service/id interface)]
+                                     [interface-id (fetch-gtfs-validation-data db service-id interface-id)])))
+        latest-publication (:published (fetch-latest-published-service db))]
+    {:service service
+     :operation-areas operation-areas
+     :operator operator
+     :validation-data validation-data
+     :latest-publication latest-publication}))

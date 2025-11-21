@@ -775,18 +775,12 @@
 
 (defn create-dcat-ap-model
   "https://mobilitydcat-ap.github.io/mobilityDCAT-AP/releases/#properties-for-dataset"
-  [db service operation-areas operator]
+  [service-data]
   (let [model (ModelFactory/createDefaultModel)
+        {:keys [service operation-areas operator validation-data latest-publication]} service-data
         external-interfaces (::t-service/external-interfaces service)
         is-dataservice? false
-        latest-publication (:published (rdf-data/fetch-latest-published-service db))
         fintraffic-uri (fintraffic-url business-id)
-        service-id (:ote.db.transport-service/id service)
-        
-        ;; Fetch validation data for all interfaces
-        validation-data (into {} (for [interface external-interfaces]
-                                   (let [interface-id (::t-service/id interface)]
-                                     [interface-id (rdf-data/fetch-gtfs-validation-data db service-id interface-id)])))
         
         ;; Create all RDF data structures using pure functions
         rdf-data (domain->rdf service 
@@ -822,12 +816,8 @@
                                    {}))
          _ (assert (seq service-ids))
          models (map (fn [service-id]
-                       ;; Use data layer functions for fetching
-                       (let [service (rdf-data/fetch-dataset-raw-data db service-id)
-                             operation-areas (rdf-data/fetch-operation-areas-data db service-id)
-                             operator-id (:ote.db.transport-service/transport-operator-id service)
-                             operator (rdf-data/fetch-operator-data db operator-id)]
-                         (create-dcat-ap-model db service operation-areas operator)))
+                       (let [service-data (rdf-data/fetch-service-data db service-id)]
+                         (create-dcat-ap-model service-data)))
                      service-ids)
          final-model (reduce (fn [acc model]
                                (doto acc
@@ -843,13 +833,8 @@
   (let [service-id (if (string? service-id)
                      (Long/parseLong service-id)
                      service-id)
-        service (rdf-data/fetch-dataset-raw-data db service-id)
-        operation-areas (rdf-data/fetch-operation-areas-data db service-id)
-        operator-id (:ote.db.transport-service/transport-operator-id service)
-        operator (rdf-data/fetch-operator-data db operator-id)
-
-        model (create-dcat-ap-model db service operation-areas operator)
-
+        service-data (rdf-data/fetch-service-data db service-id)
+        model (create-dcat-ap-model service-data)
         rdf-turtle (serialize-model model)
         turtle-format (-> (response/response rdf-turtle)
                           (response/content-type "text/turtle; charset=UTF-8")
