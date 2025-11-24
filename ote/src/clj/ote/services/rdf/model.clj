@@ -337,8 +337,6 @@
                                     :dcat/accessURL (uri (:access-url domain))
                                     :dcat/downloadURL (uri (:download-url domain))
                                     :dct/format (uri (:format domain))
-                                    :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
-                                                           :dct/type (uri (:rights-url domain))})
                                     :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                                             :dct/identifier (uri (:license-url domain))})
                                     :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
