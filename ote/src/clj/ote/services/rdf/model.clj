@@ -3,6 +3,7 @@
    This namespace contains all business logic for transforming service data into RDF data structures
    without any dependency on the Jena API."
   (:require [ote.localization :as localization :refer [tr]]
+            [clojure.string :as str]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
@@ -299,7 +300,8 @@
      :vaco-validation-timestamp vaco-validation-timestamp
      :vaco-result-link (when latest-conversion-status
                          (:tis-magic-link latest-conversion-status))
-     :has-interface? (some? interface)}))
+     :has-interface? (some? interface)
+     :municipality (:municipality service)}))
 
 ;; ===== RDF DATA STRUCTURE CREATION =====
 
@@ -366,7 +368,7 @@
                                :mobility/transportMode (uri (:transport-mode domain))
                                :dct/accrualPeriodicity (uri (:accrual-periodicity domain))
                                :mobility/mobilityTheme mobility-themes
-                               :dct/spatial [(uri "https://w3id.org/stirdata/resource/lau/item/FI_244")
+                               :dct/spatial [(uri (:municipality domain))
                                              (resource {:rdf/type (uri :dct/Location)
                                                         :locn/geometry (typed-literal (:operation-area-geojson domain)
                                                                                       "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]

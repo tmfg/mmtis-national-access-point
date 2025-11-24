@@ -81,7 +81,12 @@
   ["transport_service_company_csv_temp" ::transport-service-company-csv-temp
    ote.db.modification/modification-fields]
   ["transport_service_company_csv" ::transport-service-company-csv
-   ote.db.modification/modification-fields])
+   ote.db.modification/modification-fields]
+  
+  ;; Codesets
+  ["finnish_municipalities" ::municipalities {"namefin" ::namefin
+                                              "nameswe" ::nameswe
+                                              "natcode" ::natcode}])
 
 ;; Create order for transport_type
 (def transport-service-types [:terminal :passenger-transportation :rentals :parking])

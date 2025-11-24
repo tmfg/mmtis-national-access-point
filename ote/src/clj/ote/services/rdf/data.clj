@@ -1,6 +1,7 @@
 (ns ote.services.rdf.data
   "Data layer for RDF service - database queries with no RDF concerns."
   (:require [specql.core :as specql]
+            [clojure.string :as str]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]))
@@ -15,15 +16,45 @@
   [db]
   (first (latest-published-service db)))
 
+(defn get-lau-code [db service]
+  "Location is defined by transforming (some-> service :ote.db.transport-service/contact-address :ote.db.common/post-office) into a kuntakoodi and trying to find a municipality lau code from the codeset.
+
+This is a bit dumb and bad (as a kuntakoodi might contain multiple post_offices), but the data model doesn't make it possible to use more reliable methods.
+
+In case this logic fails (if, for example, service's address happens to be in Kälviä instead of Kokkola) and we can't find a kuntakoodi, we'll have to skip this element completely, as LAU codeset doesn't seem to contain \"unknown\".
+
+Also, Location supports adding NUTS/County on top of the LAU/Municipality, but finding location's county is impossible with finap's codesets that do not link those."
+  
+  (let [post-office (some-> service
+                            :ote.db.transport-service/contact-address
+                            :ote.db.common/post_office
+                            str/capitalize)
+        suitable-municipalities (specql/fetch db ::t-service/municipalities
+                                              #{:ote.db.transport-service/natcode}
+                                              (specql.op/or
+                                               {::t-service/nameswe post-office}
+                                               {::t-service/namefin post-office}))
+        ;; let's blindly assume nameswe == ? || namefin == ? => true only for 1 or 0 rows.
+        municipality-id (some-> suitable-municipalities
+                                first
+                                :ote.db.transport-service/natcode)]
+
+    ;; I don't know if it's legal to have dct::Location completely absent if municipality lookup fails
+    (when municipality-id 
+      (clojure.core/format "https://w3id.org/stirdata/resource/lau/item/FI_%s" municipality-id))))
+
 (defn fetch-dataset-raw-data
   "Fetch raw dataset data from database (service record).
   Returns simple map with no RDF concerns."
   [db service-id]
-  (first (specql/fetch db ::t-service/transport-service
-                      (conj (specql/columns ::t-service/transport-service)
-                            [::t-service/external-interfaces
-                             (specql/columns ::t-service/external-interface-description)])
-                      {::t-service/id service-id})))
+  (let [service 
+        (first (specql/fetch db ::t-service/transport-service
+                             (conj (specql/columns ::t-service/transport-service)
+                                   [::t-service/external-interfaces
+                                    (specql/columns ::t-service/external-interface-description)])
+                             {::t-service/id service-id}))]
+    (assoc service 
+           :municipality (get-lau-code db service ))))
 
 (defn fetch-operator-data
   "Fetch raw operator data from database.
