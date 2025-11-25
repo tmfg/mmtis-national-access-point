@@ -16,15 +16,15 @@
   [db]
   (first (latest-published-service db)))
 
-(defn get-lau-code [db service]
-  "Location is defined by transforming (some-> service :ote.db.transport-service/contact-address :ote.db.common/post-office) into a kuntakoodi and trying to find a municipality lau code from the codeset.
-
-This is a bit dumb and bad (as a kuntakoodi might contain multiple post_offices), but the data model doesn't make it possible to use more reliable methods.
-
-In case this logic fails (if, for example, service's address happens to be in Kälviä instead of Kokkola) and we can't find a kuntakoodi, we'll have to skip this element completely, as LAU codeset doesn't seem to contain \"unknown\".
-
-Also, Location supports adding NUTS/County on top of the LAU/Municipality, but finding location's county is impossible with finap's codesets that do not link those."
+(defn get-lau-code
+    "Location is defined by transforming (some-> service :ote.db.transport-service/contact-address :ote.db.common/post-office) into a kuntakoodi and trying to find a municipality lau code from the codeset.
   
+  This is a bit dumb and bad (as a kuntakoodi might contain multiple post_offices), but the data model doesn't make it possible to use more reliable methods.
+  
+  In case this logic fails (if, for example, service's address happens to be in Kälviä instead of Kokkola) and we can't find a kuntakoodi, we'll have to skip this element completely, as LAU codeset doesn't seem to contain \"unknown\".
+  
+  Also, Location supports adding NUTS/County on top of the LAU/Municipality, but finding location's county is impossible with finap's codesets that do not link those."
+  [db service] 
   (let [post-office (some-> service
                             :ote.db.transport-service/contact-address
                             :ote.db.common/post_office

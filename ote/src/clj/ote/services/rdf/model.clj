@@ -148,7 +148,7 @@
     "CSV" "http://publications.europa.eu/resource/authority/file-type/CSV"
     "SIRI" "http://publications.europa.eu/resource/authority/file-type/XML"
 
-    ;; there is now option for "file-type/OTHER" in https://publications.europa.eu/resource/authority/file-type
+    ;; there is no option for "file-type/OTHER" in https://publications.europa.eu/resource/authority/file-type
     ;; TODO ask about this from the customer
     nil))
 
@@ -170,12 +170,12 @@
 (defn compute-operator-uri [operator]
   (operator-url (::t-operator/business-id operator)))
 
-(defn compute-access-url [service operator-id service-id interface]
+(defn compute-access-url [operator-id service-id interface]
   (if (nil? interface)
     (str base-uri "export/geojson/" operator-id "/" service-id)
     (get-in interface [::t-service/external-interface ::t-service/url])))
 
-(defn compute-download-url [service operator-id service-id interface]
+(defn compute-download-url [operator-id service-id interface]
   (if (nil? interface)
     (str base-uri "export/geojson/" operator-id "/" service-id)
     (get-in interface [::t-service/external-interface ::t-service/url])))
@@ -257,8 +257,8 @@
         dataset-uri (compute-dataset-uri service interface)
         distribution-uri (compute-distribution-uri service interface)
         operator-uri (compute-operator-uri operator)
-        access-url (compute-access-url service operator-id service-id interface)
-        download-url (compute-download-url service operator-id service-id interface)
+        access-url (compute-access-url operator-id service-id interface)
+        download-url (compute-download-url operator-id service-id interface)
         format (interface->format interface)
         rights-url (interface->rights-url-computed interface)
         license-url (interface->license-url interface)
@@ -373,7 +373,7 @@
                                :dct/accrualPeriodicity (uri (:accrual-periodicity domain))
                                :mobility/mobilityTheme mobility-themes
                                :dct/spatial [(uri (:municipality domain))
-                                             (resource {:rdf/type (uri :dct/Location)
+                                             #_(resource {:rdf/type (uri :dct/Location)
                                                         :locn/geometry (typed-literal (:operation-area-geojson domain)
                                                                                       "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
