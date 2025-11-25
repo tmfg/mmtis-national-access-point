@@ -251,63 +251,11 @@
         (log/warnf "Unknown datacontent %s" (pr-str data-content))
         "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))))
 
-(defn prepare-domain [service operator operation-areas interface latest-conversion-status]
-  (let [service-id (:ote.db.transport-service/id service)
-        operator-id (:ote.db.transport-service/transport-operator-id service)
-        dataset-uri (compute-dataset-uri service interface)
-        distribution-uri (compute-distribution-uri service interface)
-        operator-uri (compute-operator-uri operator)
-        access-url (compute-access-url operator-id service-id interface)
-        download-url (compute-download-url operator-id service-id interface)
-        format (interface->format interface)
-        rights-url (interface->rights-url-computed interface)
-        license-url (interface->license-url interface)
-        distribution-description (compute-distribution-description service interface)
-        last-modified (compute-last-modified service interface latest-conversion-status)
-        accrual-periodicity (interface->accrual-periodicity interface)
-        mobility-themes (service->mobility-themes service)
-        dataset-languages (interface->dataset-languages interface)
-        transport-mode (service->transport-mode service)
-        intended-info-service (if interface
-                                (interface->intended-information-service interface)
-                                "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
-        vaco-validation-timestamp (when interface
-                                    (:tis_polling_completed latest-conversion-status))
-        record-uri (if (nil? interface)
-                     (str dataset-base-uri service-id "/record")
-                     (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))]
-    {:dataset-uri dataset-uri
-     :distribution-uri distribution-uri
-     :operator-uri operator-uri
-     :operator-name (:ote.db.transport-operator/name operator)
-     :service-id (:ote.db.transport-service/id service)
-     :service-name (:ote.db.transport-service/name service)
-     :service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
-     :available-from (:ote.db.transport-service/available-from service)
-     :available-to (:ote.db.transport-service/available-to service)
-     :created (::modification/created service)
-     :modified (::modification/modified service)
-     :last-modified last-modified
-     :record-uri record-uri
-     :access-url access-url
-     :download-url download-url
-     :format format
-     :rights-url rights-url
-     :license-url license-url
-     :distribution-description distribution-description
-     :accrual-periodicity accrual-periodicity
-     :mobility-themes mobility-themes
-     :dataset-languages dataset-languages
-     :transport-mode transport-mode
-     :intended-info-service intended-info-service
-     :operation-area-geojson (:geojson (first operation-areas))
-     :needs-mobility-data-standard-blank-node? (nil? interface)
-     :mobility-data-standard-uri (when interface (interface->mobility-data-standard interface))
-     :vaco-validation-timestamp vaco-validation-timestamp
-     :vaco-result-link (when latest-conversion-status
-                         (:tis-magic-link latest-conversion-status))
-     :has-interface? (some? interface)
-     :municipality (:municipality service)}))
+(defn compute-record-uri [service interface]
+  (let [service-id (:ote.db.transport-service/id service)]
+    (if (nil? interface)
+      (str dataset-base-uri service-id "/record")
+      (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))))
 
 ;; ===== RDF DATA STRUCTURE CREATION =====
 
@@ -338,78 +286,117 @@
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})})))
 
-(defn domain->distribution [domain]
-  (let [distribution-props (cond-> {:rdf/type (uri :dcat/Distribution)
-                                    :dcat/accessURL (uri (:access-url domain))
-                                    :dcat/downloadURL (uri (:download-url domain))
-                                    :dct/format (uri (:format domain))
+(defn domain->distribution [service interface latest-conversion-status]
+  (let [service-id (:ote.db.transport-service/id service)
+        operator-id (:ote.db.transport-service/transport-operator-id service)
+        distribution-uri (compute-distribution-uri service interface)
+        access-url (compute-access-url operator-id service-id interface)
+        download-url (compute-download-url operator-id service-id interface)
+        format (interface->format interface)
+        license-url (interface->license-url interface)
+        distribution-description (compute-distribution-description service interface)
+        has-interface? (some? interface)
+        needs-blank-node? (nil? interface)
+        mobility-data-standard-uri (when interface (interface->mobility-data-standard interface))
+        vaco-validation-timestamp (when interface
+                                    (:tis_polling_completed latest-conversion-status))
+        vaco-result-link (when latest-conversion-status
+                           (:tis-magic-link latest-conversion-status))
+        distribution-props (cond-> {:rdf/type (uri :dcat/Distribution)
+                                    :dcat/accessURL (uri access-url)
+                                    :dcat/downloadURL (uri download-url)
+                                    :dct/format (uri format)
                                     :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                                            :dct/identifier (uri (:license-url domain))})
+                                                            :dct/identifier (uri license-url)})
                                     :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
-                                    :mobility/description (lang-literal (:distribution-description domain) "fi")
+                                    :mobility/description (lang-literal distribution-description "fi")
                                     :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
                                     :mobility/mobilityDataStandard (mobility-data-standard-data 
-                                                                     (:needs-mobility-data-standard-blank-node? domain)
-                                                                     (:mobility-data-standard-uri domain))}
-                             (not (:has-interface? domain))
+                                                                     needs-blank-node?
+                                                                     mobility-data-standard-uri)}
+                             (not has-interface?)
                              (assoc :cnt/characterEncoding (literal "UTF-8")
                                     :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema"))
                              
-                             (:vaco-validation-timestamp domain)
-                             (assoc :dct/result (literal (:vaco-result-link domain))))]
-    (resource (:distribution-uri domain) distribution-props)))
+                             vaco-validation-timestamp
+                             (assoc :dct/result (literal vaco-result-link)))]
+    (resource distribution-uri distribution-props)))
 
-(defn domain->dataset [domain distributions]
-  (let [mobility-themes (vec (map uri (:mobility-themes domain)))
-        dataset-languages (when (:dataset-languages domain)
-                           (vec (map uri (:dataset-languages domain))))
-        operator (resource (:operator-uri domain)
-                           {:rdf/type (uri :foaf/Organization)
-                            :foaf/name (literal (:operator-name domain))})
+(defn domain->dataset [service operator operation-areas interface latest-conversion-status distributions]
+  (let [dataset-uri (compute-dataset-uri service interface)
+        operator-uri (compute-operator-uri operator)
+        operator-name (:ote.db.transport-operator/name operator)
+        service-name (:ote.db.transport-service/name service)
+        service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
+        municipality (:municipality service)
+        transport-mode (service->transport-mode service)
+        accrual-periodicity (interface->accrual-periodicity interface)
+        mobility-themes (service->mobility-themes service)
+        dataset-languages (interface->dataset-languages interface)
+        intended-info-service (if interface
+                                (interface->intended-information-service interface)
+                                "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
+        last-modified (compute-last-modified service interface latest-conversion-status)
+        has-interface? (some? interface)
+        operation-area-geojson (:geojson (first operation-areas))
+        mobility-themes-uris (vec (map uri mobility-themes))
+        dataset-languages-uris (when dataset-languages
+                                 (vec (map uri dataset-languages)))
+        operator-resource (resource operator-uri
+                                    {:rdf/type (uri :foaf/Organization)
+                                     :foaf/name (literal operator-name)})
+        spatial-data (if operation-area-geojson
+                       [(uri municipality)
+                        (resource {:rdf/type (uri :dct/Location)
+                                   :locn/geometry (typed-literal operation-area-geojson
+                                                                 "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
+                       [(uri municipality)])
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
-                               :dct/title (literal (:service-name domain))
-                               :dct/description (literal (:service-description domain))
-                               :mobility/transportMode (uri (:transport-mode domain))
-                               :dct/accrualPeriodicity (uri (:accrual-periodicity domain))
-                               :mobility/mobilityTheme mobility-themes
-                               :dct/spatial [(uri (:municipality domain))
-                                             #_(resource {:rdf/type (uri :dct/Location)
-                                                        :locn/geometry (typed-literal (:operation-area-geojson domain)
-                                                                                      "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
+                               :dct/title (literal service-name)
+                               :dct/description (literal service-description)
+                               :mobility/transportMode (uri transport-mode)
+                               :dct/accrualPeriodicity (uri accrual-periodicity)
+                               :mobility/mobilityTheme mobility-themes-uris
+                               :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
-                               :mobility/identifier (uri (:dataset-uri domain))
-                               :mobility/intendedInformationService (uri (:intended-info-service domain))
-                               :dct/publisher operator
-                               :dct/rightsHolder operator
+                               :mobility/identifier (uri dataset-uri)
+                               :mobility/intendedInformationService (uri intended-info-service)
+                               :dct/publisher operator-resource
+                               :dct/rightsHolder operator-resource
                                :dcat/distribution (map resource->uri distributions)}
-                        (not (:has-interface? domain))
+                        (not has-interface?)
                         (assoc :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326"))
 
-                        dataset-languages
-                        (assoc :dct/language dataset-languages)
+                        dataset-languages-uris
+                        (assoc :dct/language dataset-languages-uris)
 
-                        (:last-modified domain)
-                        (assoc :dct/modified (typed-literal (str (:last-modified domain))
+                        last-modified
+                        (assoc :dct/modified (typed-literal (str last-modified)
                                                             "http://www.w3.org/2001/XMLSchema#dateTime")))]
-    (resource (:dataset-uri domain) dataset-props)))
+    (resource dataset-uri dataset-props)))
 
-(defn domain->assessment [domain]
-  (when (:vaco-validation-timestamp domain)
-    (resource {:rdf/type (uri :mobility/Assessment)
-               :dct/date (typed-literal (str (:vaco-validation-timestamp domain))
-                                        "http://www.w3.org/2001/XMLSchema#dateTime")})))
+(defn domain->assessment [interface latest-conversion-status]
+  (when (and interface latest-conversion-status)
+    (let [vaco-validation-timestamp (:tis_polling_completed latest-conversion-status)]
+      (when vaco-validation-timestamp
+        (resource {:rdf/type (uri :mobility/Assessment)
+                   :dct/date (typed-literal (str vaco-validation-timestamp)
+                                            "http://www.w3.org/2001/XMLSchema#dateTime")})))))
 
-(defn domain->catalog-record [domain dataset-uri fintraffic-uri]
-  (resource (:record-uri domain)
-            {:rdf/type (uri :dcat/CatalogRecord)
-             :dct/created (literal (str (:created domain)))
-             :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                            (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                            (uri "http://publications.europa.eu/resource/authority/language/ENG")]
-             :foaf/primaryTopic (uri dataset-uri)
-             :dct/modified (literal (str (:modified domain)))
-             :dct/publisher (uri fintraffic-uri)}))
+(defn domain->catalog-record [service interface dataset-uri fintraffic-uri]
+  (let [record-uri (compute-record-uri service interface)
+        created (::modification/created service)
+        modified (::modification/modified service)]
+    (resource record-uri
+              {:rdf/type (uri :dcat/CatalogRecord)
+               :dct/created (literal (str created))
+               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
+                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
+                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :foaf/primaryTopic (uri dataset-uri)
+               :dct/modified (literal (str modified))
+               :dct/publisher (uri fintraffic-uri)})))
 
 (defn domain->catalog [catalog-records dataset-uris latest-publication fintraffic-uri]
   (let [catalog-record-uris (map :uri catalog-records)]
@@ -435,15 +422,13 @@
                :dcat/dataset (vec (map uri dataset-uris))})))
 
 (defn domain->rdf-for-service [service operation-areas operator interface latest-conversion-status fintraffic-uri]
-  (let [domain (prepare-domain service operator operation-areas interface 
-                               latest-conversion-status)
-        distributions [(domain->distribution domain)]
-        dataset (domain->dataset domain distributions)
+  (let [distributions [(domain->distribution service interface latest-conversion-status)]
+        dataset (domain->dataset service operator operation-areas interface latest-conversion-status distributions)
         dataset-uri (:uri dataset)
-        catalog-record (domain->catalog-record domain dataset-uri fintraffic-uri)]
+        catalog-record (domain->catalog-record service interface dataset-uri fintraffic-uri)]
     
     {:distributions distributions
-     :assessments (if-let [assessment (domain->assessment domain)] [assessment] [])
+     :assessments (if-let [assessment (domain->assessment interface latest-conversion-status)] [assessment] [])
      :datasets [dataset]
      :catalog-records [catalog-record]}))
 
