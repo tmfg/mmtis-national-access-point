@@ -3,89 +3,13 @@
   (:require [clojure.test :as t :refer [deftest testing is]]
             [ote.services.rdf.data :as rdf-data]
             [ote.services.rdf.model :as rdf-model]
+            [ote.services.rdf-test-utilities :as test-utils]
             [ote.localization :as localization :refer [tr]]))
-
-(def test-service
-  {:service
-   {:ote.db.transport-service/contact-email "tero.testinen@sahkoposti.fi",
-    :ote.db.transport-service/sub-type :taxi,
-    :ote.db.transport-service/id 123456789,
-    :ote.db.modification/created
-    #inst "2016-12-19T18:45:33.294000000-00:00",
-    :ote.db.transport-service/notice-external-interfaces? false,
-    :ote.db.transport-service/companies [],
-    :municipality "https://w3id.org/stirdata/resource/lau/item/FI_092",
-    :ote.db.transport-service/description
-    [#:ote.db.transport-service{:lang "FI", :text "henkilöliikenne"}],
-    :ote.db.transport-service/brokerage? false,
-    :ote.db.transport-service/external-interfaces nil,
-    :ote.db.transport-service/rentals {},
-    :ote.db.transport-service/contact-address
-    #:ote.db.common{:street "Testikatu 1",
-                    :post_office "Vantaa",
-                    :postal_code "01230"},
-    :ote.db.modification/created-by
-    "some_uuid",
-    :ote.db.transport-service/name "Taksi",
-    :ote.db.transport-service/type :passenger-transportation,
-    :ote.db.transport-service/transport-operator-id 1,
-    :ote.db.transport-service/contact-phone "0401234567",
-    :ote.db.transport-service/commercial-traffic? true,
-    :ote.db.transport-service/passenger-transportation
-    #:ote.db.transport-service{:additional-services [],
-                               :price-classes [],
-                               :guaranteed-accessibility-tool [],
-                               :booking-service
-                               #:ote.db.transport-service{:description
-                                                          []},
-                               :guaranteed-info-service-accessibility [],
-                               :guaranteed-accessibility-description [],
-                               :limited-transportable-aid [],
-                               :guaranteed-vehicle-accessibility [],
-                               :pricing
-                               #:ote.db.transport-service{:description
-                                                          []},
-                               :payment-methods [],
-                               :limited-vehicle-accessibility [],
-                               :real-time-information
-                               #:ote.db.transport-service{:description
-                                                          []},
-                               :guaranteed-transportable-aid [],
-                               :payment-method-description [],
-                               :limited-accessibility-description [],
-                               :service-exceptions [],
-                               :limited-info-service-accessibility [],
-                               :service-hours [],
-                               :luggage-restrictions
-                               [#:ote.db.transport-service{:lang "FI"}],
-                               :limited-accessibility-tool []},
-    :ote.db.transport-service/transport-type [:road]},
-   :operation-areas
-   [{:geojson "{\"type\":\"Polygon\",\"coordinates\":[]}",
-     :primary? true,
-     :feature-id "Vantaa"}],
-   :operator
-   #:ote.db.transport-operator{:gsm "0401234567",
-                               :business-id "1234567-5",
-                               :name "Tero Testinen",
-                               :ckan-group-id
-                               "some_uuid",
-                               :id 123456789,
-                               :billing-address {},
-                               :visiting-address
-                               #:ote.db.common{:street "Testikatu 1",
-                                               :post_office "Vantaa",
-                                               :postal_code "01230"},
-                               :phone "0401234567",
-                               :deleted? false,
-                               :email "tero.testinen@example.com"},
-   :validation-data {},
-   :latest-publication #inst "2025-11-17T06:43:13.005000000-00:00"})
 
 (deftest catalog
   (testing "Catalog"
     (testing "has all mandatory properties"
-      (let [rdf-output (rdf-model/service-data->rdf test-service)
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
             catalog (:catalog rdf-output)
             catalog-props (:properties catalog)
             mandatory-properties [:dcat/dataset :dct/description :foaf/homepage 
@@ -139,5 +63,41 @@
             license (get-in catalog [:properties :dct/license])
             license-identifier (get-in license [:properties :dct/identifier])]
         (is (= (:value license-identifier) "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
-            "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)"))))
+            "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)")))
+    
+    (testing "dcat:record contains as many elements as there are datasets"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service)
+            catalog (:catalog rdf-output)
+            catalog-records (:catalog-records rdf-output)
+            datasets (:datasets rdf-output)
+            dataset-uris (set (map :uri datasets))
+            record-primary-topics (set (map #(get-in % [:properties :foaf/primaryTopic :value]) catalog-records))
+            catalog-record-links (get-in catalog [:properties :dcat/record])
+            catalog-record-uris (set (map :value catalog-record-links))
+            expected-record-uris (set (map :uri catalog-records))]
+        (is (= (count catalog-records) (count datasets))
+            "Should have one catalog record for each dataset")
+        (is (= dataset-uris record-primary-topics)
+            "Each catalog record's foaf:primaryTopic should match a dataset URI")
+        (is (= catalog-record-uris expected-record-uris)
+            "Catalog's dcat:record properties should link to all catalog records"))))
 
+(deftest dataset
+  (testing "Dataset"
+    (testing "has all mandatory properties"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
+            dataset (first (:datasets rdf-output))
+            dataset-props (:properties dataset)
+            mandatory-properties [:dct/description :dcat/distribution :dct/accrualPeriodicity
+                                 :mobility/mobilityTheme :dct/spatial :dct/title :dct/publisher]]
+        (doseq [prop mandatory-properties]
+          (is (contains? dataset-props prop)
+              (str "Dataset should have mandatory property " prop)))))
+    
+    (testing "dct:publisher is the search URL for the operator"
+      (let [business-id "1234567-5"
+            test-data (assoc-in test-utils/test-small-taxi-service [:operator :ote.db.transport-operator/business-id] business-id)
+            rdf-output (rdf-model/service-data->rdf test-data)
+            dataset (first (:datasets rdf-output))
+            publisher (get-in dataset [:properties :dct/publisher])]
+        (is (= (:uri publisher) "https://finap.fi/service-search?operators=1234567-5"))))))
