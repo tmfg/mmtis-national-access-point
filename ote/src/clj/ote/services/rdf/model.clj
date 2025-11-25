@@ -132,18 +132,24 @@
     "SIRI" "https://w3id.org/mobilitydcat-ap/mobility-data-standard/siri"
     "https://w3id.org/mobilitydcat-ap/mobility-data-standard/other"))
 
+;; GTFS on aina ZIP. DATEX ja NETEX ja SIRI ja kalkati on aina XML. GBFS on aina JSON. Jos ei voida päätellä, laitetaan other
 (defn interface->format-extent [interface]
   (case (str (first (::t-service/format interface)))
-    "GTFS" "http://publications.europa.eu/resource/authority/file-type/CSV"
+    "GTFS" "http://publications.europa.eu/resource/authority/file-type/ZIP"
+    ;; kuuluuko GTFS-RT joukkoon GTFS, joka on aina ZIP?
     "GTFS-RT" "http://publications.europa.eu/resource/authority/file-type/CSV"
     "GBFS" "http://publications.europa.eu/resource/authority/file-type/JSON"
     "Kalkati" "http://publications.europa.eu/resource/authority/file-type/XML"
     "NeTEx" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "Datex II" "http://publications.europa.eu/resource/authority/file-type/XML"
+    
     "GeoJSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
     "JSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
     "CSV" "http://publications.europa.eu/resource/authority/file-type/CSV"
-    "Datex II" "http://publications.europa.eu/resource/authority/file-type/XML"
     "SIRI" "http://publications.europa.eu/resource/authority/file-type/XML"
+
+    ;; there is now option for "file-type/OTHER" in https://publications.europa.eu/resource/authority/file-type
+    ;; TODO ask about this from the customer
     nil))
 
 (defn interface->rights-url [interface]
