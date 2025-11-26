@@ -82,6 +82,17 @@
         (is (= catalog-record-uris expected-record-uris)
             "Catalog's dcat:record properties should link to all catalog records"))))
 
+(deftest catalog-record
+  (testing "CatalogRecord"
+    (testing "has all mandatory properties"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
+            catalog-record (first (:catalog-records rdf-output))
+            catalog-record-props (:properties catalog-record)
+            mandatory-properties [:dct/created :dct/language :foaf/primaryTopic :dct/modified]]
+        (doseq [prop mandatory-properties]
+          (is (contains? catalog-record-props prop)
+              (str "CatalogRecord should have mandatory property " prop)))))))
+
 (deftest dataset
   (testing "Dataset"
     (testing "has all mandatory properties"
