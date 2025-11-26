@@ -3,7 +3,6 @@
    This namespace contains all business logic for transforming service data into RDF data structures
    without any dependency on the Jena API."
   (:require [ote.localization :as localization :refer [tr]]
-            [clojure.string :as str]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
@@ -11,7 +10,6 @@
 
 ;; ===== CONSTANTS =====
 
-(def service-id 1)
 (def fintraffic-business-id "2942108-7")
 
 (defn fintraffic-url [base-url]
@@ -152,85 +150,90 @@
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided"
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/other"))
 
-;; TODO all the URIs below are more or less placeholders, to be specified later
-(defn compute-dataset-uri [service interface base-url]
-  (if (nil? interface)
-    (str base-url "rdf/" (:ote.db.transport-service/id service))
-    (get-in interface [::t-service/external-interface ::t-service/url])))
+;; ===== GEOJSON-SPECIFIC FUNCTIONS =====
 
-(defn compute-distribution-uri [service interface base-url]
-  (if (nil? interface)
-    (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/" (:ote.db.transport-service/id service))
-    (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/interface/" (::t-service/id interface))))
+(defn geojson-dataset-uri [service base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service)))
+
+(defn geojson-distribution-uri [service base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/" (:ote.db.transport-service/id service)))
+
+(defn geojson-access-url [operator-id service-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id))
+
+(defn geojson-download-url [operator-id service-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id))
+
+(defn geojson-record-uri [service base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/record"))
+
+(def geojson-format "http://publications.europa.eu/resource/authority/file-type/GEOJSON")
+
+(def geojson-rights-url "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge")
+
+(def geojson-license-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+
+(defn geojson-distribution-description [service]
+  (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service)))
+
+(defn geojson-last-modified [service]
+  (:ote.db.modification/modified service))
+
+(def geojson-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
+
+(def geojson-dataset-languages
+  ["http://publications.europa.eu/resource/authority/language/FIN"
+   "http://publications.europa.eu/resource/authority/language/SWE"
+   "http://publications.europa.eu/resource/authority/language/ENG"])
+
+(def geojson-intended-information-service "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
+
+;; ===== EXTERNAL INTERFACE-SPECIFIC FUNCTIONS =====
+
+(defn interface-dataset-uri [interface]
+  (get-in interface [::t-service/external-interface ::t-service/url]))
+
+(defn interface-distribution-uri [service interface base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/interface/" (::t-service/id interface)))
+
+(defn interface-access-url [interface]
+  (get-in interface [::t-service/external-interface ::t-service/url]))
+
+(defn interface-download-url [interface]
+  (get-in interface [::t-service/external-interface ::t-service/url]))
+
+(defn interface-record-uri [interface]
+  (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))
+
+(defn interface-format [interface]
+  (interface->format-extent interface))
+
+(def interface-license-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+
+(defn interface-distribution-description [interface]
+  (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) ""))
+
+(defn interface-last-modified [interface latest-conversion-status]
+  (cond
+    latest-conversion-status
+    (:created latest-conversion-status)
+    
+    (::t-service/gtfs-imported interface)
+    (::t-service/gtfs-imported interface)
+    
+    :else nil))
+
+(def interface-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")
+
+;; ===== COMMON HELPER FUNCTIONS =====
 
 (defn compute-operator-uri [operator base-url]
   (operator-url (::t-operator/business-id operator) base-url))
-
-(defn compute-access-url [operator-id service-id interface base-url]
-  (if (nil? interface)
-    (str base-url "export/geojson/" operator-id "/" service-id)
-    (get-in interface [::t-service/external-interface ::t-service/url])))
-
-(defn compute-download-url [operator-id service-id interface base-url]
-  (if (nil? interface)
-    (str base-url "export/geojson/" operator-id "/" service-id)
-    (get-in interface [::t-service/external-interface ::t-service/url])))
-
-(defn compute-record-uri [service interface base-url]
-  (let [service-id (:ote.db.transport-service/id service)]
-    (if (nil? interface)
-      (str base-url "rdf/" service-id "/record")
-      (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))))
-
-(defn interface->format [interface]
-  (if (nil? interface)
-    "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
-    (interface->format-extent interface)))
-
-(defn interface->rights-url-computed [interface]
-  (if (nil? interface)
-    "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
-    (interface->rights-url interface)))
-
-(defn interface->license-url [interface]
-  "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
-
-(defn compute-distribution-description [service interface]
-  (if (nil? interface)
-    (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service))
-    (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")))
-
-(defn compute-last-modified [service interface latest-conversion-status]
-  (cond
-    (and interface latest-conversion-status)
-    (:created latest-conversion-status)
-    
-    (and interface
-         (nil? latest-conversion-status)
-         (::t-service/gtfs-imported interface))
-    (::t-service/gtfs-imported interface)
-    
-    (not interface)
-    (:ote.db.modification/modified service)))
-
-(defn interface->accrual-periodicity [interface]
-  (if (nil? interface)
-    "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-    (let [{:ote.db.transport-service/keys [format]} interface]
-      (if (= (first format) "GeoJSON")
-        "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-        "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"))))
 
 (defn service->mobility-themes [service]
   (if-let [sub-theme (service->sub-theme service)]
     [(service->mobility-theme service) sub-theme]
     [(service->mobility-theme service)]))
-
-(defn interface->dataset-languages [interface]
-  (when-not interface
-    ["http://publications.europa.eu/resource/authority/language/FIN"
-     "http://publications.europa.eu/resource/authority/language/SWE"
-     "http://publications.europa.eu/resource/authority/language/ENG"]))
 
 (defn interface->intended-information-service [interface]
   (let [data-content (some-> interface ::t-service/data-content first)]
@@ -256,6 +259,7 @@
 
 ;; ===== RDF DATA STRUCTURE CREATION =====
 
+;; Common helpers
 (defn mobility-data-standard-data [needs-blank-node? standard-uri]
   (if needs-blank-node?
     (resource {:rdf/type (uri :mobility/MobilityDataStandard)
@@ -283,62 +287,42 @@
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})})))
 
-(defn domain->distribution [service interface latest-conversion-status base-url]
+;; ===== GEOJSON RDF GENERATION =====
+
+(defn geojson->distribution [service base-url]
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
-        distribution-uri (compute-distribution-uri service interface base-url)
-        access-url (compute-access-url operator-id service-id interface base-url)
-        download-url (compute-download-url operator-id service-id interface base-url)
-        format (interface->format interface)
-        license-url (interface->license-url interface)
-        distribution-description (compute-distribution-description service interface)
-        has-interface? (some? interface)
-        needs-blank-node? (nil? interface)
-        mobility-data-standard-uri (when interface (interface->mobility-data-standard interface))
-        vaco-validation-timestamp (when interface
-                                    (:tis_polling_completed latest-conversion-status))
-        vaco-result-link (when latest-conversion-status
-                           (:tis-magic-link latest-conversion-status))
-        distribution-props (cond-> {:rdf/type (uri :dcat/Distribution)
-                                    :dcat/accessURL (uri access-url)
-                                    :dcat/downloadURL (uri download-url)
-                                    :dct/format (uri format)
-                                    :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                                            :dct/identifier (uri license-url)})
-                                    :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
-                                    :mobility/description (lang-literal distribution-description "fi")
-                                    :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
-                                    :mobility/mobilityDataStandard (mobility-data-standard-data 
-                                                                     needs-blank-node?
-                                                                     mobility-data-standard-uri)}
-                             (not has-interface?)
-                             (assoc :cnt/characterEncoding (literal "UTF-8")
-                                    :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema"))
-                             
-                             vaco-validation-timestamp
-                             (assoc :dct/result (literal vaco-result-link)))]
+        distribution-uri (geojson-distribution-uri service base-url)
+        access-url (geojson-access-url operator-id service-id base-url)
+        download-url (geojson-download-url operator-id service-id base-url)
+        distribution-description (geojson-distribution-description service)
+        distribution-props {:rdf/type (uri :dcat/Distribution)
+                            :dcat/accessURL (uri access-url)
+                            :dcat/downloadURL (uri download-url)
+                            :dct/format (uri geojson-format)
+                            :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
+                                                    :dct/identifier (uri geojson-license-url)})
+                            :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
+                            :mobility/description (lang-literal distribution-description "fi")
+                            :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
+                            :mobility/mobilityDataStandard (mobility-data-standard-data true nil)
+                            :cnt/characterEncoding (literal "UTF-8")
+                            :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
     (resource distribution-uri distribution-props)))
 
-(defn domain->dataset [service operator operation-areas interface latest-conversion-status distributions base-url]
-  (let [dataset-uri (compute-dataset-uri service interface base-url)
+(defn geojson->dataset [service operator operation-areas distributions base-url]
+  (let [dataset-uri (geojson-dataset-uri service base-url)
         operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
         service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
         municipality (:municipality service)
         transport-mode (service->transport-mode service)
-        accrual-periodicity (interface->accrual-periodicity interface)
         mobility-themes (service->mobility-themes service)
-        dataset-languages (interface->dataset-languages interface)
-        intended-info-service (if interface
-                                (interface->intended-information-service interface)
-                                "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
-        last-modified (compute-last-modified service interface latest-conversion-status)
-        has-interface? (some? interface)
+        last-modified (geojson-last-modified service)
         operation-area-geojson (:geojson (first operation-areas))
         mobility-themes-uris (vec (map uri mobility-themes))
-        dataset-languages-uris (when dataset-languages
-                                 (vec (map uri dataset-languages)))
+        dataset-languages-uris (vec (map uri geojson-dataset-languages))
         operator-resource (resource operator-uri
                                     {:rdf/type (uri :foaf/Organization)
                                      :foaf/name (literal operator-name)})
@@ -352,37 +336,26 @@
                                :dct/title (literal service-name)
                                :dct/description (literal service-description)
                                :mobility/transportMode (uri transport-mode)
-                               :dct/accrualPeriodicity (uri accrual-periodicity)
+                               :dct/accrualPeriodicity (uri geojson-accrual-periodicity)
                                :mobility/mobilityTheme mobility-themes-uris
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
-                               :mobility/intendedInformationService (uri intended-info-service)
+                               :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher operator-resource
                                :dct/rightsHolder operator-resource
-                               :dcat/distribution (map resource->uri distributions)}
-                        (not has-interface?)
-                        (assoc :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326"))
-
-                        dataset-languages-uris
-                        (assoc :dct/language dataset-languages-uris)
-
+                               :dcat/distribution (map resource->uri distributions)
+                               :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326")
+                               :dct/language dataset-languages-uris}
+                        
                         last-modified
                         (assoc :dct/modified (typed-literal (str last-modified)
                                                             "http://www.w3.org/2001/XMLSchema#dateTime")))]
     (resource dataset-uri dataset-props)))
 
-(defn domain->assessment [interface latest-conversion-status]
-  (when (and interface latest-conversion-status)
-    (let [vaco-validation-timestamp (:tis_polling_completed latest-conversion-status)]
-      (when vaco-validation-timestamp
-        (resource {:rdf/type (uri :mobility/Assessment)
-                   :dct/date (typed-literal (str vaco-validation-timestamp)
-                                            "http://www.w3.org/2001/XMLSchema#dateTime")})))))
-
-(defn domain->catalog-record [service interface dataset-uri fintraffic-uri base-url]
-  (let [record-uri (compute-record-uri service interface base-url)
+(defn geojson->catalog-record [service dataset-uri fintraffic-uri base-url]
+  (let [record-uri (geojson-record-uri service base-url)
         created (::modification/created service)
         modified (::modification/modified service)]
     (resource record-uri
@@ -394,6 +367,120 @@
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (literal (str modified))
                :dct/publisher (uri fintraffic-uri)})))
+
+(defn geojson->rdf [service operation-areas operator fintraffic-uri base-url]
+  (let [distributions [(geojson->distribution service base-url)]
+        dataset (geojson->dataset service operator operation-areas distributions base-url)
+        dataset-uri (:uri dataset)
+        catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri base-url)]
+    {:distributions distributions
+     :assessments []
+     :datasets [dataset]
+     :catalog-records [catalog-record]}))
+
+;; ===== EXTERNAL INTERFACE RDF GENERATION =====
+
+(defn interface->distribution [service interface latest-conversion-status base-url]
+  (let [distribution-uri (interface-distribution-uri service interface base-url)
+        access-url (interface-access-url interface)
+        download-url (interface-download-url interface)
+        format (interface-format interface)
+        distribution-description (interface-distribution-description interface)
+        mobility-data-standard-uri (interface->mobility-data-standard interface)
+        vaco-validation-timestamp (when latest-conversion-status
+                                    (:tis_polling_completed latest-conversion-status))
+        vaco-result-link (when latest-conversion-status
+                           (:tis-magic-link latest-conversion-status))
+        distribution-props (cond-> {:rdf/type (uri :dcat/Distribution)
+                                    :dcat/accessURL (uri access-url)
+                                    :dcat/downloadURL (uri download-url)
+                                    :dct/format (uri format)
+                                    :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
+                                                            :dct/identifier (uri interface-license-url)})
+                                    :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
+                                    :mobility/description (lang-literal distribution-description "fi")
+                                    :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
+                                    :mobility/mobilityDataStandard (uri mobility-data-standard-uri)}
+                             
+                             vaco-validation-timestamp
+                             (assoc :dct/result (literal vaco-result-link)))]
+    (resource distribution-uri distribution-props)))
+
+(defn interface->dataset [service operator operation-areas interface latest-conversion-status distributions base-url]
+  (let [dataset-uri (interface-dataset-uri interface)
+        operator-uri (compute-operator-uri operator base-url)
+        operator-name (:ote.db.transport-operator/name operator)
+        service-name (:ote.db.transport-service/name service)
+        service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
+        municipality (:municipality service)
+        transport-mode (service->transport-mode service)
+        mobility-themes (service->mobility-themes service)
+        intended-info-service (interface->intended-information-service interface)
+        last-modified (interface-last-modified interface latest-conversion-status)
+        operation-area-geojson (:geojson (first operation-areas))
+        mobility-themes-uris (vec (map uri mobility-themes))
+        operator-resource (resource operator-uri
+                                    {:rdf/type (uri :foaf/Organization)
+                                     :foaf/name (literal operator-name)})
+        spatial-data (if operation-area-geojson
+                       [(uri municipality)
+                        (resource {:rdf/type (uri :dct/Location)
+                                   :locn/geometry (typed-literal operation-area-geojson
+                                                                 "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
+                       [(uri municipality)])
+        dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
+                               :dct/title (literal service-name)
+                               :dct/description (literal service-description)
+                               :mobility/transportMode (uri transport-mode)
+                               :dct/accrualPeriodicity (uri interface-accrual-periodicity)
+                               :mobility/mobilityTheme mobility-themes-uris
+                               :dct/spatial spatial-data
+                               :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
+                               :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
+                               :mobility/identifier (uri dataset-uri)
+                               :mobility/intendedInformationService (uri intended-info-service)
+                               :dct/publisher operator-resource
+                               :dct/rightsHolder operator-resource
+                               :dcat/distribution (map resource->uri distributions)}
+
+                        last-modified
+                        (assoc :dct/modified (typed-literal (str last-modified)
+                                                            "http://www.w3.org/2001/XMLSchema#dateTime")))]
+    (resource dataset-uri dataset-props)))
+
+(defn interface->assessment [latest-conversion-status]
+  (when latest-conversion-status
+    (let [vaco-validation-timestamp (:tis_polling_completed latest-conversion-status)]
+      (when vaco-validation-timestamp
+        (resource {:rdf/type (uri :mobility/Assessment)
+                   :dct/date (typed-literal (str vaco-validation-timestamp)
+                                            "http://www.w3.org/2001/XMLSchema#dateTime")})))))
+
+(defn interface->catalog-record [service interface dataset-uri fintraffic-uri]
+  (let [record-uri (interface-record-uri interface)
+        created (::modification/created service)
+        modified (::modification/modified service)]
+    (resource record-uri
+              {:rdf/type (uri :dcat/CatalogRecord)
+               :dct/created (literal (str created))
+               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
+                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
+                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :foaf/primaryTopic (uri dataset-uri)
+               :dct/modified (literal (str modified))
+               :dct/publisher (uri fintraffic-uri)})))
+
+(defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
+  (let [distributions [(interface->distribution service interface latest-conversion-status base-url)]
+        dataset (interface->dataset service operator operation-areas interface latest-conversion-status distributions base-url)
+        dataset-uri (:uri dataset)
+        catalog-record (interface->catalog-record service interface dataset-uri fintraffic-uri)]
+    {:distributions distributions
+     :assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
+     :datasets [dataset]
+     :catalog-records [catalog-record]}))
+
+;; ===== CATALOG GENERATION =====
 
 (defn domain->catalog [catalog-records dataset-uris latest-publication fintraffic-uri base-url]
   (let [catalog-uri (str base-url "catalog")
@@ -419,17 +506,6 @@
                :dcat/record (vec (map uri catalog-record-uris))
                :dcat/dataset (vec (map uri dataset-uris))})))
 
-(defn domain->rdf-for-service [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
-  (let [distributions [(domain->distribution service interface latest-conversion-status base-url)]
-        dataset (domain->dataset service operator operation-areas interface latest-conversion-status distributions base-url)
-        dataset-uri (:uri dataset)
-        catalog-record (domain->catalog-record service interface dataset-uri fintraffic-uri base-url)]
-    
-    {:distributions distributions
-     :assessments (if-let [assessment (domain->assessment interface latest-conversion-status)] [assessment] [])
-     :datasets [dataset]
-     :catalog-records [catalog-record]}))
-
 (defn merge-rdf-models [model1 model2]
   {:distributions (vec (concat (:distributions model1) (:distributions model2)))
    :assessments (vec (concat (:assessments model1) (:assessments model2)))
@@ -438,7 +514,7 @@
 
 (defn service-data->rdf
   "Create complete RDF data structure including catalog and fintraffic agent.
-   Calls domain->rdf-for-service for geojson and all interfaces, merges results,
+   Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
    and creates catalog. Returns a map with :catalog, :datasets, :distributions,
    :assessments, :catalog-records, :data-services, :relationships, :ns-prefixes, and :fintraffic-agent."
   [service-data base-url]
@@ -457,14 +533,14 @@
                        [])
         result (if operation-areas
                  (let [;; Generate RDF data for GeoJSON dataset
-                       geojson-rdf (domain->rdf-for-service service operation-areas operator nil nil fintraffic-uri base-url)
+                       geojson-rdf (geojson->rdf service operation-areas operator fintraffic-uri base-url)
                        
                        ;; Process interfaces and collect their RDF data
                        interface-rdf-models (doall
                                              (for [interface external-interfaces]
                                                (let [interface-id (::t-service/id interface)
                                                      validation-status (get validation-data interface-id)]
-                                                 (domain->rdf-for-service service operation-areas operator interface validation-status fintraffic-uri base-url))))
+                                                 (interface->rdf service operation-areas operator interface validation-status fintraffic-uri base-url))))
                        
                        ;; Merge all RDF models
                        merged-rdf (reduce merge-rdf-models geojson-rdf interface-rdf-models)
