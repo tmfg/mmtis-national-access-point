@@ -9,7 +9,7 @@
 (deftest catalog
   (testing "Catalog"
     (testing "has all mandatory properties"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
             catalog (:catalog rdf-output)
             catalog-props (:properties catalog)
             mandatory-properties [:dcat/dataset :dct/description :foaf/homepage 
@@ -19,19 +19,19 @@
               (str "Catalog should have mandatory property " prop)))))
     
     (testing "dct:title is \"Finap.fi - NAP - National Access Point\""
-      (let [rdf-output (rdf-model/service-data->rdf {})
+      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             title (get-in catalog [:properties :foaf/title])]
         (is (= (:value title) "Finap.fi - NAP - National Access Point"))))
     
     (testing "dct:publisher is FINAP search URL to Fintraffic business id"
-      (let [rdf-output (rdf-model/service-data->rdf {})
+      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3210/")
             catalog (:catalog rdf-output)
             publisher (get-in catalog [:properties :dct/publisher])]
-        (is (= (:value publisher) "https://finap.fi/service-search?operators=2942108-7"))))
+        (is (= (:value publisher) "http://localhost:3210/service-search?operators=2942108-7"))))
     
     (testing "dct:description is obtained from i18n files"
-      (let [rdf-output (rdf-model/service-data->rdf {})
+      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             descriptions (get-in catalog [:properties :dct/description])
             fi-expected (localization/with-language "fi" (tr [:front-page :column-NAP]))
@@ -52,13 +52,13 @@
             "English description should be from i18n [:front-page :column-NAP]"))))
     
     (testing "dct:spatial is the Finnish NUTS code"
-      (let [rdf-output (rdf-model/service-data->rdf {})
+      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             spatial (get-in catalog [:properties :dct/spatial])]
         (is (= (:value spatial) "http://data.europa.eu/nuts/code/FI"))))
     
     (testing "dct:license is \"Creative Commons Nimeä 4.0 Kansainvälinen\""
-      (let [rdf-output (rdf-model/service-data->rdf {})
+      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             license (get-in catalog [:properties :dct/license])
             license-identifier (get-in license [:properties :dct/identifier])]
@@ -66,7 +66,7 @@
             "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)")))
     
     (testing "dcat:record contains as many elements as there are datasets"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service)
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
             catalog (:catalog rdf-output)
             catalog-records (:catalog-records rdf-output)
             datasets (:datasets rdf-output)
@@ -85,7 +85,7 @@
 (deftest catalog-record
   (testing "CatalogRecord"
     (testing "has all mandatory properties"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
             catalog-record (first (:catalog-records rdf-output))
             catalog-record-props (:properties catalog-record)
             mandatory-properties [:dct/created :dct/language :foaf/primaryTopic :dct/modified]]
@@ -96,7 +96,7 @@
 (deftest dataset
   (testing "Dataset"
     (testing "has all mandatory properties"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service)
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
             dataset (first (:datasets rdf-output))
             dataset-props (:properties dataset)
             mandatory-properties [:dct/description :dcat/distribution :dct/accrualPeriodicity
@@ -108,7 +108,18 @@
     (testing "dct:publisher is the search URL for the operator"
       (let [business-id "1234567-5"
             test-data (assoc-in test-utils/test-small-taxi-service [:operator :ote.db.transport-operator/business-id] business-id)
-            rdf-output (rdf-model/service-data->rdf test-data)
+            rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             dataset (first (:datasets rdf-output))
             publisher (get-in dataset [:properties :dct/publisher])]
-        (is (= (:uri publisher) "https://finap.fi/service-search?operators=1234567-5"))))))
+        (is (= (:uri publisher) "http://localhost:3000/service-search?operators=1234567-5"))))))
+
+#_(keep (fn [service-id]
+          (try
+            (when-let [service-data (ote.services.rdf.data/fetch-service-data db service-id)]
+              (when (seq (get-in service-data [:service :ote.db.transport-service/external-interfaces]))
+                (update service-data :operation-areas
+                        (partial map #(assoc % :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}")))))
+            (catch Throwable e
+              (println "Error processing service id" service-id ":" (.getMessage e))
+              nil)))
+        (range 1 1000))

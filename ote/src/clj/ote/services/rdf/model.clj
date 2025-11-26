@@ -11,15 +11,14 @@
 
 ;; ===== CONSTANTS =====
 
-(def base-uri "http://localhost:3000/")
 (def service-id 1)
-(def business-id "2942108-7")
+(def fintraffic-business-id "2942108-7")
 
-(defn fintraffic-url [business-id]
-  (str "https://finap.fi/service-search?operators=" business-id))
+(defn fintraffic-url [base-url]
+  (str base-url "service-search?operators=" fintraffic-business-id))
 
-(defn operator-url [business-id]
-  (str "https://finap.fi/service-search?operators=" business-id))
+(defn operator-url [business-id base-url]
+  (str base-url "service-search?operators=" business-id))
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
@@ -29,10 +28,6 @@
 (def mobility "http://www.w3.org/ns/mobilitydcatap#")
 #_(def owl "http://www.w3.org/2002/07/owl#")
 
-(def catalog-uri (str base-uri "catalog"))
-(def dataset-base-uri (str base-uri "rdf/" service-id))
-(def distribution-base-uri (str dataset-base-uri "/distribution"))
-(def distribution-interface-base-uri (str dataset-base-uri "/distribution/interface"))
 (def licence-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
 ;; ===== HELPER FUNCTIONS FOR RDF DATA STRUCTURES =====
@@ -157,28 +152,35 @@
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided"
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/other"))
 
-(defn compute-dataset-uri [service interface]
+;; TODO all the URIs below are more or less placeholders, to be specified later
+(defn compute-dataset-uri [service interface base-url]
   (if (nil? interface)
-    (str dataset-base-uri (:ote.db.transport-service/id service))
+    (str base-url "rdf/" (:ote.db.transport-service/id service))
     (get-in interface [::t-service/external-interface ::t-service/url])))
 
-(defn compute-distribution-uri [service interface]
+(defn compute-distribution-uri [service interface base-url]
   (if (nil? interface)
-    (str distribution-base-uri "/" (:ote.db.transport-service/id service))
-    (str distribution-interface-base-uri "/" (::t-service/id interface))))
+    (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/" (:ote.db.transport-service/id service))
+    (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/interface/" (::t-service/id interface))))
 
-(defn compute-operator-uri [operator]
-  (operator-url (::t-operator/business-id operator)))
+(defn compute-operator-uri [operator base-url]
+  (operator-url (::t-operator/business-id operator) base-url))
 
-(defn compute-access-url [operator-id service-id interface]
+(defn compute-access-url [operator-id service-id interface base-url]
   (if (nil? interface)
-    (str base-uri "export/geojson/" operator-id "/" service-id)
+    (str base-url "export/geojson/" operator-id "/" service-id)
     (get-in interface [::t-service/external-interface ::t-service/url])))
 
-(defn compute-download-url [operator-id service-id interface]
+(defn compute-download-url [operator-id service-id interface base-url]
   (if (nil? interface)
-    (str base-uri "export/geojson/" operator-id "/" service-id)
+    (str base-url "export/geojson/" operator-id "/" service-id)
     (get-in interface [::t-service/external-interface ::t-service/url])))
+
+(defn compute-record-uri [service interface base-url]
+  (let [service-id (:ote.db.transport-service/id service)]
+    (if (nil? interface)
+      (str base-url "rdf/" service-id "/record")
+      (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))))
 
 (defn interface->format [interface]
   (if (nil? interface)
@@ -251,11 +253,6 @@
         (log/warnf "Unknown datacontent %s" (pr-str data-content))
         "https://w3id.org/mobilitydcat-ap/intended-information-service/other"))))
 
-(defn compute-record-uri [service interface]
-  (let [service-id (:ote.db.transport-service/id service)]
-    (if (nil? interface)
-      (str dataset-base-uri service-id "/record")
-      (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))))
 
 ;; ===== RDF DATA STRUCTURE CREATION =====
 
@@ -286,12 +283,12 @@
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})})))
 
-(defn domain->distribution [service interface latest-conversion-status]
+(defn domain->distribution [service interface latest-conversion-status base-url]
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
-        distribution-uri (compute-distribution-uri service interface)
-        access-url (compute-access-url operator-id service-id interface)
-        download-url (compute-download-url operator-id service-id interface)
+        distribution-uri (compute-distribution-uri service interface base-url)
+        access-url (compute-access-url operator-id service-id interface base-url)
+        download-url (compute-download-url operator-id service-id interface base-url)
         format (interface->format interface)
         license-url (interface->license-url interface)
         distribution-description (compute-distribution-description service interface)
@@ -322,9 +319,9 @@
                              (assoc :dct/result (literal vaco-result-link)))]
     (resource distribution-uri distribution-props)))
 
-(defn domain->dataset [service operator operation-areas interface latest-conversion-status distributions]
-  (let [dataset-uri (compute-dataset-uri service interface)
-        operator-uri (compute-operator-uri operator)
+(defn domain->dataset [service operator operation-areas interface latest-conversion-status distributions base-url]
+  (let [dataset-uri (compute-dataset-uri service interface base-url)
+        operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
         service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
@@ -384,8 +381,8 @@
                    :dct/date (typed-literal (str vaco-validation-timestamp)
                                             "http://www.w3.org/2001/XMLSchema#dateTime")})))))
 
-(defn domain->catalog-record [service interface dataset-uri fintraffic-uri]
-  (let [record-uri (compute-record-uri service interface)
+(defn domain->catalog-record [service interface dataset-uri fintraffic-uri base-url]
+  (let [record-uri (compute-record-uri service interface base-url)
         created (::modification/created service)
         modified (::modification/modified service)]
     (resource record-uri
@@ -398,8 +395,9 @@
                :dct/modified (literal (str modified))
                :dct/publisher (uri fintraffic-uri)})))
 
-(defn domain->catalog [catalog-records dataset-uris latest-publication fintraffic-uri]
-  (let [catalog-record-uris (map :uri catalog-records)]
+(defn domain->catalog [catalog-records dataset-uris latest-publication fintraffic-uri base-url]
+  (let [catalog-uri (str base-url "catalog")
+        catalog-record-uris (map :uri catalog-records)]
     (resource catalog-uri
               {:rdf/type (uri :dcat/Catalog)
                :foaf/title (literal "Finap.fi - NAP - National Access Point")
@@ -421,11 +419,11 @@
                :dcat/record (vec (map uri catalog-record-uris))
                :dcat/dataset (vec (map uri dataset-uris))})))
 
-(defn domain->rdf-for-service [service operation-areas operator interface latest-conversion-status fintraffic-uri]
-  (let [distributions [(domain->distribution service interface latest-conversion-status)]
-        dataset (domain->dataset service operator operation-areas interface latest-conversion-status distributions)
+(defn domain->rdf-for-service [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
+  (let [distributions [(domain->distribution service interface latest-conversion-status base-url)]
+        dataset (domain->dataset service operator operation-areas interface latest-conversion-status distributions base-url)
         dataset-uri (:uri dataset)
-        catalog-record (domain->catalog-record service interface dataset-uri fintraffic-uri)]
+        catalog-record (domain->catalog-record service interface dataset-uri fintraffic-uri base-url)]
     
     {:distributions distributions
      :assessments (if-let [assessment (domain->assessment interface latest-conversion-status)] [assessment] [])
@@ -443,11 +441,11 @@
    Calls domain->rdf-for-service for geojson and all interfaces, merges results,
    and creates catalog. Returns a map with :catalog, :datasets, :distributions,
    :assessments, :catalog-records, :data-services, :relationships, :ns-prefixes, and :fintraffic-agent."
-  [service-data]
+  [service-data base-url]
   (let [{:keys [service operation-areas operator validation-data latest-publication]} service-data
         external-interfaces (::t-service/external-interfaces service)
         ;; TODO this is probably not what we want for Fintraffic.
-        fintraffic-uri (fintraffic-url business-id)
+        fintraffic-uri (fintraffic-url base-url)
         fintraffic-agent (resource fintraffic-uri
                                    {:rdf/type (uri :foaf/Organization)
                                     :foaf/name (literal "Fintraffic Oy")})
@@ -459,14 +457,14 @@
                        [])
         result (if operation-areas
                  (let [;; Generate RDF data for GeoJSON dataset
-                       geojson-rdf (domain->rdf-for-service service operation-areas operator nil nil fintraffic-uri)
+                       geojson-rdf (domain->rdf-for-service service operation-areas operator nil nil fintraffic-uri base-url)
                        
                        ;; Process interfaces and collect their RDF data
                        interface-rdf-models (doall
                                              (for [interface external-interfaces]
                                                (let [interface-id (::t-service/id interface)
                                                      validation-status (get validation-data interface-id)]
-                                                 (domain->rdf-for-service service operation-areas operator interface validation-status fintraffic-uri))))
+                                                 (domain->rdf-for-service service operation-areas operator interface validation-status fintraffic-uri base-url))))
                        
                        ;; Merge all RDF models
                        merged-rdf (reduce merge-rdf-models geojson-rdf interface-rdf-models)
@@ -481,14 +479,14 @@
                                                   interface-uris))
                        
                        ;; Create catalog with embedded records and datasets
-                       catalog-resource (domain->catalog (:catalog-records merged-rdf) all-dataset-uris latest-publication fintraffic-uri)]
+                       catalog-resource (domain->catalog (:catalog-records merged-rdf) all-dataset-uris latest-publication fintraffic-uri base-url)]
                    
                    (assoc merged-rdf 
                           :catalog catalog-resource
                           :relationships relationships))
                  
                  ;; No operation areas - create empty catalog
-                 (let [catalog-resource (domain->catalog [] [] latest-publication fintraffic-uri)]
+                 (let [catalog-resource (domain->catalog [] [] latest-publication fintraffic-uri base-url)]
                    {:catalog catalog-resource
                     :distributions []
                     :assessments []
