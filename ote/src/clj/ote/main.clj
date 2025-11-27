@@ -51,6 +51,7 @@
 
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
+            [ote.tasks.rdf :as rdf-task]
             [jeesql.autoreload :as autoreload])
   (:gen-class))
 
@@ -104,6 +105,10 @@
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
    :export-gtfsflex (component/using (export-gtfsflex/->GTFSFlexExport config) [:db :http])
+
+   ;; rdf -> s3 
+   :rdf->s3 (component/using (rdf-task/rdf-tasks
+                              (:rdf-export config)) [:db])
 
    ;; Integration: Fetch company data from YTJ
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])

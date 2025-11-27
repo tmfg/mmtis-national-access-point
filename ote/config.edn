@@ -51,6 +51,8 @@
           :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
+ :rdf-export {:bucket "finap-rdf-cache"
+              :dev-mode? true}
  :csv {:bucket "napote-csv-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
                ;; :laundry_url "http://localhost:8080/"
@@ -67,7 +69,8 @@
                      :terms-of-service
                      :other-catalogs
                      :tis-vaco-integration
-                     :new-transit-data-formats}
+                     :new-transit-data-formats
+                     :rdf-export}
 
  :no-gtfs-update-for-operators #{}
 
