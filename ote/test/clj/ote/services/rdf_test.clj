@@ -1,7 +1,7 @@
 (ns ote.services.rdf-test
   "Tests for RDF generation"
   (:require [clojure.test :as t :refer [deftest testing is]]
-            [ote.services.rdf.data :as rdf-data]
+            [clojure.string :as str]
             [ote.services.rdf.model :as rdf-model]
             [ote.services.rdf-test-utilities :as test-utils]
             [ote.localization :as localization :refer [tr]]))
@@ -24,11 +24,11 @@
             title (get-in catalog [:properties :foaf/title])]
         (is (= (:value title) "Finap.fi - NAP - National Access Point"))))
     
-    (testing "dct:publisher is FINAP search URL to Fintraffic business id"
+    (testing "dct:publisher is URL to Fintraffic english site"
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3210/")
             catalog (:catalog rdf-output)
             publisher (get-in catalog [:properties :dct/publisher])]
-        (is (= (:value publisher) "http://localhost:3210/service-search?operators=2942108-7"))))
+        (is (= (:value publisher) "https://www.fintraffic.fi/en"))))
     
     (testing "dct:description is obtained from i18n files"
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
@@ -111,8 +111,25 @@
             rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             dataset (first (:datasets rdf-output))
             publisher (get-in dataset [:properties :dct/publisher])]
-        (is (= (:uri publisher) "http://localhost:3000/service-search?operators=1234567-5"))))))
+        (is (= (:uri publisher) "http://localhost:3000/service-search?operators=1234567-5"))))
+    
+    (testing "dct:title for external interfaces includes service name and interface access URL"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            ;; Find a dataset that has an interface (not the GeoJSON one)
+            ;; TODO need a better way to identify interface datasets
+            interface-dataset (first (filter #(not (str/includes? (:uri %) "/rdf/")) datasets))
+            title (get-in interface-dataset [:properties :dct/title])]
+        (is (not (nil? interface-dataset)) "Should have at least one interface dataset")
+        (when interface-dataset
+          (is (string? (:value title)) "Title should be a string")
+          (is (str/starts-with? (:value title) 
+                                          (get-in test-utils/test-large-bus-service [:service :ote.db.transport-service/name]))
+              "Title should start with the service name")
+          (is (str/includes? (:value title) "http") 
+              "Title should include the interface access URL"))))))
 
+;; A snippet for service testing in REPL
 #_(keep (fn [service-id]
           (try
             (when-let [service-data (ote.services.rdf.data/fetch-service-data db service-id)]

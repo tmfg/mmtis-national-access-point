@@ -405,6 +405,8 @@
         operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
+        access-url (interface-access-url interface)
+        dataset-title (str service-name " " access-url)
         service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
         municipality (:municipality service)
         transport-mode (service->transport-mode service)
@@ -423,7 +425,7 @@
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                        [(uri municipality)])
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
-                               :dct/title (literal service-name)
+                               :dct/title (literal dataset-title)
                                :dct/description (literal service-description)
                                :mobility/transportMode (uri transport-mode)
                                :dct/accrualPeriodicity (uri interface-accrual-periodicity)
