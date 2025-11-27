@@ -12,9 +12,6 @@
 
 (def fintraffic-business-id "2942108-7")
 
-(defn fintraffic-url [base-url]
-  (str base-url "service-search?operators=" fintraffic-business-id))
-
 (defn operator-url [business-id base-url]
   (str base-url "service-search?operators=" business-id))
 
@@ -520,8 +517,7 @@
   [service-data base-url]
   (let [{:keys [service operation-areas operator validation-data latest-publication]} service-data
         external-interfaces (::t-service/external-interfaces service)
-        ;; TODO this is probably not what we want for Fintraffic.
-        fintraffic-uri (fintraffic-url base-url)
+        fintraffic-uri "https://www.fintraffic.fi/en"
         fintraffic-agent (resource fintraffic-uri
                                    {:rdf/type (uri :foaf/Organization)
                                     :foaf/name (literal "Fintraffic Oy")})
