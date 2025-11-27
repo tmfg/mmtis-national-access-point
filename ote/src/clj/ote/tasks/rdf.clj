@@ -13,8 +13,8 @@
   (:import (org.joda.time DateTime DateTimeZone)
            (java.io ByteArrayInputStream)))
 
-(defn export-rdf-to-s3 [db]
-  (let [rdf (rdf-service/create-rdf db)
+(defn export-rdf-to-s3 [config db]
+  (let [rdf (rdf-service/create-rdf config db)
         bytes (.getBytes rdf)
         len (count bytes)]
     
@@ -34,7 +34,7 @@
         [(chime-at
           (tasks-util/daily-at 16 30)
           (fn [_]
-            (#'export-rdf-to-s3 db)))]
+            (#'export-rdf-to-s3 config db)))]
         (do
           (log/debug "RDF EXPORT IS NOT ENABLED!")
           nil))))
