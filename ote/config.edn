@@ -51,8 +51,7 @@
           :site-id 10}
 
  :gtfs {:bucket "napote-gtfs-localdev"}
- :rdf-export {:bucket "finap-rdf-cache"
-              :dev-mode? true}
+ :rdf-export {:bucket "finap-rdf-cache"}
  :csv {:bucket "napote-csv-localdev"}
  :pre-notices {:bucket "napote-pre-notice-attachment-localdev"
                ;; :laundry_url "http://localhost:8080/"

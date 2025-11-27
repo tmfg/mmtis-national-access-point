@@ -13,15 +13,6 @@
   (:import (org.joda.time DateTime DateTimeZone)
            (java.io ByteArrayInputStream)))
 
-;; run only once a day
-(def allowed-hours #{16})
-
-(def daily-update-time-dev (t/from-time-zone (t/today-at 11 5)
-                                         (DateTimeZone/forID "Europe/Helsinki")))
-
-(def daily-update-time-prod (t/from-time-zone (t/today-at 18 5)
-                                              (DateTimeZone/forID "Europe/Helsinki")))
-
 (defn export-rdf-to-s3 [db]
   (let [rdf (rdf-service/create-rdf db)
         bytes (.getBytes rdf)
@@ -32,22 +23,18 @@
                    (ByteArrayInputStream. bytes)
                    {:content-length len})
     (log/info "exported rdf into s3")))
-                   
 
-(defn allowed-time? [dt]
-  (-> dt (t/to-time-zone tasks-util/timezone) time/date-fields ::time/hours allowed-hours boolean))
-
-(defrecord RdfTasks [at config]
+(defrecord RdfTasks [dev-mode? config]
   component/Lifecycle
   (start [{db :db :as this}]
     (assoc this
       ::stop-tasks
-      (if (feature/feature-enabled? :rdf-export)
+      (if (and (not dev-mode?)
+               (feature/feature-enabled? :rdf-export))
         [(chime-at
-           (filter allowed-time?
-                   (drop 1 (periodic-seq (t/now) (t/days 1))))
-           (fn [_]
-             (#'export-rdf-to-s3 db)))]
+          (tasks-util/daily-at 16 30)
+          (fn [_]
+            (#'export-rdf-to-s3 db)))]
         (do
           (log/debug "RDF EXPORT IS NOT ENABLED!")
           nil))))
@@ -57,7 +44,5 @@
     (dissoc this ::stop-tasks)))
 
 (defn rdf-tasks
-  ([config] (rdf-tasks (if (:dev-mode? config) daily-update-time-dev daily-update-time-prod ) config))
-  ([at config]
-   (println (pr-str {:rdf-config config}))
-   (->RdfTasks at config)))
+  ([dev-mode config]
+   (->RdfTasks dev-mode config)))

@@ -107,8 +107,8 @@
    :export-gtfsflex (component/using (export-gtfsflex/->GTFSFlexExport config) [:db :http])
 
    ;; rdf -> s3 
-   :rdf->s3 (component/using (rdf-task/rdf-tasks
-                              (:rdf-export config)) [:db])
+   :rdf->s3 (component/using (rdf-task/rdf-tasks (:dev-mode? config)
+                                                 (:rdf-export config)) [:db])
 
    ;; Integration: Fetch company data from YTJ
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
