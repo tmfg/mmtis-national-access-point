@@ -64,18 +64,24 @@
                   (spit tmp-file (create-rdf config db))
                   tmp-file)))
 
-      (turtle-response (slurp @dev-tmp-payload)))
+      ;; Stream the file instead of loading it all into memory
+      (-> (ring-io/piped-input-stream
+           (fn [out]
+             (io/copy @dev-tmp-payload out)))
+          turtle-response))
     
+    ;; TODO how are response headers handled here? (turtle-response ...) ?
     (ring-io/piped-input-stream
      (fn [out]
        (io/copy (:input-stream (s3/get-object "finap-rdf-cache" "rdf")) out)))))
 
 (defn- rds-routes [{:keys [dev-mode?] :as config} db]
   (routes
-   (GET "/rdf" {:as req}
+   (GET "/rdf" []
      (find-rdf-payload db config dev-mode?))
    
    (when dev-mode?
+     ;; For testing smaller rdf payloads in dev-mode. Returns rdf for a single service
      (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params}
        ;; create-rdf returns a complete response
        ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
