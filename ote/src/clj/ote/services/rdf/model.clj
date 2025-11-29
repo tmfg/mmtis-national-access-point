@@ -17,11 +17,15 @@
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
-#_(def cnt "http://www.w3.org/2011/content#")
-#_(def locn "http://www.w3.org/ns/locn#")
+(def cnt "http://www.w3.org/2011/content#")
+(def locn "http://www.w3.org/ns/locn#")
 (def foaf "http://xmlns.com/foaf/0.1/")
 (def mobility "http://www.w3.org/ns/mobilitydcatap#")
-#_(def owl "http://www.w3.org/2002/07/owl#")
+(def owl "http://www.w3.org/2002/07/owl#")
+(def mdcat "https://w3id.org/mobilitydcat-ap/")
+(def euauth "http://publications.europa.eu/resource/authority/")
+(def xsd "http://www.w3.org/2001/XMLSchema#")
+(def eudata "http://data.europa.eu/")
 
 (def licence-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
@@ -589,4 +593,11 @@
            :ns-prefixes [["dcat" dcat]
                          ["dct" dct]
                          ["foaf" foaf]
-                         ["mobility" mobility]])))
+                         ["mobility" mobility]
+                         ["cnt" cnt]
+                         ["locn" locn]
+                         ["owl" owl]
+                         ["mdcat" mdcat]
+                         ["euauth" euauth]
+                         ["xsd" xsd]
+                         ["eudata" eudata]])))
