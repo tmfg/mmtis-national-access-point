@@ -306,7 +306,7 @@
                             :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
     (resource distribution-uri distribution-props)))
 
-(defn geojson->dataset [service operator operation-area distributions base-url]
+(defn geojson->dataset [service operator operation-area distribution base-url]
   (let [dataset-uri (geojson-dataset-uri service operation-area base-url)
         operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
@@ -345,7 +345,7 @@
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher operator-resource
                                :dct/rightsHolder operator-resource
-                               :dcat/distribution (map resource->uri distributions)
+                               :dcat/distribution [(resource->uri distribution)]
                                :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326")
                                :dct/language dataset-languages-uris}
                         
@@ -378,7 +378,7 @@
   (if (seq operation-areas)
     (let [area-models (for [operation-area operation-areas]
                         (let [distribution (geojson->distribution service operation-area base-url)
-                              dataset (geojson->dataset service operator operation-area [distribution] base-url)
+                              dataset (geojson->dataset service operator operation-area distribution base-url)
                               dataset-uri (:uri dataset)
                               catalog-record (geojson->catalog-record service operation-area dataset-uri fintraffic-uri base-url)]
                           {:distributions [distribution]
@@ -423,7 +423,7 @@
                              (assoc :dct/result (literal vaco-result-link)))]
     (resource distribution-uri distribution-props)))
 
-(defn interface->dataset [service operator operation-areas interface latest-conversion-status distributions base-url]
+(defn interface->dataset [service operator operation-areas interface latest-conversion-status distribution base-url]
   (let [dataset-uri (interface-dataset-uri interface)
         operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
@@ -460,7 +460,7 @@
                                :mobility/intendedInformationService (uri intended-info-service)
                                :dct/publisher operator-resource
                                :dct/rightsHolder operator-resource
-                               :dcat/distribution (map resource->uri distributions)}
+                               :dcat/distribution [(resource->uri distribution)]}
 
                         last-modified
                         (assoc :dct/modified (typed-literal (str last-modified)
@@ -490,11 +490,11 @@
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
-  (let [distributions [(interface->distribution service interface latest-conversion-status base-url)]
-        dataset (interface->dataset service operator operation-areas interface latest-conversion-status distributions base-url)
+  (let [distribution (interface->distribution service interface latest-conversion-status base-url)
+        dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
         dataset-uri (:uri dataset)
         catalog-record (interface->catalog-record service interface dataset-uri fintraffic-uri)]
-    {:distributions distributions
+    {:distributions [distribution]
      :assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
      :datasets [dataset]
      :catalog-records [catalog-record]}))
