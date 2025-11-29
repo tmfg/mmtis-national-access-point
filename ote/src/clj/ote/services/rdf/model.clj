@@ -146,20 +146,21 @@
 
 ;; ===== GEOJSON-SPECIFIC FUNCTIONS =====
 
-(defn geojson-dataset-uri [service base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service)))
+;; TODO placeholder URIs
+(defn geojson-dataset-uri [service operation-area base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area)))
 
-(defn geojson-distribution-uri [service base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/" (:ote.db.transport-service/id service)))
+(defn geojson-distribution-uri [service operation-area base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/area/" (:id operation-area)))
 
-(defn geojson-access-url [operator-id service-id base-url]
-  (str base-url "export/geojson/" operator-id "/" service-id))
+(defn geojson-access-url [operator-id service-id operation-area-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
 
-(defn geojson-download-url [operator-id service-id base-url]
-  (str base-url "export/geojson/" operator-id "/" service-id))
+(defn geojson-download-url [operator-id service-id operation-area-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
 
-(defn geojson-record-uri [service base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/record"))
+(defn geojson-record-uri [service operation-area base-url]
+  (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area) "/record"))
 
 (def geojson-format "http://publications.europa.eu/resource/authority/file-type/GEOJSON")
 
@@ -283,12 +284,13 @@
 
 ;; ===== GEOJSON RDF GENERATION =====
 
-(defn geojson->distribution [service base-url]
+(defn geojson->distribution [service operation-area base-url]
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
-        distribution-uri (geojson-distribution-uri service base-url)
-        access-url (geojson-access-url operator-id service-id base-url)
-        download-url (geojson-download-url operator-id service-id base-url)
+        operation-area-id (:id operation-area)
+        distribution-uri (geojson-distribution-uri service operation-area base-url)
+        access-url (geojson-access-url operator-id service-id operation-area-id base-url)
+        download-url (geojson-download-url operator-id service-id operation-area-id base-url)
         distribution-description (geojson-distribution-description service)
         distribution-props {:rdf/type (uri :dcat/Distribution)
                             :dcat/accessURL (uri access-url)
@@ -304,17 +306,21 @@
                             :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
     (resource distribution-uri distribution-props)))
 
-(defn geojson->dataset [service operator operation-areas distributions base-url]
-  (let [dataset-uri (geojson-dataset-uri service base-url)
+(defn geojson->dataset [service operator operation-area distributions base-url]
+  (let [dataset-uri (geojson-dataset-uri service operation-area base-url)
         operator-uri (compute-operator-uri operator base-url)
         operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
+        area-name (get-in operation-area [:description 0 ::t-service/text] "")
+        dataset-title (if (seq area-name)
+                        (str service-name " - " area-name)
+                        service-name)
         service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
         municipality (:municipality service)
         transport-mode (service->transport-mode service)
         mobility-themes (service->mobility-themes service)
         last-modified (geojson-last-modified service)
-        operation-area-geojson (:geojson (first operation-areas))
+        operation-area-geojson (:geojson operation-area)
         mobility-themes-uris (vec (map uri mobility-themes))
         dataset-languages-uris (vec (map uri geojson-dataset-languages))
         operator-resource (resource operator-uri
@@ -327,7 +333,7 @@
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                        [(uri municipality)])
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
-                               :dct/title (literal service-name)
+                               :dct/title (literal dataset-title)
                                :dct/description (literal service-description)
                                :mobility/transportMode (uri transport-mode)
                                :dct/accrualPeriodicity (uri geojson-accrual-periodicity)
@@ -348,8 +354,8 @@
                                                             "http://www.w3.org/2001/XMLSchema#dateTime")))]
     (resource dataset-uri dataset-props)))
 
-(defn geojson->catalog-record [service dataset-uri fintraffic-uri base-url]
-  (let [record-uri (geojson-record-uri service base-url)
+(defn geojson->catalog-record [service operation-area dataset-uri fintraffic-uri base-url]
+  (let [record-uri (geojson-record-uri service operation-area base-url)
         created (::modification/created service)
         modified (::modification/modified service)]
     (resource record-uri
@@ -362,15 +368,32 @@
                :dct/modified (literal (str modified))
                :dct/publisher (uri fintraffic-uri)})))
 
+(defn merge-rdf-models [model1 model2]
+  {:distributions (vec (concat (:distributions model1) (:distributions model2)))
+   :assessments (vec (concat (:assessments model1) (:assessments model2)))
+   :datasets (vec (concat (:datasets model1) (:datasets model2)))
+   :catalog-records (vec (concat (:catalog-records model1) (:catalog-records model2)))})
+
 (defn geojson->rdf [service operation-areas operator fintraffic-uri base-url]
-  (let [distributions [(geojson->distribution service base-url)]
-        dataset (geojson->dataset service operator operation-areas distributions base-url)
-        dataset-uri (:uri dataset)
-        catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri base-url)]
-    {:distributions distributions
+  (if (seq operation-areas)
+    (let [area-models (for [operation-area operation-areas]
+                        (let [distribution (geojson->distribution service operation-area base-url)
+                              dataset (geojson->dataset service operator operation-area [distribution] base-url)
+                              dataset-uri (:uri dataset)
+                              catalog-record (geojson->catalog-record service operation-area dataset-uri fintraffic-uri base-url)]
+                          {:distributions [distribution]
+                           :assessments []
+                           :datasets [dataset]
+                           :catalog-records [catalog-record]}))
+          merged (reduce merge-rdf-models 
+                        {:distributions [] :assessments [] :datasets [] :catalog-records []}
+                        area-models)]
+      merged)
+    ;; No operation areas - return empty model
+    {:distributions []
      :assessments []
-     :datasets [dataset]
-     :catalog-records [catalog-record]}))
+     :datasets []
+     :catalog-records []}))
 
 ;; ===== EXTERNAL INTERFACE RDF GENERATION =====
 
@@ -502,12 +525,6 @@
                :dcat/record (vec (map uri catalog-record-uris))
                :dcat/dataset (vec (map uri dataset-uris))})))
 
-(defn merge-rdf-models [model1 model2]
-  {:distributions (vec (concat (:distributions model1) (:distributions model2)))
-   :assessments (vec (concat (:assessments model1) (:assessments model2)))
-   :datasets (vec (concat (:datasets model1) (:datasets model2)))
-   :catalog-records (vec (concat (:catalog-records model1) (:catalog-records model2)))})
-
 (defn service-data->rdf
   "Create complete RDF data structure including catalog and fintraffic agent.
    Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
@@ -542,12 +559,14 @@
                        
                        ;; Extract URIs for catalog and relationships
                        all-dataset-uris (map :uri (:datasets merged-rdf))
-                       geojson-uri (first all-dataset-uris)
-                       interface-uris (rest all-dataset-uris)
+                       geojson-uris (map :uri (:datasets geojson-rdf))
+                       interface-uris (map :uri (mapcat :datasets interface-rdf-models))
                        
-                       ;; Create relationships between datasets
-                       relationships (vec (mapcat #(isreferenced-and-related-data geojson-uri %)
-                                                  interface-uris))
+                       ;; Create relationships between datasets (each GeoJSON dataset relates to each interface dataset)
+                       relationships (vec (for [geojson-uri geojson-uris
+                                               interface-uri interface-uris]
+                                           (isreferenced-and-related-data geojson-uri interface-uri)))
+                       relationships (vec (apply concat relationships))
                        
                        ;; Create catalog with embedded records and datasets
                        catalog-resource (domain->catalog (:catalog-records merged-rdf) all-dataset-uris latest-publication fintraffic-uri base-url)]

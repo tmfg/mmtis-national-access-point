@@ -127,7 +127,63 @@
                                           (get-in test-utils/test-large-bus-service [:service :ote.db.transport-service/name]))
               "Title should start with the service name")
           (is (str/includes? (:value title) "http") 
-              "Title should include the interface access URL"))))))
+              "Title should include the interface access URL")))))
+    
+    (testing "is created for each operation area"
+      (let [test-data (assoc test-utils/test-small-taxi-service
+                            :operation-areas
+                            [{:id 1
+                              :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                              :primary? true
+                              :description [{:ote.db.transport-service/lang "FI"
+                                           :ote.db.transport-service/text "Helsinki"}]}
+                             {:id 2
+                              :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                              :primary? false
+                              :description [{:ote.db.transport-service/lang "FI"
+                                           :ote.db.transport-service/text "Espoo"}]}])
+            rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            geojson-datasets (filter #(str/includes? (:uri %) "/area/") datasets)]
+        (is (= 2 (count geojson-datasets)) "Should have one dataset per operation area")
+        (is (some #(str/includes? (:uri %) "/area/1") geojson-datasets)
+            "Should have dataset for operation area 1")
+        (is (some #(str/includes? (:uri %) "/area/2") geojson-datasets)
+            "Should have dataset for operation area 2")
+        ;; Check that titles include area names
+        (let [titles (map #(get-in % [:properties :dct/title :value]) geojson-datasets)]
+          (is (some #(str/includes? % "Helsinki") titles)
+              "Should have dataset title with Helsinki")
+          (is (some #(str/includes? % "Espoo") titles)
+              "Should have dataset title with Espoo")))))
+
+(deftest relationship
+  (testing "Relationship"
+    ;; TODO need to check why it is we do this, and does this generalize as we moved from including one GeoJSON to multiple
+    (testing "is created between each GeoJSON dataset and interface dataset"
+      (let [test-data (-> test-utils/test-large-bus-service
+                          (assoc :operation-areas
+                                 [{:id 1
+                                   :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                                   :primary? true
+                                   :description [{:ote.db.transport-service/lang "FI"
+                                                  :ote.db.transport-service/text "Helsinki"}]}
+                                  {:id 2
+                                   :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                                   :primary? false
+                                   :description [{:ote.db.transport-service/lang "FI"
+                                                  :ote.db.transport-service/text "Espoo"}]}]))
+            rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
+            relationships (:relationships rdf-output)
+            geojson-datasets (filter #(str/includes? (:uri %) "/area/") (:datasets rdf-output))
+            interface-datasets (remove #(str/includes? (:uri %) "/area/") (:datasets rdf-output))
+            num-geojson (count geojson-datasets)
+            num-interfaces (count interface-datasets)
+            expected-relationships (* num-geojson num-interfaces 2)] ; 2 relationships per pair (relation + isReferencedBy)
+        (is (= 2 num-geojson) "Should have 2 GeoJSON datasets")
+        (is (= 2 num-interfaces) "Should have 2 interface datasets")
+        (is (= expected-relationships (count relationships))
+            (str "Should have " expected-relationships " relationships (2 operation areas x 2 interfaces x 2 directions)"))))))
 
 ;; A snippet for service testing in REPL
 #_(keep (fn [service-id]
