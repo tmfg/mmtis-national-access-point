@@ -75,11 +75,11 @@
    (GET "/rdf" {:as req}
      (find-rdf-payload db config dev-mode?))
    
-   ;; is this endpoint necessary?
-   #_(GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params :as req}
-     ;; create-rdf returns a complete response
-     ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
-     (create-rdf config db service-id))))
+   (when dev-mode?
+     (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params}
+       ;; create-rdf returns a complete response
+       ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
+       (create-rdf db config service-id)))))
 
 (defrecord RDS [config]
   component/Lifecycle
