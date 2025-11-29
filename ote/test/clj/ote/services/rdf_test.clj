@@ -105,6 +105,14 @@
           (is (contains? dataset-props prop)
               (str "Dataset should have mandatory property " prop)))))
     
+    (testing "always has exactly one Distribution"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+            datasets (:datasets rdf-output)]
+        (doseq [dataset datasets]
+          (let [distributions (get-in dataset [:properties :dcat/distribution])]
+            (is (= 1 (count distributions))
+                (str "Dataset " (:uri dataset) " should have exactly one distribution"))))))
+    
     (testing "dct:publisher is the search URL for the operator"
       (let [business-id "1234567-5"
             test-data (assoc-in test-utils/test-small-taxi-service [:operator :ote.db.transport-operator/business-id] business-id)
