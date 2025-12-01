@@ -13,7 +13,7 @@
             catalog (:catalog rdf-output)
             catalog-props (:properties catalog)
             mandatory-properties [:dcat/dataset :dct/description :foaf/homepage 
-                                 :dct/publisher :dcat/record :dct/spatial :foaf/title]]
+                                 :dct/publisher :dcat/record :dct/spatial :dct/title]]
         (doseq [prop mandatory-properties]
           (is (contains? catalog-props prop)
               (str "Catalog should have mandatory property " prop)))))
@@ -21,7 +21,7 @@
     (testing "dct:title is \"Finap.fi - NAP - National Access Point\""
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
-            title (get-in catalog [:properties :foaf/title])]
+            title (get-in catalog [:properties :dct/title])]
         (is (= (:value title) "Finap.fi - NAP - National Access Point"))))
     
     (testing "dct:publisher is URL to Fintraffic english site"
@@ -54,8 +54,9 @@
     (testing "dct:spatial is the Finnish NUTS code"
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
-            spatial (get-in catalog [:properties :dct/spatial])]
-        (is (= (:value spatial) "http://data.europa.eu/nuts/code/FI"))))
+            spatial (get-in catalog [:properties :dct/spatial])
+            spatial-identifier (get-in spatial [:properties :dct/identifier])]
+        (is (= (:value spatial-identifier) "http://data.europa.eu/nuts/code/FI"))))
     
     (testing "dct:license is \"Creative Commons Nimeä 4.0 Kansainvälinen\""
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
@@ -106,6 +107,10 @@
               (str "Dataset should have mandatory property " prop)))))
     
     (testing "always has exactly one Distribution"
+      ;; This is not a general property of mobility DCAT-AP, but a reusult of our data model.
+      ;; There is no wayt to programmatically deduce whether two external interfaces are different
+      ;; representations of the same dataset, so we create one dataset per interface with a single
+      ;; distribution each.
       (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
             datasets (:datasets rdf-output)]
         (doseq [dataset datasets]

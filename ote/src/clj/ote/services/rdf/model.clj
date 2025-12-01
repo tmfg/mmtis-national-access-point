@@ -510,12 +510,13 @@
         catalog-record-uris (map :uri catalog-records)]
     (resource catalog-uri
               {:rdf/type (uri :dcat/Catalog)
-               :foaf/title (literal "Finap.fi - NAP - National Access Point")
+               :dct/title (lang-literal "Finap.fi - NAP - National Access Point" "en")
                :dct/description [(lang-literal (localized-text-with-key "fi" [:front-page :column-NAP]) "fi")
                                  (lang-literal (localized-text-with-key "sv" [:front-page :column-NAP]) "sv")
                                  (lang-literal (localized-text-with-key "en" [:front-page :column-NAP]) "en")]
-               :foaf/homepage (literal "https://www.finap.fi/")
-               :dct/spatial (uri "http://data.europa.eu/nuts/code/FI")
+               :foaf/homepage (uri "https://www.finap.fi/")
+               :dct/spatial (resource {:rdf/type (uri :dct/Location)
+                                       :dct/identifier (uri "http://data.europa.eu/nuts/code/FI")})
                :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
                               (uri "http://publications.europa.eu/resource/authority/language/SWE")
                               (uri "http://publications.europa.eu/resource/authority/language/ENG")]
@@ -539,7 +540,7 @@
         external-interfaces (::t-service/external-interfaces service)
         fintraffic-uri "https://www.fintraffic.fi/en"
         fintraffic-agent (resource fintraffic-uri
-                                   {:rdf/type (uri :foaf/Organization)
+                                   {:rdf/type (uri :foaf/Agent)
                                     :foaf/name (literal "Fintraffic Oy")})
         ;; TODO this is probably not correct
         is-dataservice? false
