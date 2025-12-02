@@ -20,9 +20,8 @@
 (def cnt "http://www.w3.org/2011/content#")
 (def locn "http://www.w3.org/ns/locn#")
 (def foaf "http://xmlns.com/foaf/0.1/")
-(def mobility "http://www.w3.org/ns/mobilitydcatap#")
+(def mobility "http://w3id.org/mobilitydcat-ap#")
 (def owl "http://www.w3.org/2002/07/owl#")
-(def mdcat "https://w3id.org/mobilitydcat-ap/")
 (def euauth "http://publications.europa.eu/resource/authority/")
 (def xsd "http://www.w3.org/2001/XMLSchema#")
 (def eudata "http://data.europa.eu/")
@@ -87,7 +86,9 @@
     :rentals "https://w3id.org/mobilitydcat-ap/mobility-theme/sharing-and-hiring-services"
     :parking "https://w3id.org/mobilitydcat-ap/mobility-theme/parking-service-and-rest-area-information"
     :brokerage "https://w3id.org/mobilitydcat-ap/mobility-theme/sharing-and-hiring-services"
-    :other "https://w3id.org/mobilitydcat-ap/mobility-theme/other"))
+    :other "https://w3id.org/mobilitydcat-ap/mobility-theme/other"
+    ;; default case
+    "https://w3id.org/mobilitydcat-ap/mobility-theme/other"))
 
 (defn service->sub-theme [service]
   (case (:ote.db.transport-service/sub-type service)
@@ -99,7 +100,7 @@
     :parking nil
     :brokerage nil
     :other nil
-    :else nil))
+    nil))
 
 (defn service->transport-mode [service]
   (let [transport-type (first (::t-service/transport-type service))
@@ -609,7 +610,6 @@
                          ["cnt" cnt]
                          ["locn" locn]
                          ["owl" owl]
-                         ["mdcat" mdcat]
                          ["euauth" euauth]
                          ["xsd" xsd]
                          ["eudata" eudata]])))

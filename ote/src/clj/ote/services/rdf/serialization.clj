@@ -11,7 +11,7 @@
 (def cnt "http://www.w3.org/2011/content#")
 (def locn "http://www.w3.org/ns/locn#")
 (def foaf "http://xmlns.com/foaf/0.1/")
-(def mobility "http://www.w3.org/ns/mobilitydcatap#")
+(def mobility "http://w3id.org/mobilitydcat-ap#")
 (def owl "http://www.w3.org/2002/07/owl#")
 
 (def namespace-map
