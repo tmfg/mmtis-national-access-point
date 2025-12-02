@@ -14,15 +14,19 @@
            (java.io ByteArrayInputStream)))
 
 (defn export-rdf-to-s3 [config db]
-  (let [rdf (rdf-service/create-rdf config db)
-        bytes (.getBytes rdf)
-        len (count bytes)]
-    
-    (s3/put-object "finap-rdf-cache"
-                   "rdf"
-                   (ByteArrayInputStream. bytes)
-                   {:content-length len})
-    (log/info "exported rdf into s3")))
+  (with-open [out (java.io.ByteArrayOutputStream.)]
+    (rdf-service/create-rdf config db out)
+    (let [bytes (.toByteArray out)
+          len (count bytes)]
+      
+      (s3/put-object "finap-rdf-cache"
+                     "rdf"
+                     (ByteArrayInputStream. bytes)
+                     {:content-length len})
+      (log/info "exported rdf into s3"))))
+
+;; (export-rdf-to-s3 ote.main/_config
+;;                   (:db ote.main/ote))
 
 (defrecord RdfTasks [dev-mode? config]
   component/Lifecycle

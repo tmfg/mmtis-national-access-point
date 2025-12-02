@@ -34,19 +34,19 @@
       (response/header "Content-Disposition" "attachment;")))
 
 (defn create-rdf
-  ([config db]
+  ([config db output-stream]
    (->> (fetch-all-service-ids db)
         (map (partial service-id->rdf-model config db))
-        rdf-serialization/rdf-data->turtle))
+        (rdf-serialization/rdf-data->turtle output-stream)))
   
-  ([config db service-id]
+  ([config db output-stream service-id]
    ;; Use data layer functions for fetching
    (let [service-id (if (string? service-id)
                       (Long/parseLong service-id)
                       service-id)]
      (->> service-id
-          (service-id->rdf-model db config)
-          rdf-serialization/rdf-data->turtle))))
+          (service-id->rdf-model config db)
+          (rdf-serialization/rdf-data->turtle output-stream )))))
 
 (def dev-tmp-payload
   "An atom that - in dev - contains a tmp-file handle that we can spit into and slurp from the rdf-data that would be in s3 in a real world"
@@ -61,13 +61,14 @@
         (reset! dev-tmp-payload
                 (let [tmp-file (File/createTempFile "napote" ".tmp")]
                   (.deleteOnExit tmp-file)
-                  (spit tmp-file (create-rdf config db))
+                  (with-open [out (java.io.FileOutputStream. tmp-file)]
+                    (create-rdf config db out))
                   tmp-file)))
 
       ;; Stream the file instead of loading it all into memory
       (-> (ring-io/piped-input-stream
            (fn [out]
-             (io/copy @dev-tmp-payload out)))
+             (io/copy (clojure.java.io/input-stream @dev-tmp-payload) out)))
           turtle-response))
 
     (-> (ring-io/piped-input-stream
@@ -85,7 +86,8 @@
      (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params}
        ;; create-rdf returns a complete response
        ;; and is probably a lot easier to redefine, as compojure's/ring's handlers are somewhat repl-hostile to redefine
-       (turtle-response (create-rdf db config service-id))))))
+       (turtle-response (ring-io/piped-input-stream (fn [out]
+                                                      (create-rdf config db out service-id))))))))
 
 (defrecord RDS [config]
   component/Lifecycle

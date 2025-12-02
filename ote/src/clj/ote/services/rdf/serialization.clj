@@ -198,12 +198,13 @@
 (defn rdf-data->turtle
   "Convert RDF data structure(s) to Turtle format string.
    Takes either a single RDF data map or a sequence of RDF data maps.
-   If given a sequence, merges all models before serialization."
-  [rdf-data-or-seq]
+   If given a sequence, merges all models before serialization.
+
+  Writes the resulting ttl into the out-outputstream"
+  [out rdf-data-or-seq]
   (let [model (if (sequential? rdf-data-or-seq)
                 (let [models (map create-dcat-ap-model rdf-data-or-seq)]
                   (reduce (fn [acc m] (doto acc (.add m))) models))
                 (create-dcat-ap-model rdf-data-or-seq))]
-    (with-open [out (java.io.ByteArrayOutputStream.)]
-      (.write model out "TURTLE")
-      (.toString out))))
+    (.write model out "TURTLE")
+    nil))
