@@ -66,6 +66,11 @@
   [resource]
   (uri (:uri resource)))
 
+(defn datetime
+  "Create a typed literal for an xsd:dateTime value."
+  [value]
+  (typed-literal (str value) "http://www.w3.org/2001/XMLSchema#dateTime"))
+
 ;; ===== DOMAIN LOGIC FUNCTIONS =====
 
 (defn localized-text-with-key
@@ -354,8 +359,7 @@
                                :dct/language dataset-languages-uris}
                         
                         last-modified
-                        (assoc :dct/modified (typed-literal (str last-modified)
-                                                            "http://www.w3.org/2001/XMLSchema#dateTime")))]
+                        (assoc :dct/modified (datetime last-modified)))]
     (resource dataset-uri dataset-props)))
 
 (defn geojson->catalog-record [service operation-area dataset-uri fintraffic-uri base-url]
@@ -364,12 +368,15 @@
         modified (::modification/modified service)]
     (resource record-uri
               {:rdf/type (uri :dcat/CatalogRecord)
-               :dct/created (literal (str created))
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/created (datetime created)
+               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})]
                :foaf/primaryTopic (uri dataset-uri)
-               :dct/modified (literal (str modified))
+               :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn merge-rdf-models [model1 model2]
@@ -467,8 +474,7 @@
                                :dcat/distribution [(resource->uri distribution)]}
 
                         last-modified
-                        (assoc :dct/modified (typed-literal (str last-modified)
-                                                            "http://www.w3.org/2001/XMLSchema#dateTime")))]
+                        (assoc :dct/modified (datetime last-modified)))]
     (resource dataset-uri dataset-props)))
 
 (defn interface->assessment [latest-conversion-status]
@@ -476,8 +482,7 @@
     (let [vaco-validation-timestamp (:tis_polling_completed latest-conversion-status)]
       (when vaco-validation-timestamp
         (resource {:rdf/type (uri :mobility/Assessment)
-                   :dct/date (typed-literal (str vaco-validation-timestamp)
-                                            "http://www.w3.org/2001/XMLSchema#dateTime")})))))
+                   :dct/date (datetime vaco-validation-timestamp)})))))
 
 (defn interface->catalog-record [service interface dataset-uri fintraffic-uri]
   (let [record-uri (interface-record-uri interface)
@@ -485,12 +490,15 @@
         modified (::modification/modified service)]
     (resource record-uri
               {:rdf/type (uri :dcat/CatalogRecord)
-               :dct/created (literal (str created))
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/created (datetime created)
+               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})]
                :foaf/primaryTopic (uri dataset-uri)
-               :dct/modified (literal (str modified))
+               :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
@@ -525,9 +533,9 @@
                                         {:rdf/type (uri :dct/LinguisticSystem)})]
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})
-               :dct/issued (typed-literal "2018-01-01T00:00:01Z" "http://www.w3.org/2001/XMLSchema#dateTime")
+               :dct/issued (datetime "2018-01-01T00:00:01Z")
                :dct/themeTaxonomy (uri "https://w3id.org/mobilitydcat-ap/mobility-theme")
-               :dct/modified (typed-literal (str latest-publication) "http://www.w3.org/2001/XMLSchema#dateTime")
+               :dct/modified (datetime latest-publication)
                :dct/identifier (literal catalog-uri)
                :dct/publisher (uri fintraffic-uri)
                :dcat/record (vec (map uri catalog-record-uris))
