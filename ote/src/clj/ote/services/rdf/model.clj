@@ -235,6 +235,15 @@
 (defn compute-operator-uri [operator base-url]
   (operator-url (::t-operator/business-id operator) base-url))
 
+(defn operator->agent
+  "Create a standalone foaf:Agent resource for an operator."
+  [operator base-url] 
+  (let [operator-uri (compute-operator-uri operator base-url)
+        operator-name (:ote.db.transport-operator/name operator)]
+    (resource operator-uri
+              {:rdf/type (uri :foaf/Agent)
+               :foaf/name (literal operator-name)})))
+
 (defn service->mobility-themes [service]
   (if-let [sub-theme (service->sub-theme service)]
     [(service->mobility-theme service) sub-theme]
@@ -319,7 +328,6 @@
 (defn geojson->dataset [service operator operation-area distribution base-url]
   (let [dataset-uri (geojson-dataset-uri service operation-area base-url)
         operator-uri (compute-operator-uri operator base-url)
-        operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
         area-name (get-in operation-area [:description 0 ::t-service/text] "")
         dataset-title (if (seq area-name)
@@ -333,9 +341,6 @@
         operation-area-geojson (:geojson operation-area)
         mobility-themes-uris (vec (map uri mobility-themes))
         dataset-languages-uris (vec (map uri geojson-dataset-languages))
-        operator-resource (resource operator-uri
-                                    {:rdf/type (uri :foaf/Organization)
-                                     :foaf/name (literal operator-name)})
         spatial-data (if operation-area-geojson
                        [(uri municipality)
                         (resource {:rdf/type (uri :dct/Location)
@@ -353,8 +358,8 @@
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
-                               :dct/publisher operator-resource
-                               :dct/rightsHolder operator-resource
+                               :dct/publisher (uri operator-uri)
+                               :dct/rightsHolder (uri operator-uri)
                                :dcat/distribution [(resource->uri distribution)]
                                :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326")
                                :dct/language dataset-languages-uris}
@@ -450,9 +455,6 @@
         last-modified (interface-last-modified interface latest-conversion-status)
         operation-area-geojson (:geojson (first operation-areas))
         mobility-themes-uris (vec (map uri mobility-themes))
-        operator-resource (resource operator-uri
-                                    {:rdf/type (uri :foaf/Organization)
-                                     :foaf/name (literal operator-name)})
         spatial-data (if operation-area-geojson
                        [(uri municipality)
                         (resource {:rdf/type (uri :dct/Location)
@@ -470,8 +472,8 @@
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri intended-info-service)
-                               :dct/publisher operator-resource
-                               :dct/rightsHolder operator-resource
+                               :dct/publisher (uri operator-uri)
+                               :dct/rightsHolder (uri operator-uri)
                                :dcat/distribution [(resource->uri distribution)]}
 
                         last-modified
@@ -554,6 +556,7 @@
         fintraffic-agent (resource fintraffic-uri
                                    {:rdf/type (uri :foaf/Agent)
                                     :foaf/name (literal "Fintraffic Oy")})
+        operator-agent (when operator (operator->agent operator base-url))
         ;; TODO this is probably not correct
         is-dataservice? false
         ;; Create data services for interfaces that need them
@@ -602,6 +605,7 @@
                     :relationships []}))]
     (assoc result 
            :fintraffic-agent fintraffic-agent
+           :operator-agent operator-agent
            :data-services data-services
            :ns-prefixes [["dcat" dcat]
                          ["dct" dct]
