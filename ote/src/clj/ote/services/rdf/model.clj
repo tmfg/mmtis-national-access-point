@@ -235,7 +235,7 @@
     [(service->mobility-theme service)]))
 
 (defn interface->intended-information-service [interface]
-  (let [data-content (some-> interface ::t-service/data-content first)]
+  (let [data-content (some-> interface ::t-service/data-content first name)]
     (case data-content
       "route-and-schedule" "https://w3id.org/mobilitydcat-ap/intended-information-service/trip-plans"
       "luggage-restrictions" "https://w3id.org/mobilitydcat-ap/intended-information-service/other"
