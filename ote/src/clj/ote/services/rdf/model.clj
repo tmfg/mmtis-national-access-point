@@ -517,9 +517,12 @@
                :foaf/homepage (uri "https://www.finap.fi/")
                :dct/spatial (resource {:rdf/type (uri :dct/Location)
                                        :dct/identifier (uri "http://data.europa.eu/nuts/code/FI")})
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
+                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
+                                        {:rdf/type (uri :dct/LinguisticSystem)})]
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})
                :dct/issued (typed-literal "2018-01-01T00:00:01Z" "http://www.w3.org/2001/XMLSchema#dateTime")
