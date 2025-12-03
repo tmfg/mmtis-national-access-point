@@ -22,11 +22,11 @@
 (def foaf "http://xmlns.com/foaf/0.1/")
 (def mobility "http://w3id.org/mobilitydcat-ap#")
 (def owl "http://www.w3.org/2002/07/owl#")
-(def euauth "http://publications.europa.eu/resource/authority/")
+(def euauth "https://publications.europa.eu/resource/authority/")
 (def xsd "http://www.w3.org/2001/XMLSchema#")
 (def eudata "http://data.europa.eu/")
 
-(def licence-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+(def licence-url "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
 ;; ===== HELPER FUNCTIONS FOR RDF DATA STRUCTURES =====
 
@@ -134,20 +134,20 @@
 
 (defn interface->format-extent [interface]
   (case (str (first (::t-service/format interface)))
-    "GTFS" "http://publications.europa.eu/resource/authority/file-type/GTFS"
-    "GTFS-RT" "http://publications.europa.eu/resource/authority/file-type/GTFS"
-    "GBFS" "http://publications.europa.eu/resource/authority/file-type/JSON"
-    "Kalkati" "http://publications.europa.eu/resource/authority/file-type/XML"
-    "NeTEx" "http://publications.europa.eu/resource/authority/file-type/XML"
-    "Datex II" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "GTFS" "https://publications.europa.eu/resource/authority/file-type/GTFS"
+    "GTFS-RT" "https://publications.europa.eu/resource/authority/file-type/GTFS"
+    "GBFS" "https://publications.europa.eu/resource/authority/file-type/JSON"
+    "Kalkati" "https://publications.europa.eu/resource/authority/file-type/XML"
+    "NeTEx" "https://publications.europa.eu/resource/authority/file-type/XML"
+    "Datex II" "https://publications.europa.eu/resource/authority/file-type/XML"
     
-    "GeoJSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
-    "JSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
-    "CSV" "http://publications.europa.eu/resource/authority/file-type/CSV"
-    "SIRI" "http://publications.europa.eu/resource/authority/file-type/XML"
+    "GeoJSON" "https://publications.europa.eu/resource/authority/file-type/JSON"
+    "JSON" "https://publications.europa.eu/resource/authority/file-type/JSON"
+    "CSV" "https://publications.europa.eu/resource/authority/file-type/CSV"
+    "SIRI" "https://publications.europa.eu/resource/authority/file-type/XML"
 
     ;; probably not an actually-correct default but at least its technically correct
-    "http://publications.europa.eu/resource/authority/file-type/BIN"))
+    "https://publications.europa.eu/resource/authority/file-type/BIN"))
 
 (defn interface->rights-url [interface]
   (if (::t-service/license interface)
@@ -172,11 +172,11 @@
 (defn geojson-record-uri [service operation-area base-url]
   (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area) "/record"))
 
-(def geojson-format "http://publications.europa.eu/resource/authority/file-type/GEOJSON")
+(def geojson-format "https://publications.europa.eu/resource/authority/file-type/GEOJSON")
 
 (def geojson-rights-url "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge")
 
-(def geojson-license-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+(def geojson-license-url "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
 (defn geojson-distribution-description [service]
   (str "Olennaiset liikennepalvelutiedot palvelusta " (::t-service/name service)))
@@ -184,12 +184,12 @@
 (defn geojson-last-modified [service]
   (:ote.db.modification/modified service))
 
-(def geojson-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
+(def geojson-accrual-periodicity "https://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
 
 (def geojson-dataset-languages
-  ["http://publications.europa.eu/resource/authority/language/FIN"
-   "http://publications.europa.eu/resource/authority/language/SWE"
-   "http://publications.europa.eu/resource/authority/language/ENG"])
+  ["https://publications.europa.eu/resource/authority/language/FIN"
+   "https://publications.europa.eu/resource/authority/language/SWE"
+   "https://publications.europa.eu/resource/authority/language/ENG"])
 
 (def geojson-intended-information-service "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
 
@@ -213,7 +213,7 @@
 (defn interface-format [interface]
   (interface->format-extent interface))
 
-(def interface-license-url "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+(def interface-license-url "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
 (defn interface-distribution-description [interface]
   (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) ""))
@@ -228,7 +228,7 @@
     
     :else nil))
 
-(def interface-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")
+(def interface-accrual-periodicity "https://publications.europa.eu/resource/authority/frequency/UNKNOWN")
 
 ;; ===== COMMON HELPER FUNCTIONS =====
 
@@ -355,13 +355,13 @@
                                :mobility/mobilityTheme mobility-themes-uris
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
-                               :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
+                               :dct/theme (uri "https://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher (uri operator-uri)
                                :dct/rightsHolder (uri operator-uri)
                                :dcat/distribution [(resource->uri distribution)]
-                               :dct/conformsTo (uri "https://www.opengis.net/def/crs/EPSG/0/4326")
+                               :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")
                                :dct/language dataset-languages-uris}
                         
                         last-modified
@@ -375,12 +375,13 @@
     (resource record-uri
               {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})]
+               ;; TODO SHACL validation complained until we added LinguisticSystem types here, but it seems unnecessary.
+               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
+                                        {:rdf/type :dct/LinguisticSystem})
+                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
+                                        {:rdf/type :dct/LinguisticSystem})
+                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
+                                        {:rdf/type :dct/LinguisticSystem})]
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -469,7 +470,7 @@
                                :mobility/mobilityTheme mobility-themes-uris
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
-                               :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
+                               :dct/theme (uri "https://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri intended-info-service)
                                :dct/publisher (uri operator-uri)
@@ -494,11 +495,11 @@
     (resource record-uri
               {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
+               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
                                         {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
+                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
                                         {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
+                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
                                         {:rdf/type (uri :dct/LinguisticSystem)})]
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
@@ -528,11 +529,11 @@
                :foaf/homepage (uri "https://www.finap.fi/")
                :dct/spatial (resource {:rdf/type (uri :dct/Location)
                                        :dct/identifier (uri "http://data.europa.eu/nuts/code/FI")})
-               :dct/language [(resource "http://publications.europa.eu/resource/authority/language/FIN"
+               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
                                         {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/SWE"
+                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
                                         {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "http://publications.europa.eu/resource/authority/language/ENG"
+                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
                                         {:rdf/type (uri :dct/LinguisticSystem)})]
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})
