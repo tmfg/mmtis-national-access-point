@@ -9,6 +9,7 @@
 (defqueries "ote/integration/export/geojson.sql")
 (defqueries "ote/services/service_search.sql")
 (defqueries "ote/tasks/gtfs.sql")
+(defqueries "ote/services/rdf/data.sql")
 
 (defn fetch-latest-published-service
   "Fetch the latest published service timestamp.
@@ -66,9 +67,9 @@
 
 (defn fetch-operation-areas-data
   "Fetch operation areas for a service from database.
-  Returns sequence of maps with geojson, primary?, and feature-id."
+  Returns sequence of maps with id, geojson, primary?, and feature-id."
   [db service-id]
-  (seq (fetch-operation-area-for-service db {:transport-service-id service-id})))
+  (seq (fetch-operation-area-with-id-for-service db {:transport-service-id service-id})))
 
 (defn fetch-gtfs-validation-data
   "Fetch latest GTFS validation status for an interface.
