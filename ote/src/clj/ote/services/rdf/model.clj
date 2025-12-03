@@ -184,8 +184,9 @@
 (defn geojson-last-modified [service]
   (:ote.db.modification/modified service))
 
-(def geojson-accrual-periodicity "https://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
+(def geojson-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
 
+;; TODO Why don't we need LinguisticSystem here like in the catalog record? Does this not end up in a SHACL validation?
 (def geojson-dataset-languages
   ["https://publications.europa.eu/resource/authority/language/FIN"
    "https://publications.europa.eu/resource/authority/language/SWE"
@@ -228,7 +229,7 @@
     
     :else nil))
 
-(def interface-accrual-periodicity "https://publications.europa.eu/resource/authority/frequency/UNKNOWN")
+(def interface-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")
 
 ;; ===== COMMON HELPER FUNCTIONS =====
 
@@ -377,11 +378,11 @@
                :dct/created (datetime created)
                ;; TODO SHACL validation complained until we added LinguisticSystem types here, but it seems unnecessary.
                :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
-                                        {:rdf/type :dct/LinguisticSystem})
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
                               (resource "https://publications.europa.eu/resource/authority/language/SWE"
-                                        {:rdf/type :dct/LinguisticSystem})
+                                        {:rdf/type (uri :dct/LinguisticSystem)})
                               (resource "https://publications.europa.eu/resource/authority/language/ENG"
-                                        {:rdf/type :dct/LinguisticSystem})]
+                                        {:rdf/type (uri :dct/LinguisticSystem)})]
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -528,13 +529,10 @@
                                  (lang-literal (localized-text-with-key "en" [:front-page :column-NAP]) "en")]
                :foaf/homepage (uri "https://www.finap.fi/")
                :dct/spatial (resource {:rdf/type (uri :dct/Location)
-                                       :dct/identifier (uri "http://data.europa.eu/nuts/code/FI")})
-               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})]
+                                       :dct/identifier (uri "http://publications.europa.eu/resource/authority/country/FIN")})
+               :dct/language [(uri "https://publications.europa.eu/resource/authority/language/FIN")
+                              (uri "https://publications.europa.eu/resource/authority/language/SWE")
+                              (uri "https://publications.europa.eu/resource/authority/language/ENG")]
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})
                :dct/issued (datetime "2018-01-01T00:00:01Z")
