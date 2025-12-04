@@ -51,19 +51,19 @@
                  descriptions)
             "English description should be from i18n [:front-page :column-NAP]"))))
     
-    (testing "dct:spatial is the Finnish NUTS code"
+    (testing "dct:spatial is the Finnish country code"
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             spatial (get-in catalog [:properties :dct/spatial])
             spatial-identifier (get-in spatial [:properties :dct/identifier])]
-        (is (= (:value spatial-identifier) "http://data.europa.eu/nuts/code/FI"))))
+        (is (= (:value spatial-identifier) "http://publications.europa.eu/resource/authority/country/FIN"))))
     
     (testing "dct:license is \"Creative Commons Nimeä 4.0 Kansainvälinen\""
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             license (get-in catalog [:properties :dct/license])
             license-identifier (get-in license [:properties :dct/identifier])]
-        (is (= (:value license-identifier) "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+        (is (= (:value license-identifier) "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
             "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)")))
     
     (testing "dcat:record contains as many elements as there are datasets"
@@ -124,7 +124,7 @@
             rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             dataset (first (:datasets rdf-output))
             publisher (get-in dataset [:properties :dct/publisher])]
-        (is (= (:uri publisher) "http://localhost:3000/service-search?operators=1234567-5"))))
+        (is (= (:value publisher) "http://localhost:3000/service-search?operators=1234567-5"))))
     
     (testing "dct:title for external interfaces includes service name and interface access URL"
       (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")

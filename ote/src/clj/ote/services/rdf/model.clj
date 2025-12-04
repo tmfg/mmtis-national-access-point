@@ -156,12 +156,8 @@
 
 ;; ===== GEOJSON-SPECIFIC FUNCTIONS =====
 
-;; TODO placeholder URIs
 (defn geojson-dataset-uri [service operation-area base-url]
   (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area)))
-
-(defn geojson-distribution-uri [service operation-area base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/area/" (:id operation-area)))
 
 (defn geojson-access-url [operator-id service-id operation-area-id base-url]
   (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
@@ -195,9 +191,6 @@
 
 (defn interface-dataset-uri [interface]
   (get-in interface [::t-service/external-interface ::t-service/url]))
-
-(defn interface-distribution-uri [service interface base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/distribution/interface/" (::t-service/id interface)))
 
 (defn interface-access-url [interface]
   (get-in interface [::t-service/external-interface ::t-service/url]))
@@ -302,7 +295,6 @@
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
         operation-area-id (:id operation-area)
-        distribution-uri (geojson-distribution-uri service operation-area base-url)
         access-url (geojson-access-url operator-id service-id operation-area-id base-url)
         download-url (geojson-download-url operator-id service-id operation-area-id base-url)
         distribution-description (geojson-distribution-description service)
@@ -318,7 +310,7 @@
                             :mobility/mobilityDataStandard (mobility-data-standard-data true nil)
                             :cnt/characterEncoding (literal "UTF-8")
                             :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
-    (resource distribution-uri distribution-props)))
+    (resource distribution-props)))
 
 (defn geojson->dataset [service operator operation-area distribution base-url]
   (let [dataset-uri (geojson-dataset-uri service operation-area base-url)
@@ -355,7 +347,7 @@
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher (uri operator-uri)
                                :dct/rightsHolder (uri operator-uri)
-                               :dcat/distribution [(resource->uri distribution)]
+                               :dcat/distribution [distribution]
                                :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")
                                :dct/language dataset-languages-uris}
                         
@@ -376,8 +368,7 @@
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn merge-rdf-models [model1 model2]
-  {:distributions (vec (concat (:distributions model1) (:distributions model2)))
-   :assessments (vec (concat (:assessments model1) (:assessments model2)))
+  {:assessments (vec (concat (:assessments model1) (:assessments model2)))
    :datasets (vec (concat (:datasets model1) (:datasets model2)))
    :catalog-records (vec (concat (:catalog-records model1) (:catalog-records model2)))})
 
@@ -388,25 +379,22 @@
                               dataset (geojson->dataset service operator operation-area distribution base-url)
                               dataset-uri (:uri dataset)
                               catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
-                          {:distributions [distribution]
-                           :assessments []
+                          {:assessments []
                            :datasets [dataset]
                            :catalog-records [catalog-record]}))
           merged (reduce merge-rdf-models 
-                        {:distributions [] :assessments [] :datasets [] :catalog-records []}
+                        {:assessments [] :datasets [] :catalog-records []}
                         area-models)]
       merged)
     ;; No operation areas - return empty model
-    {:distributions []
-     :assessments []
+    {:assessments []
      :datasets []
      :catalog-records []}))
 
 ;; ===== EXTERNAL INTERFACE RDF GENERATION =====
 
 (defn interface->distribution [service interface latest-conversion-status base-url]
-  (let [distribution-uri (interface-distribution-uri service interface base-url)
-        access-url (interface-access-url interface)
+  (let [access-url (interface-access-url interface)
         download-url (interface-download-url interface)
         format (interface-format interface)
         distribution-description (interface-distribution-description interface)
@@ -428,12 +416,11 @@
                              
                              vaco-validation-timestamp
                              (assoc :dct/result (literal vaco-result-link)))]
-    (resource distribution-uri distribution-props)))
+    (resource distribution-props)))
 
 (defn interface->dataset [service operator operation-areas interface latest-conversion-status distribution base-url]
   (let [dataset-uri (interface-dataset-uri interface)
         operator-uri (compute-operator-uri operator base-url)
-        operator-name (:ote.db.transport-operator/name operator)
         service-name (:ote.db.transport-service/name service)
         access-url (interface-access-url interface)
         dataset-title (str service-name " " access-url)
@@ -464,7 +451,7 @@
                                :mobility/intendedInformationService (uri intended-info-service)
                                :dct/publisher (uri operator-uri)
                                :dct/rightsHolder (uri operator-uri)
-                               :dcat/distribution [(resource->uri distribution)]}
+                               :dcat/distribution [distribution]}
 
                         last-modified
                         (assoc :dct/modified (datetime last-modified)))]
@@ -494,8 +481,7 @@
         dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
         dataset-uri (:uri dataset)
         catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
-    {:distributions [distribution]
-     :assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
+    {:assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
      :datasets [dataset]
      :catalog-records [catalog-record]}))
 
@@ -579,7 +565,6 @@
                  ;; No operation areas - create empty catalog
                  (let [catalog-resource (domain->catalog [] [] latest-publication fintraffic-uri base-url)]
                    {:catalog catalog-resource
-                    :distributions []
                     :assessments []
                     :datasets []
                     :catalog-records []
