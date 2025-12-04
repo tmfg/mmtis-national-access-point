@@ -81,7 +81,37 @@
         (is (= dataset-uris record-primary-topics)
             "Each catalog record's foaf:primaryTopic should match a dataset URI")
         (is (= catalog-record-uris expected-record-uris)
-            "Catalog's dcat:record properties should link to all catalog records"))))
+            "Catalog's dcat:record properties should link to all catalog records")))
+    
+    (testing "dataset URIs follow hierarchical pattern with operator context"
+      ;; The web app uses URLs like /{operator-id}/{service-id}/ for services, and this is used as base for dataset URIs too.
+      (let [operator-id 123
+            service-id 456
+            area-id 789
+            interface-id 999
+            test-data (-> test-utils/test-large-bus-service
+                         (assoc-in [:service :ote.db.transport-service/id] service-id)
+                         (assoc-in [:service :ote.db.transport-service/transport-operator-id] operator-id)
+                         (assoc-in [:operation-areas 0 :id] area-id)
+                         (assoc-in [:service :ote.db.transport-service/external-interfaces 0 :ote.db.transport-service/id] interface-id))
+            rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            geojson-dataset (first (filter #(str/includes? (:uri %) "/area/") datasets))
+            interface-dataset (first (filter #(str/includes? (:uri %) "/interface/") datasets))]
+        
+        (testing "GeoJSON dataset URI includes operator-id, service-id, and area-id"
+          (is (not (nil? geojson-dataset)) "Should have at least one GeoJSON dataset")
+          (when geojson-dataset
+            (is (= (:uri geojson-dataset) 
+                   (str "http://localhost:3000/dataset/" operator-id "/" service-id "/area/" area-id))
+                "GeoJSON dataset URI should be {base-url}dataset/{operator-id}/{service-id}/area/{area-id}")))
+        
+        (testing "Interface dataset URI includes operator-id, service-id, and interface-id"
+          (is (not (nil? interface-dataset)) "Should have at least one interface dataset")
+          (when interface-dataset
+            (is (= (:uri interface-dataset) 
+                   (str "http://localhost:3000/dataset/" operator-id "/" service-id "/interface/" interface-id))
+                "Interface dataset URI should be {base-url}dataset/{operator-id}/{service-id}/interface/{interface-id}"))))))
 
 (deftest catalog-record
   (testing "CatalogRecord"
@@ -130,8 +160,8 @@
       (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
             datasets (:datasets rdf-output)
             ;; Find a dataset that has an interface (not the GeoJSON one)
-            ;; TODO need a better way to identify interface datasets
-            interface-dataset (first (filter #(not (str/includes? (:uri %) "/rdf/")) datasets))
+            ;; Interface datasets have "/interface/" in their URI, GeoJSON datasets have "/area/"
+            interface-dataset (first (filter #(str/includes? (:uri %) "/interface/") datasets))
             title (get-in interface-dataset [:properties :dct/title])]
         (is (not (nil? interface-dataset)) "Should have at least one interface dataset")
         (when interface-dataset

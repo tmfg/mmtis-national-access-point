@@ -157,7 +157,10 @@
 ;; ===== GEOJSON-SPECIFIC FUNCTIONS =====
 
 (defn geojson-dataset-uri [service operation-area base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area)))
+  (let [operator-id (:ote.db.transport-service/transport-operator-id service)
+        service-id (:ote.db.transport-service/id service)
+        area-id (:id operation-area)]
+    (str base-url "dataset/" operator-id "/" service-id "/area/" area-id)))
 
 (defn geojson-access-url [operator-id service-id operation-area-id base-url]
   (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
@@ -189,8 +192,11 @@
 
 ;; ===== EXTERNAL INTERFACE-SPECIFIC FUNCTIONS =====
 
-(defn interface-dataset-uri [interface]
-  (get-in interface [::t-service/external-interface ::t-service/url]))
+(defn interface-dataset-uri [service interface base-url]
+  (let [operator-id (:ote.db.transport-service/transport-operator-id service)
+        service-id (:ote.db.transport-service/id service)
+        interface-id (::t-service/id interface)]
+    (str base-url "dataset/" operator-id "/" service-id "/interface/" interface-id)))
 
 (defn interface-access-url [interface]
   (get-in interface [::t-service/external-interface ::t-service/url]))
@@ -419,7 +425,7 @@
     (resource distribution-props)))
 
 (defn interface->dataset [service operator operation-areas interface latest-conversion-status distribution base-url]
-  (let [dataset-uri (interface-dataset-uri interface)
+  (let [dataset-uri (interface-dataset-uri service interface base-url)
         operator-uri (compute-operator-uri operator base-url)
         service-name (:ote.db.transport-service/name service)
         access-url (interface-access-url interface)
