@@ -167,14 +167,14 @@
 
 (defn flatten-rdf
   "Flatten RDF data structure into a single sequence of resources in the order they should be added to the model.
-   Order: fintraffic-agent, operator-agent, assessments, distributions, catalog-records, datasets, relationships, data-services, catalog.
+   Order: fintraffic-agent, operator-agent, assessments, distributions, datasets, relationships, data-services, catalog.
+   Catalog records are now embedded as blank nodes within the catalog.
    Note: relationships are maps with :subject and :properties that need special handling."
   [rdf-data]
   (concat [(:fintraffic-agent rdf-data)]
           (when-let [op-agent (:operator-agent rdf-data)] [op-agent])
           (:assessments rdf-data)
           (:distributions rdf-data)
-          (:catalog-records rdf-data)
           (:datasets rdf-data)
           (:relationships rdf-data)
           (:data-services rdf-data)

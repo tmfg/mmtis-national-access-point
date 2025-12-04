@@ -169,9 +169,6 @@
 (defn geojson-download-url [operator-id service-id operation-area-id base-url]
   (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
 
-(defn geojson-record-uri [service operation-area base-url]
-  (str base-url "rdf/" (:ote.db.transport-service/id service) "/area/" (:id operation-area) "/record"))
-
 (def geojson-format "https://publications.europa.eu/resource/authority/file-type/GEOJSON")
 
 (def geojson-rights-url "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge")
@@ -207,9 +204,6 @@
 
 (defn interface-download-url [interface]
   (get-in interface [::t-service/external-interface ::t-service/url]))
-
-(defn interface-record-uri [interface]
-  (str (get-in interface [::t-service/external-interface ::t-service/url]) "/record"))
 
 (defn interface-format [interface]
   (interface->format-extent interface))
@@ -369,20 +363,14 @@
                         (assoc :dct/modified (datetime last-modified)))]
     (resource dataset-uri dataset-props)))
 
-(defn geojson->catalog-record [service operation-area dataset-uri fintraffic-uri base-url]
-  (let [record-uri (geojson-record-uri service operation-area base-url)
-        created (::modification/created service)
+(defn geojson->catalog-record [service dataset-uri fintraffic-uri]
+  (let [created (::modification/created service)
         modified (::modification/modified service)]
-    (resource record-uri
-              {:rdf/type (uri :dcat/CatalogRecord)
+    (resource {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               ;; TODO SHACL validation complained until we added LinguisticSystem types here, but it seems unnecessary.
-               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})]
+               :dct/language [(uri "https://publications.europa.eu/resource/authority/language/FIN")
+                              (uri "https://publications.europa.eu/resource/authority/language/SWE")
+                              (uri "https://publications.europa.eu/resource/authority/language/ENG")]
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -399,7 +387,7 @@
                         (let [distribution (geojson->distribution service operation-area base-url)
                               dataset (geojson->dataset service operator operation-area distribution base-url)
                               dataset-uri (:uri dataset)
-                              catalog-record (geojson->catalog-record service operation-area dataset-uri fintraffic-uri base-url)]
+                              catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
                           {:distributions [distribution]
                            :assessments []
                            :datasets [dataset]
@@ -489,19 +477,14 @@
         (resource {:rdf/type (uri :mobility/Assessment)
                    :dct/date (datetime vaco-validation-timestamp)})))))
 
-(defn interface->catalog-record [service interface dataset-uri fintraffic-uri]
-  (let [record-uri (interface-record-uri interface)
-        created (::modification/created service)
+(defn interface->catalog-record [service dataset-uri fintraffic-uri]
+  (let [created (::modification/created service)
         modified (::modification/modified service)]
-    (resource record-uri
-              {:rdf/type (uri :dcat/CatalogRecord)
+    (resource {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               :dct/language [(resource "https://publications.europa.eu/resource/authority/language/FIN"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/SWE"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})
-                              (resource "https://publications.europa.eu/resource/authority/language/ENG"
-                                        {:rdf/type (uri :dct/LinguisticSystem)})]
+               :dct/language [(uri "https://publications.europa.eu/resource/authority/language/FIN")
+                              (uri "https://publications.europa.eu/resource/authority/language/SWE")
+                              (uri "https://publications.europa.eu/resource/authority/language/ENG")]
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -510,7 +493,7 @@
   (let [distribution (interface->distribution service interface latest-conversion-status base-url)
         dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
         dataset-uri (:uri dataset)
-        catalog-record (interface->catalog-record service interface dataset-uri fintraffic-uri)]
+        catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
     {:distributions [distribution]
      :assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
      :datasets [dataset]
@@ -519,8 +502,7 @@
 ;; ===== CATALOG GENERATION =====
 
 (defn domain->catalog [catalog-records dataset-uris latest-publication fintraffic-uri base-url]
-  (let [catalog-uri (str base-url "catalog")
-        catalog-record-uris (map :uri catalog-records)]
+  (let [catalog-uri (str base-url "catalog")]
     (resource catalog-uri
               {:rdf/type (uri :dcat/Catalog)
                :dct/title (lang-literal "Finap.fi - NAP - National Access Point" "en")
@@ -540,7 +522,7 @@
                :dct/modified (datetime latest-publication)
                :dct/identifier (literal catalog-uri)
                :dct/publisher (uri fintraffic-uri)
-               :dcat/record (vec (map uri catalog-record-uris))
+               :dcat/record (vec catalog-records)
                :dcat/dataset (vec (map uri dataset-uris))})))
 
 (defn service-data->rdf
