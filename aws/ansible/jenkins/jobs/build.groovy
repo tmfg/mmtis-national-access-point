@@ -1,10 +1,14 @@
 job('OTE build from master') {
+    parameters {
+        stringParam('branch', '*/master', 'Branch to build from')
+    }
+    
     logRotator {
         daysToKeep(3)
     }
 
     scm {
-        git('https://github.com/tmfg/mmtis-national-access-point.git', '*/master')
+        git('https://github.com/tmfg/mmtis-national-access-point.git', '$branch')
     }
     triggers {
         scm('H/15 * * * *')
