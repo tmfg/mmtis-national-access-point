@@ -34,9 +34,9 @@
       (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
             catalog (:catalog rdf-output)
             descriptions (get-in catalog [:properties :dct/description])
-            fi-expected (localization/with-language "fi" (tr [:front-page :column-NAP]))
-            sv-expected (localization/with-language "sv" (tr [:front-page :column-NAP]))
-            en-expected (localization/with-language "en" (tr [:front-page :column-NAP]))]
+            fi-expected (rdf-model/localized-text-with-key "fi" [:front-page :column-NAP])
+            sv-expected (rdf-model/localized-text-with-key "sv" [:front-page :column-NAP])
+            en-expected (rdf-model/localized-text-with-key "en" [:front-page :column-NAP])]
         (is (= (count descriptions) 3) "Should have 3 language variants")
         (is (some #(and (= (:lang %) "fi") 
                        (= (:value %) fi-expected)) 

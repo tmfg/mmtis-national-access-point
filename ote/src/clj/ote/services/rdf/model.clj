@@ -73,9 +73,17 @@
 ;; ===== DOMAIN LOGIC FUNCTIONS =====
 
 (defn localized-text-with-key
-  "Usage: (localized-text-with-key \"fi\" [:email-templates :password-reset :subject])"
+  "Usage: (localized-text-with-key \"fi\" [:email-templates :password-reset :subject])
+   Catches markdown translation exceptions and returns the first argument as plain text."
   [language key]
-  (localization/with-language language (tr key)))
+  (try
+    (localization/with-language language (tr key))
+    (catch clojure.lang.ExceptionInfo e
+      (if (= (.getMessage e) "Markdown formatted translations not supported.")
+        ;; Return the first argument from the markdown translation as plain text
+        (first (:args (ex-data e)))
+        ;; Re-throw other ExceptionInfo instances unchanged
+        (throw e)))))
 
 (defn service->mobility-theme [service]
   (case (:ote.db.transport-service/sub-type service)

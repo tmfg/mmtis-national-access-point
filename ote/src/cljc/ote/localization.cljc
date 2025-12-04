@@ -82,10 +82,8 @@
        {:__html (js/marked (message (vec args) parameters) #js {:sanitize true})}}]
 
      :clj
-     ;; TODO
-     ;; rdf.clj needs markdown-localizations and IMO it's better to just return the localization unparsed instead of signalling an error than to copy-paste the localization unmarkdowned
-     (first args)
-     #_(throw (ex-info "Markdown formatted translations not supported." {operator args}))))
+     ;; Markdown is only supported in ClojureScript
+     (throw (ex-info "Markdown formatted translations not supported." {:operator operator :args args}))))
 
 (defmethod evaluate-list :default [[op & _] _]
   (str "{{unknown translation operation " op "}}"))
