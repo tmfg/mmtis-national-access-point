@@ -25,7 +25,7 @@
 
 (defn send-outdated-taxiui-prices-emails
   [config db email]
-  (doseq [outdated (taxiui/fetch-pricing-statistics db {:age-filter :over-year-ago})]
+  (doseq [outdated (taxiui/fetch-pricing-statistics db {:filters {:age-filter :over-year-ago}})]
     (println "outdated" outdated)
     (let [{:keys [service-id]} outdated
           service (some-> (specql/fetch db ::t-service/transport-service
