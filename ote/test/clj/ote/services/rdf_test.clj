@@ -3,8 +3,7 @@
   (:require [clojure.test :as t :refer [deftest testing is]]
             [clojure.string :as str]
             [ote.services.rdf.model :as rdf-model]
-            [ote.services.rdf-test-utilities :as test-utils]
-            [ote.localization :as localization :refer [tr]]))
+            [ote.services.rdf-test-utilities :as test-utils]))
 
 (deftest catalog
   (testing "Catalog"
@@ -96,15 +95,15 @@
                          (assoc-in [:service :ote.db.transport-service/external-interfaces 0 :ote.db.transport-service/id] interface-id))
             rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             datasets (:datasets rdf-output)
-            geojson-dataset (first (filter #(str/includes? (:uri %) "/area/") datasets))
+            geojson-dataset (first (remove #(str/includes? (:uri %) "/interface/") datasets))
             interface-dataset (first (filter #(str/includes? (:uri %) "/interface/") datasets))]
         
-        (testing "GeoJSON dataset URI includes operator-id, service-id, and area-id"
+        (testing "GeoJSON dataset URI includes operator-id and service-id (service-level, not per-area)"
           (is (not (nil? geojson-dataset)) "Should have at least one GeoJSON dataset")
           (when geojson-dataset
             (is (= (:uri geojson-dataset) 
-                   (str "http://localhost:3000/dataset/" operator-id "/" service-id "/area/" area-id))
-                "GeoJSON dataset URI should be {base-url}dataset/{operator-id}/{service-id}/area/{area-id}")))
+                   (str "http://localhost:3000/dataset/" operator-id "/" service-id))
+                "GeoJSON dataset URI should be {base-url}dataset/{operator-id}/{service-id}")))
         
         (testing "Interface dataset URI includes operator-id, service-id, and interface-id"
           (is (not (nil? interface-dataset)) "Should have at least one interface dataset")
@@ -172,38 +171,54 @@
           (is (str/includes? (:value title) "http") 
               "Title should include the interface access URL")))))
     
-    (testing "is created for each operation area"
-      (let [test-data (assoc test-utils/test-small-taxi-service
+    (testing "is created once per service (not per operation area)"
+      (let [helsinki-geojson "{\"type\":\"Point\",\"coordinates\":[24.9384,60.1695]}"
+            espoo-geojson "{\"type\":\"Point\",\"coordinates\":[24.6559,60.2055]}"
+            test-data (assoc test-utils/test-small-taxi-service
                             :operation-areas
                             [{:id 1
-                              :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                              :geojson helsinki-geojson
                               :primary? true
                               :description [{:ote.db.transport-service/lang "FI"
                                            :ote.db.transport-service/text "Helsinki"}]}
                              {:id 2
-                              :geojson "{\"type\":\"Polygon\",\"coordinates\":[]}"
+                              :geojson espoo-geojson
                               :primary? false
                               :description [{:ote.db.transport-service/lang "FI"
                                            :ote.db.transport-service/text "Espoo"}]}])
             rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             datasets (:datasets rdf-output)
-            geojson-datasets (filter #(str/includes? (:uri %) "/area/") datasets)]
-        (is (= 2 (count geojson-datasets)) "Should have one dataset per operation area")
-        (is (some #(str/includes? (:uri %) "/area/1") geojson-datasets)
-            "Should have dataset for operation area 1")
-        (is (some #(str/includes? (:uri %) "/area/2") geojson-datasets)
-            "Should have dataset for operation area 2")
-        ;; Check that titles include area names
-        (let [titles (map #(get-in % [:properties :dct/title :value]) geojson-datasets)]
-          (is (some #(str/includes? % "Helsinki") titles)
-              "Should have dataset title with Helsinki")
-          (is (some #(str/includes? % "Espoo") titles)
-              "Should have dataset title with Espoo")))))
+            geojson-datasets (remove #(str/includes? (:uri %) "/interface/") datasets)]
+        (is (= 1 (count geojson-datasets)) "Should have exactly one GeoJSON dataset per service")
+        ;; Check that title is just the service name (no area names)
+        (let [geojson-dataset (first geojson-datasets)
+              title (get-in geojson-dataset [:properties :dct/title :value])
+              service-name (get-in test-data [:service :ote.db.transport-service/name])]
+          (is (= title service-name)
+              "GeoJSON dataset title should be the service name without area names")
+          (is (not (str/includes? title "Helsinki"))
+              "Title should not include area name Helsinki")
+          (is (not (str/includes? title "Espoo"))
+              "Title should not include area name Espoo"))
+        ;; Check that spatial property contains both operation areas in a GeometryCollection
+        (let [geojson-dataset (first geojson-datasets)
+              spatial-locations (get-in geojson-dataset [:properties :dct/spatial])
+              geometry-location (first (filter #(= :resource (:type %)) spatial-locations))
+              geometry-literal (get-in geometry-location [:properties :locn/geometry :value])
+              parsed-geometry (cheshire.core/parse-string geometry-literal keyword)]
+          (is (not (nil? geometry-location)) "Should have a dct:Location with geometry")
+          (is (= "GeometryCollection" (:type parsed-geometry))
+              "Spatial geometry should be a GeometryCollection")
+          (is (= 2 (count (:geometries parsed-geometry)))
+              "GeometryCollection should contain 2 geometries (one per operation area)")
+          (is (some #(= % {:type "Point" :coordinates [24.9384 60.1695]}) (:geometries parsed-geometry))
+              "Should contain Helsinki coordinates")
+          (is (some #(= % {:type "Point" :coordinates [24.6559 60.2055]}) (:geometries parsed-geometry))
+              "Should contain Espoo coordinates")))))
 
 (deftest relationship
   (testing "Relationship"
-    ;; TODO need to check why it is we do this, and does this generalize as we moved from including one GeoJSON to multiple
-    (testing "is created between each GeoJSON dataset and interface dataset"
+    (testing "is created between the GeoJSON dataset and each interface dataset"
       (let [test-data (-> test-utils/test-large-bus-service
                           (assoc :operation-areas
                                  [{:id 1
@@ -218,15 +233,15 @@
                                                   :ote.db.transport-service/text "Espoo"}]}]))
             rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
             relationships (:relationships rdf-output)
-            geojson-datasets (filter #(str/includes? (:uri %) "/area/") (:datasets rdf-output))
-            interface-datasets (remove #(str/includes? (:uri %) "/area/") (:datasets rdf-output))
+            geojson-datasets (remove #(str/includes? (:uri %) "/interface/") (:datasets rdf-output))
+            interface-datasets (filter #(str/includes? (:uri %) "/interface/") (:datasets rdf-output))
             num-geojson (count geojson-datasets)
             num-interfaces (count interface-datasets)
             expected-relationships (* num-geojson num-interfaces 2)] ; 2 relationships per pair (relation + isReferencedBy)
-        (is (= 2 num-geojson) "Should have 2 GeoJSON datasets")
+        (is (= 1 num-geojson) "Should have exactly 1 GeoJSON dataset (service-level, not per-area)")
         (is (= 2 num-interfaces) "Should have 2 interface datasets")
         (is (= expected-relationships (count relationships))
-            (str "Should have " expected-relationships " relationships (2 operation areas x 2 interfaces x 2 directions)"))))))
+            (str "Should have " expected-relationships " relationships (1 GeoJSON dataset x 2 interfaces x 2 directions)"))))))
 
 ;; A snippet for service testing in REPL
 #_(keep (fn [service-id]

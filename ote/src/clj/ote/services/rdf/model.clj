@@ -6,11 +6,10 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
+            [cheshire.core :as cheshire]
             [taoensso.timbre :as log]))
 
 ;; ===== CONSTANTS =====
-
-(def fintraffic-business-id "2942108-7")
 
 (defn operator-url [business-id base-url]
   (str base-url "service-search?operators=" business-id))
@@ -58,12 +57,6 @@
    {:type :resource :uri nil :properties properties})
   ([uri properties]
    {:type :resource :uri uri :properties properties}))
-
-(defn resource->uri
-  "Convert a resource to a URI reference.
-   Takes a resource map and returns a URI reference to that resource."
-  [resource]
-  (uri (:uri resource)))
 
 (defn datetime
   "Create a typed literal for an xsd:dateTime value."
@@ -164,21 +157,24 @@
 
 ;; ===== GEOJSON-SPECIFIC FUNCTIONS =====
 
-(defn geojson-dataset-uri [service operation-area base-url]
+(defn geojson-dataset-uri
+  "Generate dataset URI for a service (without operation area id)."
+  [service base-url]
   (let [operator-id (:ote.db.transport-service/transport-operator-id service)
-        service-id (:ote.db.transport-service/id service)
-        area-id (:id operation-area)]
-    (str base-url "dataset/" operator-id "/" service-id "/area/" area-id)))
+        service-id (:ote.db.transport-service/id service)]
+    (str base-url "dataset/" operator-id "/" service-id)))
 
-(defn geojson-access-url [operator-id service-id operation-area-id base-url]
-  (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
+(defn geojson-access-url
+  "Generate access URL for the GeoJSON export endpoint (service level)."
+  [operator-id service-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id))
 
-(defn geojson-download-url [operator-id service-id operation-area-id base-url]
-  (str base-url "export/geojson/" operator-id "/" service-id "/area/" operation-area-id))
+(defn geojson-download-url
+  "Generate download URL for the GeoJSON export endpoint (service level)."
+  [operator-id service-id base-url]
+  (str base-url "export/geojson/" operator-id "/" service-id))
 
 (def geojson-format "https://publications.europa.eu/resource/authority/file-type/GEOJSON")
-
-(def geojson-rights-url "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge")
 
 (def geojson-license-url "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
 
@@ -197,6 +193,17 @@
    "https://publications.europa.eu/resource/authority/language/ENG"])
 
 (def geojson-intended-information-service "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
+
+(defn operation-areas->geometry-collection
+  "Create a GeometryCollection from operation areas without styling."
+  [operation-areas]
+  (when (seq operation-areas)
+    (cheshire/generate-string
+      {:type "GeometryCollection"
+       :geometries (mapv 
+                     (fn [area]
+                       (cheshire/decode (:geojson area) keyword))
+                     operation-areas)})))
 
 ;; ===== EXTERNAL INTERFACE-SPECIFIC FUNCTIONS =====
 
@@ -305,12 +312,13 @@
 
 ;; ===== GEOJSON RDF GENERATION =====
 
-(defn geojson->distribution [service operation-area base-url]
+(defn geojson->distribution
+  "Create a distribution resource for the GeoJSON export endpoint."
+  [service base-url]
   (let [service-id (:ote.db.transport-service/id service)
         operator-id (:ote.db.transport-service/transport-operator-id service)
-        operation-area-id (:id operation-area)
-        access-url (geojson-access-url operator-id service-id operation-area-id base-url)
-        download-url (geojson-download-url operator-id service-id operation-area-id base-url)
+        access-url (geojson-access-url operator-id service-id base-url)
+        download-url (geojson-download-url operator-id service-id base-url)
         distribution-description (geojson-distribution-description service)
         distribution-props {:rdf/type (uri :dcat/Distribution)
                             :dcat/accessURL (uri access-url)
@@ -326,26 +334,25 @@
                             :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
     (resource distribution-props)))
 
-(defn geojson->dataset [service operator operation-area distribution base-url]
-  (let [dataset-uri (geojson-dataset-uri service operation-area base-url)
+(defn geojson->dataset
+  "Create a dataset resource for all operation areas of a service."
+  [service operator operation-areas distribution base-url]
+  (let [dataset-uri (geojson-dataset-uri service base-url)
         operator-uri (compute-operator-uri operator base-url)
         service-name (:ote.db.transport-service/name service)
-        area-name (get-in operation-area [:description 0 ::t-service/text] "")
-        dataset-title (if (seq area-name)
-                        (str service-name " - " area-name)
-                        service-name)
+        dataset-title service-name
         service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
         municipality (:municipality service)
         transport-mode (service->transport-mode service)
         mobility-themes (service->mobility-themes service)
         last-modified (geojson-last-modified service)
-        operation-area-geojson (:geojson operation-area)
+        combined-geojson (operation-areas->geometry-collection operation-areas)
         mobility-themes-uris (vec (map uri mobility-themes))
         dataset-languages-uris (vec (map uri geojson-dataset-languages))
-        spatial-data (if operation-area-geojson
+        spatial-data (if combined-geojson
                        [(uri municipality)
                         (resource {:rdf/type (uri :dct/Location)
-                                   :locn/geometry (typed-literal operation-area-geojson
+                                   :locn/geometry (typed-literal combined-geojson
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                        [(uri municipality)])
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
@@ -386,20 +393,17 @@
    :datasets (vec (concat (:datasets model1) (:datasets model2)))
    :catalog-records (vec (concat (:catalog-records model1) (:catalog-records model2)))})
 
-(defn geojson->rdf [service operation-areas operator fintraffic-uri base-url]
+(defn geojson->rdf
+  "Create RDF data for a single GeoJSON dataset containing all operation areas."
+  [service operation-areas operator fintraffic-uri base-url]
   (if (seq operation-areas)
-    (let [area-models (for [operation-area operation-areas]
-                        (let [distribution (geojson->distribution service operation-area base-url)
-                              dataset (geojson->dataset service operator operation-area distribution base-url)
-                              dataset-uri (:uri dataset)
-                              catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
-                          {:assessments []
-                           :datasets [dataset]
-                           :catalog-records [catalog-record]}))
-          merged (reduce merge-rdf-models 
-                        {:assessments [] :datasets [] :catalog-records []}
-                        area-models)]
-      merged)
+    (let [distribution (geojson->distribution service base-url)
+          dataset (geojson->dataset service operator operation-areas distribution base-url)
+          dataset-uri (:uri dataset)
+          catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
+      {:assessments []
+       :datasets [dataset]
+       :catalog-records [catalog-record]})
     ;; No operation areas - return empty model
     {:assessments []
      :datasets []
