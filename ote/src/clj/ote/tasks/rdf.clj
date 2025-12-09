@@ -15,16 +15,20 @@
 
 (defn export-rdf-to-s3 [config db]
   (println "EXPORT-RDF-TO-S3")
-  (with-open [out (java.io.ByteArrayOutputStream.)]
-    (rdf-service/create-rdf config db out)
-    (let [bytes (.toByteArray out)
-          len (count bytes)]
-      
-      (s3/put-object "finap-rdf-cache3"
-                     "rdf"
-                     (ByteArrayInputStream. bytes)
-                     {:content-length len})
-      (log/info "exported rdf into s3"))))
+  (try 
+    (with-open [out (java.io.ByteArrayOutputStream.)]
+      (rdf-service/create-rdf config db out)
+      (let [bytes (.toByteArray out)
+            len (count bytes)]
+        
+        (s3/put-object "finap-rdf-cache3"
+                       "rdf"
+                       (ByteArrayInputStream. bytes)
+                       {:content-length len})
+        (log/info "exported rdf into s3")))
+    (catch Throwable t
+      (log/error (str (pr-str t) " export-rdf-to-s3 failed"))
+      (throw t))))
 
 ;; (export-rdf-to-s3 ote.main/_config
 ;;                   (:db ote.main/ote))
@@ -33,7 +37,9 @@
   component/Lifecycle
   (start [{db :db :as this}]
 
-    (#'export-rdf-to-s3 config db)
+    (when (and (not dev-mode?)
+               (feature/feature-enabled? :rdf-export))
+      (#'export-rdf-to-s3 config db))      
     
     (assoc this
       ::stop-tasks
