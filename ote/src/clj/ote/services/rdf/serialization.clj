@@ -133,7 +133,8 @@
                   (seq? val) val
                   (map? val) [val]
                   :else [val])]
-       (doseq [v vals]
+       ;; TODO vals might contain nils, I do not yet know their source
+       (doseq [v (filter (comp some? :value) vals)]
          (let [object (case (:type v)
                         :uri
                         (let [uri-val (:value v)]
