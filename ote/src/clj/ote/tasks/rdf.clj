@@ -14,6 +14,7 @@
            (java.io ByteArrayInputStream)))
 
 (defn export-rdf-to-s3 [config db]
+  (println "EXPORT-RDF-TO-S3")
   (with-open [out (java.io.ByteArrayOutputStream.)]
     (rdf-service/create-rdf config db out)
     (let [bytes (.toByteArray out)
@@ -31,14 +32,17 @@
 (defrecord RdfTasks [dev-mode? config]
   component/Lifecycle
   (start [{db :db :as this}]
+
+    (#'export-rdf-to-s3 config db)
+    
     (assoc this
       ::stop-tasks
       (if (and (not dev-mode?)
                (feature/feature-enabled? :rdf-export))
-        [(chime-at
-          (tasks-util/daily-at 16 30)
-          (fn [_]
-            (#'export-rdf-to-s3 config db)))]
+          [(chime-at
+            (tasks-util/daily-at 16 30)
+            (fn [_]
+              (#'export-rdf-to-s3 config db)))]
         (do
           (log/debug "RDF EXPORT IS NOT ENABLED!")
           nil))))
