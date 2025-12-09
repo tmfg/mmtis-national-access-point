@@ -81,7 +81,7 @@
    (GET "/rdf" []
      (find-rdf-payload db config dev-mode?))
    
-   (when dev-mode?
+   #_(when dev-mode?
      ;; For testing smaller rdf payloads in dev-mode. Returns rdf for a single service
      (GET ["/rdf/:service-id", :service-id #".+"] {{service-id :service-id} :params}
        ;; create-rdf returns a complete response
