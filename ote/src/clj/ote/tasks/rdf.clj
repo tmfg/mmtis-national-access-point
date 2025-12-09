@@ -20,7 +20,7 @@
     (let [bytes (.toByteArray out)
           len (count bytes)]
       
-      (s3/put-object "finap-rdf-cache"
+      (s3/put-object "finap-rdf-cache3"
                      "rdf"
                      (ByteArrayInputStream. bytes)
                      {:content-length len})
