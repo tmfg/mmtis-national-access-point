@@ -27,8 +27,7 @@
     {:success? false}
     (let [email-taken? (email-exists? db {:email email})
           group-info (when token
-                       (first (fetch-operator-info db {:token token})))
-          _ (println "register " (pr-str form-data))]
+                       (first (fetch-operator-info db {:token token})))]
       (if email-taken?
         ;; email taken, return errors to form
         {:success? false
