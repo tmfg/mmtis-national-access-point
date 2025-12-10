@@ -13,15 +13,14 @@
   (:import (org.joda.time DateTime DateTimeZone)
            (java.io ByteArrayInputStream)))
 
-(defn export-rdf-to-s3 [config db]
-  (println "EXPORT-RDF-TO-S3")
+(defn export-rdf-to-s3 [{{:keys [bucket]} :rdf-export :as config} db]
   (try 
     (with-open [out (java.io.ByteArrayOutputStream.)]
       (rdf-service/create-rdf config db out)
       (let [bytes (.toByteArray out)
             len (count bytes)]
         
-        (s3/put-object "finap-rdf-cache3"
+        (s3/put-object bucket 
                        "rdf"
                        (ByteArrayInputStream. bytes)
                        {:content-length len})
@@ -33,30 +32,30 @@
 ;; (export-rdf-to-s3 ote.main/_config
 ;;                   (:db ote.main/ote))
 
-(defrecord RdfTasks [dev-mode? config]
+(defrecord RdfTasks [config]
   component/Lifecycle
   (start [{db :db :as this}]
-
-    (when (and (not dev-mode?)
-               (feature/feature-enabled? :rdf-export))
-      (#'export-rdf-to-s3 config db))      
-    
-    (assoc this
-      ::stop-tasks
-      (if (and (not dev-mode?)
-               (feature/feature-enabled? :rdf-export))
-          [(chime-at
-            (tasks-util/daily-at 16 30)
-            (fn [_]
-              (#'export-rdf-to-s3 config db)))]
-        (do
-          (log/debug "RDF EXPORT IS NOT ENABLED!")
-          nil))))
+    (let [{:keys [dev-mode?]} config]
+      (when (and (not dev-mode?)
+                 (feature/feature-enabled? :rdf-export))
+        (#'export-rdf-to-s3 config db))      
+      
+      (assoc this
+             ::stop-tasks
+             (if (and (not dev-mode?)
+                      (feature/feature-enabled? :rdf-export))
+               [(chime-at
+                 (tasks-util/daily-at 16 30)
+                 (fn [_]
+                   (#'export-rdf-to-s3 config db)))]
+               (do
+                 (log/debug "RDF EXPORT IS NOT ENABLED!")
+                 nil)))))
   (stop [{stop-tasks ::stop-tasks :as this}]
     (for [stop-task stop-tasks]
       (stop-task))
     (dissoc this ::stop-tasks)))
 
 (defn rdf-tasks
-  ([dev-mode config]
-   (->RdfTasks dev-mode config)))
+  ([config]
+   (->RdfTasks config)))

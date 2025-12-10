@@ -73,7 +73,8 @@
 
     (-> (ring-io/piped-input-stream
          (fn [out]
-           (io/copy (:input-stream (s3/get-object "finap-rdf-cache3" "rdf")) out)))
+           (let [{{:keys [bucket]} :rdf-export} config]
+             (io/copy (:input-stream (s3/get-object bucket "rdf")) out))))
         turtle-response)))
 
 (defn- rds-routes [{:keys [dev-mode?] :as config} db]
