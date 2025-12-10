@@ -62,7 +62,7 @@
             catalog (:catalog rdf-output)
             license (get-in catalog [:properties :dct/license])
             license-identifier (get-in license [:properties :dct/identifier])]
-        (is (= (:value license-identifier) "https://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
+        (is (= (:value license-identifier) "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0")
             "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)")))
     
     (testing "dcat:record contains as many elements as there are datasets"
