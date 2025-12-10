@@ -388,8 +388,7 @@
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn merge-rdf-models [model1 model2]
-  {:assessments (vec (concat (:assessments model1) (:assessments model2)))
-   :datasets (vec (concat (:datasets model1) (:datasets model2)))
+  {:datasets (vec (concat (:datasets model1) (:datasets model2)))
    :catalog-records (vec (concat (:catalog-records model1) (:catalog-records model2)))})
 
 (defn geojson->rdf
@@ -400,12 +399,10 @@
           dataset (geojson->dataset service operator operation-areas distribution base-url)
           dataset-uri (:uri dataset)
           catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
-      {:assessments []
-       :datasets [dataset]
+      {:datasets [dataset]
        :catalog-records [catalog-record]})
     ;; No operation areas - return empty model
-    {:assessments []
-     :datasets []
+    {:datasets []
      :catalog-records []}))
 
 ;; ===== EXTERNAL INTERFACE RDF GENERATION =====
@@ -474,13 +471,6 @@
                         (assoc :dct/modified (datetime last-modified)))]
     (resource dataset-uri dataset-props)))
 
-(defn interface->assessment [latest-conversion-status]
-  (when latest-conversion-status
-    (let [vaco-validation-timestamp (:tis_polling_completed latest-conversion-status)]
-      (when vaco-validation-timestamp
-        (resource {:rdf/type (uri :mobility/Assessment)
-                   :dct/date (datetime vaco-validation-timestamp)})))))
-
 (defn interface->catalog-record [service dataset-uri fintraffic-uri]
   (let [created (::modification/created service)
         modified (::modification/modified service)]
@@ -498,8 +488,7 @@
         dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
         dataset-uri (:uri dataset)
         catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
-    {:assessments (if-let [assessment (interface->assessment latest-conversion-status)] [assessment] [])
-     :datasets [dataset]
+    {:datasets [dataset]
      :catalog-records [catalog-record]}))
 
 ;; ===== CATALOG GENERATION =====
@@ -532,7 +521,7 @@
   "Create complete RDF data structure including catalog and fintraffic agent.
    Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
    and creates catalog. Returns a map with :catalog, :datasets, :distributions,
-   :assessments, :catalog-records, :data-services, :relationships, :ns-prefixes, and :fintraffic-agent."
+   :catalog-records, :data-services, :relationships, :ns-prefixes, and :fintraffic-agent."
   [service-data base-url]
   (let [{:keys [service operation-areas operator validation-data latest-publication]} service-data
         external-interfaces (::t-service/external-interfaces service)
@@ -582,7 +571,6 @@
                  ;; No operation areas - create empty catalog
                  (let [catalog-resource (domain->catalog [] [] latest-publication fintraffic-uri base-url)]
                    {:catalog catalog-resource
-                    :assessments []
                     :datasets []
                     :catalog-records []
                     :relationships []}))]
