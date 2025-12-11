@@ -16,6 +16,7 @@
 (defn export-rdf-to-s3 [{{:keys [bucket]} :rdf-export :as config} db]
   (try 
     (with-open [out (java.io.ByteArrayOutputStream.)]
+      (log/info "Starting export-rdf-to-s3")
       (rdf-service/create-rdf config db out)
       (let [bytes (.toByteArray out)
             len (count bytes)]
@@ -36,9 +37,12 @@
   component/Lifecycle
   (start [{db :db :as this}]
     (let [{:keys [dev-mode?]} config]
-      (when (and (not dev-mode?)
-                 (feature/feature-enabled? :rdf-export))
-        (#'export-rdf-to-s3 config db))      
+      (if (and (not dev-mode?)
+               (feature/feature-enabled? :rdf-export))
+        (do
+          (log/info "Config allows us to start export-rdf-to-s3")
+          (#'export-rdf-to-s3 config db))
+        (log/info ("dev-mode? %s; feature-enabled? %s" (pr-str dev-mode?) (pr-str (feature/feature-enabled? :rdf-export)))))
       
       (assoc this
              ::stop-tasks
