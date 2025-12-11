@@ -123,8 +123,8 @@
    (let [;; Handle both regular resources and relationship objects
          uri-or-subject (or (:uri resource-data) (:subject resource-data))
          res (if uri-or-subject
-              (ResourceFactory/createResource uri-or-subject)
-              (ResourceFactory/createResource))]
+              (.createResource model uri-or-subject)
+              (.createResource model))]
      (add-resource-to-model! model res (:properties resource-data))))
   ([model resource properties-map]
    (doseq [[prop-kw val] properties-map]
@@ -133,14 +133,15 @@
                   (seq? val) val
                   (map? val) [val]
                   :else [val])]
-       ;; TODO vals might contain nils, I do not yet know their source
-       (doseq [v (filter (comp some? :value) vals)]
+       ;; Filter out values that have neither :value nor :properties (nil values)
+       ;; Keep values with :value (literals, URIs) or :properties (nested resources)
+       (doseq [v (filter #(or (some? (:value %)) (:properties %)) vals)]
          (let [object (case (:type v)
                         :uri
                         (let [uri-val (:value v)]
                           (if (keyword? uri-val)
-                            (ResourceFactory/createResource (kw->uri uri-val))
-                            (ResourceFactory/createResource uri-val)))
+                            (.createResource model (kw->uri uri-val))
+                            (.createResource model uri-val)))
                         
                         :literal
                         (ResourceFactory/createStringLiteral (:value v))

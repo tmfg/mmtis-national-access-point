@@ -145,7 +145,12 @@
         (doseq [dataset datasets]
           (let [distributions (get-in dataset [:properties :dcat/distribution])]
             (is (= 1 (count distributions))
-                (str "Dataset " (:uri dataset) " should have exactly one distribution"))))))
+                (str "Dataset " (:uri dataset) " should have exactly one distribution"))
+            (let [distribution (first distributions)]
+              (is (= :resource (:type distribution))
+                  "Distribution should be an embedded resource")
+              (is (= :dcat/Distribution (get-in distribution [:properties :rdf/type :value]))
+                  "Distribution should have type :dcat/Distribution"))))))
     
     (testing "dct:publisher is the search URL for the operator"
       (let [business-id "1234567-5"
