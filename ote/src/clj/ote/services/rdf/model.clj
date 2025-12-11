@@ -185,11 +185,11 @@
 
 (def geojson-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
 
-;; TODO Why don't we need LinguisticSystem here like in the catalog record? Does this not end up in a SHACL validation?
-(def geojson-dataset-languages
-  ["http://publications.europa.eu/resource/authority/language/FIN"
-   "http://publications.europa.eu/resource/authority/language/SWE"
-   "http://publications.europa.eu/resource/authority/language/ENG"])
+(def fin-swe-eng-languages
+  (mapv uri
+        ["http://publications.europa.eu/resource/authority/language/FIN"
+         "http://publications.europa.eu/resource/authority/language/SWE"
+         "http://publications.europa.eu/resource/authority/language/ENG"]))
 
 (def geojson-intended-information-service "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
 
@@ -337,39 +337,32 @@
   "Create a dataset resource for all operation areas of a service."
   [service operator operation-areas distribution base-url]
   (let [dataset-uri (geojson-dataset-uri service base-url)
-        operator-uri (compute-operator-uri operator base-url)
-        service-name (:ote.db.transport-service/name service)
-        dataset-title service-name
-        service-description (or (get-in service [::t-service/description 0 ::t-service/text]) "")
-        municipality (:municipality service)
-        transport-mode (service->transport-mode service)
-        mobility-themes (service->mobility-themes service)
+        operator-uri (uri (compute-operator-uri operator base-url))
+        municipality-uri (uri (:municipality service))
         last-modified (geojson-last-modified service)
         combined-geojson (operation-areas->geometry-collection operation-areas)
-        mobility-themes-uris (vec (map uri mobility-themes))
-        dataset-languages-uris (vec (map uri geojson-dataset-languages))
         spatial-data (if combined-geojson
-                       [(uri municipality)
+                       [municipality-uri
                         (resource {:rdf/type (uri :dct/Location)
                                    :locn/geometry (typed-literal combined-geojson
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
-                       [(uri municipality)])
+                       [municipality-uri])
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
-                               :dct/title (literal dataset-title)
-                               :dct/description (literal service-description)
-                               :mobility/transportMode (uri transport-mode)
+                               :dct/title (literal (:ote.db.transport-service/name service))
+                               :dct/description (literal (or (get-in service [::t-service/description 0 ::t-service/text]) ""))
+                               :mobility/transportMode (uri (service->transport-mode service))
                                :dct/accrualPeriodicity (uri geojson-accrual-periodicity)
-                               :mobility/mobilityTheme mobility-themes-uris
+                               :mobility/mobilityTheme (mapv uri (service->mobility-themes service))
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
                                :mobility/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
-                               :dct/publisher (uri operator-uri)
-                               :dct/rightsHolder (uri operator-uri)
+                               :dct/publisher operator-uri
+                               :dct/rightsHolder operator-uri
                                :dcat/distribution [distribution]
                                :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")
-                               :dct/language dataset-languages-uris}
+                               :dct/language fin-swe-eng-languages}
                         
                         last-modified
                         (assoc :dct/modified (datetime last-modified)))]
@@ -380,9 +373,7 @@
         modified (::modification/modified service)]
     (resource {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/language fin-swe-eng-languages
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -476,9 +467,7 @@
         modified (::modification/modified service)]
     (resource {:rdf/type (uri :dcat/CatalogRecord)
                :dct/created (datetime created)
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/language fin-swe-eng-languages
                :foaf/primaryTopic (uri dataset-uri)
                :dct/modified (datetime modified)
                :dct/publisher (uri fintraffic-uri)})))
@@ -504,9 +493,7 @@
                :foaf/homepage (uri "https://www.finap.fi/")
                :dct/spatial (resource {:rdf/type (uri :dct/Location)
                                        :dct/identifier (uri "http://publications.europa.eu/resource/authority/country/FIN")})
-               :dct/language [(uri "http://publications.europa.eu/resource/authority/language/FIN")
-                              (uri "http://publications.europa.eu/resource/authority/language/SWE")
-                              (uri "http://publications.europa.eu/resource/authority/language/ENG")]
+               :dct/language fin-swe-eng-languages
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                        :dct/identifier (uri licence-url)})
                :dct/issued (datetime "2018-01-01T00:00:01Z")
