@@ -74,8 +74,6 @@
     (-> (ring-io/piped-input-stream
          (fn [out]
            (let [{{:keys [bucket]} :rdf-export} config]
-             ;; TODO älä päästä tuotantoon 
-             (clojure.pprint/pprint {:config config})
              (log/infof "Reading file \"rdf\" from bucket %s" (pr-str bucket))
              (io/copy (:input-stream (s3/get-object bucket "rdf")) out))))
         turtle-response)))
