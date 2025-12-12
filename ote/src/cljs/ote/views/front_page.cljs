@@ -145,19 +145,4 @@
                           (e! (fp/->ChangePage :services nil)))}
          [:button (stylefy/use-style style-front-page/front-page-button)
           [:span [feather-icons/monitor {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-          (tr [:buttons :check-out-the-service])]]]]]
-
-     [:div.col-md-6 (stylefy/use-style style-front-page/media-transport-service)
-      [:div (stylefy/use-style style-front-page/lower-section-data-container)
-       [:img (merge (stylefy/use-style style-front-page/lower-section-font-icon)
-                    {:src "/img/icons/Traficom.svg"
-                     :alt (tr [:common-texts :footer-livi-logo])}) ]
-       [:p (stylefy/use-style style-front-page/lower-section-text)
-        (tr [:front-page :column-service-operator-info])]
-       [:div {:style {:padding-top "20px"}}
-        [linkify
-         "https://www.traficom.fi/fi/liikenne-ja-viestintavirasto-traficom"
-         [:button (stylefy/use-style style-front-page/front-page-button)
-          [:span [feather-icons/compass {:style {:height 23 :width 40 :padding-top 0 :color "#fff"}}]]
-          (tr [:buttons :visit-service-operator])]
-         {:hide-external-icon? true}]]]]]]])
+          (tr [:buttons :check-out-the-service])]]]]]]]])
