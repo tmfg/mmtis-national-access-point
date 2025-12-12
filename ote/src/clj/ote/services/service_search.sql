@@ -161,3 +161,11 @@ SELECT oa."transport-service-id" as id,
       "transport-service" ts
 WHERE ts.id IN (:id)
   AND ts.id = oa."transport-service-id";
+
+-- name: latest-published-service
+-- Fetch the latest published service by modified date
+SELECT id, name, modified, published
+  FROM "transport-service"
+ WHERE published IS NOT NULL
+ ORDER BY published DESC, modified DESC
+ LIMIT 1;

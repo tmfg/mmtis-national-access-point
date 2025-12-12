@@ -27,6 +27,8 @@
             [ote.services.robots :as robots]
             [ote.services.health :as health]
 
+            [ote.services.rdf :as rdf]
+
             [ote.integration.export.geojson :as export-geojson]
             [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.export.csv :as export-csv]
@@ -49,6 +51,7 @@
 
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.3rd-party.rolling :as timbre-rolling]
+            [ote.tasks.rdf :as rdf-task]
             [jeesql.autoreload :as autoreload])
   (:gen-class))
 
@@ -62,6 +65,8 @@
    :http (component/using (http/http-server (:http config)) [:db])
    :ssl-upgrade (http/map->SslUpgrade (get-in config [:http :ssl-upgrade]))
    :email (email/->Email (:email config))
+
+   :rdf (component/using (rdf/->RDS config) [:http :db])
 
    ;; Index pages for frontends
    :ote/index (component/using (index/->Index config) [:http :db])
@@ -100,6 +105,9 @@
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])
    :import-kalkati (component/using (import-kalkati/->KalkatiImport) [:http])
    :export-gtfsflex (component/using (export-gtfsflex/->GTFSFlexExport config) [:db :http])
+
+   ;; rdf -> s3 
+   :rdf->s3 (component/using (rdf-task/rdf-tasks config) [:db])
 
    ;; Integration: Fetch company data from YTJ
    :fetch-ytj (component/using (fetch-ytj/->YTJFetch config) [:db :http])
