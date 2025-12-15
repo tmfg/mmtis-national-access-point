@@ -149,6 +149,7 @@
 
     ;; probably not an actually-correct default but at least its technically correct
     "http://publications.europa.eu/resource/authority/file-type/BIN"))
+
 (defn interface->rights-url [interface]
   (if (::t-service/license interface)
     "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided"
@@ -305,12 +306,15 @@
         access-url (geojson-access-url operator-id service-id base-url)
         download-url (geojson-download-url operator-id service-id base-url)
         distribution-description (geojson-distribution-description service)
+        rights-url "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
         distribution-props {:rdf/type (uri :dcat/Distribution)
                             :dcat/accessURL (uri access-url)
                             :dcat/downloadURL (uri download-url)
                             :dct/format (uri geojson-format)
                             :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                                     :dct/identifier (uri geojson-license-url)})
+                            :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
+                                                   :dct/type (uri rights-url)})
                             :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
                             :mobility/description (lang-literal distribution-description "fi")
                             :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
@@ -390,6 +394,7 @@
         format (interface-format interface)
         distribution-description (interface-distribution-description interface)
         mobility-data-standard-uri (interface->mobility-data-standard interface)
+        rights-url (interface->rights-url interface)
         vaco-validation-timestamp (when latest-conversion-status
                                     (:tis_polling_completed latest-conversion-status))
         vaco-result-link (when latest-conversion-status
@@ -400,6 +405,8 @@
                                     :dct/format (uri format)
                                     :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
                                                             :dct/identifier (uri interface-license-url)})
+                                    :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
+                                                           :dct/type (uri rights-url)})
                                     :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
                                     :mobility/description (lang-literal distribution-description "fi")
                                     :mobility/mobilityDataStandard (uri mobility-data-standard-uri)}

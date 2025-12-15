@@ -221,6 +221,45 @@
           (is (some #(= % {:type "Point" :coordinates [24.6559 60.2055]}) (:geometries parsed-geometry))
               "Should contain Espoo coordinates")))))
 
+(deftest distribution
+  (testing "Distribution"
+    (testing "has required properties"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            mandatory-distribution-properties [:dcat/accessURL :mobility/mobilityDataStandard :dct/format :dct/rights]]
+        (doseq [dataset datasets]
+          (let [distribution (first (get-in dataset [:properties :dcat/distribution]))
+                dist-props (set (keys (get distribution :properties)))]
+            (doseq [prop mandatory-distribution-properties]
+              (is (contains? dist-props prop)
+                  (str "Distribution in dataset " (:uri dataset) " should have mandatory property " prop)))))))
+    
+    (testing "has correct dct:rights values"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            geojson-datasets (filter #(not (str/includes? (:uri %) "/interface/")) datasets)
+            interface-datasets (filter #(str/includes? (:uri %) "/interface/") datasets)]
+        ;; GeoJSON distributions should have free-of-charge rights
+        (doseq [dataset geojson-datasets]
+          (let [distribution (first (get-in dataset [:properties :dcat/distribution]))
+                rights (get-in distribution [:properties :dct/rights])
+                rights-type (get-in rights [:properties :dct/type :value])]
+            (is (= :resource (:type rights))
+                (str "Rights in GeoJSON dataset " (:uri dataset) " should be a resource"))
+            (is (= "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided-free-of-charge"
+                   rights-type)
+                (str "GeoJSON dataset " (:uri dataset) " should have free-of-charge rights"))))
+        ;; Interface distributions should have appropriate rights based on license
+        (doseq [dataset interface-datasets]
+          (let [distribution (first (get-in dataset [:properties :dcat/distribution]))
+                rights (get-in distribution [:properties :dct/rights])
+                rights-type (get-in rights [:properties :dct/type :value])]
+            (is (= :resource (:type rights))
+                (str "Rights in interface dataset " (:uri dataset) " should be a resource"))
+            (is (or (= "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided" rights-type)
+                    (= "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/other" rights-type))
+                (str "Interface dataset " (:uri dataset) " should have valid rights URL"))))))))
+
 (deftest relationship
   (testing "Relationship"
     (testing "is created between the GeoJSON dataset and each interface dataset"
