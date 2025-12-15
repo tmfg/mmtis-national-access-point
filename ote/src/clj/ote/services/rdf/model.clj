@@ -356,7 +356,7 @@
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
-                               :mobility/identifier (uri dataset-uri)
+                               :dct/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher operator-uri
                                :dct/rightsHolder operator-uri
@@ -452,7 +452,7 @@
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
-                               :mobility/identifier (uri dataset-uri)
+                               :dct/identifier (uri dataset-uri)
                                :mobility/intendedInformationService (uri intended-info-service)
                                :dct/publisher (uri operator-uri)
                                :dct/rightsHolder (uri operator-uri)
