@@ -7,12 +7,13 @@
             [ote.db.transport-operator :as t-operator]
             [ote.db.modification :as modification]
             [cheshire.core :as cheshire]
+            [clojure.string :as str]
             [taoensso.timbre :as log]))
 
 ;; ===== CONSTANTS =====
 
 (defn operator-url [business-id base-url]
-  (str base-url "service-search?operators=" business-id))
+  (str base-url "service-search?operators=" (java.net.URLEncoder/encode (str business-id) "UTF-8")))
 
 (def dcat "http://www.w3.org/ns/dcat#")
 (def dct "http://purl.org/dc/terms/")
@@ -59,9 +60,12 @@
    {:type :resource :uri uri :properties properties}))
 
 (defn datetime
-  "Create a typed literal for an xsd:dateTime value."
+  "Create a typed literal for an xsd:dateTime value.
+   Formats the timestamp to use 'T' separator for XSD dateTime compliance."
   [value]
-  (typed-literal (str value) "http://www.w3.org/2001/XMLSchema#dateTime"))
+  (let [formatted (-> (str value)
+                      (str/replace #" " "T"))]
+    (typed-literal formatted "http://www.w3.org/2001/XMLSchema#dateTime")))
 
 ;; ===== DOMAIN LOGIC FUNCTIONS =====
 
@@ -214,10 +218,12 @@
     (str base-url "dataset/" operator-id "/" service-id "/interface/" interface-id)))
 
 (defn interface-access-url [interface]
-  (get-in interface [::t-service/external-interface ::t-service/url]))
+  (some-> (get-in interface [::t-service/external-interface ::t-service/url])
+          str/trim))
 
 (defn interface-download-url [interface]
-  (get-in interface [::t-service/external-interface ::t-service/url]))
+  (some-> (get-in interface [::t-service/external-interface ::t-service/url])
+          str/trim))
 
 (defn interface-format [interface]
   (interface->format-extent interface))
