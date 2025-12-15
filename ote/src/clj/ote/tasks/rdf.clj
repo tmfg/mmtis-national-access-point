@@ -36,8 +36,9 @@
 (defrecord RdfTasks [config]
   component/Lifecycle
   (start [{db :db :as this}]
-    (let [{:keys [dev-mode?]} config]
+    (let [{:keys [testing-env? dev-mode?]} config]
       (if (and (not dev-mode?)
+               testing-env?
                (feature/feature-enabled? :rdf-export))
         (do
           (log/info "Config allows us to start export-rdf-to-s3")
