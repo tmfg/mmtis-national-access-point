@@ -295,20 +295,6 @@
    {:subject interface-dataset-id
     :properties {:dct/isReferencedBy (uri geojson-dataset-id)}}])
 
-(defn domain->data-service [interface]
-  (let [endpointUrl (get-in interface [::t-service/external-interface ::t-service/url])
-        title (localized-text-with-key "fi" [:enums :ote.db.transport-service/interface-data-content :route-and-schedule])
-        description (or (get-in interface [::t-service/external-interface ::t-service/description 0 ::t-service/text]) "")
-        rights-url (interface->rights-url interface)]
-    (resource {:rdf/type (uri :dct/DataService)
-               :dcat/endpointURL (uri endpointUrl)
-               :dct/title (uri title)
-               :dct/description (uri description)
-               :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
-                                      :dct/type (uri rights-url)})
-               :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                       :dct/identifier (uri licence-url)})})))
-
 ;; ===== GEOJSON RDF GENERATION =====
 
 (defn geojson->distribution
@@ -507,7 +493,7 @@
   "Create complete RDF data structure including catalog and fintraffic agent.
    Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
    and creates catalog. Returns a map with :catalog, :datasets, :distributions,
-   :catalog-records, :data-services, :relationships, :ns-prefixes, and :fintraffic-agent."
+   :catalog-records, :relationships, :ns-prefixes, and :fintraffic-agent."
   [service-data base-url]
   (let [{:keys [service operation-areas operator validation-data latest-publication]} service-data
         external-interfaces (::t-service/external-interfaces service)
@@ -516,12 +502,6 @@
                                    {:rdf/type (uri :foaf/Agent)
                                     :foaf/name (literal "Fintraffic Oy")})
         operator-agent (when operator (operator->agent operator base-url))
-        ;; TODO this is probably not correct
-        is-dataservice? false
-        ;; Create data services for interfaces that need them
-        data-services (if is-dataservice?
-                       (vec (map domain->data-service external-interfaces))
-                       [])
         result (if operation-areas
                  (let [;; Generate RDF data for GeoJSON dataset
                        geojson-rdf (geojson->rdf service operation-areas operator fintraffic-uri base-url)
@@ -563,7 +543,6 @@
     (assoc result 
            :fintraffic-agent fintraffic-agent
            :operator-agent operator-agent
-           :data-services data-services
            :ns-prefixes [["dcat" dcat]
                          ["dct" dct]
                          ["foaf" foaf]
