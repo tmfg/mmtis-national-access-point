@@ -142,7 +142,7 @@
     "NeTEx" "http://publications.europa.eu/resource/authority/file-type/XML"
     "Datex II" "http://publications.europa.eu/resource/authority/file-type/XML"
 
-    "GeoJSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
+    "GeoJSON" "http://publications.europa.eu/resource/authority/file-type/GEOJSON"
     "JSON" "http://publications.europa.eu/resource/authority/file-type/JSON"
     "CSV" "http://publications.europa.eu/resource/authority/file-type/CSV"
     "SIRI" "http://publications.europa.eu/resource/authority/file-type/XML"
