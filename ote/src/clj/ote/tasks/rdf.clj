@@ -42,7 +42,7 @@
         (do
           (log/info "Config allows us to start export-rdf-to-s3")
           (#'export-rdf-to-s3 config db))
-        (log/info ("dev-mode? %s; feature-enabled? %s" (pr-str dev-mode?) (pr-str (feature/feature-enabled? :rdf-export)))))
+        (log/infof "dev-mode? %s; feature-enabled? %s" (pr-str dev-mode?) (pr-str (feature/feature-enabled? :rdf-export))))
       
       (assoc this
              ::stop-tasks
