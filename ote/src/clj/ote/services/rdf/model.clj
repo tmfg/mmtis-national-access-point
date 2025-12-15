@@ -416,7 +416,6 @@
                                                             :dct/identifier (uri interface-license-url)})
                                     :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
                                     :mobility/description (lang-literal distribution-description "fi")
-                                    :mobility/communicationMethod (uri "https://w3id.org/mobilitydcat-ap/communication-method/pull")
                                     :mobility/mobilityDataStandard (uri mobility-data-standard-uri)}
                              
                              vaco-validation-timestamp
