@@ -190,6 +190,10 @@
   (resource {:uri "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
              :rdf/type (uri :dct/Frequency)}))
 
+(def epsg-4326-standard
+  (resource {:uri "http://www.opengis.net/def/crs/EPSG/0/4326"
+             :rdf/type (uri :dct/Standard)}))
+
 (def fin-swe-eng-languages
   (mapv (fn [lang-uri]
           (resource {:uri lang-uri
@@ -374,7 +378,7 @@
                                :dct/publisher operator-uri
                                :dct/rightsHolder operator-uri
                                :dcat/distribution [distribution]
-                               :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")}
+                               :dct/conformsTo epsg-4326-standard}
                         
                         last-modified-dt
                         (assoc :dct/modified last-modified-dt))]
