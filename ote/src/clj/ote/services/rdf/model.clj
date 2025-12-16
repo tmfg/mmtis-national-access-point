@@ -5,10 +5,13 @@
   (:require [ote.localization :as localization :refer [tr]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
+            [clj-time.format :as time-format]
+            [clj-time.core :as time]
             [ote.db.modification :as modification]
             [cheshire.core :as cheshire]
             [clojure.string :as str]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log])
+  (:import (org.joda.time DateTimeZone)))
 
 ;; ===== CONSTANTS =====
 
@@ -59,11 +62,18 @@
   ([uri properties]
    {:type :resource :uri uri :properties properties}))
 
+(defn format-datetime [dt]
+  (time-format/unparse
+   (time-format/with-zone
+     (time-format/formatter "yyyy-MM-dd'T'HH:mm:ss") 
+     (DateTimeZone/forID "Europe/Helsinki"))
+   (org.joda.time.DateTime. dt)))
+
 (defn datetime
   "Create a typed literal for an xsd:dateTime value."
   [value]
   (when value
-    (typed-literal (str value) "http://www.w3.org/2001/XMLSchema#dateTime")))
+    (typed-literal (format-datetime value) "http://www.w3.org/2001/XMLSchema#dateTime")))
 
 ;; ===== DOMAIN LOGIC FUNCTIONS =====
 
