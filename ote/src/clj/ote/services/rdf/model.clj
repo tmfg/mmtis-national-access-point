@@ -60,12 +60,10 @@
    {:type :resource :uri uri :properties properties}))
 
 (defn datetime
-  "Create a typed literal for an xsd:dateTime value.
-   Formats the timestamp to use 'T' separator for XSD dateTime compliance."
+  "Create a typed literal for an xsd:dateTime value."
   [value]
-  (let [formatted (-> (str value)
-                      (str/replace #" " "T"))]
-    (typed-literal formatted "http://www.w3.org/2001/XMLSchema#dateTime")))
+  (when value
+    (typed-literal (str value) "http://www.w3.org/2001/XMLSchema#dateTime")))
 
 ;; ===== DOMAIN LOGIC FUNCTIONS =====
 
@@ -188,10 +186,14 @@
 (defn geojson-last-modified [service]
   (:ote.db.modification/modified service))
 
-(def geojson-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED")
+(def geojson-accrual-periodicity
+  (resource {:uri "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+             :rdf/type (uri :dct/Frequency)}))
 
 (def fin-swe-eng-languages
-  (mapv uri
+  (mapv (fn [lang-uri]
+          (resource {:uri lang-uri
+                     :rdf/type (uri :dct/LinguisticSystem)}))
         ["http://publications.europa.eu/resource/authority/language/FIN"
          "http://publications.europa.eu/resource/authority/language/SWE"
          "http://publications.europa.eu/resource/authority/language/ENG"]))
@@ -216,6 +218,18 @@
         service-id (:ote.db.transport-service/id service)
         interface-id (::t-service/id interface)]
     (str base-url "dataset/" operator-id "/" service-id "/interface/" interface-id)))
+
+(defn valid-url?
+  "Check if a string is a valid HTTP/HTTPS URL."
+  [url-string]
+  (when url-string
+    (try
+      (let [url (java.net.URL. url-string)
+            protocol (.getProtocol url)]
+        (and (some? url)
+             (or (= protocol "http") (= protocol "https"))))
+      (catch Exception _
+        false))))
 
 (defn interface-access-url [interface]
   (some-> (get-in interface [::t-service/external-interface ::t-service/url])
@@ -243,7 +257,9 @@
     
     :else nil))
 
-(def interface-accrual-periodicity "http://publications.europa.eu/resource/authority/frequency/UNKNOWN")
+(def interface-accrual-periodicity
+  (resource {:uri "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"
+             :rdf/type (uri :dct/Frequency)}))
 
 ;; ===== COMMON HELPER FUNCTIONS =====
 
@@ -343,11 +359,12 @@
                                    :locn/geometry (typed-literal combined-geojson
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                        [municipality-uri])
+        last-modified-dt (when last-modified (datetime last-modified))
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
                                :dct/title (literal (:ote.db.transport-service/name service))
                                :dct/description (literal (or (get-in service [::t-service/description 0 ::t-service/text]) ""))
                                :mobility/transportMode (uri (service->transport-mode service))
-                               :dct/accrualPeriodicity (uri geojson-accrual-periodicity)
+                               :dct/accrualPeriodicity geojson-accrual-periodicity
                                :mobility/mobilityTheme (mapv uri (service->mobility-themes service))
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
@@ -357,11 +374,10 @@
                                :dct/publisher operator-uri
                                :dct/rightsHolder operator-uri
                                :dcat/distribution [distribution]
-                               :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")
-                               :dct/language fin-swe-eng-languages}
+                               :dct/conformsTo (uri "http://www.opengis.net/def/crs/EPSG/0/4326")}
                         
-                        last-modified
-                        (assoc :dct/modified (datetime last-modified)))]
+                        last-modified-dt
+                        (assoc :dct/modified last-modified-dt))]
     (resource dataset-uri dataset-props)))
 
 (defn geojson->catalog-record [service dataset-uri fintraffic-uri]
@@ -441,11 +457,12 @@
                                    :locn/geometry (typed-literal operation-area-geojson
                                                                  "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
                        [(uri municipality)])
+        last-modified-dt (when last-modified (datetime last-modified))
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
                                :dct/title (literal dataset-title)
                                :dct/description (literal service-description)
                                :mobility/transportMode (uri transport-mode)
-                               :dct/accrualPeriodicity (uri interface-accrual-periodicity)
+                               :dct/accrualPeriodicity interface-accrual-periodicity
                                :mobility/mobilityTheme mobility-themes-uris
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
@@ -456,8 +473,8 @@
                                :dct/rightsHolder (uri operator-uri)
                                :dcat/distribution [distribution]}
 
-                        last-modified
-                        (assoc :dct/modified (datetime last-modified)))]
+                        last-modified-dt
+                        (assoc :dct/modified last-modified-dt))]
     (resource dataset-uri dataset-props)))
 
 (defn interface->catalog-record [service dataset-uri fintraffic-uri]
@@ -471,12 +488,17 @@
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
-  (let [distribution (interface->distribution service interface latest-conversion-status base-url)
-        dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
-        dataset-uri (:uri dataset)
-        catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
-    {:datasets [dataset]
-     :catalog-records [catalog-record]}))
+  (let [access-url (interface-access-url interface)]
+    (if (valid-url? access-url)
+      (let [distribution (interface->distribution service interface latest-conversion-status base-url)
+            dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
+            dataset-uri (:uri dataset)
+            catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
+        {:datasets [dataset]
+         :catalog-records [catalog-record]})
+      (do
+        (log/warn "Skipping interface with invalid URL:" access-url)
+        nil))))
 
 ;; ===== CATALOG GENERATION =====
 
@@ -521,10 +543,11 @@
                        
                        ;; Process interfaces and collect their RDF data
                        interface-rdf-models (doall
-                                             (for [interface external-interfaces]
-                                               (let [interface-id (::t-service/id interface)
-                                                     validation-status (get validation-data interface-id)]
-                                                 (interface->rdf service operation-areas operator interface validation-status fintraffic-uri base-url))))
+                                             (keep (fn [interface]
+                                                     (let [interface-id (::t-service/id interface)
+                                                           validation-status (get validation-data interface-id)]
+                                                       (interface->rdf service operation-areas operator interface validation-status fintraffic-uri base-url)))
+                                                   external-interfaces))
                        
                        ;; Merge all RDF models
                        merged-rdf (reduce merge-rdf-models geojson-rdf interface-rdf-models)
