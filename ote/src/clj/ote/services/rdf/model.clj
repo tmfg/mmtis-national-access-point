@@ -197,12 +197,12 @@
   (:ote.db.modification/modified service))
 
 (def geojson-accrual-periodicity
-  (resource {:uri "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-             :rdf/type (uri :dct/Frequency)}))
+  (resource "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
+            {:rdf/type (uri :dct/Frequency)}))
 
 (def epsg-4326-standard
-  (resource {:uri "http://www.opengis.net/def/crs/EPSG/0/4326"
-             :rdf/type (uri :dct/Standard)}))
+  (resource "http://www.opengis.net/def/crs/EPSG/0/4326"
+            {:rdf/type (uri :dct/Standard)}))
 
 (def fin-swe-eng-languages
   (mapv (fn [lang-uri]
