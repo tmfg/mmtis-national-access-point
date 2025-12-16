@@ -206,8 +206,7 @@
 
 (def fin-swe-eng-languages
   (mapv (fn [lang-uri]
-          (resource {:uri lang-uri
-                     :rdf/type (uri :dct/LinguisticSystem)}))
+          (resource lang-uri {:rdf/type (uri :dct/LinguisticSystem)}))
         ["http://publications.europa.eu/resource/authority/language/FIN"
          "http://publications.europa.eu/resource/authority/language/SWE"
          "http://publications.europa.eu/resource/authority/language/ENG"]))
