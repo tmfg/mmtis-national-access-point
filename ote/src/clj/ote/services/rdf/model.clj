@@ -348,7 +348,7 @@
                             :dcat/downloadURL (uri download-url)
                             :dct/format (uri geojson-format)
                             :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                                    :dct/identifier (uri geojson-license-url)})
+                                                    :dct/identifier (literal geojson-license-url)})
                             :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
                                                    :dct/type (uri rights-url)})
                             :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
@@ -383,7 +383,7 @@
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
-                               :dct/identifier (uri dataset-uri)
+                               :dct/identifier (literal dataset-uri)
                                :mobility/intendedInformationService (uri geojson-intended-information-service)
                                :dct/publisher operator-uri
                                :dct/rightsHolder operator-uri
@@ -440,7 +440,7 @@
                                     :dcat/downloadURL (uri download-url)
                                     :dct/format (uri format)
                                     :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                                            :dct/identifier (uri interface-license-url)})
+                                                            :dct/identifier (literal interface-license-url)})
                                     :dct/rights (resource {:rdf/type (uri :dct/RightsStatement)
                                                            :dct/type (uri rights-url)})
                                     :mobility/applicationLayerProtocol (uri "https://w3id.org/mobilitydcat-ap/application-layer-protocol/http-https")
@@ -481,7 +481,7 @@
                                :dct/spatial spatial-data
                                :mobility/georeferencingMethod (uri "https://w3id.org/mobilitydcat-ap/georeferencing-method/geocoordinates")
                                :dct/theme (uri "http://publications.europa.eu/resource/authority/data-theme/TRAN")
-                               :dct/identifier (uri dataset-uri)
+                               :dct/identifier (literal dataset-uri)
                                :mobility/intendedInformationService (uri intended-info-service)
                                :dct/publisher (uri operator-uri)
                                :dct/rightsHolder (uri operator-uri)
@@ -529,7 +529,7 @@
                                        :dct/identifier (uri "http://publications.europa.eu/resource/authority/country/FIN")})
                :dct/language fin-swe-eng-languages
                :dct/license (resource {:rdf/type (uri :dct/LicenseDocument)
-                                       :dct/identifier (uri licence-url)})
+                                       :dct/identifier (literal licence-url)})
                :dct/issued (datetime "2018-01-01T00:00:01Z")
                :dct/themeTaxonomy (uri "https://w3id.org/mobilitydcat-ap/mobility-theme")
                :dct/modified (datetime latest-publication)
