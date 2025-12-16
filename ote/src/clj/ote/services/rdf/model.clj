@@ -274,8 +274,8 @@
     :else nil))
 
 (def interface-accrual-periodicity
-  (resource {:uri "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"
-             :rdf/type (uri :dct/Frequency)}))
+  (resource "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"
+            {:rdf/type (uri :dct/Frequency)}))
 
 ;; ===== COMMON HELPER FUNCTIONS =====
 
