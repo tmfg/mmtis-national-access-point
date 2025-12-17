@@ -197,8 +197,7 @@
   (:ote.db.modification/modified service))
 
 (def geojson-accrual-periodicity
-  (resource "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"
-            {:rdf/type (uri :dct/Frequency)}))
+  (literal "http://publications.europa.eu/resource/authority/frequency/AS_NEEDED"))
 
 (def epsg-4326-standard
   (resource "http://www.opengis.net/def/crs/EPSG/0/4326"
@@ -274,8 +273,7 @@
     :else nil))
 
 (def interface-accrual-periodicity
-  (resource "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"
-            {:rdf/type (uri :dct/Frequency)}))
+  (literal "http://publications.europa.eu/resource/authority/frequency/UNKNOWN"))
 
 ;; ===== COMMON HELPER FUNCTIONS =====
 
