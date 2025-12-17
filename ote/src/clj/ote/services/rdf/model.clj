@@ -540,6 +540,23 @@
                :dcat/record (vec catalog-records)
                :dcat/dataset (vec (map uri dataset-uris))})))
 
+(defn add-catalog-to-service-rdf
+  "Helper function to add catalog to service RDF data.
+   Used for testing and single-service endpoints.
+   Takes the output of service-data->rdf and adds a catalog to it."
+  [service-rdf-data base-url]
+  (let [dataset-uris (map :uri (:datasets service-rdf-data))
+        catalog-records (:catalog-records service-rdf-data)
+        latest-publication (or (:latest-publication service-rdf-data)
+                               (->> catalog-records
+                                    (map #(get-in % [:properties :dct/modified :value]))
+                                    (filter some?)
+                                    (sort)
+                                    (last)))
+        fintraffic-uri "https://www.fintraffic.fi/en"
+        catalog (domain->catalog catalog-records dataset-uris latest-publication fintraffic-uri base-url)]
+    (assoc service-rdf-data :catalog catalog)))
+
 (defn service-data->rdf
   "Create complete RDF data structure including catalog and fintraffic agent.
    Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
@@ -579,19 +596,18 @@
                                            (isreferenced-and-related-data geojson-uri interface-uri)))
                        relationships (vec (apply concat relationships))
                        
-                       ;; Create catalog with embedded records and datasets
-                       catalog-resource (domain->catalog (:catalog-records merged-rdf) all-dataset-uris latest-publication fintraffic-uri base-url)]
+                       ;; NOTE: Do NOT create catalog here - it will be created once after merging all services
+                       ]
                    
                    (assoc merged-rdf 
-                          :catalog catalog-resource
-                          :relationships relationships))
+                          :relationships relationships
+                          :latest-publication latest-publication))
                  
-                 ;; No operation areas - create empty catalog
-                 (let [catalog-resource (domain->catalog [] [] latest-publication fintraffic-uri base-url)]
-                   {:catalog catalog-resource
-                    :datasets []
-                    :catalog-records []
-                    :relationships []}))]
+                 ;; No operation areas - return empty structure
+                 {:datasets []
+                  :catalog-records []
+                  :relationships []
+                  :latest-publication latest-publication})]
     (assoc result 
            :fintraffic-agent fintraffic-agent
            :operator-agent operator-agent

@@ -169,15 +169,16 @@
 
 (defn flatten-rdf
   "Flatten RDF data structure into a single sequence of resources in the order they should be added to the model.
-   Order: fintraffic-agent, operator-agent, datasets, relationships, catalog.
+   Order: fintraffic-agent, operator-agents, datasets, relationships, catalog (if present).
    Distributions and catalog records are now embedded as blank nodes within their parent resources.
    Note: relationships are maps with :subject and :properties that need special handling."
   [rdf-data]
   (concat [(:fintraffic-agent rdf-data)]
-          (when-let [op-agent (:operator-agent rdf-data)] [op-agent])
+          (or (:operator-agents rdf-data)
+              (when-let [op-agent (:operator-agent rdf-data)] [op-agent]))
           (:datasets rdf-data)
           (:relationships rdf-data)
-          [(:catalog rdf-data)]))
+          (when-let [catalog (:catalog rdf-data)] [catalog])))
 
 (defn create-dcat-ap-model
   "Create a Jena RDF model from RDF data structure.

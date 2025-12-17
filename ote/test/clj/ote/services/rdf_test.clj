@@ -8,7 +8,9 @@
 (deftest catalog
   (testing "Catalog"
     (testing "has all mandatory properties"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             catalog-props (:properties catalog)
             mandatory-properties [:dcat/dataset :dct/description :foaf/homepage 
@@ -18,19 +20,25 @@
               (str "Catalog should have mandatory property " prop)))))
     
     (testing "dct:title is \"Finap.fi - NAP - National Access Point\""
-      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf {} "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             title (get-in catalog [:properties :dct/title])]
         (is (= (:value title) "Finap.fi - NAP - National Access Point"))))
     
     (testing "dct:publisher is URL to Fintraffic english site"
-      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3210/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf {} "http://localhost:3210/")
+                         "http://localhost:3210/")
             catalog (:catalog rdf-output)
             publisher (get-in catalog [:properties :dct/publisher])]
         (is (= (:value publisher) "https://www.fintraffic.fi/en"))))
     
     (testing "dct:description is obtained from i18n files"
-      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf {} "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             descriptions (get-in catalog [:properties :dct/description])
             fi-expected (rdf-model/localized-text-with-key "fi" [:front-page :column-NAP])
@@ -51,14 +59,18 @@
             "English description should be from i18n [:front-page :column-NAP]"))))
     
     (testing "dct:spatial is the Finnish country code"
-      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf {} "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             spatial (get-in catalog [:properties :dct/spatial])
             spatial-identifier (get-in spatial [:properties :dct/identifier])]
         (is (= (:value spatial-identifier) "http://publications.europa.eu/resource/authority/country/FIN"))))
     
     (testing "dct:license is \"Creative Commons Nimeä 4.0 Kansainvälinen\""
-      (let [rdf-output (rdf-model/service-data->rdf {} "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf {} "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             license (get-in catalog [:properties :dct/license])
             license-identifier (get-in license [:properties :dct/identifier])]
@@ -66,7 +78,9 @@
             "License should be CC BY 4.0 (Creative Commons Nimeä 4.0 Kansainvälinen)")))
     
     (testing "dcat:record contains as many elements as there are datasets"
-      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+      (let [rdf-output (rdf-model/add-catalog-to-service-rdf 
+                         (rdf-model/service-data->rdf test-utils/test-large-bus-service "http://localhost:3000/")
+                         "http://localhost:3000/")
             catalog (:catalog rdf-output)
             catalog-records (:catalog-records rdf-output)
             datasets (:datasets rdf-output)
