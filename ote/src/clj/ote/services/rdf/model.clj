@@ -206,12 +206,9 @@
 (def fin-swe-eng-languages
   (mapv (fn [lang-uri]
           (resource lang-uri {:rdf/type (uri :dct/LinguisticSystem)}))
-        ;; these used to be "http://publications.europa.eu/resource/authority/language/3-LETTER-LANG-CODE"
-        ;; which, I think, might be more correct per mobility-dcat spec, but which also caused errors according to /tools/shaclvalidator/shapes.ttl
-        ;; and these lang-codes from the library of congress do not cause those errors 
-        ["http://id.loc.gov/vocabulary/iso639-2/fin"
-         "http://id.loc.gov/vocabulary/iso639-2/swe"
-         "http://id.loc.gov/vocabulary/iso639-2/eng"]))
+        ["http://publications.europa.eu/resource/authority/language/FIN"
+         "http://publications.europa.eu/resource/authority/language/SWE"
+         "http://publications.europa.eu/resource/authority/language/ENG"]))
 
 (def geojson-intended-information-service "https://w3id.org/mobilitydcat-ap/intended-information-service/other")
 
