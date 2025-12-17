@@ -19,3 +19,6 @@ help:
 	@echo -e "\tmake help: show this help"
 	@echo -e "\tmake: generate result file if clj files have changed"
 	@echo -e "\tmake validate: force validation on fresh data"
+
+.PHONY clean:
+	rm -f data.ttl result 
