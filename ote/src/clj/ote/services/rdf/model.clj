@@ -357,20 +357,25 @@
                             :mobility/grammar (uri "https://w3id.org/mobilitydcat-ap/grammar/json-schema")}]
     (resource distribution-props)))
 
+(defn geojson->spatial
+  "Create spatial data for a GeoJSON dataset.
+   Returns a vector containing either a geometry location (if operation-areas exist) or municipality URI (if no operation-areas)."
+  [service operation-areas]
+  (let [municipality-uri (uri (:municipality service))
+        combined-geojson (operation-areas->geometry-collection operation-areas)]
+    (if combined-geojson
+      [(resource {:rdf/type (uri :dct/Location)
+                  :locn/geometry (typed-literal combined-geojson
+                                                "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
+      [municipality-uri])))
+
 (defn geojson->dataset
   "Create a dataset resource for all operation areas of a service."
   [service operator operation-areas distribution base-url]
   (let [dataset-uri (geojson-dataset-uri service base-url)
         operator-uri (uri (compute-operator-uri operator base-url))
-        municipality-uri (uri (:municipality service))
         last-modified (geojson-last-modified service)
-        combined-geojson (operation-areas->geometry-collection operation-areas)
-        spatial-data (if combined-geojson
-                       [municipality-uri
-                        (resource {:rdf/type (uri :dct/Location)
-                                   :locn/geometry (typed-literal combined-geojson
-                                                                 "https://www.iana.org/assignments/media-types/application/vnd.geo+json")})]
-                       [municipality-uri])
+        spatial-data (geojson->spatial service operation-areas)
         last-modified-dt (when last-modified (datetime last-modified))
         dataset-props (cond-> {:rdf/type (uri :dcat/Dataset)
                                :dct/title (literal (:ote.db.transport-service/name service))

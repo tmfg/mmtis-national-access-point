@@ -234,6 +234,32 @@
               "Should contain Helsinki coordinates")
           (is (some #(= % {:type "Point" :coordinates [24.6559 60.2055]}) (:geometries parsed-geometry))
               "Should contain Espoo coordinates")))))
+    
+    (testing "spatial is dct:Location with geometry when operation-areas exist"
+      (let [rdf-output (rdf-model/service-data->rdf test-utils/test-small-taxi-service "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            geojson-dataset (first (remove #(str/includes? (:uri %) "/interface/") datasets))
+            spatial-locations (get-in geojson-dataset [:properties :dct/spatial])]
+        (is (not (nil? geojson-dataset)) "Should have a GeoJSON dataset")
+        (is (= 1 (count spatial-locations)) "Should have exactly one spatial entry")
+        (let [spatial-entry (first spatial-locations)]
+          (is (= :resource (:type spatial-entry)) "Spatial should be a resource (dct:Location)")
+          (is (= :dct/Location (get-in spatial-entry [:properties :rdf/type :value]))
+              "Spatial resource should have type dct:Location")
+          (is (contains? (:properties spatial-entry) :locn/geometry)
+              "dct:Location should have locn:geometry property"))))
+    
+    (testing "spatial is municipality URI when no operation-areas exist"
+      (let [municipality-uri "http://publications.europa.eu/resource/authority/place/FIN_HEL"
+            test-data (-> test-utils/test-small-taxi-service
+                         (assoc :operation-areas [])
+                         (assoc-in [:service :municipality] municipality-uri))
+            rdf-output (rdf-model/service-data->rdf test-data "http://localhost:3000/")
+            datasets (:datasets rdf-output)
+            geojson-dataset (first (remove #(str/includes? (:uri %) "/interface/") datasets))]
+        ;; When there are no operation areas, there should be no GeoJSON dataset
+        (is (nil? geojson-dataset) 
+            "Should not have a GeoJSON dataset when operation-areas is empty")))
 
 (deftest distribution
   (testing "Distribution"
