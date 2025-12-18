@@ -6,7 +6,6 @@
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]
             [clj-time.format :as time-format]
-            [clj-time.core :as time]
             [ote.db.modification :as modification]
             [cheshire.core :as cheshire]
             [clojure.string :as str]
@@ -423,7 +422,7 @@
 
 ;; ===== EXTERNAL INTERFACE RDF GENERATION =====
 
-(defn interface->distribution [service interface latest-conversion-status base-url]
+(defn interface->distribution [interface latest-conversion-status]
   (let [access-url (interface-access-url interface)
         download-url (interface-download-url interface)
         format (interface-format interface)
@@ -503,7 +502,7 @@
 (defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
   (let [access-url (interface-access-url interface)]
     (if (valid-url? access-url)
-      (let [distribution (interface->distribution service interface latest-conversion-status base-url)
+      (let [distribution (interface->distribution interface latest-conversion-status)
             dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
             dataset-uri (:uri dataset)
             catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
@@ -583,7 +582,6 @@
                        merged-rdf (reduce merge-rdf-models geojson-rdf interface-rdf-models)
                        
                        ;; Extract URIs for catalog and relationships
-                       all-dataset-uris (map :uri (:datasets merged-rdf))
                        geojson-uris (map :uri (:datasets geojson-rdf))
                        interface-uris (map :uri (mapcat :datasets interface-rdf-models))
                        

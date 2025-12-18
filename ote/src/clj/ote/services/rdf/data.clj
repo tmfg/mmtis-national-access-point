@@ -1,7 +1,6 @@
 (ns ote.services.rdf.data
   "Data layer for RDF service - database queries with no RDF concerns."
   (:require [specql.core :as specql]
-            [clojure.string :as str]
             [jeesql.core :refer [defqueries]]
             [ote.db.transport-service :as t-service]
             [ote.db.transport-operator :as t-operator]))
