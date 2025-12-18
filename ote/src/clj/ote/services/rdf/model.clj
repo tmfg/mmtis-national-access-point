@@ -400,7 +400,7 @@
                :dct/created (datetime created)
                :dct/language fin-swe-eng-languages
                :foaf/primaryTopic (uri dataset-uri)
-               :dct/modified (datetime modified)
+               :dct/modified (or (datetime modified) (datetime created))
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn merge-rdf-models [model1 model2]
@@ -497,7 +497,7 @@
                :dct/created (datetime created)
                :dct/language fin-swe-eng-languages
                :foaf/primaryTopic (uri dataset-uri)
-               :dct/modified (datetime modified)
+               :dct/modified (or (datetime modified) (datetime created))
                :dct/publisher (uri fintraffic-uri)})))
 
 (defn interface->rdf [service operation-areas operator interface latest-conversion-status fintraffic-uri base-url]
