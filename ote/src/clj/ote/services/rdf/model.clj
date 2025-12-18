@@ -409,16 +409,13 @@
 (defn geojson->rdf
   "Create RDF data for a single GeoJSON dataset containing all operation areas."
   [service operation-areas operator fintraffic-uri base-url]
-  (if (seq operation-areas)
+  (when (seq operation-areas)
     (let [distribution (geojson->distribution service base-url)
           dataset (geojson->dataset service operator operation-areas distribution base-url)
           dataset-uri (:uri dataset)
           catalog-record (geojson->catalog-record service dataset-uri fintraffic-uri)]
-      {:datasets [dataset]
-       :catalog-records [catalog-record]})
-    ;; No operation areas - return empty model
-    {:datasets []
-     :catalog-records []}))
+      {:dataset dataset
+       :catalog-record catalog-record})))
 
 ;; ===== EXTERNAL INTERFACE RDF GENERATION =====
 
@@ -506,11 +503,9 @@
             dataset (interface->dataset service operator operation-areas interface latest-conversion-status distribution base-url)
             dataset-uri (:uri dataset)
             catalog-record (interface->catalog-record service dataset-uri fintraffic-uri)]
-        {:datasets [dataset]
-         :catalog-records [catalog-record]})
-      (do
-        (log/warn "Skipping interface with invalid URL:" access-url)
-        nil))))
+        {:dataset dataset
+         :catalog-record catalog-record})
+      (log/warn "Invalid or missing URL for interface" (::t-service/id interface)))))
 
 ;; ===== CATALOG GENERATION =====
 
@@ -553,6 +548,16 @@
         catalog (domain->catalog catalog-records dataset-uris latest-publication fintraffic-uri base-url)]
     (assoc service-rdf-data :catalog catalog)))
 
+(defn calculate-dataset-relationships
+  "Calculate relationships between GeoJSON and interface datasets.
+   Returns a vector of relationship maps."
+  [geojson-rdf interface-rdfs]
+  (when-let [geojson-uri (when geojson-rdf (:uri (:dataset geojson-rdf)))]
+    (let [interface-uris (map #(:uri (:dataset %)) interface-rdfs)]
+      (vec (for [interface-uri interface-uris
+                 relationship (isreferenced-and-related-data geojson-uri interface-uri)]
+             relationship)))))
+
 (defn service-data->rdf
   "Create complete RDF data structure including catalog and fintraffic agent.
    Calls geojson->rdf for geojson and interface->rdf for all interfaces, merges results,
@@ -571,32 +576,25 @@
                        geojson-rdf (geojson->rdf service operation-areas operator fintraffic-uri base-url)
                        
                        ;; Process interfaces and collect their RDF data
-                       interface-rdf-models (doall
-                                             (keep (fn [interface]
-                                                     (let [interface-id (::t-service/id interface)
-                                                           validation-status (get validation-data interface-id)]
-                                                       (interface->rdf service operation-areas operator interface validation-status fintraffic-uri base-url)))
-                                                   external-interfaces))
+                       interface-rdfs (keep (fn [interface]
+                                              (let [interface-id (::t-service/id interface)
+                                                    validation-status (get validation-data interface-id)]
+                                                (interface->rdf service operation-areas operator interface validation-status fintraffic-uri base-url)))
+                                            external-interfaces)
                        
-                       ;; Merge all RDF models
-                       merged-rdf (reduce merge-rdf-models geojson-rdf interface-rdf-models)
+                       ;; Build datasets and catalog-records vectors
+                       datasets (vec (concat (when geojson-rdf [(:dataset geojson-rdf)])
+                                             (map :dataset interface-rdfs)))
+                       catalog-records (vec (concat (when geojson-rdf [(:catalog-record geojson-rdf)])
+                                                    (map :catalog-record interface-rdfs)))
                        
-                       ;; Extract URIs for catalog and relationships
-                       geojson-uris (map :uri (:datasets geojson-rdf))
-                       interface-uris (map :uri (mapcat :datasets interface-rdf-models))
-                       
-                       ;; Create relationships between datasets (each GeoJSON dataset relates to each interface dataset)
-                       relationships (vec (for [geojson-uri geojson-uris
-                                               interface-uri interface-uris]
-                                           (isreferenced-and-related-data geojson-uri interface-uri)))
-                       relationships (vec (apply concat relationships))
-                       
-                       ;; NOTE: Do NOT create catalog here - it will be created once after merging all services
-                       ]
+                       ;; Calculate relationships between datasets
+                       relationships (or (calculate-dataset-relationships geojson-rdf interface-rdfs) [])]
                    
-                   (assoc merged-rdf 
-                          :relationships relationships
-                          :latest-publication latest-publication))
+                   {:datasets datasets
+                    :catalog-records catalog-records
+                    :relationships relationships
+                    :latest-publication latest-publication})
                  
                  ;; No operation areas - return empty structure
                  {:datasets []
