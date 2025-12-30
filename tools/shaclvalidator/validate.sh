@@ -3,7 +3,7 @@
 # Download MobilityDCAT-AP SHACL shapes if not present
 if [ ! -f shapes.ttl ]; then
     echo "shapes.ttl not found, downloading MobilityDCAT-AP SHACL shapes..."
-    wget -q -O shapes.ttl https://raw.githubusercontent.com/mobilityDCAT-AP/mobilityDCAT-AP/refs/heads/gh-pages/releases/1.1.0/validationFiles/mobilitydcat-ap_shacl_shapes.ttl
+    curl -s -o shapes.ttl https://raw.githubusercontent.com/mobilityDCAT-AP/mobilityDCAT-AP/refs/heads/gh-pages/releases/1.1.0/validationFiles/mobilitydcat-ap_shacl_shapes.ttl
     if [ $? -eq 0 ]; then
         echo "Downloaded shapes.ttl successfully"
         # Fix GitHub issue #131: Update access-right URL to licence URL
@@ -15,22 +15,10 @@ if [ ! -f shapes.ttl ]; then
         echo "Applying fix for DCAT-AP issue #403..."
         echo "https://github.com/SEMICeu/DCAT-AP/issues/403"
         sed -i '1i@prefix shacl:   <http://www.w3.org/ns/shacl#> .' shapes.ttl
-        
-        # Add custom Distribution.format constraint at the end of the file
-        cat >> shapes.ttl << 'EOF'
+        # Remove all owl:imports lines
+        echo "Removing owl:imports..."
+        sed -i '/owl:imports/d' shapes.ttl        
 
-<https://semiceu.github.io//DCAT-AP/releases/3.0.0#DistributionShape/737cd5f1c9f0e13c35eb82b7f0d2b2f76a9a82c7> 
-    rdfs:seeAlso "https://semiceu.github.io//DCAT-AP/releases/3.0.0#Distribution.format";
-    shacl:or (
-        [ shacl:class dcat:MediaTypeOrExtent ]
-        [ shacl:class skos:Concept ]
-    );
-    shacl:description "The file format of the Distribution."@en;
-    shacl:name "format"@en;
-    shacl:path dcat:format;
-    shacl:message "The format must be either a MediaTypeOrExtent or a SKOS concept"@en .
-EOF
-        
         echo "Fixed shapes.ttl"
     else
         echo "Failed to download shapes.ttl"
