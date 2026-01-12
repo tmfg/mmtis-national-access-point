@@ -42,7 +42,7 @@
                (feature/feature-enabled? :rdf-export))
         (do
           (log/info "Config allows us to start export-rdf-to-s3")
-          (#'export-rdf-to-s3 config db))
+          #_(#'export-rdf-to-s3 config db))
         (log/infof "dev-mode? %s; feature-enabled? %s" (pr-str dev-mode?) (pr-str (feature/feature-enabled? :rdf-export))))
       
       (assoc this
