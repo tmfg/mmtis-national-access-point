@@ -38,11 +38,8 @@
   (start [{db :db :as this}]
     (let [{:keys [testing-env? dev-mode?]} config]
       (if (and (not dev-mode?)
-               testing-env?
                (feature/feature-enabled? :rdf-export))
-        (do
-          (log/info "Config allows us to start export-rdf-to-s3")
-          #_(#'export-rdf-to-s3 config db))
+        (log/info "Config allows us to start export-rdf-to-s3")
         (log/infof "dev-mode? %s; feature-enabled? %s" (pr-str dev-mode?) (pr-str (feature/feature-enabled? :rdf-export))))
       
       (assoc this
