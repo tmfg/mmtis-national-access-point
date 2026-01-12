@@ -26,9 +26,6 @@
 (defn service-id->rdf-model [config db service-id]
   (let [rdf-data (rdf-data/fetch-service-data db service-id)
         base-url (get-in config [:environment :base-url])]
-    ;; obvs don't let these go to prod
-    ;; (log/infof "whole config: %s" (pr-str config))
-    ;; (log/infof "base url: %s" (pr-str base-url))
     (rdf-model/service-data->rdf rdf-data base-url)))
 
 (defn turtle-response [turtle-data]
