@@ -203,9 +203,6 @@
 
   Writes the resulting ttl into the out-outputstream"
   [out rdf-data-or-seq]
-  (let [model (if (sequential? rdf-data-or-seq)
-                (let [models (map create-dcat-ap-model rdf-data-or-seq)]
-                  (reduce (fn [acc m] (doto acc (.add m))) models))
-                (create-dcat-ap-model rdf-data-or-seq))]
+  (let [model (create-dcat-ap-model rdf-data-or-seq)]
     (.write model out "TURTLE")
     nil))
