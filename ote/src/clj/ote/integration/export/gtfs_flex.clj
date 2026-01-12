@@ -25,15 +25,17 @@
 
 (defqueries "ote/integration/export/geojson.sql")
 
+(declare fetch-operation-area-for-service)
+
 (defn- ->geojson-feature
   [area]
   (let [{:keys [geojson feature-id primary?]} area
-        geometry                              (cheshire/decode geojson keyword)]
-    {:type       "Feature"
-     :id         feature-id
-     :properties {}  ; TODO: figure out use for this
-     :geometry   geometry
-     :style      {:fill (if primary? "green" "orange")}}))
+        geometry (cheshire/decode geojson keyword)]
+    {:type "Feature"
+     :id feature-id
+     :properties {}                                         ; TODO: figure out use for this
+     :geometry geometry
+     :style {:fill (if primary? "green" "orange")}}))
 
 (defn- ->geojson-features
   [areas]
@@ -41,7 +43,7 @@
 
 (defn- ->geojson-feature-collection
   [areas]
-  {:type     "FeatureCollection"
+  {:type "FeatureCollection"
    :features (->geojson-features areas)})
 
 (defn- mapv-indexed
@@ -103,9 +105,9 @@
 (defn ->static-routes
   "Generate a static route reference for given route-id to specify an eternally servicing route."
   [route-id route-type transport-operator-id operator-name service-name]
-  {:gtfs/route-id         route-id
+  {:gtfs/route-id route-id
    :gtfs/route-short-name operator-name
-   :gtfs/route-long-name  service-name
+   :gtfs/route-long-name service-name
    :gtfs/route-type (case route-type
                       :light-rail "0"
                       :subway "1"
