@@ -1,6 +1,7 @@
 (ns ote.tasks.rdf
   "Scheduled tasks to generate rdf-dump to s3, where user can fetch it by calling /rdf"
   (:require [ote.util.feature :as feature]
+            [ote.db.lock :as lock]
             [amazonica.aws.s3 :as s3]
             [ote.services.rdf :as rdf-service]
             [taoensso.timbre :as log]
@@ -14,21 +15,23 @@
            (java.io ByteArrayInputStream)))
 
 (defn export-rdf-to-s3 [{{:keys [bucket]} :rdf-export :as config} db]
-  (try 
-    (with-open [out (java.io.ByteArrayOutputStream.)]
-      (log/info "Starting export-rdf-to-s3")
-      (rdf-service/create-rdf config db out)
-      (let [bytes (.toByteArray out)
-            len (count bytes)]
-        
-        (s3/put-object bucket 
-                       "rdf"
-                       (ByteArrayInputStream. bytes)
-                       {:content-length len})
-        (log/info "exported rdf into s3")))
-    (catch Throwable t
-      (log/error (str (pr-str t) " export-rdf-to-s3 failed"))
-      (throw t))))
+  (lock/try-with-lock
+      db "export-rdf-to-s3" 20000
+    (try 
+      (with-open [out (java.io.ByteArrayOutputStream.)]
+        (log/info "Starting export-rdf-to-s3")
+        (rdf-service/create-rdf config db out)
+        (let [bytes (.toByteArray out)
+              len (count bytes)]
+          
+          (s3/put-object bucket 
+                         "rdf"
+                         (ByteArrayInputStream. bytes)
+                         {:content-length len})
+          (log/info "exported rdf into s3")))
+      (catch Throwable t
+        (log/error (str (pr-str t) " export-rdf-to-s3 failed"))
+        (throw t)))))
 
 ;; (export-rdf-to-s3 ote.main/_config
 ;;                   (:db ote.main/ote))
