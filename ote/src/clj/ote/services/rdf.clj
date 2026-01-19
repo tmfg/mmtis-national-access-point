@@ -1,6 +1,7 @@
 (ns ote.services.rdf
   "RDF service endpoints for DCAT-AP transport service data."
   (:require [amazonica.aws.s3 :as s3]
+            [clj-time.core :as t]
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as log]
             [ote.components.http :as http]
@@ -111,9 +112,11 @@
              (io/copy (clojure.java.io/input-stream @dev-tmp-payload) out)))
           turtle-response))
 
-    (let [{{:keys [export-url]} :rdf-export} config]
+    (let [{{:keys [export-url bucket]} :rdf-export} config
+          presigned-url (s3/generate-presigned-url bucket "rdf" (java.util.Date. (+ (.getTime (java.util.Date.)) (* 3600 1000))))]
       ;; redirect straight to the public object in s3-bucket. Streaming the object through the app server caused 504 timeouts in the ALB
-      (response/redirect export-url))))
+      (log/infof "presigned url: %s" (pr-str presigned-url))
+      (response/redirect presigned-url ))))
 
 (defn- rds-routes [{:keys [dev-mode?] :as config} db]
   (routes
