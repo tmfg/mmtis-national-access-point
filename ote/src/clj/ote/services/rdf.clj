@@ -114,9 +114,9 @@
 
     (let [{{:keys [export-url bucket]} :rdf-export} config
           presigned-url (s3/generate-presigned-url bucket "rdf" (java.util.Date. (+ (.getTime (java.util.Date.)) (* 3600 1000))))]
-      ;; redirect straight to the public object in s3-bucket. Streaming the object through the app server caused 504 timeouts in the ALB
-      (log/infof "presigned url: %s" (pr-str presigned-url))
+      ;; redirect to a presigned url into s3-bucket. Streaming the object through the app server caused 504 timeouts in the ALB
       (response/redirect presigned-url ))))
+                   
 
 (defn- rds-routes [{:keys [dev-mode?] :as config} db]
   (routes
