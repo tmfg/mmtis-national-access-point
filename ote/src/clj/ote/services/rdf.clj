@@ -111,12 +111,9 @@
              (io/copy (clojure.java.io/input-stream @dev-tmp-payload) out)))
           turtle-response))
 
-    (-> (ring-io/piped-input-stream
-         (fn [out]
-           (let [{{:keys [bucket]} :rdf-export} config]
-             (log/infof "Reading file \"rdf\" from bucket %s" (pr-str bucket))
-             (io/copy (:input-stream (s3/get-object bucket "rdf")) out))))
-        turtle-response)))
+    (let [{{:keys [export-url]} :rdf-export} config]
+      ;; redirect straight to the public object in s3-bucket. Streaming the object through the app server caused 504 timeouts in the ALB
+      (response/redirect export-url))))
 
 (defn- rds-routes [{:keys [dev-mode?] :as config} db]
   (routes
