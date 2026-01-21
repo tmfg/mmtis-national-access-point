@@ -50,18 +50,20 @@
       response)))
 
 (defn load-gtfs [url-or-response]
-  (http/transit-response
-    (into {}
-          (keep (fn [{:keys [name data]}]
-                  (when-let [gtfs-file-type (gtfs-spec/name->keyword name)]
-                    [gtfs-file-type (gtfs-parse/parse-gtfs-file gtfs-file-type data)])))
-          (if (and (map? url-or-response)
-                   (contains? url-or-response :body))
-            ;; This is an HTTP response, read body input stream
-            (read-zip (:body url-or-response))
+  (if (= "https://gtfs.dist.flix.tech/gtfs_generic_eu.zip" url-or-response)
+    {:status 500}
+    (http/transit-response
+      (into {}
+            (keep (fn [{:keys [name data]}]
+                    (when-let [gtfs-file-type (gtfs-spec/name->keyword name)]
+                      [gtfs-file-type (gtfs-parse/parse-gtfs-file gtfs-file-type data)])))
+            (if (and (map? url-or-response)
+                     (contains? url-or-response :body))
+              ;; This is an HTTP response, read body input stream
+              (read-zip (:body url-or-response))
 
-            ;; This is an URL, fetch and read it
-            (load-zip-from-url url-or-response)))))
+              ;; This is an URL, fetch and read it
+              (load-zip-from-url url-or-response))))))
 
 ; This is also used by ote.tasks.tis to generate a compatible name
 (defn gtfs-file-name [operator-id ts-id]
