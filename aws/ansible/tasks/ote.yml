@@ -52,8 +52,14 @@
 - name: Tell the system to use automatic java version selection
   command: 'alternatives --auto java'
 
+- name: Check if Java 17 alternative is registered
+  command: 'alternatives --display java'
+  register: alternatives_display
+  ignore_errors: yes
+
 - name: Unregister the earlier Java 17 (expecting to flow into java 25)
   command: 'alternatives --remove "java" "/opt/jdk-17.0.3/bin/java"'
+  when: '/opt/jdk-17.0.3/bin/java' in alternatives_display.stdout
 
 - name: Ensure botocore and boto3 modules are installed
   pip:
