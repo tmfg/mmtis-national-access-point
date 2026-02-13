@@ -59,6 +59,7 @@ SELECT DISTINCT
  WHERE tse.published IS NOT NULL
    AND m.capacity = 'admin'
    AND ('GTFS' = ANY(eid.format) OR 'Kalkati.net' = ANY(eid.format) OR 'NeTEx' = ANY(eid.format))
+   AND (tse."sub-type" IS NULL OR tse."sub-type" != 'taxi')
 ORDER BY tso.id DESC;
 
 -- name: fetch-external-interface-for-package
