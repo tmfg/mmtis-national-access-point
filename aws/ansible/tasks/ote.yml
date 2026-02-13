@@ -38,41 +38,27 @@
   vars:
     packages:
     - python3-pip
+    - java-25-openjdk-headless
+
+- name: Remove the older java 1.8.0
+  yum:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
     - java-1.8.0-openjdk
+    - java-1.8.0-openjdk-headless
+
+- name: Tell the system to use automatic java version selection
+  command: 'alternatives --auto java'
+
+- name: Unregister the earlier Java 17 (expecting to flow into java 25)
+  command: 'alternatives --remove "java" "/opt/jdk-17.0.3/bin/java"'
 
 - name: Ensure botocore and boto3 modules are installed
   pip:
     name:         [ "boto3"]
     extra_args:   "--user"
-
-- name: Check Java 17 existence and save state to variable get_java17
-  stat: path={{java_name}}
-  register: get_java17
-
-- name: Download Java 17
-  get_url:
-    url="{{java_download_url}}"
-    dest="{{java_archive}}"
-  when: not get_java17.stat.exists
-
-- name: Unpack archive Java 17
-  unarchive:
-    src: "{{java_archive}}"
-    dest: "{{java_download_folder}}"
-    remote_src: yes
-  when: not get_java17.stat.exists
-
-- name: Fix Java 17 ownership
-  file: "state=directory path={{java_name}} owner=root group=root recurse=yes"
-  when: not get_java17.stat.exists
-
-- name: Make Java 17 available for system
-  command: 'alternatives --install "/usr/bin/java" "java" "{{java_name}}/bin/java" 2000'
-  when: not get_java17.stat.exists
-
-- name: Take Java 17 into use
-  command: 'alternatives --set "java" "{{java_name}}/bin/java"'
-  when: not get_java17.stat.exists
 
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote
