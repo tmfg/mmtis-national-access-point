@@ -5,8 +5,8 @@ Description={{item.description}}
 ExecStart={{item.start_file}}
 User={{item.user_name}}
 Group={{item.user_group}}
-Type=forking
-KillMode=process
+Type=simple
+KillMode=mixed
 Restart=always
 WorkingDirectory={{item.workingdir}}
 

@@ -2,4 +2,29 @@
 
 cd /opt/ote
 
-java -XX:MaxRAMPercentage=80 -jar ote.jar &
+# Calculate safe heap memory: min(available_ram - 1GB, 0.8 * available_ram)
+# This ensures we leave at least 1GB for OS and other processes
+if [ -r /proc/meminfo ]; then
+  AVAILABLE_RAM_MB=$(awk '/^MemTotal:/ {print $2/1024}' /proc/meminfo | cut -d. -f1)
+else
+  # Fallback to 2GB if /proc/meminfo can't be read
+  AVAILABLE_RAM_MB=2048
+fi
+
+RESERVE_MB=1024
+EIGHTY_PERCENT=$((AVAILABLE_RAM_MB * 80 / 100))
+SAFE_HEAP=$((AVAILABLE_RAM_MB - RESERVE_MB))
+
+# Use the smaller of the two values
+if [ "$SAFE_HEAP" -lt "$EIGHTY_PERCENT" ]; then
+  HEAP_SIZE=$SAFE_HEAP
+else
+  HEAP_SIZE=$EIGHTY_PERCENT
+fi
+
+# Ensure minimum heap size of 512MB
+if [ "$HEAP_SIZE" -lt 512 ]; then
+  HEAP_SIZE=512
+fi
+
+exec java -Xmx${HEAP_SIZE}m -jar ote.jar
