@@ -4,7 +4,7 @@
   (:require [bide.core :as r]
             [ote.app.state :as state]
             [ote.app.utils :refer [user-logged-in?]]
-            [tuck.core :as tuck]))
+            [tuck.core :as tuck :refer-macros [define-event]]))
 
 (def dev-mode?
   (.getAttribute js/document.body "data-dev-mode?"))
