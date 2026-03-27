@@ -39,3 +39,25 @@ Analysis of the CI/CD pipeline (`aws/ansible/jenkins/jobs/`) shows the following
 ## Output format
 
 **CycloneDX JSON 1.6** — This is the required output format for both SBOM targets. Any tooling chosen must support generating CycloneDX spec version 1.6 in JSON format.
+
+## Approach
+
+### OTE uberjar — Artifact scan with dependency tree cross-check
+
+**Step 1: Generate dependency tree reference**
+Run `lein deps :tree` in the `ote/` directory to produce the resolved dependency tree (including transitive deps with versions after conflict resolution). This serves as the **expected** dependency list.
+
+**Step 2: Build the uberjar**
+Run the existing `lein production` build to produce `ote-0.1-SNAPSHOT-standalone.jar`. This is the artifact that actually ships.
+
+**Step 3: Scan the artifact to produce the SBOM**
+Use an artifact-level scanner (e.g., `syft`, `trivy`, or `cdxgen`) against the built uberjar. The scanner identifies components via `META-INF/maven/` POM files preserved inside the JAR and outputs a CycloneDX JSON 1.6 SBOM.
+
+**Step 4: Cross-check (one-time manual validation)**
+Compare the dependency tree from Step 1 against the components in the SBOM from Step 3. This is a manual step performed during initial setup to identify gaps in the artifact scanner's coverage (e.g., deps lacking `META-INF/maven/` metadata). Since dependencies change rarely in this project, once the initial cross-check passes, simple version bumps can be expected to reflect correctly in subsequent SBOM generations without re-validation.
+
+### Database migrations — Source-level approach
+
+The Flyway migrations (`database/pom.xml`) don't produce a fat JAR artifact, so artifact scanning doesn't apply. For this target, a source-level tool is needed — either the official `cyclonedx-maven-plugin` or `cdxgen` reading the `pom.xml` directly.
+
+<!-- REVIEW: The database pom.xml has no runtime `<dependencies>` — the Flyway and PostgreSQL JDBC deps are declared as plugin dependencies inside the `<build><plugins>` section. Verify that whichever tool is chosen can capture Maven plugin dependencies, not just project-level dependencies. This is a non-standard setup that many SBOM tools may not handle correctly. -->
