@@ -5,3 +5,33 @@ that are included in a software application. It provides detailed information ab
 including the versions of each component, their sources, and any known vulnerabilities associated with them.
 
 A SBOM is needed for the application defined in [project.clj](./ote/project.clj)
+
+## Scope
+
+### In scope
+
+The primary target is `ote/project.clj` — a Leiningen-based Clojure/ClojureScript project with ~60+ direct dependencies (plus transitive dependencies resolved via Maven Central and Clojars).
+
+### Deployed artifacts from this repository
+
+Analysis of the CI/CD pipeline (`aws/ansible/jenkins/jobs/`) shows the following deployed artifacts:
+
+1. **OTE uberjar** (`ote/project.clj`) — The main application. Built via `lein production`, producing `ote-0.1-SNAPSHOT-standalone.jar`, deployed to staging/production via Ansible. **Primary SBOM target.**
+
+2. **Database migrations** (`database/pom.xml`) — Flyway migrations run via Maven during every deployment against the production database with privileged credentials. Dependencies: `flyway-maven-plugin 10.10.0`, `flyway-database-postgresql 10.10.0`, `postgresql 42.7.3`. Although short-lived, these execute on the server and are security-relevant. **Secondary SBOM target.** This is a Maven project, so a Maven-compatible SBOM tool is needed (separate from the Leiningen approach for OTE).
+
+### Out of scope
+
+- **`tools/lambda-kalkati2gtfs/`** — Python AWS Lambda function. Although deployed to AWS, it has no automated deployment pipeline in this repo (manual `build.sh` → `deploy.zip` upload). Uses Python 2 syntax, appears to be legacy. Out of scope for this ticket.
+- **`tools/load-test/`** — Development tool only, not deployed.
+- **`tools/dashboard/`** — No deployment pipeline found in Jenkins jobs. Internal tool, not part of the release process.
+- **`tools/changelog/`** — Runs during CI to generate `changelog.html`, which is copied into OTE's `resources/public/`. The changelog tool's own Clojure dependencies do NOT ship in the uberjar — only the static HTML output does.
+- **`tools/feedvalidator/`** — Standalone Docker tool (Google transitfeed). No reference in deployment pipeline.
+- **`tools/shaclvalidator/`** — Standalone Docker tool (Apache Jena). No reference in deployment pipeline.
+- **Docker images** (database, nginx, cypress) — Infrastructure/testing containers.
+
+### Remaining scope decisions
+
+1. **Dev vs production dependencies** — The `ote/project.clj` has a `:dev` profile with test-only deps (`test.check`, `json-schema`). The SBOM should cover only production dependencies (what ships in the uberjar). Confirm this is the desired behavior.
+
+2. **ClojureScript/CLJSJS packages** — The project uses CLJSJS wrappers around JS libraries (React, Leaflet, Chart.js, etc.). These are Maven artifacts wrapping JavaScript libraries. They will appear in the SBOM via their Maven coordinates, but the underlying JS library version may not be explicit. Is this sufficient?
