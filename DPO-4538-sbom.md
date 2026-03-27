@@ -42,23 +42,62 @@ Analysis of the CI/CD pipeline (`aws/ansible/jenkins/jobs/`) shows the following
 
 ## Approach
 
-### OTE uberjar — Artifact scan with dependency tree cross-check
+### Background
 
-**Step 1: Generate dependency tree reference**
-Run `lein deps :tree` in the `ote/` directory to produce the resolved dependency tree (including transitive deps with versions after conflict resolution). This serves as the **expected** dependency list.
+The cross-check (see below) established that `lein deps :tree` is the authoritative and complete dependency source — it accounts for 100% of what ships in the uberjar. Artifact scanning with Syft covers only 85.5% due to 23 jars missing `META-INF/maven/` metadata. Therefore the SBOM generation should be driven from Leiningen's dependency data, not from artifact scanning alone.
 
-**Step 2: Build the uberjar**
-Run the existing `lein production` build to produce `ote-0.1-SNAPSHOT-standalone.jar`. This is the artifact that actually ships.
+Two candidate approaches are described below. Both need to be tested to determine which produces a better result.
 
-**Step 3: Scan the artifact to produce the SBOM**
-Use an artifact-level scanner (e.g., `syft`, `trivy`, or `cdxgen`) against the built uberjar. The scanner identifies components via `META-INF/maven/` POM files preserved inside the JAR and outputs a CycloneDX JSON 1.6 SBOM.
+### OTE uberjar — Option A: Direct conversion from `lein deps :tree`
 
-**Step 4: Cross-check (one-time manual validation)**
-Compare the dependency tree from Step 1 against the components in the SBOM from Step 3. This is a manual step performed during initial setup to identify gaps in the artifact scanner's coverage (e.g., deps lacking `META-INF/maven/` metadata). Since dependencies change rarely in this project, once the initial cross-check passes, simple version bumps can be expected to reflect correctly in subsequent SBOM generations without re-validation.
+Parse `lein deps :tree` output and convert it to CycloneDX JSON 1.6 using a custom script.
+
+**What it provides:**
+- Group, artifact, version for all 186 compile-scope deps (complete coverage)
+- Dependency hierarchy (direct vs transitive)
+- Package URLs (derivable as `pkg:maven/{group}/{artifact}@{version}`)
+- Scope information (compile vs test)
+
+**What it lacks:**
+- License information (not present in `lein deps :tree` output)
+- SHA hashes of jar files
+- CPE identifiers for NVD/CVE matching
+- Component descriptions and external references
+
+**Pros:** Simple, no external tooling beyond a script, complete coverage, repeatable.
+**Cons:** Minimal SBOM — purls are present for vulnerability scanning, but no license data for compliance use cases.
+
+### OTE uberjar — Option B: `lein pom` → `cyclonedx-maven-plugin`
+
+Use Leiningen's built-in `lein pom` command to generate a standard Maven `pom.xml` from `project.clj`, then run the official `cyclonedx-maven-plugin` against it to produce the SBOM.
+
+**What it provides:**
+- Group, artifact, version (from resolved Maven dependency tree)
+- License information (resolved from POM metadata in Maven repositories)
+- SHA hashes (from Maven repository artifacts)
+- Package URLs
+- Potentially richer metadata (descriptions, external references) depending on what upstream POMs contain
+
+**What it lacks / risks:**
+- The generated POM may not perfectly represent all Leiningen-specific configuration (repositories, exclusions, profiles, managed dependencies)
+- Need to verify that the `cyclonedx-maven-plugin` resolves the same dependency tree as Leiningen — version conflicts may be resolved differently by Maven vs Leiningen
+- Adds Maven as a build-time dependency (already available for the database migrations target)
+
+**Pros:** Richer SBOM with licenses and hashes, uses the official CycloneDX toolchain, well-maintained.
+**Cons:** Indirect — two conversion steps (lein → pom → SBOM), risk of dependency tree divergence from what Leiningen actually resolves.
+
+### Evaluation criteria
+
+To select between the options, test both and compare:
+
+1. **Completeness** — Does the output cover all 183 deps that actually ship in the uberjar (186 compile-scope minus 3 absent)?
+2. **Accuracy** — Do the versions match what `lein deps :tree` reports?
+3. **Richness** — How many components include license data? Are CPEs/hashes present?
+4. **Maintainability** — How much custom code or configuration is needed to keep this working?
 
 ### Database migrations — Source-level approach
 
-The Flyway migrations (`database/pom.xml`) don't produce a fat JAR artifact, so artifact scanning doesn't apply. For this target, a source-level tool is needed — either the official `cyclonedx-maven-plugin` or `cdxgen` reading the `pom.xml` directly.
+The Flyway migrations (`database/pom.xml`) don't produce a fat JAR artifact, so artifact scanning doesn't apply. For this target, a source-level tool is needed — either the official `cyclonedx-maven-plugin` or `cdxgen` reading the `pom.xml` directly. If Option B is selected for OTE, the same Maven plugin can be reused here.
 
 <!-- REVIEW: The database pom.xml has no runtime `<dependencies>` — the Flyway and PostgreSQL JDBC deps are declared as plugin dependencies inside the `<build><plugins>` section. Verify that whichever tool is chosen can capture Maven plugin dependencies, not just project-level dependencies. This is a non-standard setup that many SBOM tools may not handle correctly. -->
 
