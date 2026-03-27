@@ -35,3 +35,7 @@ Analysis of the CI/CD pipeline (`aws/ansible/jenkins/jobs/`) shows the following
 - **Production dependencies only** — The SBOM covers only production dependencies that ship in the uberjar. The `:dev` profile deps (`test.check`, `json-schema`) are excluded. Dev dependency coverage may be added in a future iteration.
 
 - **ClojureScript/CLJSJS packages** — These are Maven artifacts containing pre-bundled standalone JS builds (e.g., `react.min.js`). The internal npm transitive dependencies of each JS library are baked into the bundle and will NOT appear individually in the SBOM. Only peer dependencies modeled as Maven deps (e.g., `react-dom` → `react`) are visible. **Decision: Maven-level tracking is sufficient for now.** This is a known limitation — the SBOM will underrepresent the true JS dependency tree. Deeper JS-level SBOM coverage can be explored in a future iteration.
+
+## Output format
+
+**CycloneDX JSON 1.6** — This is the required output format for both SBOM targets. Any tooling chosen must support generating CycloneDX spec version 1.6 in JSON format.
