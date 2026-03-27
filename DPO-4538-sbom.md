@@ -30,8 +30,8 @@ Analysis of the CI/CD pipeline (`aws/ansible/jenkins/jobs/`) shows the following
 - **`tools/shaclvalidator/`** — Standalone Docker tool (Apache Jena). No reference in deployment pipeline.
 - **Docker images** (database, nginx, cypress) — Infrastructure/testing containers.
 
-### Remaining scope decisions
+### Scope decisions
 
-1. **Dev vs production dependencies** — The `ote/project.clj` has a `:dev` profile with test-only deps (`test.check`, `json-schema`). The SBOM should cover only production dependencies (what ships in the uberjar). Confirm this is the desired behavior.
+- **Production dependencies only** — The SBOM covers only production dependencies that ship in the uberjar. The `:dev` profile deps (`test.check`, `json-schema`) are excluded. Dev dependency coverage may be added in a future iteration.
 
-2. **ClojureScript/CLJSJS packages** — The project uses CLJSJS wrappers around JS libraries (React, Leaflet, Chart.js, etc.). These are Maven artifacts wrapping JavaScript libraries. They will appear in the SBOM via their Maven coordinates, but the underlying JS library version may not be explicit. Is this sufficient?
+- **ClojureScript/CLJSJS packages** — These are Maven artifacts containing pre-bundled standalone JS builds (e.g., `react.min.js`). The internal npm transitive dependencies of each JS library are baked into the bundle and will NOT appear individually in the SBOM. Only peer dependencies modeled as Maven deps (e.g., `react-dom` → `react`) are visible. **Decision: Maven-level tracking is sufficient for now.** This is a known limitation — the SBOM will underrepresent the true JS dependency tree. Deeper JS-level SBOM coverage can be explored in a future iteration.
