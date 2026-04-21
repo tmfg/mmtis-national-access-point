@@ -27,8 +27,6 @@
             [ote.views.admin.admin :as admin]
             [ote.views.admin.detected-changes :as admin-detected-changes]
             [ote.views.email-notification-settings :as email-settings]
-            [ote.views.route.route-list :as route-list]
-            [ote.views.route :as route]
             [ote.views.gtfs-viewer :as gtfs-viewer]
             [ote.views.pre-notices.pre-notice :as notice]
             [ote.views.pre-notices.listing :as pre-notices-listing]
@@ -62,7 +60,7 @@
       [:span])}))
 
 (def wide-pages #{:transit-visualization :transit-changes :authority-pre-notices
-                  :own-services :admin :services :edit-route :new-route :routes
+                  :own-services :admin :services
                   :new-notice :edit-pre-notice :edit-service :new-service
                   :view-gtfs})
 
@@ -137,10 +135,6 @@
                   :email-settings [email-settings/email-notification-settings e! app]
                   :confirm-email [ce/confirm-email e! app]
                   :resend-confirmation [rc/email-confirmation-form e! app]
-
-                  :routes [route-list/routes e! app]
-                  :new-route [route/new-route e! app]
-                  :edit-route [route/edit-route-by-id e! app]
 
                   :monitor [monitor/monitor-main e! app]
 

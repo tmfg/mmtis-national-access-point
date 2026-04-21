@@ -20,7 +20,6 @@
        ["/admin/reports/transport-operator/request-operators" "Tilausliikennettä tuottavat yritykset ja aliyritykset"]
        ["/admin/reports/transport-operator/schedule-operators" "Säännöllistä aikataulun mukaista liikennettä tuottavat yritykset ja aliyritykset"]
        ["/admin/reports/transport-operator/payment-interfaces" "Lippu- ja Maksujärjestelmän avanneet yritykset"]
-       ["/admin/reports/port" "Satama-aineisto csv"]
        ["/admin/reports/tvv" "Toimivaltaiset viranomaiset"]
        ["/admin/reports/netex-interfaces" "Gtfs/Kalkati.net rajapinnat, jotka on käännetty Netex muotoon"]
        ["/admin/reports/netex-interfaces-with-max-date" "Gtfs/Kalkati.net rajapinnat ja ajopäivät, jotka on käännetty Netex muotoon"]

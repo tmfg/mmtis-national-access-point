@@ -25,7 +25,10 @@
   [session config]
   (future
     (let [hits  (count (get-in session [(:session-key config) :hits]))
-          delay (* 1000 (- (Math/pow 2 hits) 2))]
+          delay  (-> (Math/pow 2 hits)
+                     (- 2)
+                     (* 1000)
+                     Math/round)]
       (Thread/sleep delay))))
 
 (defn- throttle*

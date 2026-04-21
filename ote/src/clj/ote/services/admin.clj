@@ -19,7 +19,6 @@
             [ote.db.auditlog :as auditlog]
             [ote.db.modification :as modification]
             [ote.db.netex :as netex]
-            [ote.db.transit :as transit]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
             [ote.email :as email]
@@ -37,8 +36,6 @@
             [ote.util.db :as db-util]
             [ote.util.email-template :as email-template]
             [specql.core :refer [fetch upsert!] :as specql]
-            [specql.impl.composite :as composite]
-            [specql.impl.registry :as specql-registry]
             [specql.op :as op]
             [taoensso.timbre :as log]
             [ote.tasks.tis :as tis]
@@ -49,9 +46,9 @@
 (defqueries "ote/services/reports.sql")
 
 (declare search-services-with-interfaces search-services-wihtout-interface search-interface-downloads
-         fetch-sea-routes-for-admin fetch-netex-conversions-for-admin fetch-reported-taxi-prices
+         fetch-netex-conversions-for-admin fetch-reported-taxi-prices
          fetch-associated-companies-for-admin fetch-successfull-netex-conversion-interfaces-for-admin-with-max-date
-         fetch-successfull-netex-conversion-interfaces-for-admin fetch-all-ports fetch-validation-services
+         fetch-successfull-netex-conversion-interfaces-for-admin fetch-validation-services
          fetch-service-business-ids fetch-operator-business-ids monthly-producer-types-and-counts
          monthly-registered-companies tertile-registered-companies operator-type-distribution fetch-all-emails
          fetch-operators-no-services fetch-operators-brokerage fetch-all-operators fetch-operators-with-sub-contractors
@@ -69,24 +66,6 @@
    :validation-file-error ::netex/validation-file-error
    :operator-name ::t-operator/name
    :service-name ::t-service/name})
-
-(def routes-column-keys
-  {:id ::transit/id
-   :operator-id ::transit/operator-id
-   :route-name ::transit/name
-   :operator-name ::transit/operator-name
-   :published? ::transit/published?
-   :created ::transit/created
-   :modified ::transit/modified
-   :to-date ::transit/to-date
-   :weekday ::transit/weekday
-   :monday ::transit/monday
-   :tuesday ::transit/tuesday
-   :wednesday ::transit/wednesday
-   :thursday ::transit/thursday
-   :friday ::transit/friday
-   :saturday ::transit/saturday
-   :sunday ::transit/sunday})
 
 (def service-search-result-columns
   #{::t-service/contact-email
@@ -273,20 +252,6 @@
 
 (defn- list-interface-downloads [db interface-id]
   (interfaces-array->vec (search-interface-downloads db {:interface-id interface-id})))
-
-(defn- list-sea-routes [db user query]
-  (let [routes (fetch-sea-routes-for-admin db {:operator (if query
-                                                           (str "%" query "%")
-                                                           nil)})
-        ;; Add namespace for non namespaced keywords because sql query returns values without namespace
-        routes-with-namespace (mapv (fn [x] (set/rename-keys x routes-column-keys)) routes)
-        routes-with-name (mapv (fn [route]
-                                 (update route ::transit/name #(composite/parse @specql-registry/table-info-registry
-                                                                                {:category "A"
-                                                                                 :element-type ::t-service/localized_text}
-                                                                                (str %))))
-                               routes-with-namespace)]
-    routes-with-name))
 
 (defn netex-file-download-url [{{base-url :base-url} :environment} transport-service-id file-id]
   (format "%sexport/netex/%d/%d" base-url transport-service-id file-id))
@@ -654,12 +619,6 @@
     (catch Exception e
       (log/warn "Error while sending a notification" e))))
 
-
-(defn- all-ports-response [db]
-  (csv-data ["Koodi" "Nimi" "Leveyspiiri (lat)" "Pituuspiiri (lon)" "Käyttäjän lisäämä?" "Luontihetki"]
-            (map (juxt :code :name :lat :lon :user-added? :created)
-                 (fetch-all-ports db))))
-
 (defn- tvv-response
   "Return Toimivaltaiset viranomaiset in one csv list"
   [db]
@@ -822,8 +781,6 @@
       (or (authorization-fail-response (:user user))
           (http/transit-response (list-interface-downloads db (Long/parseLong interface-id)))))
 
-    (POST "/admin/sea-routes" req (admin-service "sea-routes" req db #'list-sea-routes))
-
     (POST "/admin/netex" {:keys [body user]}
       (or (authorization-fail-response (:user user))
           (list-netex-conversions-response config db (http/transit-request body))))
@@ -927,12 +884,6 @@
         user :user}
     (require-admin-user "reports/transport-operator" (:user user))
     (transport-operator-report db type))
-
-  ^{:format :csv
-    :filename (str "satama-aineisto-" (time/format-date-iso-8601 (time/now)) ".csv")}
-  (GET "/admin/reports/port" {user :user}
-    (or (authorization-fail-response (:user user))
-        (all-ports-response db)))
 
   ^{:format :csv
     :filename (str "toimivaltaiset-viranomaiset-" (time/format-date-iso-8601 (time/now)) ".csv")}

@@ -15,7 +15,6 @@
             [ote.services.places :as places]
             [ote.services.external :as external]
             [ote.services.users :as users]
-            [ote.services.routes :as routes]
             [ote.services.service-search :as service-search]
             [ote.services.login :as login-service]
             [ote.services.admin :as admin-service]
@@ -30,7 +29,6 @@
             [ote.services.rdf :as rdf]
 
             [ote.integration.export.geojson :as export-geojson]
-            [ote.integration.export.gtfs :as export-gtfs]
             [ote.integration.export.csv :as export-csv]
             [ote.integration.export.netex :as export-netex]
             [ote.integration.export.gtfs-flex :as export-gtfsflex]
@@ -79,7 +77,6 @@
    :transport (component/using (transport-service/->TransportService config) [:http :db :email])
    :transport-operator (component/using (transport-operator/->TransportOperator config) [:http :db :email])
    :external (component/using (external/->External (:nap config)) [:http :db])
-   :routes (component/using (routes/->Routes (:nap config)) [:http :db])
    :pre-notices (component/using (pre-notices/->PreNotices config) [:http :db])
    :transit-visualization (component/using (transit-visualization/->TransitVisualization) [:http :db])
    :transit-changes (component/using (transit-changes/->TransitChanges config) [:http :db :email])
@@ -99,7 +96,6 @@
 
    ;; Integration: export GeoJSON, GTFS and CSV
    :export-geojson (component/using (export-geojson/->GeoJSONExport config) [:db :http])
-   :export-gtfs (component/using (export-gtfs/->GTFSExport) [:db :http])
    :export-csv (component/using (export-csv/->CSVExport) [:db :http])
    :export-netex (component/using (export-netex/->NeTExExport config) [:db :http])
    :import-gtfs (component/using (import-gtfs/->GTFSImport (:gtfs config)) [:db :http])

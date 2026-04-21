@@ -286,7 +286,6 @@
                                  :view-routes "Katsele reittejä"}
   :external-interface-netex-info "Traficom voi muuntaa tässä osiossa annettuja tietoja toiseen formaattiin (esim. NeTEx) EU-lainsäädännön vaatimusten mukaisesti ja tarjota formaattimuunnettuja tietoja NAP-palvelussa ladattavaksi alkuperäismuodon rinnalla. Tietosisältö ei kuitenkaan muutu formaattimuunnoksen yhteydessä."
   :RAE-link-text "Rae-työkalulla"
-  :SEA-ROUTE-link-text "Merenkulun reitti - ja aikataulueditorilla"
   :companies-main-info (:md "**Mikäli ajat välityskeskuksen tai jonkun toisen palveluntuottajan kyytejä, älä täytä tähän osioon mitään!**\n\n"
                          "Tähän kohtaan tietoja tallentavat vain ne tahot, jotka koordinoivat palvelun tuottamista (esim. taksivälityskeskukset tai tilaava viranomainen)."
                          "\n\n**Tiedot julkaistaan julkisessa palvelukatalogissa ja avoimissa koneluettavissa rajapinnoissa. Mikäli ette ilmoita palvelunne tuottamiseen osallistuvia yrityksiä, tulee teidän varmistaa, että kyseiset yritykset julkaisevat itse tiedot NAP-katalogiin siitä, että osallistuvat palvelunne tuottamiseen.**"
@@ -808,114 +807,6 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :service-sub-type "Liikkumispalvelun tyyppi"
   :service "Palvelu"}
 
- :route-list-page
- {:header-route-list "Omat merenkulun reitti- ja aikataulutiedot"
-  :header-link-public-routes-to-service "Valmiiden reittien liittäminen palveluun"
-  :header-link-interface-to-service "Rajapinnan liittäminen palveluun"
-  :desc-link-interface-to-service "Rajapinnan voi liittää yhteen tai useampaan palveluun vasta sitten, kun olet luonut yhden valmiin reitin."
-  :header-route-drafts "Reittiluonnokset"
-  :desc-route-drafts (:md "Taulukossa on listattuna **luonnostilassa** olevat reitit. Nämä reitit eivät sisälly koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-public-routes "Valmiit reitit"
-  :desc-public-routes (:md "Taulukossa on listattuna **valmiit** reitit. Nämä reitit sisältyvät koneluettavaan merenkulun reitti- ja aikataulurajapintaan.")
-  :header-sea-route-interface "Merenkulun reitti- ja aikataulurajapinta"
-  :desc-sea-route-interface (:md "NAP-palvelu luo ja päivittää merenkulun reitti- ja aikataulurajapintaa automaattisesti. Rajapinta sisältää **valmiit reitit** -taulukossa listattujen reittien tiedot. Mikäli haluat käyttää merenkulun rajapintaa myös muualla kuin NAP-palvelussa, voit ladata ajantaisaisen rajapintatiedoston alla olevasta linkistä.")
-  :header-download-gtfs "Rajapinnan lataaminen"
-  :desc-download-gtfs "Rajapinta muodostetaan ja on ladattavissa vasta sitten, kun olet luonut yhden valmiin reitin."
-  :delete-dialog-header "Haluatko poistaa laivareitin?"
-  :delete-dialog-remove-route "Poistetaan reitti "
-  :route-list-table-name "Nimi"
-  :route-list-published? "Reitin tila"
-  :route-list-published?-values {true "Julkaistu"
-                                 false "Ei julkaistu"}
-  :route-list-table-starting-point "Lähtöpaikka"
-  :route-list-table-destination-point "Määränpää"
-  :route-list-table-valid-from "Voimassa lähtien"
-  :route-list-table-valid-to "Voimassa asti"
-  :route-list-table-modified "Muokattu"
-  :route-list-table-created "Luotu"
-  :route-list-table-actions "Toiminnot"
-  :route-list-active-routes "Palveluntuottajan voimassaolevat reitit: "
-  :route-list-gtfs-zip-file "GTFS Zip tiedosto"
-  :route-list-copy-link "Kopioi osoite: "
-  :link-to-help-pdf "Merenkulun reittityökalun käyttöohje"
-  :link-to-help-pdf-url "https://www.traficom.fi/sites/default/files/media/file/merenkulun%20editorin%20kayttoohje.pdf"
-  :create-new-route-disabled "Luo palveluntuottaja \"Omat palvelutiedot\"-sivulta ensin"
-  :link-interface-to-service-succeed "Rajapinta liitettiin palveluun onnistuneesti."
-  :delete-link-interface-to-service-succeed "Rajapinta poistettiin palvelulta onnistuneesti."
-  :link-interface-to-service-failed "Rajapinnan liittäminen palveluun epäonnistui."
-  :delete-link-interface-to-service-failed "Rajapinnan poistaminen palvelulta epäonnistui."
-  :select-services-to-link-interfaces "Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit."
-  :unlinked-routes "Et ole liittänyt valmiita merenkulun reittejä vielä yhteenkään palveluun."
-  :no-draft-routes "Ei reittiluonnoksia."
-  :no-public-routes "Ei valmiita reittejä."
-  :add-operator-and-service "Merenkulun reitti- ja aikataulueditorin käyttäminen edellyttää, että olet lisännyt palveluntuottajan NAP:iin tai olet jonkun palveluntuottajan jäsen."
-  :warn-check-stop-time "Tarkista tulo- ja lähtöajat"
-  }
-
- :route-wizard-page
- {:trip-stop-exception
-  {:arrival {:tooltip "Muuta poistumismahdollisuutta"
-             :default "Kyydistä poistuminen aina mahdollista"
-             :no "Kyydistä poistuminen ei mahdollista"
-             :agency "Poistuminen sovittava liikennöitsijän kanssa"
-             :driver "Poistuminen sovittava kuljettajan kanssa"}
-   :departure {:tooltip "Muuta nousumahdollisuutta"
-               :default "Kyytiin otto aina mahdollista"
-               :no "Ei kyytiin ottoa"
-               :agency "Kyytiin otto sovittava liikennöitsijän kanssa"
-               :driver "Kyytiin otto sovittava kuljettajan kanssa"}}
-
-  :trip-stop-arrival-header "tulo"
-  :trip-stop-departure-header "lähtö"
-
-  :trip-stop-calendar "Liikennöintikalenteri"
-  :trip-schedule-new-trip "Uuden vuoron lähtöaika: "
-  :trip-add-new-trip "Lisää vuoro"
-  :trip-delete "Poista vuoro"
-
-  :stop-sequence-custom-dialog-title "Lisää uusi satama tai laituri"
-  :stop-sequence-custom-dialog-add "Lisää"
-  :stop-sequence-custom-dialog-name "Nimi"
-  :stop-sequence-custom-dialog-help "Voit muuttaa laiturin / sataman sijaintia tai poistaa sen karttatyökaluilla. Reitin tallennuksen jälkeen satamaa / laituria ei voi muokata."
-  :stop-sequence-leaflet-button-marker "Lisää uusi satama/laituri"
-  :stop-sequence-leaflet-button-start "Klikkaa karttaa lisätäksesi satama/laituri"
-  :stop-sequence-port-header "Pysähtymispaikka"
-  :stop-sequence-arrival-header "Saapumisaika"
-  :stop-sequence-departure-header "Lähtöaika"
-  :stop-sequence-map-help "Muodosta reitti valitsemalla pysähdyspaikkoja kartalta. Voit tarvittaessa lisätä pysähdyspaikkoja myös itse."
-  :stop-sequence-delete "Poista pysäkki ketjusta"
-  :stop-sequence-edit-map-help "Muokkaustilassa voit lisätä puuttuvia pysähtymispaikkoja kartalle. Voit myös siirtää ja poistaa juuri lisäämiäsi pysähtymispaikkoja. Kartan muita pysähtymispaikkoja et voi muokata. Muokkauspainikkeet löydät kartan vasemmasta reunasta."
-
-  :wizard-step-basic-info "Reitin nimi"
-  :wizard-step-stop-sequence "Pysähtymispaikat"
-  :wizard-step-times "Vuorot"
-  :wizard-step-save "Reitin tallennus"
-
-  :basic-info-header "Reitin nimi ja palveluntuottaja"
-  :basic-info-route-name "Reitin nimi"
-  :basic-info-transport-operator "Palveluntuottaja"
-  :basic-info-departure-point-name "Lähtöpaikka"
-  :basic-info-destination-point-name "Määränpää"
-  :basic-info-available-from "Voimassa alkaen"
-  :basic-info-available-to "Voimassa asti"
-
-  :route-calendar-name "Reittikalenteri"
-  :route-calendar-group-name ["Liikennöintikalenteri (Lähtöpaikka: " :departure-stop ", lähtöaika: " :departure-time ")"]
-  :route-calendar-from-date "Alkaen"
-  :route-calendar-to-date "Päättyen"
-  :route-calendar-add-new-period "Lisää uusi ajojakso kalenteriin"
-  :route-calendar-guidance-info "Lisää vuorolle liikennöintijakso valitsemalla jaksolle alkamispäivämäärä (Alkaen) ja päättymispäivämäärä (Päättyen). Valitse tämän jälkeen liikennöitävät viikonpäivät klikkaamalla valintalaatikoita niiden alla. Voit poistaa ja lisätä kulkupäiviä tämän jälkeen vielä kalenterissa klikkaamalla."
-  :save-success "Reitin tallennus onnistui."
-  :save-failure "Reitin tallennus epäonnistui"
-  :publish-missing-required "Et voi vielä lähettää palvelua julkaistavaksi, sillä lomakkeelta puuttuu pakollisia tietoja. Täytä tiedot kohtiin, joissa on maininta \"Tieto vaaditaan\"."
-  :show-draw-tools "Muokkaa pysähtymispaikkoja"
-  :hide-draw-tools "Lopeta muokkaus"
-  :data-missing "Tietoja täyttämättä"
-  :instructions-description "Alla olevan lomakkeen avulla voit julkaista tiedot merenkulun palvelusi reitti- ja aikataulutiedot. Tarkemmat ohjeet lomakkeen täyttöön löydät oheisesta linkistä."
-  :homepage-update-success "Verkko-osoite päivitettiin onnistuneesti."
-  :homepage-update-failure "Verkko-osoite päivittäminen epäonnistui."
-  :back-to-routes "Takaisin Merenkulun reitti- ja aikataulueditorin etusivulle"
-  }
 
  :pre-notice-list-page
  {:header-pre-notice-list "Omat säännöllisen henkilöliikenteen muutosilmoitukset"
