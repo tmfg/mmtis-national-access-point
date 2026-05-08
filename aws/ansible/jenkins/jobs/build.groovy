@@ -50,6 +50,21 @@ job('OTE build from master') {
                 }
             }
         }
+
+        // Only trigger SBOM generation for master branch builds
+        conditionalSteps {
+            condition {
+                stringsMatch('${branch}', '*/master', false)
+            }
+            steps {
+                downstreamParameterized {
+                    trigger('Generate and upload SBOM') {
+                        condition('SUCCESS')
+                        triggerWithNoParameters()
+                    }
+                }
+            }
+        }
     }
     publishers {
         archiveArtifacts {
