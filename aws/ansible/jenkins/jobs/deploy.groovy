@@ -45,8 +45,7 @@ job('Deploy OTE') {
             }
             extraVars {
                 extraVar {
-                    key('ote_build_artifact')
-                    value('${ote_build_artifact}')
+                    key('ote_build_artifact=${ote_build_artifact}')
                 }
             }
         }
