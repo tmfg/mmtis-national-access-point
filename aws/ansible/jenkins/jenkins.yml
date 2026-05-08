@@ -2,9 +2,9 @@
 - hosts: jenkins
   become: yes
   tasks:
-    - include: tasks/java21.yml
-    - include: tasks/leiningen.yml
-    - include: tasks/cypress-deps.yml
+    - include_tasks: tasks/java21.yml
+    - include_tasks: tasks/leiningen.yml
+    - include_tasks: tasks/cypress-deps.yml
 
 
 - hosts: jenkins
