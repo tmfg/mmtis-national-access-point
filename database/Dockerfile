@@ -1,5 +1,5 @@
 # Uusin ubuntu image
-FROM ubuntu:latest
+FROM ubuntu:noble
 
 # Install wget to get signing key
 RUN  apt-get update \
