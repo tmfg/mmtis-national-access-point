@@ -80,6 +80,9 @@
           resources
           (wrap-middleware strip-prefix (route/resources "/"))
 
+          frontpage
+          #(resources (assoc % :uri "/frontpage.html"))
+
           ;; Handler for routes that don't require authenticated user
           public-handler
           (wrap-middleware strip-prefix #(serve-request @public-handlers %)
@@ -99,7 +102,9 @@
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (or (resources req)
+                (or (when (= "/" (:uri req))
+                      (frontpage req))
+                    (resources req)
                     (public-handler req)
                     (handler req)))
               (merge config
