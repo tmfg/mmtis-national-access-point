@@ -70,6 +70,11 @@
       :cookie-name "ote-session"
       :cookie-attrs {:http-only true}})))
 
+(defn- frontpage-uri?
+  "We want to serve a static frontpage for both '/' and '/index.html'."
+  [uri]
+  (or (= "/" uri)
+      (= "/index.html" uri)))
 
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
@@ -102,7 +107,7 @@
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (or (when (= "/" (:uri req))
+                (or (when (frontpage-uri? (:uri req))
                       (frontpage req))
                     (resources req)
                     (public-handler req)
