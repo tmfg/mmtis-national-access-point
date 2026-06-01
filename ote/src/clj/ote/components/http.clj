@@ -37,6 +37,14 @@
                 (assoc req :uri (subs uri (count strip-prefix)))
                 req))))
 
+(defn wrap-strip-prefix [strip-prefix handler]
+  (fn [{uri :uri :as req}]
+    (if-let [prefix (some #(when (str/starts-with? uri %) %) strip-prefix)]
+      (let [stripped (subs uri (count prefix))]
+        (handler (assoc req :uri (if (seq stripped) stripped "/"))))
+      (handler req))))
+
+
 (defn wrap-middleware [strip-prefix handler & extra-middleware]
   (gzip/wrap-gzip
    (params/wrap-params
@@ -70,6 +78,11 @@
       :cookie-name "ote-session"
       :cookie-attrs {:http-only true}})))
 
+(defn- frontpage-uri?
+  "We want to serve a static frontpage for both '/' and '/index.html'."
+  [uri]
+  (or (= "/" uri)
+      (= "/index.html" uri)))
 
 (defrecord HttpServer [config handlers public-handlers]
   component/Lifecycle
@@ -79,6 +92,9 @@
           ;; Handler for static resources
           resources
           (wrap-middleware strip-prefix (route/resources "/"))
+
+          frontpage
+          #(resources (assoc % :uri "/frontpage.html"))
 
           ;; Handler for routes that don't require authenticated user
           public-handler
@@ -99,7 +115,9 @@
       (assoc this ::stop
              (server/run-server
               (fn [req]
-                (or (resources req)
+                (or (when (frontpage-uri? (:uri req))
+                      (frontpage req))
+                    (resources req)
                     (public-handler req)
                     (handler req)))
               (merge config

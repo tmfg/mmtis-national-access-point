@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icons: Lucide (ISC), Bootstrap Icons (MIT) -->
+    <title>NAP — Finlands nationella åtkomstpunkt</title>
+    <link rel="stylesheet" href="../main.css">
+</head>
+<body class="l-page">
+<header class="l-header">
+    <nav class="top-nav">
+
+        <a class="top-nav__logo-link" href="https://www.fintraffic.fi/sv" aria-label="Fintraffic">
+                <span class="top-nav__logo">
+                    <svg class="top-nav__logo-svg" viewBox="0 0 253 42" aria-hidden="true">
+                        <use href="../fintraffic_horizontal_white.svg#fintraffic_horizontal_white"></use>
+                    </svg>
+                </span>
+        </a>
+
+        <div class="top-nav__quick-links">
+            <input class="top-nav__toggle-input visually-hidden" type="checkbox" id="top-nav-toggle"
+                   aria-label="Öppna tjänstemenyn">
+            <label class="top-nav__toggle" for="top-nav-toggle">
+                Tjänster
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="top-nav__toggle-icon lucide lucide-chevron-down-icon lucide-chevron-down">
+                    <path d="m6 9 6 6 6-6"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="top-nav__toggle-icon lucide lucide-chevron-up-icon lucide-chevron-up">
+                    <path d="m18 15-6-6-6 6"/>
+                </svg>
+            </label>
+            <ul class="top-nav__list">
+                <li class="top-nav__item"><a class="top-nav__link" href="https://liikennetilanne.fintraffic.fi/pulssi?lang=sv"
+                                             target="_blank" rel="noopener noreferrer">Trafikläget</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://www.palautevayla.fi/aspa?lang=sv" target="_blank"
+                                             rel="noopener noreferrer">Responskanalen</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://junalahdot.fintraffic.fi/?lang=2"
+                                             target="_blank" rel="noopener noreferrer">Tågavgångar</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://www.fintraffic.fi/sv/fintraffic_appen">Fintraffic
+                    Appen</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://matka.fintraffic.fi/" target="_blank"
+                                             rel="noopener noreferrer">Fintraffic Matka</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://sky.fintraffic.fi/" target="_blank"
+                                             rel="noopener noreferrer">Fintraffic Sky</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://www.digitraffic.fi/" target="_blank"
+                                             rel="noopener noreferrer">Digitraffic</a></li>
+                <li class="top-nav__item"><a class="top-nav__link" href="https://digitransit.fi/" target="_blank"
+                                             rel="noopener noreferrer">Digitransit</a></li>
+                <li class="top-nav__item"><a class="top-nav__link top-nav__link--active" href="/">NAP</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav class="sub-nav" aria-label="Undernavigering">
+        <div class="sub-nav__left">
+            <a class="sub-nav__link sub-nav__link-nap" href="/">
+                NAP
+            </a>
+            <input class="sub-nav__toggle-input visually-hidden" type="checkbox" id="sub-nav-toggle">
+            <label class="sub-nav__toggle" for="sub-nav-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-menu-icon lucide-menu">
+                     <path d="M4 5h16"/>
+                     <path d="M4 12h16"/>
+                     <path d="M4 19h16"/>
+                </svg>
+                Meny
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="sub-nav__toggle-chevron" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6"/>
+                </svg>
+            </label>
+            <div class="sub-nav__catalog-links">
+                <a class="sub-nav__link" href="https://finap.fi/mmtis/#/">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lucide lucide-car-icon lucide-car">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+                        <circle cx="7" cy="17" r="2"/>
+                        <path d="M9 17h6"/>
+                        <circle cx="17" cy="17" r="2"/>
+                    </svg>
+                    Katalogen för mobilitetstjänster
+                </a>
+                <a class="sub-nav__link" href="https://catalog.digitraffic.fi/">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lucide lucide-train-front-icon lucide-train-front">
+                        <path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/>
+                        <path d="m9 15-1-1"/>
+                        <path d="m15 15 1-1"/>
+                        <path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/>
+                        <path d="m8 19-2 3"/>
+                        <path d="m16 19 2 3"/>
+                    </svg>
+                    Trafikdatakatalogen
+                </a>
+                <div class="sub-nav__lang-section">
+                    <a class="sub-nav__lang-link" href="/index.html" hreflang="fi">Suomeksi</a>
+                    <a class="sub-nav__lang-link" href="/en/index.html" hreflang="en">In English</a>
+                </div>
+            </div>
+        </div>
+        <div class="sub-nav__right">
+            <div class="lang-switcher">
+                <input class="lang-switcher__input visually-hidden" type="checkbox" id="lang-switcher-toggle">
+                <label class="lang-switcher__toggle" for="lang-switcher-toggle"
+                       aria-label="Välj sidans språk. Valt: Svenska">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lang-switcher__globe" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                        <path d="M2 12h20"/>
+                    </svg>
+                    <span class="lang-switcher__label">På Svenska</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lucide lucide-chevron-down-icon lucide-chevron-down lang-switcher__chevron">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                </label>
+                <ul class="lang-switcher__list">
+                    <li class="lang-switcher__item">
+                        <a class="lang-switcher__link" href="/index.html" hreflang="fi">Suomeksi</a>
+                    </li>
+                    <li class="lang-switcher__item">
+                        <a class="lang-switcher__link" href="/en/index.html" hreflang="en">In English</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="l-main">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero__content">
+            <h1 class="hero__heading">Finlands nationella åtkomstpunkt</h1>
+            <p class="hero__text">
+                Den nationella åtkomstpunkten (eng. National Access Point, NAP) är en tjänst till vilken
+                väghållare och olika tjänsteleverantörer, i enlighet med EU-reglering, är skyldiga att lämna
+                data om vägtrafikinfrastruktur, vägtrafik, mobilitetstjänster samt distributionsnät för
+                alternativa drivmedel.
+            </p>
+            <p class="hero__text">
+                Syftet med nationella åtkomstpunkter är att möjliggöra en smidig delning och användning av
+                trafikdata i olika digitala trafikstyrnings- och informationstjänster, såsom
+                navigeringstjänster.
+            </p>
+            <div class="hero__text">
+                I Finland finns det för närvarande två sådana åtkomstpunkter: 
+                <ul class="hero__text__list">
+                    <li>Katalogen för mobilitetstjänster</li>
+                    <li>Trafikdatakatalogen</li>
+                </ul>
+            </div>
+            <p class="hero__text hero__text--bold">
+                Under 2026 kommer dessa två åtkomstpunkter att slås samman till en gemensam tjänst.
+            </p>
+        </div>
+        <div class="hero__media">
+            <img class="hero__image" src="../images/image_1.png" alt="Ett kontor med flera datorskärmar">
+        </div>
+    </section>
+
+    <!-- Catalogue Cards Section -->
+    <section class="catalogue-cards">
+        <div class="catalogue-card">
+            <h2 class="catalogue-card__title">Katalogen för mobilitets&shy;tjänster</h2>
+            <hr class="catalogue-card__divider">
+            <div class="catalogue-card__icons">
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="lucide lucide-badge-euro-icon lucide-badge-euro">
+                            <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
+                            <path d="M7 12h5"/>
+                            <path d="M15 9.4a4 4 0 1 0 0 5.2"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Priser</span>
+                </div>
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="lucide lucide-clock-icon lucide-clock">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Tidtabeller</span>
+                </div>
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="lucide lucide-navigation-icon lucide-navigation">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Rutter</span>
+                </div>
+            </div>
+            <p class="catalogue-card__description">
+                Katalogen för mobilitetstjänster är den nationella åtkomstpunkten för data om
+                mobilitetstjänster. Tjänsteleverantörer tillhandahåller data om sina tjänster i katalogen,
+                till exempel tjänstebeskrivningar, rutter, tidtabeller, biljettinformation och realtidsdata.
+            </p>
+            <a class="catalogue-card__cta" href="https://finap.fi/mmtis/#/">Gå till Katalogen för mobilitetstjänster</a>
+        </div>
+
+        <div class="catalogue-card">
+            <h2 class="catalogue-card__title">Trafikdata&shy;katalogen</h2>
+            <hr class="catalogue-card__divider">
+            <div class="catalogue-card__icons">
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="lucide lucide-fuel-icon lucide-fuel">
+                            <path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/>
+                            <path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/>
+                            <path d="M2 21h13"/>
+                            <path d="M3 9h11"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Laddpunkter</span>
+                </div>
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" class="lucide lucide-signpost-icon lucide-signpost">
+                            <path d="M12 13v8"/>
+                            <path d="M12 3v3"/>
+                            <path d="M2.354 10.354a1.207 1.207 0 0 1 0-1.708l2.06-2.06A2 2 0 0 1 5.828 6h12.344a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H5.828a2 2 0 0 1-1.414-.586z"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Vägnät</span>
+                </div>
+                <div class="catalogue-card__icon-item">
+                    <div class="catalogue-card__icon-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round"
+                             class="lucide lucide-message-circle-warning-icon lucide-message-circle-warning">
+                            <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
+                            <path d="M12 8v4"/>
+                            <path d="M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <span class="catalogue-card__icon-label">Begränsningar</span>
+                </div>
+            </div>
+            <p class="catalogue-card__description">
+                Trafikdatakatalogen är den nationella åtkomstpunkten för trafikdata. Väghållare och olika
+                tjänsteleverantörer lämnar data om väg- och gatunätets infrastruktur, regler och
+                begränsningar, användning och tillstånd i trafiknätet samt distributionsnät för alternativa
+                drivmedel.
+            </p>
+            <a class="catalogue-card__cta" href="https://catalog.digitraffic.fi">Gå till Trafikdatakatalogen</a>
+        </div>
+    </section>
+
+    <!-- Why merging section -->
+    <section class="info-section">
+        <div class="info-section__inner">
+            <div class="info-section__heading">
+                <div class="info-section__heading-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="lucide lucide-message-circle-question-mark-icon lucide-message-circle-question-mark">
+                        <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <path d="M12 17h.01"/>
+                    </svg>
+                </div>
+                <h2 class="info-section__heading-text">
+                    Varför slås tjänsterna samman?
+                </h2>
+            </div>
+            <p class="info-section__text">
+                Ett gemensamt europeiskt transportområde förutsätter ett öppet ekosystem för trafikdata baserat
+                på gemensamma standarder. Nationella åtkomstpunkter är ett centralt element enligt EU:s
+                ITS-reglering för att uppnå detta mål.
+            </p>
+            <p class="info-section__text">
+                I Finland centraliseras driften av den nationella åtkomstpunkten till Fintraffic i enlighet med
+                lagstiftning som träder i kraft den 1 januari 2026.
+            </p>
+            <p class="info-section__text">
+                Den nuvarande modellen med två åtkomstpunkter är ett resultat av både administrativa strukturer
+                och tekniska förutsättningar. Genom att slå samman dessa två åtkomstpunkter skapas en gemensam
+                tjänst för all trafikdata i Finland, vilket underlättar arbetet både för dataleverantörer och
+                dataanvändare.
+            </p>
+            <p class="info-section__text">
+                En enda nationell åtkomstpunkt tillhandahåller harmoniserad information om dataproducenter,
+                datatillgänglighet, datatäckning, användningsvillkor och datakvalitet.
+            </p>
+        </div>
+    </section>
+
+    <!-- Audience Cards Section -->
+    <section class="audience-cards">
+        <div class="audience-card">
+            <img class="audience-card__bg" src="../images/image_2.png" alt="Flygbild av motorvägsramper">
+            <div class="audience-card__overlay">
+                <h3 class="audience-card__heading">För data&shy;leverantörer</h3>
+                <p class="audience-card__text">
+                    Trafikdata produceras både av offentliga organisationer och av den privata sektorn. Dessa
+                    uppgifter görs tillgängliga via den nationella åtkomstpunkten för att maximera användningen
+                    av data.
+                </p>
+                <a class="audience-card__cta"
+                   href="https://www.fintraffic.fi/fi/digitaalisetpalvelut/liikennejarjestelman-digitaaliset-tietopalvelut">Ta
+                    del av anvisningar för dataleverantörer</a>
+            </div>
+        </div>
+        <div class="audience-card">
+            <img class="audience-card__bg" src="../images/image_3.png" alt="Tågtidtabellsskärm">
+            <div class="audience-card__overlay">
+                <h3 class="audience-card__heading">För data&shy;användare</h3>
+                <p class="audience-card__text">
+                    Den nationella åtkomstpunkten fungerar som ett skyltfönster för olika trafikdatamängder.
+                    Via tjänsten kan användare söka efter och hitta relevanta datamängder samt deras
+                    producenter.
+                </p>
+                <a class="audience-card__cta"
+                   href="https://www.fintraffic.fi/fi/digitaalisetpalvelut/fintrafficin-datapalvelut">Läs mer om
+                    användning av data</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline">
+        <div class="timeline__header">
+            <h2 class="timeline__heading">Hur fortskrider sammanslagningen?</h2>
+            <p class="timeline__subtext">
+                Sammanslagningen sker i faser under 2026–2027. Båda tjänsterna fungerar normalt under
+                övergångsperioden. Vi informerar om ändringar och eventuella åtgärder i god tid.
+            </p>
+        </div>
+        <div class="timeline__steps">
+            <div class="timeline__step">
+                <span class="timeline__badge">Maj 2026</span>
+                <div class="timeline__dot"></div>
+                <div class="timeline__step-description">
+                    <h3 class="timeline__step-title">1. Lansering av gemensam NAP-startsida</h3>
+                    <p class="timeline__step-text">Finlands nationella åtkomstpunkter finns nu tillgängliga via
+                        en gemensam adress: finap.fi</p>
+                </div>
+            </div>
+            <div class="timeline__step">
+                <span class="timeline__badge">December 2026</span>
+                <div class="timeline__dot"></div>
+                <div class="timeline__step-description">
+                    <h3 class="timeline__step-title">2. Parallell drift</h3>
+                    <p class="timeline__step-text">Under 2026 kommer uppgifter fortfarande, i tillämpliga delar,
+                        att upprätthållas i båda katalogerna.</p>
+                </div>
+            </div>
+            <div class="timeline__step">
+                <span class="timeline__badge">Juni 2027</span>
+                <div class="timeline__dot"></div>
+                <div class="timeline__step-description">
+                    <h3 class="timeline__step-title">3. En gemensam NAP</h3>
+                    <p class="timeline__step-text">Data i Transporttjänstkatalogen överförs till
+                        Trafikdatakatalogen, varefter Transporttjänstkatalogen avvecklas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <h2 class="newsletter__heading">Nyhetsbrev</h2>
+        <p class="newsletter__text">Prenumerera på nyhetsbrevet för trafikdatatjänster</p>
+        <a class="newsletter__cta" href="https://uutiskirje.fintraffic.fi/">
+            <div class="newsletter__cta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-mail-icon lucide-mail">
+                    <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                </svg>
+            </div>
+            <span>Prenumerera på nyhetsbrevet</span>
+        </a>
+    </section>
+</main>
+
+<footer class="site-footer l-footer">
+    <div class="site-footer__inner">
+        <div class="site-footer__branding">
+            <a class="site-footer__branding-link" href="https://www.fintraffic.fi/sv" aria-label="Fintraffic">
+                <svg class="site-footer__logo-svg" viewBox="0 0 253 42" aria-hidden="true">
+                    <use href="../fintraffic_horizontal_white.svg#fintraffic_horizontal_white"></use>
+                </svg>
+            </a>
+            <a class="site-footer__branding-link" href="https://www.fintraffic.fi/sv">fintraffic.fi</a>
+        </div>
+        <div class="site-footer__divider"></div>
+        <div class="site-footer__links">
+            <nav class="site-footer__nav">
+                <div class="footer-menu">
+                    <ul class="footer-menu__list">
+                        <li><a class="footer-menu__link" href="https://liikennetilanne.fintraffic.fi/pulssi?lang=sv"
+                               target="_blank" rel="noopener noreferrer">Trafikläget</a></li>
+                        <li><a class="footer-menu__link" href="https://www.palautevayla.fi/aspa?lang=sv"
+                               target="_blank" rel="noopener noreferrer">Responskanalen</a></li>
+                        <li><a class="footer-menu__link" href="https://junalahdot.fintraffic.fi/?lang=2"
+                               target="_blank" rel="noopener noreferrer">Tågavgångar</a></li>
+                        <li><a class="footer-menu__link" href="https://sky.fintraffic.fi/" target="_blank"
+                               rel="noopener noreferrer">Fintraffic Sky</a></li>
+                    </ul>
+                </div>
+                <div class="footer-menu">
+                    <ul class="footer-menu__list">
+                        <li><a class="footer-menu__link" href="https://www.digitraffic.fi/" target="_blank"
+                               rel="noopener noreferrer">Digitraffic</a></li>
+                        <li><a class="footer-menu__link" href="https://digitransit.fi/" target="_blank"
+                               rel="noopener noreferrer">Digitransit</a></li>
+                        <li><a class="footer-menu__link" href="https://finap.fi/#/" target="_blank"
+                               rel="noopener noreferrer">NAP</a></li>
+                    </ul>
+                </div>
+                <div class="footer-menu">
+                    <ul class="footer-menu__list">
+                        <li><a class="footer-menu__link"
+                               href="https://www.fintraffic.fi/sv/fintraffic/kontaktuppgifter"
+                               target="_blank" rel="noopener noreferrer">Kontaktinformation</a></li>
+                        <li><a class="footer-menu__link"
+                               href="https://www.fintraffic.fi/sv/fintraffic/dataskydd-och-anvandarvillkor"
+                               target="_blank" rel="noopener noreferrer">Dataskydd</a></li>
+                        <li><a class="footer-menu__link"
+                               href="https://www.fintraffic.fi/sv/fintraffic/tillganglighetsutlatande"
+                               target="_blank" rel="noopener noreferrer">Tillgänglighetsutlåtande</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="social-links">
+                <a class="social-links__item" href="https://www.facebook.com/FintrafficFI/" rel="noreferrer"
+                   aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-facebook" viewBox="0 0 16 16">
+                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/>
+                    </svg>
+                </a>
+                <a class="social-links__item" href="https://x.com/Fintraffic_fi" rel="noreferrer" aria-label="X">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-twitter-x" viewBox="0 0 16 16">
+                        <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
+                    </svg>
+                </a>
+                <a class="social-links__item" href="https://www.instagram.com/fintraffic_stories_fi"
+                   rel="noreferrer" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-instagram" viewBox="0 0 16 16">
+                        <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+                    </svg>
+                </a>
+                <a class="social-links__item" href="https://www.youtube.com/channel/UCpnhwBRjt58yUu_Oky7vyxQ"
+                   rel="noreferrer" aria-label="YouTube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-youtube" viewBox="0 0 16 16">
+                        <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>
+                    </svg>
+                </a>
+                <a class="social-links__item" href="https://www.linkedin.com/company/fintraffic" rel="noreferrer"
+                   aria-label="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                         class="bi bi-linkedin" viewBox="0 0 16 16">
+                        <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="site-footer__tisgrade">
+                <img src="../images/TISGRADE-logo+EU-for-dark-BG.png" alt="TISGRADE-logotyp">
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
