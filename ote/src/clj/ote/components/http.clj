@@ -37,6 +37,14 @@
                 (assoc req :uri (subs uri (count strip-prefix)))
                 req))))
 
+(defn wrap-strip-prefix [strip-prefix handler]
+  (fn [{uri :uri :as req}]
+    (if-let [prefix (some #(when (str/starts-with? uri %) %) strip-prefix)]
+      (let [stripped (subs uri (count prefix))]
+        (handler (assoc req :uri (if (seq stripped) stripped "/"))))
+      (handler req))))
+
+
 (defn wrap-middleware [strip-prefix handler & extra-middleware]
   (gzip/wrap-gzip
    (params/wrap-params

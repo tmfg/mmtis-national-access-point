@@ -13,7 +13,7 @@
  :http {:port 3000
         :ip "0.0.0.0"
         :max-body 33554432 ;; 32 megabytes
-        :strip-prefix "/ote"
+        :strip-prefix ["/ote", "/mmtis"]
         :auth-tkt {:shared-secret "localdev"
                    :max-age-in-seconds 36000
                    :digest-algorithm "MD5"}
