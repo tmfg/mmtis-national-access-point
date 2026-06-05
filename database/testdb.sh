@@ -2,7 +2,7 @@
 
 echo "Creating local PostgreSQL database for CI build"
 
-P="psql -h localhost -U napote "
+P="psql -h 127.0.0.1 -U napote "
 
 
 $P -c "DROP DATABASE IF EXISTS napotetest_template;"
