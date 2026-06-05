@@ -88,7 +88,10 @@
   tags: configuration
 
 - name: Upload OTE build
-  copy: src={{ote_build_artifact}} dest=/opt/ote/ote.jar owner=napote
+  copy:
+    src: "{{ ote_build_artifact }}"
+    dest: /opt/ote/ote.jar
+    owner: napote
   tags: deploy
 
 - name: Restart OTE service
