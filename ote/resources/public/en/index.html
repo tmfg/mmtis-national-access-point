@@ -4,6 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Icons: Lucide (ISC), Bootstrap Icons (MIT) -->
+    <script type="text/javascript"> function cacheParam() {
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+
+        var now = new Date();
+        return (now.getUTCFullYear() + '-' + pad(now.getUTCMonth() + 1) + '-' + pad(now.getUTCDate()) + '-' + pad(now.getUTCHours() + 1));
+    }
+
+    window.addEventListener('CookieInformationConsentGiven', function (event) {
+        if (CookieInformation.getConsentGivenFor('cookie_cat_statistic')) {
+            var _mtm = window._mtm = window._mtm || [];
+            _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.async = true;
+            g.src = 'https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_YeewVWCJ.js?c=' + cacheParam();
+            s.parentNode.insertBefore(g, s);
+        }
+    });
+    </script>
+    <script type="text/javascript"> window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('consent', 'default', {ad_storage: 'denied', analytics_storage: 'denied', wait_for_update: 1500,});
+    gtag('set', 'ads_data_redaction', true);
+
+    function askConsent() {
+        let langCode = "EN";
+        if (window.location.host.endsWith("finap.fi")) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.id = "CookieConsent";
+            script.setAttribute("data-culture", langCode);
+            script.src = 'https://policy.app.cookieinformation.com/uc.js';
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+    } /* Ask consent when dom is fully loaded */
+    document.addEventListener("DOMContentLoaded", askConsent); /* Document already fully loaded? Just ask as event won't be fired anymore */
+    if (document.readyState === "complete") {
+        askConsent();
+    }
+    </script>
     <title>NAP — Finland's National Access Point</title>
     <link rel="stylesheet" href="../main.css">
 </head>
