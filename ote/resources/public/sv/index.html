@@ -4,6 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Icons: Lucide (ISC), Bootstrap Icons (MIT) -->
+    <script type="text/javascript"> function cacheParam() {
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+
+        var now = new Date();
+        return (now.getUTCFullYear() + '-' + pad(now.getUTCMonth() + 1) + '-' + pad(now.getUTCDate()) + '-' + pad(now.getUTCHours() + 1));
+    }
+
+    window.addEventListener('CookieInformationConsentGiven', function (event) {
+        if (CookieInformation.getConsentGivenFor('cookie_cat_statistic')) {
+            var _mtm = window._mtm = window._mtm || [];
+            _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.async = true;
+            g.src = 'https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_YeewVWCJ.js?c=' + cacheParam();
+            s.parentNode.insertBefore(g, s);
+        }
+    });
+    </script>
+    <script type="text/javascript"> window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('consent', 'default', {ad_storage: 'denied', analytics_storage: 'denied', wait_for_update: 1500,});
+    gtag('set', 'ads_data_redaction', true);
+
+    function askConsent() {
+        let langCode = "SV";
+        if (window.location.host.endsWith("finap.fi")) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.id = "CookieConsent";
+            script.setAttribute("data-culture", langCode);
+            script.src = 'https://policy.app.cookieinformation.com/uc.js';
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+    } /* Ask consent when dom is fully loaded */
+    document.addEventListener("DOMContentLoaded", askConsent); /* Document already fully loaded? Just ask as event won't be fired anymore */
+    if (document.readyState === "complete") {
+        askConsent();
+    }
+    </script>
     <title>NAP — Finlands nationella åtkomstpunkt</title>
     <link rel="stylesheet" href="../main.css">
 </head>
@@ -87,7 +135,7 @@
                         <path d="M9 17h6"/>
                         <circle cx="17" cy="17" r="2"/>
                     </svg>
-                    Katalogen för mobilitetstjänster
+                    Katalogen för mobilitetstjänster (finap.fi)
                 </a>
                 <a class="sub-nav__link" href="https://catalog.digitraffic.fi/">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -100,7 +148,7 @@
                         <path d="m8 19-2 3"/>
                         <path d="m16 19 2 3"/>
                     </svg>
-                    Trafikdatakatalogen
+                    Trafikdatakatalogen (catalog.digitraffic.fi)
                 </a>
                 <div class="sub-nav__lang-section">
                     <a class="sub-nav__lang-link" href="/index.html" hreflang="fi">Suomeksi</a>
@@ -159,8 +207,8 @@
             <div class="hero__text">
                 I Finland finns det för närvarande två sådana åtkomstpunkter: 
                 <ul class="hero__text__list">
-                    <li>Katalogen för mobilitetstjänster</li>
-                    <li>Trafikdatakatalogen</li>
+                    <li>Katalogen för mobilitetstjänster (finap.fi)</li>
+                    <li>Trafikdatakatalogen (catalog.digitraffic.fi)</li>
                 </ul>
             </div>
             <p class="hero__text hero__text--bold">
@@ -176,6 +224,7 @@
     <section class="catalogue-cards">
         <div class="catalogue-card">
             <h2 class="catalogue-card__title">Katalogen för mobilitets&shy;tjänster</h2>
+            <span class="catalogue-card__subtitle">(finap.fi)</span>
             <hr class="catalogue-card__divider">
             <div class="catalogue-card__icons">
                 <div class="catalogue-card__icon-item">
@@ -222,6 +271,7 @@
 
         <div class="catalogue-card">
             <h2 class="catalogue-card__title">Trafikdata&shy;katalogen</h2>
+            <span class="catalogue-card__subtitle">(catalog.digitraffic.fi)</span>
             <hr class="catalogue-card__divider">
             <div class="catalogue-card__icons">
                 <div class="catalogue-card__icon-item">
