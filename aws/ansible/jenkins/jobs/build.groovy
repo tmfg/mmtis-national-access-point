@@ -43,6 +43,24 @@ job('OTE build from master') {
             task('production')
         }
 
+        // Generate the POM file for the project, which is needed for the CycloneDX plugin to generate the SBOM.
+        leiningenBuilder {
+            subdirPath('ote')
+            task('pom')
+        }
+
+        maven {
+            goals('org.cyclonedx:cyclonedx-maven-plugin:2.9.1:makeAggregateBom')
+            rootPOM('ote/pom.xml')
+            mavenInstallation('Maven 3.5.0')
+            property('outputFormat', 'json')
+            property('schemaVersion', '1.6')
+            property('outputName', 'bom')
+        }
+
+        // Because of this "get latest build" pattern, we'll also store the git commit hash as an artifact.
+        shell('git rev-parse HEAD > build-commit.txt')
+
         downstreamParameterized {
             trigger('Deploy OTE') {
                 parameters {
@@ -53,7 +71,7 @@ job('OTE build from master') {
     }
     publishers {
         archiveArtifacts {
-            pattern('ote/target/*-standalone.jar')
+            pattern('ote/target/*-standalone.jar,ote/target/bom.json,build-commit.txt')
             onlyIfSuccessful()
         }
         slackNotifier {
