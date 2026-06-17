@@ -51,7 +51,8 @@ job('Deploy OTE') {
             extraVars {
                 extraVar {
                     key('ote_build_artifact')
-                    value('${ote_build_artifact}')
+                    secretValue(hudson.util.Secret.fromString('${ote_build_artifact}'))
+                    hidden(true)
                 }
             }
         }
