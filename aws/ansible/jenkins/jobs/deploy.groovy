@@ -60,6 +60,9 @@ job('Deploy OTE') {
         shell('''
             set -euo pipefail
 
+            export AWS_CONFIG_FILE=/dev/null
+            export AWS_SHARED_CREDENTIALS_FILE=/dev/null
+
             COMMIT_SHA=$(tr -d '\n' < "$ote_build_commit")
             SBOM_FILE="$ote_bom_artifact"
 
