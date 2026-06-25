@@ -12,16 +12,17 @@
     --nap-color-primary: var(--fds-color-brand-secondary-lippu);
     --nap-color-dark-bg: var(--fds-color-brand-secondary-mustikka);
     --nap-max-width: 1200px;
-    --nap-default-space: 2rem;
+    --nap-default-space: var(--fds-size-4);
     --nap-icon-square-size: 3rem;
+    --nap-catalogue-card-overlap: var(--nap-default-space);
 
     @media (min-width: 500px) {
-        --nap-default-space: 3rem;
+        --nap-default-space: var(--fds-size-6);
         --nap-icon-square-size: 4rem;
     }
 
     @media (min-width: 900px) {
-        --nap-default-space: 5rem;
+        --nap-default-space: var(--fds-size-8);
         --nap-icon-square-size: 4rem;
     }
 
@@ -520,11 +521,10 @@ img {
 .hero {
     background-color: var(--fds-color-brand-secondary-mustikka);
     color: var(--fds-color-text-1);
-    padding: var(--nap-default-space);
 }
 
 .hero__content {
-    max-width: var(--nap-max-width);
+    padding: var(--nap-default-space);
     margin: 0 auto;
 }
 
@@ -548,42 +548,29 @@ img {
     font-weight: var(--fds-typography-emphasis-default-font-weight);
 }
 
-.hero__media {
-    margin-top: var(--fds-size-4);
-    display: none;
-}
-
-.hero__image {
-    object-fit: cover;
-}
-
 @media (min-width: 990px) {
     .hero {
-        padding: 0 0 0 var(--nap-default-space);
-        height: 46.25rem;
         display: flex;
         flex-wrap: nowrap;
         justify-content: space-between;
-        align-items: center;
     }
 
     .hero__content {
-        margin: 0;
+        max-width: 58%;
+        margin: var(--nap-catalogue-card-overlap) 0;
     }
 
     .hero__text {
-        max-width: 1000px;
-        padding-right: 1rem;
     }
 
     .hero__media {
-        margin-top: 0;
         display: block;
-    }
-
-    .hero__image {
-        height: 46.25rem;
-        width:50vw;
+        margin-top: 0;
+        width: 42%;
+        background-image: url("images/image_1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 }
 
@@ -613,7 +600,7 @@ img {
         justify-content: center;
         flex-direction: row;
         padding: 0 var(--nap-default-space) var(--fds-size-8) var(--nap-default-space);
-        margin-top: calc(0rem - var(--nap-default-space));
+        margin-top: calc((-1) * var(--nap-catalogue-card-overlap));
         gap: 5rem;
     }
     .catalogue-card {
