@@ -14,18 +14,15 @@
     --nap-max-width: 1200px;
     --nap-default-space: 2rem;
     --nap-icon-square-size: 3rem;
-    --nap-heading-size: 2.5rem;
 
     @media (min-width: 500px) {
         --nap-default-space: 3rem;
         --nap-icon-square-size: 4rem;
-        --nap-heading-size: 3rem;
     }
 
     @media (min-width: 900px) {
         --nap-default-space: 5rem;
         --nap-icon-square-size: 4rem;
-        --nap-heading-size: 3rem;
     }
 
     @media (min-width: 1200px) {
@@ -634,7 +631,7 @@ img {
 }
 
 .catalogue-card__title {
-    font-size: var(--nap-heading-size);
+    font-size: var(--fds-typography-heading-small-heading-4-font-size);
     margin: 0 6px;
     line-height: 110%;
     font-weight: 700;
@@ -732,7 +729,7 @@ img {
 }
 
 .info-section__heading-text {
-    font-size: var(--nap-heading-size);
+    font-size: var(--fds-typography-heading-small-heading-1-font-size);
     line-height: 110%;
     font-weight: 700;
 }
