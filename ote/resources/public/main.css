@@ -557,7 +557,7 @@ img {
 
     .hero__content {
         max-width: 58%;
-        margin: var(--nap-catalogue-card-overlap) 0;
+        margin: var(--fds-size-3) 0 var(--nap-catalogue-card-overlap) 0;
     }
 
     .hero__text {
