@@ -633,8 +633,8 @@ img {
 }
 
 .catalogue-card__title {
-    font-size: var(--fds-typography-heading-small-heading-4-font-size);
-    margin: 0 6px;
+    font-size: var(--fds-typography-heading-small-heading-2-font-size);
+    margin: 0 var(--fds-size-2);
     line-height: 110%;
     font-weight: 700;
     overflow-wrap: break-word;
