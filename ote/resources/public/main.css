@@ -49,7 +49,7 @@
 }
 
 body {
-    font-family: var(--fds-typography-body-default-font-family);
+    font-family: var(--fds-typography-body-default-font-family), sans-serif;
     font-size: var(--fds-typography-body-default-font-size);
     line-height: var(--fds-typography-body-default-line-height);
     font-weight: var(--fds-typography-body-default-font-weight);
