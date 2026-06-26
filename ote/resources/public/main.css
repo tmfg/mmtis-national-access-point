@@ -1,12 +1,36 @@
-/* TODO: remove this */
-@import "tokens.css";
-
 /* ── Settings (Design Tokens) ── */
 
 :root {
     /* FDS tokens (from fds-coreui-css/dist/tokens.css) */
-    /* TODO: Bring only what's used once finished */
-
+    --fds-size-1: 8px;
+    --fds-size-2: 16px;
+    --fds-size-3: 24px;
+    --fds-size-4: 32px;
+    --fds-size-6: 48px;
+    --fds-size-8: 64px;
+    --fds-radius-normal: 4px;
+    --fds-radius-large: 8px;
+    --fds-typography-body-default-font-family: 'Public Sans';
+    --fds-typography-body-default-font-size: 16px;
+    --fds-typography-body-default-line-height: 150%;
+    --fds-typography-body-default-font-weight: 400;
+    --fds-typography-body-large-font-size: 18px;
+    --fds-typography-body-micro-font-size: 12px;
+    --fds-typography-body-small-font-size: 14px;
+    --fds-typography-emphasis-default-font-weight: 700;
+    --fds-typography-heading-large-heading-2-font-size: 48px;
+    --fds-typography-heading-small-heading-1-font-size: 42px;
+    --fds-typography-heading-small-heading-2-font-size: 32px;
+    --fds-color-brand-black: #000000;
+    --fds-color-brand-white: #ffffff;
+    --fds-color-brand-secondary-mustikka: #202647;
+    --fds-color-brand-secondary-lippu: #213BF7;
+    --fds-color-neutral-50: #F6F6F6;
+    --fds-color-neutral-100: #cdcdd7;
+    --fds-color-neutral-200: #9696aa;
+    --fds-color-neutral-300: #505064;
+    --fds-color-text-1: #ffffff;
+    --fds-color-text-1000: #000000;
 
     /* Project-specific tokens (not in FDS) */
     --nap-color-primary: var(--fds-color-brand-secondary-lippu);
