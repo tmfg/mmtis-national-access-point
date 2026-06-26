@@ -2,6 +2,25 @@
 
 :root {
     /* FDS tokens (from fds-coreui-css/dist/tokens.css) */
+    --fds-size-1: 8px;
+    --fds-size-2: 16px;
+    --fds-size-3: 24px;
+    --fds-size-4: 32px;
+    --fds-size-6: 48px;
+    --fds-size-8: 64px;
+    --fds-radius-normal: 4px;
+    --fds-radius-large: 8px;
+    --fds-typography-body-default-font-family: 'Public Sans';
+    --fds-typography-body-default-font-size: 16px;
+    --fds-typography-body-default-line-height: 150%;
+    --fds-typography-body-default-font-weight: 400;
+    --fds-typography-body-large-font-size: 18px;
+    --fds-typography-body-micro-font-size: 12px;
+    --fds-typography-body-small-font-size: 14px;
+    --fds-typography-emphasis-default-font-weight: 700;
+    --fds-typography-heading-large-heading-2-font-size: 48px;
+    --fds-typography-heading-small-heading-1-font-size: 42px;
+    --fds-typography-heading-small-heading-2-font-size: 32px;
     --fds-color-brand-black: #000000;
     --fds-color-brand-white: #ffffff;
     --fds-color-brand-secondary-mustikka: #202647;
@@ -10,69 +29,37 @@
     --fds-color-neutral-100: #cdcdd7;
     --fds-color-neutral-200: #9696aa;
     --fds-color-neutral-300: #505064;
-    --fds-color-neutral-400: #2c2c44;
     --fds-color-text-1: #ffffff;
-    --fds-color-text-300: #9696aa;
     --fds-color-text-1000: #000000;
-    --fds-color-interactive-200: #1777f8;
-    --fds-size-1: 8px;
-    --fds-size-2: 16px;
-    --fds-size-3: 24px;
-    --fds-size-4: 32px;
-    --fds-size-6: 48px;
-    --fds-size-8: 64px;
-    --fds-size-12: 96px;
-    --fds-radius-compact: 2px;
-    --fds-radius-normal: 4px;
-    --fds-radius-large: 8px;
-    --fds-radius-rounded: 1000px;
-    --fds-typography-body-default-font-family: 'Public Sans', sans-serif;
-    --fds-typography-body-default-font-size: 16px;
-    --fds-typography-body-default-line-height: 150%;
-    --fds-typography-body-default-font-weight: 400;
-    --fds-typography-emphasis-default-font-weight: 700;
-    --fds-typography-body-small-font-size: 14px;
-    --fds-typography-body-micro-font-size: 12px;
 
     /* Project-specific tokens (not in FDS) */
     --nap-color-primary: var(--fds-color-brand-secondary-lippu);
     --nap-color-dark-bg: var(--fds-color-brand-secondary-mustikka);
     --nap-max-width: 1200px;
-    --nap-default-space: 2rem;
+    --nap-default-space: var(--fds-size-4);
     --nap-icon-square-size: 3rem;
-    --nap-heading-size: 2.5rem;
+    --nap-catalogue-card-overlap: var(--nap-default-space);
 
     @media (min-width: 500px) {
-        --nap-default-space: 3rem;
+        --nap-default-space: var(--fds-size-6);
         --nap-icon-square-size: 4rem;
-        --nap-heading-size: 3rem;
     }
 
     @media (min-width: 900px) {
-        --nap-default-space: 5rem;
+        --nap-default-space: var(--fds-size-8);
         --nap-icon-square-size: 4rem;
-        --nap-heading-size: 3rem;
     }
 
     @media (min-width: 1200px) {
-        --fds-typography-body-default-font-size: 18px;
-        --fds-typography-body-small-font-size: 16px;
-        --fds-typography-body-micro-font-size: 14px;
     }
 
     @media (min-width: 1500px) {
-        --fds-typography-body-default-font-size: 22px;
-        --fds-typography-body-small-font-size: 20px;
-        --fds-typography-body-micro-font-size: 18px;
     }
 
     @media (min-width: 2000px) {
-        --fds-typography-body-default-font-size: 30px;
-        --fds-typography-body-small-font-size: 28px;
-        --fds-typography-body-micro-font-size: 26px;
     }
 
-    font-size: var(--fds-typography-body-default-font-size);
+    font-size: 16px;
 }
 
 /* ── Base ── */
@@ -86,7 +73,7 @@
 }
 
 body {
-    font-family: var(--fds-typography-body-default-font-family);
+    font-family: var(--fds-typography-body-default-font-family), sans-serif;
     font-size: var(--fds-typography-body-default-font-size);
     line-height: var(--fds-typography-body-default-line-height);
     font-weight: var(--fds-typography-body-default-font-weight);
@@ -558,16 +545,15 @@ img {
 .hero {
     background-color: var(--fds-color-brand-secondary-mustikka);
     color: var(--fds-color-text-1);
-    padding: var(--nap-default-space);
 }
 
 .hero__content {
-    max-width: var(--nap-max-width);
+    padding: var(--nap-default-space);
     margin: 0 auto;
 }
 
 .hero__heading {
-    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-size: var(--fds-typography-heading-large-heading-2-font-size);
     font-weight: var(--fds-typography-emphasis-default-font-weight);
     line-height: 110%;
     margin-bottom: var(--fds-size-3);
@@ -586,42 +572,29 @@ img {
     font-weight: var(--fds-typography-emphasis-default-font-weight);
 }
 
-.hero__media {
-    margin-top: var(--fds-size-4);
-    display: none;
-}
-
-.hero__image {
-    object-fit: cover;
-}
-
 @media (min-width: 990px) {
     .hero {
-        padding: 0 0 0 var(--nap-default-space);
-        height: 46.25rem;
         display: flex;
         flex-wrap: nowrap;
         justify-content: space-between;
-        align-items: center;
     }
 
     .hero__content {
-        margin: 0;
+        max-width: 58%;
+        margin: var(--fds-size-3) 0 var(--nap-catalogue-card-overlap) 0;
     }
 
     .hero__text {
-        max-width: 1000px;
-        padding-right: 1rem;
     }
 
     .hero__media {
-        margin-top: 0;
         display: block;
-    }
-
-    .hero__image {
-        height: 46.25rem;
-        width:50vw;
+        margin-top: 0;
+        width: 42%;
+        background-image: url("images/image_1.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 }
 
@@ -651,7 +624,7 @@ img {
         justify-content: center;
         flex-direction: row;
         padding: 0 var(--nap-default-space) var(--fds-size-8) var(--nap-default-space);
-        margin-top: calc(0rem - var(--nap-default-space));
+        margin-top: calc((-1) * var(--nap-catalogue-card-overlap));
         gap: 5rem;
     }
     .catalogue-card {
@@ -660,8 +633,8 @@ img {
 }
 
 .catalogue-card__title {
-    font-size: var(--nap-heading-size);
-    margin: 0 6px;
+    font-size: var(--fds-typography-heading-small-heading-2-font-size);
+    margin: 0 var(--fds-size-2);
     line-height: 110%;
     font-weight: 700;
     overflow-wrap: break-word;
@@ -669,9 +642,9 @@ img {
 }
 
 .catalogue-card__subtitle {
-    font-size: var(--fds-typography-body-small-font-size);
+    font-size: var(--fds-typography-body-large-font-size);
+    font-weight: var(--fds-typography-emphasis-default-font-weight);
     margin-top: 0.5rem;
-    color: var(--fds-color-neutral-200);
 }
 
 .catalogue-card__divider {
@@ -679,6 +652,7 @@ img {
     height: 3px;
     background-color: blue;
     color: blue;
+    border: none;
     margin: 2.25rem 0;
 }
 
@@ -758,7 +732,7 @@ img {
 }
 
 .info-section__heading-text {
-    font-size: var(--nap-heading-size);
+    font-size: var(--fds-typography-heading-small-heading-1-font-size);
     line-height: 110%;
     font-weight: 700;
 }
