@@ -618,9 +618,9 @@ img {
 }
 
 .catalogue-card__subtitle {
-    font-size: var(--fds-typography-body-small-font-size);
+    font-size: var(--fds-typography-body-large-font-size);
+    font-weight: var(--fds-typography-emphasis-default-font-weight);
     margin-top: 0.5rem;
-    color: var(--fds-color-neutral-200);
 }
 
 .catalogue-card__divider {
