@@ -628,6 +628,7 @@ img {
     height: 3px;
     background-color: blue;
     color: blue;
+    border: none;
     margin: 2.25rem 0;
 }
 
