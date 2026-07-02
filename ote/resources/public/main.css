@@ -880,7 +880,6 @@ img {
 
 .timeline__subtext {
     margin-bottom: var(--fds-size-6);
-    max-width: 90ch;
 }
 
 .timeline__steps {
