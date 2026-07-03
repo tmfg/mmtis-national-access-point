@@ -875,7 +875,7 @@ img {
 .timeline__heading {
     font-size: clamp(1.25rem, 3vw, 2rem);
     font-weight: var(--fds-typography-emphasis-default-font-weight);
-    margin-bottom: var(--fds-size-1);
+    margin-bottom: var(--fds-size-2);
 }
 
 .timeline__subtext {
