@@ -1,4 +1,4 @@
-(ns ote.views.confirm-email
+  (ns ote.views.confirm-email
   "Email confirmation page"
   (:require [ote.app.controller.confirm-email :as ce]
             [ote.localization :refer [tr tr-key]]
@@ -13,7 +13,7 @@
                                :type :success}]
    (when (:user app)
      [:div {:style {:margin-top "1rem"}}
-        [common-ui/linkify "/#/login" (tr [:login :login-button])]])])
+        [common-ui/linkify "#/login" (tr [:login :login-button])]])])
 
 (defn- confirm-failure
   []
@@ -22,7 +22,7 @@
     (tr [:register :confirmation-failed])]
    [:div {:style {:margin-top "1rem"}}
     [:p [common-ui/linkify "#/confirm-email/resend-token" (tr [:common-texts :send-new-message])]]
-    [:p [common-ui/linkify "/#/login" (tr [:login :login-button])]]]])
+    [:p [common-ui/linkify "#/login" (tr [:login :login-button])]]]])
 
 (defn confirm-email
   [e! app]
