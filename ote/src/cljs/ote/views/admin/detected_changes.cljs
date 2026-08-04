@@ -503,7 +503,7 @@
                  :vertical-align "top"}
        :rowSpan 2}
       [common-ui/linkify
-       (str "/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
+       (str "#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))
        [:span
         (get-in report [:transport-operator :name])
         [:br]
