@@ -69,7 +69,7 @@
                 ^{:key (str "prices_" service-id)}
                 [ui/table-row {:selectable true}
                  [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "12%"})
-                  [:a {:href     (str "/edit-service/" service-id)
+                  [:a {:href     (str "#/edit-service/" service-id)
                        :on-click #(do
                                     (.preventDefault %)
                                     (e! (admin-validation/->EditService service-id)))} name]]

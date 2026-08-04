@@ -56,7 +56,7 @@
      [:div.row (stylefy/use-style style-front-page/hero-btn-container)
       [:div {:style {:width "330px" :margin-left "auto" :margin-right "auto"}}
        [:a {:style {:text-decoration "none"}
-            :href "/#/services"
+            :href "#/services"
             :on-click #(do
                          (.preventDefault %)
                          (e! (fp/->ChangePage :services nil)))}

@@ -184,7 +184,7 @@
                     [:span service-name])]
     (if date
       [:a {:style {:text-decoration "none" :color colors/gray800}
-           :href (str "/transit-visualization/" transport-service-id "/" formatted-date)
+           :href (str "#/transit-visualization/" transport-service-id "/" formatted-date)
            :on-click #(do
                         (.preventDefault %)
                         (e! (tc/->ShowChangesForService transport-service-id date)))}

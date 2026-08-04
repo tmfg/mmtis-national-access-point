@@ -17,7 +17,7 @@
             [cljs-time.core :as t]))
 
 (defn- edit-sea-route-link [e! route-id route-name]
-  [:a {:href (str "/#/edit-route/" route-id)
+  [:a {:href (str "#/edit-route/" route-id)
        :on-click #(do
                     (.preventDefault %)
                     (e! (admin-controller/->ChangeRedirectTo :admin))

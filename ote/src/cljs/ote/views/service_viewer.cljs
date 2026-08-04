@@ -144,7 +144,7 @@
   [service-name]
   [:section
    [common-ui/linkify
-    "/#/services"
+    "#/services"
     [:span
      [feather-icons/arrow-left style-base/inline-icon]
      (tr [:service-search :back-link])]]

@@ -123,6 +123,10 @@
         [:script {:src "js/out/goog/base.js" :type "text/javascript"}])
       [:script {:src (ote-js-location dev-mode?) :type "text/javascript"}]
       (when dev-mode?
+        ;; Loading figwheel.preload triggers figwheel.connect/start, which opens the
+        ;; websocket connection to the figwheel server for hot code reloading.
+        [:script {:type "text/javascript"} "goog.require('figwheel.preload');"])
+      (when dev-mode?
         [:script {:type "text/javascript"} "goog.require('ote.main');"])
       [:script {:src "js-ext/leaflet.polylineoffset.js" :type "text/javascript"}]]]))
 

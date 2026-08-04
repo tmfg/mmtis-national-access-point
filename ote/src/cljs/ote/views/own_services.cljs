@@ -90,7 +90,7 @@
                                   :overflow "visible"}}
             [ui/table-row-column {:class "table-col-style-semi-wrap"
                                   :style {:width "23%"}}
-             [:a (merge {:href (str "/#/edit-service/" id)
+             [:a (merge {:href (str "#/edit-service/" id)
                          :on-click #(do (.preventDefault %)
                                         (e! (fp-controller/->ChangePage :edit-service {:id id})))}
                         (stylefy/use-sub-style style-base/basic-table :link)) name]]
@@ -200,7 +200,7 @@
       #_ (when (error-keys :no-schedule-sea)
         [:p {:style {:margin 0}}
          [:strong (tr [:enums ::t-service/transport-type :sea]) " • "]
-         [linkify "/#/routes" (tr [:own-services-page :open-sea-rae]) {:target "_blank"}]])]
+         [linkify "#/routes" (tr [:own-services-page :open-sea-rae]) {:target "_blank"}]])]
      {:icon ic-warning
       :default-open? true}]))
 
