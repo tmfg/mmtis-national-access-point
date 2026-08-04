@@ -95,7 +95,7 @@
                [ui/table-row-column
                 (merge (stylefy/use-style style-base/table-col-style-wrap)
                        {:width "20%"})
-                [:a {:href (str "/edit-service/" id)
+                [:a {:href (str "#/edit-service/" id)
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (fp/->ChangePage :edit-service {:id id})))} name]]

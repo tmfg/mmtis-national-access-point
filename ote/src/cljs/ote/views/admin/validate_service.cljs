@@ -42,7 +42,7 @@
               ^{:key (:id result)}
               [ui/table-row {:selectable false}
                [ui/table-row-column (merge (stylefy/use-style style-base/table-col-style-wrap) {:width "20%"})
-                [:a {:href (str "/edit-service/" id)
+                [:a {:href (str "#/edit-service/" id)
                      :on-click #(do
                                   (.preventDefault %)
                                   (e! (admin-validation/->EditService id)))} name]]
