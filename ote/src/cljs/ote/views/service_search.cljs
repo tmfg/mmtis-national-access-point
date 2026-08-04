@@ -155,7 +155,7 @@
         formatted-desc (cond
                          (> (count service-desc) 90)
                          [:span (str (str/join (take 80 service-desc)) "... ")
-                          [common-ui/linkify (str "/#/service/" transport-operator-id "/" id)
+                          [common-ui/linkify (str "#/service/" transport-operator-id "/" id)
                            (tr [:service-search :show-all-information])]]
                          (not-empty service-desc)
                          [:span service-desc]
@@ -187,7 +187,7 @@
        [:a (merge (stylefy/use-style (merge button-styles/primary-button
                                        {:padding "1rem"}))
                   {:id "all-info-link"
-                   :href (str "/#/service/" transport-operator-id "/" id)})
+                   :href (str "#/service/" transport-operator-id "/" id)})
         [:span (tr [:service-search :show-all-information])]
         [ic/navigation-chevron-right {:style {:color "#fff"}}]]]]
      [:div (stylefy/use-sub-style style/result-card :body)
