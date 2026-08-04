@@ -38,7 +38,7 @@
                  [:span interface-url " Ladattu NAPiin "
                   (if show-link?
                     (common/linkify
-                      (str "/#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all/")
+                      (str "#/transit-visualization/" service-id "/" (time/format-date-iso-8601 created) "/all/")
                       (str (time/format-timestamp-for-ui created)))
                     (str (time/format-timestamp-for-ui created)))] ". "
                  "Sisältää tietoa liikennöinnistä ajanjaksolle  " min-date " - " max-date "."
