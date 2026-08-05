@@ -43,12 +43,6 @@
     ["/confirm-email/resend-token" :resend-confirmation]
     ["/confirm-email/:token" :confirm-email]
 
-    ;; Route based traffic
-    ;; MeriRAE is disabled
-    ;["/routes" :routes]
-    ;["/route/new" :new-route]
-    ;["/edit-route/:id" :edit-route]
-
     ["/routes/view-gtfs" :view-gtfs]
     ["/transit-visualization/:service-id/:date/:scope/:route-hash-id/:change-id/" :transit-visualization]
     ["/transit-visualization/:service-id/:date/:scope/:route-hash-id/" :transit-visualization]
@@ -76,7 +70,6 @@
 ;; Add pages that needs authenticating to this list
 (def auth-required #{:own-services :transport-service :edit-service :new-service
                      :transport-operator :operator-users
-                     :routes :new-route :edit-route
                      :new-notice :edit-pre-notice :pre-notices
                      :email-settings :user-edit})
 

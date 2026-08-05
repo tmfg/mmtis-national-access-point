@@ -177,11 +177,6 @@
                                 [:span (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
                                  [linkify "https://www.traficom.fi/fi/asioi-kanssamme/saannollisen-henkiloliikenteen-reitti-ja-aikataulutiedon-digitoiminen"
                                   (str (tr [:form-help :RAE-link-text]) ". ")
-                                  {:target "_blank"}]])
-                              (when (and (flags/enabled? :sea-routes) (:sea transport-type))
-                                [:span
-                                 (str (tr [:form-help :external-interfaces-intro-rae-text]) " ")
-                                 [linkify "/ote/#/routes" (tr [:form-help :SEA-ROUTE-link-text])
                                   {:target "_blank"}]])]
                              (tr [:form-help :external-interfaces-intro]))]]
                       [:div (tr [:form-help :external-interfaces])]

@@ -73,11 +73,6 @@
 (defrecord GetInterfaceDownloadsResponse [response interface-id])
 (defrecord CloseDownloadList [])
 
-;; Sea route tab
-(defrecord UpdateSeaRouteFilters [filter])
-(defrecord SearchSeaRoutes [])
-(defrecord SearchSeaRoutesResponse [response])
-
 ;; Netex tab
 (defrecord UpdateNetexFilters [filter])
 (defrecord SearchNetexConversions [])
@@ -346,8 +341,7 @@
                {:on-success (tuck/send-async! ->GetInterfaceDownloadsResponse interface-id)
                 :on-failure (tuck/send-async! ->ServerError)})
     (-> app
-        (assoc-in [:admin :interface-list :selected-interface-id] interface-id)
-        (assoc-in [:admin :sea-routes :loading-tab?] true)))
+        (assoc-in [:admin :interface-list :selected-interface-id] interface-id)))
 
   CloseDownloadList
   (process-event [_ app]
@@ -368,22 +362,6 @@
   CloseOperatorModal
   (process-event [_ app]
     (assoc-in app [:admin :interface-list :operator-modal] nil))
-
-  UpdateSeaRouteFilters
-  (process-event [{filter :filter} app]
-    (update-in app [:admin :sea-routes] assoc :filters filter))
-
-  SearchSeaRoutes
-  (process-event [_ app]
-    (comm/post! "admin/sea-routes" (get-in app [:admin :sea-routes :filters])
-                {:on-success (tuck/send-async! ->SearchSeaRoutesResponse)})
-    (assoc-in app [:admin :sea-routes :loading?] true))
-
-  SearchSeaRoutesResponse
-  (process-event [{response :response} app]
-    (update-in app [:admin :sea-routes] assoc
-               :loading? false
-               :results response))
 
   UpdateNetexFilters
   (process-event [{filter :filter} app]

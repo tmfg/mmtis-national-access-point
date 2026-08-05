@@ -61,7 +61,6 @@
  ;; add features to the set to enable them in this environment
  :enabled-features #{:ote-login
                      :ote-operators-list
-                     #_ :sea-routes
                      :pre-notice
                      :gtfs-import
                      :ote-register

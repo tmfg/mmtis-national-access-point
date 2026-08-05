@@ -14,7 +14,6 @@
             [ote.gtfs.transform :as gtfs-transform]
             [ote.db.transport-operator :as t-operator]
             [ote.db.transport-service :as t-service]
-            [ote.integration.export.gtfs :as gtfs]
             [ote.services.transport :as transport-service]
             [ote.util.transport-operator-util :as op-util]
             [ote.util.zip :as zip]
@@ -151,6 +150,16 @@
      :gtfs-flex/booking_prior_notice_last_day 1
      :gtfs-flex/booking_phone_number          (str phone-countrycode phone-number)}))
 
+(defn- get-transport-operator
+  [db transport-operator-id]
+  (first (specql/fetch db ::t-operator/transport-operator
+                       #{::t-operator/id
+                         ::t-operator/name
+                         ::t-operator/homepage
+                         ::t-operator/phone
+                         ::t-operator/email}
+                       {::t-operator/id transport-operator-id})))
+
 (defn get-transport-service
   [db transport-service-id]
   (first (specql/fetch db ::t-service/transport-service
@@ -163,51 +172,31 @@
                        {::t-service/id transport-service-id})))
 
 (defn export-gtfs-flex
-  "This function is an adaptation of the GTFS generation in [[ote.gtfs.transform/sea-routes-gtfs]]"
+  "Export GTFS Flex package for a transport service with operation areas."
   [db config transport-operator-id transport-service-id]
-
-  ; load raw data and structures
-  (let [transport-operator (gtfs/get-transport-operator db transport-operator-id)
+  (let [transport-operator (get-transport-operator db transport-operator-id)
         areas              (seq (fetch-operation-area-for-service db {:transport-service-id transport-service-id}))
-        routes             (->> (gtfs/get-sea-routes db transport-operator-id)
-                                (mapv #(assoc % :services (gtfs-transform/route-services %))))
         agency-txt         (gtfs-transform/agency-txt transport-operator)
-        calendar-dates-txt (gtfs-transform/calendar-dates-txt routes)
-        ; XXX: trips carries over metadata which is not part of any spec, but the existing functionality relies on it
-        pseudo-trips       (gtfs-transform/sea-trips-txt routes)
-        gtfs-trips         (->> pseudo-trips (map #(dissoc % :stoptimes)))
-        gtfs-stop-times    (gtfs-transform/sea-stop-times-txt routes pseudo-trips)
-        gtfs-routes        (gtfs-transform/sea-routes-txt (::t-operator/id transport-operator) routes)
-        gtfs-stops (gtfs-transform/stops-txt (into {}
-                                                   (comp (mapcat :ote.db.transit/stops)
-                                                         (map (juxt :ote.db.transit/code identity)))
-                                                   routes))
-        gtfs-calendar      (gtfs-transform/calendar-txt routes)]
-    ; complement GTFS content with GTFS Flex additions
-    (let [transport-service (get-transport-service db transport-service-id)
-          static-route-id   (str (::t-operator/name transport-operator) " route")
-          static-service-id (str (::t-operator/name transport-operator) " schedule")
-          static-trip-id    (str (::t-operator/name transport-operator) " transport service")
-          flex-trips        (conj gtfs-trips
-                                  (->static-trips static-route-id static-trip-id static-service-id))
-          ; TODO: defaulting to bus is due to backwards compatability, feel free to improve this detection if necessary
-          readable-route-type (if (= (::t-service/sub-type transport-service) :taxi)
-                                :taxi
-                                :bus)
-          flex-routes       (conj gtfs-routes
-                                  (->static-routes
-                                    static-route-id
-                                    readable-route-type
-                                    transport-operator-id
-                                    (::t-operator/name transport-operator)
-                                    (::t-service/name transport-service)))
-          flex-booking-rule (->booking-rules db transport-service)  ; TODO: maybe apply to all stop times?
-          flex-stop-times   (concat gtfs-stop-times
-                                    (->static-stop-times static-trip-id areas flex-booking-rule))
-          flex-calendar     (->calendar static-service-id transport-service)
-          flex-locations    (when-not (empty? areas)
-                              (-> (->geojson-feature-collection areas)
-                                  (cheshire/encode {:key-fn name})))]
+        transport-service  (get-transport-service db transport-service-id)
+        static-route-id    (str (::t-operator/name transport-operator) " route")
+        static-service-id  (str (::t-operator/name transport-operator) " schedule")
+        static-trip-id     (str (::t-operator/name transport-operator) " transport service")
+        flex-trips         [(->static-trips static-route-id static-trip-id static-service-id)]
+        readable-route-type (if (= (::t-service/sub-type transport-service) :taxi)
+                              :taxi
+                              :bus)
+        flex-routes        [(->static-routes
+                              static-route-id
+                              readable-route-type
+                              transport-operator-id
+                              (::t-operator/name transport-operator)
+                              (::t-service/name transport-service))]
+        flex-booking-rule  (->booking-rules db transport-service)
+        flex-stop-times    (->static-stop-times static-trip-id areas flex-booking-rule)
+        flex-calendar      (->calendar static-service-id transport-service)
+        flex-locations     (when-not (empty? areas)
+                             (-> (->geojson-feature-collection areas)
+                                 (cheshire/encode {:key-fn name})))]
     {:status  200
      :headers {"Content-Type"        "application/zip"
                "Content-Disposition" (str "attachment; filename=" (op-util/gtfs-flex-file-name transport-operator))}
@@ -216,21 +205,17 @@
                        :data (parse/unparse-gtfs-file :gtfs/agency-txt agency-txt)}
                       {:name "routes.txt"
                        :data (parse/unparse-gtfs-file :gtfs/routes-txt flex-routes)}
-                      {:name "stops.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/stops-txt gtfs-stops)}
                       {:name "trips.txt"
                        :data (parse/unparse-gtfs-file :gtfs/trips-txt flex-trips)}
                       {:name "calendar.txt"
                        :data (parse/unparse-gtfs-file :gtfs/calendar-txt flex-calendar)}
-                      {:name "calendar_dates.txt"
-                       :data (parse/unparse-gtfs-file :gtfs/calendar-dates-txt calendar-dates-txt)}
                       {:name "locations.geojson"
                        :data flex-locations}
                       {:name "stop_times.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/stop-times-txt flex-stop-times)}
                       {:name "booking_rules.txt"
                        :data (parse/unparse-gtfs-file :gtfs-flex/booking-rules-txt [flex-booking-rule])}]
-                     (partial zip-content)))})))
+                     (partial zip-content)))}))
 
 (defrecord GTFSFlexExport [config]
   component/Lifecycle
