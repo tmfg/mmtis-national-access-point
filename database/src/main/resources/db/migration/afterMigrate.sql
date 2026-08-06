@@ -3,7 +3,7 @@ DECLARE
   r RECORD;
   sql TEXT;
 BEGIN
-  FOR r IN SELECT relname FROM pg_catalog.pg_class WHERE relowner=(SELECT usesysid FROM pg_catalog.pg_user WHERE usename='flyway') AND relkind IN ('r','v','S','m')
+  FOR r IN SELECT c.relname FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relowner=(SELECT usesysid FROM pg_catalog.pg_user WHERE usename='flyway') AND c.relkind IN ('r','v','S','m') AND n.nspname = current_schema()
   LOOP
     sql := 'GRANT ALL PRIVILEGES ON "' || r.relname || '" TO ote';
     EXECUTE sql;
