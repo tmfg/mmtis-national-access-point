@@ -5,7 +5,7 @@ describe('Service search page basic tests', function () {
         cy.server();
         cy.route('/service-search*').as('serviceSearch');
 
-        cy.visit('/#/services');
+        cy.visit('/mmtis/#/services');
 
         cy.wait('@serviceSearch');
 

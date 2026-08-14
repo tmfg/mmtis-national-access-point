@@ -664,9 +664,9 @@
 
  ## **NAP-tjänstens uppbyggnad**
 
- På sidan [Tjänstekatalog](/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
+ På sidan [Tjänstekatalog](/mmtis/#/services) -kan du kontrollera och hämta gränssnitt som publicerats i tjänsten.
 
- På sidan [Tjänsteproducenter](/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
+ På sidan [Tjänsteproducenter](/mmtis/#/operators) -ser du en lista över de organisationer som registrerat sig i tjänsten.
 
  Man måste vara inloggad för att digitalisera eller publicera mobilitetstjänster i NAP-tjänsten.")
   :hero-title "Katalogen med Finlands mobilitetstjänster avsedd för tjänsteutvecklare."

@@ -29,7 +29,7 @@ describe('Operator creation basic tests', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
     });
 
     it('should navigate to own services', function () {
@@ -51,7 +51,7 @@ describe('Operator creation basic tests', function () {
 
         // Save button should be disabled
         cy.get('#btn-operator-save').should('be.disabled');
-        cy.visit('/#/');
+        cy.visit('/mmtis/#/');
         cy.get('#btn-confirm-leave-page').click({ force: true });
     });
 });
@@ -84,7 +84,7 @@ describe('Operator creation advanced tests', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
     });
 
     it('should add new operator', function () {
@@ -121,13 +121,13 @@ describe('Operator creation advanced tests', function () {
         cy.contains(newOperatorName);
 
         // Ensure that other pages have it selected by default
-        cy.visit('/#/pre-notices');
+        cy.visit('/mmtis/#/pre-notices');
         cy.contains(newOperatorName);
-        cy.visit('/#/routes');
+        cy.visit('/mmtis/#/routes');
         cy.contains(newOperatorName);
 
         // Delete operator
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
         cy.get('#edit-transport-operator-btn').click({force: true});
         cy.get('#btn-delete-transport-operator').click();
         cy.get('#confirm-operator-delete').click({force: true});
@@ -149,7 +149,7 @@ describe('Operator creation advanced tests', function () {
 
 
         // Add user to operator
-        cy.visit('/#/transport-operator/1/users');
+        cy.visit('/mmtis/#/transport-operator/1/users');
         cy.contains('Hallinnoi käyttöoikeuksia');
 
         // HOX!!!! We need to use Amazon SES email simulator.
@@ -221,4 +221,3 @@ describe('Operator creation advanced tests', function () {
 // TODO: test delete test operator
     });
 */
-

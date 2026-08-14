@@ -28,7 +28,7 @@
     "TÄMÄ ON TESTIPALVELU!!"]
    [:p {:style {:margin "10px"}}
     "Julkinen NAP-palvelukatalogi löytyy osoitteesta: "
-    [linkify "https://finap.fi/ote/#/services" "finap.fi"]]
+    [linkify "https://finap.fi/mmtis/#/services" "finap.fi"]]
    [:p {:style {:margin "10px"}}
     "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta "
     [linkify (tr [:common-texts :footer-livi-url-link])
