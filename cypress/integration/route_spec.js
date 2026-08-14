@@ -11,7 +11,7 @@ describe('Sea route tests', function () {
 
 
     it('Create new route', function () {
-        cy.visit('/#/routes/');
+        cy.visit('/mmtis/#/routes/');
         cy.contains('Lisää uusi merireitti').click();
     });
 
@@ -79,7 +79,7 @@ describe('Sea route tests', function () {
 
     it('Link route to service - create new service', function () {
         const service = this.service;
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
 
         // Add new schedule type service
         cy.server();
@@ -117,7 +117,7 @@ describe('Sea route tests', function () {
 
     it('Link route to new service', function () {
         // Link route to schedule service
-        cy.visit('/#/routes/');
+        cy.visit('/mmtis/#/routes/');
         cy.wait(200)
         cy.contains('Valmiiden reittien liittäminen palveluun');
         cy.contains('Valitse alapuolelta palvelut, joihin haluat liittää valmiit merenkulun reitit.');
@@ -138,14 +138,14 @@ describe('Sea route tests', function () {
     });
 
     it('Delete public route', function () {
-        cy.visit('/#/routes/');
+        cy.visit('/mmtis/#/routes/');
         cy.get('div.public').get('[id*="delete-route"]').last().click();
         cy.contains('button', 'Poista').click();
         cy.contains('Test route').should('not.exist');
     });
 
     it('Delete schedule service', function () {
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
         cy.server();
         cy.route('POST', '/transport-service/delete').as('deleteService');
 

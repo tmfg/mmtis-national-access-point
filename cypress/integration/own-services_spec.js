@@ -13,7 +13,7 @@ describe('Own services basic tests', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/own-services' );
+        cy.visit('/mmtis/#/own-services' );
     });
 
     it('should render the own services page', function () {
@@ -55,7 +55,7 @@ describe('Add a new service', function () {
             cy.server();
             cy.route('POST', '/transport-service').as('addService');
 
-            cy.visit('/#/own-services');
+            cy.visit('/mmtis/#/own-services');
             cy.get('a[id*="new-service-button"]').click({force: true});
 
             cy.get('[id*="Valitseliikkumispalveluntyyppi"]')
@@ -119,7 +119,7 @@ describe('Add a new service', function () {
             cy.server();
             cy.route('POST', '/transport-service/delete').as('deleteService');
 
-            cy.visit('/#/own-services');
+            cy.visit('/mmtis/#/own-services');
 
             cy.contains('tr', this.serviceName)
                 .within($tr => {
@@ -144,7 +144,7 @@ describe('Add a new service', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
     });
 
     // Currently these test won't work in PR run. Because we do not have ckan there.
@@ -198,7 +198,7 @@ describe('Add a new service', function () {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
         cy.fixture('services/taxi.json').as('service');
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
     });
 
     it('Should be in own-services page and have a provider added', function () {

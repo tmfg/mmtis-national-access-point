@@ -514,7 +514,7 @@
   ;; Use this when navigating outside of OTE. Above methods won't work from NAP.
   OpenTransportServicePage
   (process-event [{id :id} app]
-    (set! (.-location js/window) (str "/ote/#/edit-service/" id))
+    (set! (.-location js/window) (str "/mmtis/#/edit-service/" id))
     app)
 
   DeleteTransportService

@@ -12,13 +12,13 @@ describe('Pre notice tests', () => {
 
 
     it('should render pre-notice list page', () => {
-        cy.visit('/#/pre-notices');
+        cy.visit('/mmtis/#/pre-notices');
         cy.contains('Omat säännöllisen henkilöliikenteen muutosilmoitukset');
         cy.contains('Lähetetyt muutosilmoitukset');
     });
 
     it('should render pre-notice form page', () => {
-        cy.visit('/#/pre-notices');
+        cy.visit('/mmtis/#/pre-notices');
         cy.server();
         cy.route('GET', '/pre-notices/list').as('getPreNotices');
         // Wait for pre-notices query because it causes re-render of the view.
@@ -37,7 +37,7 @@ describe('Pre notice tests', () => {
 
     it('save and send pre-notice', () => {
         // Open pre notice form
-        cy.visit('/#/pre-notices');
+        cy.visit('/mmtis/#/pre-notices');
         cy.server();
         cy.route('GET', '/pre-notices/list').as('getPreNotices');
 
@@ -74,7 +74,7 @@ describe('Pre notice tests', () => {
 
     it('open the pre-notice and check region', () => {
         // Open pre notice form
-        cy.visit('/#/pre-notices');
+        cy.visit('/mmtis/#/pre-notices');
         cy.server();
         cy.route('GET', '/pre-notices/list').as('getPreNoticeList');
 
@@ -111,7 +111,7 @@ describe('Authority pre notice tests', () => {
         // Session cookies will not be cleared before the NEXT test starts
         cy.preserveSessionOnce();
 
-        cy.visit('/#/authority-pre-notices');
+        cy.visit('/mmtis/#/authority-pre-notices');
     });
 
     it('should render authority pre notice list', () => {

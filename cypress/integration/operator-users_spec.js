@@ -10,7 +10,7 @@ describe('Operator user control', function () {
 
     beforeEach(function () {
         cy.preserveSessionOnce();
-        cy.visit('/#/own-services');
+        cy.visit('/mmtis/#/own-services');
         cy.server();
         cy.get('#select-operator-at-own-services').click();
         cy.contains(operatorName).click({ force: true });

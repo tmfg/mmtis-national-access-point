@@ -664,8 +664,8 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
                         "ole loppukäyttäjien ja matkustajien palvelu, vaan se on tarkoitettu liikkumispalveluiden tuottajille ja "
                         "kehittäjille.\n\n"
                         "## **NAP-palvelun rakenne**\n"
-                        "[Palvelukatalogi](/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
-                        "[Palveluntuottajat](/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
+                        "[Palvelukatalogi](/mmtis/#/services)-sivulla voit tarkastella ja hakea palvelussa julkaistuja rajapintoja.\n\n"
+                        "[Palveluntuottajat](/mmtis/#/operators)-sivulla on listattuna palveluun rekisteröityneet organisaatiot.")
   :hero-title "Suomen liikkumispalveluiden tietojen avoin yhteyspiste palveluiden kehitykseen."
   :new-user? "Uusi käyttäjä?"
 

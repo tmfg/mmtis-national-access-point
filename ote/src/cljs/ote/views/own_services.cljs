@@ -239,7 +239,7 @@
       [:div {:style {:border "red 4px dashed"}}
        [:p {:style {:padding "10px"}} "TÄMÄ ON TESTIPALVELU!"
         [:br]
-        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/#/services"} "finap.fi"]
+        "Julkinen NAP-palvelukatalogi löytyy osoitteesta: " [:a {:href "https://finap.fi/mmtis/#/services"} "finap.fi"]
         [:br]
         "Lisätietoa NAP-palvelukatalogin taustoista saat osoitteesta " [:a {:href (tr [:common-texts :footer-livi-url-link])}
                                                                         (tr [:common-texts :footer-livi-url-link])]]])))
@@ -495,5 +495,4 @@
            [operator-info-container e! has-services? operator-services state]
            ;; Render service type selection page if no services added
            [service-type/select-service-type e! state])]))))
-
 
