@@ -108,7 +108,7 @@
             no-traffic-routes (count (filter #(= "no-traffic" (:change-type %)) change-list))]
 
         [operator-name
-         (str "<a class=\"change-link\" href=\"" (environment/base-url) "#/transit-visualization/"
+         (str "<a class=\"change-link\" href=\"" (environment/base-url) "mmtis/#/transit-visualization/"
            transport-service-id "/" date "/new/\">" (escape-html service-name) "</a>")
          (str/join ", " (db-util/PgArray->vec regions))
          (str days-until-change " pv (" (time/format-date different-week-date) ")")
@@ -125,7 +125,7 @@
 
 (defn- pre-notice-row [{:keys [id regions operator-name pre-notice-type route-description
                                first-effective-date description]}]
-  [[:a {:href (str (environment/base-url) "#/authority-pre-notices/" id)} (escape-html route-description)]
+  [[:a {:href (str (environment/base-url) "mmtis/#/authority-pre-notices/" id)} (escape-html route-description)]
    (escape-html operator-name)
    (str/join ",<br />" (db-util/PgArray->seqable regions))
    (str/join ",<br />" (mapv #(tr [:enums ::transit/pre-notice-type (keyword %)])
@@ -210,7 +210,7 @@
          [:br]
          [:a
           {:style "font-family:Public Sans,helvetica neue,arial,sans-serif;font-size:0.75rem;"
-           :href (str (environment/base-url) "#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]])
+           :href (str (environment/base-url) "mmtis/#/email-settings") :target "_blank"} "Avaa NAPin sähköposti-ilmoitusten asetukset -sivu"]])
       [:br]]]]])
 
 (defn notification-html [pre-notices detected-changes title]
@@ -239,7 +239,7 @@
           (for [n pre-notices]
             (pre-notice-row n)))
         [:br]
-        (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
+        (blue-border-button (str (environment/base-url) "mmtis/#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan lomakeilmoituksia")])
 
      (when (seq detected-changes)
        [:div {:style "background-color:#FFFFFF"}
@@ -260,7 +260,7 @@
             {:class "tg-lusz" :width "25%" :label "Muutokset"}]
            (detected-change-row detected-changes))
          [:br]]
-        (blue-border-button (str (environment/base-url) "#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
+        (blue-border-button (str (environment/base-url) "mmtis/#/transit-changes") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")])
      (html-divider-border nil)]))
 
 (defn notify-user-new-member [new-member requester operator title]
@@ -279,9 +279,9 @@
       (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " (::t-operator/title operator) " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "mmtis/#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
-     (blue-border-button (str (environment/base-url) "#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
+     (blue-border-button (str (environment/base-url) "mmtis/#/own-services") "Avaa NAP-palvelun Omat palvelutiedot -näkymä")
 
      (html-divider-border "100%")]))
 
@@ -299,9 +299,9 @@
      [:p "Voit muokata herätesähköpostien asetuksia viestin lopussa olevasta linkistä."]
      [:br]
      [:p "Mikäli olet saanut kutsun vahingossa, tai et halua alkaa tarkastelemaan muutosilmoituksia, "
-      [:a {:href (str (environment/base-url) "#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
+      [:a {:href (str (environment/base-url) "mmtis/#/transport-operator/" (::t-operator/group-id operator) "/users")} "voit poistaa itsesi jäsenlistalta."]]
      [:br]
-     (blue-border-button (str (environment/base-url) "#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
+     (blue-border-button (str (environment/base-url) "mmtis/#/authority-pre-notices") "Siirry NAP:iin tarkastelemaan tunnistettuja muutoksia")
      [:br]
      [:br]]))
 
@@ -322,7 +322,7 @@
         (str " -nimisen palveluntuottajan jäseneksi. Voit nyt muokata " op-name " -nimisen palvelutuottajan ja sen alla julkaistujen palveluiden tietoja.")]
        [:p "Mikäli olet saanut kutsun vahingossa, tai et halua olla palveluntuottajan jäsen, sinun ei tarvitse tehdä mitään."]
        [:br]
-       (blue-border-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       (blue-border-button (str (environment/base-url) "mmtis/#/register/" token) "Rekisteröidy NAP-palveluun")
 
        (html-divider-border "100%")])))
 
@@ -342,7 +342,7 @@
        [:br]
        [:p "Mikäli olet saanut kutsun vahingossa, sinun ei tarvitse tehdä mitään."]
        [:br]
-       (blue-border-button (str (environment/base-url) "#/register/" token) "Rekisteröidy NAP-palveluun")
+       (blue-border-button (str (environment/base-url) "mmtis/#/register/" token) "Rekisteröidy NAP-palveluun")
        [:br]
        [:br]])))
 
@@ -354,7 +354,7 @@
      [:br]
      [:p (tr [:email-templates :email-verification :if-not-registered])]
      [:br]
-     (blue-border-button (str (environment/base-url) "#/confirm-email/" token) (tr [:email-templates :email-verification :verify-email]))
+     (blue-border-button (str (environment/base-url) "mmtis/#/confirm-email/" token) (tr [:email-templates :email-verification :verify-email]))
      (html-divider-border "100%")]))
 
 (defn reset-password [title token user]
@@ -371,7 +371,7 @@
                   [:p (tr [:email-templates :password-reset :body2]) [:strong (str " " (tr [:email-templates :password-reset :link-text]))] (tr [:email-templates :password-reset :body3])]
                   [:br]
 
-                  (blue-border-button (str (environment/base-url)"#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
+                  (blue-border-button (str (environment/base-url) "mmtis/#/reset-password?key=" token "&id=" (:id user)  " ") (tr [:email-templates :password-reset :link-text]))
                   [:br]
                   [:p (tr [:email-templates :password-reset :body4])]
                   [:p (tr [:email-templates :password-reset :body5])]
@@ -385,7 +385,7 @@
                   (html-divider-border "100%")]))
 
 (defn- report-row [operator service report]
-  [[:a {:href (str (environment/base-url) "#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))} (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))]
+  [[:a {:href (str (environment/base-url) "mmtis/#/service/" (get-in report [:transport-operator :id]) "/" (get-in report [:transport-service :id]))} (escape-html (str (get-in report [:transport-operator :name]) ", " (get-in report [:transport-service :name])))]
    (escape-html (str "Paketti " (get-in report [:gtfs-package :id])
                 ", "
                 "Rajapinta " (get-in report [:gtfs-package :external-interface-description-id])
