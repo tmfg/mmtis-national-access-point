@@ -2,7 +2,7 @@
   :dependencies [;; Clojure - Eclipse Public License 1.0
                  [org.clojure/clojure "1.12.5"]
                  ;; ClojureScript (clojure to js) - Eclipse Public License 1.0
-                 [org.clojure/clojurescript "1.10.597"]
+                 [org.clojure/clojurescript "1.12.145"]
 
                  ;; Components - MIT
                  [com.stuartsierra/component "0.3.2"]
