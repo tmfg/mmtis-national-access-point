@@ -146,8 +146,8 @@
                  [net.java.dev.jna/jna "5.14.0"]
 
                  ;; APache Jena
-                 [org.apache.jena/jena-core "4.10.0"]
-                 [org.apache.jena/jena-arq "4.10.0"]
+                 [org.apache.jena/jena-core "6.2.0"]
+                 [org.apache.jena/jena-arq "6.2.0"]
                  ]
   :profiles {:uberjar {:aot :all
 
