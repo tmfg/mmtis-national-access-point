@@ -15,7 +15,7 @@
                  ;; PostgreSQL JDBC driver, connection pool and other libraries - BSD-2-Clause License
                  [org.postgresql/postgresql "42.5.4"]
                  ;; Postgis jdbc driver - LGPL 2.1
-                 [net.postgis/postgis-jdbc "2.1.7.2"
+                 [net.postgis/postgis-jdbc "2.5.1"
                   :exclusions [ch.qos.logback/logback-classic
                                ch.qos.logback/logback-core]]
                  ;; HicariCP jdbc driver - Apache 2.0
