@@ -110,8 +110,8 @@
                  [org.clojure/data.zip "0.1.3"]
 
                  ;; GeoTools - LGPL
-                 [org.geotools/gt-epsg-wkt "20.1"]
-                 [org.geotools/gt-geometry "20.1"]
+                 [org.geotools/gt-epsg-wkt "22.2"]
+                 [org.geotools/gt-geometry "22.2"]
 
                  ;; Data/file formats and file handling
                  ;; JSON - MIT
