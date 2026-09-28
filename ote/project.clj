@@ -129,8 +129,8 @@
                  [amazonica "0.3.121"
                   :exclusions [com.amazonaws/aws-java-sdk
                                com.amazonaws/amazon-kinesis-client]]
-                 [com.amazonaws/aws-java-sdk-core "1.11.312"]
-                 [com.amazonaws/aws-java-sdk-s3 "1.11.312"]
+                 [com.amazonaws/aws-java-sdk-core "1.12.797"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.12.797"]
 
                  ;; Override old guava version from deps - Apache 2.0
                  [com.google.guava/guava "21.0"]
