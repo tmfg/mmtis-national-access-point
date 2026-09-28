@@ -115,7 +115,7 @@
 
                  ;; Data/file formats and file handling
                  ;; JSON - MIT
-                 [cheshire "5.8.0"]
+                 [cheshire "5.13.0"]
                  ;; CSV - Eclipse Public License 1.0
                  [org.clojure/data.csv "0.1.4"]
                  ;; ClojureScript wrapper around JSZip. - MIT
