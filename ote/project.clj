@@ -35,7 +35,7 @@
                  ;; Ring middleware that prevents CSRF attacks - MIT
                  [ring/ring-anti-forgery "1.3.0"]
                  ;; HTTP library wrapping the Apache HttpComponents client - MIT
-                 [clj-http "3.10.0"]
+                 [clj-http "3.13.1"]
                  ;; Support for multipart file upload - Apache 2.0
                  [commons-fileupload/commons-fileupload "1.3.3"]
                  ;; CDDL GPL 2.0
