@@ -58,7 +58,7 @@
       (is (= 1 (count @outbox)))
       (is (= "taxi@example.com" (:to (first @outbox))))
       ;; Email is sent with pricing table data
-      (is (str/includes? (email-content) "10,00")))))
+      (is (str/includes? (email-content) "10.00")))))
 
 (deftest no-email-for-recent-prices
   (testing "No email is sent when taxi service prices are recent (less than one year old)"
