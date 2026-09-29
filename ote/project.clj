@@ -37,7 +37,7 @@
                  ;; HTTP library wrapping the Apache HttpComponents client - MIT
                  [clj-http "3.13.1"]
                  ;; Support for multipart file upload - Apache 2.0
-                 [commons-fileupload/commons-fileupload "1.3.3"]
+                 [commons-fileupload/commons-fileupload "1.6.0"]
                  ;; CDDL GPL 2.0
                  [javax.servlet/javax.servlet-api "4.0.1"]
 
