@@ -1,5 +1,5 @@
 db_url: "jdbc:postgresql://{{vault_db_host}}/napote"
-runtime_secret_id: "/ote/prod/runtime"
+runtime_secret_id: "ote/prod/runtime"
 db_username: "{{vault_db_ote_user}}"
 db_password: "{{vault_db_ote_password}}"
 db_schema: "{{vault_db_ote_schema}}"
