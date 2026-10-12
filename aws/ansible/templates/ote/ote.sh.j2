@@ -1,5 +1,22 @@
 #!/bin/sh
 
+# Retrieve the AWS specific config.edn from Secrets Manager
+RUNTIME_CONFIG=/run/ote/config.edn
+RUNTIME_CONFIG_TMP="${RUNTIME_CONFIG}.$$"
+
+if aws secretsmanager get-secret-value \
+  --region eu-central-1 \
+  --secret-id "{{ runtime_secret_id }}" \
+  --query SecretString \
+  --output text > "$RUNTIME_CONFIG_TMP"
+then
+    chmod 600 "$RUNTIME_CONFIG_TMP" && mv "$RUNTIME_CONFIG_TMP" "$RUNTIME_CONFIG"
+else
+  echo "Could not retrieve OTE runtime configuration; continuing startup" >&2
+fi
+
+rm -f "$RUNTIME_CONFIG_TMP"
+
 cd /opt/ote
 
 # Calculate safe heap memory: min(available_ram - 1GB, 0.8 * available_ram)
