@@ -90,7 +90,6 @@ job('Deploy OTE') {
 
 
         ansiblePlaybookBuilder {
-            additionalParameters('--vault-password-file=~/.vault_pass.txt')
             playbook('aws/ansible/ote.yml')
             inventory {
                 inventoryPath { path('aws/ansible/environments/${ENV}/inventory') }
