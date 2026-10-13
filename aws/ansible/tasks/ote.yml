@@ -69,8 +69,14 @@
 - name: Create OTE app folder
   file: path=/opt/ote state=directory owner=napote group=napote
 
-- name: Create OTE config
-  template: src=templates/ote/config.edn.j2 dest=/opt/ote/config.edn
+- name: Create OTE config symlink
+  file:
+    src: /run/ote/config.edn
+    dest: /opt/ote/config.edn
+    state: link
+    force: true
+    owner: napote
+    group: napote
   tags: configuration
 
 - name: Write OTE startup script
