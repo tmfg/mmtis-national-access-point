@@ -10,7 +10,7 @@
   become: false
   command: >
     aws elbv2 describe-target-groups
-     --names "{{vault_ote_target_group_name}}"
+     --names "{{deploy_target_group_name}}"
   register: target_group
 
 - name: Print target_group
