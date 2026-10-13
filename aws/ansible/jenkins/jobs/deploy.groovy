@@ -118,6 +118,8 @@ job('Deploy OTE') {
             COMMIT_SHA=$(tr -d '\n' < "$ote_build_commit")
             SBOM_FILE="$ote_bom_artifact"
 
+            set +x
+
             CREDS=$(aws sts assume-role --role-arn "$deploy_sbom_upload_role_arn" --role-session-name finap-jenkins-sbom-upload --output json)
             export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
             export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
