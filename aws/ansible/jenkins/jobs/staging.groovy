@@ -10,7 +10,6 @@ job('Daily staging env deploy') {
                     predefinedProp('ENV','staging')
                 }
             }
-            trigger('Cypress-e2e-tests')
         }
     }
 }
