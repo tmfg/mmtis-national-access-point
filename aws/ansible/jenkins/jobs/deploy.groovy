@@ -30,9 +30,24 @@ job('Deploy OTE') {
             export AWS_CONFIG_FILE=/dev/null
             export AWS_SHARED_CREDENTIALS_FILE=/dev/null
 
+            # Jenkins and Secrets Manager use historically varying
+            # names for these environments.
+            case "$ENV" in
+              staging)
+                DEPLOY_SECRET_ENV=dev
+                ;;
+              production)
+                DEPLOY_SECRET_ENV=prod
+                ;;
+              *)
+                echo "Unsupported deployment environment: $ENV" >&2
+                exit 1
+                ;;
+            esac
+
             aws secretsmanager get-secret-value \
               --region eu-central-1 \
-              --secret-id "ote/${ENV}/deploy" \
+              --secret-id "ote/${DEPLOY_SECRET_ENV}/deploy" \
               --query SecretString \
               --output text |
             jq -er '
