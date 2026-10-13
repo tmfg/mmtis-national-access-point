@@ -24,7 +24,39 @@ job('Deploy OTE') {
 
     steps {
 
-        shell('ansible-vault view --vault-password-file=~/.vault_pass.txt aws/ansible/environments/${ENV}/group_vars/all/vault > build.properties')
+        shell('''
+            set -euo pipefail
+
+            export AWS_CONFIG_FILE=/dev/null
+            export AWS_SHARED_CREDENTIALS_FILE=/dev/null
+
+            aws secretsmanager get-secret-value \
+              --region eu-central-1 \
+              --secret-id "ote/${ENV}/deploy" \
+              --query SecretString \
+              --output text |
+            jq -er '
+              if ([
+                .flyway.host,
+                .flyway.username,
+                .flyway.password,
+                .target_group_name,
+                .sbom.role_arn,
+                .sbom.bucket_name,
+                .sbom.object_prefix
+              ] | all(type == "string")) then
+                "deploy_db_host=\\(.flyway.host)\\n" +
+                "deploy_db_flyway_user=\\(.flyway.username)\\n" +
+                "deploy_db_flyway_password=\\(.flyway.password)\\n" +
+                "deploy_target_group_name=\\(.target_group_name)\\n" +
+                "deploy_sbom_upload_role_arn=\\(.sbom.role_arn)\\n" +
+                "deploy_sbom_s3_bucket_name=\\(.sbom.bucket_name)\\n" +
+                "deploy_sbom_uuid=\\(.sbom.object_prefix)"
+              else
+                error("deployment secret has an invalid shape")
+              end
+            ' > build.properties
+        ''')
 
         envInjectBuilder {
             propertiesContent('')
@@ -35,9 +67,9 @@ job('Deploy OTE') {
             goals('flyway:migrate')
             rootPOM('database/pom.xml')
             mavenInstallation('Maven 3.5.0')
-            property('databaseUrl', 'jdbc:postgresql://${vault_db_host}/napote')
-            property('databaseUser', '${vault_db_flyway_user}')
-            property('databasePassword', '${vault_db_flyway_password}')
+            property('databaseUrl', 'jdbc:postgresql://${deploy_db_host}/napote')
+            property('databaseUser', '${deploy_db_flyway_user}')
+            property('databasePassword', '${deploy_db_flyway_password}')
             property('databaseSchema', 'public')
         }
 
@@ -54,6 +86,11 @@ job('Deploy OTE') {
                     secretValue(hudson.util.Secret.fromString('${ote_build_artifact}'))
                     hidden(true)
                 }
+                extraVar {
+                    key('deploy_target_group_name')
+                    secretValue(hudson.util.Secret.fromString('${deploy_target_group_name}'))
+                    hidden(true)
+                }
             }
         }
 
@@ -66,12 +103,12 @@ job('Deploy OTE') {
             COMMIT_SHA=$(tr -d '\n' < "$ote_build_commit")
             SBOM_FILE="$ote_bom_artifact"
 
-            CREDS=$(aws sts assume-role --role-arn "$vault_sbom_upload_role_arn" --role-session-name finap-jenkins-sbom-upload --output json)
+            CREDS=$(aws sts assume-role --role-arn "$deploy_sbom_upload_role_arn" --role-session-name finap-jenkins-sbom-upload --output json)
             export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
             export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
             export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
 
-            aws s3 cp "$SBOM_FILE" "s3://${vault_sbom_s3_bucket_name}/${vault_sbom_uuid}/${COMMIT_SHA}.json"
+            aws s3 cp "$SBOM_FILE" "s3://${deploy_sbom_s3_bucket_name}/${deploy_sbom_uuid}/${COMMIT_SHA}.json"
         ''')
     }
 }
