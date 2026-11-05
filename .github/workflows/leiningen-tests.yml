@@ -1,0 +1,83 @@
+name: Leiningen Tests (Broad Subset, No Config Repo)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: napote
+          POSTGRES_USER: napote
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U napote -d napote"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Set up Leiningen
+        uses: DeLaGuardo/setup-clojure@13.2
+        with:
+          lein: 2.11.2
+
+      - name: Prepare database roles
+        run: |
+          psql -h 127.0.0.1 -U napote -d napote -v ON_ERROR_STOP=1 --pset pager=off -c "DO \$\$ BEGIN CREATE ROLE napotetest LOGIN SUPERUSER CREATEDB; EXCEPTION WHEN duplicate_object THEN ALTER ROLE napotetest WITH LOGIN SUPERUSER CREATEDB; END \$\$;"
+          psql -h 127.0.0.1 -U napote -d napote -v ON_ERROR_STOP=1 --pset pager=off -c "DO \$\$ BEGIN CREATE ROLE ckan LOGIN SUPERUSER CREATEDB; EXCEPTION WHEN duplicate_object THEN ALTER ROLE ckan WITH LOGIN SUPERUSER CREATEDB; END \$\$;"
+
+      - name: Initialize database schema and migrations
+        run: |
+          (cd nap && sed 's/^CREATE SCHEMA topology;$/CREATE SCHEMA IF NOT EXISTS topology;/' ckan-initial-db.sql | psql -h localhost -p 5432 -U napote -v ON_ERROR_STOP=1 --pset pager=off napote)
+          (cd database && ./devdb_migrate.sh)
+
+      - name: Run OTE broad test subset (no config repo required)
+        working-directory: ote
+        run: |
+          lein test \
+            ote.db.migration-file-test \
+            ote.format-test \
+            ote.gtfs.kalkati-to-gtfs-test \
+            ote.gtfs.parse-gtfs-test \
+            ote.integration.export.geojson-test \
+            ote.integration.import.exception-csv-test \
+            ote.integration.import.gtfs-test \
+            ote.integration.import.ytj-test \
+            ote.localization-test \
+            ote.services.admin-test \
+            ote.services.external-test \
+            ote.services.gtfsflexexport-test \
+            ote.services.login-test \
+            ote.services.pre-notice-test \
+            ote.services.rdf-test \
+            ote.services.rdf.serialization-test \
+            ote.services.transport-test \
+            ote.tasks.company-test \
+            ote.tasks.pre-notices-task-test \
+            ote.tasks.taxiui-test \
+            ote.time-test \
+            ote.transit-changes.detection-test-days \
+            ote.transit-changes.detection-test-route-end \
+            ote.transit-changes.detection-test-weeks \
+            ote.transit-changes.detection-tools-test \
+            ote.transit-changes.stop-name-detection-test \
+            ote.util-tests
+
+
