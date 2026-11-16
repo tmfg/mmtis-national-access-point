@@ -702,7 +702,23 @@ You can also draw the operating area or point to the map with drawing tools. You
   :desc-to-add-new-operator-5 "Did you not find the transport operator you were looking for or are you the main user of the organization, company or community you are representing?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Well done! Now you have successfully added a service provider to the NAP service catalog. The next task is to add information about the transport service or services you are providing. If you provide different types of transport services, please, add just a single service first. After that you can add the next one."}
+  :operator-dont-have-any-services "Well done! Now you have successfully added a service provider to the NAP service catalog. The next task is to add information about the transport service or services you are providing. If you provide different types of transport services, please, add just a single service first. After that you can add the next one."
+  :finap-discontinued-pre "The "
+  :finap-discontinued-info1 "Finnish national open transport service catalog "
+  :finap-discontinued-finapfi-link "https://finap.fi/"
+  :finap-discontinued-finapfi-desc "Finap.fi"
+  :finap-discontinued-info2 " will undergo changes after the turn of the year 2026–2027. As part of this transition, login to the current Finap service at "
+  :finap-discontinued-mmtis-link "https://finap.fi/mmtis/#/"
+  :finap-discontinued-mmtis-desc "finap.fi/mmtis/#/"
+  :finap-discontinued-info3 " will be disabled on "
+  :finap-discontinued-date "14 December"
+  :finap-discontinued-info4 ". Publications and API endpoint addresses can be edited as usual until the deadline."
+  :finap-discontinued-info5 "We are preparing for the launch of the "
+  :finap-discontinued-uusiyp "new National Access Point"
+  :finap-discontinued-info6 ", which will be made available at "
+  :finap-discontinued-finapfi2-link "https://finap.fi/"
+  :finap-discontinued-finapfi2-desc "finap.fi"
+  :finap-discontinued-info7 ". Further information about the changes will be provided on that website."}
 
  :organization-page
  {:address-postal "Postal address"

@@ -704,7 +704,23 @@ Voit myös piirtää toimialueen tai toimipisteen kartan piirtotyökalujen avull
   :desc-to-add-new-operator-5 "Etkö löytänyt edustamaasi palveluntuottajaa tai oletko edustamasi organisaation, yrityksen tai yhteisön pääkäyttäjä?"
   :to-add-new-operator "Mikäli lisäät uuden palveluntuottajan, voit tehdä sen "
   :to-add-new-operator-tab " välilehdestä."
-  :operator-dont-have-any-services "Hienoa! Olet nyt lisännyt palveluntuottajan tiedot NAP:iin. Lisää seuraavaksi tiedot tarjoamastasi liikkumispalvelusta tai -palveluista. Mikäli tarjoat useamman tyyppistä liikkumispalvelua, lisää ensin yksi palvelu. Tämän jälkeen voit lisätä seuraavan palvelun."}
+  :operator-dont-have-any-services "Hienoa! Olet nyt lisännyt palveluntuottajan tiedot NAP:iin. Lisää seuraavaksi tiedot tarjoamastasi liikkumispalvelusta tai -palveluista. Mikäli tarjoat useamman tyyppistä liikkumispalvelua, lisää ensin yksi palvelu. Tämän jälkeen voit lisätä seuraavan palvelun."
+  :finap-discontinued-pre ""
+  :finap-discontinued-info1 "Liikkumispalvelukatalogi "
+  :finap-discontinued-finapfi-link "https://finap.fi/"
+  :finap-discontinued-finapfi-desc "Finap.fi"
+  :finap-discontinued-info2 " muuttuu vuodenvaihteen jälkeen 2026–2027. Osana tätä muutosta kirjautuminen nykyiseen Finapiin "
+  :finap-discontinued-mmtis-link "https://finap.fi/mmtis/#/"
+  :finap-discontinued-mmtis-desc "finap.fi/mmtis/#/"
+  :finap-discontinued-info3 " estetään "
+  :finap-discontinued-date "14.12"
+  :finap-discontinued-info4 ". Julkaisuja ja rajapintaosoitteita voi muokata normaalisti määräaikaan asti."
+  :finap-discontinued-info5 "Valmistelemme "
+  :finap-discontinued-uusiyp "uuden kansallisen yhteyspisteen käyttöönottoa"
+  :finap-discontinued-info6 ", joka julkaistaan sivulla "
+  :finap-discontinued-finapfi2-link "https://finap.fi/"
+  :finap-discontinued-finapfi2-desc "finap.fi"
+  :finap-discontinued-info7 ". Lisää tietoa muutoksesta saatte mainitulta sivulta."}
 
  :organization-page
  {:address-postal "Postiosoite"
