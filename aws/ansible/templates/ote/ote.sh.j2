@@ -44,4 +44,4 @@ if [ "$HEAP_SIZE" -lt 512 ]; then
   HEAP_SIZE=512
 fi
 
-exec java -Xmx${HEAP_SIZE}m -jar ote.jar
+exec java -Xmx${HEAP_SIZE}m -XX:-UseBASE64Intrinsics -jar ote.jar
